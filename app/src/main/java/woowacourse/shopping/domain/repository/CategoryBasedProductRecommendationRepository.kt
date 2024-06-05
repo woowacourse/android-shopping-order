@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import android.util.Log
 import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
@@ -13,22 +12,14 @@ class CategoryBasedProductRecommendationRepository(
     private val cartSource: ShoppingCartDataSource,
 ) : ProductsRecommendationRepository {
     override fun recommendedProducts(productId: Long): List<Product> {
-        val latest = productsSource.findById(productId).also {
-            Log.d(TAG, "latest: $it")
-        }
+        val latest = productsSource.findById(productId)
 
-        val allCartItemProductIds: List<Long> = cartSource.loadAllCartItems().map { it.product.id }.also {
-            Log.d(TAG, "allCartItemProductIds: $it")
-        }
+        val allCartItemProductIds: List<Long> = cartSource.loadAllCartItems().map { it.product.id }
 
-        val productsWithCategory: List<ProductData> = productsSource.findByCategory(latest.category).also {
-            Log.d(TAG, "productsWithCategory: $it")
-        }
+        val productsWithCategory: List<ProductData> = productsSource.findByCategory(latest.category)
 
         val filteredProducts = productsWithCategory.filterNot { productData ->
             allCartItemProductIds.contains(productData.id)
-        }.also {
-            Log.d(TAG, "filteredProducts: $it")
         }
 
         val minimumCount = min(filteredProducts.size, 10)
@@ -36,9 +27,7 @@ class CategoryBasedProductRecommendationRepository(
 
         return filteredProducts.map { productData ->
             productData.toDomain()
-        }.subList(0, minimumCount).also {
-            Log.d(TAG, "recommendedProducts: $it")
-        }
+        }.subList(0, minimumCount)
     }
 
     companion object {

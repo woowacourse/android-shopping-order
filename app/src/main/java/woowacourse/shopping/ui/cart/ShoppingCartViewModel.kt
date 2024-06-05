@@ -57,9 +57,7 @@ class ShoppingCartViewModel(
         }.join()
 
         thread {
-            val currentItems = shoppingCartRepository.loadAllCartItems().also {
-                Log.d(TAG, "deleteItem: currentItems: $it")
-            }
+            val currentItems = shoppingCartRepository.loadAllCartItems()
             _cartItems.postValue(currentItems)
         }.join()
 
@@ -93,7 +91,6 @@ class ShoppingCartViewModel(
     }
 
     override fun onRemove(productId: Long) {
-        Log.d(TAG, "onRemove: delete id: $productId")
         _deletedItemId.setValue(productId)
     }
 

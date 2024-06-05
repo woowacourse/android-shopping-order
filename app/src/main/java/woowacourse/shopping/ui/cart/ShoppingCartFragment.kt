@@ -78,7 +78,6 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeDeletedItem() {
         viewModel.deletedItemId.observe(viewLifecycleOwner) { productId ->
-            Log.d("fragment", "$productId")
             viewModel.deleteItem(productId)
         }
     }
