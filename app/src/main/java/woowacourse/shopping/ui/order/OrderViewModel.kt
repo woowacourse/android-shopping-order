@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.order.OrderRemoteRepository
@@ -15,6 +16,7 @@ import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.listener.OnOrderListener
@@ -37,6 +39,9 @@ class OrderViewModel(
     private val _ordersCount = MutableLiveData(orderInformation.ordersCount)
     val ordersCount: LiveData<Int> get() = _ordersCount
 
+    private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
+    val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
+
     override fun createOrder() {
         thread {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@thread
@@ -44,6 +49,9 @@ class OrderViewModel(
             val cartItems: List<CartItem> = cartItemRepository.loadCartItems()
             val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
             orderRepository.order(orderInformation.cartItemIds + cartItemIds)
+            uiHandler.post {
+                _isOrderSuccess.setValue(true)
+            }
         }
     }
 

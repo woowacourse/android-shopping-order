@@ -26,4 +26,5 @@
     <string name="order_recommended_product_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
 
     <string name="order_items_count">주문하기(%d)</string>
+    <string name="order_success">주문이 완료되었습니다.</string>
 </resources>
