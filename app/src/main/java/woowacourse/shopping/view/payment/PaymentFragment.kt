@@ -52,7 +52,10 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeData()
@@ -78,15 +81,18 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
             adapter.submitList(it)
         }
         paymentViewModel.paymentEvent.observe(viewLifecycleOwner) { paymentEvent ->
-            when(paymentEvent){
+            when (paymentEvent) {
                 PaymentEvent.Order.Success -> navigateToProduct()
                 PaymentEvent.SelectCoupon.InvalidCount,
-                PaymentEvent.SelectCoupon.InvalidDate -> requireContext().makeToast(
-                    getString(R.string.invalid_coupon)
-                )
-                PaymentEvent.SelectCoupon.InvalidPrice -> requireContext().makeToast(
-                    getString(R.string.invalid_coupon_date)
-                )
+                PaymentEvent.SelectCoupon.InvalidDate,
+                ->
+                    requireContext().makeToast(
+                        getString(R.string.invalid_coupon),
+                    )
+                PaymentEvent.SelectCoupon.InvalidPrice ->
+                    requireContext().makeToast(
+                        getString(R.string.invalid_coupon_date),
+                    )
                 PaymentEvent.SelectCoupon.Success -> adapter.notifyDataSetChanged()
             }
             adapter.notifyDataSetChanged()
@@ -118,7 +124,7 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable(
                 RecommendFragment.CHECKED_SHOPPING_CART,
-                ShoppingCart::class.java
+                ShoppingCart::class.java,
             )
                 ?: throw ErrorEvent.LoadDataEvent()
         } else {

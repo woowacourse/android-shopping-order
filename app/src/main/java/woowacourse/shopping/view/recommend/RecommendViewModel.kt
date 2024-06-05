@@ -10,10 +10,9 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
 import woowacourse.shopping.domain.model.cart.CartItem
-import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
 import woowacourse.shopping.domain.model.cart.UpdateCartItemType
-import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository

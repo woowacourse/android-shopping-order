@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 
 class RemoteCouponRepositoryImpl(
     private val couponDataSource: CouponDataSource = CouponDataSourceImpl(),
-): CouponRepository {
+) : CouponRepository {
     override suspend fun loadCoupons(): Result<List<Coupon>> {
         return couponDataSource.loadCoupons()
     }

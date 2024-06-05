@@ -37,8 +37,7 @@ class CouponCalculator {
         coupon: Coupon,
         shoppingCart: ShoppingCart,
     ): SelectCouponResult {
-
-        return if (coupon.isPastDate()){
+        return if (coupon.isPastDate()) {
             SelectCouponResult.InValidDate
         } else if (shoppingCart.getTotalPrice() >= coupon.minimumAmount && coupon.minimumAmount != DEFAULT_PRICE) {
             selectCoupon(
@@ -55,16 +54,17 @@ class CouponCalculator {
         coupon: Coupon,
         shoppingCart: ShoppingCart,
     ): SelectCouponResult {
-        if (coupon.isPastDate()){
+        if (coupon.isPastDate()) {
             SelectCouponResult.InValidDate
         }
-        val cartItem = shoppingCart.cartItems.value
-            ?.filter {
-                it.product.cartItemCounter.itemCount > coupon.buyQuantity + coupon.getQuantity
-            }
-            ?.maxByOrNull {
-                it.product.price * it.product.cartItemCounter.itemCount
-            } ?: return SelectCouponResult.InValidCount
+        val cartItem =
+            shoppingCart.cartItems.value
+                ?.filter {
+                    it.product.cartItemCounter.itemCount > coupon.buyQuantity + coupon.getQuantity
+                }
+                ?.maxByOrNull {
+                    it.product.price * it.product.cartItemCounter.itemCount
+                } ?: return SelectCouponResult.InValidCount
         selectCoupon(
             discountPrice = cartItem.product.price,
             coupon = coupon,
@@ -77,7 +77,7 @@ class CouponCalculator {
         shoppingCart: ShoppingCart,
         deliveryCharge: Int,
     ): SelectCouponResult {
-        return if (coupon.isPastDate()){
+        return if (coupon.isPastDate()) {
             SelectCouponResult.InValidDate
         } else if (shoppingCart.getTotalPrice() >= coupon.minimumAmount && coupon.minimumAmount != DEFAULT_PRICE) {
             selectCoupon(
@@ -111,15 +111,14 @@ class CouponCalculator {
         discountPrice: Int,
     ) {
         coupons.value?.forEach {
-            if (it.id == coupon.id){
+            if (it.id == coupon.id) {
                 it.itemSelector.selectItem()
-            }else{
+            } else {
                 it.itemSelector.unSelectItem()
             }
         }
         _discountPrice.value = discountPrice
     }
-
 
     companion object {
         const val DEFAULT_PRICE = 0

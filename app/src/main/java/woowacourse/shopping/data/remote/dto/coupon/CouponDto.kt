@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.dto.coupon
 
-
 import com.google.gson.annotations.SerializedName
 
 data class CouponDto(
@@ -23,5 +22,5 @@ data class CouponDto(
     @SerializedName("expirationDate")
     val expirationDate: String,
     @SerializedName("id")
-    val id: Int
+    val id: Int,
 )

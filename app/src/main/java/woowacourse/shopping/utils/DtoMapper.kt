@@ -61,7 +61,7 @@ object DtoMapper {
             getQuantity = getQuantity,
             minimumAmount = minimumAmount,
             availableTime = availableTimeDto?.toAvailableTime(),
-            itemSelector = ItemSelector()
+            itemSelector = ItemSelector(),
         )
     }
 

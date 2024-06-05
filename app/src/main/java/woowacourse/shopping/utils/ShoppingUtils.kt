@@ -2,7 +2,6 @@ package woowacourse.shopping.utils
 
 import android.content.Context
 import android.widget.Toast
-import woowacourse.shopping.data.remote.dto.coupon.CouponDto
 import woowacourse.shopping.domain.model.coupon.Coupon
 import java.time.LocalDate
 import java.time.LocalTime
@@ -24,7 +23,7 @@ object ShoppingUtils {
         return currentDate.isAfter(dateToCompare)
     }
 
-    fun Coupon.isAvailableTime(): Boolean{
+    fun Coupon.isAvailableTime(): Boolean {
         return this.availableTime?.let {
             val timeFormatter = DateTimeFormatter.ofPattern(AVAILABLE_TIME_FORMAT)
             val start = LocalTime.parse(it.start, timeFormatter)

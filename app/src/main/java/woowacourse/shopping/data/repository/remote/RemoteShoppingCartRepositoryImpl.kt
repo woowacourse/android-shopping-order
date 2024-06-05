@@ -5,9 +5,9 @@ import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.cart.CartItemResult
-import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
 import woowacourse.shopping.domain.model.cart.UpdateCartItemType
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState

@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCouponBinding
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.view.payment.OnclickPayment
 import woowacourse.shopping.view.payment.adapter.viewholder.CouponViewHolder
 
@@ -21,7 +20,10 @@ class CouponAdapter(
         return CouponViewHolder(view, onclickPayment)
     }
 
-    override fun onBindViewHolder(holder: CouponViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CouponViewHolder,
+        position: Int,
+    ) {
         val item = getItem(position)
         holder.bind(item)
     }

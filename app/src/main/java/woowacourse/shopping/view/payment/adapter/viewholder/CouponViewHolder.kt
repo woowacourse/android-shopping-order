@@ -14,10 +14,11 @@ class CouponViewHolder(
         binding.coupon = coupon
         binding.onClickPayment = onClickPayment
         if (coupon.minimumAmount != 0) {
-            binding.minimumAmount.text = binding.root.context.getString(
-                R.string.coupon_min_price,
-                coupon.minimumAmount
-            )
+            binding.minimumAmount.text =
+                binding.root.context.getString(
+                    R.string.coupon_min_price,
+                    coupon.minimumAmount,
+                )
         }
     }
 }

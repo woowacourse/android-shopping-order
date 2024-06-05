@@ -20,7 +20,6 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ) : BaseViewModel(), OnclickPayment {
-
     private var shoppingCart = ShoppingCart()
     val couponCalculator = CouponCalculator()
 
@@ -44,15 +43,16 @@ class PaymentViewModel(
                 }
         }
 
-    fun loadCoupons() = viewModelScope.launch {
-        couponRepository.loadCoupons()
-            .onSuccess {
-                couponCalculator.loadCoupons(it)
-            }
-            .onFailure {
-                handleException(ErrorEvent.LoadDataEvent())
-            }
-    }
+    fun loadCoupons() =
+        viewModelScope.launch {
+            couponRepository.loadCoupons()
+                .onSuccess {
+                    couponCalculator.loadCoupons(it)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     fun saveCheckedShoppingCarts(shoppingCart: ShoppingCart) {
         this.shoppingCart = shoppingCart
@@ -60,12 +60,13 @@ class PaymentViewModel(
     }
 
     override fun clickCoupon(coupon: Coupon) {
-        val selectCouponResult = couponCalculator.selectCoupon(
-            coupon = coupon,
-            shoppingCart = shoppingCart,
-            deliveryCharge = deliveryCharge,
-        )
-        when(selectCouponResult){
+        val selectCouponResult =
+            couponCalculator.selectCoupon(
+                coupon = coupon,
+                shoppingCart = shoppingCart,
+                deliveryCharge = deliveryCharge,
+            )
+        when (selectCouponResult) {
             SelectCouponResult.InValidCount -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.InvalidCount)
             SelectCouponResult.InValidDate -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.InvalidDate)
             SelectCouponResult.InValidPrice -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.InvalidPrice)
@@ -73,9 +74,7 @@ class PaymentViewModel(
         }
     }
 
-
     override fun clickPayment() {
         orderItems()
     }
-
 }

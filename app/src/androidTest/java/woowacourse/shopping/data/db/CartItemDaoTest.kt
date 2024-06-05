@@ -3,6 +3,7 @@ package woowacourse.shopping.data.db
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -19,10 +20,11 @@ import kotlin.concurrent.thread
 class CartItemDaoTest {
     private lateinit var database: CartItemDatabase
     private lateinit var dao: CartItemDao
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        context = ApplicationProvider.getApplicationContext<Context>()
         database = CartItemDatabase.getInstance(context)
         dao = database.cartItemDao()
         thread {
@@ -38,17 +40,17 @@ class CartItemDaoTest {
     }
 
     @Test
-    fun `선택한_아이템을_장바구니에_저장할_수_있다`() {
-        val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
-        thread {
-            dao.saveCartItem(item)
-        }.join()
+    fun `선택한_아이템을_장바구니에_저장할_수_있다`() =
+        runTest {
+            val item = CartItemEntity(0, Product(0, "상품", 1000, "", ""))
 
-        val actual = dao.findAll().firstOrNull()?.product
-        val expected = item.product
-        assertThat(actual).isNotNull()
-        assertThat(actual?.id).isEqualTo(expected.id)
-    }
+            dao.saveCartItem(item)
+            val actual = dao.findAll().firstOrNull()?.product
+
+            val expected = item.product
+            assertThat(actual).isNotNull()
+            assertThat(actual?.id).isEqualTo(expected.id)
+        }
 
     @Test
     fun `특정_ID로_장바구니_아이템을_불러올_수_있다`() {

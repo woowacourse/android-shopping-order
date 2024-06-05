@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.model.product
 
-import woowacourse.shopping.domain.model.selector.ItemSelector
 import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.selector.ItemSelector
 
 data class Product(
     val id: Long,

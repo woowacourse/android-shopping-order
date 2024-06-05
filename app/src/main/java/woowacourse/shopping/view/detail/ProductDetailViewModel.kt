@@ -7,10 +7,10 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.cart.CartItemCounter
 import woowacourse.shopping.domain.model.cart.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
+import woowacourse.shopping.domain.model.cart.UpdateCartItemType
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.product.Product.Companion.DEFAULT_PRODUCT_ID
 import woowacourse.shopping.domain.model.product.RecentlyProduct
-import woowacourse.shopping.domain.model.cart.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository

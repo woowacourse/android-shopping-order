@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.model.cart
 
-import woowacourse.shopping.domain.model.selector.ItemSelector
 import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.selector.ItemSelector
 
 data class CartItem(
     val id: Long = DEFAULT_CART_ITEM_ID,
