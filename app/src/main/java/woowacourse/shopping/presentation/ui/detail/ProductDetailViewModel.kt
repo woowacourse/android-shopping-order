@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
@@ -15,7 +17,6 @@ import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val repository: Repository,
@@ -38,13 +39,13 @@ class ProductDetailViewModel(
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
     fun setCartProduct(cartProduct: CartProduct) =
-        thread {
+        viewModelScope.launch {
             saveRecentProduct(cartProduct)
             _cartProduct.postValue(UiState.Success(DetailCartProduct.fromCartProduct(cartProduct)))
         }
 
     fun findOneRecentProduct() =
-        thread {
+        viewModelScope.launch {
             repository.findOneRecent().onSuccess {
                 if (it == null) {
                     _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
@@ -56,8 +57,8 @@ class ProductDetailViewModel(
             }
         }
 
-    override fun onAddToCart(detailCartProduct: DetailCartProduct) {
-        thread {
+    override fun onAddToCart(detailCartProduct: DetailCartProduct) =
+        viewModelScope.launch {
             when (detailCartProduct.isNew) {
                 true -> {
                     repository.postCartItem(CartItemRequestDto.fromCartProduct(detailCartProduct.cartProduct))
@@ -90,14 +91,13 @@ class ProductDetailViewModel(
             )
             _cartHandler.postValue(EventState(updateUiModel))
         }
-    }
 
     override fun onNavigateToDetail(recentProduct: RecentProduct) {
         _navigateHandler.value = EventState(recentProduct.toCartProduct())
     }
 
-    override fun onPlus(cartProduct: CartProduct) {
-        thread {
+    override fun onPlus(cartProduct: CartProduct) =
+        viewModelScope.launch {
             cartProduct.plusQuantity()
             _cartProduct.postValue(
                 UiState.Success(
@@ -105,10 +105,9 @@ class ProductDetailViewModel(
                 ),
             )
         }
-    }
 
-    override fun onMinus(cartProduct: CartProduct) {
-        thread {
+    override fun onMinus(cartProduct: CartProduct) =
+        viewModelScope.launch {
             cartProduct.minusQuantity()
             _cartProduct.postValue(
                 UiState.Success(
@@ -116,13 +115,11 @@ class ProductDetailViewModel(
                 ),
             )
         }
-    }
 
-    override fun saveRecentProduct(cartProduct: CartProduct) {
-        thread {
+    override fun saveRecentProduct(cartProduct: CartProduct) =
+        viewModelScope.launch {
             repository.saveRecentProduct(cartProduct.toRecentProduct()).onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }
-    }
 }

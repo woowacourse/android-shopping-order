@@ -11,33 +11,33 @@ import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
 import woowacourse.shopping.data.remote.dto.response.QuantityResponseDto
 
 interface RemoteDataSource {
-    fun getProducts(
+    suspend fun getProducts(
         category: String? = null,
         page: Int = 0,
         size: Int = 20,
     ): Response<ProductResponseDto>
 
-    fun postProduct(productRequestDto: ProductRequestDto): Response<Unit>
+    suspend fun postProduct(productRequestDto: ProductRequestDto): Response<Unit>
 
-    fun getProductById(id: Int): Response<Product>
+    suspend fun getProductById(id: Int): Response<Product>
 
-    fun deleteProductById(id: Int): Response<Unit>
+    suspend fun deleteProductById(id: Int): Response<Unit>
 
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int = 0,
         size: Int = 20,
     ): Response<CartResponseDto>
 
-    fun postCartItem(cartItemRequestDto: CartItemRequestDto): Response<Unit>
+    suspend fun postCartItem(cartItemRequestDto: CartItemRequestDto): Response<Unit>
 
-    fun deleteCartItem(id: Int): Response<Unit>
+    suspend fun deleteCartItem(id: Int): Response<Unit>
 
-    fun patchCartItem(
+    suspend fun patchCartItem(
         id: Int,
         quantityRequestDto: QuantityRequestDto,
     ): Response<Unit>
 
-    fun getCartItemsCounts(): Response<QuantityResponseDto>
+    suspend fun getCartItemsCounts(): Response<QuantityResponseDto>
 
-    fun postOrders(orderRequestDto: OrderRequestDto): Response<Unit>
+    suspend fun postOrders(orderRequestDto: OrderRequestDto): Response<Unit>
 }

@@ -1,5 +1,5 @@
 package woowacourse.shopping.data.remote.service
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -13,28 +13,28 @@ import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
 
 interface ProductApi {
     @GET("/products")
-    fun getProducts(
+    suspend fun getProducts(
         @Header("accept") accept: String = "*/*",
         @Query("category") category: String? = null,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 1,
-    ): Call<ProductResponseDto>
+    ): Response<ProductResponseDto>
 
     @POST("/products")
-    fun postProduct(
+    suspend fun postProduct(
         @Header("accept") accept: String = "*/*",
         @Body productRequestDto: ProductRequestDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @GET("/products/{id}")
-    fun getProductById(
+    suspend fun getProductById(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
-    ): Call<Product>
+    ): Response<Product>
 
     @DELETE("/products/{id}")
-    fun deleteProductById(
+    suspend fun deleteProductById(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
-    ): Call<Unit>
+    ): Response<Unit>
 }

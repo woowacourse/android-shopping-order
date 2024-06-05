@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.ui.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.domain.CartProduct
@@ -13,7 +15,6 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
-import kotlin.concurrent.thread
 
 class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
     private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
@@ -32,7 +33,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     val isAllChecked: LiveData<Boolean> get() = _isAllChecked
 
     fun findCartByOffset() =
-        thread {
+        viewModelScope.launch {
             repository.getCartItems(0, 1000).onSuccess {
                 _carts.postValue(
                     UiState.Success(
@@ -48,8 +49,8 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             }
         }
 
-    override fun onDelete(cartProductUiModel: CartProductUiModel) {
-        thread {
+    override fun onDelete(cartProductUiModel: CartProductUiModel) =
+        viewModelScope.launch {
             updateUiModel.add(
                 cartProductUiModel.cartProduct.productId,
                 cartProductUiModel.cartProduct.copy(quantity = 0),
@@ -64,12 +65,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 _errorHandler.postValue(EventState(ErrorType.ERROR_CART_DELETE))
             }
         }
-    }
 
-    fun postCheckedItems() {
-        val checkedIds = getCheckedIds()
+    fun postCheckedItems() =
+        viewModelScope.launch {
+            val checkedIds = getCheckedIds()
 
-        thread {
             repository.postOrders(
                 OrderRequestDto(
                     checkedIds,
@@ -94,7 +94,6 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
             }
         }
-    }
 
     private fun getCheckedIds(): List<Int> {
         return (_carts.value as UiState.Success).data.filter { it.isChecked }
@@ -138,8 +137,8 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         _isAllChecked.value = !selectAll
     }
 
-    override fun onPlus(cartProduct: CartProduct) {
-        thread {
+    override fun onPlus(cartProduct: CartProduct) =
+        viewModelScope.launch {
             val cartProducts =
                 (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
             val index =
@@ -159,11 +158,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                     _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                 }
         }
-    }
 
-    override fun onMinus(cartProduct: CartProduct) {
-        if (cartProduct.quantity == 1) return
-        thread {
+    override fun onMinus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            if (cartProduct.quantity == 1) return@launch
+
             val cartProducts =
                 (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
             val index =
@@ -182,5 +181,4 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                     _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                 }
         }
-    }
 }

@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.ui.cart
 
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -12,12 +12,12 @@ import woowacourse.shopping.cartProduct
 import woowacourse.shopping.cartProducts
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.getOrAwaitValue
+import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
-@ExtendWith(InstantTaskExecutorExtension::class)
-@ExtendWith(MockKExtension::class)
+@ExtendWith(InstantTaskExecutorExtension::class, CoroutinesTestExtension::class, MockKExtension::class)
 class CartEntityViewModelTest {
     @MockK
     private lateinit var productCartRepository: Repository
@@ -27,7 +27,7 @@ class CartEntityViewModelTest {
 
     @Test
     fun `카트 아이템을 pageCount개씩 불러온다`() {
-        every { productCartRepository.getCartItems(any(), any()) } returns
+        coEvery { productCartRepository.getCartItems(any(), any()) } returns
             Result.success(
                 cartProducts,
             )
@@ -45,7 +45,7 @@ class CartEntityViewModelTest {
 
     @Test
     fun `카트 아이템을 불러오기 실패하면 Error 상태로 변화한다`() {
-        every { productCartRepository.getCartItems(any(), any()) } returns Result.failure(Throwable())
+        coEvery { productCartRepository.getCartItems(any(), any()) } returns Result.failure(Throwable())
         viewModel.findCartByOffset()
         Thread.sleep(1000)
         assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(
@@ -55,7 +55,7 @@ class CartEntityViewModelTest {
 
     @Test
     fun `데이터 삭제에 실패하면 Error 상태로 변화한다`() {
-        every { productCartRepository.deleteCartItem(any()) } returns Result.failure(Throwable())
+        coEvery { productCartRepository.deleteCartItem(any()) } returns Result.failure(Throwable())
         viewModel.onDelete(
             CartProductUiModel(
                 cartProduct = cartProduct,

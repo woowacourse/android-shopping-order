@@ -5,6 +5,6 @@ fun <T : Any> LoadResult.Page<T>.mergeWith(other: LoadResult.Page<T>): LoadResul
     return LoadResult.Page(
         offset = other.offset,
         last = other.last,
-        data = mergedData
+        data = mergedData,
     )
 }

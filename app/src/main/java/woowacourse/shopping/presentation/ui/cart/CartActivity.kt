@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
@@ -18,7 +21,6 @@ import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
-import kotlin.concurrent.thread
 
 class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
@@ -72,12 +74,10 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
-                    thread {
-                        Thread.sleep(500)
-                        runOnUiThread {
-                            binding.layoutShimmer.isVisible = false
-                            cartAdapter.submitList(it.data)
-                        }
+                    lifecycleScope.launch {
+                        delay(500)
+                        binding.layoutShimmer.isVisible = false
+                        cartAdapter.submitList(it.data)
                     }
                 }
             }

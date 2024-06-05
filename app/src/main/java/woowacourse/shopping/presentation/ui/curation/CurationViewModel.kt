@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.ui.curation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
@@ -11,7 +13,6 @@ import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
-import kotlin.concurrent.thread
 
 class CurationViewModel(
     private val repository: Repository,
@@ -26,7 +27,7 @@ class CurationViewModel(
     val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
 
     init {
-        thread {
+        viewModelScope.launch {
             repository.getCuration().onSuccess {
                 _cartProducts.postValue(UiState.Success(it))
             }.onFailure {
@@ -35,8 +36,8 @@ class CurationViewModel(
         }
     }
 
-    override fun order() {
-        thread {
+    override fun order() =
+        viewModelScope.launch {
             val orderCartIds = getOrderCartIds()
             repository.postOrders(
                 OrderRequestDto(
@@ -44,7 +45,7 @@ class CurationViewModel(
                 ),
             ).onSuccess {
                 val cartProducts =
-                    (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+                    (this@CurationViewModel.cartProducts.value as UiState.Success).data.map { it.copy() }
 
                 orderCartIds.forEach { id ->
                     cartProducts.find { it.cartId == id.toLong() }?.quantity = 0
@@ -55,7 +56,6 @@ class CurationViewModel(
                 _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
             }
         }
-    }
 
     override fun onProductClick(cartProduct: CartProduct) {
     }
@@ -67,8 +67,8 @@ class CurationViewModel(
             it.cartId.toInt()
         }
 
-    override fun onPlus(cartProduct: CartProduct) {
-        thread {
+    override fun onPlus(cartProduct: CartProduct) =
+        viewModelScope.launch {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].plusQuantity()
@@ -100,10 +100,9 @@ class CurationViewModel(
                     }
             }
         }
-    }
 
-    override fun onMinus(cartProduct: CartProduct) {
-        thread {
+    override fun onMinus(cartProduct: CartProduct) =
+        viewModelScope.launch {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].minusQuantity()
@@ -127,7 +126,6 @@ class CurationViewModel(
                 }
             }
         }
-    }
 
     companion object {
         const val FIRST_UPDATE = 1

@@ -6,7 +6,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
@@ -21,7 +24,6 @@ import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 import woowacourse.shopping.utils.getParcelableExtraCompat
-import kotlin.concurrent.thread
 
 class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
@@ -69,12 +71,10 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
-                    thread {
-                        Thread.sleep(500) // Skeleton ui display time
-                        runOnUiThread {
-                            binding.layoutShimmer.isVisible = false
-                            shoppingAdapter.submitList(it.data)
-                        }
+                    lifecycleScope.launch {
+                        delay(500) // Skeleton ui display time
+                        binding.layoutShimmer.isVisible = false
+                        shoppingAdapter.submitList(it.data)
                     }
                 }
             }

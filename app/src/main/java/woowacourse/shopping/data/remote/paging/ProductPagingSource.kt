@@ -7,7 +7,10 @@ import woowacourse.shopping.domain.CartProduct
 class ProductPagingSource(
     private val remoteDataSource: RemoteDataSource,
 ) {
-    fun load(defaultOffset: Int = 0, defaultPageSize: Int = 20): LoadResult<CartProduct> {
+    suspend fun load(
+        defaultOffset: Int = 0,
+        defaultPageSize: Int = 20,
+    ): LoadResult<CartProduct> {
         val response = remoteDataSource.getProducts(page = defaultOffset, size = defaultPageSize)
 
         if (!response.isSuccessful) {

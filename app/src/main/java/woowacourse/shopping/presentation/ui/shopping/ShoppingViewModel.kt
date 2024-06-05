@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
@@ -18,7 +20,6 @@ import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
-import kotlin.concurrent.thread
 
 class ShoppingViewModel(private val repository: Repository) :
     ViewModel(), ShoppingActionHandler {
@@ -72,10 +73,8 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     fun loadProductsByOffset() =
-        thread {
-
-            val offset = if(_products.value is UiState.Success) (_products.value as UiState.Success).data.offset + 1 else 0
-
+        viewModelScope.launch {
+            val offset = if (_products.value is UiState.Success) (_products.value as UiState.Success).data.offset + 1 else 0
             repository.getProductsByPaging(offset, DEFAULT_PAGE_SIZE).onSuccess {
                 if (_products.value is UiState.Loading) {
                     _products.postValue(UiState.Success(it))
@@ -90,7 +89,7 @@ class ShoppingViewModel(private val repository: Repository) :
         }
 
     fun loadAllCart() =
-        thread {
+        viewModelScope.launch {
             repository.getCartItems(0, 5000).onSuccess {
                 _carts.postValue(UiState.Success(it))
             }.onFailure {
@@ -99,7 +98,7 @@ class ShoppingViewModel(private val repository: Repository) :
         }
 
     fun getCartItemCounts() =
-        thread {
+        viewModelScope.launch {
             repository.getCartItemsCounts().onSuccess { maxCount ->
                 _cartCount.postValue(maxCount)
             }.onFailure {
@@ -128,9 +127,9 @@ class ShoppingViewModel(private val repository: Repository) :
         loadProductsByOffset()
     }
 
-    override fun onPlus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+    override fun onPlus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val cartProducts = (this@ShoppingViewModel.cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
 
             cartProducts[index].plusQuantity()
@@ -140,7 +139,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         saveRecentProduct(cartProducts[index])
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -153,7 +152,7 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         saveRecentProduct(cartProducts[index])
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -161,11 +160,10 @@ class ShoppingViewModel(private val repository: Repository) :
                     }
             }
         }
-    }
 
-    override fun onMinus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+    override fun onMinus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val cartProducts = (this@ShoppingViewModel.cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].minusQuantity()
 
@@ -175,7 +173,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                         saveRecentProduct(cartProducts[index])
                         _cartCount.postValue(_cartCount.value?.minus(1))
                     }
@@ -184,7 +182,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     }
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
-                    this.cartProducts.postValue(UiState.Success(cartProducts))
+                    this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                     saveRecentProduct(cartProducts[index])
                     _cartCount.postValue(_cartCount.value?.minus(1))
                 }.onFailure {
@@ -192,7 +190,6 @@ class ShoppingViewModel(private val repository: Repository) :
                 }
             }
         }
-    }
 
     fun updateCartProducts(updateUiModel: UpdateUiModel) {
         val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
@@ -203,23 +200,21 @@ class ShoppingViewModel(private val repository: Repository) :
         this.cartProducts.value = UiState.Success(cartProducts)
     }
 
-    fun findAllRecent() {
-        thread {
+    fun findAllRecent() =
+        viewModelScope.launch {
             repository.findByLimit(10).onSuccess {
                 _recentProducts.postValue(UiState.Success(it))
             }.onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_LOAD))
             }
         }
-    }
 
-    override fun saveRecentProduct(cartProduct: CartProduct) {
-        thread {
+    override fun saveRecentProduct(cartProduct: CartProduct) =
+        viewModelScope.launch {
             repository.saveRecentProduct(cartProduct.toRecentProduct()).onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }
-    }
 
     companion object {
         const val FIRST_UPDATE = 1

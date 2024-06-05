@@ -21,7 +21,7 @@ class RepositoryImpl(
 ) : Repository {
     private val productPagingSource = ProductPagingSource(remoteDataSource)
 
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String,
         page: Int,
         size: Int,
@@ -34,7 +34,10 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun getProductsByPaging(offset: Int, pageSize: Int): Result<LoadResult.Page<CartProduct>> {
+    override suspend fun getProductsByPaging(
+        offset: Int,
+        pageSize: Int,
+    ): Result<LoadResult.Page<CartProduct>> {
         return when (val data = productPagingSource.load(defaultOffset = offset, defaultPageSize = pageSize)) {
             is LoadResult.Page -> {
                 Result.success(data)
@@ -45,7 +48,7 @@ class RepositoryImpl(
         }
     }
 
-    override fun getCartItems(
+    override suspend fun getCartItems(
         page: Int,
         size: Int,
     ): Result<List<CartProduct>> =
@@ -57,7 +60,7 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun getProductById(id: Int): Result<CartProduct?> =
+    override suspend fun getProductById(id: Int): Result<CartProduct?> =
         runCatching {
             val response = remoteDataSource.getProductById(id = id)
             if (response.isSuccessful) {
@@ -66,7 +69,7 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> =
+    override suspend fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> =
         runCatching {
             val response = remoteDataSource.postCartItem(cartItemRequestDto)
             if (response.isSuccessful) {
@@ -77,7 +80,7 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun patchCartItem(
+    override suspend fun patchCartItem(
         id: Int,
         quantityRequestDto: QuantityRequestDto,
     ): Result<Unit> =
@@ -89,7 +92,7 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun deleteCartItem(id: Int): Result<Unit> =
+    override suspend fun deleteCartItem(id: Int): Result<Unit> =
         runCatching {
             val response = remoteDataSource.deleteCartItem(id)
             if (response.isSuccessful) {
@@ -98,7 +101,7 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> =
+    override suspend fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> =
         runCatching {
             val response = remoteDataSource.postOrders(orderRequestDto)
             if (response.isSuccessful) {
@@ -107,22 +110,22 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun findByLimit(limit: Int): Result<List<RecentProduct>> =
+    override suspend fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
             localDataSource.findByLimit(limit).map { it.toDomain() }
         }
 
-    override fun findOneRecent(): Result<RecentProduct?> =
+    override suspend fun findOneRecent(): Result<RecentProduct?> =
         runCatching {
             localDataSource.findOne()?.toDomain()
         }
 
-    override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
+    override suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
         runCatching {
             localDataSource.saveRecentProduct(recentProduct.toEntity())
         }
 
-    override fun getCartItemsCounts(): Result<Int> =
+    override suspend fun getCartItemsCounts(): Result<Int> =
         runCatching {
             val response = remoteDataSource.getCartItemsCounts()
             if (response.isSuccessful) {
@@ -131,7 +134,7 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override fun getCuration(): Result<List<CartProduct>> {
+    override suspend fun getCuration(): Result<List<CartProduct>> {
         localDataSource.findOne()?.toDomain()?.let {
             val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
             val cartResponse = remoteDataSource.getCartItems(0, 1000)
