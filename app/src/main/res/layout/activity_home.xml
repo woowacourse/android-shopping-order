@@ -7,14 +7,14 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.home.viewmodel.HomeViewModel" />
+            type="woowacourse.shopping.ui.home.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_shopping"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.home.HomeActivity">
+        tools:context=".ui.home.HomeActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbar_main"

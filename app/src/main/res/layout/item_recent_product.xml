@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.home.viewmodel.HomeViewModel" />
+            type="woowacourse.shopping.ui.home.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

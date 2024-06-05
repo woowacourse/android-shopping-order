@@ -7,12 +7,12 @@
 
         <variable
             name="productViewItem"
-            type="woowacourse.shopping.view.home.adapter.product.HomeViewItem.ProductViewItem" />
+            type="woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem" />
 
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.home.viewmodel.HomeViewModel" />
+            type="woowacourse.shopping.ui.home.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -18,16 +18,16 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".view.order.OrderActivity"
+            android:name=".ui.order.OrderActivity"
             android:exported="false"
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".view.detail.DetailActivity"
+            android:name=".ui.detail.DetailActivity"
             android:exported="false"
             android:label=""
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".view.home.HomeActivity"
+            android:name=".ui.home.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

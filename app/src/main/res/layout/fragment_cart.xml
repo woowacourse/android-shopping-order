@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UiState" />
+        <import type="woowacourse.shopping.ui.state.UiState" />
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
+            type="woowacourse.shopping.ui.order.viewmodel.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
