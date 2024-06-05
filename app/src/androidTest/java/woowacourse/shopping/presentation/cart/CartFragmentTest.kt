@@ -20,10 +20,12 @@ import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.data.cart.FakeCartRepository
+import woowacourse.shopping.data.cart.FakeProductRepository
+import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.domain.entity.Cart
-import woowacourse.shopping.domain.entity.Product
-import woowacourse.shopping.fixtures.fakeProduct
-import woowacourse.shopping.fixtures.fakeProducts
+import woowacourse.shopping.domain.entity.CartProduct
+import woowacourse.shopping.fixtures.fakeCartProduct
+import woowacourse.shopping.fixtures.fakeCartProducts
 import woowacourse.shopping.util.matchDescendantSoftly
 import woowacourse.shopping.util.performClickHolderAt
 import woowacourse.shopping.util.performScrollToHolder
@@ -52,7 +54,7 @@ class CartFragmentTest {
     @DisplayName("상품이 있으면, 비어있는 문구가 안보인다")
     fun display_test() {
         // given
-        startScenarioWith(fakeProduct())
+        startScenarioWith(fakeCartProduct(productId = 1))
         val emptyText = testApplicationContext.getString(R.string.cart_empty)
         // when & then
         onView(withText(containsString(emptyText)))
@@ -63,7 +65,7 @@ class CartFragmentTest {
     @DisplayName("상품이 수량이 1개일 때, 증가 시키면 2개가 된다")
     fun increase_count_test() {
         // given
-        startScenarioWith(fakeProduct())
+        startScenarioWith(fakeCartProduct(productId = 2,count = 1))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -77,7 +79,7 @@ class CartFragmentTest {
     @DisplayName("상품이 1000원이고 수량이 1개일 때, 증가 시키면 총 가격이 2000가 된다")
     fun increase_count_price_test2() {
         // given
-        startScenarioWith(fakeProduct())
+        startScenarioWith(fakeCartProduct(productId = 3, count = 1, price = 1000))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -91,7 +93,7 @@ class CartFragmentTest {
     @DisplayName("상품의 수량이 1개일 때, 감소 시키면 1개이다.")
     fun decrease_count_test() {
         // given
-        startScenarioWith(fakeProduct())
+        startScenarioWith(fakeCartProduct(productId = 4,count = 1))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -104,13 +106,13 @@ class CartFragmentTest {
     @DisplayName("상품의 수량이 3개일 때, 감소 시키면 2개이다.")
     fun decrease_count_test2() {
         // given
-        startScenarioWith(fakeProduct(), fakeProduct(), fakeProduct())
+        startScenarioWith(fakeCartProduct(productId = 5, count = 3))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
             R.id.btn_decrease_product,
         )
-        Thread.sleep(100)
+        Thread.sleep(3000)
         onView(withId(R.id.rv_shopping_cart)).check(matchDescendantSoftly("2"))
     }
 
@@ -118,7 +120,7 @@ class CartFragmentTest {
     @DisplayName("상품이 1000원이고 수량이 3개일 때, 감소 시키면 총 가격이 2000가 된다")
     fun decrease_count_price_test2() {
         // given
-        startScenarioWith(fakeProduct())
+        startScenarioWith(fakeCartProduct(productId = 6,count = 3, price = 1000))
         // when & then
         onView(withId(R.id.rv_shopping_cart)).performClickHolderAt<CartAdapter.CartViewHolder>(
             0,
@@ -133,7 +135,7 @@ class CartFragmentTest {
     fun next_page_disabled_test() {
         // given
         val totalProductCount = 5
-        startScenarioWith(fakeProducts(totalProductCount))
+        startScenarioWith(fakeCartProducts(totalProductCount))
         // when & then
         onView(withId(R.id.tv_plus_page))
             .check(matches(isNotEnabled()))
@@ -144,7 +146,7 @@ class CartFragmentTest {
     fun next_page_enabled_test() {
         // given
         val totalProductCount = 6
-        startScenarioWith(fakeProducts(totalProductCount))
+        startScenarioWith(fakeCartProducts(totalProductCount))
         // when & then
         onView(withId(R.id.tv_plus_page))
             .check(matches(isEnabled()))
@@ -154,7 +156,7 @@ class CartFragmentTest {
     @DisplayName("현재 페이지가 1이고 장바구니에 상품이 6개 있을 때, 다음 페이지 버튼을 누르면, 1개의 상품이 보인다")
     fun move_next_page_test() {
         // given
-        startScenarioWith(fakeProducts(6))
+        startScenarioWith(fakeCartProducts(6))
         // when
         onView(withId(R.id.tv_plus_page))
             .perform(ViewActions.click())
@@ -171,13 +173,13 @@ class CartFragmentTest {
     @Test
     @DisplayName(
         "현재 페이지가 1이고 장바구니에 상품이 총 6개 있을 때, 3번째 상품을 삭제 하면 " +
-            "5 개의 상품이 현재 페이지에 보인다",
+                "5 개의 상품이 현재 페이지에 보인다",
     )
     fun delete_test1() {
         // given
         val deletePosition = 2
         val totalProductCount = 6
-        startScenarioWith(fakeProducts(totalProductCount))
+        startScenarioWith(fakeCartProducts(totalProductCount))
         // when
         onView(withId(R.id.rv_shopping_cart)).performScrollToHolder<CartAdapter.CartViewHolder>(
             deletePosition,
@@ -194,14 +196,14 @@ class CartFragmentTest {
     @Test
     @DisplayName(
         "현재 페이지가 1이고 장바구니에 상품이 총 6개 있을 때, 3번째 상품을 삭제 하면 " +
-            "5번째 위치에 6 번째 상품이 현재 페이지에 보인다",
+                "5번째 위치에 6 번째 상품이 현재 페이지에 보인다",
     )
     fun delete_test2() {
         // given
         val deletePosition = 2
         val addedPosition = 4
         val totalProductCount = 6
-        startScenarioWith(fakeProducts(totalProductCount))
+        startScenarioWith(fakeCartProducts(totalProductCount))
         // when
         onView(withId(R.id.rv_shopping_cart)).performScrollToHolder<CartAdapter.CartViewHolder>(
             deletePosition,
@@ -224,13 +226,13 @@ class CartFragmentTest {
     @Test
     @DisplayName(
         "현재 페이지가 1이고 장바구니에 상품이 5개 있을 때, 3번째 상품을 삭제 하면 " +
-            "4개가 보인다",
+                "4개가 보인다",
     )
     fun delete_test3() {
         // given
         val deletePosition = 2
         val totalProductCount = 5
-        startScenarioWith(fakeProducts(totalProductCount))
+        startScenarioWith(fakeCartProducts(totalProductCount))
         // when
         onView(withId(R.id.rv_shopping_cart)).performScrollToHolder<CartAdapter.CartViewHolder>(
             deletePosition,
@@ -244,15 +246,21 @@ class CartFragmentTest {
         onView(withId(R.id.rv_shopping_cart)).check(withItemCount(expectCount))
     }
 
-    private fun startScenarioWith(vararg products: Product = emptyArray()) {
-        val fakeCartRepository = FakeCartRepository(Cart(products.toList()))
+    private fun startScenarioWith(vararg cartProducts: CartProduct = emptyArray()) {
+        val products = cartProducts.map { it.product }
+        val fakeCartRepository = FakeCartRepository(Cart(cartProducts.toList()))
+        val fakeProductRepository = FakeProductRepository(products)
         CartRepositoryInjector.setCartRepository(fakeCartRepository)
+        ProductRepositoryInjector.setProductRepository(fakeProductRepository)
         launchFragmentInContainer<CartFragment>()
     }
 
-    private fun startScenarioWith(products: List<Product>) {
-        val fakeCartRepository = FakeCartRepository(Cart(products))
+    private fun startScenarioWith(cartProducts: List<CartProduct>) {
+        val products = cartProducts.map { it.product }
+        val fakeCartRepository = FakeCartRepository(Cart(cartProducts.toList()))
+        val fakeProductRepository = FakeProductRepository(products)
         CartRepositoryInjector.setCartRepository(fakeCartRepository)
+        ProductRepositoryInjector.setProductRepository(fakeProductRepository)
         launchFragmentInContainer<CartFragment>()
     }
 }

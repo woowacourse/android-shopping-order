@@ -2,22 +2,29 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
+import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.fixtures.fakeProduct
+import woowacourse.shopping.fixtures.fakeCartProduct
 
 class FakeCartRepository(
     private var cart: Cart = Cart(),
 ) : CartRepository {
-    private val products: List<CartProduct> get() = cart.cartProducts()
+    private val products: List<CartProduct> get() = cart.cartProducts
+    override fun findCartProduct(productId: Long): Result<CartProduct> {
+        val cartProduct = cart.findCartProductByProductId(productId) ?: return Result.failure(
+            NoSuchElementException("Invalid product id"),
+        )
+        return Result.success(cartProduct)
+    }
 
-    override fun cartProducts(
+    override fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,
-    ): Result<List<CartProduct>> {
+    ): Result<Cart> {
         if (canLoadMoreCartProducts(currentPage, pageSize).getOrThrow()
                 .not()
         ) {
-            return Result.success(emptyList())
+            return Result.success(Cart())
         }
         val startIndex = (currentPage) * pageSize
         val endIndex = (startIndex + pageSize).coerceAtMost(products.size)
@@ -27,34 +34,37 @@ class FakeCartRepository(
                 IllegalArgumentException("Invalid page"),
             )
         }
-        return Result.success(products.subList(startIndex, endIndex))
+        return Result.success(Cart(products.subList(startIndex, endIndex)))
     }
 
-    override fun totalCartProducts(): Result<List<CartProduct>> {
-        return Result.success(products)
+    override fun loadCart(): Result<Cart> {
+        return Result.success(cart)
     }
 
-    override fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
-        return Result.success(products.filter { it.product.id in productIds })
+    override fun filterCartProducts(productIds: List<Long>): Result<Cart> {
+        return Result.success(cart.filterByProductIds(productIds))
+    }
+
+    override fun createCartProduct(product: Product, count: Int): Result<Cart> {
+        cart = cart.add(
+            fakeCartProduct(productId = product.id, name = "오둥이 $product.id", count = count),
+        )
+        return Result.success(cart)
     }
 
     override fun updateCartProduct(
-        productId: Long,
+        product: Product,
         count: Int,
-    ): Result<Unit> {
-        val preCount = cart.cartProducts().find { it.product.id == productId }?.count ?: 0
-        if (preCount == count) error("Same count")
-        if (preCount < count) {
-            cart = cart.add(fakeProduct(id = productId, name = "오둥이 $productId"))
-        } else {
-            cart = cart.remove(fakeProduct(id = productId, name = "오둥이 $productId"))
-        }
-        return Result.success(Unit)
+    ): Result<Cart> {
+        cart = cart.add(
+            fakeCartProduct(productId = product.id, name = "오둥이 $product.id", count = count),
+        )
+        return Result.success(cart)
     }
 
-    override fun deleteCartProduct(productId: Long): Result<Unit> {
-        cart = cart.remove(fakeProduct(id = productId, name = "오둥이 $productId"))
-        return Result.success(Unit)
+    override fun deleteCartProduct(productId: Long): Result<Cart> {
+        cart = cart.delete(productId)
+        return Result.success(cart)
     }
 
     override fun canLoadMoreCartProducts(

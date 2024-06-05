@@ -19,7 +19,7 @@ object ProductRepositoryInjector {
         }
 
     @VisibleForTesting
-    fun setShoppingRepository(productRepository: ProductRepository) {
+    fun setProductRepository(productRepository: ProductRepository) {
         instance = productRepository
     }
 

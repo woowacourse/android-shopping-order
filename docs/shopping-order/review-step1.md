@@ -9,6 +9,16 @@
 - [x]: UiState 에 있는 로직들 ViewModel 로 옮기기
 - [x]: RecommendCartProductViewModel.kt - 실패에 대한 예외처리 하기
 
+- 일관성을 위해 UseCase 를 만들어서 사용하기
+
+- [x]: CreateCartProductUseCase
+- [x]: InCreaseProductCountUseCase
+- [x]: DecreaseProductCountUseCase
+- [x]: DeleteCartProductUseCase
+- [x]: LoadCartProductUseCase
+- [x]: LoadPagingCartProductsUseCase
+- [x]: OrderCartProductUseCase
+
 ## 카트에서 상품 개수를 증가시켰을 때 상품목록에 반영되지 않는 버그를 수정
 
 버그 발생 이유: 업데이트 이벤트를 발행하자마자 해당 Cart 프래그먼트에서 이벤트를 소비하고 있어서 발생한 문제
