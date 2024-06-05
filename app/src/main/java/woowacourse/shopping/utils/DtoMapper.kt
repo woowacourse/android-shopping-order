@@ -12,8 +12,8 @@ import woowacourse.shopping.domain.model.cart.CartItemCounter
 import woowacourse.shopping.domain.model.coupon.AvailableTime
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponType
-import woowacourse.shopping.domain.model.selector.ItemSelector
 import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.selector.ItemSelector
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -49,18 +49,20 @@ object DtoMapper {
         )
     }
 
-    fun CouponDto.toCoupon(): Coupon{
-       return Coupon(
-           id = id,
-           expirationDate = this.formatExpirationDate(),
-           couponType = CouponType.matchCoupon(code),
-           description = description,
-           discountType =discountType,
-           discount = discount,
-           minimumAmount = minimumAmount,
-           availableTime = availableTimeDto?.toAvailableTime(),
-           itemSelector =  ItemSelector()
-       )
+    fun CouponDto.toCoupon(): Coupon {
+        return Coupon(
+            id = id,
+            expirationDate = this.formatExpirationDate(),
+            couponType = CouponType.matchCoupon(code),
+            description = description,
+            discountType = discountType,
+            discount = discount,
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity,
+            minimumAmount = minimumAmount,
+            availableTime = availableTimeDto?.toAvailableTime(),
+            itemSelector = ItemSelector()
+        )
     }
 
     private fun AvailableTimeDto.toAvailableTime(): AvailableTime {
@@ -71,7 +73,8 @@ object DtoMapper {
     }
 
     private fun CouponDto.formatExpirationDate(): String {
-        val couponExpirationDateFormatter = DateTimeFormatter.ofPattern(ShoppingUtils.EXPIRATION_FORMAT)
+        val couponExpirationDateFormatter =
+            DateTimeFormatter.ofPattern(ShoppingUtils.EXPIRATION_FORMAT)
         val date = LocalDate.parse(this.expirationDate)
         return date.format(couponExpirationDateFormatter)
     }

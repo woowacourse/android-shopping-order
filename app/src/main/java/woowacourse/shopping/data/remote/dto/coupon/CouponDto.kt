@@ -14,6 +14,10 @@ data class CouponDto(
     val discount: Int = 0,
     @SerializedName("minimumAmount")
     val minimumAmount: Int = 0,
+    @SerializedName("buyQuantity")
+    val buyQuantity: Int = 0,
+    @SerializedName("getQuantity")
+    val getQuantity: Int = 0,
     @SerializedName("discountType")
     val discountType: String,
     @SerializedName("expirationDate")

@@ -74,11 +74,19 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
-        paymentViewModel.coupons.observe(viewLifecycleOwner) {
+        paymentViewModel.couponCalculator.coupons.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
-        paymentViewModel.paymentEvent.observe(viewLifecycleOwner) {
-            adapter.notifyDataSetChanged()
+        paymentViewModel.paymentEvent.observe(viewLifecycleOwner) { paymentEvent ->
+            when(paymentEvent){
+                PaymentEvent.Order.Success -> navigateToProduct()
+                PaymentEvent.SelectCoupon.InvalidCount,
+                PaymentEvent.SelectCoupon.InvalidDate,
+                PaymentEvent.SelectCoupon.InvalidPrice -> requireContext().makeToast(
+                    getString(R.string.invalid_coupon)
+                )
+                PaymentEvent.SelectCoupon.Success -> adapter.notifyDataSetChanged()
+            }
         }
         paymentViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             requireContext().makeToast(
@@ -114,5 +122,9 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
             arguments?.getSerializable(RecommendFragment.CHECKED_SHOPPING_CART) as? ShoppingCart
                 ?: throw ErrorEvent.LoadDataEvent()
         }
+    }
+
+    private fun navigateToProduct() {
+        mainActivityListener?.resetFragment()
     }
 }

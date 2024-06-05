@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.SelectCouponResult
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.utils.exception.ErrorEvent
@@ -12,35 +13,24 @@ import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cart.model.ShoppingCart
-import woowacourse.shopping.view.recommend.RecommendEvent
+import woowacourse.shopping.view.payment.model.CouponCalculator
+import woowacourse.shopping.view.payment.model.CouponCalculator.Companion.DEFAULT_PRICE
 
 class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ) : BaseViewModel(), OnclickPayment {
-    private val _coupons: MutableLiveData<List<Coupon>> = MutableLiveData(emptyList())
-    val coupons: LiveData<List<Coupon>> get() = _coupons
-
-    private val _totalDiscountPrice: MutableLiveData<Int> = MutableLiveData(DEFAULT_PRICE)
-    val totalDiscountPrice: LiveData<Int> get() = _totalDiscountPrice
 
     private var shoppingCart = ShoppingCart()
-    val deliveryCharge = couponRepository.loadDeliveryCharge()
+    val couponCalculator = CouponCalculator()
 
     private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(DEFAULT_PRICE)
-    val totalOrderPrice: LiveData<Int> get() = _totalDiscountPrice
+    val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
+
+    val deliveryCharge = couponRepository.loadDeliveryCharge()
 
     private val _paymentEvent: MutableSingleLiveData<PaymentEvent> = MutableSingleLiveData()
-    val paymentEvent : SingleLiveData<PaymentEvent> get() = _paymentEvent
-
-    override fun clickCoupon(coupon: Coupon) {
-        TODO("Not yet implemented")
-    }
-
-
-    override fun clickPayment() {
-        orderItems()
-    }
+    val paymentEvent: SingleLiveData<PaymentEvent> get() = _paymentEvent
 
     private fun orderItems() =
         viewModelScope.launch {
@@ -57,7 +47,7 @@ class PaymentViewModel(
     fun loadCoupons() = viewModelScope.launch {
         couponRepository.loadCoupons()
             .onSuccess {
-                _coupons.value = it
+                couponCalculator.loadCoupons(it)
             }
             .onFailure {
                 handleException(ErrorEvent.LoadDataEvent())
@@ -69,8 +59,23 @@ class PaymentViewModel(
         _totalOrderPrice.value = shoppingCart.getTotalPrice()
     }
 
-    companion object {
-        private const val DEFAULT_PRICE = 0
+    override fun clickCoupon(coupon: Coupon) {
+        val selectCouponResult = couponCalculator.selectCoupon(
+            coupon = coupon,
+            shoppingCart = shoppingCart,
+            deliveryCharge = deliveryCharge,
+        )
+        when(selectCouponResult){
+            SelectCouponResult.InValidCount -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.InvalidCount)
+            SelectCouponResult.InValidDate -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.InvalidDate)
+            SelectCouponResult.InValidPrice -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.InvalidPrice)
+            SelectCouponResult.Valid -> _paymentEvent.setValue(PaymentEvent.SelectCoupon.Success)
+        }
+    }
+
+
+    override fun clickPayment() {
+        orderItems()
     }
 
 }
