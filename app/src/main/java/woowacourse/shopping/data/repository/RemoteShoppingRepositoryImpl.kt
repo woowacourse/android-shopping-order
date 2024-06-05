@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.database.ProductClient
-import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.mapper.extractPageInfo
+import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.ProductDto
 import woowacourse.shopping.domain.model.PageInfo
 import woowacourse.shopping.domain.model.Product
@@ -17,7 +17,7 @@ class RemoteShoppingRepositoryImpl(private val service: RetrofitService = Produc
     fun fetchProductsWithPage(
         page: Int,
         size: Int,
-        resultCallBack: (ProductListInfo) -> Unit
+        resultCallBack: (ProductListInfo) -> Unit,
     ) {
         var productListInfo: ProductListInfo? = null
         threadAction {
@@ -25,8 +25,9 @@ class RemoteShoppingRepositoryImpl(private val service: RetrofitService = Produc
             if (response.isSuccessful && response.body() != null) {
                 val productResponseDto = response.body()
                 val products = productResponseDto?.content?.map { it.toDomainModel() }.orEmpty()
-                val pageInfo = productResponseDto?.extractPageInfo()
-                    ?: PageInfo(false, 0, 0)
+                val pageInfo =
+                    productResponseDto?.extractPageInfo()
+                        ?: PageInfo(false, 0, 0)
                 productListInfo = ProductListInfo(products, pageInfo)
             }
         }
@@ -44,8 +45,9 @@ class RemoteShoppingRepositoryImpl(private val service: RetrofitService = Produc
             if (response.isSuccessful && response.body() != null) {
                 val productResponseDto = response.body()
                 val products = productResponseDto?.content?.map { it.toDomainModel() }.orEmpty()
-                val pageInfo = productResponseDto?.extractPageInfo()
-                    ?: PageInfo(false, 0, 0)
+                val pageInfo =
+                    productResponseDto?.extractPageInfo()
+                        ?: PageInfo(false, 0, 0)
                 productListInfo = ProductListInfo(products, pageInfo)
                 result = Result.success(productListInfo)
             }
@@ -72,10 +74,11 @@ class RemoteShoppingRepositoryImpl(private val service: RetrofitService = Produc
         val categoryProducts: MutableList<Product>
         var productDtoList: List<ProductDto>? = null
         threadAction {
-            val response = service.requestProductWithCategory(
-                category = category,
-                size = count + cartItemIds.size,
-            ).execute()
+            val response =
+                service.requestProductWithCategory(
+                    category = category,
+                    size = count + cartItemIds.size,
+                ).execute()
             if (response.isSuccessful && response.body() != null) {
                 productDtoList = response.body()?.content
             }

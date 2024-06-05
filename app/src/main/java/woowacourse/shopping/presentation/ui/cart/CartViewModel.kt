@@ -84,16 +84,17 @@ class CartViewModel(
             Log.d("ㅌㅅㅌ", "cartViewModel | result = $result")
             result.fold(
                 onSuccess = { items ->
-                    uiState = if (items.isEmpty()) {
-                        UIState.Empty
-                    } else {
-                        UIState.Success(items)
-                    }
+                    uiState =
+                        if (items.isEmpty()) {
+                            UIState.Empty
+                        } else {
+                            UIState.Success(items)
+                        }
                 },
                 onFailure = {
                     uiState = UIState.Error(RuntimeException("something goes wrong. try again."))
                     Log.d("ㅌㅅㅌ", "$it")
-                }
+                },
             )
         }
         Log.d("ㅌㅅㅌ", "ui state : $uiState")
@@ -128,7 +129,6 @@ class CartViewModel(
 
     fun deleteItem(itemId: Long) {
         cartRepository.deleteCartItem(itemId) {
-
         }
         loadPage()
     }

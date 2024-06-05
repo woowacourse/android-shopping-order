@@ -2,7 +2,6 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.model.Product
 
 interface CartRepository {
     fun fetchCartItemsInfo(resultCallback: (Result<List<CartItem>>) -> Unit)

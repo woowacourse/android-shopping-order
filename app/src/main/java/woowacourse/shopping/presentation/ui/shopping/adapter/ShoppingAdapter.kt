@@ -51,7 +51,6 @@ class ShoppingAdapter(
         }
     }
 
-
     override fun getItemCount(): Int {
         return shoppingProducts.size
     }

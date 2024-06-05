@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.cart.selection
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
 
 class SelectionViewHolder(private val binding: ItemCartBinding) :

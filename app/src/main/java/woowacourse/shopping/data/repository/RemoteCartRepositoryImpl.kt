@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,23 +19,31 @@ class RemoteCartRepositoryImpl : CartRepository {
     private val service = ProductClient.service
 
     override fun fetchCartItemsInfo(resultCallback: (Result<List<CartItem>>) -> Unit) {
-        service.requestCartItems().enqueue(object : Callback<CartItemDto> {
-            override fun onResponse(call: Call<CartItemDto>, response: Response<CartItemDto>) {
-                if (response.isSuccessful && response.body() != null) {
-                    val cartItemDto = response.body()
-                    cartItemDto?.let { dto ->
-                        val cartItems = dto.content.map { it.toDomainModel() }
-                        resultCallback(Result.success(cartItems))
+        service.requestCartItems().enqueue(
+            object : Callback<CartItemDto> {
+                override fun onResponse(
+                    call: Call<CartItemDto>,
+                    response: Response<CartItemDto>,
+                ) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val cartItemDto = response.body()
+                        cartItemDto?.let { dto ->
+                            val cartItems = dto.content.map { it.toDomainModel() }
+                            resultCallback(Result.success(cartItems))
+                        }
+                    } else {
+                        resultCallback(Result.failure(RuntimeException("Failed to fetch cart items.")))
                     }
-                } else {
-                    resultCallback(Result.failure(RuntimeException("Failed to fetch cart items.")))
                 }
-            }
 
-            override fun onFailure(call: Call<CartItemDto>, throwable: Throwable) {
-                resultCallback(Result.failure(throwable))
-            }
-        })
+                override fun onFailure(
+                    call: Call<CartItemDto>,
+                    throwable: Throwable,
+                ) {
+                    resultCallback(Result.failure(throwable))
+                }
+            },
+        )
     }
 
     override fun fetchCartItemsInfoWithPage(
@@ -58,20 +65,28 @@ class RemoteCartRepositoryImpl : CartRepository {
     }
 
     override fun fetchTotalQuantity(resultCallback: (Result<Int>) -> Unit) {
-        service.requestCartItemsCount().enqueue(object : Callback<QuantityDto> {
-            override fun onResponse(call: Call<QuantityDto>, response: Response<QuantityDto>) {
-                if (response.isSuccessful) {
-                    val totalQuantity = response.body()?.quantity ?: 0
-                    resultCallback(Result.success(totalQuantity))
-                } else {
-                    resultCallback(Result.failure(RuntimeException("Failed to fetch products.")))
+        service.requestCartItemsCount().enqueue(
+            object : Callback<QuantityDto> {
+                override fun onResponse(
+                    call: Call<QuantityDto>,
+                    response: Response<QuantityDto>,
+                ) {
+                    if (response.isSuccessful) {
+                        val totalQuantity = response.body()?.quantity ?: 0
+                        resultCallback(Result.success(totalQuantity))
+                    } else {
+                        resultCallback(Result.failure(RuntimeException("Failed to fetch products.")))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<QuantityDto>, throwable: Throwable) {
-                resultCallback(Result.failure(throwable))
-            }
-        })
+                override fun onFailure(
+                    call: Call<QuantityDto>,
+                    throwable: Throwable,
+                ) {
+                    resultCallback(Result.failure(throwable))
+                }
+            },
+        )
     }
 
     override fun findCartItemWithProductId(productId: Long): CartItem? {
@@ -103,7 +118,7 @@ class RemoteCartRepositoryImpl : CartRepository {
     override fun addCartItem(
         productId: Long,
         quantity: Int,
-        resultCallback: (Result<Unit>) -> Unit
+        resultCallback: (Result<Unit>) -> Unit,
     ) {
         val cartItem: CartItem? = findCartItemWithProductId(productId)
         if (cartItem == null) {
@@ -119,45 +134,61 @@ class RemoteCartRepositoryImpl : CartRepository {
         resultCallback: (Result<Unit>) -> Unit,
     ) {
         service.addCartItem(ShoppingProductDto(productId, quantity))
-            .enqueue(object : Callback<Unit> {
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (response.isSuccessful) {
-                        resultCallback(Result.success(Unit))
-                    } else {
-                        resultCallback(Result.failure(RuntimeException("Failed to add item. Check product Id.")))
+            .enqueue(
+                object : Callback<Unit> {
+                    override fun onResponse(
+                        call: Call<Unit>,
+                        response: Response<Unit>,
+                    ) {
+                        if (response.isSuccessful) {
+                            resultCallback(Result.success(Unit))
+                        } else {
+                            resultCallback(Result.failure(RuntimeException("Failed to add item. Check product Id.")))
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<Unit>, throwable: Throwable) {
-                    resultCallback(Result.failure(throwable))
-                }
-            })
+                    override fun onFailure(
+                        call: Call<Unit>,
+                        throwable: Throwable,
+                    ) {
+                        resultCallback(Result.failure(throwable))
+                    }
+                },
+            )
     }
 
     override fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
-        resultCallback: (Result<Unit>) -> Unit
+        resultCallback: (Result<Unit>) -> Unit,
     ) {
-        service.updateCartItemQuantity(cartItemId, quantity).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful) {
-                    resultCallback(Result.success(Unit))
-                } else {
-                    resultCallback(Result.failure(RuntimeException("Failed to update item quantity. Check item id.")))
+        service.updateCartItemQuantity(cartItemId, quantity).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.isSuccessful) {
+                        resultCallback(Result.success(Unit))
+                    } else {
+                        resultCallback(Result.failure(RuntimeException("Failed to update item quantity. Check item id.")))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
-                resultCallback(Result.failure(throwable))
-            }
-        })
+                override fun onFailure(
+                    call: Call<Unit>,
+                    throwable: Throwable,
+                ) {
+                    resultCallback(Result.failure(throwable))
+                }
+            },
+        )
     }
 
     override fun updateCartItemQuantityWithProductId(
         productId: Long,
         quantity: Int,
-        resultCallback: (Result<Unit>) -> Unit
+        resultCallback: (Result<Unit>) -> Unit,
     ) {
         val cartItemId = findCartItemIdWithProductId(productId)
         if (cartItemId == -1L) {
@@ -176,20 +207,27 @@ class RemoteCartRepositoryImpl : CartRepository {
         cartItemId: Long,
         resultCallback: (Result<Unit>) -> Unit,
     ) {
-        service.deleteCartItem(cartItemId).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful) {
-                    resultCallback(Result.success(Unit))
-                } else {
-                    resultCallback(Result.failure(RuntimeException("Failed to delete item. Check item id.")))
+        service.deleteCartItem(cartItemId).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.isSuccessful) {
+                        resultCallback(Result.success(Unit))
+                    } else {
+                        resultCallback(Result.failure(RuntimeException("Failed to delete item. Check item id.")))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
-                resultCallback(Result.failure(throwable))
-            }
-        })
-
+                override fun onFailure(
+                    call: Call<Unit>,
+                    throwable: Throwable,
+                ) {
+                    resultCallback(Result.failure(throwable))
+                }
+            },
+        )
     }
 
     override fun deleteCartItemWithProductId(
@@ -220,19 +258,27 @@ class RemoteCartRepositoryImpl : CartRepository {
         resultCallback: (Result<Unit>) -> Unit,
     ) {
         val cartItemIds = order.map.keys.toList()
-        service.makeOrder(CartItemsDto(cartItemIds)).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful) {
-                    resultCallback(Result.success(Unit))
-                } else {
-                    resultCallback(Result.failure(RuntimeException("Failed to make order. Check Item Ids.")))
+        service.makeOrder(CartItemsDto(cartItemIds)).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.isSuccessful) {
+                        resultCallback(Result.success(Unit))
+                    } else {
+                        resultCallback(Result.failure(RuntimeException("Failed to make order. Check Item Ids.")))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
-                resultCallback(Result.failure(throwable))
-            }
-        })
+                override fun onFailure(
+                    call: Call<Unit>,
+                    throwable: Throwable,
+                ) {
+                    resultCallback(Result.failure(throwable))
+                }
+            },
+        )
     }
 
     private fun threadAction(action: () -> Unit) {

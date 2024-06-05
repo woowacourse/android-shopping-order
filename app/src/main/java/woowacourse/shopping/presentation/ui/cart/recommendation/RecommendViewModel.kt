@@ -148,8 +148,9 @@ class RecommendViewModel(
     ) {
         cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc()) { result ->
             result.onSuccess {
-                val cartItem = cartRepository.findCartItemWithProductId(productId)
-                    ?: return@updateCartItemQuantityWithProductId
+                val cartItem =
+                    cartRepository.findCartItemWithProductId(productId)
+                        ?: return@updateCartItemQuantityWithProductId
                 val prevOrder = order.value ?: Order()
                 prevOrder.addCartItem(cartItem)
                 _order.postValue(prevOrder)
@@ -189,14 +190,18 @@ class RecommendViewModel(
         }
     }
 
-    private fun decreaseOrderQuantity(productId: Long, quantity: Int) {
+    private fun decreaseOrderQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
         cartRepository.updateCartItemQuantityWithProductId(
             productId,
-            quantity.dec()
+            quantity.dec(),
         ) { result ->
             result.onSuccess {
-                val cartItem = cartRepository.findCartItemWithProductId(productId)
-                    ?: return@updateCartItemQuantityWithProductId
+                val cartItem =
+                    cartRepository.findCartItemWithProductId(productId)
+                        ?: return@updateCartItemQuantityWithProductId
                 val prevOrder = order.value ?: Order()
                 prevOrder.addCartItem(cartItem)
                 _order.postValue(prevOrder)

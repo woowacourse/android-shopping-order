@@ -173,7 +173,7 @@ class ShoppingViewModel(
         if (quantity > 1) {
             cartItemsRepository.updateCartItemQuantityWithProductId(
                 productId,
-                quantity.dec()
+                quantity.dec(),
             ) { result ->
                 result.onSuccess {
                     _shoppingProducts.postValue(getQuantityChangedList(productId, quantity.dec()))

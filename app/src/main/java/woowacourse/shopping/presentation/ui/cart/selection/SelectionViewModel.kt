@@ -92,7 +92,7 @@ class SelectionViewModel(
     }
 
     fun setUpCartItems() {
-        cartRepository.fetchCartItemsInfo() { result ->
+        cartRepository.fetchCartItemsInfo { result ->
             result.onSuccess { items ->
                 cartItems = items
                 setUpUIState()
@@ -106,16 +106,19 @@ class SelectionViewModel(
 
     private fun setUpUIState() {
         if (_uiCartItemsState.value !is UIState.Error) {
-            _uiCartItemsState.value = if (cartItems.isEmpty()) {
-                UIState.Empty
-            } else {
-                val prevOrder = OrderDatabase.getOrder()
-                UIState.Success(cartItems.map {
-                    it.toUiModel(
-                        prevOrder.containsCartItem(it)
+            _uiCartItemsState.value =
+                if (cartItems.isEmpty()) {
+                    UIState.Empty
+                } else {
+                    val prevOrder = OrderDatabase.getOrder()
+                    UIState.Success(
+                        cartItems.map {
+                            it.toUiModel(
+                                prevOrder.containsCartItem(it),
+                            )
+                        },
                     )
-                })
-            }
+                }
         }
         updatePriceAndQuantity()
         setLoadingState(false)
@@ -285,14 +288,15 @@ class SelectionViewModel(
         productId: Long,
         newQuantity: Int,
     ) {
-        cartItems = cartItems.map { item ->
-            if (item.productId == productId) {
-                addToOrder(item.copy(quantity = newQuantity))
-                item.copy(quantity = newQuantity)
-            } else {
-                item
+        cartItems =
+            cartItems.map { item ->
+                if (item.productId == productId) {
+                    addToOrder(item.copy(quantity = newQuantity))
+                    item.copy(quantity = newQuantity)
+                } else {
+                    item
+                }
             }
-        }
     }
 
     private fun changeUiCartItemQuantity(

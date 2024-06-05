@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.shopping.adapter.viewholder
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler
 import woowacourse.shopping.presentation.ui.shopping.ShoppingItemCountHandler
