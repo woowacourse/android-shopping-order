@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 
 interface ProductHistoryRepository {
-    fun insertProductHistory(
+    suspend fun insertProductHistory(
         productId: Long,
         name: String,
         price: Int,
@@ -12,13 +12,13 @@ interface ProductHistoryRepository {
         imageUrl: String,
     ): Result<Unit>
 
-    fun getProductHistoryById(productId: Long): Result<Product>
+    suspend fun getProductHistoryById(productId: Long): Result<Product>
 
     suspend fun getProductHistoriesByCategory(size: Int): Result<List<Cart>>
 
-    fun getProductHistoriesBySize(size: Int): Result<List<Product>>
+    suspend fun getProductHistoriesBySize(size: Int): Result<List<Product>>
 
-    fun deleteProductHistoryById(productId: Long): Result<Unit>
+    suspend fun deleteProductHistoryById(productId: Long): Result<Unit>
 
-    fun deleteAllProductHistories(): Result<Unit>
+    suspend fun deleteAllProductHistories(): Result<Unit>
 }

@@ -59,36 +59,38 @@ class ProductDetailViewModel(
     }
 
     private fun getProductHistory(cart: Cart) {
-        productHistoryRepository.getProductHistoriesBySize(2).onSuccess { productHistories ->
-            hideError()
-            val productHistory =
-                if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
-                    if (productHistories.size >= 2) productHistories[1] else null
-                } else {
-                    productHistories.firstOrNull()
+        viewModelScope.launch(Dispatchers.IO) {
+            productHistoryRepository.getProductHistoriesBySize(2).onSuccess { productHistories ->
+                hideError()
+                val productHistory =
+                    if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
+                        if (productHistories.size >= 2) productHistories[1] else null
+                    } else {
+                        productHistories.firstOrNull()
+                    }
+
+                val isLastProductPage =
+                    when {
+                        productHistories.isEmpty() -> true
+                        cart.product.id == productHistories.first().id -> productHistories.size < 2
+                        else -> false
+                    }
+
+                uiState.value?.let { state ->
+                    _uiState.postValue(
+                        state.copy(
+                            cart = cart,
+                            productHistory = productHistory,
+                            isLastProductPage = isLastProductPage,
+                        ),
+                    )
                 }
 
-            val isLastProductPage =
-                when {
-                    productHistories.isEmpty() -> true
-                    cart.product.id == productHistories.first().id -> productHistories.size < 2
-                    else -> false
-                }
-
-            uiState.value?.let { state ->
-                _uiState.postValue(
-                    state.copy(
-                        cart = cart,
-                        productHistory = productHistory,
-                        isLastProductPage = isLastProductPage,
-                    ),
-                )
+                insertProductHistory(cart.product)
+            }.onFailure { e ->
+                showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
             }
-
-            insertProductHistory(cart.product)
-        }.onFailure { e ->
-            showError(e)
-            showMessage(MessageProvider.DefaultErrorMessage)
         }
     }
 
@@ -160,7 +162,7 @@ class ProductDetailViewModel(
     }
 
     private fun insertProductHistory(productValue: Product) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             productHistoryRepository.insertProductHistory(
                 productId = productValue.id,
                 name = productValue.name,

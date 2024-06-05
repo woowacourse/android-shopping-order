@@ -11,7 +11,7 @@ class ProductHistoryRepositoryImpl(
     private val shoppingCartRepository: ShoppingCartRepository,
 ) :
     ProductHistoryRepository {
-    override fun insertProductHistory(
+    override suspend fun insertProductHistory(
         productId: Long,
         name: String,
         price: Int,
@@ -26,7 +26,7 @@ class ProductHistoryRepositoryImpl(
             imageUrl = imageUrl,
         )
 
-    override fun getProductHistoryById(productId: Long): Result<Product> =
+    override suspend fun getProductHistoryById(productId: Long): Result<Product> =
         productHistoryLocalDataSource.getProductHistoryById(productId = productId)
 
     override suspend fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
@@ -45,11 +45,11 @@ class ProductHistoryRepositoryImpl(
             }
     }
 
-    override fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
+    override suspend fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
         productHistoryLocalDataSource.getProductHistoriesBySize(size = size)
 
-    override fun deleteProductHistoryById(productId: Long): Result<Unit> =
+    override suspend fun deleteProductHistoryById(productId: Long): Result<Unit> =
         productHistoryLocalDataSource.deleteProductHistoryById(productId = productId)
 
-    override fun deleteAllProductHistories(): Result<Unit> = productHistoryLocalDataSource.deleteAllProductHistories()
+    override suspend fun deleteAllProductHistories(): Result<Unit> = productHistoryLocalDataSource.deleteAllProductHistories()
 }
