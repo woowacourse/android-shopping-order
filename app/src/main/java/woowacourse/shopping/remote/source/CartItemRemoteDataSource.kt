@@ -42,9 +42,8 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         call.execute()
     }
 
-    // TODO: 동작 안됨
     override fun removeCartItem(cartItemId: Long) {
-        cartItemApiService.removeCartItem(cartItemId)
+        cartItemApiService.removeCartItem(cartItemId).execute()
     }
 
     override fun plusProductsIdCount(

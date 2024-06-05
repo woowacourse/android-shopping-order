@@ -12,8 +12,10 @@ import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.currentPageIsNullException
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
+import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
@@ -22,6 +24,7 @@ import kotlin.concurrent.thread
 class ProductListViewModel(
     private val productsRepository: ShoppingProductsRepository,
     private val productHistoryRepository: ProductHistoryRepository,
+    private val shoppingCartRepository: ShoppingCartRepository,
     private var _currentPage: MutableLiveData<Int> = MutableLiveData(FIRST_PAGE),
 ) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener {
     val currentPage: LiveData<Int> get() = _currentPage
@@ -50,7 +53,7 @@ class ProductListViewModel(
         thread {
             val page = currentPage.value ?: currentPageIsNullException()
             val result = (FIRST_PAGE..page).flatMap { productsRepository.loadAllProducts(it) }
-            val totalCartCount = productsRepository.shoppingCartProductQuantity()
+            val totalCartCount = shoppingCartRepository.shoppingCartProductQuantity()
             val isLastPage = productsRepository.isFinalPage(page)
             val productHistory = productHistoryRepository.loadAllProductHistory()
 
@@ -157,9 +160,13 @@ class ProductListViewModel(
                     ShoppingApp.historySource,
                     ShoppingApp.productSource,
                 ),
+            shoppingCartRepository: ShoppingCartRepository =
+                DefaultShoppingCartRepository(
+                    ShoppingApp.cartSource,
+                ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
-                ProductListViewModel(productRepository, historyRepository)
+                ProductListViewModel(productRepository, historyRepository, shoppingCartRepository)
             }
     }
 }

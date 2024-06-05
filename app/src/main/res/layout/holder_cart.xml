@@ -64,6 +64,7 @@
             android:importantForAccessibility="no"
             android:onClick="@{() -> onProductItemClickListener.onClick(cartItem.id)}"
             android:src="@drawable/ic_x"
+            android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/cart_product_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cart_product_name"

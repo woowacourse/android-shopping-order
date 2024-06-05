@@ -29,3 +29,8 @@ API 문서: http://54.180.95.212:8080/swagger-ui/index.html
 계정 정보 확인(사용자 아이디, 비밀번호)
 
 
+### 리팩토링
+
+- [x] 사용하지 않는 클래스, 메서드 제거
+- [x] shoppingcartRepository 를 분리하기
+- [x] 쇼핑 장바구니 remove 동작 버그 픽스

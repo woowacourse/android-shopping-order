@@ -2,14 +2,17 @@ package woowacourse.shopping.ui.cart
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
@@ -18,6 +21,7 @@ import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val shoppingProductsRepository: ShoppingProductsRepository,
+    private val shoppingCartRepository: ShoppingCartRepository,
 ) : ViewModel(),
     OnProductItemClickListener,
     OnItemQuantityChangeListener,
@@ -46,8 +50,7 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         thread {
-            val currentItems =
-                shoppingProductsRepository.loadPagedCartItem()
+            val currentItems = shoppingCartRepository.loadAllCartItems()
 
             uiHandler.post {
                 _cartItems.value = currentItems
@@ -57,18 +60,20 @@ class ShoppingCartViewModel(
 
     fun deleteItem(cartItemId: Long) {
         thread {
-            shoppingProductsRepository.removeShoppingCartProduct(cartItemId)
-            val currentItems =
-                shoppingProductsRepository.loadPagedCartItem()
+            shoppingCartRepository.removeShoppingCartProduct(cartItemId)
+        }.join()
 
+        thread {
+            val currentItems = shoppingCartRepository.loadAllCartItems()
             uiHandler.post {
                 _cartItems.value = currentItems
             }
-        }
+        }.join()
+
         updateSelectedCartItemsCount()
     }
 
-    fun updateSelectedCartItemsCount() {
+    private fun updateSelectedCartItemsCount() {
         _selectedCartItemsCount.value = cartItems.value?.count { it.checked }
     }
 
@@ -81,17 +86,21 @@ class ShoppingCartViewModel(
     }
 
     override fun onClick(productId: Long) {
+        Log.d(TAG, "onClick: delete id: $productId")
         _deletedItemId.setValue(productId)
     }
 
+    // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
     override fun onIncrease(
         productId: Long,
         quantity: Int,
     ) {
         thread {
-//            shoppingProductsRepository.increaseShoppingCartProduct(productId, quantity)
-            shoppingProductsRepository.increaseInShoppingCart(productId, quantity)
-            val currentItems = shoppingProductsRepository.loadPagedCartItem()
+            val item = cartItems.value?.find { it.id == productId }
+                ?: throw NoSuchElementException("There is no product with id: $productId")
+            shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity + 1)
+            val currentItems = shoppingCartRepository.loadAllCartItems()
+
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
@@ -99,13 +108,19 @@ class ShoppingCartViewModel(
         }
     }
 
+    // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
         thread {
-            shoppingProductsRepository.decreaseShoppingCartProduct(productId, quantity)
-            val currentItems = shoppingProductsRepository.loadPagedCartItem()
+
+            val item = cartItems.value?.find { it.id == productId }
+                ?: throw NoSuchElementException("There is no product with id: $productId")
+            shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity - 1)
+
+            val currentItems = shoppingCartRepository.loadAllCartItems()
+
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
@@ -176,9 +191,13 @@ class ShoppingCartViewModel(
                     productsSource = ShoppingApp.productSource,
                     cartSource = ShoppingApp.cartSource,
                 ),
+            shoppingCartRepository: ShoppingCartRepository =
+                DefaultShoppingCartRepository(
+                    cartSource = ShoppingApp.cartSource,
+                ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
-                ShoppingCartViewModel(shoppingProductsRepository)
+                ShoppingCartViewModel(shoppingProductsRepository, shoppingCartRepository)
             }
     }
 }
