@@ -102,9 +102,9 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
                 RecommendEvent.OrderRecommends.Success -> navigateToProduct()
             }
         }
-        recommendViewModel.errorEvent.observe(viewLifecycleOwner) {
+        recommendViewModel.errorEvent.observe(viewLifecycleOwner) { errorState->
             requireContext().makeToast(
-                getString(R.string.error_default),
+                errorState.receiveErrorMessage(),
             )
         }
     }

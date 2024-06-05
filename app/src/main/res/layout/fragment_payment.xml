@@ -4,7 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.payment.PaymentViewModel" />
+        <variable
+            name="onclickNavigatePayment"
+            type="woowacourse.shopping.view.payment.OnclickNavigatePayment" />
+        <variable
+            name="onClickPayment"
+            type="woowacourse.shopping.view.payment.OnclickPayment" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,6 +36,7 @@
             android:layout_marginStart="27dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_arrow_back"
+            android:onClick="@{() -> onclickNavigatePayment.clickBack()}"
             app:layout_constraintBottom_toBottomOf="@id/vw_cart_top_bar"
             app:layout_constraintStart_toStartOf="@id/vw_cart_top_bar"
             app:layout_constraintTop_toTopOf="@id/vw_cart_top_bar" />
@@ -115,12 +124,12 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:textColor="@color/black"
                     android:textSize="18sp"
+                    android:text="@{@string/formatted_price(vm.totalOrderPrice)}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -148,6 +157,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:text="@{@string/formatted_price(-vm.totalDiscountPrice)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -179,6 +189,7 @@
                     android:layout_height="match_parent"
                     android:textColor="@color/black"
                     android:textSize="18sp"
+                    android:text="@{@string/formatted_price(vm.deliveryCharge)}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -216,6 +227,7 @@
                     android:layout_height="match_parent"
                     android:textColor="@color/black"
                     android:textSize="18sp"
+                    android:text="@{@string/formatted_price(vm.totalOrderPrice + vm.deliveryCharge-vm.totalDiscountPrice)}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -232,6 +244,7 @@
                 android:layout_height="48dp"
                 android:background="@color/primary"
                 android:gravity="center"
+                android:onClick="@{() ->onClickPayment.clickPayment()}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"

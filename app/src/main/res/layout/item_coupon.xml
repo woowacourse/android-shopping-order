@@ -3,7 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.model.coupon.Coupon" />
+        <variable
+            name="onClickPayment"
+            type="woowacourse.shopping.view.payment.OnclickPayment" />
     </data>
 
     <LinearLayout

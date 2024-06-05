@@ -24,4 +24,13 @@ class ShoppingCart : Serializable {
     fun deleteProductFromProductId(productId: Long) {
         _cartItems.value = _cartItems.value?.filter { it.product.id != productId }
     }
+
+    fun getTotalPrice(): Int {
+        return cartItems.value
+            ?.sumOf { it.product.cartItemCounter.itemCount * it.product.price } ?: DEFAULT_PRICE
+    }
+
+    companion object {
+        private const val DEFAULT_PRICE = 0
+    }
 }

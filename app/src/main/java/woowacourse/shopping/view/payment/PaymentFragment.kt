@@ -1,20 +1,24 @@
 package woowacourse.shopping.view.payment
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteCouponRepositoryImpl
-import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
-import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.RemoteOrderRepositoryImpl
 import woowacourse.shopping.databinding.FragmentPaymentBinding
-import woowacourse.shopping.databinding.FragmentProductListBinding
+import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
-import woowacourse.shopping.view.products.ProductListViewModel
+import woowacourse.shopping.view.cart.model.ShoppingCart
+import woowacourse.shopping.view.payment.adapter.CouponAdapter
+import woowacourse.shopping.view.recommend.RecommendFragment
 
 class PaymentFragment : Fragment(), OnclickNavigatePayment {
     private var mainActivityListener: MainActivityListener? = null
@@ -24,10 +28,19 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
         val viewModelFactory =
             ViewModelFactory {
                 PaymentViewModel(
+                    orderRepository = RemoteOrderRepositoryImpl(),
                     couponRepository = RemoteCouponRepositoryImpl(),
                 )
             }
         viewModelFactory.create(PaymentViewModel::class.java)
+    }
+    private lateinit var adapter: CouponAdapter
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainActivityListener) {
+            mainActivityListener = context
+        }
     }
 
     override fun onCreateView(
@@ -35,10 +48,71 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        return inflater.inflate(R.layout.fragment_payment, container, false)
+        _binding = FragmentPaymentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+        observeData()
+    }
+
+    private fun initView() {
+        binding.vm = paymentViewModel
+        binding.onclickNavigatePayment = this
+        binding.onClickPayment = paymentViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        adapter =
+            CouponAdapter(
+                onclickPayment = paymentViewModel,
+            )
+        binding.rvCoupon.adapter = adapter
+        loadCheckedShoppingCart()
+        paymentViewModel.loadCoupons()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun observeData() {
+        paymentViewModel.coupons.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+        paymentViewModel.paymentEvent.observe(viewLifecycleOwner) {
+            adapter.notifyDataSetChanged()
+        }
+        paymentViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
+            requireContext().makeToast(
+                errorState.receiveErrorMessage(),
+            )
+        }
     }
 
     override fun clickBack() {
-        TODO("Not yet implemented")
+        mainActivityListener?.popFragment()
+    }
+
+    private fun loadCheckedShoppingCart() {
+        try {
+            val shoppingCart = receiveCheckedShoppingCart()
+            paymentViewModel.saveCheckedShoppingCarts(shoppingCart)
+        } catch (e: Exception) {
+            requireContext().makeToast(
+                getString(R.string.error_data_load),
+            )
+            clickBack()
+        }
+    }
+
+    private fun receiveCheckedShoppingCart(): ShoppingCart {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(
+                RecommendFragment.CHECKED_SHOPPING_CART,
+                ShoppingCart::class.java
+            )
+                ?: throw ErrorEvent.LoadDataEvent()
+        } else {
+            arguments?.getSerializable(RecommendFragment.CHECKED_SHOPPING_CART) as? ShoppingCart
+                ?: throw ErrorEvent.LoadDataEvent()
+        }
     }
 }
