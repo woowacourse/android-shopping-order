@@ -51,13 +51,8 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
             when (state) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
-                    thread {
-                        Thread.sleep(500)
-                        runOnUiThread {
-                            binding.layoutShimmer.root.isVisible = false
-                            binding.detailCartProduct = state.data
-                        }
-                    }
+                    binding.layoutShimmer.root.isVisible = false
+                    binding.detailCartProduct = state.data
                 }
             }
         }

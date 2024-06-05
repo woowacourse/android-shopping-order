@@ -131,7 +131,7 @@ class ShoppingViewModel(private val repository: Repository) :
             cartProducts[index].plusQuantity()
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
-                repository.postCartItem(CartItemRequest.fromCartProduct(cartProduct))
+                repository.postCartItem(CartItemRequest.fromCartProduct(cartProducts[index]))
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         saveRecentProduct(cartProducts[index])
