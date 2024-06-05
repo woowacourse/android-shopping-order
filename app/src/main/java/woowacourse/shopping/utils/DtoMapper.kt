@@ -3,10 +3,15 @@ package woowacourse.shopping.utils
 import woowacourse.shopping.data.remote.dto.cart.CartItemDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
+import woowacourse.shopping.data.remote.dto.coupon.AvailableTimeDto
+import woowacourse.shopping.data.remote.dto.coupon.CouponDto
 import woowacourse.shopping.data.remote.dto.product.ProductDto
 import woowacourse.shopping.data.remote.dto.product.ProductResponse
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.coupon.AvailableTime
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.CouponType
 import woowacourse.shopping.domain.model.selector.ItemSelector
 import woowacourse.shopping.domain.model.product.Product
 
@@ -39,6 +44,26 @@ object DtoMapper {
             category = category,
             cartItemCounter = CartItemCounter(quantity),
             itemSelector = ItemSelector(),
+        )
+    }
+
+    fun CouponDto.toCoupon(): Coupon{
+       return Coupon(
+           id = id,
+           expirationDate = expirationDate,
+           couponType = CouponType.matchCoupon(code),
+           description = description,
+           discountType =discountType,
+           discount = discount,
+           availableTime = availableTimeDto?.toAvailableTime(),
+           itemSelector =  ItemSelector()
+       )
+    }
+
+    private fun AvailableTimeDto.toAvailableTime(): AvailableTime {
+        return AvailableTime(
+            end = end,
+            start = start,
         )
     }
 }
