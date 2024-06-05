@@ -84,12 +84,12 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
             when (paymentEvent) {
                 PaymentEvent.Order.Success -> navigateToProduct()
                 PaymentEvent.SelectCoupon.InvalidCount,
-                PaymentEvent.SelectCoupon.InvalidDate,
+                PaymentEvent.SelectCoupon.InvalidPrice,
                 ->
                     requireContext().makeToast(
                         getString(R.string.invalid_coupon),
                     )
-                PaymentEvent.SelectCoupon.InvalidPrice ->
+                PaymentEvent.SelectCoupon.InvalidDate ->
                     requireContext().makeToast(
                         getString(R.string.invalid_coupon_date),
                     )
