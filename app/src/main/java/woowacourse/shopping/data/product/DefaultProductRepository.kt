@@ -2,11 +2,9 @@ package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.ResponseResult
 import woowacourse.shopping.data.cart.CartItemDataSource
-import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
-
 
 class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
@@ -21,7 +19,7 @@ class DefaultProductRepository(
                 }
             }
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 
@@ -29,7 +27,7 @@ class DefaultProductRepository(
         when(val response = productDataSource.findById(id)) {
             is ResponseResult.Success -> return response.data.toDomain(productQuantity(id))
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 
@@ -39,7 +37,7 @@ class DefaultProductRepository(
                 return (page + 1) == response.data.totalPages
             }
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 
@@ -47,7 +45,7 @@ class DefaultProductRepository(
         when(val response = cartItemDataSource.loadAllCartItems()) {
             is ResponseResult.Success -> response.data.content.sumOf { it.quantity }
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
 
     private fun productQuantity(productId: Long): Int {
@@ -57,7 +55,7 @@ class DefaultProductRepository(
                 return cartItem?.quantity ?: 0
             }
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 

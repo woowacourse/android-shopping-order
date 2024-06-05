@@ -17,7 +17,7 @@ class OrderRemoteRepository(
         when(val response = orderDataSource.order(cartItemIds)) {
             is ResponseResult.Success -> return
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}:  예기치 않은 오류가 발생했습니다.")
         }
     }
 
@@ -26,12 +26,12 @@ class OrderRemoteRepository(
         val category = when(val response = productDataSource.findById(productId)) {
             is ResponseResult.Success -> response.data.category
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
         return when(val response = productDataSource.findByCategory(category)) {
             is ResponseResult.Success -> response.data.content.map { productDto -> productDto.toDomain() }
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 }

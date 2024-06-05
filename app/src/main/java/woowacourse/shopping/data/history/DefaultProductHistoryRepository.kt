@@ -21,7 +21,7 @@ class DefaultProductHistoryRepository(
             when(val response = productDataSource.findById(it)) {
                 is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
                 is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-                is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+                is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
             }
         }
     }
@@ -33,7 +33,7 @@ class DefaultProductHistoryRepository(
         return when(val response = productDataSource.findById(id)) {
             is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 
@@ -42,7 +42,7 @@ class DefaultProductHistoryRepository(
         return when(val response = productDataSource.findById(productId)) {
             is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
             is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
 
