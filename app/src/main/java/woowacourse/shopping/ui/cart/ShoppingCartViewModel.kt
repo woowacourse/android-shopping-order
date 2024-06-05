@@ -22,9 +22,8 @@ class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
-    ShoppingCartItemListener,
-    OnAllCartItemSelectedListener,
-    OnNavigationOrderListener {
+    ShoppingCartListener
+{
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private var _cartItems = MutableLiveData<List<CartItem>>()
