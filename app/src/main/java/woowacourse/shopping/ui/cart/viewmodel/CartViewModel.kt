@@ -140,30 +140,26 @@ class CartViewModel(
         }
     }
 
-    private fun setRecommendProducts(recentProduct: RecentProduct) {
-        viewModelScope.launch {
-            productRepository.find(recentProduct.productId).onSuccess { product ->
-                if (isRecommendPage.value == false) {
-                    isRecommendPage.value = true
-                }
-                setRecommendProducts(product)
-            }.onFailure {
-                error.setValue(it)
+    private suspend fun setRecommendProducts(recentProduct: RecentProduct) {
+        productRepository.find(recentProduct.productId).onSuccess { product ->
+            if (isRecommendPage.value == false) {
+                isRecommendPage.value = true
             }
+            setRecommendProducts(product)
+        }.onFailure {
+            error.setValue(it)
         }
     }
 
-    private fun setRecommendProducts(it: Product) {
-        viewModelScope.launch {
-            productRepository.getProductsByCategory(it.category).onSuccess {
-                _products.value =
-                    it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
-                        .map { ProductWithQuantity(product = it) }
-                        .subList(0, minOf(it.size, 10))
-                noRecommendProductState.value = false
-            }.onFailure {
-                noRecommendProductState.value = true
-            }
+    private suspend fun setRecommendProducts(it: Product) {
+        productRepository.getProductsByCategory(it.category).onSuccess {
+            _products.value =
+                it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
+                    .map { ProductWithQuantity(product = it) }
+                    .subList(0, minOf(it.size, 10))
+            noRecommendProductState.value = false
+        }.onFailure {
+            noRecommendProductState.value = true
         }
     }
 
@@ -185,17 +181,15 @@ class CartViewModel(
             )
     }
 
-    private fun updateCartLiveData() {
-        viewModelScope.launch {
-            cartRepository.getAllCartItemsWithProduct().onSuccess {
-                _cart.value =
-                    CartItemsUiState(
-                        it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
-                        isLoading = false,
-                    )
-            }.onFailure {
-                error.setValue(it)
-            }
+    private suspend fun updateCartLiveData() {
+        cartRepository.getAllCartItemsWithProduct().onSuccess {
+            _cart.value =
+                CartItemsUiState(
+                    it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                    isLoading = false,
+                )
+        }.onFailure {
+            error.setValue(it)
         }
     }
 
@@ -204,45 +198,41 @@ class CartViewModel(
         return current.cartItems.firstOrNull { it.productId == productId }?.isChecked ?: false
     }
 
-    private fun updateCountToPlus(
+    private suspend fun updateCountToPlus(
         it: CartWithProduct,
         productId: Long,
     ) {
-        viewModelScope.launch {
+        cartRepository.patchCartItem(
+            it.id,
+            it.quantity.value.inc(),
+        ).onSuccess {
+            if (isRecommendPage.value == false) {
+                loadCartItems()
+            } else {
+                changeRecommendProductCount(productId)
+                loadCartItems()
+            }
+        }.onFailure {
+            error.setValue(it)
+        }
+    }
+
+    private suspend fun updateCountToMinus(
+        it: CartWithProduct,
+        productId: Long,
+    ) {
+        if (it.quantity.value > 0) {
             cartRepository.patchCartItem(
                 it.id,
-                it.quantity.value.inc(),
+                it.quantity.value.dec(),
             ).onSuccess {
                 if (isRecommendPage.value == false) {
                     loadCartItems()
                 } else {
                     changeRecommendProductCount(productId)
-                    loadCartItems()
                 }
             }.onFailure {
                 error.setValue(it)
-            }
-        }
-    }
-
-    private fun updateCountToMinus(
-        it: CartWithProduct,
-        productId: Long,
-    ) {
-        viewModelScope.launch {
-            if (it.quantity.value > 0) {
-                cartRepository.patchCartItem(
-                    it.id,
-                    it.quantity.value.dec(),
-                ).onSuccess {
-                    if (isRecommendPage.value == false) {
-                        loadCartItems()
-                    } else {
-                        changeRecommendProductCount(productId)
-                    }
-                }.onFailure {
-                    error.setValue(it)
-                }
             }
         }
     }
