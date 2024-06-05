@@ -59,7 +59,7 @@ class RecommendFragment : Fragment() {
 
     private fun setRecommendProduct() {
         viewModel.loadRecommendProducts()
-        viewModel.products.observe(viewLifecycleOwner) {
+        viewModel.recommendProducts.observe(viewLifecycleOwner) {
             recommendProductAdapter.submitList(it.map { it.toUiModel() })
         }
     }

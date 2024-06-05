@@ -26,11 +26,11 @@ class CartViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener {
-    private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
-    val products: LiveData<List<ProductWithQuantity>> = _products
+    private val _recommendProducts: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
+    val recommendProducts: LiveData<List<ProductWithQuantity>> = _recommendProducts
 
     val cartOfRecommendProductCount: LiveData<Int> =
-        _products.map {
+        _recommendProducts.map {
             it.sumOf { it.quantity.value }
         }
 
@@ -40,7 +40,7 @@ class CartViewModel(
     val totalPrice: MediatorLiveData<Int> =
         MediatorLiveData<Int>().apply {
             addSource(_cart) { value = totalPrice() }
-            addSource(_products) { value = totalPrice() }
+            addSource(_recommendProducts) { value = totalPrice() }
         }
 
     val isTotalChbChecked: LiveData<Boolean> =
@@ -89,7 +89,7 @@ class CartViewModel(
             productRepository.productsByCategory(category)
                 .filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
         }.onSuccess {
-            _products.value =
+            _recommendProducts.value =
                 it.map { ProductWithQuantity(product = it) }.subList(0, minOf(it.size, 10))
             noRecommendProductState.value = false
         }.onFailure {
@@ -100,7 +100,7 @@ class CartViewModel(
     fun totalPrice(): Int {
         val carts = _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice } ?: 0
         val recommends =
-            _products.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
+            _recommendProducts.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
         return carts + recommends
     }
 
@@ -189,10 +189,10 @@ class CartViewModel(
             cartRepository.getCartItem(productId)
         }.onSuccess {
             val current = productWithQuantities(productId, it.quantity)
-            _products.value = current
+            _recommendProducts.value = current
         }.onFailure {
             val current = productWithQuantities(productId, Quantity())
-            _products.value = current
+            _recommendProducts.value = current
         }
     }
 
@@ -201,8 +201,8 @@ class CartViewModel(
         quantity: Quantity,
     ): MutableList<ProductWithQuantity> {
         val changedRecommend =
-            requireNotNull(_products.value?.firstOrNull { it.product.id == productId })
-        val current = _products.value?.toMutableList() ?: mutableListOf()
+            requireNotNull(_recommendProducts.value?.firstOrNull { it.product.id == productId })
+        val current = _recommendProducts.value?.toMutableList() ?: mutableListOf()
         current[current.indexOf(changedRecommend)] =
             changedRecommend.copy(quantity = quantity)
         return current
@@ -241,5 +241,5 @@ class CartViewModel(
             _cart.value?.cartItems?.firstOrNull {
                 it.productId == productId
             }?.isChecked ?: false
-        ) || _products.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
+        ) || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 }
