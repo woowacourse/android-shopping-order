@@ -29,5 +29,5 @@ object NetworkManager {
 
     fun orderService(): OrderApiService = getRetrofit().create(OrderApiService::class.java)
 
-    fun couponService(): CouponService = getRetrofit().create(CouponService::class.java)
+    fun couponService(): CouponApiService = getRetrofit().create(CouponApiService::class.java)
 }
