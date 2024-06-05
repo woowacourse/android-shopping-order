@@ -70,7 +70,6 @@ class ProductContentsViewModel(
     }
 
     fun loadProducts() {
-        val handler = Handler(Looper.getMainLooper())
         runCatching {
             productWithQuantity.value = currentProduct().copy(isLoading = true)
             productRepository.getProducts(
@@ -78,9 +77,7 @@ class ProductContentsViewModel(
                 PAGE_SIZE
             )
         }.onSuccess { loadedProducts ->
-
             products.value = (products.value ?: emptyList()) + loadedProducts
-
         }
     }
 
@@ -112,14 +109,10 @@ class ProductContentsViewModel(
     }
 
     fun loadCartItems() {
-        val handler = Handler(Looper.getMainLooper())
         runCatching {
             productWithQuantity.value = currentProduct().copy(isLoading = true)
             cartRepository.getAllCartItems()
         }.onSuccess { carts ->
-//            handler.postDelayed({
-//                cart.value = carts
-//            }, 1000)
             cart.value = carts
         }
     }
