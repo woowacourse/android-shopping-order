@@ -135,5 +135,8 @@ class PaymentFragment : Fragment(), OnclickNavigatePayment {
 
     private fun navigateToProduct() {
         mainActivityListener?.resetFragment()
+        requireContext().makeToast(
+            getString(R.string.success_order),
+        )
     }
 }
