@@ -21,8 +21,6 @@ import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
-import java.util.Timer
-import java.util.TimerTask
 
 class ProductContentsViewModel(
     private val productRepository: ProductRepository,
@@ -105,14 +103,7 @@ class ProductContentsViewModel(
             productRepository.getProducts(currentOffset++, 20).onSuccess {
                 items.addAll(it)
                 products.value = items
-                Timer().schedule(
-                    object : TimerTask() {
-                        override fun run() {
-                            productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
-                        }
-                    },
-                    1000,
-                )
+                productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
             }.onFailure {
                 _error.setValue(it)
             }
