@@ -38,6 +38,10 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
 
     private fun handleActivityResult(data: Intent?) {
         data?.let {
+            val isRecentProductChanged = it.getBooleanExtra(EXTRA_IS_RECENT_PRODUCT_CHANGED, false)
+            if (isRecentProductChanged) {
+                viewModel.fetchAllRecentProducts()
+            }
             updateSingleProductQuantity(it)
             updateMultipleProductsQuantities(it)
         }
@@ -47,7 +51,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         val modifiedProductId = intent.getLongExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, -1L)
         val newQuantity = intent.getIntExtra(ProductDetailActivity.EXTRA_NEW_PRODUCT_QUANTITY, -1)
         if (modifiedProductId != -1L && newQuantity != -1) {
-            viewModel.updateProductQuantity(modifiedProductId, newQuantity)
+            viewModel.setNewShoppingProductQuantity(modifiedProductId, newQuantity)
         }
     }
 
@@ -55,7 +59,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         val modifiedProductIds = intent.getLongArrayExtra(CartActivity.EXTRA_CHANGED_PRODUCT_IDS)
         val newQuantities = intent.getIntArrayExtra(CartActivity.EXTRA_NEW_PRODUCT_QUANTITIES)
         modifiedProductIds?.zip(newQuantities?.toList() ?: emptyList())?.forEach { (id, quantity) ->
-            viewModel.updateProductQuantity(id, quantity)
+            viewModel.setNewShoppingProductQuantity(id, quantity)
         }
     }
 
@@ -110,7 +114,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.shoppingProducts.observe(this) { state ->
             when (state) {
                 is UiState.Success -> {
-                    viewModel.fetchCartCount()
+                    viewModel.fetchCartItemCount()
                     adapter.updateProductItems(state.data)
                 }
 
@@ -138,7 +142,6 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                             this,
                             activityResultLauncher,
                             it.productId,
-                            it.cartId,
                             it.quantity,
                         )
                     }
@@ -154,13 +157,9 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         )
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadInitialShoppingItems()
-    }
-
     companion object {
         const val GRIDLAYOUT_COL = 2
+        const val EXTRA_IS_RECENT_PRODUCT_CHANGED = "isRecentChanged"
         private const val EXTRA_PRODUCT_ID = "productId"
         private const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
 

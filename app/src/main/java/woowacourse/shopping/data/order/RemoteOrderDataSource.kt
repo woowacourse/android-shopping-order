@@ -8,7 +8,7 @@ class RemoteOrderDataSource {
     private val orderApiService: OrderApiService =
         ApiClient.getApiClient().create(OrderApiService::class.java)
 
-    fun requestOrder(cartItemIds: List<Int>): Call<Unit> {
+    fun requestOrder(cartItemIds: List<Long>): Call<Unit> {
         return orderApiService.requestOrder(OrderRequest(cartItemIds))
     }
 }

@@ -8,7 +8,6 @@ data class Cart(
     fun toShoppingProduct(): ProductListItem.ShoppingProductItem =
         ProductListItem.ShoppingProductItem(
             id = this.product.id,
-            cartId = this.cartId,
             name = this.product.name,
             imgUrl = this.product.imgUrl,
             price = this.product.price,

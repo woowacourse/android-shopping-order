@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
 import woowacourse.shopping.data.local.AppDatabase
 import woowacourse.shopping.data.order.OrderRepositoryImpl
@@ -19,11 +18,9 @@ class ViewModelFactory() : ViewModelProvider.Factory {
         return when {
             modelClass.isAssignableFrom(ProductDetailViewModel::class.java) -> {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 ProductDetailViewModel(
                     ProductRepositoryImpl(),
                     CartRepositoryImpl(
-                        localCartDataSource = LocalCartDataSourceImpl(cartDao),
                         remoteCartDataSource = RemoteCartDataSource(),
                     ),
                     RecentProductRepositoryImpl(recentDao),
@@ -32,13 +29,11 @@ class ViewModelFactory() : ViewModelProvider.Factory {
 
             modelClass.isAssignableFrom(ShoppingViewModel::class.java) -> {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 ShoppingViewModel(
                     productRepository = ProductRepositoryImpl(),
                     recentRepository = RecentProductRepositoryImpl(recentDao),
                     cartRepository =
                         CartRepositoryImpl(
-                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
                             remoteCartDataSource = RemoteCartDataSource(),
                         ),
                 ) as T
@@ -50,12 +45,15 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                 CartViewModel(
                     cartRepository =
                         CartRepositoryImpl(
-                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
                             remoteCartDataSource = RemoteCartDataSource(),
                         ),
                     productRepository = ProductRepositoryImpl(),
                     recentRepository = RecentProductRepositoryImpl(recentDao),
-                    orderRepository = OrderRepositoryImpl(RemoteOrderDataSource()),
+                    orderRepository =
+                        OrderRepositoryImpl(
+                            RemoteOrderDataSource(),
+                            RemoteCartDataSource(),
+                        ),
                 ) as T
             }
 

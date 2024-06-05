@@ -8,11 +8,9 @@ import woowacourse.shopping.data.dto.response.CartQuantityResponse
 import woowacourse.shopping.data.dto.response.CartResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.LocalCartDataSource
 
 class CartRepositoryImpl(
     private val remoteCartDataSource: RemoteCartDataSource = RemoteCartDataSource(),
-    private val localCartDataSource: LocalCartDataSource,
 ) : CartRepository {
     override fun load(
         startPage: Int,
@@ -48,68 +46,55 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun updateIncrementQuantity(
-        cartId: Long,
+    override fun loadById(
         productId: Long,
-        incrementAmount: Int,
-        quantity: Int,
-        onSuccess: (Long, Int) -> Unit,
+        onSuccess: (Cart?) -> Unit,
         onFailure: () -> Unit,
     ) {
-        if (cartId == -1L) {
-            saveNewCartItem(productId, incrementAmount, onSuccess, onFailure)
-        } else {
-            updateExistCartItem(cartId, quantity + incrementAmount, onSuccess, onFailure)
-        }
-    }
-
-    override fun updateDecrementQuantity(
-        cartId: Long,
-        productId: Long,
-        decrementAmount: Int,
-        quantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        if (cartId == -1L) {
-            throw IllegalArgumentException()
-        }
-        val resultQuantity = quantity - decrementAmount
-        if (resultQuantity == 0) {
-            deleteExistCartItem(
-                cartId,
-                onSuccess,
-                onFailure,
-            )
-        } else {
-            updateExistCartItem(cartId, quantity - decrementAmount, onSuccess, onFailure)
-        }
+        var cart: Cart?
+        loadAll(
+            onSuccess = { carts ->
+                cart = carts.firstOrNull { it.product.id == productId }
+                onSuccess(cart)
+            },
+            onFailure = {
+                throw NoSuchElementException("productId : $productId) 장바구니에서 해당 상품을 찾을 수 없습니다.")
+            },
+        )
     }
 
     override fun deleteExistCartItem(
-        cartId: Long,
+        productId: Long,
         onSuccess: (Long, Int) -> Unit,
         onFailure: () -> Unit,
     ) {
-        remoteCartDataSource.delete(cartId).enqueue(
-            object :
-                Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.isSuccessful) {
-                        onSuccess(cartId, 0)
-                    }
-                }
+        loadAll(
+            onSuccess = { carts ->
+                val cart =
+                    carts.firstOrNull { it.product.id == productId }
+                        ?: throw IllegalArgumentException()
+                remoteCartDataSource.delete(cart.cartId).enqueue(
+                    object :
+                        Callback<Unit> {
+                        override fun onResponse(
+                            call: Call<Unit>,
+                            response: Response<Unit>,
+                        ) {
+                            if (response.isSuccessful) {
+                                onSuccess(productId, 0)
+                            }
+                        }
 
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
+                        override fun onFailure(
+                            call: Call<Unit>,
+                            t: Throwable,
+                        ) {
+                            onFailure()
+                        }
+                    },
+                )
             },
+            onFailure = {},
         )
     }
 
@@ -196,6 +181,106 @@ class CartRepositoryImpl(
                     onFailure()
                 }
             },
+        )
+    }
+
+    override fun loadAll(
+        onSuccess: (List<Cart>) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        var maxCount = 0
+        getCount(onSuccess = { count ->
+            maxCount = count
+        }, onFailure = {
+            throw NoSuchElementException()
+        })
+        load(
+            0,
+            maxCount,
+            onSuccess = { carts, _ ->
+                onSuccess(carts)
+            },
+            onFailure = {},
+        )
+    }
+
+    override fun setNewCartQuantity(
+        productId: Long,
+        newQuantity: Int,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        loadAll(onSuccess = { carts ->
+            val targetCart: Cart =
+                carts.firstOrNull { it.product.id == productId } ?: run {
+                    saveNewCartItem(
+                        productId,
+                        newQuantity,
+                        onSuccess,
+                        onFailure,
+                    )
+                    return@loadAll
+                }
+            when {
+                0 < newQuantity ->
+                    updateExistCartItem(
+                        targetCart.cartId,
+                        newQuantity,
+                        onSuccess,
+                        onFailure,
+                    )
+
+                0 == newQuantity ->
+                    deleteExistCartItem(
+                        productId,
+                        onSuccess,
+                        onFailure,
+                    )
+
+                else -> throw IllegalArgumentException()
+            }
+        }, onFailure = {})
+    }
+
+    override fun modifyExistCartQuantity(
+        productId: Long,
+        quantityDelta: Int,
+        onSuccess: (Long, Int) -> Unit,
+        onFailure: () -> Unit,
+    ) {
+        loadAll(
+            onSuccess = { carts ->
+                val targetCart: Cart =
+                    carts.firstOrNull { it.product.id == productId } ?: run {
+                        saveNewCartItem(
+                            productId,
+                            quantityDelta,
+                            onSuccess,
+                            onFailure,
+                        )
+                        return@loadAll
+                    }
+                val resultQuantity = targetCart.quantity + quantityDelta
+                when {
+                    0 < resultQuantity ->
+                        updateExistCartItem(
+                            targetCart.cartId,
+                            resultQuantity,
+                            onSuccess,
+                            onFailure,
+                        )
+
+                    0 == resultQuantity ->
+                        deleteExistCartItem(
+                            productId,
+                            onSuccess,
+                            onFailure,
+                        )
+
+                    else -> throw java.lang.IllegalArgumentException()
+                }
+            },
+            onFailure = {},
         )
     }
 }

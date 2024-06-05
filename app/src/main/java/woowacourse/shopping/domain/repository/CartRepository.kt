@@ -10,20 +10,27 @@ interface CartRepository {
         onFailure: () -> Unit,
     )
 
-    fun updateIncrementQuantity(
-        cartId: Long,
+    fun loadById(
         productId: Long,
-        incrementAmount: Int,
-        quantity: Int,
+        onSuccess: (Cart?) -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun loadAll(
+        onSuccess: (List<Cart>) -> Unit,
+        onFailure: () -> Unit,
+    )
+
+    fun modifyExistCartQuantity(
+        productId: Long,
+        quantityDelta: Int,
         onSuccess: (Long, Int) -> Unit,
         onFailure: () -> Unit,
     )
 
-    fun updateDecrementQuantity(
-        cartId: Long,
+    fun setNewCartQuantity(
         productId: Long,
-        decrementAmount: Int,
-        quantity: Int,
+        newQuantity: Int,
         onSuccess: (Long, Int) -> Unit,
         onFailure: () -> Unit,
     )
@@ -34,7 +41,7 @@ interface CartRepository {
     )
 
     fun deleteExistCartItem(
-        cartId: Long,
+        productId: Long,
         onSuccess: (Long, Int) -> Unit,
         onFailure: () -> Unit,
     )

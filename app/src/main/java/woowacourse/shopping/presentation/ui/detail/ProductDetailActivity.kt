@@ -11,6 +11,7 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
+import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity.Companion.EXTRA_IS_RECENT_PRODUCT_CHANGED
 import woowacourse.shopping.presentation.util.EventObserver
 import kotlin.properties.Delegates
 
@@ -21,7 +22,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     private val viewModel: ProductDetailViewModel by viewModels { ViewModelFactory() }
 
     private var productId by Delegates.notNull<Long>()
-    private var cartId by Delegates.notNull<Long>()
 
     override fun initStartView(savedInstanceState: Bundle?) {
         binding.lifecycleOwner = this
@@ -43,11 +43,10 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     private fun fetchInitialData() {
-        cartId = intent.getLongExtra(EXTRA_CART_ID, -1L)
         productId = intent.getLongExtra(EXTRA_PRODUCT_ID, -1L)
-        val quantity = intent.getIntExtra(EXTRA_QUANTITY, 0)
+//        val quantity = intent.getIntExtra(EXTRA_QUANTITY, 0)
         if (productId == -1L) finish()
-        viewModel.fetchInitialData(cartId, quantity, productId)
+        viewModel.fetchInitialData(productId)
     }
 
     private fun observeLiveDatas() {
@@ -94,9 +93,14 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         )
     }
 
+    override fun onBackPressed() {
+        val intent = Intent().putExtra(EXTRA_IS_RECENT_PRODUCT_CHANGED, true)
+        setResult(RESULT_OK, intent)
+        super.onBackPressed()
+    }
+
     companion object {
-        const val EXTRA_QUANTITY = "quantity"
-        const val EXTRA_CART_ID = "cartId"
+//        const val EXTRA_QUANTITY = "quantity"
         const val EXTRA_PRODUCT_ID = "productId"
         const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
         private const val EXTRA_IS_LAST_VIEWED_PRODUCT = "isLastViewedProduct"
@@ -117,13 +121,11 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
             context: Context,
             activityLauncher: ActivityResultLauncher<Intent>,
             productId: Long,
-            cartId: Long,
             quantity: Int,
         ) {
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(EXTRA_PRODUCT_ID, productId)
-                putExtra(EXTRA_CART_ID, cartId)
-                putExtra(EXTRA_QUANTITY, quantity)
+//                putExtra(EXTRA_QUANTITY, quantity)
                 activityLauncher.launch(this)
             }
         }

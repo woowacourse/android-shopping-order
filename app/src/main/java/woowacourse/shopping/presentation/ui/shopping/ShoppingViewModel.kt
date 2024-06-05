@@ -22,7 +22,7 @@ class ShoppingViewModel(
 ) : ViewModel(), ShoppingHandler {
     private var currentPage: Int = 0
 
-    private val cartProducts: MutableList<Cart> = mutableListOf()
+    private var cartProducts: List<Cart> = emptyList()
 
     private val _cartItemQuantity = MutableLiveData<Int>()
     val cartItemQuantity: LiveData<Int> get() = _cartItemQuantity
@@ -36,8 +36,6 @@ class ShoppingViewModel(
 
     val shoppingProducts: LiveData<UiState<List<ProductListItem.ShoppingProductItem>>> get() = _shoppingProducts
 
-    private val shoppingProductItems = mutableListOf<ProductListItem.ShoppingProductItem>()
-
     private val _error = MutableLiveData<Event<ShoppingError>>()
 
     val error: LiveData<Event<ShoppingError>> get() = _error
@@ -47,17 +45,17 @@ class ShoppingViewModel(
     val moveEvent: LiveData<Event<FromShoppingToScreen>> get() = _moveEvent
 
     fun loadInitialShoppingItems() {
-        if (shoppingProducts.value !is UiState.Success<List<ProductListItem.ShoppingProductItem>>) {
+        if (shoppingProducts.value !is UiState.Success) {
 //            val handler = Handler(Looper.getMainLooper())
-            fetchInitialRecentProducts()
 //            handler.postDelayed({
-            fetchCartCount()
+            fetchAllRecentProducts()
+            fetchCartItemCount()
             fetchInitialCartProducts()
 //            }, 1000)
         }
     }
 
-    fun fetchInitialRecentProducts() {
+    fun fetchAllRecentProducts() {
         recentRepository.loadAll().onSuccess {
             _recentProducts.value = UiState.Success(it)
         }.onFailure {
@@ -65,36 +63,30 @@ class ShoppingViewModel(
         }
     }
 
-    fun fetchCartCount() {
+    fun fetchCartItemCount() {
         cartRepository.getCount(
-            onSuccess = { totalCartItemsQuantity ->
-                _cartItemQuantity.value = totalCartItemsQuantity
-            },
-            onFailure = {},
+            onSuccess = { _cartItemQuantity.value = it },
+            onFailure = { Event(ShoppingError.CartItemCountNotFound) },
         )
     }
 
     private fun fetchInitialCartProducts() {
-        cartRepository.load(
-            startPage = 0,
-            pageSize = _cartItemQuantity.value ?: 0,
-            onSuccess = { cartItems, _ ->
-                cartProducts.addAll(cartItems)
-                fetchInitialProducts(cartItems)
+        cartRepository.loadAll(
+            onSuccess = { cartItems ->
+                cartProducts = cartItems
+                fetchProductsByPage()
             },
-            onFailure = {
-                _error.value = Event(ShoppingError.CartItemsNotFound)
-            },
+            onFailure = { _error.value = Event(ShoppingError.CartItemsNotFound) },
         )
     }
 
-    private fun fetchInitialProducts(carts: List<Cart>) {
+    private fun fetchProductsByPage() {
         productRepository.load(
             currentPage,
             PAGE_SIZE,
             onSuccess = { products ->
                 currentPage++
-                addShoppingProducts(products, carts)
+                addShoppingProducts(products)
             },
             onFailure = {
                 _error.value = Event(ShoppingError.ProductItemsNotFound)
@@ -102,61 +94,26 @@ class ShoppingViewModel(
         )
     }
 
-    private fun fetchProductForNewPage() {
-        productRepository.load(currentPage, PAGE_SIZE, onSuccess = { products ->
-            currentPage++
-            addShoppingProducts(products, cartProducts)
-        }, onFailure = {
-            _error.value = Event(ShoppingError.AllProductsLoaded)
-        })
-    }
-
-    private fun addShoppingProducts(
-        products: List<Product>,
-        carts: List<Cart>,
-    ) {
-        val newShoppingProducts = fromProductsAndCarts(products, carts)
-        shoppingProductItems.addAll(newShoppingProducts)
-        _shoppingProducts.value = UiState.Success(shoppingProductItems)
-    }
-
-    private fun modifyShoppingProductQuantity(
-        cartId: Long,
-        productId: Long,
-        resultQuantity: Int,
-    ) {
-        val productIndex = shoppingProductItems.indexOfFirst { it.id == productId }
-        val updatedProduct =
-            shoppingProductItems[productIndex].copy(
-                quantity = resultQuantity,
-                cartId = cartId,
-            )
-        shoppingProductItems[productIndex] = updatedProduct
-        _shoppingProducts.value = UiState.Success(shoppingProductItems)
-    }
-
-    fun updateProductQuantity(
-        productId: Long,
-        newQuantity: Int,
-    ) {
-        val productIndex = shoppingProductItems.indexOfFirst { it.id == productId }
-        if (productIndex != -1) {
-            var cartId = cartProducts.find { it.product.id == productId }?.cartId ?: -1
-            if (newQuantity == 0) cartId = -1
-            val updatedProduct =
-                shoppingProductItems[productIndex].copy(
-                    cartId = cartId,
-                    quantity = newQuantity,
-                )
-            shoppingProductItems[productIndex] = updatedProduct
-            _shoppingProducts.value = UiState.Success(shoppingProductItems)
-        }
+    private fun addShoppingProducts(products: List<Product>) {
+        val state = shoppingProducts.value ?: return
+        val originShoppingProducts =
+            when (state) {
+                is UiState.Success -> state.data.toMutableList()
+                is UiState.Loading -> mutableListOf()
+            }
+        val newShoppingProducts = fromProductsAndCarts(products, cartProducts)
+        val resultShoppingProducts = originShoppingProducts.plus(newShoppingProducts)
+        _shoppingProducts.value = UiState.Success(resultShoppingProducts)
     }
 
     override fun onProductItemClick(productId: Long) {
-        val cartId = cartProducts.find { it.product.id == productId }?.cartId ?: -1
-        val quantity = shoppingProductItems.find { it.id == productId }?.quantity ?: 0
-        _moveEvent.value = Event(FromShoppingToScreen.ProductDetail(productId, cartId, quantity))
+        val state = shoppingProducts.value
+        if (state is UiState.Success) {
+            val originShoppingProducts = state.data.toMutableList()
+            val quantity = originShoppingProducts.find { it.id == productId }?.quantity ?: 0
+            _moveEvent.value =
+                Event(FromShoppingToScreen.ProductDetail(productId, quantity))
+        }
     }
 
     override fun onCartMenuItemClick() {
@@ -164,45 +121,52 @@ class ShoppingViewModel(
     }
 
     override fun onLoadMoreClick() {
-        fetchProductForNewPage()
+        fetchProductsByPage()
     }
 
-    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let { product ->
-            cartRepository.updateDecrementQuantity(
-                cartId = product.cartId,
-                productId = product.id,
-                decrementAmount = 1,
-                quantity = product.quantity,
-                onSuccess = { cartId, resultQuantity ->
-                    if (resultQuantity == 0) {
-                        modifyShoppingProductQuantity(-1, product.id, resultQuantity)
-                    } else {
-                        modifyShoppingProductQuantity(cartId, product.id, resultQuantity)
-                    }
-                },
-                onFailure = {
-                    _error.value = Event(ShoppingError.CartItemsNotModified)
-                },
-            )
-        }
+    override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        product ?: return
+        cartRepository.modifyExistCartQuantity(
+            productId = product.id,
+            quantityDelta = -1,
+            onSuccess = { _, resultQuantity ->
+                setNewShoppingProductQuantity(product.id, resultQuantity)
+            },
+            onFailure = {
+                _error.value = Event(ShoppingError.CartItemsNotModified)
+            },
+        )
     }
 
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let { product ->
-            cartRepository.updateIncrementQuantity(
-                cartId = product.cartId,
-                productId = product.id,
-                incrementAmount = 1,
-                quantity = product.quantity,
-                onSuccess = { cartId, incrementAmount ->
-                    modifyShoppingProductQuantity(cartId, product.id, incrementAmount)
-                },
-                onFailure = {
-                    _error.value = Event(ShoppingError.CartItemsNotModified)
-                },
-            )
-        }
+    override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        product ?: return
+        cartRepository.modifyExistCartQuantity(
+            productId = product.id,
+            quantityDelta = 1,
+            onSuccess = { _, incrementAmount ->
+                setNewShoppingProductQuantity(product.id, incrementAmount)
+            },
+            onFailure = {
+                _error.value = Event(ShoppingError.CartItemsNotModified)
+            },
+        )
+    }
+
+    fun setNewShoppingProductQuantity(
+        productId: Long,
+        newQuantity: Int,
+    ) {
+        val state = shoppingProducts.value
+        if (state !is UiState.Success) return
+        val updatedShoppingProduct =
+            state.data.map { shoppingProduct ->
+                if (shoppingProduct.id == productId) {
+                    shoppingProduct.copy(quantity = newQuantity)
+                } else {
+                    shoppingProduct
+                }
+            }
+        _shoppingProducts.value = UiState.Success(updatedShoppingProduct)
     }
 
     companion object {
