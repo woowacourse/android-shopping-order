@@ -9,4 +9,6 @@ interface OrderRepository {
 
     fun allOrderItemsTempQuantity(): Int
 
+    fun tempOrderItemsTotalPrice(): Int
+
 }

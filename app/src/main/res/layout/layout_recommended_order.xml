@@ -8,6 +8,15 @@
         <variable
             name="onOrderListener"
             type="woowacourse.shopping.ui.order.OnOrderListener" />
+
+        <variable
+            name="totalCartItemQuantity"
+            type="int" />
+
+        <variable
+            name="totalCartItemsPrice"
+            type="int" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +31,7 @@
             android:layout_marginHorizontal="12dp"
             android:layout_marginVertical="26dp"
             android:gravity="end"
+            android:text="@{@string/price_format(totalCartItemsPrice)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -36,11 +46,12 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/shape_order_button"
+            android:onClick="@{() -> onOrderListener.createOrder()}"
             android:paddingHorizontal="16dp"
+            android:text="@{@string/order_items_count(totalCartItemQuantity)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:onClick="@{() -> onOrderListener.createOrder()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_recommended_order_price"

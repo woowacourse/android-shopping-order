@@ -36,6 +36,9 @@ class OrderViewModel(
     private val _changedProduct: MutableSingleLiveData<Product> = MutableSingleLiveData()
     val changedProduct: SingleLiveData<Product> get() = _changedProduct
 
+    private val _totalPrice: MutableLiveData<Int> = MutableLiveData()
+    val totalPrice: LiveData<Int> get() = _totalPrice
+
     override fun createOrder() {
         orderRepository.order(orderItemsId)
     }
@@ -47,43 +50,11 @@ class OrderViewModel(
                     productId = historyRepository.loadLatestProduct().id
                 )
             )
+            _addedProductQuantity.postValue(orderRepository.allOrderItemsTempQuantity())
+            _totalPrice.postValue(orderRepository.tempOrderItemsTotalPrice())
         }.join()
-
-        _addedProductQuantity.postValue(orderRepository.allOrderItemsTempQuantity())
-
     }
 
-
-    companion object {
-        private const val TAG = "OrderViewModel"
-
-        fun factory(
-            productIds: List<Long>,
-            orderRepository: OrderRepository = DefaultOrderRepository(
-                ShoppingApp.orderSource
-            ),
-            historyRepository: ProductHistoryRepository = DefaultProductHistoryRepository(
-                ShoppingApp.historySource,
-                ShoppingApp.productSource
-            ),
-            productRecommendationRepository: ProductsRecommendationRepository =
-                CategoryBasedProductRecommendationRepository(
-                    ShoppingApp.productSource,
-                    ShoppingApp.cartSource
-                ),
-            cartRepository: ShoppingCartRepository =
-                DefaultShoppingCartRepository(
-                    ShoppingApp.cartSource,
-                ),
-        ): UniversalViewModelFactory {
-            return UniversalViewModelFactory {
-                OrderViewModel(
-                    productIds, orderRepository, historyRepository, productRecommendationRepository, cartRepository
-                )
-            }
-        }
-
-    }
 
     override fun onIncrease(productId: Long, quantity: Int) {
         thread {
@@ -108,6 +79,12 @@ class OrderViewModel(
                     } ?: emptyList()
                 )
 
+                _totalPrice.postValue(
+                    _totalPrice.value?.plus(
+                        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+                    ) ?: 0
+                )
+
             }
             _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
 
@@ -116,5 +93,37 @@ class OrderViewModel(
 
     override fun onDecrease(productId: Long, quantity: Int) {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        private const val TAG = "OrderViewModel"
+
+        fun factory(
+            productIds: List<Long>,
+            orderRepository: OrderRepository = DefaultOrderRepository(
+                ShoppingApp.orderSource,
+                ShoppingApp.productSource
+            ),
+            historyRepository: ProductHistoryRepository = DefaultProductHistoryRepository(
+                ShoppingApp.historySource,
+                ShoppingApp.productSource
+            ),
+            productRecommendationRepository: ProductsRecommendationRepository =
+                CategoryBasedProductRecommendationRepository(
+                    ShoppingApp.productSource,
+                    ShoppingApp.cartSource
+                ),
+            cartRepository: ShoppingCartRepository =
+                DefaultShoppingCartRepository(
+                    ShoppingApp.cartSource,
+                ),
+        ): UniversalViewModelFactory {
+            return UniversalViewModelFactory {
+                OrderViewModel(
+                    productIds, orderRepository, historyRepository, productRecommendationRepository, cartRepository
+                )
+            }
+        }
+
     }
 }

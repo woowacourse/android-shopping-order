@@ -1,9 +1,12 @@
 package woowacourse.shopping.domain.repository
 
+import androidx.room.PrimaryKey
 import woowacourse.shopping.data.source.OrderDataSource
+import woowacourse.shopping.data.source.ProductDataSource
 
 class DefaultOrderRepository(
-    private val orderSource: OrderDataSource
+    private val orderSource: OrderDataSource,
+    private val productDataSource: ProductDataSource,
 ) : OrderRepository {
     override fun order(cartItemIds: List<Long>) {
         orderSource.order(cartItemIds)
@@ -16,6 +19,10 @@ class DefaultOrderRepository(
     override fun loadOrderItemTemp(): Map<Long, Int> = orderSaved
 
     override fun allOrderItemsTempQuantity(): Int = orderSaved.values.sum()
+
+    override fun tempOrderItemsTotalPrice(): Int = orderSaved.map { (id, quantity) ->
+        productDataSource.findById(id).price.times(quantity)
+    }.sum()
 
 
     companion object {
