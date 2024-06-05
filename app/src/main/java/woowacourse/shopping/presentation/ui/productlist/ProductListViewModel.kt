@@ -18,7 +18,6 @@ import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.productlist.adapter.ProductListPagingSource
-import kotlin.concurrent.thread
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
@@ -109,7 +108,7 @@ class ProductListViewModel(
     }
 
     fun updateProducts() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             uiState.value?.let { state ->
                 val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
                 val updatedProductList =
@@ -189,7 +188,7 @@ class ProductListViewModel(
         product: Product,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
@@ -218,7 +217,7 @@ class ProductListViewModel(
     }
 
     private fun deleteCartProduct(cartId: Int) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.deleteCartProductById(
                 cartId = cartId,
             ).onFailure { e ->
@@ -231,7 +230,7 @@ class ProductListViewModel(
         cartId: Int,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.updateCartProduct(
                 cartId = cartId,
                 quantity = quantity,

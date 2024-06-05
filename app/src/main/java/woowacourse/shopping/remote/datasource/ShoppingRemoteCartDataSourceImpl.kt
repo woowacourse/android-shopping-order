@@ -8,47 +8,41 @@ import woowacourse.shopping.remote.mapper.toDomain
 import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
 
-class ShoppingRemoteCartDataSourceImpl(private val service: CartService) : ShoppingRemoteCartDataSource {
-    override fun insertCartProduct(
+class ShoppingRemoteCartDataSourceImpl(private val service: CartService) :
+    ShoppingRemoteCartDataSource {
+    override suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Result<Int> =
-        runCatching {
-            val body =
-                PostCartItemRequest(
-                    productId = productId.toInt(),
-                    quantity = quantity,
-                )
-            service.postCartItem(body).execute().toCartId()
-        }
+    ): Int {
+        val body =
+            PostCartItemRequest(
+                productId = productId.toInt(),
+                quantity = quantity,
+            )
 
-    override fun updateCartProduct(
+        val response = service.postCartItem(body).headers()["location"]
+
+        return response?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
+    }
+
+    override suspend fun updateCartProduct(
         cartId: Int,
         quantity: Int,
-    ): Result<Unit> =
-        runCatching {
-            val body = PatchCartItemRequest(quantity = quantity)
-            service.patchCartItem(id = cartId, body = body).execute()
-        }
+    ) {
+        val body = PatchCartItemRequest(quantity = quantity)
+        service.patchCartItem(id = cartId, body = body)
+    }
 
-    override fun getCartProductsPaged(
+    override suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
-    ): Result<Carts> =
-        runCatching {
-            service.getCartItems(page = page, size = size).execute().body()?.toDomain()
-                ?: throw IllegalArgumentException()
-        }
+    ): Carts = service.getCartItems(page = page, size = size).toDomain()
 
-    override fun getCartProductsQuantity(): Result<Int> =
-        runCatching {
-            service.getCartItemsCount().execute().body()?.quantity ?: 0
-        }
+    override suspend fun getCartProductsQuantity(): Int = service.getCartItemsCount().quantity
 
-    override fun deleteCartProductById(cartId: Int): Result<Unit> =
-        runCatching {
-            service.deleteCartItem(id = cartId).execute().body()
-        }
+    override suspend fun deleteCartProductById(cartId: Int) {
+        service.deleteCartItem(id = cartId)
+    }
 
     fun <T> Response<T>.toCartId(): Int = this.headers()["location"]?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
 }

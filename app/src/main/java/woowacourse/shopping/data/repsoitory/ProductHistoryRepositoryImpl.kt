@@ -29,7 +29,7 @@ class ProductHistoryRepositoryImpl(
     override fun getProductHistoryById(productId: Long): Result<Product> =
         productHistoryLocalDataSource.getProductHistoryById(productId = productId)
 
-    override fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
+    override suspend fun getProductHistoriesByCategory(size: Int): Result<List<Cart>> {
         val recentHistory = productHistoryLocalDataSource.getProductHistoriesBySize(1).getOrThrow()
 
         if (recentHistory.isEmpty()) return Result.success(emptyList())

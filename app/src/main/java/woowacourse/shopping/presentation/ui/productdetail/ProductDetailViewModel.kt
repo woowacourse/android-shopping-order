@@ -108,28 +108,32 @@ class ProductDetailViewModel(
     }
 
     fun insertCart(cart: Cart) {
-        shoppingCartRepository.insertCartProduct(
-            productId = cart.product.id,
-            quantity = cart.quantity,
-        ).onSuccess {
-            hideError()
-            showMessage(ProductDetailMessage.AddToCartSuccessMessage)
-        }.onFailure { e ->
-            showError(e)
-            showMessage(MessageProvider.DefaultErrorMessage)
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.insertCartProduct(
+                productId = cart.product.id,
+                quantity = cart.quantity,
+            ).onSuccess {
+                hideError()
+                showMessage(ProductDetailMessage.AddToCartSuccessMessage)
+            }.onFailure { e ->
+                showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
+            }
         }
     }
 
     fun updateCart(cart: Cart) {
-        shoppingCartRepository.updateCartProduct(
-            cartId = cart.id,
-            quantity = cart.quantity,
-        ).onSuccess {
-            hideError()
-            showMessage(ProductDetailMessage.AddToCartSuccessMessage)
-        }.onFailure { e ->
-            showError(e)
-            showMessage(MessageProvider.DefaultErrorMessage)
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.updateCartProduct(
+                cartId = cart.id,
+                quantity = cart.quantity,
+            ).onSuccess {
+                hideError()
+                showMessage(ProductDetailMessage.AddToCartSuccessMessage)
+            }.onFailure { e ->
+                showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
+            }
         }
     }
 

@@ -3,6 +3,9 @@ package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -13,7 +16,6 @@ import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.ShoppingCartPagingSource
-import kotlin.concurrent.thread
 
 class CartSelectViewModel(
     private val shoppingRepository: ShoppingCartRepository,
@@ -36,9 +38,8 @@ class CartSelectViewModel(
     }
 
     private fun loadCartProducts(page: Int) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             showLoading()
-            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
 
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
@@ -136,7 +137,7 @@ class CartSelectViewModel(
         product: Product,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
@@ -149,7 +150,7 @@ class CartSelectViewModel(
     }
 
     override fun deleteCartProduct(cartId: Int) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingRepository.deleteCartProductById(cartId = cartId).onSuccess {
                 uiState.value?.let { state ->
                     loadCartProducts(state.pagingCartProduct.currentPage)
@@ -187,7 +188,7 @@ class CartSelectViewModel(
     }
 
     override fun checkAllCartProduct() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingRepository.getAllCarts().onSuccess { carts ->
                 hideError()
 
@@ -234,7 +235,7 @@ class CartSelectViewModel(
         cartId: Int,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingRepository.updateCartProduct(
                 cartId = cartId,
                 quantity = quantity,

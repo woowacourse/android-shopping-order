@@ -14,7 +14,7 @@ interface ProductHistoryRepository {
 
     fun getProductHistoryById(productId: Long): Result<Product>
 
-    fun getProductHistoriesByCategory(size: Int): Result<List<Cart>>
+    suspend fun getProductHistoriesByCategory(size: Int): Result<List<Cart>>
 
     fun getProductHistoriesBySize(size: Int): Result<List<Product>>
 

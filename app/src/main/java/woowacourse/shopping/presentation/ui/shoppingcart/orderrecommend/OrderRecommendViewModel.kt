@@ -17,7 +17,6 @@ import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
-import kotlin.concurrent.thread
 
 class OrderRecommendViewModel(
     private val productHistoryRepository: ProductHistoryRepository,
@@ -37,7 +36,7 @@ class OrderRecommendViewModel(
     }
 
     private fun recommendProductLoad() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             productHistoryRepository.getProductHistoriesByCategory(10)
                 .onSuccess { recommendProducts ->
 
@@ -126,7 +125,7 @@ class OrderRecommendViewModel(
         product: Product,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
@@ -157,7 +156,7 @@ class OrderRecommendViewModel(
     }
 
     private fun deleteCartProduct(cartId: Int) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.deleteCartProductById(
                 cartId = cartId,
             ).onSuccess {
@@ -179,7 +178,7 @@ class OrderRecommendViewModel(
         cart: Cart,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.updateCartProduct(
                 cartId = cart.id,
                 quantity = quantity,
