@@ -1,12 +1,22 @@
 package woowacourse.shopping.presentation.base
 
 import android.database.SQLException
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonParseException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.concurrent.TimeoutException
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 abstract class BaseViewModel : ViewModel() {
     private val _message: MutableLiveData<Event<MessageProvider>> = MutableLiveData()
@@ -18,6 +28,26 @@ abstract class BaseViewModel : ViewModel() {
     private val _loading: MutableLiveData<LoadingProvider?> = MutableLiveData(null)
     val loading: LiveData<LoadingProvider?> get() = _loading
 
+    protected fun launch(
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job {
+        val exceptionHandler =
+            CoroutineExceptionHandler { _, throwable ->
+                handleException(throwable)
+            }
+        return viewModelScope.launch(
+            context = context + exceptionHandler,
+            start = start,
+            block = block,
+        )
+    }
+
+    private fun handleException(throwable: Throwable) {
+        if (throwable is CancellationException) return
+    }
+
     abstract fun retry()
 
     fun showMessage(messageProvider: MessageProvider) {
@@ -28,6 +58,7 @@ abstract class BaseViewModel : ViewModel() {
         e: Throwable,
         onUnhandledError: () -> Unit = {},
     ) {
+        Log.d("Ttt e", e.toString())
         when (e) {
             is IllegalArgumentException -> showError("잘못된 요청", "잘못된 요청입니다.")
             is SecurityException -> showError("보안 오류", "인증 오류가 발생했습니다.")
