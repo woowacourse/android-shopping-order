@@ -3,6 +3,9 @@ package woowacourse.shopping.presentation.ui.productlist
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -41,7 +44,7 @@ class ProductListViewModel(
     }
 
     private fun initLoad() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             showLoading()
             Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             productListPagingSource.load().mapCatching { pagingProduct ->
@@ -80,7 +83,7 @@ class ProductListViewModel(
     }
 
     override fun loadMoreProducts() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             productListPagingSource.load().onSuccess { pagingProduct ->
                 hideError()
                 _uiState.value?.let { state ->

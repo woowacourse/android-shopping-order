@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -34,7 +37,7 @@ class ProductDetailViewModel(
     }
 
     fun getProduct() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             productRepository.getCartById(id).onSuccess { cart ->
                 hideError()
                 _uiState.value?.let { state ->
