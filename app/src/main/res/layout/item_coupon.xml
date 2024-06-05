@@ -28,10 +28,13 @@
             android:orientation="horizontal">
 
             <CheckBox
+                android:onClick="@{() -> onClickPayment.clickCoupon(coupon)}"
+                android:checked="@{coupon.itemSelector.isSelected}"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size" />
 
             <TextView
+                android:text="@{coupon.description}"
                 android:id="@+id/tv_cart_item_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,6 +47,7 @@
         </LinearLayout>
 
         <TextView
+            android:text="@{@string/coupon_date(coupon.expirationDate)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -53,7 +57,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:text=""
             android:layout_marginBottom="@dimen/margin_payment"
-            tools:text="최소 주문 금액: 2024년 11월 30일" />
+            android:id="@+id/minimumAmount"
+            tools:text="최소 주문 금액: 1,000원" />
     </LinearLayout>
 </layout>

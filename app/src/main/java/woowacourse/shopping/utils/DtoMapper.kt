@@ -57,6 +57,7 @@ object DtoMapper {
            description = description,
            discountType =discountType,
            discount = discount,
+           minimumAmount = minimumAmount,
            availableTime = availableTimeDto?.toAvailableTime(),
            itemSelector =  ItemSelector()
        )

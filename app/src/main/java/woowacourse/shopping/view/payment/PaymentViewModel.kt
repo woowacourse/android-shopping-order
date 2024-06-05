@@ -33,9 +33,10 @@ class PaymentViewModel(
     private val _paymentEvent: MutableSingleLiveData<PaymentEvent> = MutableSingleLiveData()
     val paymentEvent : SingleLiveData<PaymentEvent> get() = _paymentEvent
 
-    override fun clickCoupon() {
-
+    override fun clickCoupon(coupon: Coupon) {
+        TODO("Not yet implemented")
     }
+
 
     override fun clickPayment() {
         orderItems()
