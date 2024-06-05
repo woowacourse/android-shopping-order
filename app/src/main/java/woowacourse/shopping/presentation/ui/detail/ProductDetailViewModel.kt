@@ -98,7 +98,7 @@ class ProductDetailViewModel(
                 is NetworkResult.Success -> {
                     val carts = result.data
                     val cartItem = carts.find { it.product.id == productId }
-                    saveCartItem(cartItem)
+                    addCartItem(cartItem)
                 }
                 is NetworkResult.Error -> {
                     _error.value = Event(DetailError.CartItemNotFound)
@@ -107,30 +107,41 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveCartItem(cartItem: Cart?) {
+    private fun addCartItem(cartItem: Cart?) {
         val product = product.value ?: return
 
         if (cartItem == null) {
-            cartRepository.saveNewCartItem(productId, product.quantity) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
-                    }
-                    is NetworkResult.Error -> {
-                        _error.value = Event(DetailError.CartItemNotFound)
-                    }
+            saveNewCartItem(product)
+        } else {
+            updateExistCartItem(cartItem, product)
+        }
+    }
+
+    private fun saveNewCartItem(product: ProductModel) {
+        cartRepository.saveNewCartItem(productId, product.quantity) { result ->
+            when (result) {
+                is NetworkResult.Success -> {
+                    _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
+                }
+                is NetworkResult.Error -> {
+                    _error.value = Event(DetailError.CartItemNotFound)
                 }
             }
-        } else {
-            val newQuantity = cartItem.quantity + product.quantity
-            cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity))
-                    }
-                    is NetworkResult.Error -> {
-                        _error.value = Event(DetailError.CartItemNotFound)
-                    }
+        }
+    }
+
+    private fun updateExistCartItem(
+        cartItem: Cart,
+        product: ProductModel,
+    ) {
+        val newQuantity = cartItem.quantity + product.quantity
+        cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity) { result ->
+            when (result) {
+                is NetworkResult.Success -> {
+                    _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity))
+                }
+                is NetworkResult.Error -> {
+                    _error.value = Event(DetailError.CartItemNotFound)
                 }
             }
         }
