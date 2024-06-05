@@ -6,13 +6,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.HolderProductBinding
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.ui.OnItemQuantityChangeListener
 
 class RecommendedProductsAdapter(
-    // TODO: listener
+    private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
 ) : ListAdapter<Product, RecommendedProductViewHolder>(productComparator) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecommendedProductViewHolder =
         RecommendedProductViewHolder(
-            HolderProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            HolderProductBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onItemQuantityChangeListener
         )
 
     override fun onBindViewHolder(holder: RecommendedProductViewHolder, position: Int) {

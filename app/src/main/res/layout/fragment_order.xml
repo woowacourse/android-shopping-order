@@ -75,6 +75,7 @@
             android:id="@+id/include_order"
             layout="@layout/layout_recommended_order"
             android:layout_width="0dp"
+            bind:totalCartItemQuantity="@{viewModel.addedProductQuantity}"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

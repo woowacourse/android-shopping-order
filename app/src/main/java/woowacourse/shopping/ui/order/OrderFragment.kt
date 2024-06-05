@@ -17,7 +17,11 @@ class OrderFragment : Fragment() {
     private lateinit var factory: UniversalViewModelFactory
     private lateinit var viewModel: OrderViewModel
 
-    private val recommendedProductsAdapter: RecommendedProductsAdapter by lazy { RecommendedProductsAdapter() }
+    private val recommendedProductsAdapter: RecommendedProductsAdapter by lazy {
+        RecommendedProductsAdapter(
+            viewModel,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
