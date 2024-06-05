@@ -5,6 +5,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
 import woowacourse.shopping.data.product.ProductRepository
@@ -73,35 +75,43 @@ class CartViewModel(
     }
 
     override fun addCart(productId: Long) {
-        cartRepository.postCartItems(productId, 1).onSuccess {
-            changeRecommendProductCount(productId)
-            loadCartItems()
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.postCartItems(productId, 1).onSuccess {
+                changeRecommendProductCount(productId)
+                loadCartItems()
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 
     override fun plusCount(productId: Long) {
-        cartRepository.getCartItem(productId).onSuccess {
-            updateCountToPlus(it, productId)
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.getCartItem(productId).onSuccess {
+                updateCountToPlus(it, productId)
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 
     override fun minusCount(productId: Long) {
-        cartRepository.getCartItem(productId).onSuccess {
-            updateCountToMinus(it, productId)
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.getCartItem(productId).onSuccess {
+                updateCountToMinus(it, productId)
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 
     override fun removeCartItem(productId: Long) {
-        cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
-            updateCartLiveData()
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
+                updateCartLiveData()
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 
@@ -116,15 +126,17 @@ class CartViewModel(
     }
 
     fun clickOrderButton() {
-        if (isRecommendPage.value == true) {
-            _cart.value?.cartItems?.let { cartRepository.order(it.map { it.id }) }
-            _order.setValue(Unit)
-            return
-        }
-        recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
-            setRecommendProducts(recentProduct)
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            if (isRecommendPage.value == true) {
+                _cart.value?.cartItems?.let { cartRepository.order(it.map { it.id }) }
+                _order.setValue(Unit)
+                return@launch
+            }
+            recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
+                setRecommendProducts(recentProduct)
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 
@@ -170,14 +182,16 @@ class CartViewModel(
     }
 
     private fun updateCartLiveData() {
-        cartRepository.getAllCartItemsWithProduct().onSuccess {
-            _cart.value =
-                CartItemsUiState(
-                    it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
-                    isLoading = false,
-                )
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.getAllCartItemsWithProduct().onSuccess {
+                _cart.value =
+                    CartItemsUiState(
+                        it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                        isLoading = false,
+                    )
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 
@@ -190,34 +204,16 @@ class CartViewModel(
         it: CartWithProduct,
         productId: Long,
     ) {
-        cartRepository.patchCartItem(
-            it.id,
-            it.quantity.value.inc(),
-        ).onSuccess {
-            if (isRecommendPage.value == false) {
-                loadCartItems()
-            } else {
-                changeRecommendProductCount(productId)
-                loadCartItems()
-            }
-        }.onFailure {
-            error.setValue(it)
-        }
-    }
-
-    private fun updateCountToMinus(
-        it: CartWithProduct,
-        productId: Long,
-    ) {
-        if (it.quantity.value > 0) {
+        viewModelScope.launch {
             cartRepository.patchCartItem(
                 it.id,
-                it.quantity.value.dec(),
+                it.quantity.value.inc(),
             ).onSuccess {
                 if (isRecommendPage.value == false) {
                     loadCartItems()
                 } else {
                     changeRecommendProductCount(productId)
+                    loadCartItems()
                 }
             }.onFailure {
                 error.setValue(it)
@@ -225,13 +221,37 @@ class CartViewModel(
         }
     }
 
+    private fun updateCountToMinus(
+        it: CartWithProduct,
+        productId: Long,
+    ) {
+        viewModelScope.launch {
+            if (it.quantity.value > 0) {
+                cartRepository.patchCartItem(
+                    it.id,
+                    it.quantity.value.dec(),
+                ).onSuccess {
+                    if (isRecommendPage.value == false) {
+                        loadCartItems()
+                    } else {
+                        changeRecommendProductCount(productId)
+                    }
+                }.onFailure {
+                    error.setValue(it)
+                }
+            }
+        }
+    }
+
     private fun changeRecommendProductCount(productId: Long) {
-        cartRepository.getCartItem(productId).onSuccess {
-            val current = productWithQuantities(productId, it.quantity)
-            _products.value = current
-        }.onFailure {
-            val current = productWithQuantities(productId, Quantity())
-            _products.value = current
+        viewModelScope.launch {
+            cartRepository.getCartItem(productId).onSuccess {
+                val current = productWithQuantities(productId, it.quantity)
+                _products.value = current
+            }.onFailure {
+                val current = productWithQuantities(productId, Quantity())
+                _products.value = current
+            }
         }
     }
 
@@ -248,15 +268,17 @@ class CartViewModel(
     }
 
     private fun loadCartItems() {
-        cartRepository.getAllCartItemsWithProduct().onSuccess {
-            _cart.value =
-                CartItemsUiState(
-                    it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
-                    isLoading = true,
-                )
-            _cart.value = cart.value?.copy(isLoading = false)
-        }.onFailure {
-            error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.getAllCartItemsWithProduct().onSuccess {
+                _cart.value =
+                    CartItemsUiState(
+                        it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                        isLoading = true,
+                    )
+                _cart.value = cart.value?.copy(isLoading = false)
+            }.onFailure {
+                error.setValue(it)
+            }
         }
     }
 

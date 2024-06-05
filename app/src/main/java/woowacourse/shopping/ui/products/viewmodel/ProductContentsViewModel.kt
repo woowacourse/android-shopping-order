@@ -5,6 +5,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.product.ProductRepository
@@ -70,21 +72,25 @@ class ProductContentsViewModel(
     }
 
     override fun plusCount(productId: Long) {
-        cartRepository.patchCartItem(
-            findCartItemByProductId(productId),
-            findCartItemQuantityByProductId(productId).inc().value,
-        )
-        loadCartItems()
+        viewModelScope.launch {
+            cartRepository.patchCartItem(
+                findCartItemByProductId(productId),
+                findCartItemQuantityByProductId(productId).inc().value,
+            )
+            loadCartItems()
+        }
     }
 
     override fun minusCount(productId: Long) {
-        val currentCount = findCartItemQuantityByProductId(productId).dec().value
-        if (currentCount == 0) {
-            cartRepository.deleteCartItem(findCartItemByProductId(productId))
-        } else {
-            cartRepository.patchCartItem(findCartItemByProductId(productId), currentCount)
+        viewModelScope.launch {
+            val currentCount = findCartItemQuantityByProductId(productId).dec().value
+            if (currentCount == 0) {
+                cartRepository.deleteCartItem(findCartItemByProductId(productId))
+            } else {
+                cartRepository.patchCartItem(findCartItemByProductId(productId), currentCount)
+            }
+            loadCartItems()
         }
-        loadCartItems()
     }
 
     override fun itemClickListener(productId: Long) {
@@ -92,8 +98,10 @@ class ProductContentsViewModel(
     }
 
     override fun addCart(productId: Long) {
-        cartRepository.postCartItems(productId, 1)
-        loadCartItems()
+        viewModelScope.launch {
+            cartRepository.postCartItems(productId, 1)
+            loadCartItems()
+        }
     }
 
     fun loadProducts() {
@@ -114,11 +122,13 @@ class ProductContentsViewModel(
     }
 
     fun loadCartItems() {
-        cartRepository.getAllCartItems().onSuccess {
-            cart.value = it
-            productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
-        }.onFailure {
-            _error.setValue(it)
+        viewModelScope.launch {
+            cartRepository.getAllCartItems().onSuccess {
+                cart.value = it
+                productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
+            }.onFailure {
+                _error.setValue(it)
+            }
         }
     }
 

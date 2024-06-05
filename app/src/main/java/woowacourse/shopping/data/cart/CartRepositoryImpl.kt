@@ -15,13 +15,13 @@ class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
     private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : CartRepository {
-    override fun getCartItem(productId: Long): Result<CartWithProduct> =
+    override suspend fun getCartItem(productId: Long): Result<CartWithProduct> =
         getAllCartItemsWithProduct().mapCatching {
             it.firstOrNull { it.product.id == productId }
                 ?: throw ShoppingException(ShoppingError.CartNotFound)
         }
 
-    override fun getAllCartItems(): Result<List<Cart>> {
+    override suspend fun getAllCartItems(): Result<List<Cart>> {
         val size = getCartItemCounts()
         return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching {
             it.content.map {
@@ -30,7 +30,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun getAllCartItemsWithProduct(): Result<List<CartWithProduct>> {
+    override suspend fun getAllCartItemsWithProduct(): Result<List<CartWithProduct>> {
         val size = getCartItemCounts()
         return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching {
             it.content.map {
@@ -43,7 +43,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun postCartItems(
+    override suspend fun postCartItems(
         productId: Long,
         quantity: Int,
     ): Result<Unit> =
@@ -54,19 +54,21 @@ class CartRepositoryImpl(
             ),
         )
 
-    override fun deleteCartItem(id: Long): Result<Unit> = cartRemoteDataSource.deleteCartItems(id)
+    override suspend fun deleteCartItem(id: Long): Result<Unit> = cartRemoteDataSource.deleteCartItems(id)
 
-    override fun getCartItemCounts(): Result<Int> =
+    override suspend fun getCartItemCounts(): Result<Int> =
         cartRemoteDataSource.getCartItemCounts().mapCatching {
             it.quantity
         }
 
-    override fun patchCartItem(
+    override suspend fun patchCartItem(
         id: Long,
         quantity: Int,
-    ): Result<Unit> = cartRemoteDataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
+    ): Result<Unit> {
+        return cartRemoteDataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
+    }
 
-    override fun addProductToCart(
+    override suspend fun addProductToCart(
         productId: Long,
         quantity: Int,
     ): Result<Unit> {
@@ -77,7 +79,7 @@ class CartRepositoryImpl(
         return patchCartItem(cart.id, cart.quantity.value + quantity)
     }
 
-    override fun order(cartItemIds: List<Long>) = orderRemoteDataSource.order(RequestOrdersPostDto(cartItemIds = cartItemIds))
+    override suspend fun order(cartItemIds: List<Long>) = orderRemoteDataSource.order(RequestOrdersPostDto(cartItemIds = cartItemIds))
 
     private fun ResponseCartItemsGetDto.Product.toDomain() =
         Product(
