@@ -60,7 +60,6 @@ class OrderViewModel(
         }
     }
 
-
     override fun onIncrease(productId: Long, quantity: Int) {
         thread {
             try {

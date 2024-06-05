@@ -40,10 +40,19 @@ class OrderFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.rvOrderRecommendedProducts.adapter = recommendedProductsAdapter
 
+        observeRecommendedProducts()
+        observeEvent()
+
+        return binding.root
+    }
+
+    private fun observeRecommendedProducts() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) {
             recommendedProductsAdapter.submitList(it)
         }
+    }
 
+    private fun observeEvent() {
         viewModel.event.observe(viewLifecycleOwner) { event ->
             when (event) {
                 OrderEvent.CompleteOrder -> {
@@ -51,10 +60,7 @@ class OrderFragment : Fragment() {
                     (requireActivity() as FragmentNavigator).navigateToProductList()
                 }
             }
-
         }
-
-        return binding.root
     }
 
     companion object {
