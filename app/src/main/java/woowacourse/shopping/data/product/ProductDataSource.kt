@@ -1,15 +1,16 @@
 package woowacourse.shopping.data.product
 
+import woowacourse.shopping.data.ResponseResult
 import woowacourse.shopping.remote.product.ProductDto
+import woowacourse.shopping.remote.product.ProductResponse
 
 interface ProductDataSource {
-    fun findByPaged(page: Int): List<ProductDto>
 
-    fun findById(id: Long): ProductDto
+    fun findByPaged(page: Int): ResponseResult<ProductResponse>
 
-    fun isFinalPage(page: Int): Boolean
+    fun findById(id: Long): ResponseResult<ProductDto>
 
-    fun findByCategory(productId: Long): List<ProductDto>
+    fun findByCategory(category: String): ResponseResult<ProductResponse>
 
     fun shutDown(): Boolean
 }

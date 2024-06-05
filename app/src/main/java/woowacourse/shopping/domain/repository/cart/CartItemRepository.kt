@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.repository.cart
 import woowacourse.shopping.ui.model.CartItem
 
 interface CartItemRepository {
-    fun loadPagedCartItem(): List<CartItem>
+    fun loadCartItems(): List<CartItem>
 
     fun addCartItem(
         id: Long,

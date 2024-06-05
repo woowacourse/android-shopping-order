@@ -1,35 +1,27 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.ResponseResult
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.remote.cart.CartItemDto
+import woowacourse.shopping.remote.cart.CartItemResponse
 
 interface CartItemDataSource {
-    fun findByProductId(productId: Long): ProductIdsCountData?
+    fun loadAllCartItems(): ResponseResult<CartItemResponse>
 
-    fun loadPaged(page: Int): List<ProductIdsCountData>
-
-    fun loadPagedItems(page: Int): List<CartItemDto>
-
-    fun loadAll(): List<ProductIdsCountData>
-
-    fun loadAllCartItems(): List<CartItemDto>
-
-    fun isFinalPage(page: Int): Boolean
-
-    fun addedNewProductsId(productIdsCount: ProductIdsCount): Long
+    fun addedNewProductsId(productIdsCount: ProductIdsCount): ResponseResult<Unit>
 
     fun removedProductsId(productId: Long): Long
 
     fun plusProductsIdCount(
         cartItemId: Long,
         quantity: Int,
-    )
+    ): ResponseResult<Unit>
 
     fun minusProductsIdCount(
         cartItemId: Long,
         quantity: Int,
-    )
+    ): ResponseResult<Unit>
 
     fun clearAll()
 }

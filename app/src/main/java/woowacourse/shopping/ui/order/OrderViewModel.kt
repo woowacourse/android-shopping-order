@@ -39,7 +39,7 @@ class OrderViewModel(
         thread {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@thread
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
-            val cartItems: List<CartItem> = cartItemRepository.loadPagedCartItem()
+            val cartItems: List<CartItem> = cartItemRepository.loadCartItems()
             val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
             orderRepository.order(orderInformation.cartItemIds + cartItemIds)
         }

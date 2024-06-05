@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.ResponseResult
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.remote.cart.CartItemDto.Companion.toDomain
@@ -8,23 +9,26 @@ import woowacourse.shopping.ui.model.CartItem
 class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartItemRepository {
-    override fun loadPagedCartItem(): List<CartItem> {
-        return cartItemDataSource.loadAllCartItems().map { cartItemDto -> cartItemDto.toDomain() }
+
+    override fun loadCartItems(): List<CartItem> {
+        return when(val response = cartItemDataSource.loadAllCartItems()) {
+            is ResponseResult.Success -> response.data.content.map { cartItemDto -> cartItemDto.toDomain() }
+            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+        }
     }
 
     override fun addCartItem(
         id: Long,
         quantity: Int,
     ) {
-        val all = cartItemDataSource.loadAllCartItems()
-        val cartItem = all.find { it.product.id == id }
-
-        if (cartItem == null) {
-            cartItemDataSource.addedNewProductsId(ProductIdsCount(id, quantity))
-            return
-        }
-
-        cartItemDataSource.plusProductsIdCount(cartItem.id, quantity = cartItem.quantity + quantity)
+        val cartItem = loadCartItems().find { it.product.id == id }
+            ?: when(val response = cartItemDataSource.addedNewProductsId(ProductIdsCount(id, quantity))) {
+                is ResponseResult.Success -> return
+                is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+                is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            }
+        handleResponse(cartItemDataSource.plusProductsIdCount(cartItem.id, quantity))
     }
 
     override fun removeCartItem(id: Long) {
@@ -35,22 +39,29 @@ class DefaultCartItemRepository(
         id: Long,
         quantity: Int,
     ) {
-        val all = cartItemDataSource.loadAllCartItems()
-        val cartItem = all.find { it.product.id == id } ?: throw NoSuchElementException()
-        cartItemDataSource.plusProductsIdCount(cartItem.id, quantity)
+        val cartItem = loadCartItems().find { it.product.id == id } ?: throw NoSuchElementException()
+        handleResponse(cartItemDataSource.plusProductsIdCount(cartItem.id, quantity))
     }
 
     override fun decreaseCartProduct(
         id: Long,
         quantity: Int,
     ) {
-        cartItemDataSource.minusProductsIdCount(id, quantity)
+        handleResponse(cartItemDataSource.minusProductsIdCount(id, quantity))
     }
 
     override fun increaseCartItem(
         cartItemId: Long,
         quantity: Int,
     ) {
-        cartItemDataSource.plusProductsIdCount(cartItemId, quantity)
+        handleResponse(cartItemDataSource.plusProductsIdCount(cartItemId, quantity))
+    }
+
+    private fun <T : Any> handleResponse(response: ResponseResult<T>) {
+        when(response) {
+            is ResponseResult.Success -> return
+            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+        }
     }
 }

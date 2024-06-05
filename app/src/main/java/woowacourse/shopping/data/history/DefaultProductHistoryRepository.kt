@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.history
 
+import woowacourse.shopping.data.ResponseResult
 import woowacourse.shopping.data.product.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
-import woowacourse.shopping.remote.product.ProductDto
 import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
 
 class DefaultProductHistoryRepository(
@@ -16,8 +16,13 @@ class DefaultProductHistoryRepository(
 
     override fun loadAllProductHistory(): List<Product> {
         val productIds = productHistoryDataSource.loadAllProductHistory()
+
         return productIds.map {
-            productDataSource.findById(it).toDomain(quantity = 0)
+            when(val response = productDataSource.findById(it)) {
+                is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
+                is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+                is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+            }
         }
     }
 
@@ -25,14 +30,20 @@ class DefaultProductHistoryRepository(
         val id =
             productHistoryDataSource.loadProductHistory(productId)
                 ?: throw NoSuchElementException("there is no product history with id $productId")
-        val productDto: ProductDto = productDataSource.findById(id)
-        return productDto.toDomain(quantity = 0)
+        return when(val response = productDataSource.findById(id)) {
+            is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
+            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+        }
     }
 
     override fun loadLatestProduct(): Product {
         val productId: Long = productHistoryDataSource.loadLatestProduct()
-        val productDto: ProductDto = productDataSource.findById(productId)
-        return productDto.toDomain(quantity = 0)
+        return when(val response = productDataSource.findById(productId)) {
+            is ResponseResult.Success -> response.data.toDomain(quantity = DEFAULT_QUANTITY)
+            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.Exception -> throw IllegalStateException("$response.code - 예기치 않은 오류가 발생했습니다.")
+        }
     }
 
     override fun deleteAllProductHistory() {
@@ -41,5 +52,6 @@ class DefaultProductHistoryRepository(
 
     companion object {
         private const val TAG = "DefaultProductHistoryRe"
+        private const val DEFAULT_QUANTITY = 0
     }
 }
