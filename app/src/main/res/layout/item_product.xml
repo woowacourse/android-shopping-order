@@ -18,25 +18,21 @@
         <variable
             name="eventHandler"
             type="woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler" />
-
-        <variable
-            name="product"
-            type="woowacourse.shopping.domain.model.Product" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="166dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{() -> eventHandler.onProductClick(shoppingProduct.product.id)}"
         android:padding="6dp">
 
         <ImageView
             android:id="@+id/iv_product"
-            android:layout_width="154dp"
-            android:layout_height="154dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:imageUrl="@{shoppingProduct.product.imageUrl}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.25"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@android:color/darker_gray" />
@@ -59,7 +55,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="@{() -> countHandler.increaseCount(shoppingProduct.product.id)}"
+            android:onClick="@{() -> countHandler.increaseCount(shoppingProduct.product.id, shoppingProduct.quantity)}"
             android:src="@drawable/ic_plus"
             android:visibility="@{shoppingProduct.quantity == 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/iv_product"
@@ -76,8 +72,7 @@
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/iv_product"
-            app:layout_constraintStart_toStartOf="@+id/iv_product"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_product"
             tools:text="PET보틀-정사각형어쩌구저ㄱㅉ" />
 
@@ -90,7 +85,7 @@
             android:maxLines="1"
             android:text="@{@string/price_format(shoppingProduct.product.price)}"
             android:textSize="16dp"
-            app:layout_constraintStart_toStartOf="@+id/tv_name"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_name"
             tools:text="10,000원" />
 

@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.ui.detail
 
 interface DetailEventHandler {
-    fun addCartItem(productId: Long)
+    fun onAddProductClicked(productId: Long)
 
-    fun moveBack()
+    fun onRecentProductClicked(productId: Long)
 
-    fun onRecentProductClick(productId: Long)
+    fun onBackButtonClicked()
 }

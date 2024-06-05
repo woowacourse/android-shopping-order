@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.ui.shopping.adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,7 @@ class RecentProductAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateProducts(recentlyProducts: List<RecentProduct>) {
+        Log.d("ㅌㅅㅌ", "recentAdapter, recentProducts = $recentlyProducts")
         this.recentProducts = recentlyProducts
         notifyDataSetChanged()
     }

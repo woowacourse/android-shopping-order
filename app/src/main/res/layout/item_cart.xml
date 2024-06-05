@@ -11,11 +11,11 @@
 
         <variable
             name="eventHandler"
-            type="woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler" />
+            type="woowacourse.shopping.presentation.ui.cart.selection.CartItemSelectionEventHandler" />
 
         <variable
             name="cartItem"
-            type="woowacourse.shopping.domain.model.CartItem" />
+            type="woowacourse.shopping.presentation.ui.cart.CartItemUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,12 +23,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:background="@drawable/shopping_cart_item_gridview"
-        android:onClick="@{() -> eventHandler.navigateToDetail(cartItem.productId)}">
+        android:onClick="@{() -> eventHandler.onProductClicked(cartItem.productId)}">
 
         <CheckBox
+            android:id="@+id/checkBox"
             android:onClick="@{() -> eventHandler.onCheckItem(cartItem.id)}"
             android:checked="@{cartItem.isChecked}"
-            android:id="@+id/checkBox"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginStart="12dp"
@@ -90,7 +90,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_margin="12dp"
-            android:onClick="@{() -> eventHandler.deleteCartItem(cartItem.id)}"
+            android:onClick="@{() -> eventHandler.onXButtonClicked(cartItem.id)}"
             android:src="@drawable/ic_back"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

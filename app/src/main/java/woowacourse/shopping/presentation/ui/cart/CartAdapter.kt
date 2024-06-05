@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.presentation.ui.cart.selection.SelectionEventHandler
+import woowacourse.shopping.presentation.ui.cart.selection.CartItemSelectionEventHandler
 
 class CartAdapter(
-    private val cartEventHandler: SelectionEventHandler,
+    private val cartEventHandler: CartItemSelectionEventHandler,
     private val cartItemCountHandler: CartItemCountHandler,
 ) : RecyclerView.Adapter<CartViewHolder>() {
-    private var cartItems: List<CartItem> = emptyList()
+    private var cartItems: List<CartItemUiModel> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -33,7 +33,7 @@ class CartAdapter(
         return cartItems.size
     }
 
-    fun loadData(cartItems: List<CartItem>) {
+    fun loadData(cartItems: List<CartItemUiModel>) {
         this.cartItems = cartItems
         notifyDataSetChanged()
     }

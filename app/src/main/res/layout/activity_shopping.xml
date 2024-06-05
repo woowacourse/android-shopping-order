@@ -35,52 +35,59 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="Shopping"
+                android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="22dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/iv_menu_back"
+            <FrameLayout
+                android:id="@+id/menu_cart_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="20dp"
+                android:foregroundGravity="center"
+                android:measureAllChildren="true"
+                android:paddingBottom="8dp"
                 android:onClick="@{() -> viewModel.onShoppingCartButtonClick()}"
-                android:padding="8dp"
-                android:src="@drawable/ic_cart"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iv_cart_count"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/iv_cart_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/ic_background_circle"
-                android:gravity="center"
-                android:onClick="@{() -> viewModel.onShoppingCartButtonClick()}"
-                android:text="@{String.valueOf(viewModel.cartCount)}"
-                android:textColor="@color/white"
-                android:visibility="@{viewModel.cartCount > 0 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" >
 
+                <ImageView
+                    android:id="@+id/cart_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_cart" />
+
+                <TextView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="start|top"
+                    android:background="@drawable/oval_emerald_total_quantity_count"
+                    android:gravity="center"
+                    android:text="@{String.valueOf(viewModel.totalCartItemsQuantity)}"
+                    android:textColor="@color/white"
+                    android:textSize="12dp"
+                    android:textStyle="bold"
+                    android:visibility="@{viewModel.totalCartItemsQuantity > 0 ? View.VISIBLE : View.INVISIBLE}"
+                    tools:text="2" />
+
+            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_view"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/btn_load_more"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_main">
-
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -96,6 +103,7 @@
 
                 <com.facebook.shimmer.ShimmerFrameLayout
                     android:id="@+id/shimmer_product_list"
+                    app:shimmer_auto_start="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/toolbar_main"
@@ -146,7 +154,6 @@
 
                     </LinearLayout>
 
-
                 </com.facebook.shimmer.ShimmerFrameLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -155,33 +162,35 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="14dp"
                     android:layout_marginTop="14dp"
+                    android:gravity="center"
                     app:layout_constraintBottom_toTopOf="@id/btn_load_more"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/toolbar_main"
-                    app:product="@{viewModel.products}"
-                    app:shoppingProducts="@{viewModel.shoppingProducts}"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2"
                     tools:itemCount="10"
                     tools:listitem="@layout/item_product" />
+
+                <TextView
+                    android:id="@+id/btn_load_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/emerald"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.onLoadMoreButtonClick()}"
+                    android:text="@string/shopping_load_more_products"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:visibility="@{viewModel.pageInfo.isPageable}" />
+
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
-
-        <TextView
-            android:id="@+id/btn_load_more"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:background="@color/purple_200"
-            android:gravity="center"
-            android:onClick="@{() -> viewModel.loadNextProducts()}"
-            android:text="Load More"
-            android:textColor="@color/white"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:visibility="@{viewModel.showLoadMore}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

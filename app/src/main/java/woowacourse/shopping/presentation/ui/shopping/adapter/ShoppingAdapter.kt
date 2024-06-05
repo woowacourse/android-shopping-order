@@ -4,8 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler
 import woowacourse.shopping.presentation.ui.shopping.ShoppingItemCountHandler
@@ -15,9 +13,7 @@ class ShoppingAdapter(
     private val shoppingEventHandler: ShoppingEventHandler,
     private val shoppingItemCountHandler: ShoppingItemCountHandler,
 ) : RecyclerView.Adapter<ShoppingViewHolder>() {
-    private var products: List<Product> = emptyList()
     private var shoppingProducts: List<ShoppingProduct> = emptyList()
-    private var recentProducts: List<RecentProduct> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -31,27 +27,45 @@ class ShoppingAdapter(
         holder: ShoppingViewHolder,
         position: Int,
     ) {
-        val product = products[position]
         val shoppingProduct = shoppingProducts[position]
-        return holder.bind(product, shoppingProduct, shoppingEventHandler, shoppingItemCountHandler)
+        return holder.bind(shoppingProduct, shoppingEventHandler, shoppingItemCountHandler)
     }
+
+    override fun onBindViewHolder(
+        holder: ShoppingViewHolder,
+        position: Int,
+        payloads: MutableList<Any>,
+    ) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            payloads.forEach { payload ->
+                when (payload) {
+                    ShoppingAdapterPayload.QUANTITY_CHANGED -> {
+                        holder.onQuantityChanged(shoppingProducts[position])
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
+
 
     override fun getItemCount(): Int {
-        return products.size
+        return shoppingProducts.size
     }
 
-    fun loadData(products: List<Product>) {
-        this.products = products
-        notifyDataSetChanged()
+    fun setShoppingProducts(newList: List<ShoppingProduct>) {
+        val positionStart = shoppingProducts.size
+        shoppingProducts = newList
+        notifyItemRangeInserted(positionStart, newList.size)
     }
 
-    fun loadShoppingProductData(shoppingProducts: List<ShoppingProduct>) {
-        this.shoppingProducts = shoppingProducts
-        notifyDataSetChanged()
-    }
-
-    fun loadRecentProductData(recentProducts: List<RecentProduct>) {
-        this.recentProducts = recentProducts
-        notifyDataSetChanged()
+    fun updateShoppingProducts(updatedIds: Set<Long>) {
+        updatedIds.forEach { productId ->
+            val updatedPosition = shoppingProducts.indexOfFirst { it.product.id == productId }
+            notifyItemChanged(updatedPosition, ShoppingAdapterPayload.QUANTITY_CHANGED)
+        }
     }
 }

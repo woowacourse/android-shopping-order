@@ -1,53 +1,67 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
-import woowacourse.shopping.data.model.dto.ProductResponseDto
+import woowacourse.shopping.data.mapper.extractPageInfo
+import woowacourse.shopping.data.model.dto.ProductDto
+import woowacourse.shopping.domain.model.PageInfo
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductListInfo
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
+import woowacourse.shopping.domain.service.RetrofitService
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
-    private val service = ProductClient.service
-    private var productData: ProductResponseDto? = null
-    private var products: List<Product>? = null
-
-    init {
+class RemoteShoppingRepositoryImpl(private val service: RetrofitService = ProductClient.service) :
+    ShoppingItemsRepository {
+    fun fetchProductsWithPage(
+        page: Int,
+        size: Int,
+        resultCallBack: (ProductListInfo) -> Unit
+    ) {
+        var productListInfo: ProductListInfo? = null
         threadAction {
-            productData = service.requestProducts().execute().body()
-            products = productData?.content?.map { it.toDomainModel() }
+            val response = service.requestProducts(page, size).execute()
+            if (response.isSuccessful && response.body() != null) {
+                val productResponseDto = response.body()
+                val products = productResponseDto?.content?.map { it.toDomainModel() }.orEmpty()
+                val pageInfo = productResponseDto?.extractPageInfo()
+                    ?: PageInfo(false, 0, 0)
+                productListInfo = ProductListInfo(products, pageInfo)
+            }
         }
+        productListInfo?.let { resultCallBack(it) }
     }
 
-    override fun fetchProductsSize(): Int {
-        return productData?.totalElements ?: 0
-    }
-
-    override fun fetchProductsWithIndex(
-        start: Int,
-        end: Int,
-    ): List<Product> {
-        return products?.subList(start, end) ?: emptyList()
+    override fun fetchProductsWithPage(
+        page: Int,
+        size: Int,
+    ): Result<ProductListInfo> {
+        var result: Result<ProductListInfo>? = null
+        var productListInfo: ProductListInfo
+        threadAction {
+            val response = service.requestProducts(page, size).execute()
+            if (response.isSuccessful && response.body() != null) {
+                val productResponseDto = response.body()
+                val products = productResponseDto?.content?.map { it.toDomainModel() }.orEmpty()
+                val pageInfo = productResponseDto?.extractPageInfo()
+                    ?: PageInfo(false, 0, 0)
+                productListInfo = ProductListInfo(products, pageInfo)
+                result = Result.success(productListInfo)
+            }
+        }
+        return result ?: Result.failure(RuntimeException("network connection error. try again."))
     }
 
     override fun findProductItem(id: Long): Product? {
         var product: Product? = null
         threadAction {
-            product = service.requestProduct(id).execute().body()?.toDomainModel()
+            val response = service.requestProduct(id).execute()
+            if (response.isSuccessful && response.body() != null) {
+                product = response.body()?.toDomainModel()
+            }
         }
-
         return product
-    }
-
-    private fun threadAction(action: () -> Unit) {
-        val latch = CountDownLatch(1)
-        thread {
-            action()
-            latch.countDown()
-        }
-        latch.await()
     }
 
     override fun recommendProducts(
@@ -55,19 +69,19 @@ class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
         count: Int,
         cartItemIds: List<Long>,
     ): List<Product> {
-        Log.d("crong", "recommend called")
-        var categoryProducts: MutableList<Product> = mutableListOf()
+        val categoryProducts: MutableList<Product>
+        var productDtoList: List<ProductDto>? = null
         threadAction {
-            productData =
-                service.requestProductWithCategory(
-                    category = category,
-                    size = count + cartItemIds.size,
-                ).execute().body()
+            val response = service.requestProductWithCategory(
+                category = category,
+                size = count + cartItemIds.size,
+            ).execute()
+            if (response.isSuccessful && response.body() != null) {
+                productDtoList = response.body()?.content
+            }
         }
-        categoryProducts =
-            productData?.content?.map { it.toDomainModel() }.orEmpty().toMutableList()
+        categoryProducts = productDtoList?.map { it.toDomainModel() }.orEmpty().toMutableList()
         removeDuplicateItemsFromCart(categoryProducts, cartItemIds)
-        Log.d("crong", "on recommend $categoryProducts")
         return categoryProducts.take(count)
     }
 
@@ -80,5 +94,23 @@ class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
                 categoryProducts.removeIf { it.id == cartItemId }
             }
         }
+    }
+
+    private fun threadAction(action: () -> Unit) {
+        val latch = CountDownLatch(ACTION_COUNT)
+        thread {
+            try {
+                action()
+            } catch (e: Exception) {
+                error(e)
+            } finally {
+                latch.countDown()
+            }
+        }
+        latch.await()
+    }
+
+    companion object {
+        private const val ACTION_COUNT = 1
     }
 }

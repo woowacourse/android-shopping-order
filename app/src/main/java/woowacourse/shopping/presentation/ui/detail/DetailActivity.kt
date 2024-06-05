@@ -40,9 +40,8 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.addCartItem.observe(this) {
+        viewModel.isAddCartSuccess.observe(this) {
             it.getContentIfNotHandled()?.let {
-                viewModel.createShoppingCartItem()
                 navigateToCart()
             }
         }

@@ -10,4 +10,5 @@
     <string name="make_order_with_total_quantity">주문하기(%1$d)</string>
     <string name="recommendation_explanation">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="recommendation_title">이런 상품은 어떠세요?</string>
+    <string name="shopping_load_more_products">상품을 더 불러올게요!</string>
 </resources>

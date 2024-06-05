@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -36,9 +37,9 @@ class DetailViewModel(
     val moveBack: LiveData<Event<Boolean>>
         get() = _moveBack
 
-    private val _addCartItem = MutableLiveData<Event<Long>>()
-    val addCartItem: LiveData<Event<Long>>
-        get() = _addCartItem
+    private val _isAddCartSuccess = MutableLiveData<Event<Boolean>>()
+    val isAddCartSuccess: LiveData<Event<Boolean>>
+        get() = _isAddCartSuccess
 
     init {
         loadShoppingProductData()
@@ -56,7 +57,7 @@ class DetailViewModel(
     }
 
     private fun fetchQuantity(): Int {
-        return cartRepository.findOrNullWithProductId(productId)?.quantity ?: 1
+        return cartRepository.findCartItemWithProductId(productId)?.quantity ?: 1
     }
 
     private fun loadRecentProductData() {
@@ -64,36 +65,49 @@ class DetailViewModel(
         _recentProduct.value = recentProduct
     }
 
-    fun createShoppingCartItem() {
-        val product = shoppingProduct.value?.product ?: return
-        val quantity = shoppingProduct.value?.quantity() ?: return
-        cartRepository.insert(product = product, quantity = quantity)
-    }
-
     private fun checkRecentProductVisibility() {
         _recentProductVisibility.value =
             !(recentProduct.value == null || recentProduct.value?.productId == productId)
     }
 
-    override fun addCartItem(productId: Long) {
-        _addCartItem.postValue(Event(productId))
+    override fun onAddProductClicked(productId: Long) {
+        createShoppingCartItem()
     }
 
-    override fun moveBack() {
-        _moveBack.postValue(Event(true))
+    fun createShoppingCartItem() {
+        val productId = shoppingProduct.value?.product?.id ?: return
+        val quantity = shoppingProduct.value?.quantity() ?: return
+        cartRepository.addCartItem(productId, quantity) { result ->
+            result.onSuccess {
+                _isAddCartSuccess.postValue(Event(true))
+            }.onFailure {
+                _isAddCartSuccess.postValue(Event(false))
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
     }
 
-    override fun onRecentProductClick(productId: Long) {
+    override fun onRecentProductClicked(productId: Long) {
         _navigateToDetail.postValue(Event(productId))
     }
 
-    override fun increaseCount(productId: Long) {
-        _shoppingProduct.value?.increase()
-        _shoppingProduct.value = _shoppingProduct.value
+    override fun onBackButtonClicked() {
+        _moveBack.postValue(Event(true))
     }
 
-    override fun decreaseCount(productId: Long) {
-        _shoppingProduct.value?.decrease()
-        _shoppingProduct.value = _shoppingProduct.value
+    override fun increaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val shoppingProduct = _shoppingProduct.value?.copy(quantity = quantity.inc())
+        _shoppingProduct.value = shoppingProduct ?: _shoppingProduct.value
+    }
+
+    override fun decreaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val shoppingProduct = _shoppingProduct.value?.copy(quantity = quantity.dec())
+        _shoppingProduct.value = shoppingProduct ?: _shoppingProduct.value
     }
 }

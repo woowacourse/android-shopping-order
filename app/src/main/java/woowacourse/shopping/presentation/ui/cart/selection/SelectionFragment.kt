@@ -1,28 +1,28 @@
 package woowacourse.shopping.presentation.ui.cart.selection
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.presentation.state.UIState
-import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
+import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
+import woowacourse.shopping.presentation.ui.cart.FragmentController
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
 
 class SelectionFragment : Fragment(), SelectionClickListener {
     private lateinit var binding: FragmentSelectionBinding
+    private lateinit var selectionAdapter: SelectionAdapter
+    private lateinit var fragmentEventListener: FragmentController
     private val viewModel: SelectionViewModel by lazy {
         val viewModelFactory =
             SelectionViewModelFactory(
@@ -31,6 +31,15 @@ class SelectionFragment : Fragment(), SelectionClickListener {
                 cartRepository = RemoteCartRepositoryImpl(),
             )
         viewModelFactory.create(SelectionViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is FragmentController) {
+            fragmentEventListener = context
+        } else {
+            error("invalid activity(context), $context")
+        }
     }
 
     override fun onCreateView(
@@ -47,59 +56,49 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        setUpRecyclerView()
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.clickListener = this
 
         observeViewModel()
-        showSkeletonUI()
     }
 
-    private fun setUpViews() {
-        setUpUIState()
+    private fun setUpRecyclerView() {
+        selectionAdapter = SelectionAdapter(viewModel, viewModel)
+        binding.recyclerView.adapter = selectionAdapter
     }
 
-    private fun setUpRecyclerViewAdapter(): SelectionAdapter {
-        val adapter = SelectionAdapter(viewModel, viewModel)
-        binding.recyclerView.adapter = adapter
-        return adapter
-    }
+    private fun observeViewModel() {
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { isLoading ->
+                showSkeletonUI(isLoading)
+            }
+        }
 
-    private fun setUpUIState() {
-        val adapter = setUpRecyclerViewAdapter()
-        viewModel.cartItemsState.observe(viewLifecycleOwner) { state ->
+        viewModel.uiCartItemsState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UIState.Success -> showData(state.data, adapter)
-                is UIState.Empty -> {} // emptyCart()
+                is UIState.Success -> showData(state.data, selectionAdapter)
+                is UIState.Empty -> {}
                 is UIState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
                     )
             }
         }
-    }
 
-    private fun showData(
-        data: List<CartItem>,
-        adapter: SelectionAdapter,
-    ) {
-        adapter.loadData(data)
-    }
+        viewModel.isCheckedChangedIds.observe(viewLifecycleOwner) {
+            selectionAdapter.updateChecked(it)
+        }
 
-    private fun showError(errorMessage: String) {
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
-    }
+        viewModel.quantityChangedIds.observe(viewLifecycleOwner) {
+            selectionAdapter.updateQuantity(it)
+        }
 
-    private fun emptyCart() {
-        viewModel.isCartEmpty()
-        Toast.makeText(requireContext(), getString(R.string.empty_cart_message), Toast.LENGTH_LONG).show()
-    }
-
-    private fun observeViewModel() {
-        viewModel.deleteCartItem.observe(viewLifecycleOwner) {
+        viewModel.deletedId.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let { itemId ->
-                viewModel.deleteItem(itemId)
+                selectionAdapter.deleteItem(itemId)
             }
         }
 
@@ -110,20 +109,18 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         }
     }
 
-    private fun navigateToDetail(productId: Long) {
-        startActivity(DetailActivity.createIntent(requireContext(), productId))
+    private fun showData(
+        data: List<CartItemUiModel>,
+        adapter: SelectionAdapter,
+    ) {
+        adapter.submitItems(data)
     }
 
-    private fun showSkeletonUI() {
-        lifecycleScope.launch {
-            showCartData(isLoading = true)
-            delay(1500)
-            showCartData(isLoading = false)
-            setUpViews()
-        }
+    private fun showError(errorMessage: String) {
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
     }
 
-    private fun showCartData(isLoading: Boolean) {
+    private fun showSkeletonUI(isLoading: Boolean) {
         if (isLoading) {
             binding.shimmerCartList.startShimmer()
             binding.shimmerCartList.visibility = View.VISIBLE
@@ -135,15 +132,26 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         }
     }
 
+    private fun navigateToDetail(productId: Long) {
+        startActivity(DetailActivity.createIntent(requireContext(), productId))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.setLoadingState(true)
+        viewModel.setUpCartItems()
+    }
+
     override fun onMakeOrderClick() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.cart_fragment, RecommendationFragment())
-            .setReorderingAllowed(true)
-            .commit()
+        OrderDatabase.postOrder(viewModel.order.value ?: Order())
+        fragmentEventListener.onOrderButtonClicked()
     }
 
     override fun onSelectAllClick() {
-        OrderDatabase.postOrder(viewModel.order.value ?: Order())
         viewModel.selectAllByCondition()
+    }
+
+    fun onShow() {
+        viewModel.setUpCartItems()
     }
 }

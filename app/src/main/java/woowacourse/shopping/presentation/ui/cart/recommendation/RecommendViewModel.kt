@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.cart.recommendation
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.database.OrderDatabase
@@ -12,6 +13,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
+import woowacourse.shopping.presentation.event.SingleLiveEvent
 import woowacourse.shopping.presentation.state.UIState
 
 class RecommendViewModel(
@@ -36,7 +38,7 @@ class RecommendViewModel(
     val totalOrderQuantity: LiveData<Int>
         get() = _totalOrderQuantity
 
-    private val _isEmpty = MutableLiveData<Boolean>(false)
+    private val _isEmpty = MediatorLiveData<Boolean>(false)
     val isEmpty: LiveData<Boolean>
         get() = _isEmpty
 
@@ -44,9 +46,29 @@ class RecommendViewModel(
     val deleteCartItem: LiveData<Event<Long>>
         get() = _deleteCartItem
 
+    private val _isLoading = MutableLiveData(Event(true))
+    val isLoading: LiveData<Event<Boolean>>
+        get() = _isLoading
+
+    private val _changedIds: SingleLiveEvent<Set<Long>> = SingleLiveEvent()
+    val changedIds: LiveData<Set<Long>>
+        get() = _changedIds
+
     init {
+        with(_isEmpty) {
+            addSource(recommendItemsState) {
+                value = (it as UIState.Success<List<ShoppingProduct>>).data.isEmpty()
+            }
+        }
+    }
+
+    fun setLoadingState(value: Boolean) {
+        _isLoading.value = Event(value)
+    }
+
+    fun setRecommendation() {
         fetchOrder()
-        setUpUIState()
+        loadRecommendationProducts()
     }
 
     private fun fetchOrder() {
@@ -54,77 +76,152 @@ class RecommendViewModel(
         updatePriceAndQuantity()
     }
 
-    private fun setUpUIState() {
-        _recommendItemsState.value =
-            try {
-                Log.d("crong", "setupState")
-                loadRecommendationProducts()
-            } catch (e: Exception) {
-                UIState.Error(e)
-                loadRecommendationProducts()
-            }
-    }
-
     private fun updatePriceAndQuantity() {
         _totalOrderPrice.value = _order.value?.getTotalPrice() ?: 0L
         _totalOrderQuantity.value = _order.value?.getTotalQuantity() ?: 0
     }
 
-    private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
-        val recentProduct = recentProductRepository.loadLatest() ?: return UIState.Empty
-        cartRepository.updateCartItems()
-        Log.d("crong", "${recentProduct.category}")
-        val cartItemIds = cartRepository.findAll().items.map { it.productId }
-        Log.d("crong", "$cartItemIds")
-        val items =
-            shoppingRepository.recommendProducts(
-                recentProduct.category,
-                DEFAULT_RECOMMEND_ITEM_COUNTS,
-                cartItemIds,
-            ).mapperToShoppingProductList()
-        Log.d("crong", "$items")
-        return if (items.isEmpty()) {
-            UIState.Empty
+    private fun loadRecommendationProducts() {
+        val recentProduct = recentProductRepository.loadLatest()
+        if (recentProduct != null) {
+            cartRepository.fetchCartItemsInfo { result ->
+                result.onSuccess { items ->
+                    val cartItemIds = items.map { it.productId }
+                    val recommendItems =
+                        shoppingRepository.recommendProducts(
+                            recentProduct.category,
+                            DEFAULT_RECOMMEND_ITEM_COUNTS,
+                            cartItemIds,
+                        ).mapperToShoppingProductList()
+                    setUpUIState(recommendItems)
+                }.onFailure {
+                    setLoadingState(false)
+                    Log.d(this::class.java.simpleName, "$it")
+                }
+            }
         } else {
-            UIState.Success(items)
+            _recommendItemsState.value = UIState.Empty
+            setLoadingState(false)
         }
+    }
+
+    private fun setUpUIState(recommendItems: List<ShoppingProduct>) {
+        if (recommendItems.isEmpty()) {
+            _recommendItemsState.postValue(UIState.Empty)
+        } else {
+            _recommendItemsState.postValue(UIState.Success(recommendItems))
+        }
+        setLoadingState(false)
     }
 
     private fun List<Product>.mapperToShoppingProductList(): List<ShoppingProduct> {
         return this.map { ShoppingProduct(it) }
     }
 
-    fun deleteItem(itemId: Long) {
-        cartRepository.delete(itemId)
-        loadRecommendationProducts()
-    }
-
     fun completeOrder() {
         val currentOrder = _order.value ?: return
-        cartRepository.makeOrder(currentOrder)
-    }
-
-    override fun increaseCount(productId: Long) {
-        val shoppingProduct =
-            (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
-        shoppingProduct?.increase()
-        val product = shoppingRepository.findProductItem(productId) ?: return
-        cartRepository.insert(product, shoppingProduct?.quantity() ?: 1)
-        loadRecommendationProducts()
-    }
-
-    override fun decreaseCount(productId: Long) {
-        val shoppingProduct =
-            (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
-        shoppingProduct?.decrease()
-        val quantity = shoppingProduct?.quantity() ?: 0
-
-        if (quantity > 0) {
-            cartRepository.updateQuantity(productId, shoppingProduct?.quantity() ?: 1)
-        } else {
-            cartRepository.deleteWithProductId(productId)
+        cartRepository.makeOrder(currentOrder) { result ->
+            result.onSuccess {
+                clearOrder()
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
         }
-        loadRecommendationProducts()
+    }
+
+    private fun clearOrder() {
+        val order = order.value ?: Order()
+        order.clearOrder()
+        _order.value = order
+    }
+
+    override fun increaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        addOrder(productId, quantity)
+    }
+
+    private fun addOrder(
+        productId: Long,
+        quantity: Int,
+    ) {
+        cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc()) { result ->
+            result.onSuccess {
+                val cartItem = cartRepository.findCartItemWithProductId(productId)
+                    ?: return@updateCartItemQuantityWithProductId
+                val prevOrder = order.value ?: Order()
+                prevOrder.addCartItem(cartItem)
+                _order.postValue(prevOrder)
+                changeShoppingProductQuantity(productId, quantity.inc())
+                _changedIds.postValue(setOf(productId))
+                updatePriceAndQuantity()
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+    }
+
+    override fun decreaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        if (quantity == 1) {
+            removeOrder(productId)
+        } else {
+            decreaseOrderQuantity(productId, quantity)
+        }
+    }
+
+    private fun removeOrder(productId: Long) {
+        val cartItem = cartRepository.findCartItemWithProductId(productId) ?: return
+        cartRepository.deleteCartItemWithProductId(productId) { result ->
+            result.onSuccess {
+                val prevOrder = order.value ?: Order()
+                prevOrder.removeCartItem(cartItem.id)
+                _order.postValue(prevOrder)
+                changeShoppingProductQuantity(productId, 0)
+                _changedIds.postValue(setOf(productId))
+                updatePriceAndQuantity()
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+    }
+
+    private fun decreaseOrderQuantity(productId: Long, quantity: Int) {
+        cartRepository.updateCartItemQuantityWithProductId(
+            productId,
+            quantity.dec()
+        ) { result ->
+            result.onSuccess {
+                val cartItem = cartRepository.findCartItemWithProductId(productId)
+                    ?: return@updateCartItemQuantityWithProductId
+                val prevOrder = order.value ?: Order()
+                prevOrder.addCartItem(cartItem)
+                _order.postValue(prevOrder)
+                changeShoppingProductQuantity(productId, quantity.dec())
+                _changedIds.postValue(setOf(productId))
+                updatePriceAndQuantity()
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+    }
+
+    private fun changeShoppingProductQuantity(
+        productId: Long,
+        newQuantity: Int,
+    ) {
+        val changedShoppingProducts =
+            (recommendItemsState.value as UIState.Success<List<ShoppingProduct>>).data.map {
+                if (it.product.id == productId) {
+                    it.copy(quantity = newQuantity)
+                } else {
+                    it
+                }
+            }
+        _recommendItemsState.postValue(UIState.Success(changedShoppingProducts))
     }
 
     companion object {

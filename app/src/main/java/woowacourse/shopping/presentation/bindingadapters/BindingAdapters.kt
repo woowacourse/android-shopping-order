@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.bindingadapters
 
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -7,7 +8,6 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
@@ -20,39 +20,9 @@ fun loadImage(
     if (!url.isNullOrEmpty()) {
         Glide.with(view.context)
             .load(url)
-            .placeholder(R.drawable.ic_launcher_background)
-            .error(R.drawable.ic_launcher_background)
+            .placeholder(R.color.shimmer_content_color)
+            .error(R.color.shimmer_content_color)
             .into(view)
-    }
-}
-
-@BindingAdapter("app:product")
-fun setShoppingItems(
-    recyclerView: RecyclerView,
-    products: List<Product>?,
-) {
-    products?.let {
-        (recyclerView.adapter as? ShoppingAdapter)?.loadData(it)
-    }
-}
-
-@BindingAdapter("app:shoppingProducts")
-fun setShoppingProductItems(
-    recyclerView: RecyclerView,
-    shoppingProducts: List<ShoppingProduct>?,
-) {
-    shoppingProducts?.let {
-        (recyclerView.adapter as? ShoppingAdapter)?.loadShoppingProductData(it)
-    }
-}
-
-@BindingAdapter("app:recentProducts")
-fun setRecentProductItems(
-    recyclerView: RecyclerView,
-    recentProducts: List<RecentProduct>?,
-) {
-    recentProducts?.let {
-        (recyclerView.adapter as? ShoppingAdapter)?.loadRecentProductData(it)
     }
 }
 
@@ -114,12 +84,4 @@ fun setViewVisibility(
             view.visibility = View.GONE
         }
     }
-}
-
-@BindingAdapter("app:orderWithQuantityText")
-fun setOrderWithQuantityText(
-    view: TextView,
-    totalQuantity: Int?,
-) {
-    view.text = view.context.getString(R.string.make_order_with_total_quantity, totalQuantity ?: 0)
 }

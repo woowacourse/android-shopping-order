@@ -1,199 +1,255 @@
 package woowacourse.shopping.data.repository
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.CartItemDto
 import woowacourse.shopping.data.model.dto.CartItemsDto
-import woowacourse.shopping.data.model.dto.ContentDto
+import woowacourse.shopping.data.model.dto.QuantityDto
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class RemoteCartRepositoryImpl : CartRepository {
     private val service = ProductClient.service
-    private var cartItemData: CartItemDto? = null
-    private var cartItems: List<CartItem>? = null
 
-    init {
-        updateCartItems()
-    }
-
-    override fun updateCartItems() {
-        var response: Response<CartItemDto>? = null
-        CoroutineScope(Dispatchers.IO).launch {
-            response = service.requestCartItems().execute()
-            cartItemData = (response as Response<CartItemDto>).body()
-            cartItems = cartItemData?.content?.map { it.toDomainModel() }
-        }
-
-        while (true) {
-            Thread.sleep(1000)
-            if (cartItemData != null || response?.code() != 200) {
-                break
+    override fun fetchCartItemsInfo(resultCallback: (Result<List<CartItem>>) -> Unit) {
+        service.requestCartItems().enqueue(object : Callback<CartItemDto> {
+            override fun onResponse(call: Call<CartItemDto>, response: Response<CartItemDto>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val cartItemDto = response.body()
+                    cartItemDto?.let { dto ->
+                        val cartItems = dto.content.map { it.toDomainModel() }
+                        resultCallback(Result.success(cartItems))
+                    }
+                } else {
+                    resultCallback(Result.failure(RuntimeException("Failed to fetch cart items.")))
+                }
             }
-        }
+
+            override fun onFailure(call: Call<CartItemDto>, throwable: Throwable) {
+                resultCallback(Result.failure(throwable))
+            }
+        })
     }
 
-    override fun insert(
-        product: Product,
-        quantity: Int,
+    override fun fetchCartItemsInfoWithPage(
+        page: Int,
+        pageSize: Int,
+        resultCallback: (List<CartItem>) -> Unit,
     ) {
+        var cartItems: List<CartItem>? = null
         threadAction {
-            val cartId = findCartItemIdWithProductId(product.id)
-            if (cartId == -1L) {
-                service.addCartItem(ShoppingProductDto(product.id, quantity)).execute()
-            } else {
-                service.updateCartItemQuantity(cartId, quantity).execute()
+            val response = service.requestCartItems(page, pageSize).execute()
+            if (response.isSuccessful && response.body() != null) {
+                val cartItemDto = response.body()
+                cartItems = cartItemDto?.content?.map { it.toDomainModel() }.orEmpty()
             }
         }
-        updateCartItems()
+        cartItems?.let {
+            resultCallback(it)
+        }
     }
 
-    override fun update(
+    override fun fetchTotalQuantity(resultCallback: (Result<Int>) -> Unit) {
+        service.requestCartItemsCount().enqueue(object : Callback<QuantityDto> {
+            override fun onResponse(call: Call<QuantityDto>, response: Response<QuantityDto>) {
+                if (response.isSuccessful) {
+                    val totalQuantity = response.body()?.quantity ?: 0
+                    resultCallback(Result.success(totalQuantity))
+                } else {
+                    resultCallback(Result.failure(RuntimeException("Failed to fetch products.")))
+                }
+            }
+
+            override fun onFailure(call: Call<QuantityDto>, throwable: Throwable) {
+                resultCallback(Result.failure(throwable))
+            }
+        })
+    }
+
+    override fun findCartItemWithProductId(productId: Long): CartItem? {
+        val cartItems: List<CartItem> = fetchCartItemsWithSync()
+        return cartItems.find { it.productId == productId }
+    }
+
+    private fun fetchCartItemsWithSync(): List<CartItem> {
+        var cartItems: List<CartItem> = emptyList()
+        threadAction {
+            val response = service.requestCartItems().execute()
+            if (response.isSuccessful && response.body() != null) {
+                val cartItemDto = response.body()
+                cartItems = cartItemDto?.content?.map { it.toDomainModel() }.orEmpty()
+            }
+        }
+        return cartItems
+    }
+
+    override fun fetchItemQuantityWithProductId(productId: Long): Int {
+        return findCartItemWithProductId(productId)?.quantity ?: 0
+    }
+
+    override fun fetchCartItem(cartItemId: Long): CartItem {
+        val cartItems: List<CartItem> = fetchCartItemsWithSync()
+        return cartItems.find { it.id == cartItemId } ?: throw NoSuchElementException()
+    }
+
+    override fun addCartItem(
         productId: Long,
         quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit
     ) {
-        threadAction {
-            service.updateCartItemQuantity(productId, quantity).execute()
+        val cartItem: CartItem? = findCartItemWithProductId(productId)
+        if (cartItem == null) {
+            addNewCartItem(productId, quantity, resultCallback)
+        } else {
+            updateCartItemQuantity(cartItem.id, quantity, resultCallback)
         }
-        updateCartItems()
     }
 
-    override fun updateQuantity(
+    private fun addNewCartItem(
+        productId: Long,
+        quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit,
+    ) {
+        service.addCartItem(ShoppingProductDto(productId, quantity))
+            .enqueue(object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (response.isSuccessful) {
+                        resultCallback(Result.success(Unit))
+                    } else {
+                        resultCallback(Result.failure(RuntimeException("Failed to add item. Check product Id.")))
+                    }
+                }
+
+                override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                    resultCallback(Result.failure(throwable))
+                }
+            })
+    }
+
+    override fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit
     ) {
-        service.updateCartItemQuantity(cartItemId, quantity).execute()
-        updateCartItems()
+        service.updateCartItemQuantity(cartItemId, quantity).enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful) {
+                    resultCallback(Result.success(Unit))
+                } else {
+                    resultCallback(Result.failure(RuntimeException("Failed to update item quantity. Check item id.")))
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                resultCallback(Result.failure(throwable))
+            }
+        })
     }
 
-    override fun updateQuantityWithProductId(
+    override fun updateCartItemQuantityWithProductId(
         productId: Long,
         quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit
     ) {
-        val contentId = findCartItemIdWithProductId(productId)
-        service.updateCartItemQuantity(contentId, quantity).execute()
-        updateCartItems()
+        val cartItemId = findCartItemIdWithProductId(productId)
+        if (cartItemId == -1L) {
+            addNewCartItem(productId, quantity, resultCallback)
+        } else {
+            updateCartItemQuantity(cartItemId, quantity, resultCallback)
+        }
     }
 
     private fun findCartItemIdWithProductId(productId: Long): Long {
-        return cartItems?.find { it.productId == productId }?.id ?: -1L
+        val cartItems: List<CartItem> = fetchCartItemsWithSync()
+        return cartItems.find { it.productId == productId }?.id ?: -1L
     }
 
-    override fun findQuantityWithProductId(productId: Long): Int {
-        val contentId = findCartItemIdWithProductId(productId)
-        return cartItems?.find { it.id == contentId }?.quantity ?: 0
-    }
-
-    override fun makeOrder(order: Order) {
-        val cartItemIds = order.list.map { it.id }
-        service.makeOrder(CartItemsDto(cartItemIds)).execute()
-    }
-
-    override fun size(): Int {
-        return cartItemData?.totalElements ?: 0
-    }
-
-    override fun sumOfQuantity(): Int {
-        var quantity: Int = 0
-        var response: Int = -1
-
-        threadAction {
-            quantity = service.requestCartItemsCount().execute().body()?.quantity ?: -1
-        }
-        while (true) {
-            Thread.sleep(1000)
-            if (quantity != -1 || response != -1) {
-                break
-            }
-        }
-        Log.d("crong count", "$quantity")
-
-        return quantity
-    }
-
-    override fun findOrNullWithProductId(productId: Long): CartItem? {
-        var content: ContentDto? = null
-        threadAction {
-            content =
-                service.requestCartItems().execute().body()?.content?.find {
-                    it.product.id == productId
+    override fun deleteCartItem(
+        cartItemId: Long,
+        resultCallback: (Result<Unit>) -> Unit,
+    ) {
+        service.deleteCartItem(cartItemId).enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful) {
+                    resultCallback(Result.success(Unit))
+                } else {
+                    resultCallback(Result.failure(RuntimeException("Failed to delete item. Check item id.")))
                 }
-        }
-        return content?.toDomainModel()
-    }
-
-    override fun findWithCartItemId(cartItemId: Long): CartItem {
-        return cartItems?.find { it.id == cartItemId } ?: throw NoSuchElementException()
-    }
-
-    override fun findAll(): ShoppingCart {
-        return ShoppingCart(cartItems ?: emptyList())
-    }
-
-    override fun findAllPagedItems(
-        page: Int,
-        pageSize: Int,
-    ): ShoppingCart {
-        val offset = page * pageSize
-        val limit = pageSize
-        var cartItems: List<CartItem> = emptyList()
-        var response: Int = -1
-        threadAction {
-            cartItems = service.requestCartItems(page, pageSize).execute().body()?.content?.map {
-                it.toDomainModel()
-            } ?: emptyList()
-            response = service.requestCartItems(page, pageSize).execute().code()
-        }
-        while (true) {
-            Thread.sleep(1000)
-            if (cartItems.isNotEmpty() || response != -1) {
-                break
             }
-        }
 
-        return ShoppingCart(cartItems)
+            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                resultCallback(Result.failure(throwable))
+            }
+        })
+
     }
 
-    override fun delete(cartItemId: Long) {
-        threadAction {
-            service.deleteCartItem(cartItemId).execute()
+    override fun deleteCartItemWithProductId(
+        productId: Long,
+        resultCallback: (Result<Unit>) -> Unit,
+    ) {
+        val cartItemId = findCartItemIdWithProductId(productId)
+        if (cartItemId != -1L) {
+            deleteCartItem(cartItemId, resultCallback)
         }
-        updateCartItems()
     }
 
-    override fun deleteWithProductId(productId: Long) {
-        val contentId = findCartItemIdWithProductId(productId)
-        threadAction {
-            service.deleteCartItem(contentId).execute()
-        }
-        updateCartItems()
-    }
-
-    override fun deleteAll() {
-        if (cartItems.isNullOrEmpty()) {
+    override fun deleteAllItems() {
+        val cartItems: List<CartItem> = fetchCartItemsWithSync()
+        if (cartItems.isEmpty()) {
             return
         } else {
-            cartItems!!.forEach {
-                threadAction {
-                    service.deleteCartItem(it.id).execute()
+            threadAction {
+                cartItems.forEach { item ->
+                    service.deleteCartItem(item.id).execute()
                 }
             }
         }
-        updateCartItems()
+    }
+
+    override fun makeOrder(
+        order: Order,
+        resultCallback: (Result<Unit>) -> Unit,
+    ) {
+        val cartItemIds = order.map.keys.toList()
+        service.makeOrder(CartItemsDto(cartItemIds)).enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful) {
+                    resultCallback(Result.success(Unit))
+                } else {
+                    resultCallback(Result.failure(RuntimeException("Failed to make order. Check Item Ids.")))
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, throwable: Throwable) {
+                resultCallback(Result.failure(throwable))
+            }
+        })
     }
 
     private fun threadAction(action: () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            action()
+        val latch = CountDownLatch(ACTION_COUNT)
+        thread {
+            try {
+                action()
+            } catch (e: Exception) {
+                error(e)
+            } finally {
+                latch.countDown()
+            }
         }
+        latch.await()
+    }
+
+    companion object {
+        private const val ACTION_COUNT = 1
     }
 }

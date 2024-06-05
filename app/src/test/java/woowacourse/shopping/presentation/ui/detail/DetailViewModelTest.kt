@@ -47,17 +47,21 @@ class DetailViewModelTest {
 
     @Test
     fun `아무것도 담지 않은 장바구니의 크기는 0 이다`() {
-        val actual = testCartRepository.size()
-
-        assertThat(actual).isEqualTo(0)
+        testCartRepository.fetchTotalQuantity { result ->
+            result.onSuccess { actual ->
+                assertThat(actual).isEqualTo(0)
+            }
+        }
     }
 
     @Test
     fun `상품을 장바구니에 담으면 장바구니의 사이즈가 증가한다`() {
         viewModel.createShoppingCartItem()
         viewModel.shoppingProduct.getOrAwaitValue()
-        val actual = testCartRepository.size()
-
-        assertThat(actual).isEqualTo(1)
+        testCartRepository.fetchTotalQuantity { result ->
+            result.onSuccess { actual ->
+                assertThat(actual).isEqualTo(1)
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,7 +30,7 @@ class CartViewModel(
         currentPage.map { page ->
             page == lastPage
         }
-    private val _totalItemSize = MutableLiveData<Int>(cartRepository.size())
+    private val _totalItemSize = MutableLiveData<Int>(0)
 
     val totalItemSize: LiveData<Int> = _totalItemSize
     private val _isPageControlVisible =
@@ -77,12 +78,26 @@ class CartViewModel(
         get() = _totalQuantity
 
     private fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
-        val items = cartRepository.findAllPagedItems(page, pageSize).items
-        return if (items.isEmpty()) {
-            UIState.Empty
-        } else {
-            UIState.Success(items)
+        var uiState: UIState<List<CartItem>> = UIState.Success(emptyList())
+        Log.d("ㅌㅅㅌ", "cartViewModel")
+        cartRepository.fetchCartItemsInfo { result ->
+            Log.d("ㅌㅅㅌ", "cartViewModel | result = $result")
+            result.fold(
+                onSuccess = { items ->
+                    uiState = if (items.isEmpty()) {
+                        UIState.Empty
+                    } else {
+                        UIState.Success(items)
+                    }
+                },
+                onFailure = {
+                    uiState = UIState.Error(RuntimeException("something goes wrong. try again."))
+                    Log.d("ㅌㅅㅌ", "$it")
+                }
+            )
         }
+        Log.d("ㅌㅅㅌ", "ui state : $uiState")
+        return uiState
     }
 
     init {
@@ -90,7 +105,6 @@ class CartViewModel(
     }
 
     private fun updatePageControlVisibility() {
-        _totalItemSize.postValue(cartRepository.size())
         lastPage = ((totalItemSize.value ?: 0) - PAGE_STEP) / pageSize
         _isPageControlVisible.postValue((totalItemSize.value ?: 0) > pageSize)
     }
@@ -113,7 +127,9 @@ class CartViewModel(
     }
 
     fun deleteItem(itemId: Long) {
-        cartRepository.delete(itemId)
+        cartRepository.deleteCartItem(itemId) {
+
+        }
         loadPage()
     }
 
@@ -133,16 +149,22 @@ class CartViewModel(
         _deleteCartItem.postValue(Event(itemId))
     }
 
-    override fun increaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        cartRepository.updateQuantityWithProductId(productId, currentQuantity + 1)
+    override fun increaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val currentQuantity = cartRepository.fetchItemQuantityWithProductId(productId)
+        cartRepository.updateCartItemQuantityWithProductId(productId, currentQuantity + 1) {}
         loadPage()
     }
 
-    override fun decreaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
+    override fun decreaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val currentQuantity = cartRepository.fetchItemQuantityWithProductId(productId)
         if (currentQuantity > 1) {
-            cartRepository.updateQuantityWithProductId(productId, currentQuantity - 1)
+            cartRepository.updateCartItemQuantityWithProductId(productId, currentQuantity - 1) {}
         }
         loadPage()
     }

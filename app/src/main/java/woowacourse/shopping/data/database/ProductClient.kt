@@ -26,7 +26,7 @@ object ProductClient {
         }
 
     class AppInterceptor : Interceptor {
-        private val email = "hogu59"
+        private val email = "junyoung-won"
         private val password = "password"
 
         override fun intercept(chain: Interceptor.Chain): Response {

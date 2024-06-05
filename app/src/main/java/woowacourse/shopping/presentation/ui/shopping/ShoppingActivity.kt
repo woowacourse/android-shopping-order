@@ -2,23 +2,13 @@ package woowacourse.shopping.presentation.ui.shopping
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.widget.NestedScrollView
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ShoppingProduct
-import woowacourse.shopping.presentation.state.UIState
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
 import woowacourse.shopping.presentation.ui.shopping.adapter.RecentProductAdapter
@@ -46,48 +36,35 @@ class ShoppingActivity : AppCompatActivity() {
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        binding.countHandler = viewModel
         observeViewModel()
-        showShimmerListTest()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.reloadProducts()
     }
 
     private fun setUpRecyclerView() {
-        binding.rvProductList.layoutManager = GridLayoutManager(this, 2)
-        setUpRecyclerViewAdapter()
-        viewModel.hideLoadMore()
-        checkLoadMoreBtnVisibility()
-    }
-
-    private fun setUpRecyclerViewAdapter() {
         shoppingAdapter = ShoppingAdapter(viewModel, viewModel)
         recentProductAdapter = RecentProductAdapter(viewModel)
 
         binding.rvProductList.adapter = shoppingAdapter
         binding.horizontalView.rvRecentProduct.adapter = recentProductAdapter
-
-        try {
-            viewModel.products.observe(this) { products ->
-                shoppingAdapter.loadData(products)
-            }
-        } catch (exception: Exception) {
-            Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun observeViewModel() {
-        viewModel.shoppingUiState.observe(this) { state ->
-            when (state) {
-                is UIState.Success -> showData(state.data)
-                is UIState.Empty -> showData(emptyList())
-                is UIState.Error ->
-                    showError(
-                        state.exception.message ?: getString(R.string.unknown_error),
-                    )
+        viewModel.isLoading.observe(this) { event ->
+            event.getContentIfNotHandled()?.let {
+                showSkeletonUI(it)
             }
+        }
+
+        viewModel.shoppingProducts.observe(this) {
+            shoppingAdapter.setShoppingProducts(it)
+        }
+
+        viewModel.changedIds.observe(this) {
+            shoppingAdapter.updateShoppingProducts(it)
+        }
+
+        viewModel.recentProducts.observe(this) {
+            recentProductAdapter.updateProducts(it)
         }
 
         viewModel.navigateToDetail.observe(this) {
@@ -101,43 +78,6 @@ class ShoppingActivity : AppCompatActivity() {
                 navigateToCart()
             }
         }
-
-        viewModel.shoppingProducts.observe(this) {
-            shoppingAdapter.loadShoppingProductData(it)
-        }
-
-        viewModel.recentProducts.observe(this) {
-            recentProductAdapter.updateProducts(it)
-        }
-    }
-
-    // TODO: 데이터 로딩 중인 경우에 LoadMore 버튼 숨기기
-    private fun checkLoadMoreBtnVisibility() {
-        binding.nestedScrollView.setOnScrollChangeListener(
-            NestedScrollView.OnScrollChangeListener { v, _, _, _, _ ->
-                if (!v.canScrollVertically(1)) {
-                    viewModel.showLoadMoreByCondition()
-                } else {
-                    viewModel.hideLoadMore()
-                }
-            },
-        )
-    }
-
-    private fun showData(data: List<Product>) {
-        shoppingAdapter.loadData(data)
-        shoppingAdapter.loadShoppingProductData(
-            data.map {
-                ShoppingProduct(
-                    product = it,
-                    quantity = viewModel.fetchQuantity(it.id),
-                )
-            },
-        )
-    }
-
-    private fun showError(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
     private fun navigateToCart() {
@@ -148,15 +88,7 @@ class ShoppingActivity : AppCompatActivity() {
         startActivity(DetailActivity.createIntent(this, productId))
     }
 
-    private fun showShimmerListTest() {
-        lifecycleScope.launch {
-            showProductData(isLoading = true)
-            delay(2500)
-            showProductData(isLoading = false)
-        }
-    }
-
-    private fun showProductData(isLoading: Boolean) {
+    private fun showSkeletonUI(isLoading: Boolean) {
         if (isLoading) {
             binding.horizontalView.shimmerRecentProductList.startShimmer()
             binding.shimmerProductList.startShimmer()
@@ -172,5 +104,11 @@ class ShoppingActivity : AppCompatActivity() {
             binding.horizontalView.rvRecentProduct.visibility = View.VISIBLE
             binding.rvProductList.visibility = View.VISIBLE
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.setLoadingStart()
+        viewModel.loadProducts()
     }
 }

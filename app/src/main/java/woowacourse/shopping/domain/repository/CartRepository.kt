@@ -3,53 +3,56 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ShoppingCart
 
 interface CartRepository {
-    fun updateCartItems()
+    fun fetchCartItemsInfo(resultCallback: (Result<List<CartItem>>) -> Unit)
 
-    fun insert(
-        product: Product,
-        quantity: Int,
-    )
-
-    fun update(
-        productId: Long,
-        quantity: Int,
-    )
-
-    fun updateQuantity(
-        cartItemId: Long,
-        quantity: Int,
-    )
-
-    fun updateQuantityWithProductId(
-        productId: Long,
-        quantity: Int,
-    )
-
-    fun findQuantityWithProductId(productId: Long): Int
-
-    fun makeOrder(order: Order)
-
-    fun size(): Int
-
-    fun sumOfQuantity(): Int
-
-    fun findOrNullWithProductId(productId: Long): CartItem?
-
-    fun findWithCartItemId(cartItemId: Long): CartItem
-
-    fun findAll(): ShoppingCart
-
-    fun findAllPagedItems(
+    fun fetchCartItemsInfoWithPage(
         page: Int,
         pageSize: Int,
-    ): ShoppingCart
+        resultCallback: (List<CartItem>) -> Unit,
+    )
 
-    fun delete(cartItemId: Long)
+    fun fetchTotalQuantity(resultCallback: (Result<Int>) -> Unit)
 
-    fun deleteWithProductId(productId: Long)
+    fun findCartItemWithProductId(productId: Long): CartItem?
 
-    fun deleteAll()
+    fun fetchItemQuantityWithProductId(productId: Long): Int
+
+    fun fetchCartItem(cartItemId: Long): CartItem
+
+    fun addCartItem(
+        productId: Long,
+        quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit,
+    )
+
+    fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit,
+    )
+
+    fun updateCartItemQuantityWithProductId(
+        productId: Long,
+        quantity: Int,
+        resultCallback: (Result<Unit>) -> Unit,
+    )
+
+    fun deleteCartItem(
+        cartItemId: Long,
+        resultCallback: (Result<Unit>) -> Unit,
+    )
+
+    fun deleteCartItemWithProductId(
+        productId: Long,
+        resultCallback: (Result<Unit>) -> Unit,
+    )
+
+    fun deleteAllItems()
+
+    fun makeOrder(
+        order: Order,
+        resultCallback: (Result<Unit>) -> Unit,
+    )
 }

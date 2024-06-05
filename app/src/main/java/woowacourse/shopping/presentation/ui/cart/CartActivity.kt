@@ -5,46 +5,69 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.databinding.ActivityCartTempBinding
+import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.ui.cart.selection.SelectionFragment
 
-class CartActivity : AppCompatActivity(), CartClickListener {
-    private lateinit var binding: ActivityCartTempBinding
+class CartActivity : AppCompatActivity(), FragmentController {
+    private lateinit var binding: ActivityCartBinding
     private val selectionFragment by lazy { SelectionFragment() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCartTempBinding.inflate(layoutInflater)
+        binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.clickListener = this
 
-        setupInitialFragment()
+        setupInitialFragment(savedInstanceState)
     }
 
-    private fun setupInitialFragment() {
-        supportFragmentManager.beginTransaction()
-            .add(R.id.cart_fragment, selectionFragment)
-            .commit()
+    private fun setupInitialFragment(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.cart_fragment, selectionFragment)
+                .commit()
+        }
     }
 
-    override fun onBackButtonClick() {
-        val topFragment = supportFragmentManager.fragments.lastOrNull()
-        when (topFragment) {
+    override fun onBackButtonClicked() {
+        when (val topFragment = supportFragmentManager.fragments.lastOrNull()) {
             is SelectionFragment -> {
                 supportFragmentManager.beginTransaction()
-                    .remove(selectionFragment)
+                    .remove(topFragment)
                     .setReorderingAllowed(true)
                     .commit()
                 finish()
             }
 
             is RecommendationFragment -> {
+                selectionFragment.onShow()
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.cart_fragment, selectionFragment)
+                    .remove(topFragment)
+                    .show(selectionFragment)
                     .setReorderingAllowed(true)
                     .commit()
+            }
+
+            else -> {
+                finish()
+            }
+        }
+    }
+
+    override fun onOrderButtonClicked() {
+        when (val topFragment = supportFragmentManager.fragments.lastOrNull()) {
+            is SelectionFragment -> {
+                supportFragmentManager.beginTransaction()
+                    .hide(topFragment)
+                    .add(R.id.cart_fragment, RecommendationFragment())
+                    .setReorderingAllowed(true)
+                    .commit()
+            }
+
+            is RecommendationFragment -> {
+                finish()
             }
 
             else -> {

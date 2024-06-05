@@ -28,6 +28,7 @@
             android:id="@+id/shimmer_recent_product_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:shimmer_auto_start="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -54,7 +55,6 @@
             android:layout_marginBottom="40dp"
             android:layout_marginHorizontal="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:recentProducts="@{viewModel.recentProducts}"
             android:orientation="horizontal"
             tools:listitem="@layout/item_recent_product"
             android:layout_width="match_parent"

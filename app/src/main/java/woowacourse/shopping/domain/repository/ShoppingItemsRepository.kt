@@ -1,14 +1,13 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductListInfo
 
 interface ShoppingItemsRepository {
-    fun fetchProductsSize(): Int
-
-    fun fetchProductsWithIndex(
-        start: Int = 0,
-        end: Int,
-    ): List<Product>
+    fun fetchProductsWithPage(
+        page: Int,
+        size: Int,
+    ): Result<ProductListInfo>
 
     fun findProductItem(id: Long): Product?
 

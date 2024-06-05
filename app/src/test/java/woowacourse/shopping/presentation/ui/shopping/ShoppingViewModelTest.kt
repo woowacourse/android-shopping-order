@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.ui.shopping
 
+import io.mockk.awaits
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -36,8 +38,7 @@ class ShoppingViewModelTest {
                 Product.of(name = "Product 10", price = 2000, imageUrl = "URL 10"),
             )
 
-        every { repository.fetchProductsSize() } returns 100
-        every { repository.fetchProductsWithIndex(any(), any()) } returns products
+        every { repository.fetchProductsWithPage(any(), any()) } just awaits
         every { testRecentProductRepository.loadLatestList() } returns listOf<RecentProduct>()
 
         testCartRepository = FakeCartRepositoryImpl()
@@ -47,26 +48,12 @@ class ShoppingViewModelTest {
 
     @Test
     fun `초기페이지의 상품 목록을 가져올 수 있다`() {
-        assertEquals(10, viewModel.products.value?.size)
+        assertEquals(10, viewModel.shoppingProducts.value?.size)
     }
 
     @Test
     fun `1번째 페이지를 불러왔을 때, 다음 페이지의를 요청하면 2번째 페이지의 상품 목록을 가져온다`() {
-        viewModel.loadNextProducts()
-        assertEquals(20, viewModel.products.value?.size)
-    }
-
-    @Test
-    fun `더보기 버튼을 노출할 수 있다`() {
-        viewModel.showLoadMore()
-
-        assertEquals(true, viewModel.showLoadMore.value)
-    }
-
-    @Test
-    fun `더보기 버튼을 숨길 수 있다`() {
-        viewModel.hideLoadMore()
-
-        assertEquals(false, viewModel.showLoadMore.value)
+        viewModel.onLoadMoreButtonClick()
+        assertEquals(20, viewModel.shoppingProducts.value?.size)
     }
 }

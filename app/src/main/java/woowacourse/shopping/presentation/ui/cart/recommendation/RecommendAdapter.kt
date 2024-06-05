@@ -26,10 +26,40 @@ class RecommendAdapter(
         holder.bind(recommendItems[position], recommendItemCountHandler)
     }
 
+    override fun onBindViewHolder(
+        holder: RecommendViewHolder,
+        position: Int,
+        payloads: MutableList<Any>,
+    ) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            payloads.forEach { payload ->
+                when (payload) {
+                    RecommendAdapterPayload.QUANTITY_CHANGED -> {
+                        holder.onQuantityChanged(recommendItems[position])
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
+
     override fun getItemCount(): Int = recommendItems.size
 
-    fun loadData(recommendItems: List<ShoppingProduct>) {
-        this.recommendItems = recommendItems
-        notifyItemRangeChanged(0, recommendItems.size)
+    fun submitItems(newItems: List<ShoppingProduct>) {
+        val hasInitialized = recommendItems.isEmpty()
+        recommendItems = newItems
+        if (hasInitialized) {
+            notifyItemRangeInserted(0, newItems.size)
+        }
+    }
+
+    fun updateItems(updatedIds: Set<Long>) {
+        updatedIds.forEach { productId ->
+            val updatedPosition = recommendItems.indexOfFirst { it.product.id == productId }
+            notifyItemChanged(updatedPosition, RecommendAdapterPayload.QUANTITY_CHANGED)
+        }
     }
 }

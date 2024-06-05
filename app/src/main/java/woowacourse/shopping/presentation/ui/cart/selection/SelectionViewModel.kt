@@ -2,179 +2,324 @@ package woowacourse.shopping.presentation.ui.cart.selection
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
+import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
+import woowacourse.shopping.presentation.event.SingleLiveEvent
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
 
 class SelectionViewModel(
     private val shoppingRepository: ShoppingItemsRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(),
-    SelectionEventHandler,
+    CartItemSelectionEventHandler,
     SelectionCountHandler {
-    private val pageSize = PAGE_SIZE
+    private var cartItems: List<CartItem> = emptyList()
 
-    private val _currentPage = MutableLiveData(DEFAULT_PAGE)
-    val currentPage: LiveData<Int> = _currentPage
+    private val _uiCartItemsState: MutableLiveData<UIState<List<CartItemUiModel>>> =
+        MutableLiveData()
+    val uiCartItemsState: LiveData<UIState<List<CartItemUiModel>>>
+        get() = _uiCartItemsState
 
-    private val _order = MutableLiveData<Order>(Order())
-    val order: LiveData<Order>
-        get() = _order
-
-    private val _totalItemSize = MutableLiveData<Int>(cartRepository.size())
-    val totalItemSize: LiveData<Int>
-        get() = _totalItemSize
-
-    private var lastPage: Int = DEFAULT_PAGE
-
-    val cartItemsState: LiveData<UIState<List<CartItem>>> =
-        currentPage.switchMap { page ->
-            MutableLiveData<UIState<List<CartItem>>>().apply {
-                value =
-                    try {
-                        setUpUIState(page)
-                    } catch (e: Exception) {
-                        UIState.Error(e)
-                        setUpUIState(page)
-                    }
-            }
-        }
-
-    private val _isEmpty = MutableLiveData<Boolean>(false)
-
+    private val _isEmpty = MediatorLiveData(false)
     val isEmpty: LiveData<Boolean>
         get() = _isEmpty
 
-    private val _navigateToDetail = MutableLiveData<Event<Long>>()
+    private val _order = MutableLiveData(OrderDatabase.getOrder())
+    val order: LiveData<Order>
+        get() = _order
 
+    private val _isAllSelected: MediatorLiveData<Boolean> = MediatorLiveData(false)
+    val isAllSelected: LiveData<Boolean>
+        get() = _isAllSelected
+
+    private val _isOrderEmpty = MediatorLiveData(true)
+    val isOrderEmpty: LiveData<Boolean>
+        get() = _isOrderEmpty
+
+    private val _navigateToDetail = MutableLiveData<Event<Long>>()
     val navigateToDetail: LiveData<Event<Long>>
         get() = _navigateToDetail
-    private val _deleteCartItem = MutableLiveData<Event<Long>>()
 
-    val deleteCartItem: LiveData<Event<Long>>
-        get() = _deleteCartItem
+    private val _totalOrderPrice = MutableLiveData<Long>(order.value?.getTotalPrice() ?: 0L)
+    val totalOrderPrice: LiveData<Long>
+        get() = _totalOrderPrice
 
-    private val _totalPrice = MutableLiveData<Long>(order.value?.getTotalPrice() ?: 0L)
-    val totalPrice: LiveData<Long>
-        get() = _totalPrice
+    private val _totalOrderQuantity = MutableLiveData<Int>(order.value?.getTotalQuantity() ?: 0)
+    val totalOrderQuantity: LiveData<Int>
+        get() = _totalOrderQuantity
 
-    private val _totalQuantity = MutableLiveData<Int>(order.value?.getTotalQuantity() ?: 0)
-    val totalQuantity: LiveData<Int>
-        get() = _totalQuantity
+    private val _isLoading = MutableLiveData(Event(false))
+    val isLoading: LiveData<Event<Boolean>>
+        get() = _isLoading
 
-    private fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
-        val items = cartRepository.findAll().items
-        return if (items.isEmpty()) {
-            UIState.Empty
-        } else {
-            UIState.Success(items)
-        }
-    }
+    private val _quantityChangedIds: SingleLiveEvent<Set<Long>> = SingleLiveEvent()
+    val quantityChangedIds: LiveData<Set<Long>>
+        get() = _quantityChangedIds
+
+    private val _isCheckedChangedIds: SingleLiveEvent<Set<Long>> = SingleLiveEvent()
+    val isCheckedChangedIds: LiveData<Set<Long>>
+        get() = _isCheckedChangedIds
+
+    private val _deletedId = MutableLiveData<Event<Long>>()
+    val deletedId: LiveData<Event<Long>>
+        get() = _deletedId
 
     init {
-        loadPage()
-    }
-
-    private fun updatePageControlVisibility() {
-        _totalItemSize.postValue(cartRepository.size())
-        lastPage = ((totalItemSize.value ?: 0) - PAGE_STEP) / pageSize
-    }
-
-    private fun loadPage() {
-        _currentPage.value = currentPage.value?.coerceIn(DEFAULT_PAGE, lastPage)
-        updatePageControlVisibility()
-    }
-
-    fun deleteItem(itemId: Long) {
-        cartRepository.delete(itemId)
-        loadPage()
-    }
-
-    fun isCartEmpty() {
-        _isEmpty.postValue(true)
-    }
-
-    override fun onCheckItem(itemId: Long) {
-        val cartItem = cartRepository.findWithCartItemId(itemId)
-        if (cartItem.isChecked) {
-            removeFromOrder(cartItem)
-        } else {
-            addToOrder(cartItem)
+        with(_isAllSelected) {
+            addSource(order) { checkAllSelected(uiCartItemsState, order) }
+            addSource(uiCartItemsState) { checkAllSelected(uiCartItemsState, order) }
         }
-        // To notify the change of order
-        _order.value = _order.value
+        with(_isEmpty) {
+            addSource(uiCartItemsState) { checkCartIsEmpty(uiCartItemsState) }
+        }
+        with(_isOrderEmpty) {
+            addSource(order) { this.value = it.map.isEmpty() }
+        }
+    }
+
+    fun setLoadingState(value: Boolean) {
+        _isLoading.value = Event(value)
+    }
+
+    fun setUpCartItems() {
+        cartRepository.fetchCartItemsInfo() { result ->
+            result.onSuccess { items ->
+                cartItems = items
+                setUpUIState()
+            }.onFailure {
+                _uiCartItemsState.value = UIState.Error(it)
+                setLoadingState(false)
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+    }
+
+    private fun setUpUIState() {
+        if (_uiCartItemsState.value !is UIState.Error) {
+            _uiCartItemsState.value = if (cartItems.isEmpty()) {
+                UIState.Empty
+            } else {
+                val prevOrder = OrderDatabase.getOrder()
+                UIState.Success(cartItems.map {
+                    it.toUiModel(
+                        prevOrder.containsCartItem(it)
+                    )
+                })
+            }
+        }
         updatePriceAndQuantity()
-        Log.d("crong", "onCheckItem: ${_order.value?.list}")
+        setLoadingState(false)
     }
 
-    private fun updatePriceAndQuantity() {
-        _totalPrice.value = _order.value?.getTotalPrice() ?: 0L
-        _totalQuantity.value = _order.value?.getTotalQuantity() ?: 0
+    private fun checkAllSelected(
+        uiState: LiveData<UIState<List<CartItemUiModel>>>,
+        order: LiveData<Order>,
+    ) {
+        when (uiState.value) {
+            is UIState.Success -> {
+                val cartSize = (uiState.value as UIState.Success<List<CartItemUiModel>>).data.size
+                _isAllSelected.value = (cartSize > 0) && (order.value?.map?.size == cartSize)
+            }
+
+            else -> {
+                _isAllSelected.value = false
+            }
+        }
     }
 
-    private fun removeFromOrder(cartItem: CartItem) {
-        _order.value?.removeCartItem(cartItem)
+    private fun checkCartIsEmpty(uiState: LiveData<UIState<List<CartItemUiModel>>>) {
+        if (uiState.value is UIState.Success<List<CartItemUiModel>>) {
+            _isEmpty.value =
+                (uiState.value as UIState.Success<List<CartItemUiModel>>).data.isEmpty()
+        }
+    }
+
+    override fun onCheckItem(cartItemId: Long) {
+        val cartItem = cartItems.find { it.id == cartItemId }
+        if (cartItem != null) {
+            if (order.value?.containsCartItem(cartItem) == true) {
+                removeFromOrder(cartItem.id)
+            } else {
+                addToOrder(cartItem)
+            }
+            updatePriceAndQuantity()
+        }
+    }
+
+    private fun removeFromOrder(cartItemId: Long) {
+        val prevOrder = order.value ?: Order()
+        prevOrder.removeCartItem(cartItemId)
+        _order.value = prevOrder
+        _uiCartItemsState.value = UIState.Success(getUpdatedCheckedList(cartItemId, false))
+        _isCheckedChangedIds.value = setOf(cartItemId)
     }
 
     private fun addToOrder(cartItem: CartItem) {
-        _order.value?.addCartItem(cartItem)
+        val prevOrder = order.value ?: Order()
+        prevOrder.addCartItem(cartItem)
+        _order.value = prevOrder
+        _uiCartItemsState.value = UIState.Success(getUpdatedCheckedList(cartItem.id, true))
+        _isCheckedChangedIds.value = setOf(cartItem.id)
     }
 
-    override fun navigateToDetail(productId: Long) {
-        _navigateToDetail.postValue(Event(productId))
-    }
-
-    override fun deleteCartItem(itemId: Long) {
-        _deleteCartItem.postValue(Event(itemId))
-    }
-
-    override fun increaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        cartRepository.updateQuantityWithProductId(productId, currentQuantity + 1)
-        loadPage()
-    }
-
-    override fun decreaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        if (currentQuantity > 1) {
-            cartRepository.updateQuantityWithProductId(productId, currentQuantity - 1)
+    private fun getUpdatedCheckedList(
+        cartItemId: Long,
+        isChecked: Boolean,
+    ): List<CartItemUiModel> {
+        val uiCartItems = (uiCartItemsState.value as UIState.Success<List<CartItemUiModel>>).data
+        return uiCartItems.map {
+            if (it.id == cartItemId) {
+                it.copy(isChecked = isChecked)
+            } else {
+                it
+            }
         }
-        loadPage()
+    }
+
+    private fun updatePriceAndQuantity() {
+        _totalOrderPrice.postValue(order.value?.getTotalPrice() ?: 0L)
+        _totalOrderQuantity.postValue(order.value?.getTotalQuantity() ?: 0)
     }
 
     fun selectAllByCondition() {
-        if (_order.value?.list?.size == cartRepository.size()) {
-            unSelectAll()
+        val prevOrder = order.value ?: Order()
+        val uiCartItems = (uiCartItemsState.value as UIState.Success<List<CartItemUiModel>>).data
+        if (isAllSelected.value == true) {
+            unSelectAll(prevOrder, uiCartItems)
         } else {
-            selectAll()
+            selectAll(prevOrder, uiCartItems)
+        }
+        _isCheckedChangedIds.value = uiCartItems.map { it.id }.toSet()
+        updatePriceAndQuantity()
+    }
+
+    private fun unSelectAll(
+        prevOrder: Order,
+        uiCartItems: List<CartItemUiModel>,
+    ) {
+        prevOrder.clearOrder()
+        _order.value = prevOrder
+        _uiCartItemsState.value = UIState.Success(uiCartItems.map { it.copy(isChecked = false) })
+    }
+
+    private fun selectAll(
+        prevOrder: Order,
+        uiCartItems: List<CartItemUiModel>,
+    ) {
+        prevOrder.selectAllCartItems(cartItems)
+        _order.value = prevOrder
+        _uiCartItemsState.value = UIState.Success(uiCartItems.map { it.copy(isChecked = true) })
+    }
+
+    override fun onProductClicked(productId: Long) {
+        _navigateToDetail.postValue(Event(productId))
+    }
+
+    override fun onXButtonClicked(itemId: Long) {
+        removeFromOrder(itemId)
+        deleteItem(itemId)
+    }
+
+    private fun deleteItem(itemId: Long) {
+        cartRepository.deleteCartItem(itemId) { result ->
+            result.onSuccess {
+                _deletedId.postValue(Event(itemId))
+                updatePriceAndQuantity()
+                cartItems = cartItems.filterNot { it.id == itemId }
+                val cartItems =
+                    (uiCartItemsState.value as UIState.Success<List<CartItemUiModel>>).data
+                val updatedCartItems = cartItems.filterNot { it.id == itemId }
+                _uiCartItemsState.postValue(UIState.Success(updatedCartItems))
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
         }
     }
 
-    private fun unSelectAll() {
-        _order.value?.clearOrder()
-        _order.value = _order.value
-        updatePriceAndQuantity()
-        Log.d("crong", "unSelectAll: ${_order.value?.list}")
+    override fun increaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc()) { result ->
+            result.onSuccess {
+                changeCartItemQuantity(productId, quantity.inc())
+                changeUiCartItemQuantity(productId, quantity.inc())
+                updatePriceAndQuantity()
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
     }
 
-    private fun selectAll() {
-        _order.value?.selectAllCartItems(cartRepository.findAll().items)
-        _order.value = _order.value
-        updatePriceAndQuantity()
-        Log.d("crong", "selectAll: ${_order.value?.list}")
+    override fun decreaseCount(
+        productId: Long,
+        quantity: Int,
+    ) {
+        if (quantity > 1) {
+            cartRepository.updateCartItemQuantityWithProductId(
+                productId,
+                quantity.dec(),
+            ) { result ->
+                result.onSuccess {
+                    changeCartItemQuantity(productId, quantity.dec())
+                    changeUiCartItemQuantity(productId, quantity.dec())
+                    updatePriceAndQuantity()
+                }.onFailure {
+                    Log.d(this::class.java.simpleName, "$it")
+                }
+            }
+        }
     }
 
-    companion object {
-        private const val PAGE_SIZE = 5
-        private const val DEFAULT_PAGE = 0
-        private const val PAGE_STEP = 1
+    private fun changeCartItemQuantity(
+        productId: Long,
+        newQuantity: Int,
+    ) {
+        cartItems = cartItems.map { item ->
+            if (item.productId == productId) {
+                addToOrder(item.copy(quantity = newQuantity))
+                item.copy(quantity = newQuantity)
+            } else {
+                item
+            }
+        }
+    }
+
+    private fun changeUiCartItemQuantity(
+        productId: Long,
+        newQuantity: Int,
+    ) {
+        val uiCartItems =
+            (uiCartItemsState.value as UIState.Success<List<CartItemUiModel>>).data.map {
+                if (it.productId == productId) {
+                    it.copy(quantity = newQuantity)
+                } else {
+                    it
+                }
+            }
+        _uiCartItemsState.postValue(UIState.Success(uiCartItems))
+        _quantityChangedIds.postValue(setOf(productId))
+    }
+
+    private fun CartItem.toUiModel(isChecked: Boolean): CartItemUiModel {
+        return CartItemUiModel(
+            id = this.id,
+            productId = this.productId,
+            productName = this.productName,
+            price = this.price,
+            quantity = this.quantity,
+            imgUrl = this.imgUrl,
+            isChecked = isChecked,
+        )
     }
 }
