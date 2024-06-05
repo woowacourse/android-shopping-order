@@ -2,33 +2,31 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.dto.CartItemRequest
 import woowacourse.shopping.data.dto.CartQuantityDto
-import woowacourse.shopping.data.dto.CartResponse
-import woowacourse.shopping.data.remote.RemoteCartDataSource
+import woowacourse.shopping.data.mapper.toCartItem
+import woowacourse.shopping.data.remote.datasource.CartDataSourceImpl
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import kotlin.concurrent.thread
 
 class CartRepositoryImpl(
-    private val remoteCartDataSource: RemoteCartDataSource,
+    private val cartDataSourceImpl: CartDataSourceImpl,
 ) : CartRepository {
-    override fun getCartResponse(
+    override fun getCartItems(
         page: Int,
         size: Int,
         sort: String,
-    ): Result<CartResponse> {
-        var result: Result<CartResponse>? = null
+    ): Result<List<CartItem>> {
+        var result: Result<List<CartItem>>? = null
         thread {
-            result =
-                runCatching {
-                    val response =
-                        remoteCartDataSource.getCartItems(page, size, sort)
-                            .execute()
-                    if (response.isSuccessful) {
-                        response.body() ?: throw Exception("No data available")
-                    } else {
-                        throw Exception("Error fetching data")
-                    }
+            cartDataSourceImpl.getCartItems(page, size, sort)
+                .onSuccess {
+                    val cartItems = it.map { cartItemDto -> cartItemDto.toCartItem() }
+                    result = Result.success(cartItems)
+                }.onFailure {
+                    result = Result.failure(IllegalArgumentException())
                 }
         }.join()
+
         return result ?: throw Exception()
     }
 
@@ -38,36 +36,20 @@ class CartRepositoryImpl(
     ): Result<Unit> {
         var result: Result<Unit>? = null
         thread {
-            result =
-                runCatching {
-                    val cartItemRequest = CartItemRequest(productId, quantity)
-                    val request =
-                        remoteCartDataSource.addCartItem(cartItemRequest)
-                    val response = request.execute()
-                    if (response.isSuccessful) {
-                        response.body() ?: throw Exception("No data available")
-                    } else {
-                        throw Exception("Error fetching data")
-                    }
-                }
+            val cartItemRequest = CartItemRequest(productId, quantity)
+            cartDataSourceImpl.addCartItem(cartItemRequest)
+                .onSuccess { result = Result.success(Unit) }
+                .onFailure { result = Result.failure(IllegalArgumentException()) }
         }.join()
-
         return result ?: throw Exception()
     }
 
     override fun deleteCartItem(cartItemId: Int): Result<Unit> {
         var result: Result<Unit>? = null
         thread {
-            result =
-                runCatching {
-                    val response =
-                        remoteCartDataSource.deleteCartItem(cartItemId).execute()
-                    if (response.isSuccessful) {
-                        response.body() ?: throw Exception("No data available")
-                    } else {
-                        throw Exception("Error fetching data")
-                    }
-                }
+            cartDataSourceImpl.deleteCartItem(cartItemId)
+                .onSuccess { result = Result.success(Unit) }
+                .onFailure { result = Result.failure(IllegalArgumentException()) }
         }.join()
 
         return result ?: throw Exception()
@@ -79,36 +61,21 @@ class CartRepositoryImpl(
     ): Result<Unit> {
         var result: Result<Unit>? = null
         thread {
-            result =
-                runCatching {
-                    val cartQuantityDto = CartQuantityDto(quantity)
-                    val response =
-                        remoteCartDataSource.updateCartItem(cartItemId, cartQuantityDto)
-                            .execute()
-                    if (response.isSuccessful) {
-                        response.body() ?: throw Exception("No data available")
-                    } else {
-                        throw Exception("Error fetching data")
-                    }
-                }
+            val cartQuantityDto = CartQuantityDto(quantity)
+            cartDataSourceImpl.updateCartItem(cartItemId, cartQuantityDto)
+                .onSuccess { result = Result.success(Unit) }
+                .onFailure { result = Result.failure(IllegalArgumentException()) }
         }.join()
 
         return result ?: throw Exception()
     }
 
-    override fun getCartTotalQuantity(): Result<CartQuantityDto> {
-        var result: Result<CartQuantityDto>? = null
+    override fun getCartTotalQuantity(): Result<Int> {
+        var result: Result<Int>? = null
         thread {
-            result =
-                runCatching {
-                    val response =
-                        remoteCartDataSource.getCartTotalQuantity().execute()
-                    if (response.isSuccessful) {
-                        response.body() ?: throw Exception("No data available")
-                    } else {
-                        throw Exception("Error fetching data")
-                    }
-                }
+            cartDataSourceImpl.getCartTotalQuantity()
+                .onSuccess { result = Result.success(it) }
+                .onFailure { result = Result.failure(IllegalArgumentException()) }
         }.join()
 
         return result ?: throw Exception()

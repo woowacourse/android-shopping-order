@@ -7,7 +7,7 @@
 
         <variable
             name="cartViewItem"
-            type="woowacourse.shopping.ui.order.adapter.cart.ShoppingCartViewItem.CartViewItem" />
+            type="woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem" />
 
         <variable
             name="viewModel"

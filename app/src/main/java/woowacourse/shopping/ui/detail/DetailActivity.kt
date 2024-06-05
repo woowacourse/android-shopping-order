@@ -7,9 +7,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -30,8 +30,8 @@ class DetailActivity : AppCompatActivity() {
     }
     private val viewModel: DetailViewModel by viewModels {
         DetailViewModelFactory(
-            cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            productRepository = ProductRepositoryImpl(remoteProductDataSource),
+            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+            productRepository = ProductRepositoryImpl(productDataSourceImpl),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productId = productId,
         )

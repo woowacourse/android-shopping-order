@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order.listener
+package woowacourse.shopping.ui.order.recommend.listener
 
 import woowacourse.shopping.domain.model.Product
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order
+package woowacourse.shopping.ui.order.recommend
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +11,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
-import woowacourse.shopping.ui.order.adapter.recommend.RecommendAdapter
+import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 

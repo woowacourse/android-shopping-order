@@ -1,26 +1,21 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.dto.OrderRequest
-import woowacourse.shopping.data.remote.RemoteOrderDataSource
+import woowacourse.shopping.data.remote.datasource.OrderDataSourceImpl
 import woowacourse.shopping.domain.repository.OrderRepository
 import kotlin.concurrent.thread
 
 class OrderRepositoryImpl(
-    private val remoteOrderDataSource: RemoteOrderDataSource,
+    private val orderDataSourceImpl: OrderDataSourceImpl,
 ) : OrderRepository {
     override fun postOrder(cartItemIds: List<Int>): Result<Unit> {
         var result: Result<Unit>? = null
         thread {
-            result =
-                runCatching {
-                    val response = remoteOrderDataSource.postOrder(OrderRequest(cartItemIds)).execute()
-                    if (response.isSuccessful) {
-                        response.body() ?: throw Exception("No data available")
-                    } else {
-                        throw Exception("Error fetching data")
-                    }
-                }
+            orderDataSourceImpl.postOrder(OrderRequest(cartItemIds))
+                .onSuccess { result = Result.success(Unit) }
+                .onFailure { result = Result.failure(IllegalArgumentException()) }
         }.join()
+
         return result ?: throw Exception()
     }
 }

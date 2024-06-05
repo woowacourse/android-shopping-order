@@ -6,8 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.mapper.toCartItem
-import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -80,35 +78,44 @@ class HomeViewModel(
 
     private fun loadProductViewItems() {
         runCatching {
-            productRepository.getProductResponse(
+            productRepository.getProducts(
                 category = CATEGORY_UNDEFINED,
-                page = page++,
+                page = page,
                 size = PAGE_SIZE,
                 sort = ASCENDING_SORT_ORDER,
             )
-        }.onSuccess { productResponse ->
-            val products = productResponse.getOrNull()?.products ?: emptyList()
+        }.onSuccess {
+            val products = it.getOrNull() ?: emptyList()
             val productViewItems =
-                products.map { productDto ->
-                    val quantity = getCartItemByProductId(productDto.productId)?.quantity ?: 0
-                    ProductViewItem(productDto.toProduct(), quantity)
+                products.map { product ->
+                    val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
+                    ProductViewItem(product, quantity)
                 }
-            _canLoadMore.value = productResponse.getOrNull()?.last?.not() ?: false
             loadedProductViewItems.addAll(productViewItems)
             _homeUiState.value = UiState.Success(loadedProductViewItems)
         }.onFailure {
             _homeUiState.value = UiState.Error(it)
         }
+
+        runCatching {
+            productRepository.getProductIsLast(
+                category = CATEGORY_UNDEFINED,
+                page = page,
+                size = PAGE_SIZE,
+                sort = ASCENDING_SORT_ORDER,
+            ).onSuccess {
+                _canLoadMore.value = it.not()
+            }
+        }
+        page += 1
     }
 
     private fun loadCartItems() {
         runCatching {
-            cartRepository.getCartResponse(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
-        }.onSuccess { cartResponse ->
-            cartItems =
-                cartResponse.getOrNull()?.cartItems?.map { cartItemDto -> cartItemDto.toCartItem() }
-                    ?: return
-            _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()?.quantity
+            cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
+        }.onSuccess {
+            cartItems = it.getOrNull() ?: emptyList()
+            _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
         }
     }
 
@@ -149,6 +156,7 @@ class HomeViewModel(
         product: Product,
         quantity: Int,
     ) {
+
         val updatedProductViewItem = ProductViewItem(product, quantity)
         val position =
             loadedProductViewItems.indexOfFirst { loadedProductViewItem -> loadedProductViewItem.product.productId == product.productId }
@@ -156,6 +164,7 @@ class HomeViewModel(
             loadedProductViewItems[position] = updatedProductViewItem
             _homeUiState.value = UiState.Success(loadedProductViewItems)
         }
+
     }
 
     override fun onLoadMoreButtonClick() {
@@ -171,10 +180,11 @@ class HomeViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
+        val addedProduct = ProductViewItem(product, 1)
         runCatching {
-            cartRepository.addCartItem(product.productId, 1)
+            cartRepository.addCartItem(addedProduct.product.productId, addedProduct.quantity)
         }.onSuccess {
-            updateProductViewItemQuantity(product, 1)
+            updateProductViewItemQuantity(addedProduct.product, addedProduct.quantity)
             loadCartItems()
         }
     }

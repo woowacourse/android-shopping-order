@@ -9,15 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteOrderDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.orderDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.ui.order.cart.CartFragment
+import woowacourse.shopping.ui.order.recommend.RecommendFragment
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModelFactory
 
@@ -25,10 +27,10 @@ class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
     private val viewModel: OrderViewModel by viewModels {
         OrderViewModelFactory(
-            cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            orderRepository = OrderRepositoryImpl(remoteOrderDataSource),
+            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+            orderRepository = OrderRepositoryImpl(orderDataSourceImpl),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
-            productRepository = ProductRepositoryImpl(remoteProductDataSource),
+            productRepository = ProductRepositoryImpl(productDataSourceImpl),
         )
     }
     private val cartFragment by lazy { CartFragment.newInstance() }
@@ -52,16 +54,12 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.isBackButtonClicked.observe(this) { back ->
+        viewModel.navigateToBack.observe(this) { back ->
             back.getContentIfNotHandled()?.let {
                 finish()
             }
         }
-        viewModel.navigateToBack.observe(this) { navigateToBack ->
-            navigateToBack.getContentIfNotHandled()?.let {
-                finish()
-            }
-        }
+
         viewModel.navigateToRecommend.observe(this) { navigateToRecommend ->
             navigateToRecommend.getContentIfNotHandled()?.let {
                 addFragment(recommendFragment)

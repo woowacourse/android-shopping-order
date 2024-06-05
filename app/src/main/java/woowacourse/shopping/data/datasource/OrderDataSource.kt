@@ -4,5 +4,5 @@ import retrofit2.Call
 import woowacourse.shopping.data.dto.OrderRequest
 
 interface OrderDataSource {
-    fun postOrder(orderRequest: OrderRequest): Call<Unit>
+    fun postOrder(orderRequest: OrderRequest): Result<Unit>
 }

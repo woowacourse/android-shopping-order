@@ -2,13 +2,14 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.dto.CartQuantityDto
 import woowacourse.shopping.data.dto.CartResponse
+import woowacourse.shopping.domain.model.CartItem
 
 interface CartRepository {
-    fun getCartResponse(
+    fun getCartItems(
         page: Int,
         size: Int,
         sort: String,
-    ): Result<CartResponse>
+    ): Result<List<CartItem>>
 
     fun addCartItem(
         productId: Int,
@@ -22,5 +23,5 @@ interface CartRepository {
         quantity: Int,
     ): Result<Unit>
 
-    fun getCartTotalQuantity(): Result<CartQuantityDto>
+    fun getCartTotalQuantity(): Result<Int>
 }

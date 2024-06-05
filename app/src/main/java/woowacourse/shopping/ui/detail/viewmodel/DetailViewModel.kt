@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -82,8 +81,8 @@ class DetailViewModel(
     private fun loadProduct() {
         runCatching {
             productRepository.getProductById(productId)
-        }.onSuccess { productResult ->
-            val product = productResult.getOrNull()?.toProduct() ?: return
+        }.onSuccess {
+            val product = it.getOrNull() ?: return
             _product.value = product
             _detailUiState.value = UiState.Success(product)
         }.onFailure {
@@ -94,11 +93,13 @@ class DetailViewModel(
     private fun saveCartItem() {
         if (detailUiState.value is UiState.Success) {
             runCatching {
-                val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
-                cartRepository.getCartResponse(0, totalQuantity, DESCENDING_SORT_ORDER)
-            }.onSuccess { cartResponse ->
-                val cartItems = cartResponse.getOrNull()?.cartItems
-                val cartItem = cartItems?.firstOrNull { it.productDto.productId == productId }
+                val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
+                cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER)
+            }.onSuccess {
+                val cartItems = it.getOrNull()
+                val cartItem = cartItems?.firstOrNull { cartItem ->
+                    cartItem.product.productId == productId
+                }
                 val currentQuantity = cartItem?.quantity ?: 0
                 val quantity = quantity.value ?: 0
 

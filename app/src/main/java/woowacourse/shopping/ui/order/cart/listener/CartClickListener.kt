@@ -1,8 +1,8 @@
-package woowacourse.shopping.ui.order.listener
+package woowacourse.shopping.ui.order.cart.listener
 
 import woowacourse.shopping.ui.home.listener.QuantityClickListener
 
-interface CartItemClickListener : QuantityClickListener {
+interface CartClickListener : QuantityClickListener {
     fun onCheckBoxClick(cartItemId: Int)
 
     fun onCartItemClick(productId: Int)

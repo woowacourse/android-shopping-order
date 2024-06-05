@@ -11,7 +11,9 @@ sealed class HomeViewItem(open val viewType: Int) {
         val quantity: Int
             get() = _quantity
 
-        fun isQuantityControlVisible(): Boolean = quantity >= 1
+        fun isQuantityControlVisible(): Boolean {
+            return quantity >= 1
+        }
 
         companion object {
             private const val DEFAULT_SHOPPING_QUANTITY = 0

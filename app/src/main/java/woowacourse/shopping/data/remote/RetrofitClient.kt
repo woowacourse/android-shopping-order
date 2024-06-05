@@ -5,6 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.remote.datasource.BasicAuthInterceptor
 
 object RetrofitClient {
     private val logging =

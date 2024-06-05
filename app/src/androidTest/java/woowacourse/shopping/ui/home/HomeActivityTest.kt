@@ -11,7 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository

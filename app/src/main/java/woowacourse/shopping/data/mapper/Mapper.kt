@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.local.recent.RecentProductEntity
 import woowacourse.shopping.data.dto.CartItemDto
 import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.local.recent.RecentProductEntity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.ui.order.adapter.cart.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import java.time.LocalDateTime
 
 fun Product.toRecentProductEntity(): RecentProductEntity {

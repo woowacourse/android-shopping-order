@@ -6,8 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.mapper.toCartViewItem
-import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -16,10 +14,10 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.viewmodel.HomeViewModel.Companion.ASCENDING_SORT_ORDER
-import woowacourse.shopping.ui.order.adapter.cart.ShoppingCartViewItem.CartViewItem
-import woowacourse.shopping.ui.order.listener.CartItemClickListener
+import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.ui.order.cart.listener.CartClickListener
 import woowacourse.shopping.ui.order.listener.OrderClickListener
-import woowacourse.shopping.ui.order.listener.RecommendClickListener
+import woowacourse.shopping.ui.order.recommend.listener.RecommendClickListener
 import woowacourse.shopping.ui.state.OrderState
 import woowacourse.shopping.ui.state.UiState
 import kotlin.math.min
@@ -30,16 +28,12 @@ class OrderViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel(),
-    CartItemClickListener,
+    CartClickListener,
     OrderClickListener,
     RecommendClickListener {
-    private val _cartUiState =
-        MutableLiveData<UiState<List<CartViewItem>>>(UiState.Loading)
-    val cartUiState: LiveData<UiState<List<CartViewItem>>>
-        get() = _cartUiState
 
-    private val cartViewItems = MutableLiveData<List<CartViewItem>>()
 
+    // 공용
     val isCartEmpty: LiveData<Boolean>
         get() =
             cartViewItems.map { cartViewItemsValue ->
@@ -53,13 +47,6 @@ class OrderViewModel(
                     selectedCartViewItem.cartItem.totalPrice
                 }
             }
-
-    private val _recommendUiState =
-        MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
-    val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
-        get() = _recommendUiState
-
-    private val selectedCartViewItems = MutableLiveData<List<CartViewItem>>(mutableListOf())
 
     val selectedCartViewItemSize: LiveData<Int>
         get() =
@@ -79,21 +66,28 @@ class OrderViewModel(
                 }
             }
 
-    private val _isBackButtonClicked = MutableLiveData<Event<Boolean>>()
-    val isBackButtonClicked: LiveData<Event<Boolean>>
-        get() = _isBackButtonClicked
+    private val _navigateToBack = MutableLiveData<Event<Unit>>()
+    val navigateToBack: LiveData<Event<Unit>>
+        get() = _navigateToBack
+
 
     private val _navigateToDetail = MutableLiveData<Event<Int>>()
     val navigateToDetail: LiveData<Event<Int>>
         get() = _navigateToDetail
 
+
+    // Cart
+    private val _cartUiState =
+        MutableLiveData<UiState<List<CartViewItem>>>(UiState.Loading)
+    val cartUiState: LiveData<UiState<List<CartViewItem>>>
+        get() = _cartUiState
+
+    private val cartViewItems = MutableLiveData<List<CartViewItem>>()
+    private val selectedCartViewItems = MutableLiveData<List<CartViewItem>>(mutableListOf())
+
     private val _navigateToRecommend = MutableLiveData<Event<Unit>>()
     val navigateToRecommend: LiveData<Event<Unit>>
         get() = _navigateToRecommend
-
-    private val _navigateToBack = MutableLiveData<Event<Unit>>()
-    val navigateToBack: LiveData<Event<Unit>>
-        get() = _navigateToBack
 
     private val _notifyDeletion = MutableLiveData<Event<Unit>>()
     val notifyDeletion: LiveData<Event<Unit>>
@@ -103,9 +97,18 @@ class OrderViewModel(
     val notifyCanNotOrder: LiveData<Event<Unit>>
         get() = _notifyCanNotOrder
 
+
+    // Recommend
+    private val _recommendUiState =
+        MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
+    val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
+        get() = _recommendUiState
+
+
     private val _notifyOrderCompleted = MutableLiveData<Event<Unit>>()
     val notifyOrderCompleted: LiveData<Event<Unit>>
         get() = _notifyOrderCompleted
+
 
     private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
     val orderState: LiveData<OrderState>
@@ -120,7 +123,7 @@ class OrderViewModel(
     fun generateRecommendProductViewItems() {
         runCatching {
             val mostRecentProduct = recentProductRepository.findMostRecentProduct()
-            productRepository.getProductResponse(
+            productRepository.getProducts(
                 mostRecentProduct?.category,
                 0,
                 Int.MAX_VALUE,
@@ -130,9 +133,8 @@ class OrderViewModel(
             val selectedProducts =
                 selectedCartViewItems.value?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
                     ?: return@onSuccess
-            var sameCategoryProducts =
-                productResponse.getOrNull()?.products?.map { productDto -> productDto.toProduct() }
-                    ?: return@onSuccess
+            var sameCategoryProducts = productResponse.getOrNull()
+                ?: return@onSuccess
             sameCategoryProducts =
                 sameCategoryProducts.filter { sameCategoryProduct ->
                     !selectedProducts.contains(sameCategoryProduct)
@@ -147,12 +149,11 @@ class OrderViewModel(
 
     private fun loadCartViewItems() {
         runCatching {
-            val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull()?.quantity ?: 0
-            cartRepository.getCartResponse(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
-        }.onSuccess { cartResponse ->
+            val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
+            cartRepository.getCartItems(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
+        }.onSuccess {
             cartViewItems.value =
-                cartResponse.getOrNull()?.cartItems?.map { cartItemDto -> cartItemDto.toCartViewItem() }
-                    ?: emptyList()
+                it.getOrNull()?.map(::CartViewItem)
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
         }.onFailure {
             _cartUiState.value = UiState.Error(it)
@@ -323,7 +324,7 @@ class OrderViewModel(
     }
 
     override fun onBackButtonClick() {
-        _isBackButtonClicked.value = Event(true)
+        _navigateToBack.value = Event(Unit)
     }
 
     override fun onAllCheckBoxClick() {
@@ -371,12 +372,11 @@ class OrderViewModel(
     override fun onPlusButtonClick(product: Product) {
         runCatching {
             val cartTotalQuantity =
-                cartRepository.getCartTotalQuantity().getOrNull()?.quantity?.plus(1) ?: 0
+                cartRepository.getCartTotalQuantity().getOrNull()?.plus(1) ?: 0
             cartRepository.addCartItem(product.productId, 1)
-            cartRepository.getCartResponse(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
-        }.onSuccess { cartResponse ->
-            cartViewItems.value =
-                cartResponse.getOrNull()?.cartItems?.map { cartItemDto -> cartItemDto.toCartViewItem() }
+            cartRepository.getCartItems(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
+        }.onSuccess {
+            cartViewItems.value = it.getOrNull()?.map(::CartViewItem)
             val updatedCartItem = getCartViewItemByProductId(product.productId) ?: return
             val position = getCartViewItemPosition(updatedCartItem.cartItem.cartItemId) ?: return
             val newCartViewItems = cartViewItems.value?.toMutableList() ?: return

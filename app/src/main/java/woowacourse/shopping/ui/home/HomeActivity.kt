@@ -6,9 +6,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
+import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -29,8 +29,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var recentProductAdapter: RecentProductAdapter
     private val viewModel: HomeViewModel by viewModels {
         HomeViewModelFactory(
-            ProductRepositoryImpl(remoteProductDataSource),
-            CartRepositoryImpl(remoteCartDataSource),
+            ProductRepositoryImpl(productDataSourceImpl),
+            CartRepositoryImpl(cartDataSourceImpl),
             RecentProductRepositoryImpl(recentProductDatabase),
         )
     }
@@ -101,7 +101,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.submitProductViewItems(data, viewModel.canLoadMore.value ?: false)
+        productAdapter.submitProductViewItems(data.toList(), viewModel.canLoadMore.value ?: false)
     }
 
     private fun showError(errorMessage: String) {

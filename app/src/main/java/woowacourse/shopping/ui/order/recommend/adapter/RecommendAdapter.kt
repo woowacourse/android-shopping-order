@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order.adapter.recommend
+package woowacourse.shopping.ui.order.recommend.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order
+package woowacourse.shopping.ui.order.cart
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,8 +10,8 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.ui.detail.DetailActivity
-import woowacourse.shopping.ui.order.adapter.cart.CartAdapter
-import woowacourse.shopping.ui.order.adapter.cart.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
+import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 

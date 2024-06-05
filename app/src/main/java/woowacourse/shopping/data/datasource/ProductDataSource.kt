@@ -10,7 +10,14 @@ interface ProductDataSource {
         page: Int,
         size: Int,
         sort: String,
-    ): Call<ProductResponse>
+    ): Result<List<ProductDto>>
 
-    fun getProductById(productId: Int): Call<ProductDto>
+    fun getProductIsLast(
+        category: String?,
+        page: Int,
+        size: Int,
+        sort: String,
+    ): Result<Boolean>
+
+    fun getProductById(productId: Int): Result<ProductDto>
 }

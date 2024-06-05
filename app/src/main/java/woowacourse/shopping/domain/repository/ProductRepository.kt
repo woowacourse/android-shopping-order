@@ -1,15 +1,21 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.dto.ProductDto
-import woowacourse.shopping.data.dto.ProductResponse
+import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun getProductResponse(
+    fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Result<ProductResponse>
+    ): Result<List<Product>>
 
-    fun getProductById(id: Int): Result<ProductDto>
+    fun getProductIsLast(
+        category: String?,
+        page: Int,
+        size: Int,
+        sort: String,
+    ): Result<Boolean>
+
+    fun getProductById(id: Int): Result<Product>
 }
