@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
@@ -20,10 +21,8 @@ class ShoppingCartFragment : Fragment() {
         get() = _binding
             ?: throw IllegalStateException("FragmentCartListBinding is not initialized")
 
-    private val factory: UniversalViewModelFactory = ShoppingCartViewModel.factory()
-
-    private val viewModel: ShoppingCartViewModel by lazy {
-        ViewModelProvider(this, factory)[ShoppingCartViewModel::class.java]
+    private val viewModel: ShoppingCartViewModel by viewModels {
+        ShoppingCartViewModel.factory()
     }
 
     private val adapter: CartItemRecyclerViewAdapter by lazy {
