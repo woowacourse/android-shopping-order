@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.listener
 
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 

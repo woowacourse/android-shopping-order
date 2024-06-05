@@ -12,7 +12,7 @@
 
         <variable
             name="listener"
-            type="woowacourse.shopping.ui.cart.ShoppingCartItemListener"
+            type="woowacourse.shopping.ui.cart.listener.ShoppingCartItemListener"
             />
 
     </data>

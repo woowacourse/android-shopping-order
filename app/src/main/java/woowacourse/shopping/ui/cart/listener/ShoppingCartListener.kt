@@ -1,3 +1,3 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.listener
 
 interface ShoppingCartListener : ShoppingCartItemListener, OnAllCartItemSelectedListener, OnNavigationOrderListener

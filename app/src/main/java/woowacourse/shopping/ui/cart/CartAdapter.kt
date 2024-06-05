@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.HolderCartBinding
+import woowacourse.shopping.ui.cart.listener.ShoppingCartItemListener
 import woowacourse.shopping.ui.model.CartItem
 
 class CartAdapter(
