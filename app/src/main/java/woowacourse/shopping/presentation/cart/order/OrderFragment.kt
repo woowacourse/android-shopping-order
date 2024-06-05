@@ -131,19 +131,8 @@ class OrderFragment :
 
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) {
-            when (it) {
-                OrderErrorEvent.OrderProducts -> {
-                    showToast(R.string.error_msg_order_products)
-                }
-
-                OrderErrorEvent.IncreaseCartProduct -> {
-                    showToast(R.string.error_msg_increase_cart_count)
-                }
-
-                OrderErrorEvent.DecreaseCartProduct -> {
-                    showToast(R.string.error_msg_decrease_cart_count)
-                }
-            }
+            val errorMessage = it.toErrorMessageFrom(requireContext())
+            showToast(errorMessage)
         }
     }
 

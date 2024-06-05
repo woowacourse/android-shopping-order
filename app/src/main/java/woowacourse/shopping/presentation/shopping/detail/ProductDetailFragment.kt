@@ -19,6 +19,7 @@ import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
+import woowacourse.shopping.presentation.shopping.toErrorMessageFrom
 import woowacourse.shopping.presentation.util.showToast
 
 class ProductDetailFragment :
@@ -85,12 +86,8 @@ class ProductDetailFragment :
 
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) { event ->
-            when (event) {
-                ProductDetailErrorEvent.LoadProduct -> showToast(R.string.error_msg_load_cart_products)
-                ProductDetailErrorEvent.AddCartProduct -> showToast(R.string.error_msg_update_cart_products)
-                ProductDetailErrorEvent.DecreaseCartCount -> showToast(R.string.error_msg_decrease_cart_count_limit)
-                ProductDetailErrorEvent.SaveRecentProduct -> showToast(R.string.error_msg_save_recent_product)
-            }
+            val errorMessage = event.toErrorMessageFrom(requireContext())
+            showToast(errorMessage)
         }
     }
 

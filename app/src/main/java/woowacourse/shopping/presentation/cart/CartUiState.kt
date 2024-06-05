@@ -10,7 +10,7 @@ data class CartUiState(
     val canLoadPrevPage: Boolean = false,
     val canLoadNextPage: Boolean = false,
 ) {
-    val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
+    private val totalProducts get(): List<CartProductUi> = pagingProducts.flatMap { it.value }
     val currentPageProducts get() = pagingProducts[currentPage] ?: emptyList()
     val orderedProducts: List<CartProductUi> get() = totalProducts.filter { it.isSelected }
     val orderedProductCount get() = orderedProducts.sumOf { it.count }

@@ -109,14 +109,8 @@ class CartFragment :
 
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) {
-            when (it) {
-                CartErrorEvent.LoadCartProducts -> showToast(R.string.error_msg_load_cart_products)
-                CartErrorEvent.CanLoadMoreCartProducts -> showToast(R.string.error_msg_load_cart_products)
-                CartErrorEvent.UpdateCartProducts -> showToast(R.string.error_msg_update_cart_products)
-                CartErrorEvent.DecreaseCartCountLimit -> showToast(R.string.error_msg_decrease_cart_count_limit)
-                CartErrorEvent.DeleteCartProduct -> showToast(R.string.error_msg_delete_cart_product)
-                CartErrorEvent.EmptyOrderProduct -> showToast(R.string.error_msg_empty_order_product)
-            }
+            val errorMessage = it.toErrorMessageFrom(requireContext())
+            showToast(errorMessage)
         }
     }
 

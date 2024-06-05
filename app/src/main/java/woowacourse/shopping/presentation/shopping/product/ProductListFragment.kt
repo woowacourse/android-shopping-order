@@ -25,6 +25,7 @@ import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
 import woowacourse.shopping.presentation.shopping.product.adpater.ProductAdapter
 import woowacourse.shopping.presentation.shopping.product.adpater.RecentProductAdapter
 import woowacourse.shopping.presentation.shopping.product.adpater.RecentProductWrapperAdapter
+import woowacourse.shopping.presentation.shopping.toErrorMessageFrom
 import woowacourse.shopping.presentation.util.showToast
 
 class ProductListFragment :
@@ -128,27 +129,8 @@ class ProductListFragment :
 
     private fun initErrorEvent() {
         viewModel.errorEvent.observe(viewLifecycleOwner) {
-            when (it) {
-                ProductListErrorEvent.LoadRecentProducts -> {
-                    showToast(R.string.error_msg_load_recent_products)
-                }
-
-                ProductListErrorEvent.LoadProducts -> {
-                    showToast(R.string.error_msg_load_products)
-                }
-
-                ProductListErrorEvent.IncreaseCartCount -> {
-                    showToast(R.string.error_msg_increase_cart_count)
-                }
-
-                ProductListErrorEvent.DecreaseCartCount -> {
-                    showToast(R.string.error_msg_decrease_cart_count)
-                }
-
-                ProductListErrorEvent.LoadCartProducts -> {
-                    showToast(R.string.error_msg_load_cart_products)
-                }
-            }
+            val errorMessage = it.toErrorMessageFrom(requireContext())
+            showToast(errorMessage)
         }
     }
 
