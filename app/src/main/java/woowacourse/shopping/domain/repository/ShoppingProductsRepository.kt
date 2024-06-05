@@ -4,7 +4,9 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.ui.model.CartItem
 
 interface ShoppingProductsRepository {
-    fun loadAllProducts(page: Int): List<Product>
+    fun pagedProducts(page: Int): List<Product>
+
+    fun allProductsUntilPage(page: Int): List<Product>
 
     fun loadPagedCartItem(): List<CartItem>
 

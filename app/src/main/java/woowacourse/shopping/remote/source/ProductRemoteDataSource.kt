@@ -20,7 +20,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
     }
 
     override fun findAllUntilPage(page: Int): List<ProductData> {
-        val response = productsApiService.requestProducts(page = page, size = page * 20).execute().body()?.content
+        val response = productsApiService.requestProducts(size = page * 20).execute().body()?.content
             ?: throw NoSuchElementException("there is no product until page: $page")
 
         return response.map {

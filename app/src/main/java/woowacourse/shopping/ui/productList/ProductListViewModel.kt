@@ -27,7 +27,7 @@ class ProductListViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private var _currentPage: MutableLiveData<Int> = MutableLiveData(FIRST_PAGE),
 ) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener {
-    val currentPage: LiveData<Int> get() = _currentPage
+    private val currentPage: LiveData<Int> get() = _currentPage
 
     private val uiHandler = Handler(Looper.getMainLooper())
 
@@ -52,7 +52,7 @@ class ProductListViewModel(
     fun loadAll() {
         thread {
             val page = currentPage.value ?: currentPageIsNullException()
-            val result = (FIRST_PAGE..page).flatMap { productsRepository.loadAllProducts(it) }
+            val result = productsRepository.allProductsUntilPage(page)
             val totalCartCount = shoppingCartRepository.shoppingCartProductQuantity()
             val isLastPage = productsRepository.isFinalPage(page)
             val productHistory = productHistoryRepository.loadAllProductHistory()
@@ -72,7 +72,7 @@ class ProductListViewModel(
 
             val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
             val isLastPage = productsRepository.isFinalPage(nextPage)
-            val result = productsRepository.loadAllProducts(nextPage)
+            val result = productsRepository.pagedProducts(nextPage)
             val totalCount = productsRepository.shoppingCartProductQuantity()
 
             uiHandler.post {

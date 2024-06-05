@@ -11,8 +11,15 @@ class DefaultShoppingProductRepository(
     private val productsSource: ProductDataSource,
     private val cartSource: ShoppingCartDataSource,
 ) : ShoppingProductsRepository {
-    override fun loadAllProducts(page: Int): List<Product> {
+    override fun pagedProducts(page: Int): List<Product> {
         val productsData = productsSource.findByPaged(page)
+        return productsData.map { productData ->
+            productData.toDomain(productQuantity(productData.id))
+        }
+    }
+
+    override fun allProductsUntilPage(page: Int): List<Product> {
+        val productsData = productsSource.findAllUntilPage(page)
         return productsData.map { productData ->
             productData.toDomain(productQuantity(productData.id))
         }
@@ -83,6 +90,6 @@ class DefaultShoppingProductRepository(
     }
 
     companion object {
-        private const val TAG = "DefaultShoppingProductR"
+        private const val TAG = "DefaultShoppingProductRepository"
     }
 }
