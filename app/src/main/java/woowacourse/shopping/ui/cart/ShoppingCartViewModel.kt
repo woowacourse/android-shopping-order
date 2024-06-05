@@ -12,8 +12,8 @@ import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
-import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
+import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
 import woowacourse.shopping.ui.model.CartItem
@@ -23,7 +23,7 @@ import kotlin.concurrent.thread
 class ShoppingCartViewModel(
     private val cartItemRepository: CartItemRepository,
 ) : ViewModel(),
-    OnProductItemClickListener,
+    OnCartItemDeleteListener,
     OnItemQuantityChangeListener,
     OnCartItemSelectedListener,
     OnAllCartItemSelectedListener,
@@ -94,8 +94,8 @@ class ShoppingCartViewModel(
 
     }
 
-    override fun onClick(productId: Long) {
-        _deletedItemId.setValue(productId)
+    override fun delete(cartItemId: Long) {
+        _deletedItemId.setValue(cartItemId)
     }
 
     override fun onIncrease(

@@ -16,11 +16,8 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
     override fun addedNewProductsId(productIdsCount: ProductIdsCount): ResponseResult<Unit> =
         handleResponseResult { cartItemApiService.addCartItem(CartItemRequest(productIdsCount.productId, productIdsCount.quantity)).execute() }
 
-    // TODO: 동작 안됨
-    override fun removedProductsId(cartItemId: Long): Long {
-        cartItemApiService.removeCartItem(cartItemId)
-        return 10
-    }
+    override fun removedProductsId(cartItemId: Long): ResponseResult<Unit> =
+        handleResponseResult { cartItemApiService.removeCartItem(cartItemId).execute() }
 
     override fun plusProductsIdCount(
         cartItemId: Long,
@@ -31,10 +28,6 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         cartItemId: Long,
         quantity: Int,
     ): ResponseResult<Unit> = handleResponseResult { cartItemApiService.updateCartItemQuantity(cartItemId, quantity).execute() }
-
-    override fun clearAll() {
-        TODO("Not yet implemented")
-    }
 
     companion object {
         private const val TAG = "CartItemRemoteDataSource"

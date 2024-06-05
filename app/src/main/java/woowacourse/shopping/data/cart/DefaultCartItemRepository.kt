@@ -27,7 +27,7 @@ class DefaultCartItemRepository(
     }
 
     override fun removeCartItem(id: Long) {
-        cartItemDataSource.removedProductsId(id)
+        handleResponse(cartItemDataSource.removedProductsId(id))
     }
 
     override fun increaseCartProduct(

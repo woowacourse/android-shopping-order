@@ -11,7 +11,7 @@ interface CartItemDataSource {
 
     fun addedNewProductsId(productIdsCount: ProductIdsCount): ResponseResult<Unit>
 
-    fun removedProductsId(productId: Long): Long
+    fun removedProductsId(cartItemId: Long): ResponseResult<Unit>
 
     fun plusProductsIdCount(
         cartItemId: Long,
@@ -22,6 +22,4 @@ interface CartItemDataSource {
         cartItemId: Long,
         quantity: Int,
     ): ResponseResult<Unit>
-
-    fun clearAll()
 }
