@@ -14,32 +14,32 @@ import woowacourse.shopping.remote.model.response.CartItemCountResponse
 import woowacourse.shopping.remote.model.response.CartsResponse
 
 interface CartService {
-    @GET(CART_BASE_URL)
+    @GET(CART_RELATIVE_URL)
     fun getCartItems(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
     ): Call<CartsResponse>
 
-    @POST(CART_BASE_URL)
+    @POST(CART_RELATIVE_URL)
     fun postCartItem(
         @Body body: PostCartItemRequest,
     ): Call<Unit>
 
-    @DELETE("${CART_BASE_URL}/{id}")
+    @DELETE("${CART_RELATIVE_URL}/{id}")
     fun deleteCartItem(
         @Path("id") id: Int,
     ): Call<Unit>
 
-    @PATCH("${CART_BASE_URL}/{id}")
+    @PATCH("${CART_RELATIVE_URL}/{id}")
     fun patchCartItem(
         @Path("id") id: Int,
         @Body body: PatchCartItemRequest,
     ): Call<Unit>
 
-    @GET("${CART_BASE_URL}/counts")
+    @GET("${CART_RELATIVE_URL}/counts")
     fun getCartItemsCount(): Call<CartItemCountResponse>
 
     companion object {
-        private const val CART_BASE_URL = "/cart-items"
+        private const val CART_RELATIVE_URL = "/cart-items"
     }
 }
