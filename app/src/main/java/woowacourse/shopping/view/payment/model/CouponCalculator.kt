@@ -37,7 +37,10 @@ class CouponCalculator {
         coupon: Coupon,
         shoppingCart: ShoppingCart,
     ): SelectCouponResult {
-        return if (shoppingCart.getTotalPrice() >= coupon.minimumAmount && coupon.minimumAmount != DEFAULT_PRICE) {
+
+        return if (coupon.isPastDate()){
+            SelectCouponResult.InValidDate
+        } else if (shoppingCart.getTotalPrice() >= coupon.minimumAmount && coupon.minimumAmount != DEFAULT_PRICE) {
             selectCoupon(
                 discountPrice = coupon.discount,
                 coupon = coupon,
@@ -52,6 +55,9 @@ class CouponCalculator {
         coupon: Coupon,
         shoppingCart: ShoppingCart,
     ): SelectCouponResult {
+        if (coupon.isPastDate()){
+            SelectCouponResult.InValidDate
+        }
         val cartItem = shoppingCart.cartItems.value
             ?.filter {
                 it.product.cartItemCounter.itemCount > coupon.buyQuantity + coupon.getQuantity
@@ -71,7 +77,9 @@ class CouponCalculator {
         shoppingCart: ShoppingCart,
         deliveryCharge: Int,
     ): SelectCouponResult {
-        return if (shoppingCart.getTotalPrice() >= coupon.minimumAmount && coupon.minimumAmount != DEFAULT_PRICE) {
+        return if (coupon.isPastDate()){
+            SelectCouponResult.InValidDate
+        } else if (shoppingCart.getTotalPrice() >= coupon.minimumAmount && coupon.minimumAmount != DEFAULT_PRICE) {
             selectCoupon(
                 discountPrice = deliveryCharge,
                 coupon = coupon,
