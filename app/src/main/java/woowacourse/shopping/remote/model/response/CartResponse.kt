@@ -1,9 +1,9 @@
 package woowacourse.shopping.remote.model.response
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 data class CartResponse(
-    val id: Int,
-    val quantity: Int,
-    @SerializedName("product") val productResponse: ProductResponse,
+    @Json(name = "id") val id: Int,
+    @Json(name = "quantity") val quantity: Int,
+    @Json(name = "product") val productResponse: ProductResponse,
 )

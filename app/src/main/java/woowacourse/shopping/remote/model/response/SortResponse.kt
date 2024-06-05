@@ -1,9 +1,9 @@
 package woowacourse.shopping.remote.model.response
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 data class SortResponse(
-    val sorted: Boolean,
-    @SerializedName("unsorted") val unSorted: Boolean,
-    val empty: Boolean,
+    @Json(name = "sorted") val sorted: Boolean,
+    @Json(name = "unsorted") val unSorted: Boolean,
+    @Json(name = "empty") val empty: Boolean,
 )

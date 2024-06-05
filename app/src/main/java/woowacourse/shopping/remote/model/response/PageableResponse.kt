@@ -1,12 +1,12 @@
 package woowacourse.shopping.remote.model.response
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 data class PageableResponse(
-    @SerializedName("sort") val sortResponse: SortResponse,
-    val pageNumber: Int,
-    val pageSize: Int,
-    val offset: Int,
-    val paged: Boolean,
-    @SerializedName("unpaged") val unPaged: Boolean,
+    @Json(name = "sort") val sortResponse: SortResponse,
+    @Json(name = "pageNumber") val pageNumber: Int,
+    @Json(name = "pageSize") val pageSize: Int,
+    @Json(name = "offset")val offset: Int,
+    @Json(name = "paged") val paged: Boolean,
+    @Json(name = "unpaged") val unPaged: Boolean,
 )
