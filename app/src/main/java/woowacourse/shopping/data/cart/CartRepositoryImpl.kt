@@ -1,11 +1,9 @@
 package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.data.cart.remote.CartDataSource
-import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
-import woowacourse.shopping.domain.Cart
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.LocalCartDataSource
+import woowacourse.shopping.remote.datasource.RemoteCartDataSource
 
 class CartRepositoryImpl(
     private val remoteCartDataSource: CartDataSource = RemoteCartDataSource(),

@@ -9,20 +9,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import woowacourse.shopping.data.NetworkResult
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
-import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
-import woowacourse.shopping.data.local.AppDatabase
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
-import woowacourse.shopping.domain.Cart
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalCartDataSource
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.ProductModel
 import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
+import woowacourse.shopping.remote.datasource.RemoteCartDataSource
 
 class ShoppingViewModel(
     private val productRepository: ProductRepository = ProductRepositoryImpl(),
@@ -280,7 +280,7 @@ class ShoppingViewModel(
                     recentRepository = RecentProductRepositoryImpl(recentDao),
                     cartRepository =
                         CartRepositoryImpl(
-                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
+                            localCartDataSource = LocalCartDataSource(cartDao),
                             remoteCartDataSource = RemoteCartDataSource(),
                         ),
                 ) as T

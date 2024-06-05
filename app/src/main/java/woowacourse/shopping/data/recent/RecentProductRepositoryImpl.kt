@@ -1,8 +1,9 @@
 package woowacourse.shopping.data.recent
 
-import woowacourse.shopping.data.recent.RecentProductEntity.Companion.toRecentProductEntity
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentRepository
+import woowacourse.shopping.local.dao.RecentProductDao
+import woowacourse.shopping.local.entity.RecentProductEntity.Companion.toRecentProductEntity
 import java.time.LocalDateTime
 import kotlin.concurrent.thread
 

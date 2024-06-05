@@ -2,6 +2,7 @@ package woowacourse.shopping.data.order
 
 import woowacourse.shopping.data.NetworkResult
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.remote.datasource.RemoteOrderDataSource
 
 class OrderRepositoryImpl(private val remoteOrderDataSource: RemoteOrderDataSource) : OrderRepository {
     override fun completeOrder(

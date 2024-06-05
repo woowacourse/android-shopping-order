@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.data.product.remote.RemoteProductDataSource
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.remote.datasource.RemoteProductDataSource
 
 class ProductRepositoryImpl(private val remoteProductDataSource: ProductDataSource = RemoteProductDataSource()) : ProductRepository {
     override fun loadWithCategory(

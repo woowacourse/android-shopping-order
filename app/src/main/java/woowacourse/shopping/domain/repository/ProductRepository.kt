@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     fun loadWithCategory(

@@ -1,31 +1,31 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.NetworkResult
 import woowacourse.shopping.domain.model.Cart
 
-interface CartRepository {
-    fun load(
+interface CartDataSource {
+    fun getCartItems(
         startPage: Int,
         pageSize: Int,
         callBack: (NetworkResult<List<Cart>>) -> Unit,
     )
 
-    fun saveNewCartItem(
+    fun saveCartItem(
         productId: Long,
-        incrementAmount: Int,
+        quantity: Int,
         callBack: (NetworkResult<Long>) -> Unit,
     )
 
     fun updateCartItemQuantity(
-        cartId: Long,
+        cartId: Int,
         newQuantity: Int,
         callBack: (NetworkResult<Unit>) -> Unit,
     )
 
     fun deleteCartItem(
-        cartId: Long,
+        cartId: Int,
         callBack: (NetworkResult<Unit>) -> Unit,
     )
 
-    fun getCount(callBack: (NetworkResult<Int>) -> Unit)
+    fun getTotalCount(callBack: (NetworkResult<Int>) -> Unit)
 }

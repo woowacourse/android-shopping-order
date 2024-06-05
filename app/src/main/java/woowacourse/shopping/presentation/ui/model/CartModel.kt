@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.ui.model
 
-import woowacourse.shopping.domain.Cart
+import woowacourse.shopping.domain.model.Cart
 
 data class CartModel(
     val cartId: Long,
