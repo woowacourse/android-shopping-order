@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
+import woowacourse.shopping.ui.FragmentNavigator
 import java.io.Serializable
 
 class OrderFragment : Fragment() {
@@ -40,6 +41,7 @@ class OrderFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        initToolbar()
         initRecommendProductsAdapter()
     }
 
@@ -65,6 +67,12 @@ class OrderFragment : Fragment() {
     private fun initBinding() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
+    }
+
+    private fun initToolbar() {
+        binding.toolbarOrder.setNavigationOnClickListener {
+            (requireActivity() as FragmentNavigator).popBackStack()
+        }
     }
 
     private fun initRecommendProductsAdapter() {

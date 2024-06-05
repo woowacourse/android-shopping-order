@@ -2,6 +2,7 @@ package woowacourse.shopping.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
@@ -25,29 +26,25 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
     private fun initFragment() {
         supportFragmentManager.commit {
             replace(R.id.container, ProductListFragment::class.java, null, ProductListFragment.TAG)
-            addToBackStack(ProductListFragment.TAG)
         }
     }
 
     override fun navigateToProductList() {
-        removeBackStack()
-
         supportFragmentManager.commit {
             replace(R.id.container, ProductListFragment::class.java, null, ProductListFragment.TAG)
+            addToBackStack(ProductListFragment.TAG)
         }
     }
 
     override fun navigateToShoppingCart() {
-        removeBackStack()
-
         supportFragmentManager.commit {
             replace(R.id.container, ShoppingCartFragment::class.java, null, ShoppingCartFragment.TAG)
+            addToBackStack(ShoppingCartFragment.TAG)
         }
     }
 
     override fun navigateToProductDetail(productId: Long) {
-        removeBackStack()
-
+        supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         supportFragmentManager.commit {
             replace(
                 R.id.container,
@@ -57,13 +54,11 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
                 },
                 ProductDetailFragment.TAG,
             )
-            addToBackStack(ProductListFragment.TAG)
+            addToBackStack(ProductDetailFragment.TAG)
         }
     }
 
     override fun navigateToOrder(orderInformation: OrderInformation) {
-        removeBackStack()
-
         supportFragmentManager.commit {
             replace(
                 R.id.container,
@@ -77,11 +72,8 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         }
     }
 
-    private fun removeBackStack() {
-        val isFirstFragment = supportFragmentManager.backStackEntryCount == 0
-        if (!isFirstFragment) {
-            supportFragmentManager.popBackStackImmediate(null, 0)
-        }
+    override fun popBackStack() {
+        supportFragmentManager.popBackStack()
     }
 }
 
@@ -93,4 +85,6 @@ interface FragmentNavigator {
     fun navigateToProductDetail(productId: Long)
 
     fun navigateToOrder(orderInformation: OrderInformation)
+
+    fun popBackStack()
 }

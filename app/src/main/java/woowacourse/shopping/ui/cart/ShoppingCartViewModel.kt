@@ -45,15 +45,15 @@ class ShoppingCartViewModel(
     private var _selectedCartItemsCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedCartItemsCount: LiveData<Int> get() = _selectedCartItemsCount
 
-    private var _navigationOrderEvent = MutableLiveData<OrderInformation>()
-    val navigationOrderEvent: LiveData<OrderInformation> get() = _navigationOrderEvent
+    private var _navigationOrderEvent = MutableSingleLiveData<OrderInformation>()
+    val navigationOrderEvent: SingleLiveData<OrderInformation> get() = _navigationOrderEvent
 
     private var _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     fun loadAll() {
         thread {
-            val currentItems = cartItemRepository.loadPagedCartItem()
+            val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
 
             uiHandler.post {
                 _cartItems.value = currentItems
@@ -65,8 +65,7 @@ class ShoppingCartViewModel(
     fun deleteItem(cartItemId: Long) {
         thread {
             cartItemRepository.removeCartItem(cartItemId)
-            val currentItems =
-                cartItemRepository.loadPagedCartItem()
+            val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
 
             uiHandler.post {
                 _cartItems.value = currentItems
@@ -85,12 +84,14 @@ class ShoppingCartViewModel(
         val productIds = cartItems.value?.filter { it.checked }?.map { it.id } ?: return
         val orderAmount = selectedCartItemsTotalPrice.value ?: return
         val ordersCount = selectedCartItemsCount.value ?: return
-        _navigationOrderEvent.value =
+        _navigationOrderEvent.setValue(
             OrderInformation(
                 productIds,
                 orderAmount,
                 ordersCount,
             )
+        )
+
     }
 
     override fun onClick(productId: Long) {
@@ -103,7 +104,7 @@ class ShoppingCartViewModel(
     ) {
         thread {
             cartItemRepository.increaseCartItem(cartItemId, quantity)
-            val currentItems = cartItemRepository.loadPagedCartItem()
+            val currentItems = cartItemRepository.loadCartItems()
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()
@@ -117,7 +118,7 @@ class ShoppingCartViewModel(
     ) {
         thread {
             cartItemRepository.decreaseCartProduct(cartItemId, quantity)
-            val currentItems = cartItemRepository.loadPagedCartItem()
+            val currentItems = cartItemRepository.loadCartItems()
             uiHandler.post {
                 updateCartItems(currentItems)
                 updateTotalPrice()

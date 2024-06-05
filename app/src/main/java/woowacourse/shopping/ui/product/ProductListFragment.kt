@@ -9,13 +9,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import woowacourse.shopping.R
 import woowacourse.shopping.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentProductListBinding
-import woowacourse.shopping.ui.cart.ShoppingCartFragment
+import woowacourse.shopping.ui.FragmentNavigator
 import woowacourse.shopping.ui.product.adapter.ProductAdapter
 import woowacourse.shopping.ui.product.adapter.ProductHistoryAdapter
-import woowacourse.shopping.ui.productDetail.ProductDetailFragment
 
 class ProductListFragment : Fragment() {
     private var _binding: FragmentProductListBinding? = null
@@ -77,22 +75,12 @@ class ProductListFragment : Fragment() {
     }
 
     private fun navigateToShoppingCart() {
-        navigateToFragment(ShoppingCartFragment())
+        (requireActivity() as FragmentNavigator).navigateToShoppingCart()
     }
 
     private fun observeDetailProductDestination() {
         viewModel.detailProductDestinationId.observe(viewLifecycleOwner) { productId ->
-            navigateToProductDetail(productId)
-        }
-    }
-
-    private fun navigateToProductDetail(id: Long) = navigateToFragment(ProductDetailFragment.newInstance(id))
-
-    private fun navigateToFragment(fragment: Fragment) {
-        parentFragmentManager.beginTransaction().apply {
-            replace(R.id.container, fragment)
-            addToBackStack(null)
-            commit()
+            (requireActivity() as FragmentNavigator).navigateToProductDetail(productId)
         }
     }
 
