@@ -16,7 +16,10 @@ import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 
 class CartFragment : Fragment() {
-    private lateinit var binding: FragmentCartBinding
+    private var _binding: FragmentCartBinding? = null
+    private val binding: FragmentCartBinding
+        get() = _binding!!
+
     private lateinit var adapter: CartAdapter
     private val viewModel by activityViewModels<OrderViewModel>()
 
@@ -25,7 +28,7 @@ class CartFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentCartBinding.inflate(inflater, container, false)
+        _binding = FragmentCartBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -37,6 +40,11 @@ class CartFragment : Fragment() {
         setUpAdapter()
         setUpDataBinding()
         observeViewmodel()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setUpAdapter() {

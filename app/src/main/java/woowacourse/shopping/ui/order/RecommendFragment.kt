@@ -16,7 +16,10 @@ import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 
 class RecommendFragment : Fragment() {
-    private lateinit var binding: FragmentRecommendBinding
+    private var _binding: FragmentRecommendBinding? = null
+    private val binding: FragmentRecommendBinding
+        get() = _binding!!
+
     private lateinit var adapter: RecommendAdapter
     private val viewModel by activityViewModels<OrderViewModel>()
 
@@ -25,7 +28,7 @@ class RecommendFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentRecommendBinding.inflate(inflater, container, false)
+        _binding = FragmentRecommendBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -37,6 +40,11 @@ class RecommendFragment : Fragment() {
         setUpAdapter()
         setUpDataBinding()
         observeViewModel()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setUpAdapter() {
