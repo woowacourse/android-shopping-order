@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
@@ -38,7 +37,7 @@ class CartSelectViewModel(
     }
 
     private fun loadCartProducts(page: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             showLoading()
 
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
@@ -60,12 +59,11 @@ class CartSelectViewModel(
                 val newPagingCartProduct = pagingCartProduct.copy(cartList = newCartList)
 
                 _uiState.value?.let { state ->
-                    _uiState.postValue(
+                    _uiState.value =
                         state.copy(
                             pagingCartProduct = newPagingCartProduct,
                             totalElements = carts?.totalElements ?: 0,
-                        ),
-                    )
+                        )
                 }
             }.onFailure { e ->
                 showError(e)
@@ -137,7 +135,7 @@ class CartSelectViewModel(
         product: Product,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
@@ -150,7 +148,7 @@ class CartSelectViewModel(
     }
 
     override fun deleteCartProduct(cartId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingRepository.deleteCartProductById(cartId = cartId).onSuccess {
                 uiState.value?.let { state ->
                     loadCartProducts(state.pagingCartProduct.currentPage)
@@ -188,7 +186,7 @@ class CartSelectViewModel(
     }
 
     override fun checkAllCartProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingRepository.getAllCarts().onSuccess { carts ->
                 hideError()
 
@@ -200,12 +198,11 @@ class CartSelectViewModel(
                                 cart.copy(isChecked = false)
                             }
 
-                        _uiState.postValue(
+                        _uiState.value =
                             state.copy(
                                 orderCartList = mutableMapOf(),
                                 pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
-                            ),
-                        )
+                            )
                     }
                 } else {
                     _uiState.value?.let { state ->
@@ -217,12 +214,11 @@ class CartSelectViewModel(
                         val orderCartList =
                             carts.content.associateBy { cart -> cart.id }.toMutableMap()
 
-                        _uiState.postValue(
+                        _uiState.value =
                             state.copy(
                                 orderCartList = orderCartList,
                                 pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
-                            ),
-                        )
+                            )
                     }
                 }
             }.onFailure { e ->
@@ -235,7 +231,7 @@ class CartSelectViewModel(
         cartId: Int,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingRepository.updateCartProduct(
                 cartId = cartId,
                 quantity = quantity,

@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -36,13 +35,13 @@ class OrderRecommendViewModel(
     }
 
     private fun recommendProductLoad() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productHistoryRepository.getProductHistoriesByCategory(10)
                 .onSuccess { recommendProducts ->
 
                     hideError()
                     _uiState.value?.let { state ->
-                        _uiState.postValue(state.copy(recommendCarts = recommendProducts))
+                        _uiState.value = state.copy(recommendCarts = recommendProducts)
                     }
                 }.onFailure { e -> showError(e) }
         }
@@ -58,16 +57,14 @@ class OrderRecommendViewModel(
     override fun retry() {}
 
     fun order() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _uiState.value?.let { state ->
                 orderRepository.insertOrderByIds(state.orderCarts.keys.toList())
                     .onSuccess {
                         hideError()
-                        Log.d("HELLO1", "order: ")
                         _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
                     }.onFailure { e ->
                         showError(e)
-                        Log.d("HELLO2", "order: ")
                     }
             }
         }
@@ -102,12 +99,11 @@ class OrderRecommendViewModel(
                     }
                 }
 
-            _uiState.postValue(
+            _uiState.value =
                 state.copy(
                     recommendCarts = updatedRecommendCarts,
                     orderCarts = state.orderCarts,
-                ),
-            )
+                )
         }
     }
 
@@ -125,7 +121,7 @@ class OrderRecommendViewModel(
         product: Product,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
@@ -142,12 +138,11 @@ class OrderRecommendViewModel(
                             }
                         }
 
-                    _uiState.postValue(
+                    _uiState.value =
                         state.copy(
                             recommendCarts = updateRecommendCarts,
                             orderCarts = state.orderCarts,
-                        ),
-                    )
+                        )
                 }
             }.onFailure { e ->
                 showError(e)
@@ -162,11 +157,10 @@ class OrderRecommendViewModel(
             ).onSuccess {
                 _uiState.value?.let { state ->
                     state.orderCarts.remove(cartId)
-                    _uiState.postValue(
+                    _uiState.value =
                         state.copy(
                             orderCarts = state.orderCarts,
-                        ),
-                    )
+                        )
                 }
             }.onFailure { e ->
                 showError(e)
@@ -178,14 +172,14 @@ class OrderRecommendViewModel(
         cart: Cart,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.updateCartProduct(
                 cartId = cart.id,
                 quantity = quantity,
             ).onSuccess {
                 _uiState.value?.let { state ->
                     state.orderCarts[cart.id] = cart.copy(quantity = quantity)
-                    _uiState.postValue(state.copy(orderCarts = state.orderCarts))
+                    _uiState.value = state.copy(orderCarts = state.orderCarts)
                 }
             }.onFailure { e ->
                 showError(e)

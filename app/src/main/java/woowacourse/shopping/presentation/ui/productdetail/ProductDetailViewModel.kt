@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
@@ -37,12 +36,12 @@ class ProductDetailViewModel(
     }
 
     fun getProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productRepository.getCartById(id).onSuccess { cart ->
                 hideError()
                 _uiState.value?.let { state ->
                     if (state.isLastProductPage) {
-                        _uiState.postValue(state.copy(cart = cart))
+                        _uiState.value = state.copy(cart = cart)
                         insertProductHistory(cart.product)
                     } else {
                         getProductHistory(cart)
@@ -59,7 +58,7 @@ class ProductDetailViewModel(
     }
 
     private fun getProductHistory(cart: Cart) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productHistoryRepository.getProductHistoriesBySize(2).onSuccess { productHistories ->
                 hideError()
                 val productHistory =
@@ -77,13 +76,12 @@ class ProductDetailViewModel(
                     }
 
                 uiState.value?.let { state ->
-                    _uiState.postValue(
+                    _uiState.value =
                         state.copy(
                             cart = cart,
                             productHistory = productHistory,
                             isLastProductPage = isLastProductPage,
-                        ),
-                    )
+                        )
                 }
 
                 insertProductHistory(cart.product)
@@ -110,7 +108,7 @@ class ProductDetailViewModel(
     }
 
     fun insertCart(cart: Cart) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.insertCartProduct(
                 productId = cart.product.id,
                 quantity = cart.quantity,
@@ -125,7 +123,7 @@ class ProductDetailViewModel(
     }
 
     fun updateCart(cart: Cart) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.updateCartProduct(
                 cartId = cart.id,
                 quantity = cart.quantity,
@@ -162,7 +160,7 @@ class ProductDetailViewModel(
     }
 
     private fun insertProductHistory(productValue: Product) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productHistoryRepository.insertProductHistory(
                 productId = productValue.id,
                 name = productValue.name,

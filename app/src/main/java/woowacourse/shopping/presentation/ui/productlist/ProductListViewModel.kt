@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
@@ -25,7 +24,7 @@ class ProductListViewModel(
     private val productHistoryRepository: ProductHistoryRepository,
 ) : BaseViewModel(), ProductListActionHandler, ProductCountHandler {
     private val _uiState: MutableLiveData<ProductListUiState> =
-        MutableLiveData(ProductListUiState())
+        MutableLiveData()
     val uiState: LiveData<ProductListUiState> get() = _uiState
 
     private val _navigateAction: MutableLiveData<Event<ProductListNavigateAction>> =
@@ -43,9 +42,9 @@ class ProductListViewModel(
     }
 
     private fun initLoad() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             showLoading()
-            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
+
             productListPagingSource.load().mapCatching { pagingProduct ->
                 val productHistories =
                     productHistoryRepository.getProductHistoriesBySize(10).getOrDefault(emptyList())
@@ -58,13 +57,12 @@ class ProductListViewModel(
                 )
             }.onSuccess { productListUiState ->
                 hideError()
-                _uiState.postValue(productListUiState)
+                _uiState.value = productListUiState
             }.onFailure { e ->
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
             }
 
-            Thread.sleep(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             hideLoading()
         }
     }
@@ -82,7 +80,7 @@ class ProductListViewModel(
     }
 
     override fun loadMoreProducts() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productListPagingSource.load().onSuccess { pagingProduct ->
                 hideError()
                 _uiState.value?.let { state ->
@@ -93,12 +91,11 @@ class ProductListViewModel(
                         )
                     val cartCount = nowPagingCart.cartList.sumOf { it.quantity }
 
-                    _uiState.postValue(
+                    _uiState.value =
                         state.copy(
                             pagingCart = nowPagingCart,
                             cartQuantity = cartCount,
-                        ),
-                    )
+                        )
                 }
             }.onFailure { e ->
                 showError(e)
@@ -108,7 +105,7 @@ class ProductListViewModel(
     }
 
     fun updateProducts() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             uiState.value?.let { state ->
                 val cartProducts = shoppingCartRepository.getAllCarts().getOrNull()
                 val updatedProductList =
@@ -126,13 +123,12 @@ class ProductListViewModel(
                     productHistoryRepository.getProductHistoriesBySize(10).getOrDefault(emptyList())
                 val cartCount = shoppingCartRepository.getCartProductsQuantity().getOrDefault(0)
 
-                _uiState.postValue(
+                _uiState.value =
                     state.copy(
                         pagingCart = PagingCart(updatedProductList),
                         productHistories = productHistories,
                         cartQuantity = cartCount,
-                    ),
-                )
+                    )
             }
         }
     }
@@ -188,7 +184,7 @@ class ProductListViewModel(
         product: Product,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.insertCartProduct(
                 productId = product.id,
                 quantity = quantity,
@@ -206,9 +202,7 @@ class ProductListViewModel(
 
                     val pagingCart = PagingCart(cartList = updateCartList)
 
-                    _uiState.postValue(
-                        state.copy(pagingCart = pagingCart),
-                    )
+                    _uiState.value = state.copy(pagingCart = pagingCart)
                 }
             }.onFailure { e ->
                 showError(e)
@@ -217,7 +211,7 @@ class ProductListViewModel(
     }
 
     private fun deleteCartProduct(cartId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.deleteCartProductById(
                 cartId = cartId,
             ).onFailure { e ->
@@ -230,7 +224,7 @@ class ProductListViewModel(
         cartId: Int,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingCartRepository.updateCartProduct(
                 cartId = cartId,
                 quantity = quantity,
