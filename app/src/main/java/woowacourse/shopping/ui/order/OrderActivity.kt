@@ -40,7 +40,10 @@ class OrderActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
-        addFragment()
+
+        if (savedInstanceState == null) {
+            addFragment(cartFragment)
+        }
     }
 
     private fun setUpDataBinding() {
@@ -61,7 +64,7 @@ class OrderActivity : AppCompatActivity() {
         }
         viewModel.navigateToRecommend.observe(this) { navigateToRecommend ->
             navigateToRecommend.getContentIfNotHandled()?.let {
-                replaceFragment(recommendFragment)
+                addFragment(recommendFragment)
             }
         }
 
@@ -73,15 +76,11 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-    private fun addFragment() {
+    private fun addFragment(fragment: Fragment) {
         supportFragmentManager.commit {
-            replace(R.id.fragment_cart, cartFragment)
-        }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.commit {
+            setReorderingAllowed(true)
             replace(R.id.fragment_cart, fragment)
+            addToBackStack(null)
         }
     }
 
