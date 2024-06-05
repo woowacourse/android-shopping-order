@@ -1,8 +1,11 @@
 package woowacourse.shopping.presentation.ui.shopping
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
@@ -81,17 +84,18 @@ class ShoppingViewModel(
     }
 
     private fun fetchProductsByPage() {
-        productRepository.load(
-            currentPage,
-            PAGE_SIZE,
-            onSuccess = { products, isLast ->
+        viewModelScope.launch {
+            productRepository.load(
+                currentPage,
+                PAGE_SIZE,
+            ).onSuccess { productModel ->
                 currentPage++
-                addShoppingProducts(products, isLast)
-            },
-            onFailure = {
+                addShoppingProducts(productModel.products, productModel.isLast)
+            }.onFailure {
+                Log.d("ㅌㅅㅌ", "error : ${it.message}")
                 _error.value = Event(ShoppingError.ProductItemsNotFound)
-            },
-        )
+            }
+        }
     }
 
     private fun addShoppingProducts(

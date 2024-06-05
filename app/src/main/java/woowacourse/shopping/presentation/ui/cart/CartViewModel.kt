@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
@@ -161,21 +163,27 @@ class CartViewModel(
     }
 
     fun buildRecommendProducts() {
-        recentRepository.loadMostRecent().onSuccess {
-            val recentViewedCategory = it?.category ?: "최근 본 아이템 없음"
-            productRepository.loadWithCategory(
-                recentViewedCategory,
-                0,
-                20,
-                onSuccess = { products ->
-                    val existCarts =
-                        (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.map { it.toProduct() }
-                    _recommendedProduct.value =
-                        (products - existCarts.toSet()).take(10).map { it.toInitialShoppingItem() }
-                },
-                onFailure = {},
-            )
+        recentRepository.loadMostRecent().onSuccess { recentProduct ->
+            val recentViewedCategory = recentProduct?.category ?: "최근 본 아이템 없음"
+            viewModelScope.launch {
+                fetchProductByCategory(recentViewedCategory)
+            }
         }
+    }
+
+    private suspend fun fetchProductByCategory(recentViewedCategory: String) {
+        productRepository.loadWithCategory(
+            recentViewedCategory,
+            0,
+            20,
+        ).onSuccess { products ->
+            val shoppingProducts = shoppingProducts.value
+            if (shoppingProducts !is UiState.Success) return
+            val existCarts = shoppingProducts.data.map { it.toProduct() }
+            _recommendedProduct.value =
+                (products - existCarts.toSet()).take(10)
+                    .map { it.toInitialShoppingItem() }
+        }.onFailure {}
     }
 
     override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {

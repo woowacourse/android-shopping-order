@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductListItem
@@ -40,25 +42,22 @@ class ProductDetailViewModel(
             onSuccess = {
                 cart = it
                 val quantity = cart?.quantity ?: 0
-                productRepository.loadById(
-                    productId,
-                    onSuccess = {
+                viewModelScope.launch {
+                    productRepository.loadById(productId).onSuccess { product ->
                         _product.value =
                             ProductListItem.ShoppingProductItem(
                                 id = productId,
-                                name = it.name,
-                                imgUrl = it.imgUrl,
-                                price = it.price,
-                                category = it.category,
+                                name = product.name,
+                                imgUrl = product.imgUrl,
+                                price = product.price,
+                                category = product.category,
                                 quantity = quantity,
                             )
-                        addRecentProduct(it)
-                    },
-                    onFailure = {
-                        _error.value =
-                            Event(DetailError.ProductItemsNotFound)
-                    },
-                )
+                        addRecentProduct(product)
+                    }.onFailure {
+                        _error.value = Event(DetailError.ProductItemsNotFound)
+                    }
+                }
             },
             onFailure = {},
         )

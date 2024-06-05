@@ -1,103 +1,42 @@
 package woowacourse.shopping.data.product
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import woowacourse.shopping.data.dto.response.ProductDto
-import woowacourse.shopping.data.dto.response.ProductResponse
 import woowacourse.shopping.data.product.remote.RemoteProductDataSource
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.PagedProducts
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDataSource = RemoteProductDataSource()) :
     ProductRepository {
-    override fun loadWithCategory(
+    override suspend fun loadWithCategory(
         category: String,
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteProductDataSource.loadWithCategory(category, startPage, pageSize).enqueue(
-            object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let {
-                            onSuccess(it.content.map { it.toProduct() })
-                        } ?: onSuccess(emptyList())
-                    } else {
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ProductResponse>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    ): Result<List<Product>> {
+        return runCatching {
+            remoteProductDataSource.loadWithCategory(
+                category,
+                startPage,
+                pageSize,
+            ).content.map { it.toProduct() }
+        }
     }
 
-    override fun load(
+    override suspend fun load(
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Product>, Boolean) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteProductDataSource.load(startPage, pageSize).enqueue(
-            object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { response ->
-                            onSuccess(response.content.map { it.toProduct() }, response.last)
-                        }
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ProductResponse>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    ): Result<PagedProducts> {
+        return runCatching {
+            val productResponse = remoteProductDataSource.load(startPage, pageSize)
+            PagedProducts(
+                productResponse.content.map { it.toProduct() },
+                productResponse.last,
+            )
+        }
     }
 
-    override fun loadById(
-        id: Long,
-        onSuccess: (Product) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteProductDataSource.loadById(id).enqueue(
-            object : Callback<ProductDto> {
-                override fun onResponse(
-                    call: Call<ProductDto>,
-                    response: Response<ProductDto>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let {
-                            onSuccess(it.toProduct())
-                        }
-                    } else {
-                        onFailure()
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ProductDto>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    override suspend fun loadById(id: Long): Result<Product> {
+        return runCatching {
+            remoteProductDataSource.loadById(id).toProduct()
+        }
     }
 }
