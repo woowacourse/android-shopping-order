@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.remote.service
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -16,27 +15,27 @@ import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 
 interface CartItemService {
     @GET("/cart-items")
-    fun getCartItems(
+    suspend fun getCartItems(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ResponseCartItemsGetDto>
+    ): Response<ResponseCartItemsGetDto>
 
     @POST("/cart-items")
-    fun postCartItem(
+    suspend fun postCartItem(
         @Body request: RequestCartItemPostDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") id: Long,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun patchCartItem(
+    suspend fun patchCartItem(
         @Path("id") id: Long,
         @Body request: RequestCartItemsPatchDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @GET("/cart-items/counts")
-    fun getCartItemCounts(): Call<ResponseCartItemCountsGetDto>
+    suspend fun getCartItemCounts(): Response<ResponseCartItemCountsGetDto>
 }

@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.remote.service
 
 import androidx.room.Delete
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -14,25 +13,25 @@ import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 
 interface ProductService {
     @GET("/products")
-    fun getProductsByOffset(
+    suspend fun getProductsByOffset(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ResponseProductsGetDto>
+    ): Response<ResponseProductsGetDto>
 
     @GET("/products")
-    fun getProducts(
-    ): Call<ResponseProductsGetDto>
+    suspend fun getProducts(
+    ): Response<ResponseProductsGetDto>
 
     @POST("/products")
-    fun postProducts(
+    suspend fun postProducts(
         @Body request: RequestProductsPostDto,
-    ): Call<RequestProductsPostDto>
+    ): Response<RequestProductsPostDto>
 
     @GET("/products/{id}")
-    fun getProductsById(
+    suspend fun getProductsById(
         @Path("id") id: Long,
-    ): Call<ResponseProductIdGetDto>
+    ): Response<ResponseProductIdGetDto>
 
     @Delete
-    fun deleteProduct(): Call<Unit>
+    suspend fun deleteProduct(): Response<Unit>
 }
