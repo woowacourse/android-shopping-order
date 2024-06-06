@@ -22,6 +22,7 @@
     <string name="tv_order">주문하기(%d)</string>
 
     <!--    결제-->
+    <string name="payment_title">결제하기</string>
     <string name="tv_payment_title">결제하기</string>
     <string name="tv_coupon_description_title">* 쿠폰은 1개만 적용 가능합니다.</string>
     <string name="tv_coupon_title">적용 가능한 쿠폰</string>

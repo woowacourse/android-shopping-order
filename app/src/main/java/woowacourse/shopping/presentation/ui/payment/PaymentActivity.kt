@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.payment
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+import android.view.MenuItem
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
@@ -25,9 +26,17 @@ class PaymentActivity : BaseActivity<ActivityPaymentBinding>(R.layout.activity_p
     private val couponsAdapter: CouponsAdapter by lazy { CouponsAdapter(viewModel) }
 
     override fun initCreateView() {
+        initActionBar()
         initDataBinding()
         initAdapter()
         initObserve()
+    }
+
+    private fun initActionBar() {
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = getString(R.string.payment_title)
+        }
     }
 
     private fun initDataBinding() {
@@ -54,6 +63,11 @@ class PaymentActivity : BaseActivity<ActivityPaymentBinding>(R.layout.activity_p
         viewModel.uiState.observe(this) { state ->
             couponsAdapter.submitList(state.couponsState)
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        finish()
+        return true
     }
 
     companion object {
