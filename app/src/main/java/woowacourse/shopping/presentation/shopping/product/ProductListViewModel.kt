@@ -37,23 +37,27 @@ class ProductListViewModel(
     }
 
     override fun loadProducts() {
-        val uiState = _uiState.value ?: return
+        var uiState = _uiState.value ?: return
         val currentPage = uiState.currentPage
-        shoppingRepository.products(currentPage - 1, PAGE_SIZE)
-            .onSuccess {
-                val newProducts = it.map(Product::toShoppingUiModel)
-                _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
-            }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadProducts)
-            }
+        viewModelScope.launch {
+            shoppingRepository.products(currentPage - 1, PAGE_SIZE)
+                .onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    val newProducts = it.map(Product::toShoppingUiModel)
+                    _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
+                }.onFailure {
+                    _errorEvent.setValue(ProductListErrorEvent.LoadProducts)
+                }
+        }
     }
 
     fun loadCartProducts() {
-        val uiState = uiState.value ?: return
+        var uiState = _uiState.value ?: return
         val ids = uiState.products.map { it.id }
         viewModelScope.launch {
             cartRepository.filterCartProducts(ids)
                 .onSuccess { newCartProducts ->
+                    uiState = _uiState.value ?: return@launch
                     val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
                     _uiState.value = uiState.updateProducts(newProducts)
                 }.onFailure {

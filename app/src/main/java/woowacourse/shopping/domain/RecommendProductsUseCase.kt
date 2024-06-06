@@ -35,7 +35,7 @@ class RecommendProductsUseCase(
         return recommendProducts
     }
 
-    private fun loadRecommendProducts(category: String?): List<Product> {
+    private suspend fun loadRecommendProducts(category: String?): List<Product> {
         return if (category == null) {
             // 카테고리가 없으면 전체 상품에서 추천 상품을 가져온다.
             productRepository.products(0, PRODUCT_SIZE).getOrNull() ?: emptyList()

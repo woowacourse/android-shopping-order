@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.entity.Product
 
 interface ShoppingRepository {
-    fun products(
+    suspend fun products(
         currentPage: Int,
         size: Int,
     ): Result<List<Product>>

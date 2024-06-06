@@ -17,7 +17,7 @@ class ShoppingRepositoryImpl(
     private val cachedProductsById = ConcurrentHashMap<Long, Product>()
     private var cachedPageData: ProductPageData? = null
 
-    override fun products(
+    override suspend fun products(
         currentPage: Int,
         size: Int,
     ): Result<List<Product>> {
