@@ -17,7 +17,6 @@ class OrderViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(), OrderClickListener {
-    // 공용
     private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
     val orderState: LiveData<OrderState>
         get() = _orderState

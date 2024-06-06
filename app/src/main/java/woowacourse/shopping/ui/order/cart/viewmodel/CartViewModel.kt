@@ -101,12 +101,10 @@ class CartViewModel(
 
     override fun onQuantityMinusButtonClick(productId: Int) {
         val updatedCartItem = orderViewModel.getCartViewItemByProductId(productId) ?: return
-        if (updatedCartItem.cartItem.quantity == 1) {
-            _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCartItemDeleted)
+        if (updatedCartItem.cartItem.quantity > 1) {
+            orderViewModel.onQuantityMinusButtonClick(productId)
+
+            _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
         }
-
-        orderViewModel.onQuantityMinusButtonClick(productId)
-
-        _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
     }
 }
