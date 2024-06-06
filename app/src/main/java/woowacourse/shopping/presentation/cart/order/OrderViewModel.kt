@@ -69,9 +69,9 @@ class OrderViewModel(
 
     override fun increaseProductCount(id: Long) {
         viewModelScope.launch {
-            val uiState = _uiState.value ?: return@launch
             increaseCartProductCountUseCase(id, INCREMENT_AMOUNT)
                 .onSuccess {
+                    val uiState = _uiState.value ?: return@launch
                     _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
                     _updateCartEvent.setValue(Unit)
                 }.onFailure {
@@ -83,8 +83,8 @@ class OrderViewModel(
 
     override fun decreaseProductCount(id: Long) {
         viewModelScope.launch {
-            val uiState = _uiState.value ?: return@launch
             decreaseCartProductUseCase(id).onSuccess {
+                val uiState = _uiState.value ?: return@launch
                 _uiState.value = uiState.decreaseProductCount(
                     id,
                     INCREMENT_AMOUNT,
