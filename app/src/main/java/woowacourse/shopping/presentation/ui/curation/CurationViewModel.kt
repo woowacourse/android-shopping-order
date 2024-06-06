@@ -13,6 +13,8 @@ import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
+import woowacourse.shopping.presentation.ui.curation.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 class CurationViewModel(
     private val repository: Repository,
@@ -26,6 +28,9 @@ class CurationViewModel(
     private val _eventHandler = MutableLiveData<EventState<CurationEvent>>()
     val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
 
+    private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
+    val navigateUiState: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
+
     init {
         viewModelScope.launch {
             repository.getCuration().onSuccess {
@@ -36,37 +41,20 @@ class CurationViewModel(
         }
     }
 
-    override fun order() =
-        viewModelScope.launch {
-            val orderCartIds = getOrderCartIds()
-            repository.postOrders(
-                OrderRequestDto(
-                    orderCartIds,
-                ),
-            ).onSuccess {
-                val cartProducts =
-                    (this@CurationViewModel.cartProducts.value as UiState.Success).data.map { it.copy() }
+    override fun order() {
+        _navigateHandler.value = EventState(NavigateUiState.ToPayment(getPaymentUiModel()))
+    }
 
-                orderCartIds.forEach { id ->
-                    cartProducts.find { it.cartId == id.toLong() }?.quantity = 0
-                }
-                _eventHandler.postValue(EventState(CurationEvent.SuccessOrder))
-                _cartProducts.postValue(UiState.Success(cartProducts))
-            }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
-            }
-        }
 
     override fun onProductClick(cartProduct: CartProduct) {
     }
 
-    private fun getOrderCartIds() =
-        (_cartProducts.value as UiState.Success).data.filter {
-            it.quantity > 0
-        }.map {
-            it.cartId.toInt()
-        }
 
+    private fun getPaymentUiModel(): PaymentUiModel {
+        return PaymentUiModel(
+            cartProducts = (_cartProducts.value as UiState.Success).data.filter { it.quantity > 0 }
+        )
+    }
     override fun onPlus(cartProduct: CartProduct) =
         viewModelScope.launch {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }

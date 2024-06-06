@@ -8,6 +8,8 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.ui.curation.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 
 class CurationActivity : BindingActivity<ActivityCurationBinding>() {
     override val layoutResourceId: Int
@@ -49,6 +51,16 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
                     }
                 }
             },
+        )
+        viewModel.navigateUiState.observe(
+            this,
+            EventObserver {
+                when(it) {
+                    is NavigateUiState.ToPayment -> {
+                        startActivity(PaymentActivity.createIntent(this, it.paymentUiModel))
+                    }
+                }
+            }
         )
     }
 }

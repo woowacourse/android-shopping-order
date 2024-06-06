@@ -5,6 +5,7 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.domain.CartProduct
+import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 
@@ -83,6 +84,10 @@ class FakeRepository : Repository {
     }
 
     override suspend fun getCuration(): Result<List<CartProduct>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getCoupons(): Result<List<Coupon>> {
         TODO("Not yet implemented")
     }
 
