@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.service
 
-import retrofit2.http.POST
+import retrofit2.http.GET
 import woowacourse.shopping.data.dto.response.ResponseCouponDto
 
 interface CouponService {
-    @POST("/coupons")
+    @GET("/coupons")
     suspend fun getCoupons(): List<ResponseCouponDto>
 }

@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.data.coupon.Coupon" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,6 +35,7 @@
             android:layout_marginTop="18dp"
             android:textColor="@color/gray5"
             android:textSize="18sp"
+            android:text="@{coupon.description}"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/cb_coupon"
             app:layout_constraintTop_toTopOf="parent"

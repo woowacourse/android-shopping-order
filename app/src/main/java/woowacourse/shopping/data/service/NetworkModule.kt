@@ -1,10 +1,8 @@
 package woowacourse.shopping.data.service
 
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 
 object NetworkModule {
@@ -34,7 +32,7 @@ object NetworkModule {
 
     private fun retrofitBuilder(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BuildConfig.BASE_URL)
             .client(client)
             .build()
