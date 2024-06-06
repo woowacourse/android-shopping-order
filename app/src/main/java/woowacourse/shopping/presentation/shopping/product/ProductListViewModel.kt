@@ -43,6 +43,7 @@ class ProductListViewModel(
     override fun loadProducts() {
         productLoadJob = viewModelScope.launch {
             val currentPage = _uiState.value?.currentPage ?: return@launch
+            _uiState.value = _uiState.value?.copy(isLoading = true)
             productRepository.loadProducts(currentPage, PAGE_SIZE)
                 .onSuccess {
                     val uiState = _uiState.value ?: return@onSuccess
@@ -52,9 +53,12 @@ class ProductListViewModel(
                         uiState.copy(
                             products = uiState.products + newProducts,
                             loadMoreModel = getLoadMore(nextPage),
+                            isLoading = false,
                         )
                 }.onFailure {
                     Timber.e(it)
+                    val uiState = _uiState.value ?: return@onFailure
+                    _uiState.value = uiState.copy(isLoading = false)
                     _errorEvent.postValue(ProductListErrorEvent.LoadProducts)
                 }
             Timber.e("finish productLoadJob")
