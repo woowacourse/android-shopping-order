@@ -2,33 +2,21 @@ package woowacourse.shopping.data.remote.datasource
 
 import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.dto.ProductDto
+import woowacourse.shopping.data.dto.ProductResponse
 import woowacourse.shopping.data.remote.service.ProductService
 
 class ProductDataSourceImpl(private val productService: ProductService) : ProductDataSource {
-    override fun getProducts(
+    override fun getProductResponse(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Result<List<ProductDto>> {
+    ): Result<ProductResponse> {
         return runCatching {
-            productService.getProducts(category, page, size, sort).execute().body()?.products
+            productService.getProducts(category, page, size, sort).execute().body()
                 ?: throw IllegalArgumentException()
         }
     }
-
-    override fun getProductIsLast(
-        category: String?,
-        page: Int,
-        size: Int,
-        sort: String
-    ): Result<Boolean> {
-        return runCatching {
-            productService.getProducts(category, page, size, sort).execute().body()?.last
-                ?: throw IllegalArgumentException()
-        }
-    }
-
 
     override fun getProductById(productId: Int): Result<ProductDto> {
         return runCatching {

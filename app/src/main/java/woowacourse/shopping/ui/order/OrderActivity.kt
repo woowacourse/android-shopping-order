@@ -9,15 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
 import woowacourse.shopping.app.ShoppingApplication.Companion.orderDataSourceImpl
 import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.ui.order.action.OrderNavigationActions
+import woowacourse.shopping.ui.order.action.OrderNotifyingActions
 import woowacourse.shopping.ui.order.cart.CartFragment
 import woowacourse.shopping.ui.order.recommend.RecommendFragment
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -54,22 +56,23 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.navigateToBack.observe(this) { back ->
-            back.getContentIfNotHandled()?.let {
-                finish()
+        viewModel.orderNavigationActions.observe(this) { orderNavigationActions ->
+            orderNavigationActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is OrderNavigationActions.NavigateToBack -> finish()
+                    is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
+                }
             }
         }
 
-        viewModel.navigateToRecommend.observe(this) { navigateToRecommend ->
-            navigateToRecommend.getContentIfNotHandled()?.let {
-                addFragment(recommendFragment)
-            }
-        }
-
-        viewModel.notifyOrderCompleted.observe(this) { notifyOrderCompleted ->
-            notifyOrderCompleted.getContentIfNotHandled()?.let {
-                alertOrderCompleted()
-                finish()
+        viewModel.orderNotifyingActions.observe(this) { orderNotifyingActions ->
+            orderNotifyingActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is OrderNotifyingActions.NotifyCartCompleted -> {
+                        notifyOrderCompleted()
+                        finish()
+                    }
+                }
             }
         }
     }
@@ -82,7 +85,7 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-    private fun alertOrderCompleted() {
+    private fun notifyOrderCompleted() {
         Toast.makeText(this, ORDER_COMPLETED_MESSAGE, Toast.LENGTH_SHORT).show()
     }
 

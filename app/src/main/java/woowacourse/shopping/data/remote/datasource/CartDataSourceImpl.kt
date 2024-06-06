@@ -1,21 +1,21 @@
 package woowacourse.shopping.data.remote.datasource
 
 import woowacourse.shopping.data.datasource.CartDataSource
-import woowacourse.shopping.data.dto.CartItemDto
 import woowacourse.shopping.data.dto.CartItemRequest
 import woowacourse.shopping.data.dto.CartQuantityDto
+import woowacourse.shopping.data.dto.CartResponse
 import woowacourse.shopping.data.remote.service.CartService
 
 class CartDataSourceImpl(
     private val cartService: CartService,
 ) : CartDataSource {
-    override fun getCartItems(
+    override fun getCartResponse(
         page: Int,
         size: Int,
         sort: String,
-    ): Result<List<CartItemDto>> {
+    ): Result<CartResponse> {
         return runCatching {
-            cartService.getCartItems(page, size, sort).execute().body()?.cartItems
+            cartService.getCartItems(page, size, sort).execute().body()
                 ?: throw IllegalArgumentException()
         }
     }

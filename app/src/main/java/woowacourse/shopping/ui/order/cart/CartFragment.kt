@@ -10,6 +10,8 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.ui.detail.DetailActivity
+import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
+import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
 import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -68,21 +70,20 @@ class CartFragment : Fragment() {
                     )
             }
         }
-        viewModel.navigateToDetail.observe(viewLifecycleOwner) { navigateToDetail ->
-            navigateToDetail.getContentIfNotHandled()?.let { productId ->
-                navigateToDetail(productId)
+        viewModel.cartNavigationActions.observe(viewLifecycleOwner) { cartNavigationActions ->
+            cartNavigationActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is CartNavigationActions.NavigateToDetail -> navigateToDetail(action.productId)
+                }
             }
         }
 
-        viewModel.notifyDeletion.observe(viewLifecycleOwner) { notifyDeletion ->
-            notifyDeletion.getContentIfNotHandled()?.let {
-                alertDeletion()
-            }
-        }
-
-        viewModel.notifyCanNotOrder.observe(viewLifecycleOwner) { notifyCanNotOrder ->
-            notifyCanNotOrder.getContentIfNotHandled()?.let {
-                alertCanNotOrder()
+        viewModel.cartNotifyingActions.observe(viewLifecycleOwner) { cartNotifyingActions ->
+            cartNotifyingActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is CartNotifyingActions.NotifyCartItemDeleted -> notifyCartItemDeleted()
+                    is CartNotifyingActions.NotifyCanNotPutCart -> notifyCanNotOrder()
+                }
             }
         }
     }
@@ -99,11 +100,11 @@ class CartFragment : Fragment() {
         startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
-    private fun alertDeletion() {
+    private fun notifyCartItemDeleted() {
         Toast.makeText(requireContext(), DELETE_ITEM_MESSAGE, Toast.LENGTH_SHORT).show()
     }
 
-    private fun alertCanNotOrder() {
+    private fun notifyCanNotOrder() {
         Toast.makeText(requireContext(), CAN_NOT_ORDER_MESSAGE, Toast.LENGTH_SHORT).show()
     }
 

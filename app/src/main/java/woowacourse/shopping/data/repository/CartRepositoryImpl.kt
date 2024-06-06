@@ -18,9 +18,9 @@ class CartRepositoryImpl(
     ): Result<List<CartItem>> {
         var result: Result<List<CartItem>>? = null
         thread {
-            cartDataSourceImpl.getCartItems(page, size, sort)
-                .onSuccess {
-                    val cartItems = it.map { cartItemDto -> cartItemDto.toCartItem() }
+            cartDataSourceImpl.getCartResponse(page, size, sort)
+                .onSuccess { cartResponse ->
+                    val cartItems = cartResponse.cartItems.map { cartItemDto -> cartItemDto.toCartItem() }
                     result = Result.success(cartItems)
                 }.onFailure {
                     result = Result.failure(IllegalArgumentException())

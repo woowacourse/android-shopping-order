@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.remote.datasource.ProductDataSourceImpl
+import woowacourse.shopping.domain.model.HomeInfo
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.concurrent.thread
@@ -14,13 +15,15 @@ class ProductRepositoryImpl(
         page: Int,
         size: Int,
         sort: String,
-    ): Result<List<Product>> {
-        var result: Result<List<Product>>? = null
+    ): Result<HomeInfo> {
+        var result: Result<HomeInfo>? = null
         thread {
-            productDataSourceImpl.getProducts(category, page, size, sort)
-                .onSuccess {
-                    val products = it.map { productDto -> productDto.toProduct() }
-                    result = Result.success(products)
+            productDataSourceImpl.getProductResponse(category, page, size, sort)
+                .onSuccess { productResponse ->
+                    val products =
+                        productResponse.products.map { productDto -> productDto.toProduct() }
+                    val canLoadMore = productResponse.last.not()
+                    result = Result.success(HomeInfo(products, canLoadMore))
                 }.onFailure {
                     result = Result.failure(IllegalArgumentException())
                 }
@@ -28,26 +31,6 @@ class ProductRepositoryImpl(
 
         return result ?: throw Exception()
     }
-
-    override fun getProductIsLast(
-        category: String?,
-        page: Int,
-        size: Int,
-        sort: String
-    ): Result<Boolean> {
-        var result: Result<Boolean>? = null
-        thread {
-            productDataSourceImpl.getProductIsLast(category, page, size, sort)
-                .onSuccess {
-                    result = Result.success(it)
-                }.onFailure {
-                    result = Result.failure(IllegalArgumentException())
-                }
-        }.join()
-
-        return result ?: throw Exception()
-    }
-
 
     override fun getProductById(id: Int): Result<Product> {
         var result: Result<Product>? = null

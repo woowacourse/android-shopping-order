@@ -14,9 +14,14 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.viewmodel.HomeViewModel.Companion.ASCENDING_SORT_ORDER
+import woowacourse.shopping.ui.order.action.OrderNavigationActions
+import woowacourse.shopping.ui.order.action.OrderNotifyingActions
+import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
+import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.cart.listener.CartClickListener
 import woowacourse.shopping.ui.order.listener.OrderClickListener
+import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions
 import woowacourse.shopping.ui.order.recommend.listener.RecommendClickListener
 import woowacourse.shopping.ui.state.OrderState
 import woowacourse.shopping.ui.state.UiState
@@ -34,11 +39,7 @@ class OrderViewModel(
 
 
     // 공용
-    val isCartEmpty: LiveData<Boolean>
-        get() =
-            cartViewItems.map { cartViewItemsValue ->
-                cartViewItemsValue.isEmpty()
-            }
+
 
     val totalPrice: LiveData<Int>
         get() =
@@ -66,15 +67,25 @@ class OrderViewModel(
                 }
             }
 
-    private val _navigateToBack = MutableLiveData<Event<Unit>>()
-    val navigateToBack: LiveData<Event<Unit>>
-        get() = _navigateToBack
+    private val _orderNavigationActions = MutableLiveData<Event<OrderNavigationActions>>()
+    val orderNavigationActions: LiveData<Event<OrderNavigationActions>>
+        get() = _orderNavigationActions
 
+    private val _cartNavigationActions = MutableLiveData<Event<CartNavigationActions>>()
+    val cartNavigationActions: LiveData<Event<CartNavigationActions>>
+        get() = _cartNavigationActions
 
-    private val _navigateToDetail = MutableLiveData<Event<Int>>()
-    val navigateToDetail: LiveData<Event<Int>>
-        get() = _navigateToDetail
+    private val _recommendNavigationActions = MutableLiveData<Event<RecommendNavigationActions>>()
+    val recommendNavigationActions: LiveData<Event<RecommendNavigationActions>>
+        get() = _recommendNavigationActions
 
+    private val _orderNotifyingActions = MutableLiveData<Event<OrderNotifyingActions>>()
+    val orderNotifyingActions: LiveData<Event<OrderNotifyingActions>>
+        get() = _orderNotifyingActions
+
+    private val _cartNotifyingActions = MutableLiveData<Event<CartNotifyingActions>>()
+    val cartNotifyingActions: LiveData<Event<CartNotifyingActions>>
+        get() = _cartNotifyingActions
 
     // Cart
     private val _cartUiState =
@@ -85,30 +96,17 @@ class OrderViewModel(
     private val cartViewItems = MutableLiveData<List<CartViewItem>>()
     private val selectedCartViewItems = MutableLiveData<List<CartViewItem>>(mutableListOf())
 
-    private val _navigateToRecommend = MutableLiveData<Event<Unit>>()
-    val navigateToRecommend: LiveData<Event<Unit>>
-        get() = _navigateToRecommend
-
-    private val _notifyDeletion = MutableLiveData<Event<Unit>>()
-    val notifyDeletion: LiveData<Event<Unit>>
-        get() = _notifyDeletion
-
-    private val _notifyCanNotOrder = MutableLiveData<Event<Unit>>()
-    val notifyCanNotOrder: LiveData<Event<Unit>>
-        get() = _notifyCanNotOrder
-
+    val isCartEmpty: LiveData<Boolean>
+        get() =
+            cartViewItems.map { cartViewItemsValue ->
+                cartViewItemsValue.isEmpty()
+            }
 
     // Recommend
     private val _recommendUiState =
         MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
     val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
         get() = _recommendUiState
-
-
-    private val _notifyOrderCompleted = MutableLiveData<Event<Unit>>()
-    val notifyOrderCompleted: LiveData<Event<Unit>>
-        get() = _notifyOrderCompleted
-
 
     private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
     val orderState: LiveData<OrderState>
@@ -133,7 +131,7 @@ class OrderViewModel(
             val selectedProducts =
                 selectedCartViewItems.value?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
                     ?: return@onSuccess
-            var sameCategoryProducts = productResponse.getOrNull()
+            var sameCategoryProducts = productResponse.getOrNull()?.products
                 ?: return@onSuccess
             sameCategoryProducts =
                 sameCategoryProducts.filter { sameCategoryProduct ->
@@ -194,7 +192,7 @@ class OrderViewModel(
     }
 
     override fun onCartItemClick(productId: Int) {
-        _navigateToDetail.value = Event(productId)
+        _cartNavigationActions.value = Event(CartNavigationActions.NavigateToDetail(productId))
     }
 
     override fun onDeleteButtonClick(cartItemId: Int) {
@@ -217,7 +215,7 @@ class OrderViewModel(
             }
 
             _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
-            _notifyDeletion.value = Event(Unit)
+            _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCartItemDeleted)
         }
     }
 
@@ -285,7 +283,7 @@ class OrderViewModel(
             val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
             if (updatedCartItem.cartItem.quantity == 0) {
                 newCartViewItems.removeAt(position)
-                _notifyDeletion.value = Event(Unit)
+                _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCartItemDeleted)
             } else {
                 newCartViewItems[position] = updatedCartItem
             }
@@ -324,7 +322,7 @@ class OrderViewModel(
     }
 
     override fun onBackButtonClick() {
-        _navigateToBack.value = Event(Unit)
+        _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToBack)
     }
 
     override fun onAllCheckBoxClick() {
@@ -346,11 +344,11 @@ class OrderViewModel(
 
     override fun onOrderButtonClick() {
         if (selectedCartViewItemSize.value == 0) {
-            _notifyCanNotOrder.value = Event(Unit)
+            _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCanNotPutCart)
         } else {
             if (orderState.value is OrderState.Cart) {
                 _orderState.value = OrderState.Recommend
-                _navigateToRecommend.value = Event(Unit)
+                _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToRecommend)
             } else {
                 runCatching {
                     val selectedCartItemIds =
@@ -359,14 +357,16 @@ class OrderViewModel(
                         } ?: return
                     orderRepository.postOrder(selectedCartItemIds)
                 }.onSuccess {
-                    _notifyOrderCompleted.value = Event(Unit)
+                    _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyCartCompleted)
                 }
             }
         }
     }
 
     override fun onProductClick(productId: Int) {
-        _navigateToDetail.value = Event(productId)
+        _cartNavigationActions.value = Event(CartNavigationActions.NavigateToDetail(productId))
+        _recommendNavigationActions.value =
+            Event(RecommendNavigationActions.NavigateToDetail(productId))
     }
 
     override fun onPlusButtonClick(product: Product) {

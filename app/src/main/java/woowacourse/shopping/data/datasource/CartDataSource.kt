@@ -7,11 +7,11 @@ import woowacourse.shopping.data.dto.CartQuantityDto
 import woowacourse.shopping.data.dto.CartResponse
 
 interface CartDataSource {
-    fun getCartItems(
+    fun getCartResponse(
         page: Int,
         size: Int,
         sort: String,
-    ): Result<List<CartItemDto>>
+    ): Result<CartResponse>
 
     fun addCartItem(cartItemRequest: CartItemRequest): Result<Unit>
 

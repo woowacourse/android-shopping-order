@@ -82,29 +82,19 @@ class HomeViewModel(
                 sort = ASCENDING_SORT_ORDER,
             )
         }.onSuccess {
-            val products = it.getOrNull() ?: emptyList()
+            page += 1
+            val products = it.getOrNull()?.products ?: emptyList()
             val productViewItems =
                 products.map { product ->
                     val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
                     ProductViewItem(product, quantity)
                 }
+            _canLoadMore.value = it.getOrNull()?.canLoadMore
             loadedProductViewItems.addAll(productViewItems)
             _homeUiState.value = UiState.Success(loadedProductViewItems)
         }.onFailure {
             _homeUiState.value = UiState.Error(it)
         }
-
-        runCatching {
-            productRepository.getProductIsLast(
-                category = CATEGORY_UNDEFINED,
-                page = page,
-                size = PAGE_SIZE,
-                sort = ASCENDING_SORT_ORDER,
-            ).onSuccess {
-                _canLoadMore.value = it.not()
-            }
-        }
-        page += 1
     }
 
     private fun loadCartItems() {

@@ -5,19 +5,12 @@ import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.data.dto.ProductResponse
 
 interface ProductDataSource {
-    fun getProducts(
+    fun getProductResponse(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Result<List<ProductDto>>
-
-    fun getProductIsLast(
-        category: String?,
-        page: Int,
-        size: Int,
-        sort: String,
-    ): Result<Boolean>
+    ): Result<ProductResponse>
 
     fun getProductById(productId: Int): Result<ProductDto>
 }
