@@ -32,7 +32,6 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
 
     private fun initData() {
         intent.getParcelableExtraCompat<PaymentUiModel>(EXTRA_PAYMENT_UI_MODEL)?.let {
-            binding.paymentUiModel = it
             viewModel.setPaymentUiModel(it)
         } ?: run {
             Toast.makeText(this, "데이터가 없습니다", Toast.LENGTH_SHORT).show()
@@ -49,6 +48,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     }
 
     private fun initObserver() {
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
         viewModel.getTickets()
         viewModel.coupons.observe(this) {

@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -10,30 +11,25 @@ import woowacourse.shopping.domain.Repository
 class FakeRepository : Repository {
     val carts = cartProducts.toMutableList()
 
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String,
         page: Int,
         size: Int,
     ): Result<List<CartProduct>> {
         TODO("Not yet implemented")
     }
-
-    override fun getProductsByPaging(): Result<List<CartProduct>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCartItems(
+    override suspend fun getCartItems(
         page: Int,
         size: Int,
     ): Result<List<CartProduct>> {
         return Result.success(carts)
     }
 
-    override fun getProductById(id: Int): Result<CartProduct?> {
+    override suspend fun getProductById(id: Int): Result<CartProduct?> {
         TODO("Not yet implemented")
     }
 
-    override fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> {
+    override suspend fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> {
         carts.add(
             CartProduct(
                 productId = cartItemRequestDto.productId.toLong(),
@@ -48,7 +44,7 @@ class FakeRepository : Repository {
         return Result.success(cartItemRequestDto.productId)
     }
 
-    override fun patchCartItem(
+    override suspend fun patchCartItem(
         id: Int,
         quantityRequestDto: QuantityRequestDto,
     ): Result<Unit> {
@@ -66,27 +62,34 @@ class FakeRepository : Repository {
         return Result.success(Unit)
     }
 
-    override fun deleteCartItem(id: Int): Result<Unit> {
+    override suspend fun deleteCartItem(id: Int): Result<Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> {
+    override suspend fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun findByLimit(limit: Int): Result<List<RecentProduct>> = Result.success(recentProducts)
+    override suspend fun findByLimit(limit: Int): Result<List<RecentProduct>> = Result.success(recentProducts)
 
-    override fun findOneRecent(): Result<RecentProduct?> = Result.success(recentProduct)
+    override suspend fun findOneRecent(): Result<RecentProduct?> = Result.success(recentProduct)
 
-    override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> {
+    override suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> {
         return Result.success(1L)
     }
 
-    override fun getCartItemsCounts(): Result<Int> {
+    override suspend fun getCartItemsCounts(): Result<Int> {
         TODO("Not yet implemented")
     }
 
-    override fun getCuration(): Result<List<CartProduct>> {
+    override suspend fun getCuration(): Result<List<CartProduct>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getProductsByPaging(
+        offset: Int,
+        pageSize: Int
+    ): Result<LoadResult.Page<CartProduct>> {
         TODO("Not yet implemented")
     }
 }

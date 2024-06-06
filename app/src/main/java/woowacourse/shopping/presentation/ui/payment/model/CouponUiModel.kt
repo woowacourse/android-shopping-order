@@ -10,10 +10,10 @@ data class CouponUiModel (
     val code: String,
     val description: String,
     val expirationDate: String,
-    val discount: Int? = null,
-    val minimumAmount: Int? = null,
-    val buyQuantity: Int? = null,
-    val getQuantity: Int? = null,
+    val discount: Int = 0,
+    val minimumAmount: Int = 0,
+    val buyQuantity: Int = 0,
+    val getQuantity: Int = 0,
     val availableTimeStart: String? = null,
     val availableTimeEnd: String? = null,
     val discountType: String,
@@ -22,6 +22,6 @@ data class CouponUiModel (
 
 fun Coupon.toUiModel(): CouponUiModel {
     return CouponUiModel(
-        id, code, description, expirationDate, discount, minimumAmount, buyQuantity, getQuantity, availableTimeStart, availableTimeEnd, discountType
+        id, code, description, expirationDate, discount ?: 0, minimumAmount ?: 0, buyQuantity ?: 0, getQuantity ?: 0, availableTimeStart, availableTimeEnd, discountType
     )
 }

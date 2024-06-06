@@ -71,11 +71,8 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
-                    lifecycleScope.launch {
-                        delay(500) // Skeleton ui display time
-                        binding.layoutShimmer.isVisible = false
-                        shoppingAdapter.submitList(it.data)
-                    }
+                    binding.layoutShimmer.isVisible = false
+                    shoppingAdapter.submitList(it.data)
                 }
             }
         }

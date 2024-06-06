@@ -5,8 +5,8 @@
 
     <data>
         <variable
-            name="paymentUiModel"
-            type="woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel" />
+            name="viewModel"
+            type="woowacourse.shopping.presentation.ui.payment.PaymentActionViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -92,7 +92,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            paymentTotalPrice="@{paymentUiModel}"
+            orderTotalPrice="@{viewModel.coupons}"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
@@ -122,7 +122,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="-5,000원"
+            disCountTotalPrice="@{viewModel.coupons}"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
@@ -152,7 +152,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="3,000원"
+            deliveryTotalPrice="@{viewModel.coupons}"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
@@ -193,7 +193,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            paymentTotalPrice="@{paymentUiModel}"
+            paymentTotalPrice="@{viewModel.coupons}"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"

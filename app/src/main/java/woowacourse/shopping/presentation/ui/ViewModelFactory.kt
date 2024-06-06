@@ -6,6 +6,7 @@ import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.curation.CurationViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
+import woowacourse.shopping.presentation.ui.payment.PaymentActionViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
 class ViewModelFactory : ViewModelProvider.Factory {
@@ -31,6 +32,12 @@ class ViewModelFactory : ViewModelProvider.Factory {
 
             modelClass.isAssignableFrom(CurationViewModel::class.java) -> {
                 CurationViewModel(
+                    RepositoryInjector.repository,
+                ) as T
+            }
+
+            modelClass.isAssignableFrom(PaymentActionViewModel::class.java) -> {
+                PaymentActionViewModel(
                     RepositoryInjector.repository,
                 ) as T
             }

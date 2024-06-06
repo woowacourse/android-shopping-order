@@ -8,9 +8,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
@@ -19,7 +16,9 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.ui.cart.model.CartEvent
+import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 
 class CartActivity : BindingActivity<ActivityCartBinding>() {
@@ -74,11 +73,8 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             when (it) {
                 is UiState.Loading -> {}
                 is UiState.Success -> {
-                    lifecycleScope.launch {
-                        delay(500)
-                        binding.layoutShimmer.isVisible = false
-                        cartAdapter.submitList(it.data)
-                    }
+                    binding.layoutShimmer.isVisible = false
+                    cartAdapter.submitList(it.data)
                 }
             }
         }
@@ -91,6 +87,16 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                     }
                 }
             },
+        )
+        viewModel.navigateHandler.observe(
+            this,
+            EventObserver {
+                when(it) {
+                    is NavigateUiState.ToPayment -> {
+                        PaymentActivity.createIntent(this, it.paymentUiModel).apply { startActivity(this) }
+                    }
+                }
+            }
         )
     }
 

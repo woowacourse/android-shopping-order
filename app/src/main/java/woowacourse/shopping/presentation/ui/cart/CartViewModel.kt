@@ -15,6 +15,8 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
+import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
     private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
@@ -26,6 +28,9 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     private val _eventHandler = MutableLiveData<EventState<CartEvent>>()
     val eventHandler: LiveData<EventState<CartEvent>> get() = _eventHandler
+
+    private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
+    val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
 
     val updateUiModel: UpdateUiModel = UpdateUiModel()
 
@@ -66,34 +71,45 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             }
         }
 
-    fun postCheckedItems() =
-        viewModelScope.launch {
-            val checkedIds = getCheckedIds()
+    fun postCheckedItems() {
 
-            repository.postOrders(
-                OrderRequestDto(
-                    checkedIds,
-                ),
-            ).onSuccess {
-                val currentCarts = (_carts.value as UiState.Success).data
-                val filteredCarts =
-                    currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+        _navigateHandler.value = EventState(NavigateUiState.ToPayment(getPaymentUiModel()))
 
-                val removedCarts =
-                    currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
-                removedCarts.forEach { cartProduct ->
-                    updateUiModel.add(
-                        cartProduct.cartProduct.productId,
-                        cartProduct.cartProduct.copy(quantity = 0),
-                    )
-                }
+//        viewModelScope.launch {
+//            val checkedIds = getCheckedIds()
+//
+//            repository.postOrders(
+//                OrderRequestDto(
+//                    checkedIds,
+//                ),
+//            ).onSuccess {
+//                val currentCarts = (_carts.value as UiState.Success).data
+//                val filteredCarts =
+//                    currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+//
+//                val removedCarts =
+//                    currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
+//                removedCarts.forEach { cartProduct ->
+//                    updateUiModel.add(
+//                        cartProduct.cartProduct.productId,
+//                        cartProduct.cartProduct.copy(quantity = 0),
+//                    )
+//                }
+//
+//                _carts.postValue(UiState.Success(filteredCarts))
+//                _eventHandler.postValue(EventState(CartEvent.Update))
+//            }.onFailure {
+//                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
+//            }
+//        }
+    }
 
-                _carts.postValue(UiState.Success(filteredCarts))
-                _eventHandler.postValue(EventState(CartEvent.Update))
-            }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
-            }
-        }
+    private fun getPaymentUiModel(): PaymentUiModel {
+        return PaymentUiModel(
+            cartProducts = (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct }
+        )
+    }
+
 
     private fun getCheckedIds(): List<Int> {
         return (_carts.value as UiState.Success).data.filter { it.isChecked }
