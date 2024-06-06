@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
@@ -34,12 +35,7 @@ class ProductRepositoryImpl(
         coroutineScope {
             try {
                 // 전체 장바구니 개수
-                val countResponse = async(exceptionHandler()) { cartDataSource.getCartItemCounts() }.await()
-                val count: Int = when (countResponse) {
-                    is ApiResult.Success -> countResponse.data.quantity
-                    is ApiResult.Error -> DEFAULT_CART_COUNT
-                    is ApiResult.Exception -> DEFAULT_CART_COUNT
-                }
+                val count: Int = cartCount()
 
                 // 장바구니 리스트를 가져오는 로직
                 val cartResponse = async(exceptionHandler()) { cartDataSource.getCartItems(START_CART_PAGE, count) }.await()
@@ -73,6 +69,16 @@ class ProductRepositoryImpl(
                 return@coroutineScope ApiResponse.Exception(e)
             }
         }
+
+    private suspend fun CoroutineScope.cartCount(): Int {
+        val countResponse = async(exceptionHandler()) { cartDataSource.getCartItemCounts() }.await()
+        val count: Int = when (countResponse) {
+            is ApiResult.Success -> countResponse.data.quantity
+            is ApiResult.Error -> DEFAULT_CART_COUNT
+            is ApiResult.Exception -> DEFAULT_CART_COUNT
+        }
+        return count
+    }
 
     private fun List<Product>.filterCategoryAndNotInCart(category: String, carts: List<Cart>) =
         this.filter { it.category == category }
