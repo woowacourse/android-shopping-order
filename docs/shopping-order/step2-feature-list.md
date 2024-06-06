@@ -6,3 +6,6 @@
 
 ## Backlog
 - []: 코루틴 익셉션 핸들링
+- []: 이미 장바구니에 담긴 상품이라면 Create 가 아닌 Update 로 처리하기 (DetailProductViewModel)
+- []: 전역 에러 핸들링
+- []: 공유 이벤트 처리 (ActivityViewModel => 상위 Layer 로 마이그레이션해보기)
