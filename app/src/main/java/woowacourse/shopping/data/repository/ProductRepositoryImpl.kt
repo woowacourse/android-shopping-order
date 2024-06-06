@@ -32,8 +32,8 @@ class ProductRepositoryImpl(
 
     override suspend fun productsByCategory(category: String): ApiResponse<List<Product>> =
         coroutineScope {
-
             try {
+                // 전체 장바구니 개수
                 val countResponse = async(exceptionHandler()) { cartDataSource.getCartItemCounts() }.await()
                 val count: Int = when (countResponse) {
                     is ApiResult.Success -> countResponse.data.quantity
@@ -41,8 +41,8 @@ class ProductRepositoryImpl(
                     is ApiResult.Exception -> DEFAULT_CART_COUNT
                 }
 
+                // 장바구니 리스트를 가져오는 로직
                 val cartResponse = async(exceptionHandler()) { cartDataSource.getCartItems(START_CART_PAGE, count) }.await()
-
                 val carts: List<Cart> = when (cartResponse) {
                     is ApiResult.Success -> cartResponse.data.content.map { it.toCart() }
                     is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
@@ -50,8 +50,8 @@ class ProductRepositoryImpl(
                 }
 
                 var page = START_PRODUCT_PAGE
-                var products = mutableListOf<Product>()
-                var loadedProducts = listOf<Product>()
+                var products = mutableListOf<Product>() // 전체 상품 리스트
+                var loadedProducts = listOf<Product>() // 새로 가져온 20개의 상품 리스트
                 while (true) {
                     val productResponse = async(exceptionHandler()) { productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL) }.await()
                     when (productResponse) {
@@ -62,6 +62,7 @@ class ProductRepositoryImpl(
                         )
                     }
 
+                    // 새로 로딩된 상품 리스트가 비어있거나, 전체 리스트가 10개 이상일 경우 break
                     if (loadedProducts.isEmpty() || products.size >= MAX_RECOMMEND_SIZE) break
                     products.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
                     page++
