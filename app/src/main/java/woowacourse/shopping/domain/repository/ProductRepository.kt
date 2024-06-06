@@ -1,14 +1,15 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.repository.ApiResponse
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun getProducts(
+    suspend fun getProducts(
         page: Int,
         size: Int,
-    ): List<Product>
+    ): ApiResponse<List<Product>>
 
-    fun find(id: Long): Product
+    suspend fun find(id: Long): ApiResponse<Product>
 
-    fun productsByCategory(category: String): List<Product>
+    suspend fun productsByCategory(category: String): ApiResponse<List<Product>>
 }

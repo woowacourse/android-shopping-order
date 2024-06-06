@@ -1,49 +1,37 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.CartDataSource
-import woowacourse.shopping.data.datasource.impl.CartDataSourceImpl
+import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
 import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
-import woowacourse.shopping.data.remote.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
 
-class CartRepositoryImpl(private val dataSource: CartDataSource = CartDataSourceImpl()) :
+class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartDataSource()) :
     CartRepository {
-    override fun getCartItem(productId: Long): CartWithProduct {
-        val cart =
-            getAllCartItemsWithProduct().firstOrNull { it.product.id == productId } ?: error(
-                "장바구니 정보를 불러올 수 없습니다.",
-            )
-        return cart
+    override suspend fun getCartItem(productId: Long): CartWithProduct {
+        return getAllCartItemsWithProduct().firstOrNull { it.product.id == productId } ?: error(
+            "장바구니 정보를 불러올 수 없습니다.",
+        )
     }
 
-    override fun getAllCartItems(): List<Cart> {
-        var cartsDto: ResponseCartItemsGetDto? = null
-        val size = getCartItemCounts()
-        thread {
-            cartsDto = dataSource.getCartItems(0, size)
-        }.join()
-        val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
-        return carts.content.map {
+    override suspend fun getAllCartItems(): List<Cart> {
+
+        val response = dataSource.getCartItems(0, dataSource.getCartItemCounts().quantity)
+
+        return response.content.map {
             Cart(id = it.id, productId = it.product.id, quantity = Quantity(it.quantity))
         }
     }
 
-    override fun getAllCartItemsWithProduct(): List<CartWithProduct> {
-        var cartsDto: ResponseCartItemsGetDto? = null
-        val size = getCartItemCounts()
-        thread {
-            cartsDto = dataSource.getCartItems(0, size)
-        }.join()
-        val carts = cartsDto ?: error("장바구니 정보를 불러올 수 없습니다.")
+    override suspend fun getAllCartItemsWithProduct(): List<CartWithProduct> {
+        val response = dataSource.getCartItems(0, dataSource.getCartItemCounts().quantity)
 
-        return carts.content.map {
+        return response.content.map {
             CartWithProduct(
                 it.id,
                 it.product.toDomain(),
@@ -52,45 +40,28 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = CartDataSource
         }
     }
 
-    override fun postCartItems(
+    override suspend fun postCartItems(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            dataSource.postCartItems(
-                RequestCartItemPostDto(
-                    productId = productId,
-                    quantity = quantity,
-                ),
-            )
-        }.join()
+        dataSource.postCartItems(RequestCartItemPostDto(productId, quantity))
     }
 
-    override fun deleteCartItem(id: Long) {
-        thread {
-            dataSource.deleteCartItems(id)
-        }.join()
+    override suspend fun deleteCartItem(id: Long) {
+        dataSource.deleteCartItems(id)
     }
 
-    override fun getCartItemCounts(): Int {
-        var cartCountDto: ResponseCartItemCountsGetDto? = null
-        thread {
-            cartCountDto = dataSource.getCartItemCounts()
-        }.join()
-        val count = cartCountDto ?: error("장바구니 아이템 수량을 조회할 수 없습니다.")
-        return count.quantity
-    }
+    override suspend fun getCartItemCounts(): Int = dataSource.getCartItemCounts().quantity
 
-    override fun patchCartItem(
+
+    override suspend fun patchCartItem(
         id: Long,
         quantity: Int,
     ) {
-        thread {
-            dataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
-        }.join()
+        dataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
     }
 
-    override fun addProductToCart(
+    override suspend fun addProductToCart(
         productId: Long,
         quantity: Int,
     ) {

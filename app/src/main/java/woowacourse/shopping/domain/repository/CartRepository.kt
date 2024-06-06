@@ -4,27 +4,27 @@ import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.domain.model.CartWithProduct
 
 interface CartRepository {
-    fun getCartItem(productId: Long): CartWithProduct
+    suspend fun getCartItem(productId: Long): CartWithProduct
 
-    fun getAllCartItems(): List<Cart>
+    suspend fun getAllCartItems(): List<Cart>
 
-    fun getAllCartItemsWithProduct(): List<CartWithProduct>
+    suspend fun getAllCartItemsWithProduct(): List<CartWithProduct>
 
-    fun postCartItems(
+    suspend fun postCartItems(
         productId: Long,
         quantity: Int,
     )
 
-    fun deleteCartItem(id: Long)
+    suspend fun deleteCartItem(id: Long)
 
-    fun getCartItemCounts(): Int
+    suspend fun getCartItemCounts(): Int
 
-    fun patchCartItem(
+    suspend fun patchCartItem(
         id: Long,
         quantity: Int,
     )
 
-    fun addProductToCart(
+    suspend fun addProductToCart(
         productId: Long,
         quantity: Int,
     )
