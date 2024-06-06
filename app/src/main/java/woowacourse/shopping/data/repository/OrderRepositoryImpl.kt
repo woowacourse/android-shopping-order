@@ -1,16 +1,14 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.OrderDataSource
-import woowacourse.shopping.data.datasource.impl.OrderDataSourceImpl
+import woowacourse.shopping.data.datasource.impl.RemoteOrderDataSource
 import woowacourse.shopping.data.remote.dto.request.RequestOrderPostDto
 import woowacourse.shopping.domain.repository.OrderRepository
 import kotlin.concurrent.thread
 
-class OrderRepositoryImpl(private val dataSource: OrderDataSource = OrderDataSourceImpl()) :
+class OrderRepositoryImpl(private val dataSource: OrderDataSource = RemoteOrderDataSource()) :
     OrderRepository {
-    override fun order(cartIds: List<Long>) {
-        thread {
-            dataSource.postOrder(RequestOrderPostDto(cartIds))
-        }.join()
+    override suspend fun order(cartIds: List<Long>) {
+        dataSource.postOrder(RequestOrderPostDto(cartIds))
     }
 }
