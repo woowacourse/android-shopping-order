@@ -14,7 +14,7 @@ class DefaultProductHistoryRepository(
         productHistoryDataSource.saveProductHistory(productId)
     }
 
-    override fun loadAllProductHistory(): List<Product> {
+    override fun loadProductsHistory(): List<Product> {
         val productIds = productHistoryDataSource.fetchProductsHistory()
         return productIds.map { handleResponse(it) }
     }
@@ -39,7 +39,7 @@ class DefaultProductHistoryRepository(
         }
     }
 
-    override fun deleteAllProductHistory() {
+    override fun deleteProductsHistory() {
         productHistoryDataSource.deleteProductsHistory()
     }
 

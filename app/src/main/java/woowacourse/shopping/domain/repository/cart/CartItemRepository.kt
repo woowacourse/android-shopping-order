@@ -5,25 +5,17 @@ import woowacourse.shopping.ui.model.CartItem
 interface CartItemRepository {
     fun loadCartItems(): List<CartItem>
 
-    fun addCartItem(
-        id: Long,
+    fun updateProductQuantity(
+        productId: Long,
         quantity: Int,
     )
 
-    fun removeCartItem(id: Long)
+    fun delete(id: Long)
 
-    fun increaseCartProduct(
-        id: Long,
-        quantity: Int,
-    )
-
-    fun decreaseCartProduct(
-        id: Long,
-        quantity: Int,
-    )
-
-    fun increaseCartItem(
+    fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
     )
+
+    fun calculateCartItemsCount(): Int
 }

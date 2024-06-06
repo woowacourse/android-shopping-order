@@ -52,7 +52,7 @@ class DefaultProductHistoryRepositoryTest {
         productHistoryRepository.saveProductHistory(product.id)
 
         // then
-        assertThat(productHistoryRepository.loadAllProductHistory()).hasSize(3)
+        assertThat(productHistoryRepository.loadProductsHistory()).hasSize(3)
     }
 
     @Test
@@ -64,7 +64,7 @@ class DefaultProductHistoryRepositoryTest {
         productHistoryRepository.saveProductHistory(product.id)
 
         // then
-        assertThat(productHistoryRepository.loadAllProductHistory()).hasSize(4)
+        assertThat(productHistoryRepository.loadProductsHistory()).hasSize(4)
     }
 
     @Test
@@ -72,7 +72,7 @@ class DefaultProductHistoryRepositoryTest {
         // given setup
 
         // when
-        val products = productHistoryRepository.loadAllProductHistory()
+        val products = productHistoryRepository.loadProductsHistory()
 
         // then
         assertThat(products).hasSize(3)

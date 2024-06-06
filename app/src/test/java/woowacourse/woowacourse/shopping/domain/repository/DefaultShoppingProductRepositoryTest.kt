@@ -36,7 +36,7 @@ class DefaultShoppingProductRepositoryTest {
             )
 
         // when
-        val loadedProducts = repository.loadAllProducts(page = 1)
+        val loadedProducts = repository.loadProducts(page = 1)
 
         // then
         // TODO: 가독성이 너무 별로인데 개선해야 할듯?

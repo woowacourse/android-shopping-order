@@ -13,44 +13,30 @@ class DefaultCartItemRepository(
         return handleResponse(cartItemDataSource.fetchCartItems()).content.map { cartItemDto -> cartItemDto.toDomain() }
     }
 
-    override fun addCartItem(
-        id: Long,
+    override fun updateProductQuantity(
+        productId: Long,
         quantity: Int,
     ) {
-        val cartItem = loadCartItems().find { it.product.id == id }
+        val cartItem = loadCartItems().find { it.product.id == productId }
         if (cartItem == null) {
-            handleResponse(cartItemDataSource.saveCartItem(ProductIdsCount(id, quantity)))
+            handleResponse(cartItemDataSource.saveCartItem(ProductIdsCount(productId, quantity)))
             return
         }
         handleResponse(cartItemDataSource.updateCartItemQuantity(cartItem.id, quantity))
     }
 
-    override fun removeCartItem(id: Long) {
+    override fun delete(id: Long) {
         handleResponse(cartItemDataSource.deleteCartItem(id))
     }
 
-    override fun increaseCartProduct(
-        id: Long,
-        quantity: Int,
-    ) {
-        val cartItem = loadCartItems().find { it.product.id == id } ?: throw NoSuchElementException()
-        handleResponse(cartItemDataSource.updateCartItemQuantity(cartItem.id, quantity))
-    }
-
-    override fun decreaseCartProduct(
-        id: Long,
-        quantity: Int,
-    ) {
-        val cartItem = loadCartItems().find { it.product.id == id } ?: throw NoSuchElementException()
-        handleResponse(cartItemDataSource.updateCartItemQuantity(cartItem.id, quantity))
-    }
-
-    override fun increaseCartItem(
+    override fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
     ) {
         handleResponse(cartItemDataSource.updateCartItemQuantity(cartItemId, quantity))
     }
+
+    override fun calculateCartItemsCount(): Int = handleResponse(cartItemDataSource.fetchCartItems()).content.sumOf { it.quantity }
 
     private fun <T : Any> handleResponse(response: ResponseResult<T>): T {
         return when (response) {

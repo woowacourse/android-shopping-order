@@ -48,7 +48,7 @@ class OrderViewModel(
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
             val cartItems: List<CartItem> = cartItemRepository.loadCartItems()
             val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
-            orderRepository.order(orderInformation.cartItemIds + cartItemIds)
+            orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
             uiHandler.post {
                 _isOrderSuccess.setValue(true)
             }
@@ -61,9 +61,9 @@ class OrderViewModel(
     ) {
         thread {
             try {
-                cartItemRepository.increaseCartProduct(productId, quantity)
+                cartItemRepository.updateProductQuantity(productId, quantity)
             } catch (e: NoSuchElementException) {
-                cartItemRepository.addCartItem(productId, quantity)
+                cartItemRepository.updateProductQuantity(productId, quantity)
             } finally {
                 updateProductQuantity(productId, INCREASE_VARIATION)
                 val product = productRepository.loadProduct(productId)
@@ -78,7 +78,7 @@ class OrderViewModel(
         quantity: Int,
     ) {
         thread {
-            cartItemRepository.decreaseCartProduct(productId, quantity)
+            cartItemRepository.updateProductQuantity(productId, quantity)
             updateProductQuantity(productId, DECREASE_VARIATION)
             val product = productRepository.loadProduct(productId)
             updateOrderAmount(-product.price)
@@ -88,7 +88,7 @@ class OrderViewModel(
 
     fun loadRecommendedProducts() {
         thread {
-            _recommendProducts.postValue(orderRepository.recommendedProducts())
+            _recommendProducts.postValue(orderRepository.loadRecommendedProducts())
         }
     }
 

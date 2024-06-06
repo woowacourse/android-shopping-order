@@ -64,7 +64,7 @@ class ShoppingCartViewModel(
 
     fun deleteItem(cartItemId: Long) {
         thread {
-            cartItemRepository.removeCartItem(cartItemId)
+            cartItemRepository.delete(cartItemId)
             val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
 
             uiHandler.post {
@@ -102,7 +102,7 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-            cartItemRepository.increaseCartItem(cartItemId, quantity)
+            cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             val currentItems = cartItemRepository.loadCartItems()
             uiHandler.post {
                 updateCartItems(currentItems)
@@ -116,7 +116,7 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         thread {
-            cartItemRepository.decreaseCartProduct(cartItemId, quantity)
+            cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             val currentItems = cartItemRepository.loadCartItems()
             uiHandler.post {
                 updateCartItems(currentItems)

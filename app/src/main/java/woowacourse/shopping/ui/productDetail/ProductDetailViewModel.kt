@@ -67,7 +67,7 @@ class ProductDetailViewModel(
     fun addProductToCart() {
         val productCount = productCount.value ?: return
         thread {
-            cartItemRepository.addCartItem(productId, productCount)
+            cartItemRepository.updateProductQuantity(productId, productCount)
         }
     }
 

@@ -55,10 +55,10 @@ class ProductListViewModel(
     fun loadAll() {
         thread {
             val page = currentPage.value ?: currentPageIsNullException()
-            val result = (FIRST_PAGE..page).flatMap { productsRepository.loadAllProducts(it) }
-            val totalCartCount = productsRepository.shoppingCartProductQuantity()
+            val result = (FIRST_PAGE..page).flatMap { productsRepository.loadProducts(it) }
+            val totalCartCount = cartItemRepository.calculateCartItemsCount()
             val isLastPage = productsRepository.isFinalPage(page)
-            val productHistory = productHistoryRepository.loadAllProductHistory()
+            val productHistory = productHistoryRepository.loadProductsHistory()
 
             _isLastPage.postValue(isLastPage)
             uiHandler.post {
@@ -76,8 +76,8 @@ class ProductListViewModel(
 
             val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
             val isLastPage = productsRepository.isFinalPage(nextPage)
-            val result = productsRepository.loadAllProducts(nextPage)
-            val totalCount = productsRepository.shoppingCartProductQuantity()
+            val result = productsRepository.loadProducts(nextPage)
+            val totalCount = cartItemRepository.calculateCartItemsCount()
 
             _currentPage.postValue(nextPage)
             _isLastPage.postValue(isLastPage)
@@ -102,11 +102,11 @@ class ProductListViewModel(
     ) {
         thread {
             try {
-                cartItemRepository.increaseCartProduct(productId, quantity)
+                cartItemRepository.updateProductQuantity(productId, quantity)
             } catch (e: NoSuchElementException) {
-                cartItemRepository.addCartItem(productId, quantity)
+                cartItemRepository.updateProductQuantity(productId, quantity)
             } finally {
-                val totalCount = productsRepository.shoppingCartProductQuantity()
+                val totalCount = cartItemRepository.calculateCartItemsCount()
                 updateProductQuantity(productId, INCREASE_VARIATION, totalCount)
             }
         }
@@ -117,8 +117,8 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         thread {
-            cartItemRepository.decreaseCartProduct(productId, quantity)
-            val totalCount = productsRepository.shoppingCartProductQuantity()
+            cartItemRepository.updateProductQuantity(productId, quantity)
+            val totalCount = cartItemRepository.calculateCartItemsCount()
             updateProductQuantity(productId, DECREASE_VARIATION, totalCount)
             return@thread
         }
