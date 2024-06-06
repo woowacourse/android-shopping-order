@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.event.Event
+import woowacourse.shopping.ui.home.action.HomeNavigationActions
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.listener.HomeClickListener
 import woowacourse.shopping.ui.home.listener.ProductClickListener
@@ -48,13 +49,9 @@ class HomeViewModel(
     val cartTotalQuantity: LiveData<Int>
         get() = _cartTotalQuantity
 
-    private val _navigateToDetail = MutableLiveData<Event<Int>>()
-    val navigateToDetail: LiveData<Event<Int>>
-        get() = _navigateToDetail
-
-    private val _navigateToCart = MutableLiveData<Event<Unit>>()
-    val navigateToCart: LiveData<Event<Unit>>
-        get() = _navigateToCart
+    private val _homeNavigationActions = MutableLiveData<Event<HomeNavigationActions>>()
+    val homeNavigationActions: LiveData<Event<HomeNavigationActions>>
+        get() = _homeNavigationActions
 
     private var page = 0
 
@@ -172,11 +169,11 @@ class HomeViewModel(
     }
 
     override fun onShoppingCartButtonClick() {
-        _navigateToCart.value = Event(Unit)
+        _homeNavigationActions.value = Event(HomeNavigationActions.NavigateToCart)
     }
 
     override fun onProductClick(productId: Int) {
-        _navigateToDetail.value = Event(productId)
+        _homeNavigationActions.value = Event(HomeNavigationActions.NavigateToDetail(productId))
     }
 
     override fun onPlusButtonClick(product: Product) {

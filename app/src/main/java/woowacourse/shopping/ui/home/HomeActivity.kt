@@ -14,6 +14,7 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.ui.detail.DetailActivity
+import woowacourse.shopping.ui.home.action.HomeNavigationActions
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.adapter.product.ProductAdapter
@@ -87,15 +88,12 @@ class HomeActivity : AppCompatActivity() {
             recentProductAdapter.submitList(recentProducts)
         }
 
-        viewModel.navigateToDetail.observe(this) { navigateToDetail ->
-            navigateToDetail.getContentIfNotHandled()?.let { productId ->
-                navigateToDetail(productId)
-            }
-        }
-
-        viewModel.navigateToCart.observe(this) { navigateToCart ->
-            navigateToCart.getContentIfNotHandled()?.let {
-                navigateToCart()
+        viewModel.homeNavigationActions.observe(this) { homeNavigationActions ->
+            homeNavigationActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is HomeNavigationActions.NavigateToDetail -> navigateToDetail(action.productId)
+                    is HomeNavigationActions.NavigateToCart -> navigateToCart()
+                }
             }
         }
     }
