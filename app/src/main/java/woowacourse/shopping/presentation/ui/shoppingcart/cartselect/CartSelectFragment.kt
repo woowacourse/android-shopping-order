@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
+import woowacourse.shopping.presentation.model.CartsWrapper
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.CartProductsAdapter
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendFragment
 
@@ -54,9 +55,9 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
                 is CartSelectNavigateAction.NavigateToRecommend -> {
                     val bundle = Bundle()
 
-                    bundle.putParcelableArray(
+                    bundle.putSerializable(
                         OrderRecommendFragment.PUT_EXTRA_CART_IDS_KEY,
-                        navigateAction.orderCartProducts.toTypedArray(),
+                        CartsWrapper(navigateAction.orderCartProducts),
                     )
 
                     val orderRecommendFragment = OrderRecommendFragment()

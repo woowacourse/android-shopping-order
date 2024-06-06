@@ -85,6 +85,6 @@ class OrderRecommendViewModelTest {
 
         // then
         val actual = viewModel.navigateAction.getOrAwaitValue()
-        assertThat(actual.value).isEqualTo(OrderRecommendNavigateAction.NavigateToProductList)
+        assertThat(actual.value).isEqualTo(OrderRecommendNavigateAction.NavigateToPayment)
     }
 }
