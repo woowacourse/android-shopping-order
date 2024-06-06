@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -14,7 +16,6 @@ import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val repository: Repository,
@@ -38,9 +39,7 @@ class ProductDetailViewModel(
 
     fun setCartProduct(cartProduct: CartProduct?) {
         if (cartProduct != null) {
-            thread {
-                saveRecentProduct(cartProduct)
-            }
+            saveRecentProduct(cartProduct)
             val detailCartProduct =
                 DetailCartProduct(
                     isNew = cartProduct.quantity == 0,
@@ -54,58 +53,22 @@ class ProductDetailViewModel(
     }
 
     fun findOneRecentProduct() {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.findOne().onSuccess {
                 if (it == null) {
-                    _recentProduct.postValue(UiState.Loading)
+                    withContext(Dispatchers.Main) {
+                        _recentProduct.value = UiState.Loading
+                    }
                 } else {
-                    _recentProduct.postValue(UiState.Success(it))
+                    withContext(Dispatchers.Main) {
+                        _recentProduct.value = UiState.Success(it)
+                    }
                 }
             }.onFailure {
                 _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
             }
         }
     }
-
-    /*override fun onAddToCart(detailCartProduct: DetailCartProduct) {
-        thread {
-            updateUiModel.add(
-                detailCartProduct.cartProduct.productId,
-                detailCartProduct.cartProduct,
-            )
-
-            if (detailCartProduct.isNew) {
-                repository.postCartItem(
-                    CartItemRequest(
-                        productId = detailCartProduct.cartProduct.productId.toInt(),
-                        quantity = detailCartProduct.cartProduct.quantity,
-                    ),
-                ).onSuccess {
-                    detailCartProduct.cartProduct.cartId = it.toLong()
-                    _product.postValue(UiState.Success(detailCartProduct))
-                    saveRecentProduct(detailCartProduct.cartProduct)
-                }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
-                }
-            } else {
-                repository.patchCartItem(
-                    id = detailCartProduct.cartProduct.cartId.toInt(),
-                    quantityRequest =
-                        QuantityRequest(
-                            detailCartProduct.cartProduct.quantity,
-                        ),
-                ).onSuccess {
-                    _product.postValue(UiState.Success(detailCartProduct))
-                    saveRecentProduct(detailCartProduct.cartProduct)
-                }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
-                    }
-            }
-
-            _cartHandler.postValue(EventState(updateUiModel))
-        }
-    }*/
 
     override fun onAddToCart(detailCartProduct: DetailCartProduct) {
         viewModelScope.launch {
@@ -150,29 +113,28 @@ class ProductDetailViewModel(
     }
 
     override fun onPlus(cartProduct: CartProduct) {
-        thread {
-            cartProduct.plusQuantity()
-            _product.postValue(
-                UiState.Success(
-                    (_product.value as UiState.Success).data.copy(cartProduct = cartProduct),
+        viewModelScope.launch {
+            _product.value = UiState.Success(
+                (_product.value as UiState.Success).data.copy(
+                    cartProduct = cartProduct.apply { plusQuantity() }
                 ),
             )
         }
     }
 
     override fun onMinus(cartProduct: CartProduct) {
-        thread {
-            cartProduct.minusQuantity()
-            _product.postValue(
-                UiState.Success(
-                    (_product.value as UiState.Success).data.copy(cartProduct = cartProduct),
+        viewModelScope.launch {
+            if (cartProduct.quantity == 1) return@launch
+            _product.value = UiState.Success(
+                (_product.value as UiState.Success).data.copy(
+                    cartProduct = cartProduct.apply { minusQuantity() }
                 ),
             )
         }
     }
 
     private fun saveRecentProduct(cartProduct: CartProduct) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.saveRecentProduct(
                 RecentProduct(
                     cartProduct.productId,
@@ -185,6 +147,7 @@ class ProductDetailViewModel(
                     cartId = cartProduct.cartId,
                 ),
             ).onSuccess {
+
             }.onFailure {
                 _errorHandler.postValue(EventState("최근 아이템 추가 에러"))
             }
