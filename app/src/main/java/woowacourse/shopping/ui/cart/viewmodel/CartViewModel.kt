@@ -1,17 +1,27 @@
 package woowacourse.shopping.ui.cart.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.domain.repository.CartRepository
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.repository.ApiResponse
+import woowacourse.shopping.data.repository.Error
+import woowacourse.shopping.data.repository.onError
+import woowacourse.shopping.data.repository.onException
+import woowacourse.shopping.data.repository.onSuccess
 import woowacourse.shopping.domain.model.CartWithProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductWithQuantity
+import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.model.ProductWithQuantity
-import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.cartitem.CartItemsUiState
 import woowacourse.shopping.ui.cart.cartitem.CartUiModel
@@ -28,6 +38,9 @@ class CartViewModel(
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener {
     private val _recommendProducts: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
     val recommendProducts: LiveData<List<ProductWithQuantity>> = _recommendProducts
+
+    private val _error: MutableSingleLiveData<Error<Nothing>> = MutableSingleLiveData()
+    val error: SingleLiveData<Error<Nothing>> get() = _error
 
     val cartOfRecommendProductCount: LiveData<Int> =
         _recommendProducts.map {
@@ -62,58 +75,80 @@ class CartViewModel(
     private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
 
-    private fun currentCartState(): CartItemsUiState = _cart.value ?: CartItemsUiState(emptyList(), true)
+    private fun currentCartState(): CartItemsUiState =
+        _cart.value ?: CartItemsUiState(emptyList(), true)
 
     init {
         loadCartItems()
     }
 
     private fun loadCartItems() {
-        runCatching {
-            _cart.value = currentCartState().copy(isLoading = true)
-            cartRepository.getAllCartItemsWithProduct()
-        }.onSuccess { carts ->
-            _cart.value =
-                currentCartState().copy(
-                    cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
-                    isLoading = false,
-                )
+        viewModelScope.launch {
+            runCatching {
+                _cart.value = currentCartState().copy(isLoading = true)
+                cartRepository.getAllCartItemsWithProduct()
+            }.onSuccess { carts ->
+                _cart.value =
+                    currentCartState().copy(
+                        cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
+                        isLoading = false,
+                    )
+            }
         }
     }
 
     fun loadRecommendProducts() {
-        runCatching {
-            val recentProductId =
-                requireNotNull(recentProductRepository.findMostRecentProduct()).productId
-            val category = productRepository.find(recentProductId).category
-            productRepository.productsByCategory(category)
-                .filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
-        }.onSuccess {
-            _recommendProducts.value =
-                it.map { ProductWithQuantity(product = it) }.subList(0, minOf(it.size, 10))
-            noRecommendProductState.value = false
-        }.onFailure {
-            noRecommendProductState.value = true
+        viewModelScope.launch {
+            val recentProductId = recentProductRepository.findMostRecentProduct()?.productId ?: 0
+            val category = productByIdOrNull(recentProductId)?.category ?: "fashion"
+            productRepository.productsByCategory(category).onSuccess {
+                _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
+                noRecommendProductState.value = false
+            }.onError {
+                noRecommendProductState.value = true
+                _error.setValue(it)
+            }.onException {
+                noRecommendProductState.value = true
+                Log.d(this.javaClass.simpleName, "${it.e}")
+            }
+
         }
     }
 
-    fun totalPrice(): Int {
+    private suspend fun productByIdOrNull(productId: Long): Product? {
+        val response = viewModelScope.async { productRepository.find(productId) }.await()
+        return when (response) {
+            is ApiResponse.Success -> response.data
+            is Error -> null
+            is ApiResponse.Exception -> {
+                Log.d(this.javaClass.simpleName, "${response.e}")
+                null
+            }
+        }
+    }
+
+    private fun totalPrice(): Int {
         val carts = _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice } ?: 0
         val recommends =
-            _recommendProducts.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
+            _recommendProducts.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice }
+                ?: 0
         return carts + recommends
     }
 
     fun removeCartItem(productId: Long) {
-        runCatching {
-            cartRepository.deleteCartItem(findCartIdByProductId(productId))
-        }.onSuccess {
-            _cart.value =
-                CartItemsUiState(
-                    cartRepository.getAllCartItemsWithProduct()
-                        .map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
-                    isLoading = false,
-                )
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.deleteCartItem(findCartIdByProductId(productId))
+            }.onSuccess {
+                _cart.value =
+                    CartItemsUiState(
+                        cartRepository.getAllCartItemsWithProduct()
+                            .map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                        isLoading = false,
+                    )
+            }.onFailure {
+                Log.d(this.javaClass.simpleName, "${it.message}")
+            }
         }
     }
 
@@ -144,55 +179,70 @@ class CartViewModel(
     }
 
     override fun addCart(productId: Long) {
-        runCatching {
-            cartRepository.postCartItems(productId, 1)
-        }.onSuccess {
-            changeRecommendProductCount(productId)
-            loadCartItems()
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.postCartItems(productId, 1)
+            }.onSuccess {
+                changeRecommendProductCount(productId)
+                loadCartItems()
+            }.onFailure {
+                Log.d(this.javaClass.simpleName, "${it.message}")
+            }
         }
     }
 
     override fun plusCount(productId: Long) {
-        runCatching {
-            val cartItem = cartRepository.getCartItem(productId)
-            cartRepository.patchCartItem(
-                cartItem.id,
-                cartItem.quantity.value.inc(),
-            )
-        }.onSuccess {
-            if (requireNotNull(isRecommendPage.value)) {
-                changeRecommendProductCount(productId)
+        viewModelScope.launch {
+            runCatching {
+                val cartItem = cartRepository.getCartItem(productId)
+                cartRepository.patchCartItem(
+                    cartItem.id,
+                    cartItem.quantity.value.inc(),
+                )
+            }.onSuccess {
+                if (requireNotNull(isRecommendPage.value)) {
+                    changeRecommendProductCount(productId)
+                }
+                loadCartItems()
+            }.onFailure {
+                Log.d(this.javaClass.simpleName, "${it.message}")
             }
-            loadCartItems()
         }
     }
 
     override fun minusCount(productId: Long) {
-        runCatching {
-            val cartItem = cartRepository.getCartItem(productId)
-            if (cartItem.quantity.value > 0) {
-                cartRepository.patchCartItem(
-                    cartItem.id,
-                    cartItem.quantity.value.dec(),
-                )
+        viewModelScope.launch {
+            runCatching {
+                val cartItem = cartRepository.getCartItem(productId)
+                if (cartItem.quantity.value > 0) {
+                    cartRepository.patchCartItem(
+                        cartItem.id,
+                        cartItem.quantity.value.dec(),
+                    )
+                }
+            }.onSuccess {
+                if (requireNotNull(isRecommendPage.value)) {
+                    changeRecommendProductCount(productId)
+                }
+                loadCartItems()
+            }.onFailure {
+                Log.d(this.javaClass.simpleName, "${it.message}")
             }
-        }.onSuccess {
-            if (requireNotNull(isRecommendPage.value)) {
-                changeRecommendProductCount(productId)
-            }
-            loadCartItems()
         }
     }
 
     private fun changeRecommendProductCount(productId: Long) {
-        runCatching {
-            cartRepository.getCartItem(productId)
-        }.onSuccess {
-            val current = productWithQuantities(productId, it.quantity)
-            _recommendProducts.value = current
-        }.onFailure {
-            val current = productWithQuantities(productId, Quantity())
-            _recommendProducts.value = current
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.getCartItem(productId)
+            }.onSuccess {
+                val current = productWithQuantities(productId, it.quantity)
+                _recommendProducts.value = current
+            }.onFailure {
+                val current = productWithQuantities(productId, Quantity())
+                _recommendProducts.value = current
+                Log.d(this.javaClass.simpleName, "${it.message}")
+            }
         }
     }
 
@@ -209,14 +259,17 @@ class CartViewModel(
     }
 
     fun order() {
-        runCatching {
-            val cartIds: List<Long> =
-                _cart.value?.cartItems?.filter { it.isChecked }?.map { it.id } ?: emptyList()
-            orderRepository.order(cartIds)
-        }.onSuccess {
-            _isOrderSuccess.setValue(true)
-        }.onFailure {
-            _isOrderSuccess.setValue(false)
+        viewModelScope.launch {
+            runCatching {
+                val cartIds: List<Long> =
+                    _cart.value?.cartItems?.filter { it.isChecked }?.map { it.id } ?: emptyList()
+                orderRepository.order(cartIds)
+            }.onSuccess {
+                _isOrderSuccess.setValue(true)
+            }.onFailure {
+                _isOrderSuccess.setValue(false)
+                Log.d(this.javaClass.simpleName, "${it.message}")
+            }
         }
     }
 
@@ -237,9 +290,7 @@ class CartViewModel(
         )
 
     private fun isAlreadyChecked(productId: Long): Boolean =
-        (
-            _cart.value?.cartItems?.firstOrNull {
-                it.productId == productId
-            }?.isChecked ?: false
-        ) || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
+        _cart.value?.cartItems?.firstOrNull {
+            it.productId == productId
+        }?.isChecked ?: false || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 }

@@ -12,16 +12,18 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.Error
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModelFactory
+import woowacourse.shopping.ui.utils.showToastMessage
 
 class ProductDetailActivity :
     AppCompatActivity(),
     MostRecentProductClickListener {
     private lateinit var binding: ActivityProductDetailBinding
-    private var toast: Toast? = null
+
     private val productId by lazy { productId() }
     private val viewModel: ProductDetailViewModel by viewModels {
         ProductDetailViewModelFactory(
@@ -52,9 +54,8 @@ class ProductDetailActivity :
 
     private fun observeAddCart() {
         viewModel.addCartComplete.observe(this) {
-            toast?.cancel()
-            toast = Toast.makeText(this, getString(R.string.add_cart_complete), Toast.LENGTH_SHORT)
-            toast?.show()
+            showToastMessage(R.string.add_cart_complete)
+            finish()
         }
     }
 
@@ -82,12 +83,12 @@ class ProductDetailActivity :
     }
 
     private fun observeErrorMessage() {
-        viewModel.errorMsg.observe(this) { event ->
-            event.getContentIfNotHandled()?.let {
-                if (it.isNotEmpty()) {
-                    toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
-                    toast?.show()
-                }
+        viewModel.error.observe(this) { error ->
+            when(error) {
+                is Error.Network -> showToastMessage(R.string.server_error)
+                is Error.NotFound -> showToastMessage(R.string.not_fount_error)
+                is Error.Unauthorized -> showToastMessage(R.string.unauthorized_error)
+                is Error.Unknown -> showToastMessage(R.string.unknown_error)
             }
         }
     }

@@ -16,4 +16,8 @@
     <string name="order">주문하기(%d)</string>
     <string name="order_success_message">주문에 성공했습니다.</string>
     <string name="order_fail_message">주문에 실패했습니다.</string>
+    <string name="server_error">현재 앱 서비스가 정상적으로 작동되지 않고 있습니다. 나중에 다시 이용해주세요</string>
+    <string name="not_fount_error">잘못된 접근입니다. 다시 이용해주세요</string>
+    <string name="unauthorized_error">로그인 후 다시 이용해주세요</string>
+    <string name="unknown_error">앱을 다시 이용해주세요</string>
 </resources>

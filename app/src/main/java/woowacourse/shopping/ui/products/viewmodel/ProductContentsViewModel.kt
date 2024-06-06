@@ -1,22 +1,31 @@
 package woowacourse.shopping.ui.products.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.room.cart.Cart
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.data.repository.ApiResponse
+import woowacourse.shopping.data.repository.Error
+import woowacourse.shopping.data.repository.onError
+import woowacourse.shopping.data.repository.onException
+import woowacourse.shopping.data.repository.onSuccess
+import woowacourse.shopping.data.repository.toErrorNothing
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
-import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
@@ -51,49 +60,59 @@ class ProductContentsViewModel(
             }
         }
 
-    private val _recentProducts: MutableLiveData<List<RecentProduct>> = MutableLiveData()
-    val recentProducts: LiveData<List<Product>> =
-        _recentProducts.map { recentProducts ->
-            recentProducts.map { productRepository.find(it.productId) }
-        }
+    private val _recentProducts: MutableLiveData<List<Product>> = MutableLiveData()
+    val recentProducts: LiveData<List<Product>> = _recentProducts
 
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
 
-    private fun currentProduct(): ProductWithQuantityUiState = productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
+    private val _error: MutableSingleLiveData<Error<Nothing>> = MutableSingleLiveData()
+    val error: SingleLiveData<Error<Nothing>> get() = _error
+
+    private fun currentProduct(): ProductWithQuantityUiState =
+        productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
 
     init {
         loadProducts()
     }
 
     fun loadProducts() {
-        runCatching {
+        viewModelScope.launch {
             productWithQuantity.value = currentProduct().copy(isLoading = true)
+
             productRepository.getProducts(
                 currentProduct().productWithQuantities.size / PAGE_SIZE,
                 PAGE_SIZE,
-            )
-        }.onSuccess { loadedProducts ->
-            products.value = (products.value ?: emptyList()) + loadedProducts
+            ).onSuccess { loadedProducts ->
+                products.value = (products.value ?: emptyList()) + loadedProducts
+            }.onError { error ->
+                _error.setValue(error)
+            }.onException {
+                Log.d(this.javaClass.simpleName, "${it.e}")
+            }
         }
     }
 
     override fun plusCount(productId: Long) {
-        cartRepository.patchCartItem(
-            findCartItemByProductId(productId),
-            findCartItemQuantityByProductId(productId).inc().value,
-        )
-        loadCartItems()
+        viewModelScope.launch {
+            cartRepository.patchCartItem(
+                findCartItemByProductId(productId),
+                findCartItemQuantityByProductId(productId).inc().value,
+            )
+            loadCartItems()
+        }
     }
 
     override fun minusCount(productId: Long) {
-        val currentCount = findCartItemQuantityByProductId(productId).dec().value
-        if (currentCount == 0) {
-            cartRepository.deleteCartItem(findCartItemByProductId(productId))
-        } else {
-            cartRepository.patchCartItem(findCartItemByProductId(productId), currentCount)
+        viewModelScope.launch {
+            val currentCount = findCartItemQuantityByProductId(productId).dec().value
+            if (currentCount == 0) {
+                cartRepository.deleteCartItem(findCartItemByProductId(productId))
+            } else {
+                cartRepository.patchCartItem(findCartItemByProductId(productId), currentCount)
+            }
+            loadCartItems()
         }
-        loadCartItems()
     }
 
     override fun itemClickListener(productId: Long) {
@@ -101,22 +120,45 @@ class ProductContentsViewModel(
     }
 
     override fun addCart(productId: Long) {
-        cartRepository.postCartItems(productId, 1)
-        loadCartItems()
+        viewModelScope.launch {
+            cartRepository.postCartItems(productId, 1)
+            loadCartItems()
+        }
     }
 
     fun loadCartItems() {
-        runCatching {
-            productWithQuantity.value = currentProduct().copy(isLoading = true)
-            cartRepository.getAllCartItems()
-        }.onSuccess { carts ->
-            cart.value = carts
+        viewModelScope.launch {
+            runCatching {
+                productWithQuantity.value = currentProduct().copy(isLoading = true)
+                cartRepository.getAllCartItems()
+            }.onSuccess { carts ->
+                cart.value = carts
+            }
         }
     }
 
     fun loadRecentProducts() {
-        _recentProducts.value = recentProductRepository.findAll()
+        viewModelScope.launch {
+            runCatching {
+                recentProductRepository.findAll()
+            }.onSuccess { recentProducts ->
+                _recentProducts.value = recentProducts.mapNotNull { productByIdOrNull(it.productId) }
+            }
+        }
     }
+
+    private suspend fun productByIdOrNull(productId: Long): Product? {
+        val response = viewModelScope.async { productRepository.find(productId) }.await()
+        return when (response) {
+            is ApiResponse.Success -> response.data
+            is Error -> null
+            is ApiResponse.Exception -> {
+                Log.d(this.javaClass.simpleName, "${response.e}")
+                null
+            }
+        }
+    }
+
 
     private fun updateProductWithQuantity(): ProductWithQuantityUiState {
         val currentProducts = products.value ?: emptyList()

@@ -1,14 +1,24 @@
 package woowacourse.shopping.ui.detail.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.repository.ApiResponse
+import woowacourse.shopping.data.repository.Error
+import woowacourse.shopping.data.repository.onError
+import woowacourse.shopping.data.repository.onException
+import woowacourse.shopping.data.repository.onSuccess
+import woowacourse.shopping.data.repository.toErrorNothing
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.utils.Event
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
@@ -20,8 +30,8 @@ class ProductDetailViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(), CountButtonClickListener {
-    private val _error: MutableLiveData<Boolean> = MutableLiveData(false)
-    val error: LiveData<Boolean> get() = _error
+    private val _error: MutableSingleLiveData<Error<Nothing>> = MutableSingleLiveData()
+    val error: SingleLiveData<Error<Nothing>> get() = _error
 
     private val _errorMsg: MutableLiveData<Event<String>> = MutableLiveData(Event(""))
     val errorMsg: LiveData<Event<String>> get() = _errorMsg
@@ -48,14 +58,15 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct() {
-        runCatching {
-            productRepository.find(productId)
-        }.onSuccess {
-            _error.value = false
-            _productWithQuantity.value = ProductWithQuantity(product = it)
-        }.onFailure {
-            _error.value = true
-            _errorMsg.setErrorHandled(it.message.toString())
+
+        viewModelScope.launch {
+            productRepository.find(productId).onSuccess {
+                _productWithQuantity.value = ProductWithQuantity(product = it)
+            }.onError {
+                _error.setValue(it)
+            }.onException {
+                Log.d(this.javaClass.simpleName, "${it.e}")
+            }
         }
     }
 
@@ -72,39 +83,60 @@ class ProductDetailViewModel(
     }
 
     fun addProductToCart() {
-        _productWithQuantity.value?.let { productWithQuantity ->
-            with(productWithQuantity) {
-                cartRepository.addProductToCart(this.product.id, this.quantity.value)
+        viewModelScope.launch {
+            _productWithQuantity.value?.let { productWithQuantity ->
+                with(productWithQuantity) {
+                    cartRepository.addProductToCart(this.product.id, this.quantity.value)
+                }
+                loadProduct()
             }
-            loadProduct()
+            _addCartComplete.setValue(Unit)
         }
-        _addCartComplete.setValue(Unit)
     }
 
     fun addToRecentProduct(lastSeenProductState: Boolean) {
-        loadMostRecentProduct(productId, lastSeenProductState)
-        recentProductRepository.insert(productId)
+        viewModelScope.launch {
+            loadMostRecentProduct(productId, lastSeenProductState)
+            recentProductRepository.insert(productId)
+        }
     }
 
     private fun loadMostRecentProduct(
         productId: Long,
         lastSeenProductState: Boolean,
     ) {
-        recentProductRepository.findMostRecentProduct()?.let {
-            runCatching {
-                productRepository.find(it.productId)
-            }.onSuccess {
-                _error.value = false
-                _mostRecentProduct.value = it
-                if (!lastSeenProductState) return
-                setMostRecentVisibility(it.id, productId)
-            }.onFailure {
-                _error.value = true
-                _mostRecentProductVisibility.value = false
-                _errorMsg.setErrorHandled(it.message.toString())
+        viewModelScope.launch {
+            recentProductRepository.findMostRecentProduct()?.let {
+                runCatching {
+                    productByIdOrNull(it.productId)
+                }.onSuccess {
+                    if (!lastSeenProductState || it==null) return@launch
+                    _mostRecentProduct.value = it
+                    setMostRecentVisibility(it.id, productId)
+                }.onFailure {
+                    _mostRecentProductVisibility.value = false
+                    _error.setValue(Error.Unknown(it.message))
+                }
             }
         }
     }
+
+    private suspend fun productByIdOrNull(productId: Long): Product? {
+        val response = viewModelScope.async { productRepository.find(productId) }.await()
+        return when (response) {
+            is ApiResponse.Success -> response.data
+            is Error -> {
+                _error.setValue(response.toErrorNothing())
+                null
+            }
+
+            is ApiResponse.Exception -> {
+                Log.d(this.javaClass.simpleName, "${response.e}")
+                null
+            }
+        }
+    }
+
 
     private fun setMostRecentVisibility(
         mostRecentProductId: Long,
@@ -113,9 +145,4 @@ class ProductDetailViewModel(
         _mostRecentProductVisibility.value = (mostRecentProductId != currentProductId)
     }
 
-    private fun <T> MutableLiveData<Event<T>>.setErrorHandled(value: T?) {
-        if (this.value?.hasBeenHandled == false) {
-            value?.let { this.value = Event(it) }
-        }
-    }
 }
