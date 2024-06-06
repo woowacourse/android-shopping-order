@@ -1,4 +1,5 @@
 package woowacourse.shopping.data.remote.dto.response
+
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -6,6 +7,7 @@ import kotlinx.serialization.Serializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Serializable
@@ -72,8 +74,10 @@ data class PercentageDiscountCoupon(
 
 @Serializable
 data class AvailableTime(
-    val start: String,
-    val end: String,
+    @Serializable(with = LocalTimeSerializer::class)
+    val start: LocalTime,
+    @Serializable(with = LocalTimeSerializer::class)
+    val end: LocalTime,
 )
 
 @Serializer(forClass = LocalDate::class)
@@ -93,3 +97,22 @@ object LocalDateSerializer : KSerializer<LocalDate> {
         return LocalDate.parse(string, formatter)
     }
 }
+
+@Serializer(forClass = LocalTime::class)
+object LocalTimeSerializer : KSerializer<LocalTime> {
+    private val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+
+    override fun serialize(
+        output: Encoder,
+        obj: LocalTime,
+    ) {
+        val string = obj.format(formatter)
+        output.encodeString(string)
+    }
+
+    override fun deserialize(input: Decoder): LocalTime {
+        val string = input.decodeString()
+        return LocalTime.parse(string, formatter)
+    }
+}
+
