@@ -11,7 +11,7 @@ class FakeCartRepository(
 ) : CartRepository {
     private val products: List<CartProduct> get() = cart.cartProducts
 
-    override fun findCartProduct(productId: Long): Result<CartProduct> {
+    override suspend fun findCartProduct(productId: Long): Result<CartProduct> {
         val cartProduct =
             cart.findCartProductByProductId(productId) ?: return Result.failure(
                 NoSuchElementException("Invalid product id"),
@@ -19,7 +19,7 @@ class FakeCartRepository(
         return Result.success(cartProduct)
     }
 
-    override fun loadCurrentPageCart(
+    override suspend fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,
     ): Result<Cart> {
@@ -39,15 +39,15 @@ class FakeCartRepository(
         return Result.success(Cart(products.subList(startIndex, endIndex)))
     }
 
-    override fun loadCart(): Result<Cart> {
+    override suspend fun loadCart(): Result<Cart> {
         return Result.success(cart)
     }
 
-    override fun filterCartProducts(productIds: List<Long>): Result<Cart> {
+    override suspend fun filterCartProducts(productIds: List<Long>): Result<Cart> {
         return Result.success(cart.filterByProductIds(productIds))
     }
 
-    override fun createCartProduct(
+    override suspend fun createCartProduct(
         product: Product,
         count: Int,
     ): Result<Cart> {
@@ -58,7 +58,7 @@ class FakeCartRepository(
         return Result.success(cart)
     }
 
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         product: Product,
         count: Int,
     ): Result<Cart> {
@@ -69,9 +69,13 @@ class FakeCartRepository(
         return Result.success(cart)
     }
 
-    override fun deleteCartProduct(productId: Long): Result<Cart> {
+    override suspend fun deleteCartProduct(productId: Long): Result<Cart> {
         cart = cart.delete(productId)
         return Result.success(cart)
+    }
+
+    override suspend fun existsCartProduct(productId: Long): Boolean {
+        return cart.hasProductId(productId)
     }
 
     override fun canLoadMoreCartProducts(
@@ -83,7 +87,7 @@ class FakeCartRepository(
         return Result.success(startIndex < products.size)
     }
 
-    override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
+    override suspend fun orderCartProducts(productIds: List<Long>): Result<Unit> {
         TODO("Not yet implemented")
     }
 }

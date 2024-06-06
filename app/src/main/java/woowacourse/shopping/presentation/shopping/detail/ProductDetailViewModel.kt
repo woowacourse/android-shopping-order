@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.usecase.CreateCartProductUseCase
+import woowacourse.shopping.domain.usecase.AddCartProductUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.toDomain
 import woowacourse.shopping.presentation.shopping.toCartUiModel
@@ -15,7 +15,7 @@ import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 
 class ProductDetailViewModel(
-    private val createCartUseCase: CreateCartProductUseCase,
+    private val createCartUseCase: AddCartProductUseCase,
     private val productRepository: ProductRepository,
 ) : ViewModel(), DetailProductListener {
     private val _uiState = MutableLiveData<ProductDetailUiState>(ProductDetailUiState.init())
@@ -103,7 +103,7 @@ class ProductDetailViewModel(
 
     companion object {
         fun factory(
-            createCartUseCase: CreateCartProductUseCase,
+            createCartUseCase: AddCartProductUseCase,
             productRepository: ProductRepository,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {

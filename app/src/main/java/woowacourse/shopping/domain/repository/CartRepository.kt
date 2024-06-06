@@ -7,6 +7,8 @@ import woowacourse.shopping.domain.entity.Product
 interface CartRepository {
     suspend fun findCartProduct(productId: Long): Result<CartProduct>
 
+    suspend fun existsCartProduct(productId: Long): Boolean
+
     suspend fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,

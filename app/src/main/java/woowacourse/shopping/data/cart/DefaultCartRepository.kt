@@ -23,6 +23,10 @@ class DefaultCartRepository(
         return Result.success(cartProduct)
     }
 
+    override suspend fun existsCartProduct(productId: Long): Boolean {
+        return cachedCart.hasProductId(productId)
+    }
+
     override suspend fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,
