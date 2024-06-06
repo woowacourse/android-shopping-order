@@ -9,11 +9,8 @@ class CartRepositoryImpl(
 ) : CartRepository {
     override suspend fun loadAll(): Result<List<Cart>> {
         return runCatching {
-//            val maxCount = remoteCartDataSource.getCount().quantity // 1번 방법
             var maxCount = 0
-            getCount() // 2번 방법
-                .onSuccess { maxCount = it }
-                .onFailure { maxCount = MAXIMUM_CART_ITEM_COUNT }
+            getCount().onSuccess { maxCount = it }.onFailure { maxCount = MAXIMUM_CART_ITEM_COUNT }
             return load(
                 0,
                 maxCount,
@@ -130,6 +127,6 @@ class CartRepositoryImpl(
 
     companion object {
         private const val EXCEPTION_NO_SUCH_PRODUCT = "상품이 장바구니에 존재하지 않습니다."
-        private const val MAXIMUM_CART_ITEM_COUNT = 999
+        const val MAXIMUM_CART_ITEM_COUNT = 999
     }
 }

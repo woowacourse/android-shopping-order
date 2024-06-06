@@ -281,9 +281,10 @@ class CartViewModel(
         val productItemIds = selectedCartItems.value?.map { it.id } ?: emptyList()
         if (productItemIds.isNotEmpty()) {
             viewModelScope.launch {
-                orderRepository.completeOrder(productItemIds, onSuccess = {
-                    _orderEvent.value = Event(OrderEvent.FinishOrder)
-                }, onFailure = {})
+                orderRepository.completeOrder(productItemIds)
+                    .onSuccess {
+                        _orderEvent.value = Event(OrderEvent.FinishOrder)
+                    }.onFailure {}
             }
         }
     }
