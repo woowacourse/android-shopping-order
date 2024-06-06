@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
+import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import java.time.LocalDate
 
@@ -10,7 +11,7 @@ interface Coupon {
     val expirationDate: LocalDate
     val discountType: String
 
-    fun canUse(products: List<ProductWithQuantity>): Boolean
+    fun canUse(products: List<CartWithProduct>): Boolean
 
-    fun discountPrice(products: List<ProductWithQuantity>): Int
+    fun discountPrice(products: List<CartWithProduct>): Int
 }

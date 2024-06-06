@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
+import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import java.time.LocalDate
 
@@ -13,13 +14,13 @@ data class Discount5000(
     override val code: String,
 ) : Coupon {
 
-    override fun canUse(products: List<ProductWithQuantity>): Boolean {
-        val isMoreThanMinimumAmount = products.sumOf { it.totalPrice } >= minimumAmount
+    override fun canUse(products: List<CartWithProduct>): Boolean {
+        val isMoreThanMinimumAmount = products.sumOf { it.product.price * it.quantity.value } >= minimumAmount
         val isNotExpired = LocalDate.now().isBefore(expirationDate)
         return isMoreThanMinimumAmount && isNotExpired
     }
 
-    override fun discountPrice(products: List<ProductWithQuantity>): Int {
+    override fun discountPrice(products: List<CartWithProduct>): Int {
         if (!canUse(products)) error("$description 쿠폰을 적용할 수 없습니다.")
         return discount
     }
