@@ -23,6 +23,7 @@ import woowacourse.shopping.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.cart.adapter.RecommendProductAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
+import woowacourse.shopping.ui.payment.PaymentActivity
 import woowacourse.shopping.ui.products.toUiModel
 
 class CartActivity : AppCompatActivity() {
@@ -60,7 +61,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun observeOrder() {
         viewModel.order.observe(this) {
-            finish()
+            PaymentActivity.startActivity(this)
         }
     }
 

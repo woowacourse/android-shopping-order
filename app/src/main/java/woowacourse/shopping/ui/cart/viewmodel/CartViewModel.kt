@@ -133,12 +133,11 @@ class CartViewModel(
     }
 
     fun clickOrderButton() {
+        if (isRecommendPage.value == true) {
+            _order.setValue(Unit)
+            return
+        }
         viewModelScope.launch {
-            if (isRecommendPage.value == true) {
-                _cart.value?.cartItems?.let { cartRepository.order(it.map { it.id }) }
-                _order.setValue(Unit)
-                return@launch
-            }
             recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
                 setRecommendProducts(recentProduct)
             }.onFailure {
