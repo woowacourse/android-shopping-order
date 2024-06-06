@@ -9,7 +9,10 @@ data class PaymentUiModel(
     val couponUiModels: List<CouponUiModel> = emptyList(),
     val cartProducts: List<CartProduct> = emptyList()
 ): Parcelable {
-    val cartProductIds get() = cartProducts.map { it.cartId }
+
+    val isCheckedAlready: Boolean get() = couponUiModels.any { it.isChecked }
+
+    val cartProductIds get() = cartProducts.map { it.cartId.toInt() }
     val orderPrice get() = cartProducts.sumOf { it.price * it.quantity }
     val deliveryPrice get() = DEFAULT_DELIVERY_PRICE
 

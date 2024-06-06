@@ -72,36 +72,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         }
 
     fun postCheckedItems() {
-
         _navigateHandler.value = EventState(NavigateUiState.ToPayment(getPaymentUiModel()))
-
-//        viewModelScope.launch {
-//            val checkedIds = getCheckedIds()
-//
-//            repository.postOrders(
-//                OrderRequestDto(
-//                    checkedIds,
-//                ),
-//            ).onSuccess {
-//                val currentCarts = (_carts.value as UiState.Success).data
-//                val filteredCarts =
-//                    currentCarts.filterNot { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
-//
-//                val removedCarts =
-//                    currentCarts.filter { it.cartProduct.cartId in checkedIds.map { it.toLong() } }
-//                removedCarts.forEach { cartProduct ->
-//                    updateUiModel.add(
-//                        cartProduct.cartProduct.productId,
-//                        cartProduct.cartProduct.copy(quantity = 0),
-//                    )
-//                }
-//
-//                _carts.postValue(UiState.Success(filteredCarts))
-//                _eventHandler.postValue(EventState(CartEvent.Update))
-//            }.onFailure {
-//                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
-//            }
-//        }
     }
 
     private fun getPaymentUiModel(): PaymentUiModel {

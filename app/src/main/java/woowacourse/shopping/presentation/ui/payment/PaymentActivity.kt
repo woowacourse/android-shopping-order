@@ -13,6 +13,7 @@ import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.payment.adapter.PaymentAdapter
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
+import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.utils.getParcelableExtraCompat
 
 class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
@@ -56,6 +57,14 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
         }
         viewModel.errorHandler.observe(this, EventObserver {
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+        })
+        viewModel.navigateHandler.observe(this, EventObserver {
+            Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
+            Intent(this, ShoppingActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(this)
+            }
         })
     }
 

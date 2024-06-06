@@ -223,6 +223,7 @@
             android:textStyle="bold"
             android:textColor="@color/white"
             android:background="#04C09E"
+            android:onClick="@{() -> viewModel.pay()}"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
