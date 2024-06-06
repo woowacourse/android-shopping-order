@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.RecommendProductsUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
@@ -29,11 +31,13 @@ class RecommendCartProductViewModel(
 
     init {
         val uiState = _uiState.value
-        val recommendProducts = recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
-        if (uiState != null) {
-            _uiState.value = uiState.copy(recommendProducts = recommendProducts)
-        } else {
-            _uiState.value = RecommendOrderUiState(orders, recommendProducts)
+        viewModelScope.launch {
+            val recommendProducts = recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
+            if (uiState != null) {
+                _uiState.value = uiState.copy(recommendProducts = recommendProducts)
+            } else {
+                _uiState.value = RecommendOrderUiState(orders, recommendProducts)
+            }
         }
     }
 
