@@ -6,10 +6,12 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.ProductRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.data.remote.dto.response.CartResponseDto
+import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
 import woowacourse.shopping.data.remote.dto.response.QuantityResponseDto
 import woowacourse.shopping.data.remote.service.CartItemApi
+import woowacourse.shopping.data.remote.service.CouponApi
 import woowacourse.shopping.data.remote.service.OrderApi
 import woowacourse.shopping.data.remote.service.ProductApi
 
@@ -17,6 +19,7 @@ class RetrofitDataSource(
     private val productApi: ProductApi = RetrofitModule.productApi,
     private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
     private val orderApi: OrderApi = RetrofitModule.orderApi,
+    private val couponApi: CouponApi = RetrofitModule.couponApi
 ) : RemoteDataSource {
     override suspend fun getProducts(
         category: String?,
@@ -66,5 +69,9 @@ class RetrofitDataSource(
 
     override suspend fun postOrders(orderRequestDto: OrderRequestDto): Response<Unit> {
         return orderApi.postOrders(orderRequestDto = orderRequestDto)
+    }
+
+    override suspend fun getCoupons(): Response<List<CouponResponseDto>> {
+        return couponApi.getCoupons()
     }
 }

@@ -6,6 +6,7 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.ProductRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.data.remote.dto.response.CartResponseDto
+import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
 import woowacourse.shopping.data.remote.dto.response.QuantityResponseDto
@@ -40,4 +41,6 @@ interface RemoteDataSource {
     suspend fun getCartItemsCounts(): Response<QuantityResponseDto>
 
     suspend fun postOrders(orderRequestDto: OrderRequestDto): Response<Unit>
+
+    suspend fun getCoupons(): Response<List<CouponResponseDto>>
 }

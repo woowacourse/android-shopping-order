@@ -1,5 +1,6 @@
 package woowacourse.shopping.data
 
+import android.util.Log
 import woowacourse.shopping.data.local.LocalDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
@@ -8,9 +9,11 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.ProductPagingSource
 import woowacourse.shopping.domain.CartProduct
+import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.utils.toIdOrNull
@@ -167,5 +170,15 @@ class RepositoryImpl(
             }
         }
         return Result.failure(Throwable())
+    }
+
+    override suspend fun getCoupons(): Result<List<Coupon>> = runCatching {
+        val response = remoteDataSource.getCoupons()
+        if (response.isSuccessful) {
+            return Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
+        }
+        return Result.failure(Throwable(response.errorBody().toString()))
+    }.onFailure {
+        Log.d("DFSFDSFDFSX", it.message.toString())
     }
 }

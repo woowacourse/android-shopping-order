@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="paymentUiModel"
+            type="woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -90,7 +92,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="204,000원"
+            paymentTotalPrice="@{paymentUiModel}"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
@@ -191,7 +193,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="202,000원"
+            paymentTotalPrice="@{paymentUiModel}"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"

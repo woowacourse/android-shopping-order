@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.service.CartItemApi
+import woowacourse.shopping.data.remote.service.CouponApi
 import woowacourse.shopping.data.remote.service.OrderApi
 import woowacourse.shopping.data.remote.service.ProductApi
 
@@ -17,6 +18,7 @@ object RetrofitModule {
     private const val PRODUCT_BASE_URL = "${BASE_URL}/products/"
     private const val CART_ITEMS_BASE_URL = "${BASE_URL}/cart-items/"
     private const val ORDER_BASE_URL = "${BASE_URL}/orders/"
+    private const val COUPON_BASE_URL = "${BASE_URL}/coupons/"
     private val contentType = "application/json".toMediaType()
 
     private val basicAuthInterceptor =
@@ -59,4 +61,12 @@ object RetrofitModule {
             .client(okHttpClient)
             .build()
             .create(OrderApi::class.java)
+
+    val couponApi: CouponApi =
+        Retrofit.Builder()
+            .baseUrl(COUPON_BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .client(okHttpClient)
+            .build()
+            .create(CouponApi::class.java)
 }
