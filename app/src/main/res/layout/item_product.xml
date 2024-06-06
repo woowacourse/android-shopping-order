@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="countHandler"
+            type="woowacourse.shopping.presentation.ui.counter.CounterHandler" />
+
+        <variable
+            name="shoppingProduct"
+            type="woowacourse.shopping.domain.model.ShoppingProduct" />
+
+        <variable
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.ui.shopping.ShoppingEventHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> eventHandler.onProductClick(shoppingProduct.product.id)}"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/iv_product"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:imageUrl="@{shoppingProduct.product.imageUrl}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@android:color/darker_gray" />
+
+        <include
+            android:id="@+id/btn_quantity"
+            layout="@layout/product_quantity_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="@{shoppingProduct.quantity == 0 ? View.GONE : View.VISIBLE}"
+            app:countHandler="@{countHandler}"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_product"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:shoppingProduct="@{shoppingProduct}" />
+
+        <ImageView
+            android:id="@+id/add_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:onClick="@{() -> countHandler.increaseCount(shoppingProduct.product.id, shoppingProduct.quantity)}"
+            android:src="@drawable/ic_plus"
+            android:visibility="@{shoppingProduct.quantity == 0 ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_product"
+            app:layout_constraintEnd_toEndOf="@+id/iv_product" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{shoppingProduct.product.name}"
+            android:textColor="@color/black"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_product"
+            tools:text="PET보틀-정사각형어쩌구저ㄱㅉ" />
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{@string/price_format(shoppingProduct.product.price)}"
+            android:textSize="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name"
+            tools:text="10,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
