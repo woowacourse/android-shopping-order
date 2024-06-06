@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
@@ -160,12 +161,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
-                    // todo recentProduct update suspend
-                  /*  updateRecentProduct(
+                    updateRecentProduct(
                         cartProducts[index].cartProduct.productId,
                         cartProducts[index].cartProduct.quantity,
                         cartProducts[index].cartProduct.cartId,
-                    )*/
+                    )
                 }
                 .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -189,12 +189,11 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
-                    // todo recentProduct update suspend
-                    /* updateRecentProduct(
-                         cartProducts[index].cartProduct.productId,
-                         cartProducts[index].cartProduct.quantity,
-                         cartProducts[index].cartProduct.cartId,
-                     )*/
+                    updateRecentProduct(
+                        cartProducts[index].cartProduct.productId,
+                        cartProducts[index].cartProduct.quantity,
+                        cartProducts[index].cartProduct.cartId,
+                    )
                 }
                 .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -207,7 +206,9 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         quantity: Int,
         cartId: Long,
     ) {
-        repository.updateRecentProduct(productId, quantity, cartId)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateRecentProduct(productId, quantity, cartId)
+        }
     }
 
     companion object {

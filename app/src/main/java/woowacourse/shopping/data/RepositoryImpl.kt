@@ -58,17 +58,6 @@ class RepositoryImpl(
         }
     }
 
-    /*    override fun getCartItems(
-            page: Int,
-            size: Int,
-            callback: (Result<List<CartProduct>?>) -> Unit,
-        ) {
-            remoteDataSource.getCartItems { result ->
-                result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
-                    .onFailure { callback(Result.failure(it)) }
-            }
-        }*/
-
     override suspend fun getCartItems(
         page: Int,
         size: Int,
@@ -87,30 +76,14 @@ class RepositoryImpl(
             .mapCatching { it.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0 }
             .recoverCatching { throw it }
     }
-       /* runCatching {
-            val response = remoteDataSource.postCartItem(cartItemRequest)
-            if (response.isSuccessful) {
-                return Result.success(
-                    response.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0,
-                )
-            }
-            return Result.failure(Throwable())
-        }*/
 
     // todo post,patch
     override suspend fun patchCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
     ): Result<Unit> {
-       return remoteDataSource.patchCartItem(id, quantityRequest).recoverCatching { throw it  }
+        return remoteDataSource.patchCartItem(id, quantityRequest).recoverCatching { throw it }
     }
-       /* runCatching {
-            val response = remoteDataSource.patchCartItem(id, quantityRequest)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable())
-        }*/
 
     override suspend fun deleteCartItem(id: Int): Result<Unit> {
         return remoteDataSource.deleteCartItem(id).recoverCatching { throw it }
@@ -172,7 +145,7 @@ class RepositoryImpl(
             localDataSource.getMaxCartCount()
         }
 
-    override suspend fun getCartItemsCounts() : Result<Int> {
+    override suspend fun getCartItemsCounts(): Result<Int> {
         return remoteDataSource.getCartItemsCounts()
             .mapCatching { it.quantity }
             .recoverCatching { throw it }

@@ -19,7 +19,7 @@ interface Repository {
 
     suspend fun getProductsByPaging(): Result<List<CartProduct>?>
 
-   suspend fun getCartItems(
+    suspend fun getCartItems(
         page: Int,
         size: Int,
     ): Result<List<CartProduct>?>
@@ -60,7 +60,7 @@ interface Repository {
 
     fun getMaxCartCount(): Result<Int>
 
-    suspend fun getCartItemsCounts() : Result<Int>
+    suspend fun getCartItemsCounts(): Result<Int>
 
     fun getCuration(callback: (Result<List<CartProduct>>) -> Unit)
 }
