@@ -23,9 +23,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
 
         val response = dataSource.getCartItems(0, dataSource.getCartItemCounts().quantity)
 
-        return response.content.map {
-            Cart(id = it.id, productId = it.product.id, quantity = Quantity(it.quantity))
-        }
+        return response.content.map { it.toCart() }
     }
 
     override suspend fun getAllCartItemsWithProduct(): List<CartWithProduct> {
@@ -34,7 +32,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         return response.content.map {
             CartWithProduct(
                 it.id,
-                it.product.toDomain(),
+                it.product.toProduct(),
                 Quantity(it.quantity),
             )
         }
@@ -73,12 +71,4 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         patchCartItem(cart.id, cart.quantity.value + quantity)
     }
 
-    private fun ResponseCartItemsGetDto.Product.toDomain() =
-        Product(
-            id = this.id,
-            imageUrl = this.imageUrl,
-            name = this.name,
-            price = this.price,
-            category = this.category,
-        )
 }

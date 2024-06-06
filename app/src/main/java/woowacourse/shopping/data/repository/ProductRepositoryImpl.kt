@@ -1,16 +1,17 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
 import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
 import woowacourse.shopping.data.datasource.impl.ApiHandleCartDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ApiHandleProductDataSourceImpl
 import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.remote.api.ApiResult
-import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
-import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.ProductRepository
+import kotlin.math.min
 
 class ProductRepositoryImpl(
     private val productDataSource: ApiHandleProductDataSource = ApiHandleProductDataSourceImpl(),
@@ -29,56 +30,63 @@ class ProductRepositoryImpl(
     override suspend fun find(id: Long): ApiResponse<Product> =
         handleResponse(productDataSource.getProductsById(id), transform = ::toProduct)
 
-    override suspend fun productsByCategory(category: String): ApiResponse<List<Product>> {
+    override suspend fun productsByCategory(category: String): ApiResponse<List<Product>> =
+        coroutineScope {
 
-        val count: Int = when (val countResponse = cartDataSource.getCartItemCounts()) {
-            is ApiResult.Success -> countResponse.data.quantity
-            is ApiResult.Error -> return handleError(countResponse)
-            is ApiResult.Exception -> return ApiResponse.Exception(countResponse.e)
-        }
+            try {
+                val countResponse = async(exceptionHandler()) { cartDataSource.getCartItemCounts() }.await()
+                val count: Int = when (countResponse) {
+                    is ApiResult.Success -> countResponse.data.quantity
+                    is ApiResult.Error -> DEFAULT_CART_COUNT
+                    is ApiResult.Exception -> DEFAULT_CART_COUNT
+                }
 
+                val cartResponse = async(exceptionHandler()) { cartDataSource.getCartItems(START_CART_PAGE, count) }.await()
 
-        val carts: List<Cart> = when (val cartResponse = cartDataSource.getCartItems(0, count)) {
-            is ApiResult.Success -> cartResponse.data.content.map {
-                Cart(
-                    it.id,
-                    it.product.id,
-                    Quantity(it.quantity)
-                )
+                val carts: List<Cart> = when (cartResponse) {
+                    is ApiResult.Success -> cartResponse.data.content.map { it.toCart() }
+                    is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
+                    is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(cartResponse.e)
+                }
+
+                var page = START_PRODUCT_PAGE
+                var products = mutableListOf<Product>()
+                var loadedProducts = listOf<Product>()
+                while (true) {
+                    val productResponse = async(exceptionHandler()) { productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL) }.await()
+                    when (productResponse) {
+                        is ApiResult.Success -> loadedProducts = toProductList(productResponse.data)
+                        is ApiResult.Error -> return@coroutineScope handleError(productResponse)
+                        is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
+                            productResponse.e
+                        )
+                    }
+
+                    if (loadedProducts.isEmpty() || products.size >= MAX_RECOMMEND_SIZE) break
+                    products.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
+                    page++
+                }
+
+                return@coroutineScope ApiResponse.Success(products.subList(0, min(MAX_RECOMMEND_SIZE, products.size)))
+            } catch (e: Exception) {
+                return@coroutineScope ApiResponse.Exception(e)
             }
-
-            is ApiResult.Error -> return handleError(cartResponse)
-            is ApiResult.Exception -> return ApiResponse.Exception(cartResponse.e)
         }
 
+    private fun List<Product>.filterCategoryAndNotInCart(category: String, carts: List<Cart>) =
+        this.filter { it.category == category }
+            .filterNot { carts.map { it.productId }.contains(it.id) }
 
-        var page = 0
-        var products = mutableListOf<Product>()
-        var loadedProducts = listOf<Product>()
-        while (true) {
-            when (val productResponse = productDataSource.getProductsByOffset(page, 20)) {
-                is ApiResult.Success -> loadedProducts = toProductList(productResponse.data)
-                is ApiResult.Error -> return handleError(productResponse)
-                is ApiResult.Exception -> return ApiResponse.Exception(productResponse.e)
-            }
+    private fun exceptionHandler() = CoroutineExceptionHandler { _, exception -> throw exception }
 
-            if (loadedProducts.isEmpty() || products.size >= 10) break
-            products.addAll(loadedProducts.filter { it.category == category }
-                .filterNot { carts.map { it.productId }.contains(it.id) })
-            page++
-        }
-        return ApiResponse.Success<List<Product>>(products)
+    companion object {
+        private const val DEFAULT_CART_COUNT = 300
+        private const val LOAD_PRODUCT_INTERVAL = 30
+        private const val START_CART_PAGE = 0
+        private const val START_PRODUCT_PAGE = 0
+        private const val MAX_RECOMMEND_SIZE = 10
     }
 
-    private fun toProductList(dto: ResponseProductsGetDto): List<Product> {
-        val productDto = dto.content
-        return productDto.map {
-            Product(it.id, it.imageUrl, it.name, it.price, it.category)
-        }
-    }
 
-    private fun toProduct(dto: ResponseProductIdGetDto): Product = Product(
-        dto.id, dto.imageUrl, dto.name, dto.price, dto.category
-    )
 }
 
