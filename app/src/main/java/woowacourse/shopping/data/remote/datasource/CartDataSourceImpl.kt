@@ -22,8 +22,9 @@ class CartDataSourceImpl(
 
     override fun addCartItem(cartItemRequest: CartItemRequest): Result<Int> {
         return runCatching {
-            val location = cartService.addCartItem(cartItemRequest).execute().headers()["location"]
-                ?: throw IllegalArgumentException()
+            val location =
+                cartService.addCartItem(cartItemRequest).execute().headers()["location"]
+                    ?: throw IllegalArgumentException()
             val segments = location.split("/")
             val cartItemId = segments.last().toInt()
             cartItemId

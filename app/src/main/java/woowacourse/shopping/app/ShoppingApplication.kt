@@ -2,13 +2,13 @@ package woowacourse.shopping.app
 
 import android.app.Application
 import woowacourse.shopping.data.local.recent.RecentProductDatabase
-import woowacourse.shopping.data.remote.service.CartService
-import woowacourse.shopping.data.remote.service.OrderService
-import woowacourse.shopping.data.remote.service.ProductService
+import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.data.remote.datasource.CartDataSourceImpl
 import woowacourse.shopping.data.remote.datasource.OrderDataSourceImpl
 import woowacourse.shopping.data.remote.datasource.ProductDataSourceImpl
-import woowacourse.shopping.data.remote.RetrofitClient
+import woowacourse.shopping.data.remote.service.CartService
+import woowacourse.shopping.data.remote.service.OrderService
+import woowacourse.shopping.data.remote.service.ProductService
 
 class ShoppingApplication : Application() {
     override fun onCreate() {

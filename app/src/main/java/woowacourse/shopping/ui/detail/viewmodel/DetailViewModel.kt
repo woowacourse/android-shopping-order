@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.detail.action.DetailNavigationActions
+import woowacourse.shopping.ui.detail.action.DetailNotifyingActions
 import woowacourse.shopping.ui.detail.listener.DetailClickListener
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.home.listener.QuantityClickListener
@@ -51,6 +52,10 @@ class DetailViewModel(
     val detailNavigationActions: LiveData<Event<DetailNavigationActions>>
         get() = _detailNavigationActions
 
+    private val _detailNotifyingActions = MutableLiveData<Event<DetailNotifyingActions>>()
+    val detailNotifyingActions: LiveData<Event<DetailNotifyingActions>>
+        get() = _detailNotifyingActions
+
     init {
         loadProduct()
     }
@@ -90,9 +95,10 @@ class DetailViewModel(
                 cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER)
             }.onSuccess {
                 val cartItems = it.getOrNull()
-                val cartItem = cartItems?.firstOrNull { cartItem ->
-                    cartItem.product.productId == productId
-                }
+                val cartItem =
+                    cartItems?.firstOrNull { cartItem ->
+                        cartItem.product.productId == productId
+                    }
                 val currentQuantity = cartItem?.quantity ?: 0
                 val quantity = quantity.value ?: 0
 
@@ -107,7 +113,7 @@ class DetailViewModel(
 
     override fun onPutCartButtonClick() {
         saveCartItem()
-        _detailNavigationActions.value = Event(DetailNavigationActions.NavigateToCart)
+        _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyPutCartItem)
     }
 
     override fun onRecentProductClick() {

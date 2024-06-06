@@ -5,11 +5,9 @@
 
     <data>
 
-        <import type="woowacourse.shopping.ui.state.UiState" />
-
         <variable
             name="viewModel"
-            type="woowacourse.shopping.ui.order.viewmodel.OrderViewModel" />
+            type="woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,11 +24,11 @@
             android:textSize="100dp"
             android:textStyle="bold"
             app:isEmpty="@{viewModel.isCartEmpty}"
-            app:state="@{viewModel.cartUiState}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:state="@{viewModel.cartUiState}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_cart"
@@ -39,10 +37,10 @@
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
             app:isEmpty="@{viewModel.isCartEmpty}"
-            app:state="@{viewModel.cartUiState}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:state="@{viewModel.cartUiState}"
             tools:itemCount="5"
             tools:listitem="@layout/item_cart" />
 

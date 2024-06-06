@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModel" />
+            type="woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

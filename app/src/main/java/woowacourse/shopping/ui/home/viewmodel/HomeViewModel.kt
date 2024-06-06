@@ -144,7 +144,6 @@ class HomeViewModel(
         product: Product,
         quantity: Int,
     ) {
-
         val updatedProductViewItem = ProductViewItem(product, quantity)
         val position =
             loadedProductViewItems.indexOfFirst { loadedProductViewItem -> loadedProductViewItem.product.productId == product.productId }
@@ -152,7 +151,6 @@ class HomeViewModel(
             loadedProductViewItems[position] = updatedProductViewItem
             _homeUiState.value = UiState.Success(loadedProductViewItems)
         }
-
     }
 
     override fun onLoadMoreButtonClick() {

@@ -14,7 +14,7 @@ class OrderViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return OrderViewModel(
                 orderRepository = orderRepository,
-                cartRepository = cartRepository
+                cartRepository = cartRepository,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

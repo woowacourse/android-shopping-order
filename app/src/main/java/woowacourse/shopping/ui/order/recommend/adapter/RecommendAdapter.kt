@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendBinding
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModel
+import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
 
 class RecommendAdapter(
     private val viewModel: RecommendViewModel,

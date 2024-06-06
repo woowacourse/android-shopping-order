@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
@@ -16,6 +18,7 @@ import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
 import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
+import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 
@@ -26,7 +29,12 @@ class CartFragment : Fragment() {
 
     private lateinit var adapter: CartAdapter
     private val orderViewModel by activityViewModels<OrderViewModel>()
-    private val cartViewModel by viewModels<CartViewModel>()
+    private val cartViewModel by viewModels<CartViewModel> {
+        CartViewModelFactory(
+            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+            orderViewModel = orderViewModel,
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,17 +61,17 @@ class CartFragment : Fragment() {
     }
 
     private fun setUpAdapter() {
-        adapter = CartAdapter(orderViewModel)
+        adapter = CartAdapter(cartViewModel)
         binding.rvCart.adapter = adapter
     }
 
     private fun setUpDataBinding() {
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = orderViewModel
+        binding.viewModel = cartViewModel
     }
 
     private fun observeViewmodel() {
-        orderViewModel.cartUiState.observe(viewLifecycleOwner) { state ->
+        cartViewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
                 is UiState.Loading -> showData(emptyList())
@@ -73,7 +81,7 @@ class CartFragment : Fragment() {
                     )
             }
         }
-        orderViewModel.cartNavigationActions.observe(viewLifecycleOwner) { cartNavigationActions ->
+        cartViewModel.cartNavigationActions.observe(viewLifecycleOwner) { cartNavigationActions ->
             cartNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is CartNavigationActions.NavigateToDetail -> navigateToDetail(action.productId)
@@ -81,13 +89,16 @@ class CartFragment : Fragment() {
             }
         }
 
-        orderViewModel.cartNotifyingActions.observe(viewLifecycleOwner) { cartNotifyingActions ->
+        cartViewModel.cartNotifyingActions.observe(viewLifecycleOwner) { cartNotifyingActions ->
             cartNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is CartNotifyingActions.NotifyCartItemDeleted -> notifyCartItemDeleted()
-                    is CartNotifyingActions.NotifyCanNotPutCart -> notifyCanNotOrder()
                 }
             }
+        }
+
+        orderViewModel.allCheckBoxChecked.observe(viewLifecycleOwner) {
+            cartViewModel.updateCartUiState()
         }
     }
 
@@ -107,13 +118,8 @@ class CartFragment : Fragment() {
         Toast.makeText(requireContext(), DELETE_ITEM_MESSAGE, Toast.LENGTH_SHORT).show()
     }
 
-    private fun notifyCanNotOrder() {
-        Toast.makeText(requireContext(), CAN_NOT_ORDER_MESSAGE, Toast.LENGTH_SHORT).show()
-    }
-
     companion object {
         private const val DELETE_ITEM_MESSAGE = "장바구니에서 상품을 삭제했습니다!"
-        private const val CAN_NOT_ORDER_MESSAGE = "최소 1개 이상의 상품을 주문해주세요!"
 
         fun newInstance(): Fragment {
             return CartFragment()

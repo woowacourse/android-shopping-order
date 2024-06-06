@@ -15,9 +15,9 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.ui.detail.action.DetailNavigationActions
+import woowacourse.shopping.ui.detail.action.DetailNotifyingActions
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModelFactory
-import woowacourse.shopping.ui.order.OrderActivity
 import woowacourse.shopping.ui.state.UiState
 
 class DetailActivity : AppCompatActivity() {
@@ -72,9 +72,16 @@ class DetailActivity : AppCompatActivity() {
         viewModel.detailNavigationActions.observe(this) { detailNavigationActions ->
             detailNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is DetailNavigationActions.NavigateToCart -> putCartItem()
                     is DetailNavigationActions.NavigateToRecentDetail -> navigateToDetail()
                     is DetailNavigationActions.NavigateToBack -> finish()
+                }
+            }
+        }
+
+        viewModel.detailNotifyingActions.observe(this) { detailNotifyingActions ->
+            detailNotifyingActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is DetailNotifyingActions.NotifyPutCartItem -> notifyPutCartItem()
                 }
             }
         }
@@ -84,9 +91,8 @@ class DetailActivity : AppCompatActivity() {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
-    private fun putCartItem() {
+    private fun notifyPutCartItem() {
         Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
-        startActivity(OrderActivity.createIntent(context = this))
     }
 
     private fun navigateToDetail() {

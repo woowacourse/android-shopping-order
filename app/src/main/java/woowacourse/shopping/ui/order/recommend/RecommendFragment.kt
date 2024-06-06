@@ -9,17 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
 import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
 import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
-import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
-import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.*
+import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.NavigateToDetail
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
+import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 
@@ -34,7 +36,8 @@ class RecommendFragment : Fragment() {
         RecommendViewModelFactory(
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productRepository = ProductRepositoryImpl(productDataSourceImpl),
-            activityViewModel = orderViewModel
+            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+            orderViewModel = orderViewModel,
         )
     }
 

@@ -9,10 +9,10 @@ import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartPlaceHolderViewItem
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
-import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
+import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
 
 class CartAdapter(
-    private val viewModel: OrderViewModel,
+    private val viewModel: CartViewModel,
 ) : ListAdapter<ShoppingCartViewItem, RecyclerView.ViewHolder>(diffUtil) {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
