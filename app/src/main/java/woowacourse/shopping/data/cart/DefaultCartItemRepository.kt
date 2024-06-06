@@ -10,7 +10,7 @@ class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartItemRepository {
     override fun loadCartItems(): List<CartItem> {
-        return handleResponse(cartItemDataSource.loadAllCartItems()).content.map { cartItemDto -> cartItemDto.toDomain() }
+        return handleResponse(cartItemDataSource.fetchCartItems()).content.map { cartItemDto -> cartItemDto.toDomain() }
     }
 
     override fun addCartItem(
@@ -19,14 +19,14 @@ class DefaultCartItemRepository(
     ) {
         val cartItem = loadCartItems().find { it.product.id == id }
         if (cartItem == null) {
-            handleResponse(cartItemDataSource.addedNewProductsId(ProductIdsCount(id, quantity)))
+            handleResponse(cartItemDataSource.saveCartItem(ProductIdsCount(id, quantity)))
             return
         }
-        handleResponse(cartItemDataSource.plusProductsIdCount(cartItem.id, quantity))
+        handleResponse(cartItemDataSource.updateCartItemQuantity(cartItem.id, quantity))
     }
 
     override fun removeCartItem(id: Long) {
-        handleResponse(cartItemDataSource.removedProductsId(id))
+        handleResponse(cartItemDataSource.deleteCartItem(id))
     }
 
     override fun increaseCartProduct(
@@ -34,7 +34,7 @@ class DefaultCartItemRepository(
         quantity: Int,
     ) {
         val cartItem = loadCartItems().find { it.product.id == id } ?: throw NoSuchElementException()
-        handleResponse(cartItemDataSource.plusProductsIdCount(cartItem.id, quantity))
+        handleResponse(cartItemDataSource.updateCartItemQuantity(cartItem.id, quantity))
     }
 
     override fun decreaseCartProduct(
@@ -42,14 +42,14 @@ class DefaultCartItemRepository(
         quantity: Int,
     ) {
         val cartItem = loadCartItems().find { it.product.id == id } ?: throw NoSuchElementException()
-        handleResponse(cartItemDataSource.minusProductsIdCount(cartItem.id, quantity))
+        handleResponse(cartItemDataSource.updateCartItemQuantity(cartItem.id, quantity))
     }
 
     override fun increaseCartItem(
         cartItemId: Long,
         quantity: Int,
     ) {
-        handleResponse(cartItemDataSource.plusProductsIdCount(cartItemId, quantity))
+        handleResponse(cartItemDataSource.updateCartItemQuantity(cartItemId, quantity))
     }
 
     private fun <T : Any> handleResponse(response: ResponseResult<T>): T {

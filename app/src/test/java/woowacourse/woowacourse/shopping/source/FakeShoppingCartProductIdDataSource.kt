@@ -20,11 +20,11 @@ class FakeShoppingCartProductIdDataSource(
         TODO("Not yet implemented")
     }
 
-    override fun addedNewProductsId(productIdsCount: ProductIdsCount): Long {
+    override fun saveCartItem(productIdsCount: ProductIdsCount): Long {
         TODO("Not yet implemented")
     }
 
-    override fun removedProductsId(productId: Long): Long {
+    override fun deleteCartItem(productId: Long): Long {
         val foundItem = data.find { it.productId == productId } ?: throw NoSuchElementException()
         data.remove(foundItem)
         return foundItem.productId

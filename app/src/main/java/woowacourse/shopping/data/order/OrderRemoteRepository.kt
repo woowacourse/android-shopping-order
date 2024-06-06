@@ -16,15 +16,15 @@ class OrderRemoteRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : OrderRepository {
     override fun order(cartItemIds: List<Long>) {
-        handleResponse(orderDataSource.order(cartItemIds))
+        handleResponse(orderDataSource.orderCartItems(cartItemIds))
     }
 
     override fun recommendedProducts(): List<Product> {
-        val productId: Long = productHistoryDataSource.loadLatestProduct()
-        val category: String = handleResponse(productDataSource.findById(productId)).category
-        val cartItemsProductDto: List<ProductDto> = handleResponse(cartItemDataSource.loadAllCartItems()).content.map { it.product }
+        val productId: Long = productHistoryDataSource.fetchLatestProduct()
+        val category: String = handleResponse(productDataSource.loadById(productId)).category
+        val cartItemsProductDto: List<ProductDto> = handleResponse(cartItemDataSource.fetchCartItems()).content.map { it.product }
 
-        return handleResponse(productDataSource.findByCategory(category)).content.filterNot { cartItemsProductDto.contains(it) }
+        return handleResponse(productDataSource.loadByCategory(category)).content.filterNot { cartItemsProductDto.contains(it) }
             .map { productDto -> productDto.toDomain() }.take(10)
     }
 

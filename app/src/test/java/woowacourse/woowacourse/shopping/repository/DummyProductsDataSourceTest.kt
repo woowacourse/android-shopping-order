@@ -16,7 +16,7 @@ class DummyProductsDataSourceTest {
     @Test
     fun `데이터를 첫 페이지에 20개 로드`() {
         // given
-        val loadedCartItems = productDataSource.findByPaged(1)
+        val loadedCartItems = productDataSource.loadByPaged(1)
 
         // then
         assertThat(loadedCartItems.size).isEqualTo(20)
@@ -25,7 +25,7 @@ class DummyProductsDataSourceTest {
     @Test
     fun `데이터를 두 번째 페이지에서 20개 로드`() {
         // given
-        val loadedCartItems = productDataSource.findByPaged(2)
+        val loadedCartItems = productDataSource.loadByPaged(2)
 
         // when
         assertThat(loadedCartItems.size).isEqualTo(20)
@@ -37,7 +37,7 @@ class DummyProductsDataSourceTest {
         val productId: Long = 1
 
         // when
-        val product = productDataSource.findById(productId)
+        val product = productDataSource.loadById(productId)
 
         // then
         assertThat(product.id).isEqualTo(productId)

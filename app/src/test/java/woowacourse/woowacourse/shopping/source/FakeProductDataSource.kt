@@ -7,9 +7,9 @@ class FakeProductDataSource(
     private val pagingStrategy: NumberPagingStrategy<ProductData> = NumberPagingStrategy(20),
     private val allProducts: MutableList<ProductData>,
 ) : ProductDataSource {
-    override fun findByPaged(page: Int): List<ProductData> = pagingStrategy.loadPagedData(page, allProducts)
+    override fun loadByPaged(page: Int): List<ProductData> = pagingStrategy.loadPagedData(page, allProducts)
 
-    override fun findById(id: Long): ProductData =
+    override fun loadById(id: Long): ProductData =
         allProducts.find { it.id == id }
             ?: throw NoSuchElementException("there is no product with id: $id")
 

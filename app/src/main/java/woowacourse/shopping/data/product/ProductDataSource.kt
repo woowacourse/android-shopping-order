@@ -5,11 +5,11 @@ import woowacourse.shopping.remote.product.ProductDto
 import woowacourse.shopping.remote.product.ProductResponse
 
 interface ProductDataSource {
-    fun findByPaged(page: Int): ResponseResult<ProductResponse>
+    fun loadByPaged(page: Int): ResponseResult<ProductResponse>
 
-    fun findById(id: Long): ResponseResult<ProductDto>
+    fun loadById(id: Long): ResponseResult<ProductDto>
 
-    fun findByCategory(category: String): ResponseResult<ProductResponse>
+    fun loadByCategory(category: String): ResponseResult<ProductResponse>
 
     fun shutDown(): Boolean
 }

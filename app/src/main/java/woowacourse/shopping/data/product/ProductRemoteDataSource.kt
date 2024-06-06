@@ -9,15 +9,15 @@ import woowacourse.shopping.remote.product.ProductsApiService
 class ProductRemoteDataSource(
     private val productsApiService: ProductsApiService,
 ) : ProductDataSource {
-    override fun findByPaged(page: Int): ResponseResult<ProductResponse> =
+    override fun loadByPaged(page: Int): ResponseResult<ProductResponse> =
         handleResponseResult { productsApiService.requestProducts(page = page).execute() }
 
-    override fun findById(id: Long): ResponseResult<ProductDto> =
+    override fun loadById(id: Long): ResponseResult<ProductDto> =
         handleResponseResult {
             productsApiService.requestProduct(id.toInt()).execute()
         }
 
-    override fun findByCategory(category: String): ResponseResult<ProductResponse> =
+    override fun loadByCategory(category: String): ResponseResult<ProductResponse> =
         handleResponseResult {
             productsApiService.requestProducts(category).execute()
         }

@@ -3,11 +3,11 @@ package woowacourse.shopping.data.history
 interface ProductHistoryDataSource {
     fun saveProductHistory(productId: Long)
 
-    fun loadProductHistory(productId: Long): Long?
+    fun fetchProductHistory(productId: Long): Long?
 
-    fun loadLatestProduct(): Long
+    fun fetchLatestProduct(): Long
 
-    fun loadAllProductHistory(): List<Long>
+    fun fetchProductsHistory(): List<Long>
 
-    fun deleteAllProductHistory()
+    fun deleteProductsHistory()
 }

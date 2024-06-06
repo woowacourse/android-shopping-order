@@ -14,13 +14,13 @@ class ProductHistoryLocalDataSource(private val dao: HistoryProductDao) : Produc
         dao.insert(HistoryProduct(productId))
     }
 
-    override fun loadProductHistory(productId: Long): Long? = dao.findById(productId)?.id
+    override fun fetchProductHistory(productId: Long): Long? = dao.findById(productId)?.id
 
-    override fun loadLatestProduct(): Long = dao.findLatest()?.id ?: EMPTY
+    override fun fetchLatestProduct(): Long = dao.findLatest()?.id ?: EMPTY
 
-    override fun loadAllProductHistory(): List<Long> = dao.findAll().map { it.id }
+    override fun fetchProductsHistory(): List<Long> = dao.findAll().map { it.id }
 
-    override fun deleteAllProductHistory() {
+    override fun deleteProductsHistory() {
         dao.deleteAll()
     }
 
