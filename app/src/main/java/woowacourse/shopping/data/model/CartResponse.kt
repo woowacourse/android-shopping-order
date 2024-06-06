@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.model
 
 import com.google.gson.annotations.SerializedName
+import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.CartDomain
 import woowacourse.shopping.domain.model.CartItemDomain
 
@@ -33,4 +34,11 @@ fun CartItem.toCartItemDomain(): CartItemDomain =
         cartItemId = cartItemId,
         quantity = quantity,
         product = product.toProductItemDomain(),
+    )
+
+fun CartItem.toCartData(): CartData =
+    CartData(
+        cartItemId = cartItemId,
+        productId = product.id,
+        quantity = quantity,
     )

@@ -6,20 +6,20 @@ import woowacourse.shopping.data.model.CartQuantity
 import woowacourse.shopping.data.model.CartResponse
 
 interface RemoteCartDataSource {
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int,
         size: Int,
         sort: String,
-    ): Call<CartResponse>
+    ): CartResponse
 
-    fun addCartItem(cartItemRequestBody: CartItemRequestBody): Call<Unit>
+    suspend fun addCartItem(cartItemRequestBody: CartItemRequestBody)
 
-    fun deleteCartItem(cartItemId: Int): Call<Unit>
+    suspend fun deleteCartItem(cartItemId: Int)
 
-    fun updateCartItem(
+    suspend fun updateCartItem(
         cartItemId: Int,
         cartQuantity: CartQuantity,
-    ): Call<Unit>
+    )
 
-    fun getCartTotalQuantity(): Call<CartQuantity>
+    suspend fun getCartTotalQuantity(): CartQuantity
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
@@ -28,7 +29,11 @@ class DetailActivity : AppCompatActivity() {
     private val viewModel: DetailViewModel by viewModels {
         DetailViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            productRepository = ProductRepositoryImpl(remoteProductDataSource),
+            productRepository = ProductRepositoryImpl(
+                remoteProductDataSource,
+                remoteCartDataSource,
+                recentProductDatabase.recentProductDao()
+            ),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productId = productId,
         )
@@ -87,6 +92,7 @@ class DetailActivity : AppCompatActivity() {
                 is DetailUiEvent.NavigateToCart -> navigateToCart()
                 is DetailUiEvent.NavigateToRecentProduct -> navigateToDetail(event.productId)
                 is DetailUiEvent.NavigateBack -> finish()
+                is DetailUiEvent.Error -> showError(getString(R.string.unknown_error))
             }
             viewModel.saveRecentProduct(isMostRecentProductClicked)
         }

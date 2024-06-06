@@ -7,16 +7,16 @@ import woowacourse.shopping.data.remote.ProductService
 
 class DefaultRemoteProductDataSource(private val productService: ProductService) :
     RemoteProductDataSource {
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Call<ProductResponse> {
+    ): ProductResponse {
         return productService.getProducts(category, page, size, sort)
     }
 
-    override fun getProductById(id: Int): Call<Product> {
+    override suspend fun getProductById(id: Int): Product {
         return productService.getProductById(id)
     }
 }

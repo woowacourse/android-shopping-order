@@ -14,28 +14,28 @@ import woowacourse.shopping.data.model.CartResponse
 
 interface CartService {
     @GET("/cart-items")
-    fun getCartItems(
+    suspend fun getCartItems(
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): Call<CartResponse>
+    ): CartResponse
 
     @POST("/cart-items")
-    fun addCartItem(
+    suspend fun addCartItem(
         @Body cartItemRequestBody: CartItemRequestBody,
-    ): Call<Unit>
+    )
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") id: Int,
-    ): Call<Unit>
+    )
 
     @PATCH("/cart-items/{id}")
-    fun updateCartItem(
+    suspend fun updateCartItem(
         @Path("id") id: Int,
         @Body cartQuantity: CartQuantity,
-    ): Call<Unit>
+    )
 
     @GET("/cart-items/counts")
-    fun getCartTotalQuantity(): Call<CartQuantity>
+    suspend fun getCartTotalQuantity(): CartQuantity
 }

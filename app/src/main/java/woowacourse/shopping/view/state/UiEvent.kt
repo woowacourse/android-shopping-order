@@ -4,6 +4,8 @@ sealed interface HomeUiEvent {
     data class NavigateToDetail(val productId: Int) : HomeUiEvent
 
     data object NavigateToCart : HomeUiEvent
+
+    data object Error : HomeUiEvent
 }
 
 sealed interface DetailUiEvent {
@@ -12,6 +14,8 @@ sealed interface DetailUiEvent {
     data object NavigateToCart : DetailUiEvent
 
     data object NavigateBack : DetailUiEvent
+
+    data object Error : DetailUiEvent
 }
 
 sealed interface CartListUiEvent {

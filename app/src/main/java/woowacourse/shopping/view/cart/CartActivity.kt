@@ -29,11 +29,15 @@ class CartActivity : AppCompatActivity() {
         CartViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderRepository =
-                OrderRepositoryImpl(
-                    remoteOrderDataSource,
-                ),
+            OrderRepositoryImpl(
+                remoteOrderDataSource,
+            ),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
-            productRepository = ProductRepositoryImpl(remoteProductDataSource),
+            productRepository = ProductRepositoryImpl(
+                remoteProductDataSource,
+                remoteCartDataSource,
+                recentProductDatabase.recentProductDao()
+            ),
         )
     }
     private val cartFragment by lazy { CartFragment() }

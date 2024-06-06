@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
@@ -26,7 +27,11 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var recentProductAdapter: RecentProductAdapter
     private val viewModel: HomeViewModel by viewModels {
         HomeViewModelFactory(
-            ProductRepositoryImpl(remoteProductDataSource),
+            ProductRepositoryImpl(
+                remoteProductDataSource,
+                remoteCartDataSource,
+                recentProductDatabase.recentProductDao(),
+            ),
             CartRepositoryImpl(remoteCartDataSource),
             RecentProductRepositoryImpl(recentProductDatabase),
         )
@@ -86,12 +91,16 @@ class HomeActivity : AppCompatActivity() {
             when (val event = homeUiEvent.getContentIfNotHandled() ?: return@observe) {
                 is HomeUiEvent.NavigateToCart -> navigateToCart()
                 is HomeUiEvent.NavigateToDetail -> navigateToDetail(event.productId)
+                is HomeUiEvent.Error -> showError(getString(R.string.unknown_error))
             }
         }
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.loadData(data, viewModel.homeProductUiState.value?.loadMoreAvailable ?: false)
+        productAdapter.loadData(
+            data,
+            viewModel.homeProductUiState.value?.loadMoreAvailable ?: false
+        )
     }
 
     private fun showError(errorMessage: String) {

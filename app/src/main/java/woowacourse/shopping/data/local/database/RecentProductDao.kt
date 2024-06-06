@@ -7,23 +7,23 @@ import androidx.room.Query
 @Dao
 interface RecentProductDao {
     @Insert
-    fun save(recentProductEntity: RecentProductEntity)
+    suspend fun save(recentProductEntity: RecentProductEntity)
 
     @Query("UPDATE recent_products SET dateTime = :dateTime WHERE productId = :productId")
-    fun update(
+    suspend fun update(
         productId: Int,
         dateTime: String,
     )
 
     @Query("SELECT * FROM recent_products WHERE productId = :productId")
-    fun findByProductId(productId: Int): RecentProductEntity?
+    suspend fun findByProductId(productId: Int): RecentProductEntity?
 
     @Query("SELECT * FROM recent_products ORDER BY dateTime DESC LIMIT 1")
-    fun findMostRecentProduct(): RecentProductEntity?
+    suspend fun findMostRecentProduct(): RecentProductEntity?
 
     @Query("SELECT * FROM recent_products ORDER BY dateTime DESC LIMIT :limit")
-    fun findAll(limit: Int): List<RecentProductEntity>
+    suspend fun findAll(limit: Int): List<RecentProductEntity>
 
     @Query("DELETE FROM recent_products")
-    fun deleteAll()
+    suspend fun deleteAll()
 }

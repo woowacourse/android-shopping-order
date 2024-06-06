@@ -7,7 +7,7 @@ import woowacourse.shopping.data.remote.OrderService
 class DefaultRemoteOrderDataSource(
     private val orderService: OrderService,
 ) : RemoteOrderDataSource {
-    override fun postOrder(cartItemIds: CartItemIds): Call<Unit> {
+    override suspend fun postOrder(cartItemIds: CartItemIds) {
         return orderService.postOrder(cartItemIds)
     }
 }

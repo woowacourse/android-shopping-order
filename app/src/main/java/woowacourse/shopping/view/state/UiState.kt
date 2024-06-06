@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.state
 
+import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.model.RecentProduct
@@ -18,7 +19,7 @@ data class HomeProductUiState(
     val isLoading: Boolean = true,
     val currentPageNumber: Int = 0,
     val productItems: List<HomeViewItem.ProductViewItem> = emptyList(),
-    val cartItems: List<CartItemDomain> = emptyList(),
+    val cartItems: List<CartData> = emptyList(),
     val totalCartQuantity: Int = 0,
     val loadMoreAvailable: Boolean = false,
 )
@@ -33,7 +34,7 @@ data class ProductDetailUiState(
     val isLoading: Boolean = true,
     val product: ProductItemDomain? = null,
     val lastlyViewedProduct: RecentProduct? = null,
-    val cartItems: List<CartItemDomain> = emptyList(),
+    val cartItems: List<CartData> = emptyList(),
     val quantity: Int = 1,
 )
 

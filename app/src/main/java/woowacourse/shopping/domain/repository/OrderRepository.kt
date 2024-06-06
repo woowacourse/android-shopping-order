@@ -1,9 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 interface OrderRepository {
-    fun postOrder(
+    suspend fun postOrder(
         cartItemIds: List<Int>,
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): Result<Unit>
 }

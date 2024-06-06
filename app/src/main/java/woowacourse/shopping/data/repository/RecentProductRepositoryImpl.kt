@@ -13,55 +13,31 @@ class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) 
     RecentProductRepository {
     private val dao = recentProductDatabase.recentProductDao()
 
-    override fun save(product: Product) {
+    override suspend fun save(product: Product) {
         if (findOrNullByProductId(product.id) != null) {
             update(product.id)
         } else {
-            threadAction {
-                dao.save(product.toRecentProductEntity())
-            }
+            dao.save(product.toRecentProductEntity())
         }
     }
 
-    override fun update(productId: Int) {
-        threadAction {
-            dao.update(productId, LocalDateTime.now().toString())
-        }
+    override suspend fun update(productId: Int) {
+        dao.update(productId, LocalDateTime.now().toString())
     }
 
-    override fun findOrNullByProductId(productId: Int): RecentProduct? {
-        var recentProductEntity: RecentProductEntity? = null
-        threadAction {
-            recentProductEntity = dao.findByProductId(productId)
-        }
-        return recentProductEntity?.toRecentProduct()
+    override suspend fun findOrNullByProductId(productId: Int): RecentProduct? {
+        return dao.findByProductId(productId)?.toRecentProduct()
     }
 
-    override fun findMostRecentProduct(): RecentProduct? {
-        var recentProduct: RecentProductEntity? = null
-        threadAction {
-            recentProduct = dao.findMostRecentProduct()
-        }
-        return recentProduct?.toRecentProduct()
+    override suspend fun findMostRecentProduct(): RecentProduct? {
+        return dao.findMostRecentProduct()?.toRecentProduct()
     }
 
-    override fun findAll(limit: Int): List<RecentProduct> {
-        var recentProducts: List<RecentProduct> = emptyList()
-        threadAction {
-            recentProducts = dao.findAll(limit).map { it.toRecentProduct() }
-        }
-        return recentProducts
+    override suspend fun findAll(limit: Int): List<RecentProduct> {
+        return dao.findAll(limit).map { it.toRecentProduct() }
     }
 
-    override fun deleteAll() {
-        threadAction {
-            dao.deleteAll()
-        }
-    }
-
-    private fun threadAction(action: () -> Unit) {
-        val thread = Thread(action)
-        thread.start()
-        thread.join()
+    override suspend fun deleteAll() {
+        dao.deleteAll()
     }
 }

@@ -9,15 +9,15 @@ import woowacourse.shopping.data.model.ProductResponse
 
 interface ProductService {
     @GET("/products")
-    fun getProducts(
+    suspend fun getProducts(
         @Query("category") category: String? = null,
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): Call<ProductResponse>
+    ): ProductResponse
 
     @GET("/products/{id}")
-    fun getProductById(
+    suspend fun getProductById(
         @Path("id") id: Int,
-    ): Call<Product>
+    ): Product
 }

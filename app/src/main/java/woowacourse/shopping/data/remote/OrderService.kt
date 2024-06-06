@@ -7,7 +7,7 @@ import woowacourse.shopping.data.model.CartItemIds
 
 interface OrderService {
     @POST("/orders")
-    fun postOrder(
+    suspend fun postOrder(
         @Body cartItemIds: CartItemIds,
-    ): Call<Unit>
+    )
 }

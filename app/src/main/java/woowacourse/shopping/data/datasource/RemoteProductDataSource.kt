@@ -5,12 +5,12 @@ import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.ProductResponse
 
 interface RemoteProductDataSource {
-    fun getProducts(
+    suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Call<ProductResponse>
+    ): ProductResponse
 
-    fun getProductById(id: Int): Call<Product>
+    suspend fun getProductById(id: Int): Product
 }

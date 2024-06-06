@@ -9,30 +9,30 @@ import woowacourse.shopping.data.remote.CartService
 class DefaultRemoteCartDataSource(
     private val cartService: CartService,
 ) : RemoteCartDataSource {
-    override fun getCartItems(
+    override suspend fun getCartItems(
         page: Int,
         size: Int,
         sort: String,
-    ): Call<CartResponse> {
+    ): CartResponse {
         return cartService.getCartItems(page, size, sort)
     }
 
-    override fun addCartItem(cartItemRequestBody: CartItemRequestBody): Call<Unit> {
+    override suspend fun addCartItem(cartItemRequestBody: CartItemRequestBody) {
         return cartService.addCartItem(cartItemRequestBody)
     }
 
-    override fun deleteCartItem(cartItemId: Int): Call<Unit> {
+    override suspend fun deleteCartItem(cartItemId: Int) {
         return cartService.deleteCartItem(cartItemId)
     }
 
-    override fun updateCartItem(
+    override suspend fun updateCartItem(
         cartItemId: Int,
         cartQuantity: CartQuantity,
-    ): Call<Unit> {
+    ) {
         return cartService.updateCartItem(cartItemId, cartQuantity)
     }
 
-    override fun getCartTotalQuantity(): Call<CartQuantity> {
+    override suspend fun getCartTotalQuantity(): CartQuantity {
         return cartService.getCartTotalQuantity()
     }
 }

@@ -1,21 +1,17 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.ProductDomain
-import woowacourse.shopping.domain.model.ProductItemDomain
+import woowacourse.shopping.domain.model.OrderableProduct
+import woowacourse.shopping.domain.model.ProductDomain2
 
 interface ProductRepository {
-    fun getProducts(
+    suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-        onSuccess: (ProductDomain) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): Result<ProductDomain2>
 
-    fun getProductById(
-        id: Int,
-        onSuccess: (ProductItemDomain) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun getProductById(id: Int): Result<OrderableProduct>
+
+    suspend fun getRecommendedProducts(): Result<List<OrderableProduct>>
 }
