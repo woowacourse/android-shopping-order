@@ -40,7 +40,6 @@ class DetailActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
-//        viewModel.saveRecentProduct(isMostRecentProductClicked)
     }
 
 //    override fun onRestart() {
@@ -89,6 +88,7 @@ class DetailActivity : AppCompatActivity() {
                 is DetailUiEvent.NavigateToRecentProduct -> navigateToDetail(event.productId)
                 is DetailUiEvent.NavigateBack -> finish()
             }
+            viewModel.saveRecentProduct(isMostRecentProductClicked)
         }
     }
 

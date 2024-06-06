@@ -129,10 +129,6 @@ class HomeViewModel(
     }
 
     override fun navigateToDetail(productId: Int) {
-        recentProductRepository.save(
-            homeProductUiState.value?.productItems?.firstOrNull { it.product.id == productId }?.product?.toProduct()
-                ?: return,
-        )
         _homeUiEvent.value = Event(HomeUiEvent.NavigateToDetail(productId))
     }
 

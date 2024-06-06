@@ -3,6 +3,7 @@ package woowacourse.shopping.view.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.model.toProduct
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -119,5 +120,11 @@ class DetailViewModel(
             onFailure = {
             },
         )
+    }
+
+    fun saveRecentProduct(mostRecentProductClicked: Boolean) {
+        if (mostRecentProductClicked) return
+        println(productDetailUiState.value?.product?.toProduct())
+        recentProductRepository.save(productDetailUiState.value?.product?.toProduct() ?: return)
     }
 }
