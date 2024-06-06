@@ -6,6 +6,8 @@ import java.time.LocalTime
 import java.util.Date
 
 class MiracleSale(override val coupon: Coupon) : CouponState() {
+    override fun createState(coupon: Coupon): CouponState = MiracleSale(coupon)
+
     override fun isValidCoupon(carts: List<Cart>): Boolean {
         if (coupon.expirationDate < Date.from(Instant.now())) return false
         val availableTime = coupon.availableTime ?: return false

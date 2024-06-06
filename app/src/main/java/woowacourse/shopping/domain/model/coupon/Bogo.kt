@@ -7,6 +7,8 @@ import java.util.Date
 class Bogo(override val coupon: Coupon) : CouponState() {
     private lateinit var discountCart: Cart
 
+    override fun createState(coupon: Coupon): CouponState = Bogo(coupon)
+
     override fun isValidCoupon(carts: List<Cart>): Boolean {
         if (coupon.expirationDate < Date.from(Instant.now())) return false
         val buyQuantity = coupon.buyQuantity ?: return false

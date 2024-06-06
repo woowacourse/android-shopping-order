@@ -13,4 +13,5 @@ data class Coupon(
     val getQuantity: Int? = null,
     val availableTime: AvailableTime? = null,
     val discountType: String,
+    val checked: Boolean = false,
 )

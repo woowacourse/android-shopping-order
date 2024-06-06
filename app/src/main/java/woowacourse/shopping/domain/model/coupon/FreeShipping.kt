@@ -5,6 +5,8 @@ import java.time.Instant
 import java.util.Date
 
 class FreeShipping(override val coupon: Coupon) : CouponState() {
+    override fun createState(coupon: Coupon): CouponState = FreeShipping(coupon)
+
     override fun isValidCoupon(carts: List<Cart>): Boolean {
         if (coupon.expirationDate < Date.from(Instant.now())) return false
         val minimumAmount = coupon.minimumAmount ?: return false
