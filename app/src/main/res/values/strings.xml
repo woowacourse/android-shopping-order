@@ -21,6 +21,21 @@
     <string name="tv_next_page_title"><![CDATA[>]]></string>
     <string name="tv_order">주문하기(%d)</string>
 
+    <!--    결제-->
+    <string name="tv_payment_title">결제하기</string>
+    <string name="tv_coupon_description_title">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="tv_coupon_title">적용 가능한 쿠폰</string>
+    <string name="order_amount_title">주문 금액</string>
+    <string name="discount_amount_title">쿠폰 할인 금액</string>
+    <string name="delivery_fee_amount_title">배송비</string>
+    <string name="total_amount_title">총 결제 금액</string>
+    <string name="coupon_expiration_date_format">만료일: yyyy년 MM월 dd일</string>
+    <string name="bogo_coupon_description">%d개 제품을 구매하면 %d개 제품을 무료로 제공합니다.</string>
+    <string name="fixed5000_coupon_description">최소 주문 금액 : %s</string>
+    <string name="free_shipping_coupon_description">배송비 무료 쿠폰은 도서 및 산간 지역인 경우에도 무료 배송이 가능합니다.</string>
+    <string name="miracle_sale_coupon_description">오전 %d시부터 오후 %d시까지</string>
+    <string name="empty_coupon_title">적용 가능한 쿠폰이 없습니다.</string>
+
     <!--    에러-->
     <string name="retry_title">재시도</string>
     <string name="network_error_title">인터넷 연결이 불안정해요.</string>
@@ -35,8 +50,6 @@
     <string name="unforeseen_error_message">예상치 못한 에러가 발생했습니다</string>
     <string name="no_such_element_exception_message">해당 상품 정보가 없습니다.</string>
     <string name="add_to_cart_success_message">상품을 성공적으로 장바구니에 담았습니다.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
