@@ -34,7 +34,7 @@ class CartRepositoryImpl(
         return cartDataSource.loadTotalCarts().toCartProducts()
     }
 
-    override fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
+    override suspend fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
         return runCatching {
             productIds
                 .asSequence()

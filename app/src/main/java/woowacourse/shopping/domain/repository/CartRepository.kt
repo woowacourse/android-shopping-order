@@ -10,7 +10,7 @@ interface CartRepository {
 
     fun totalCartProducts(): Result<List<CartProduct>>
 
-    fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>>
+    suspend fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>>
 
     fun updateCartProduct(
         productId: Long,

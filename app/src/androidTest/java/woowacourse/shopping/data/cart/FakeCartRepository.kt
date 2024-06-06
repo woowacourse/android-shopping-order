@@ -30,7 +30,7 @@ class FakeCartRepository(
         return Result.success(products)
     }
 
-    override fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
+    override suspend fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>> {
         return Result.success(products.filter { it.product.id in productIds })
     }
 

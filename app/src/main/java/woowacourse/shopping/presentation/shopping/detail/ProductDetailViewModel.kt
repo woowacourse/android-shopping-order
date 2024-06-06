@@ -50,13 +50,13 @@ class ProductDetailViewModel(
         }
     }
 
-    fun refreshDetailProduct() {
+    suspend fun refreshDetailProduct() {
         val id = _uiState.value?.cartProduct?.product?.id ?: return
         loadCartProduct(id)
         shoppingRepository.saveRecentProduct(id)
     }
 
-    fun loadCartProduct(id: Long) {
+    suspend fun loadCartProduct(id: Long) {
         cartRepository.filterCartProducts(listOf(id))
             .onSuccess {
                 if (it.isEmpty()) return loadProduct(id)

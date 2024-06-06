@@ -51,13 +51,15 @@ class ProductListViewModel(
     fun loadCartProducts() {
         val uiState = uiState.value ?: return
         val ids = uiState.products.map { it.id }
-        cartRepository.filterCartProducts(ids)
-            .onSuccess { newCartProducts ->
-                val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
-                _uiState.value = uiState.updateProducts(newProducts)
-            }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
-            }
+        viewModelScope.launch {
+            cartRepository.filterCartProducts(ids)
+                .onSuccess { newCartProducts ->
+                    val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
+                    _uiState.value = uiState.updateProducts(newProducts)
+                }.onFailure {
+                    _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
+                }
+        }
     }
 
     fun loadRecentProducts() {
