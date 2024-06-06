@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="couponUiModel"
+            type="woowacourse.shopping.presentation.ui.payment.model.CouponUiModel" />
+        <variable
+            name="paymentActionHandler"
+            type="woowacourse.shopping.presentation.ui.payment.PaymentActionHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_coupon"
+        android:padding="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+
+        <CheckBox
+            android:id="@+id/cb_coupon_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@{couponUiModel.description}"
+            android:checked="@{couponUiModel.checked}"
+            android:onClick="@{() -> paymentActionHandler.checkCoupon(couponUiModel)}"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_coupon_validation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/cb_coupon_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@{couponUiModel.expirationDate}" />
+
+        <TextView
+            android:id="@+id/tv_coupon_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_validation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@{String.valueOf(couponUiModel.minimumAmount)}" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
