@@ -30,7 +30,7 @@ object NetworkModule {
 
     val orderService: OrderService = tokenRetrofit.create(OrderService::class.java)
 
-    val couponService: OrderService = retrofit.create(OrderService::class.java)
+    val couponService: CouponService = retrofit.create(CouponService::class.java)
 
     private fun retrofitBuilder(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
