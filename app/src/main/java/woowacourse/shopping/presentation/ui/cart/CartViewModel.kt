@@ -171,10 +171,12 @@ class CartViewModel(
     }
 
     fun buildRecommendProducts() {
-        recentRepository.loadMostRecent().onSuccess { recentProduct ->
-            val recentViewedCategory = recentProduct?.category ?: "최근 본 아이템 없음"
-            viewModelScope.launch {
-                fetchProductByCategory(recentViewedCategory)
+        viewModelScope.launch {
+            recentRepository.loadMostRecent().onSuccess { recentProduct ->
+                val recentViewedCategory = recentProduct?.category ?: "최근 본 아이템 없음"
+                viewModelScope.launch { // TODO
+                    fetchProductByCategory(recentViewedCategory)
+                }
             }
         }
     }

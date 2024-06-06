@@ -14,7 +14,6 @@ import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.util.Event
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -63,18 +62,20 @@ class ProductDetailViewModel(
     }
 
     fun loadLastProduct() {
-        recentRepository.loadMostRecent().onSuccess {
-            it?.let {
-                _lastProduct.value = UiState.Success(it)
+        viewModelScope.launch {
+            recentRepository.loadMostRecent().onSuccess {
+                it?.let {
+                    _lastProduct.value = UiState.Success(it)
+                }
+            }.onFailure {
+                _error.value =
+                    Event(DetailError.RecentItemNotFound)
             }
-        }.onFailure {
-            _error.value =
-                Event(DetailError.RecentItemNotFound)
         }
     }
 
     private fun addRecentProduct(product: Product) {
-        thread {
+        viewModelScope.launch {
             recentRepository.add(
                 RecentProductItem(
                     productId = product.id,
@@ -84,7 +85,7 @@ class ProductDetailViewModel(
                     category = product.category,
                 ),
             )
-        }.join()
+        }
     }
 
     override fun onAddCartClick() {
