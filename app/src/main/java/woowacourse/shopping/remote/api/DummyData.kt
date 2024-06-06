@@ -1,13 +1,17 @@
 package woowacourse.shopping.remote.api
 
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.model.remote.AvailableTimeDto
 import woowacourse.shopping.data.model.remote.CartDto
+import woowacourse.shopping.data.model.remote.CouponDto
 import woowacourse.shopping.data.model.remote.ProductDto
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.model.Pageable
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Sort
+import woowacourse.shopping.presentation.model.CartsWrapper
 
 object DummyData {
     const val STUB_IMAGE_URL_A =
@@ -119,4 +123,73 @@ object DummyData {
                     Cart(id = index, product = productDto.toDomain())
                 },
         )
+
+    val PRODUCT =
+        Product(id = 1L, name = "홍차", price = 20000, category = "", imageUrl = STUB_IMAGE_URL_A)
+
+    val CARTS_WRAPPER =
+        CartsWrapper(
+            listOf(
+                Cart(
+                    id = 1,
+                    quantity = 3,
+                    product = PRODUCT.copy(id = 1L),
+                ),
+                Cart(
+                    id = 2,
+                    quantity = 3,
+                    product = PRODUCT.copy(id = 2L),
+                ),
+                Cart(
+                    id = 3,
+                    quantity = 3,
+                    product = PRODUCT.copy(id = 3L),
+                ),
+            ),
+        )
+
+    val COUPONS =
+        listOf(
+            CouponDto(
+                id = 1,
+                code = "FIXED5000",
+                description = "5,000원 할인 쿠폰",
+                expirationDate = "2024-11-30",
+                discount = 5000,
+                minimumAmount = 100000,
+                discountType = "fixed",
+            ),
+            CouponDto(
+                id = 2,
+                code = "BOGO",
+                description = "2개 구매 시 1개 무료 쿠폰",
+                expirationDate = "2024-05-30",
+                buyQuantity = 2,
+                getQuantity = 1,
+                discountType = "buyXgetY",
+            ),
+            CouponDto(
+                id = 3,
+                code = "FREESHIPPING",
+                description = "5만원 이상 구매 시 무료 배송 쿠폰",
+                expirationDate = "2024-08-31",
+                minimumAmount = 50000,
+                discountType = "freeShipping",
+            ),
+            CouponDto(
+                id = 4,
+                code = "MIRACLESALE",
+                description = "미라클모닝 30% 할인 쿠폰",
+                expirationDate = "2024-07-31",
+                discount = 30,
+                availableTime =
+                    AvailableTimeDto(
+                        start = "04:00:00",
+                        end = "07:00:00",
+                    ),
+                discountType = "percentage",
+            ),
+        )
+
+    val COUPONS_STATE = COUPONS.map { it.toDomain() }
 }
