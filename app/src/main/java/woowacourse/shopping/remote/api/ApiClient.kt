@@ -20,4 +20,9 @@ class ApiClient {
         private const val BASE_URL = "/orders"
         const val POST_ORDER = BASE_URL
     }
+
+    object Coupon {
+        private const val BASE_URL = "/coupons"
+        const val GET_COUPONS = BASE_URL
+    }
 }

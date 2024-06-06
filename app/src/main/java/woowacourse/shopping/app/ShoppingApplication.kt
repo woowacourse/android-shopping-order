@@ -4,14 +4,17 @@ import android.app.Application
 import androidx.preference.PreferenceManager
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.datasource.local.ProductHistoryDataSource
+import woowacourse.shopping.data.datasource.remote.CouponDataSource
 import woowacourse.shopping.data.datasource.remote.OrderDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
 import woowacourse.shopping.data.datasource.remote.ShoppingCartDataSource
 import woowacourse.shopping.data.provider.AuthProvider
+import woowacourse.shopping.data.repsoitory.CouponRepositoryImpl
 import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
+import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -21,6 +24,7 @@ import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
 import woowacourse.shopping.remote.api.BaseUrl
 import woowacourse.shopping.remote.api.NetworkModule
+import woowacourse.shopping.remote.datasource.CouponDataSourceImpl
 import woowacourse.shopping.remote.datasource.OrderDataSourceImpl
 import woowacourse.shopping.remote.datasource.ProductDataSourceImpl
 import woowacourse.shopping.remote.datasource.ShoppingCartDataSourceImpl
@@ -69,10 +73,15 @@ class ShoppingApplication : Application() {
                 dao = ProductHistoryDatabase.getDatabase(applicationContext).dao(),
             )
         ProductHistoryDataSource.setInstance(productHistoryDataSourceImpl)
+
+        val couponDataSourceImpl =
+            CouponDataSourceImpl(service = NetworkModule.getInstance().couponService)
+        CouponDataSource.setInstance(couponDataSourceImpl)
     }
 
     private fun initRepositories() {
-        val shoppingCartRepositoryImpl = ShoppingCartRepositoryImpl(dataSource = ShoppingCartDataSource.getInstance())
+        val shoppingCartRepositoryImpl =
+            ShoppingCartRepositoryImpl(dataSource = ShoppingCartDataSource.getInstance())
         ShoppingCartRepository.setInstance(shoppingCartRepositoryImpl)
 
         val productRepositoryImpl =
@@ -92,6 +101,9 @@ class ShoppingApplication : Application() {
                 shoppingCartDataSource = ShoppingCartDataSource.getInstance(),
             )
         ProductHistoryRepository.setInstance(productHistoryRepositoryImpl)
+
+        val couponRepositoryImpl = CouponRepositoryImpl(dataSource = CouponDataSource.getInstance())
+        CouponRepository.setInstance(couponRepositoryImpl)
     }
 
     companion object {
