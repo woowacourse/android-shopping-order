@@ -9,7 +9,6 @@ data class FreeShipping(
     override val description: String,
     override val expirationDate: LocalDate,
     override val discountType: String,
-    val discount: Int,
     val minimumAmount: Int,
 ) : Coupon {
     override fun canUse(products: List<ProductWithQuantity>): Boolean {
