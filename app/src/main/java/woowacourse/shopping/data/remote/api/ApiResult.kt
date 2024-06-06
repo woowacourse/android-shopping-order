@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.remote.api
 
-sealed interface ApiResult {
-    data class Success(val result: Any?) : ApiResult
+sealed interface ApiResult<T : Any?> {
+    data class Success<T : Any?>(val data: T) : ApiResult<T>
 
-    data object Fail : ApiResult
+    data class Error<T : Any?>(val code: Int, val message: String?) : ApiResult<T>
 
-    data class Error(val e: Throwable) : ApiResult
+    data class Exception<T : Any?>(val e: Throwable) : ApiResult<T>
 }
