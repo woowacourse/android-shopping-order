@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartItemsBinding
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
@@ -60,5 +61,7 @@ class CartItemFragment : Fragment() {
         binding.rvCart.itemAnimator = null
         adapter = CartAdapter(viewModel)
         binding.rvCart.adapter = adapter
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.vm = viewModel
     }
 }
