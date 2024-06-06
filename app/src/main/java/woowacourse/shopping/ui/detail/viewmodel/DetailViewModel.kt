@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.detail.action.DetailNavigationActions
 import woowacourse.shopping.ui.detail.listener.DetailClickListener
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.home.listener.QuantityClickListener
@@ -46,17 +47,9 @@ class DetailViewModel(
     val isMostRecentProductVisible: LiveData<Boolean>
         get() = _isMostRecentProductVisible
 
-    private val _navigateToCart = MutableLiveData<Event<Unit>>()
-    val navigateToCart: LiveData<Event<Unit>>
-        get() = _navigateToCart
-
-    private val _navigateToRecentDetail = MutableLiveData<Event<Unit>>()
-    val navigateToRecentDetail: LiveData<Event<Unit>>
-        get() = _navigateToRecentDetail
-
-    private val _isFinishButtonClicked = MutableLiveData<Event<Unit>>()
-    val isFinishButtonClicked: LiveData<Event<Unit>>
-        get() = _isFinishButtonClicked
+    private val _detailNavigationActions = MutableLiveData<Event<DetailNavigationActions>>()
+    val detailNavigationActions: LiveData<Event<DetailNavigationActions>>
+        get() = _detailNavigationActions
 
     init {
         loadProduct()
@@ -114,12 +107,12 @@ class DetailViewModel(
 
     override fun onPutCartButtonClick() {
         saveCartItem()
-        _navigateToCart.value = Event(Unit)
+        _detailNavigationActions.value = Event(DetailNavigationActions.NavigateToCart)
     }
 
     override fun onRecentProductClick() {
         _isMostRecentProductVisible.value = false
-        _navigateToRecentDetail.value = Event(Unit)
+        _detailNavigationActions.value = Event(DetailNavigationActions.NavigateToRecentDetail)
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
@@ -131,6 +124,6 @@ class DetailViewModel(
     }
 
     override fun onFinishButtonClick() {
-        _isFinishButtonClicked.value = Event(Unit)
+        _detailNavigationActions.value = Event(DetailNavigationActions.NavigateToBack)
     }
 }

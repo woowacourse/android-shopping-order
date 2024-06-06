@@ -7,13 +7,14 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
 import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
+import woowacourse.shopping.ui.detail.action.DetailNavigationActions
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModelFactory
 import woowacourse.shopping.ui.order.OrderActivity
@@ -68,21 +69,13 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.navigateToCart.observe(this) { navigateToCart ->
-            navigateToCart.getContentIfNotHandled()?.let {
-                putCartItem()
-            }
-        }
-
-        viewModel.navigateToRecentDetail.observe(this) { navigateToRecentDetail ->
-            navigateToRecentDetail.getContentIfNotHandled()?.let {
-                navigateToDetail()
-            }
-        }
-
-        viewModel.isFinishButtonClicked.observe(this) { finish ->
-            finish.getContentIfNotHandled()?.let {
-                finish()
+        viewModel.detailNavigationActions.observe(this) { detailNavigationActions ->
+            detailNavigationActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is DetailNavigationActions.NavigateToCart -> putCartItem()
+                    is DetailNavigationActions.NavigateToRecentDetail -> navigateToDetail()
+                    is DetailNavigationActions.NavigateToBack -> finish()
+                }
             }
         }
     }
