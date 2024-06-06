@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 interface OrderRepository {
-    fun completeOrder(
+    suspend fun completeOrder(
         productIds: List<Long>,
         onSuccess: () -> Unit,
         onFailure: () -> Unit,

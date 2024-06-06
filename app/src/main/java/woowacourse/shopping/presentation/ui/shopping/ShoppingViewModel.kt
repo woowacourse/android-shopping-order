@@ -67,20 +67,22 @@ class ShoppingViewModel(
     }
 
     fun fetchCartItemCount() {
-        cartRepository.getCount(
-            onSuccess = { _cartItemQuantity.value = it },
-            onFailure = { Event(ShoppingError.CartItemCountNotFound) },
-        )
+        viewModelScope.launch {
+            cartRepository.getCount()
+                .onSuccess {
+                    _cartItemQuantity.value = it
+                }.onFailure { Event(ShoppingError.CartItemCountNotFound) }
+        }
     }
 
     private fun fetchInitialCartProducts() {
-        cartRepository.loadAll(
-            onSuccess = { cartItems ->
-                cartProducts = cartItems
-                fetchProductsByPage()
-            },
-            onFailure = { _error.value = Event(ShoppingError.CartItemsNotFound) },
-        )
+        viewModelScope.launch {
+            cartRepository.loadAll()
+                .onSuccess { cartItems ->
+                    cartProducts = cartItems
+                    fetchProductsByPage()
+                }.onFailure { _error.value = Event(ShoppingError.CartItemsNotFound) }
+        }
     }
 
     private fun fetchProductsByPage() {
@@ -137,30 +139,32 @@ class ShoppingViewModel(
 
     override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
         product ?: return
-        cartRepository.modifyExistCartQuantity(
-            productId = product.id,
-            quantityDelta = -1,
-            onSuccess = { _, resultQuantity ->
+
+        viewModelScope.launch {
+            cartRepository.applyDeltaToCartQuantity(
+                productId = product.id,
+                quantityDelta = -1,
+            ).onSuccess { resultQuantity ->
                 setNewShoppingProductQuantity(product.id, resultQuantity)
-            },
-            onFailure = {
+            }.onFailure {
                 _error.value = Event(ShoppingError.CartItemsNotModified)
-            },
-        )
+            }
+        }
     }
 
     override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
         product ?: return
-        cartRepository.modifyExistCartQuantity(
-            productId = product.id,
-            quantityDelta = 1,
-            onSuccess = { _, incrementAmount ->
-                setNewShoppingProductQuantity(product.id, incrementAmount)
-            },
-            onFailure = {
+
+        viewModelScope.launch {
+            cartRepository.applyDeltaToCartQuantity(
+                productId = product.id,
+                quantityDelta = 1,
+            ).onSuccess { resultQuantity ->
+                setNewShoppingProductQuantity(product.id, resultQuantity)
+            }.onFailure {
                 _error.value = Event(ShoppingError.CartItemsNotModified)
-            },
-        )
+            }
+        }
     }
 
     fun setNewShoppingProductQuantity(

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.RecentProductItem
@@ -22,9 +21,9 @@ class ProductDetailViewModel(
     private val cartRepository: CartRepository,
     private val recentRepository: RecentRepository,
 ) : ViewModel(), DetailHandler {
-    private val _product =
+    private val _shoppingProduct =
         MutableLiveData<ProductListItem.ShoppingProductItem>()
-    val product: LiveData<ProductListItem.ShoppingProductItem> get() = _product
+    val shoppingProduct: LiveData<ProductListItem.ShoppingProductItem> get() = _shoppingProduct
 
     private val _lastProduct = MutableLiveData<UiState<RecentProductItem>>()
     val lastProduct: LiveData<UiState<RecentProductItem>> get() = _lastProduct
@@ -36,31 +35,31 @@ class ProductDetailViewModel(
     val moveEvent: LiveData<Event<FromDetailToScreen>> get() = _moveEvent
 
     fun fetchInitialData(productId: Long) {
-        var cart: Cart?
-        cartRepository.loadById(
-            productId,
-            onSuccess = {
-                cart = it
-                val quantity = cart?.quantity ?: 0
-                viewModelScope.launch {
-                    productRepository.loadById(productId).onSuccess { product ->
-                        _product.value =
-                            ProductListItem.ShoppingProductItem(
-                                id = productId,
-                                name = product.name,
-                                imgUrl = product.imgUrl,
-                                price = product.price,
-                                category = product.category,
-                                quantity = quantity,
-                            )
-                        addRecentProduct(product)
-                    }.onFailure {
-                        _error.value = Event(DetailError.ProductItemsNotFound)
-                    }
-                }
-            },
-            onFailure = {},
-        )
+        viewModelScope.launch {
+            productRepository.loadById(productId).onSuccess { product ->
+                addRecentProduct(product)
+                _shoppingProduct.value =
+                    ProductListItem.ShoppingProductItem(
+                        id = product.id,
+                        name = product.name,
+                        imgUrl = product.imgUrl,
+                        price = product.price,
+                        category = product.category,
+                        quantity = 0,
+                    )
+                fetchCartQuantity(product.id)
+            }.onFailure {
+                _error.value = Event(DetailError.ProductItemsNotFound)
+            }
+        }
+    }
+
+    private fun fetchCartQuantity(productId: Long) {
+        viewModelScope.launch {
+            cartRepository.loadById(productId).onSuccess { cart ->
+                _shoppingProduct.value = shoppingProduct.value?.copy(quantity = cart.quantity)
+            }
+        }
     }
 
     fun loadLastProduct() {
@@ -89,22 +88,21 @@ class ProductDetailViewModel(
     }
 
     override fun onAddCartClick() {
-        product.value ?: run {
-            return
-        }
-        cartRepository.setNewCartQuantity(
-            productId = product.value!!.id,
-            newQuantity = product.value!!.quantity,
-            onSuccess = { _, quantity ->
-                saveCartItem(product.value!!.id, quantity)
-            },
-            onFailure = {
+        shoppingProduct.value ?: return
+        viewModelScope.launch {
+            val quantity = shoppingProduct.value!!.quantity
+            cartRepository.setNewCartQuantity(
+                productId = shoppingProduct.value!!.id,
+                newQuantity = quantity,
+            ).onSuccess {
+                setEventToShoppingScreen(shoppingProduct.value!!.id, quantity)
+            }.onFailure {
                 _error.value = Event(DetailError.CartItemNotFound)
-            },
-        )
+            }
+        }
     }
 
-    private fun saveCartItem(
+    private fun setEventToShoppingScreen(
         productId: Long,
         quantity: Int,
     ) {
@@ -123,18 +121,18 @@ class ProductDetailViewModel(
 
     override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
         product ?: return
-        val updatedQuantity = product.quantity - 1
-        if (updatedQuantity > 0) {
-            _product.value = product.copy(quantity = updatedQuantity)
+        val resultQuantity = product.quantity - 1
+        if (resultQuantity > 0) {
+            _shoppingProduct.value = product.copy(quantity = resultQuantity)
         }
     }
 
     override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
         product ?: return
-        val updatedItem =
+        val updatedProduct =
             product.let {
                 it.copy(quantity = it.quantity + 1)
             }
-        _product.value = updatedItem
+        _shoppingProduct.value = updatedProduct
     }
 }

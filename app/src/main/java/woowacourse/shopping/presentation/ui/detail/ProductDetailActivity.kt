@@ -30,7 +30,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         checkIsLastViewedProduct()
         initActionBarTitle()
         fetchInitialData()
-        observeLiveDatas()
+        observeLiveData()
     }
 
     private fun checkIsLastViewedProduct() {
@@ -44,12 +44,11 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
 
     private fun fetchInitialData() {
         productId = intent.getLongExtra(EXTRA_PRODUCT_ID, -1L)
-//        val quantity = intent.getIntExtra(EXTRA_QUANTITY, 0)
         if (productId == -1L) finish()
         viewModel.fetchInitialData(productId)
     }
 
-    private fun observeLiveDatas() {
+    private fun observeLiveData() {
         observeLastProductUpdates()
         observeErrorEventUpdates()
         observeMoveEvent()
@@ -100,7 +99,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     companion object {
-//        const val EXTRA_QUANTITY = "quantity"
+        //        const val EXTRA_QUANTITY = "quantity"
         const val EXTRA_PRODUCT_ID = "productId"
         const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
         private const val EXTRA_IS_LAST_VIEWED_PRODUCT = "isLastViewedProduct"

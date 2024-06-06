@@ -90,19 +90,27 @@ class CartViewModel(
     fun loadAllCartItems(pageSize: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
-            cartRepository.load(0, pageSize, onSuccess = { carts, _ ->
-                _shoppingProducts.value = UiState.Success(carts.map { it.toShoppingProduct() })
-            }, onFailure = { _error.value = Event(CartError.CartItemsNotFound) })
+            viewModelScope.launch {
+                cartRepository.load(0, pageSize).onSuccess { carts ->
+                    _shoppingProducts.value = UiState.Success(carts.map { it.toShoppingProduct() })
+                }.onFailure { _error.value = Event(CartError.CartItemsNotFound) }
+            }
         }, 500)
     }
 
     override fun onDeleteClick(product: ProductListItem.ShoppingProductItem) {
-        cartRepository.deleteExistCartItem(product.id, onSuccess = { productId, newQuantity ->
-            addChangedCartProducts(productId, product, newQuantity)
-            val newShoppingProduct =
-                (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.filter { it.id != product.id }
-            _shoppingProducts.value = UiState.Success(newShoppingProduct)
-        }, onFailure = { _error.value = Event(CartError.CartItemNotDeleted) })
+        val shoppingProductState = shoppingProducts.value
+        if (shoppingProductState !is UiState.Success) return
+        viewModelScope.launch {
+            cartRepository.deleteExistCartItem(product.id).onSuccess {
+                addChangedCartProducts(product.id, product, 0)
+                val updatedShoppingProducts =
+                    shoppingProductState.data.filter { it.id != product.id }
+                _shoppingProducts.value = UiState.Success(updatedShoppingProducts)
+            }.onFailure {
+                _error.value = Event(CartError.CartItemNotDeleted)
+            }
+        }
     }
 
     override fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem) {
@@ -187,35 +195,33 @@ class CartViewModel(
     }
 
     override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
-        val updatedQuantity = product?.let { it.quantity - 1 } ?: 1
-        if (updatedQuantity > 0) {
-            product?.let {
-                cartRepository.modifyExistCartQuantity(
-                    productId = it.id,
-                    quantityDelta = -1,
-                    onSuccess = { _, resultQuantity ->
+        viewModelScope.launch {
+            val updatedQuantity = product?.let { it.quantity - 1 } ?: 1
+            if (updatedQuantity > 0) {
+                product?.let {
+                    cartRepository.applyDeltaToCartQuantity(
+                        productId = it.id,
+                        quantityDelta = -1,
+                    ).onSuccess { resultQuantity ->
                         addChangedCartProducts(it.id, it, resultQuantity)
                         val orderState = orderState.value ?: throw IllegalStateException()
                         handleQuantity(orderState, it, resultQuantity)
-                    },
-                    onFailure = {},
-                )
+                    }.onFailure {}
+                }
             }
         }
     }
 
     override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
         product?.let {
-            cartRepository.modifyExistCartQuantity(
-                productId = it.id,
-                quantityDelta = 1,
-                onSuccess = { _, resultQuantity ->
-                    addChangedCartProducts(it.id, it, resultQuantity)
-                    val orderState = orderState.value ?: throw IllegalStateException()
-                    handleQuantity(orderState, it, resultQuantity)
-                },
-                onFailure = {},
-            )
+            viewModelScope.launch {
+                cartRepository.applyDeltaToCartQuantity(productId = it.id, quantityDelta = 1)
+                    .onSuccess { resultQuantity ->
+                        addChangedCartProducts(it.id, it, resultQuantity)
+                        val orderState = orderState.value ?: throw IllegalStateException()
+                        handleQuantity(orderState, it, resultQuantity)
+                    }
+            }
         }
     }
 
@@ -274,9 +280,11 @@ class CartViewModel(
     fun completeOrder() {
         val productItemIds = selectedCartItems.value?.map { it.id } ?: emptyList()
         if (productItemIds.isNotEmpty()) {
-            orderRepository.completeOrder(productItemIds, onSuccess = {
-                _orderEvent.value = Event(OrderEvent.FinishOrder)
-            }, onFailure = {})
+            viewModelScope.launch {
+                orderRepository.completeOrder(productItemIds, onSuccess = {
+                    _orderEvent.value = Event(OrderEvent.FinishOrder)
+                }, onFailure = {})
+            }
         }
     }
 }

@@ -28,7 +28,7 @@
 
         <ImageView
             android:id="@+id/iv_product"
-            bindLoadImage="@{viewModel.product.imgUrl}"
+            bindLoadImage="@{viewModel.shoppingProduct.imgUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="17dp"
-            android:text="@{viewModel.product.name}"
+            android:text="@{viewModel.shoppingProduct.name}"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,12 +71,12 @@
             android:layout_marginEnd="14dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/line"
-            app:product="@{viewModel.product}"
+            app:product="@{viewModel.shoppingProduct}"
             app:quantityHandler="@{detailHandler}" />
 
         <TextView
             android:id="@+id/tv_price_value"
-            bindTextFormattedCurrency="@{viewModel.product.price*viewModel.product.quantity}"
+            bindTextFormattedCurrency="@{viewModel.shoppingProduct.price*viewModel.shoppingProduct.quantity}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -102,7 +102,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            currentProduct="@{viewModel.product}"
+            currentProduct="@{viewModel.shoppingProduct}"
             lastProduct="@{lastProduct}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
