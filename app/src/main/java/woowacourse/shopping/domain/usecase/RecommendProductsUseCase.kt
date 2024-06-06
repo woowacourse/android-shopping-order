@@ -5,14 +5,14 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 interface RecommendProductsUseCase {
-    operator fun invoke(): List<Product>
+    suspend operator fun invoke(): List<Product>
 }
 
 class DefaultRecommendProductsUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : RecommendProductsUseCase {
-    override operator fun invoke(): List<Product> {
+    override suspend fun invoke(): List<Product> {
         val recentProducts = productRepository.loadRecentProducts(1).getOrNull() ?: emptyList()
         val firstProduct = recentProducts.firstOrNull()
         val category = firstProduct?.category

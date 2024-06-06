@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
@@ -15,7 +17,6 @@ import woowacourse.shopping.domain.usecase.LoadPagingCartUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
-import kotlin.concurrent.thread
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -40,12 +41,9 @@ class CartViewModel(
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val newCart = uiState.cart.increaseProductCount(id, INCREMENT_AMOUNT)
-        _uiState.value = uiState.updateCart(PAGE_SIZE, newCart)
-        // (낙관적 업뎃!) 미리 UI를 업데이트하고, 백그라운드에서 데이터를 업데이트한다.
-        thread {
+        viewModelScope.launch {
             increaseCartProductUseCase(id, INCREMENT_AMOUNT).onSuccess {
+                val uiState = _uiState.value ?: return@launch
                 val newUiState = uiState.updateCart(PAGE_SIZE, it)
                 updateUiState(newUiState)
                 _updateCartEvent.postValue(Unit)
@@ -57,35 +55,30 @@ class CartViewModel(
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        if (uiState.cart.canDecreaseProductCount(id).not()) {
-            return _errorEvent.setValue(CartErrorEvent.DecreaseCartCountLimit)
-        }
-        val newCart = uiState.cart.decreaseProductCount(id, INCREMENT_AMOUNT)
-        _uiState.value = uiState.updateCart(PAGE_SIZE, newCart)
-        // (낙관적 업뎃!) 미리 UI를 업데이트하고 나서 백그라운드에서 데이터를 업데이트한다.
-        thread {
+        viewModelScope.launch {
             decreaseCartProductUseCase(id, INCREMENT_AMOUNT).onSuccess {
+                val uiState = _uiState.value ?: return@launch
                 val newUiState = uiState.updateCart(PAGE_SIZE, it)
                 updateUiState(newUiState)
-                _updateCartEvent.postValue(Unit)
+                _updateCartEvent.setValue(Unit)
             }.onFailure {
                 Timber.e(it)
-                _errorEvent.postValue(CartErrorEvent.UpdateCartProducts)
+                _errorEvent.setValue(CartErrorEvent.UpdateCartProducts)
             }
         }
     }
 
     override fun deleteProduct(product: CartProductUi) {
-        // 여기는 낙관적 업뎃 X
-        deleteCartProductUseCase(product.product.id).onSuccess {
-            val uiState = _uiState.value ?: return
-            val newUiState = uiState.updateCart(PAGE_SIZE, it)
-            updateUiState(newUiState)
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            Timber.e(it)
-            _errorEvent.setValue(CartErrorEvent.DeleteCartProduct)
+        viewModelScope.launch {
+            deleteCartProductUseCase(product.product.id).onSuccess {
+                val uiState = _uiState.value ?: return@launch
+                val newUiState = uiState.updateCart(PAGE_SIZE, it)
+                updateUiState(newUiState)
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                Timber.e(it)
+                _errorEvent.setValue(CartErrorEvent.DeleteCartProduct)
+            }
         }
     }
 
@@ -124,20 +117,19 @@ class CartViewModel(
     ) {
         val canLoadPrevPage = canLoadMoreCartProducts(currentPage - INCREMENT_AMOUNT)
         val canLoadNextPage = canLoadMoreCartProducts(currentPage + INCREMENT_AMOUNT)
-        _uiState.postValue(
+        _uiState.value =
             newUiState.copy(
                 currentPage = currentPage,
                 canLoadPrevPage = canLoadPrevPage,
                 canLoadNextPage = canLoadNextPage,
                 isLoading = isLoading,
-            ),
-        )
+            )
     }
 
     private fun loadCurrentPageCartProducts(page: Int) {
-        val uiState = _uiState.value ?: return
-        thread {
+        viewModelScope.launch {
             loadPagingCartUseCase(page.minus(1), PAGE_SIZE).onSuccess { newCart ->
+                val uiState = _uiState.value ?: return@launch
                 val newProducts = uiState.cart.addAll(newCart)
                 val newUiState = uiState.updateCart(PAGE_SIZE, newProducts)
                 updateUiState(newUiState, currentPage = page)
@@ -149,9 +141,8 @@ class CartViewModel(
     }
 
     fun loadTotalCartProducts() {
-        val uiState = _uiState.value ?: return
-        _uiState.value = uiState.copy(isLoading = true)
-        thread {
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
             loadCartUseCase().onSuccess { newCart ->
                 val newUiState = uiState.updateCart(PAGE_SIZE, newCart)
                 updateUiState(newUiState, currentPage = START_PAGE, isLoading = false)
@@ -220,9 +211,9 @@ private fun CartUiState.toggleAllOrderProducts(): CartUiState {
     val newPagingProducts =
         pagingProducts.map {
             it.key to
-                it.value.map { cartProductUi ->
-                    cartProductUi.copy(isSelected = !isSelectedAll)
-                }
+                    it.value.map { cartProductUi ->
+                        cartProductUi.copy(isSelected = !isSelectedAll)
+                    }
         }.toMap()
     return copy(
         pagingProducts = newPagingProducts,

@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 interface IncreaseCartProductUseCase {
-    operator fun invoke(
+    suspend operator fun invoke(
         productId: Long,
         amount: Int = DEFAULT_AMOUNT,
     ): Result<Cart>
@@ -19,7 +19,7 @@ class DefaultIncreaseCartProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : IncreaseCartProductUseCase {
-    override fun invoke(
+    override suspend fun invoke(
         productId: Long,
         amount: Int,
     ): Result<Cart> {
@@ -31,7 +31,7 @@ class DefaultIncreaseCartProductUseCase(
         // 2. cart 에서 product id 를 가진 상품을 찾는다.
         val cartProduct =
             cartRepository.findCartProduct(product.id).getOrNull()
-                // 3. cartProduct 가 없으면 새로 생성한다.
+            // 3. cartProduct 가 없으면 새로 생성한다.
                 ?: return cartRepository.createCartProduct(product, amount)
         // 4. cartProduct 수량을 증가시킨다.
         val newCartProduct = cartProduct.increaseCount(amount)
@@ -39,19 +39,16 @@ class DefaultIncreaseCartProductUseCase(
     }
 
     companion object {
-        @Volatile
         private var instance: IncreaseCartProductUseCase? = null
 
         fun instance(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
         ): IncreaseCartProductUseCase {
-            return instance ?: synchronized(this) {
-                instance ?: DefaultIncreaseCartProductUseCase(
-                    productRepository,
-                    cartRepository,
-                ).also { instance = it }
-            }
+            return instance ?: DefaultIncreaseCartProductUseCase(
+                productRepository,
+                cartRepository,
+            ).also { instance = it }
         }
     }
 }

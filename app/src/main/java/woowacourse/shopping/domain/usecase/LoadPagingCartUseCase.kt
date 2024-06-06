@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 
 interface LoadPagingCartUseCase {
-    operator fun invoke(
+    suspend operator fun invoke(
         currentPage: Int,
         pageSize: Int,
     ): Result<Cart>
@@ -13,7 +13,7 @@ interface LoadPagingCartUseCase {
 class DefaultLoadPagingCartUseCase(
     private val cartRepository: CartRepository,
 ) : LoadPagingCartUseCase {
-    override fun invoke(
+    override suspend fun invoke(
         currentPage: Int,
         pageSize: Int,
     ): Result<Cart> {
@@ -21,14 +21,11 @@ class DefaultLoadPagingCartUseCase(
     }
 
     companion object {
-        @Volatile
         private var instance: LoadPagingCartUseCase? = null
 
         fun instance(cartRepository: CartRepository): LoadPagingCartUseCase {
-            return instance ?: synchronized(this) {
-                instance ?: DefaultLoadPagingCartUseCase(cartRepository)
-                    .also { instance = it }
-            }
+            return instance ?: DefaultLoadPagingCartUseCase(cartRepository)
+                .also { instance = it }
         }
     }
 }

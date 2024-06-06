@@ -3,7 +3,6 @@ package woowacourse.shopping.data.cart
 import androidx.annotation.VisibleForTesting
 import woowacourse.shopping.data.cart.datasource.CartDataSourceInjector
 import woowacourse.shopping.data.cart.order.DefaultOrderDataSource
-import woowacourse.shopping.data.common.ioExecutor
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.remote.service.OrderService
 
@@ -15,7 +14,7 @@ object CartRepositoryInjector {
         instance ?: synchronized(this) {
             instance ?: DefaultCartRepository(
                 CartDataSourceInjector.cartDataSource(),
-                DefaultOrderDataSource(ioExecutor, OrderService.instance()),
+                DefaultOrderDataSource(OrderService.instance()),
             ).also { instance = it }
         }
 

@@ -5,14 +5,14 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 interface DeleteCartProductUseCase {
-    operator fun invoke(productId: Long): Result<Cart>
+    suspend operator fun invoke(productId: Long): Result<Cart>
 }
 
 class DefaultDeleteCartProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : DeleteCartProductUseCase {
-    override operator fun invoke(productId: Long): Result<Cart> {
+    override suspend fun invoke(productId: Long): Result<Cart> {
         // 1. product id 유효성 검사
         productRepository.findProductById(productId)
             .onFailure { return Result.failure(it) }
@@ -22,17 +22,14 @@ class DefaultDeleteCartProductUseCase(
     }
 
     companion object {
-        @Volatile
         private var instance: DeleteCartProductUseCase? = null
 
         fun instance(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
         ): DeleteCartProductUseCase {
-            return instance ?: synchronized(this) {
-                instance ?: DefaultDeleteCartProductUseCase(productRepository, cartRepository)
-                    .also { instance = it }
-            }
+            return instance ?: DefaultDeleteCartProductUseCase(productRepository, cartRepository)
+                .also { instance = it }
         }
     }
 }

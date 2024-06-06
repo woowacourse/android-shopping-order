@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
@@ -15,7 +17,6 @@ import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.shopping.toCartUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
-import kotlin.concurrent.thread
 
 class OrderViewModel(
     orders: List<CartProductUi>,
@@ -36,12 +37,15 @@ class OrderViewModel(
     val errorEvent: SingleLiveData<OrderErrorEvent> get() = _errorEvent
 
     init {
-        val uiState = _uiState.value
-        val recommendProducts = recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
-        if (uiState != null) {
-            _uiState.value = uiState.copy(recommendProducts = recommendProducts)
-        } else {
-            _uiState.value = OrderUiState(orders, recommendProducts)
+        viewModelScope.launch {
+            val recommendProducts =
+                recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
+            val uiState = _uiState.value
+            if (uiState != null) {
+                _uiState.value = uiState.copy(recommendProducts = recommendProducts)
+            } else {
+                _uiState.value = OrderUiState(orders, recommendProducts)
+            }
         }
     }
 
@@ -50,49 +54,45 @@ class OrderViewModel(
     }
 
     fun orderProducts() {
-        thread {
-            val uiState = _uiState.value ?: return@thread
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
             orderCartProductsUseCase(uiState.totalOrderIds)
                 .onSuccess {
-                    _updateCartEvent.postValue(Unit)
-                    _finishOrderEvent.postValue(Unit)
+                    _updateCartEvent.setValue(Unit)
+                    _finishOrderEvent.setValue(Unit)
                 }.onFailure {
                     Timber.e(it)
-                    _errorEvent.postValue(OrderErrorEvent.OrderProducts)
+                    _errorEvent.setValue(OrderErrorEvent.OrderProducts)
                 }
         }
     }
 
     override fun increaseProductCount(id: Long) {
-        thread {
-            val uiState = _uiState.value ?: return@thread
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
             increaseCartProductCountUseCase(id, INCREMENT_AMOUNT)
                 .onSuccess {
-                    _uiState.postValue(
-                        uiState.increaseProductCount(id, INCREMENT_AMOUNT),
-                    )
-                    _updateCartEvent.postValue(Unit)
+                    _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+                    _updateCartEvent.setValue(Unit)
                 }.onFailure {
                     Timber.e(it)
-                    _errorEvent.postValue(OrderErrorEvent.IncreaseCartProduct)
+                    _errorEvent.setValue(OrderErrorEvent.IncreaseCartProduct)
                 }
         }
     }
 
     override fun decreaseProductCount(id: Long) {
-        thread {
-            val uiState = _uiState.value ?: return@thread
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
             decreaseCartProductUseCase(id).onSuccess {
-                _uiState.postValue(
-                    uiState.decreaseProductCount(
-                        id,
-                        INCREMENT_AMOUNT,
-                    ),
+                _uiState.value = uiState.decreaseProductCount(
+                    id,
+                    INCREMENT_AMOUNT,
                 )
-                _updateCartEvent.postValue(Unit)
+                _updateCartEvent.setValue(Unit)
             }.onFailure {
                 Timber.e(it)
-                _errorEvent.postValue(OrderErrorEvent.DecreaseCartProduct)
+                _errorEvent.setValue(OrderErrorEvent.DecreaseCartProduct)
             }
         }
     }
@@ -126,13 +126,13 @@ private fun OrderUiState.increaseProductCount(
 ): OrderUiState =
     copy(
         recommendProducts =
-            recommendProducts.map {
-                if (it.product.id == productId) {
-                    it.copy(count = it.count + amount)
-                } else {
-                    it
-                }
-            },
+        recommendProducts.map {
+            if (it.product.id == productId) {
+                it.copy(count = it.count + amount)
+            } else {
+                it
+            }
+        },
     )
 
 private fun OrderUiState.decreaseProductCount(

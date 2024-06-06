@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import woowacourse.shopping.local.converter.ShoppingConverters
-import woowacourse.shopping.local.dao.CartDao
 import woowacourse.shopping.local.dao.RecentProductDao
 import woowacourse.shopping.local.entity.CartEntity
 import woowacourse.shopping.local.entity.RecentProductEntity
@@ -17,7 +16,6 @@ import woowacourse.shopping.local.entity.RecentProductEntity
 )
 @TypeConverters(ShoppingConverters::class)
 abstract class ShoppingDatabase : RoomDatabase() {
-    abstract fun cartDao(): CartDao
 
     abstract fun recentProductDao(): RecentProductDao
 

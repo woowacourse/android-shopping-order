@@ -9,9 +9,9 @@ import woowacourse.shopping.remote.dto.request.OrderRequest
 
 interface OrderService {
     @POST("orders")
-    fun orderProducts(
+    suspend fun orderProducts(
         @Body body: OrderRequest,
-    ): Call<Unit>
+    )
 
     companion object {
         private var instance: OrderService? = null

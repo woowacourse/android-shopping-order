@@ -1,31 +1,19 @@
 package woowacourse.shopping.data.shopping.recent
 
 import woowacourse.shopping.local.dao.RecentProductDao
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.TimeUnit
 
 class DefaultRecentProductDataSource(
-    private val executors: ExecutorService,
     private val recentProductDao: RecentProductDao,
 ) : RecentProductDataSource {
-    override fun recentProducts(size: Int): Result<List<RecentProductData>> {
+    override suspend fun recentProducts(size: Int): Result<List<RecentProductData>> {
         return runCatching {
-            executors.submit(
-                Callable {
-                    recentProductDao.loadProducts(size)
-                },
-            )[TIME_OUT, TimeUnit.SECONDS].map { it.toData() }
+            recentProductDao.loadProducts(size).map { it.toData() }
         }
     }
 
-    override fun saveRecentProduct(product: RecentProductData): Result<Long> {
+    override suspend fun saveRecentProduct(product: RecentProductData): Result<Long> {
         return runCatching {
-            executors.submit(
-                Callable {
-                    recentProductDao.saveProduct(product.toEntity())
-                },
-            )[TIME_OUT, TimeUnit.SECONDS]
+            recentProductDao.saveProduct(product.toEntity())
         }
     }
 

@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 interface DecreaseCartProductUseCase {
-    operator fun invoke(
+    suspend operator fun invoke(
         productId: Long,
         amount: Int = DEFAULT_AMOUNT,
     ): Result<Cart>
@@ -19,7 +19,7 @@ class DefaultDecreaseCartProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : DecreaseCartProductUseCase {
-    override fun invoke(
+    override suspend fun invoke(
         productId: Long,
         amount: Int,
     ): Result<Cart> {
@@ -50,10 +50,9 @@ class DefaultDecreaseCartProductUseCase(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
         ): DecreaseCartProductUseCase {
-            return instance ?: synchronized(this) {
-                instance ?: DefaultDecreaseCartProductUseCase(productRepository, cartRepository)
-                    .also { instance = it }
-            }
+            return instance ?: DefaultDecreaseCartProductUseCase(productRepository, cartRepository)
+                .also { instance = it }
         }
     }
 }
+
