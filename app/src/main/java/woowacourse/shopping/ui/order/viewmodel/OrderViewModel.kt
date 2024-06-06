@@ -10,11 +10,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.event.Event
-import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.ui.home.viewmodel.HomeViewModel.Companion.ASCENDING_SORT_ORDER
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
 import woowacourse.shopping.ui.order.action.OrderNotifyingActions
 import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
@@ -22,17 +18,13 @@ import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.cart.listener.CartClickListener
 import woowacourse.shopping.ui.order.listener.OrderClickListener
-import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions
 import woowacourse.shopping.ui.order.recommend.listener.RecommendClickListener
 import woowacourse.shopping.ui.state.OrderState
 import woowacourse.shopping.ui.state.UiState
-import kotlin.math.min
 
 class OrderViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
-    private val recentProductRepository: RecentProductRepository,
-    private val productRepository: ProductRepository,
 ) : ViewModel(),
     CartClickListener,
     OrderClickListener,
@@ -40,7 +32,7 @@ class OrderViewModel(
     // 공용
     val totalPrice: LiveData<Int>
         get() =
-            selectedCartViewItems.map { selectedCartViewItemsValue ->
+            _selectedCartViewItems.map { selectedCartViewItemsValue ->
                 selectedCartViewItemsValue.sumOf { selectedCartViewItem ->
                     selectedCartViewItem.cartItem.totalPrice
                 }
@@ -48,7 +40,7 @@ class OrderViewModel(
 
     val selectedCartViewItemSize: LiveData<Int>
         get() =
-            selectedCartViewItems.map { selectedCartViewItemsValue ->
+            _selectedCartViewItems.map { selectedCartViewItemsValue ->
                 selectedCartViewItemsValue.sumOf { selectedCartViewItem ->
                     selectedCartViewItem.cartItem.quantity
                 }
@@ -56,7 +48,7 @@ class OrderViewModel(
 
     val allCheckBoxChecked: LiveData<Boolean>
         get() =
-            cartViewItems.map { cartViewItemsValue ->
+            _cartViewItems.map { cartViewItemsValue ->
                 if (cartUiState.value is UiState.Success && cartViewItemsValue.isNotEmpty()) {
                     cartViewItemsValue.all { selectedCartViewItem -> selectedCartViewItem.isChecked }
                 } else {
@@ -72,18 +64,27 @@ class OrderViewModel(
     val orderNotifyingActions: LiveData<Event<OrderNotifyingActions>>
         get() = _orderNotifyingActions
 
+    private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
+    val orderState: LiveData<OrderState>
+        get() = _orderState
+
     // Cart
     private val _cartUiState =
         MutableLiveData<UiState<List<CartViewItem>>>(UiState.Loading)
     val cartUiState: LiveData<UiState<List<CartViewItem>>>
         get() = _cartUiState
 
-    private val cartViewItems = MutableLiveData<List<CartViewItem>>()
-    private val selectedCartViewItems = MutableLiveData<List<CartViewItem>>(emptyList())
+    private val _cartViewItems = MutableLiveData<List<CartViewItem>>()
+    val cartViewItems: LiveData<List<CartViewItem>>
+        get() = _cartViewItems
+
+    private val _selectedCartViewItems = MutableLiveData<List<CartViewItem>>()
+    val selectedCartViewItems: LiveData<List<CartViewItem>>
+        get() = _selectedCartViewItems
 
     val isCartEmpty: LiveData<Boolean>
         get() =
-            cartViewItems.map { cartViewItemsValue ->
+            _cartViewItems.map { cartViewItemsValue ->
                 cartViewItemsValue.isEmpty()
             }
 
@@ -96,19 +97,6 @@ class OrderViewModel(
         get() = _cartNotifyingActions
 
     // Recommend
-    private val _recommendUiState =
-        MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
-    val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
-        get() = _recommendUiState
-
-    private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
-    val orderState: LiveData<OrderState>
-        get() = _orderState
-
-
-    private val _recommendNavigationActions = MutableLiveData<Event<RecommendNavigationActions>>()
-    val recommendNavigationActions: LiveData<Event<RecommendNavigationActions>>
-        get() = _recommendNavigationActions
 
 
     init {
@@ -117,31 +105,12 @@ class OrderViewModel(
         }, 1000)
     }
 
-    fun generateRecommendProductViewItems() {
-        runCatching {
-            val mostRecentProduct = recentProductRepository.findMostRecentProduct()
-            productRepository.getProducts(
-                mostRecentProduct?.category,
-                0,
-                Int.MAX_VALUE,
-                ASCENDING_SORT_ORDER,
-            )
-        }.onSuccess { productResponse ->
-            val selectedProducts =
-                selectedCartViewItems.value?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
-                    ?: return@onSuccess
-            var sameCategoryProducts = productResponse.getOrNull()?.products
-                ?: return@onSuccess
-            sameCategoryProducts =
-                sameCategoryProducts.filter { sameCategoryProduct ->
-                    !selectedProducts.contains(sameCategoryProduct)
-                }.shuffled()
+    fun updateCartViewItems(newCartViewItems: List<CartViewItem>) {
+        _cartViewItems.value = newCartViewItems
+    }
 
-            val numberOfRecommend = min(DEFAULT_NUMBER_OF_RECOMMEND, sameCategoryProducts.size)
-            val recommendProductViewItems =
-                sameCategoryProducts.subList(0, numberOfRecommend).map(::ProductViewItem)
-            _recommendUiState.value = UiState.Success(recommendProductViewItems)
-        }
+    fun updateSelectedCartViewItems(newSelectedCatViewItems: List<CartViewItem>) {
+        _selectedCartViewItems.value = newSelectedCatViewItems
     }
 
     private fun loadCartViewItems() {
@@ -149,26 +118,26 @@ class OrderViewModel(
             val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
             cartRepository.getCartItems(0, cartTotalQuantity, DESCENDING_SORT_ORDER)
         }.onSuccess {
-            cartViewItems.value =
+            _cartViewItems.value =
                 it.getOrNull()?.map(::CartViewItem)
-            _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+            _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
         }.onFailure {
             _cartUiState.value = UiState.Error(it)
         }
     }
 
     private fun getCartViewItemByCartItemId(cartItemId: Int): CartViewItem? {
-        return cartViewItems.value?.firstOrNull { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
+        return _cartViewItems.value?.firstOrNull { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
     }
 
     private fun getCartViewItemByProductId(productId: Int): CartViewItem? {
-        return cartViewItems.value?.firstOrNull { cartViewItem ->
+        return _cartViewItems.value?.firstOrNull { cartViewItem ->
             cartViewItem.cartItem.product.productId == productId
         }
     }
 
     private fun getCartViewItemPosition(cartItemId: Int): Int? {
-        return cartViewItems.value?.indexOfFirst { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
+        return _cartViewItems.value?.indexOfFirst { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
     }
 
     override fun onCheckBoxClick(cartItemId: Int) {
@@ -176,18 +145,18 @@ class OrderViewModel(
         updatedCartItem = updatedCartItem.toggleCheck()
 
         if (updatedCartItem.isChecked) {
-            selectedCartViewItems.value = selectedCartViewItems.value?.plus(updatedCartItem)
+            _selectedCartViewItems.value = _selectedCartViewItems.value?.plus(updatedCartItem)
         } else {
-            selectedCartViewItems.value =
-                selectedCartViewItems.value?.filter { it.cartItem.cartItemId != cartItemId }
+            _selectedCartViewItems.value =
+                _selectedCartViewItems.value?.filter { it.cartItem.cartItemId != cartItemId }
         }
 
         val position = getCartViewItemPosition(cartItemId) ?: return
-        val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
+        val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return
         newCartViewItems[position] = updatedCartItem
-        cartViewItems.value = newCartViewItems
-        selectedCartViewItems.value = selectedCartViewItems.value
-        _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+        _cartViewItems.value = newCartViewItems
+        _selectedCartViewItems.value = _selectedCartViewItems.value
+        _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
     }
 
     override fun onCartItemClick(productId: Int) {
@@ -199,21 +168,21 @@ class OrderViewModel(
             cartRepository.deleteCartItem(cartItemId)
         }.onSuccess {
             val deletedCartViewItem = getCartViewItemByCartItemId(cartItemId) ?: return
-            val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
+            val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return
             newCartViewItems.remove(deletedCartViewItem)
-            cartViewItems.value = newCartViewItems
+            _cartViewItems.value = newCartViewItems
 
             val selectedPosition =
-                selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem -> selectedCartViewItem.cartItem.cartItemId == cartItemId }
+                _selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem -> selectedCartViewItem.cartItem.cartItemId == cartItemId }
                     ?: return
             if (selectedPosition != -1) {
                 val newSelectedCatViewItems =
-                    selectedCartViewItems.value?.toMutableList() ?: return
+                    _selectedCartViewItems.value?.toMutableList() ?: return
                 newSelectedCatViewItems.removeAt(selectedPosition)
-                selectedCartViewItems.value = newSelectedCatViewItems
+                _selectedCartViewItems.value = newSelectedCatViewItems
             }
 
-            _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+            _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
             _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCartItemDeleted)
         }
     }
@@ -229,38 +198,22 @@ class OrderViewModel(
             )
         }.onSuccess {
             val position = getCartViewItemPosition(updatedCartItem.cartItem.cartItemId) ?: return
-            val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
+            val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return
             newCartViewItems[position] = updatedCartItem
-            cartViewItems.value = newCartViewItems
+            _cartViewItems.value = newCartViewItems
 
             val selectedPosition =
-                selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
+                _selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
                     selectedCartViewItem.cartItem.cartItemId == updatedCartItem.cartItem.cartItemId
                 } ?: return
             if (selectedPosition != -1) {
                 val newSelectedCatViewItems =
-                    selectedCartViewItems.value?.toMutableList() ?: return
+                    _selectedCartViewItems.value?.toMutableList() ?: return
                 newSelectedCatViewItems[selectedPosition] = updatedCartItem
-                selectedCartViewItems.value = newSelectedCatViewItems
+                _selectedCartViewItems.value = newSelectedCatViewItems
             }
 
-            _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
-
-            val recommendState = recommendUiState.value
-            if (recommendState is UiState.Success) {
-                val recommendProductViewItems = recommendState.data
-                val recommendPosition =
-                    recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
-                        recommendProductViewItem.product.productId == updatedCartItem.cartItem.product.productId
-                    }
-                val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
-                newRecommendProductViewItems[recommendPosition] =
-                    ProductViewItem(
-                        updatedCartItem.cartItem.product,
-                        updatedCartItem.cartItem.quantity,
-                    )
-                _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
-            }
+            _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
         }
     }
 
@@ -279,44 +232,28 @@ class OrderViewModel(
             }
         }.onSuccess {
             val position = getCartViewItemPosition(updatedCartItem.cartItem.cartItemId) ?: return
-            val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
+            val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return
             if (updatedCartItem.cartItem.quantity == 0) {
                 newCartViewItems.removeAt(position)
                 _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCartItemDeleted)
             } else {
                 newCartViewItems[position] = updatedCartItem
             }
-            cartViewItems.value = newCartViewItems
+            _cartViewItems.value = newCartViewItems
 
             val selectedPosition =
-                selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
+                _selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
                     selectedCartViewItem.cartItem.cartItemId == updatedCartItem.cartItem.cartItemId
                 }
                     ?: return
             if (selectedPosition != -1) {
                 val newSelectedCatViewItems =
-                    selectedCartViewItems.value?.toMutableList() ?: return
+                    _selectedCartViewItems.value?.toMutableList() ?: return
                 newSelectedCatViewItems[selectedPosition] = updatedCartItem
-                selectedCartViewItems.value = newSelectedCatViewItems
+                _selectedCartViewItems.value = newSelectedCatViewItems
             }
 
-            _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
-
-            val recommendState = recommendUiState.value
-            if (recommendState is UiState.Success) {
-                val recommendProductViewItems = recommendState.data
-                val recommendPosition =
-                    recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
-                        recommendProductViewItem.product.productId == updatedCartItem.cartItem.product.productId
-                    }
-                val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
-                newRecommendProductViewItems[recommendPosition] =
-                    ProductViewItem(
-                        updatedCartItem.cartItem.product,
-                        updatedCartItem.cartItem.quantity,
-                    )
-                _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
-            }
+            _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
         }
     }
 
@@ -325,20 +262,20 @@ class OrderViewModel(
     }
 
     override fun onAllCheckBoxClick() {
-        val newCartViewItems = cartViewItems.value?.toMutableList() ?: return
+        val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return
         if (allCheckBoxChecked.value == false) {
-            cartViewItems.value?.forEachIndexed { index, cartViewItem ->
+            _cartViewItems.value?.forEachIndexed { index, cartViewItem ->
                 newCartViewItems[index] = cartViewItem.check()
             }
-            selectedCartViewItems.value = cartViewItems.value
+            _selectedCartViewItems.value = _cartViewItems.value
         } else {
-            cartViewItems.value?.forEachIndexed { index, cartViewItem ->
+            _cartViewItems.value?.forEachIndexed { index, cartViewItem ->
                 newCartViewItems[index] = cartViewItem.unCheck()
             }
-            selectedCartViewItems.value = emptyList()
+            _selectedCartViewItems.value = emptyList()
         }
-        cartViewItems.value = newCartViewItems
-        _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
+        _cartViewItems.value = newCartViewItems
+        _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
     }
 
     override fun onOrderButtonClick() {
@@ -351,7 +288,7 @@ class OrderViewModel(
             } else {
                 runCatching {
                     val selectedCartItemIds =
-                        selectedCartViewItems.value?.map { selectedCartViewItem ->
+                        _selectedCartViewItems.value?.map { selectedCartViewItem ->
                             selectedCartViewItem.cartItem.cartItemId
                         } ?: return
                     orderRepository.postOrder(selectedCartItemIds)
@@ -364,8 +301,6 @@ class OrderViewModel(
 
     override fun onProductClick(productId: Int) {
         _cartNavigationActions.value = Event(CartNavigationActions.NavigateToDetail(productId))
-        _recommendNavigationActions.value =
-            Event(RecommendNavigationActions.NavigateToDetail(productId))
     }
 
     override fun onPlusButtonClick(product: Product) {
@@ -373,27 +308,9 @@ class OrderViewModel(
         runCatching {
             cartItemId = cartRepository.addCartItem(product.productId, 1).getOrNull() ?: return
         }.onSuccess {
-            var updatedCartItem = CartViewItem(CartItem(cartItemId, 1, product))
-            cartViewItems.value = cartViewItems.value?.plus(updatedCartItem)
-            _cartUiState.value = UiState.Success(cartViewItems.value ?: emptyList())
-
-            val recommendState = recommendUiState.value
-            if (recommendState is UiState.Success) {
-                val newSelectedCatViewItems =
-                    selectedCartViewItems.value?.toMutableList() ?: return
-                updatedCartItem = updatedCartItem.check()
-                newSelectedCatViewItems.add(updatedCartItem)
-                selectedCartViewItems.value = newSelectedCatViewItems
-
-                val recommendProductViewItems = recommendState.data
-                val recommendPosition =
-                    recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
-                        recommendProductViewItem.product.productId == product.productId
-                    }
-                val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
-                newRecommendProductViewItems[recommendPosition] = ProductViewItem(product, 1)
-                _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
-            }
+            val updatedCartItem = CartViewItem(CartItem(cartItemId, 1, product))
+            _cartViewItems.value = _cartViewItems.value?.plus(updatedCartItem)
+            _cartUiState.value = UiState.Success(_cartViewItems.value ?: emptyList())
         }
     }
 

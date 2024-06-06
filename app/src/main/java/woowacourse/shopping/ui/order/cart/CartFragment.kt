@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.ui.detail.DetailActivity
@@ -14,6 +15,7 @@ import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
 import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
 import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 
@@ -23,7 +25,8 @@ class CartFragment : Fragment() {
         get() = _binding!!
 
     private lateinit var adapter: CartAdapter
-    private val viewModel by activityViewModels<OrderViewModel>()
+    private val orderViewModel by activityViewModels<OrderViewModel>()
+    private val cartViewModel by viewModels<CartViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,17 +53,17 @@ class CartFragment : Fragment() {
     }
 
     private fun setUpAdapter() {
-        adapter = CartAdapter(viewModel)
+        adapter = CartAdapter(orderViewModel)
         binding.rvCart.adapter = adapter
     }
 
     private fun setUpDataBinding() {
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+        binding.viewModel = orderViewModel
     }
 
     private fun observeViewmodel() {
-        viewModel.cartUiState.observe(viewLifecycleOwner) { state ->
+        orderViewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
                 is UiState.Loading -> showData(emptyList())
@@ -70,7 +73,7 @@ class CartFragment : Fragment() {
                     )
             }
         }
-        viewModel.cartNavigationActions.observe(viewLifecycleOwner) { cartNavigationActions ->
+        orderViewModel.cartNavigationActions.observe(viewLifecycleOwner) { cartNavigationActions ->
             cartNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is CartNavigationActions.NavigateToDetail -> navigateToDetail(action.productId)
@@ -78,7 +81,7 @@ class CartFragment : Fragment() {
             }
         }
 
-        viewModel.cartNotifyingActions.observe(viewLifecycleOwner) { cartNotifyingActions ->
+        orderViewModel.cartNotifyingActions.observe(viewLifecycleOwner) { cartNotifyingActions ->
             cartNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is CartNotifyingActions.NotifyCartItemDeleted -> notifyCartItemDeleted()

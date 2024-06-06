@@ -7,11 +7,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
-import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions
+import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModel
+import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
 import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.*
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -23,7 +29,14 @@ class RecommendFragment : Fragment() {
         get() = _binding!!
 
     private lateinit var adapter: RecommendAdapter
-    private val viewModel by activityViewModels<OrderViewModel>()
+    private val orderViewModel by activityViewModels<OrderViewModel>()
+    private val recommendViewModel by viewModels<RecommendViewModel> {
+        RecommendViewModelFactory(
+            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
+            productRepository = ProductRepositoryImpl(productDataSourceImpl),
+            activityViewModel = orderViewModel
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,18 +63,17 @@ class RecommendFragment : Fragment() {
     }
 
     private fun setUpAdapter() {
-        adapter = RecommendAdapter(viewModel)
+        adapter = RecommendAdapter(recommendViewModel)
         binding.rvRecommend.adapter = adapter
-        viewModel.generateRecommendProductViewItems()
+        recommendViewModel.generateRecommendProductViewItems()
     }
 
     private fun setUpDataBinding() {
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
     }
 
     private fun observeViewModel() {
-        viewModel.recommendUiState.observe(viewLifecycleOwner) { state ->
+        recommendViewModel.recommendUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
                 is UiState.Loading -> showData(emptyList())
@@ -72,7 +84,7 @@ class RecommendFragment : Fragment() {
             }
         }
 
-        viewModel.recommendNavigationActions.observe(viewLifecycleOwner) { recommendNavigationActions ->
+        recommendViewModel.recommendNavigationActions.observe(viewLifecycleOwner) { recommendNavigationActions ->
             recommendNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is NavigateToDetail -> navigateToDetail(action.productId)

@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendBinding
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
+import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModel
 
 class RecommendAdapter(
-    private val viewModel: OrderViewModel,
+    private val viewModel: RecommendViewModel,
 ) : ListAdapter<ProductViewItem, RecommendViewHolder>(diffUtil) {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)

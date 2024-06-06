@@ -11,32 +11,29 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
 import woowacourse.shopping.app.ShoppingApplication.Companion.orderDataSourceImpl
-import woowacourse.shopping.app.ShoppingApplication.Companion.productDataSourceImpl
-import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
 import woowacourse.shopping.ui.order.action.OrderNotifyingActions
 import woowacourse.shopping.ui.order.cart.CartFragment
+import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
+import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.order.recommend.RecommendFragment
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModelFactory
 
 class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
-    private val viewModel: OrderViewModel by viewModels {
-        OrderViewModelFactory(
-            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
-            orderRepository = OrderRepositoryImpl(orderDataSourceImpl),
-            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
-            productRepository = ProductRepositoryImpl(productDataSourceImpl),
-        )
-    }
     private val cartFragment by lazy { CartFragment.newInstance() }
     private val recommendFragment by lazy { RecommendFragment.newInstance() }
+    private val orderViewModel: OrderViewModel by viewModels {
+        OrderViewModelFactory(
+            orderRepository = OrderRepositoryImpl(orderDataSourceImpl),
+            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+        )
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +49,11 @@ class OrderActivity : AppCompatActivity() {
 
     private fun setUpDataBinding() {
         binding.lifecycleOwner = this
-        binding.viewModel = viewModel
+        binding.viewModel = orderViewModel
     }
 
     private fun observeViewModel() {
-        viewModel.orderNavigationActions.observe(this) { orderNavigationActions ->
+        orderViewModel.orderNavigationActions.observe(this) { orderNavigationActions ->
             orderNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is OrderNavigationActions.NavigateToBack -> finish()
@@ -65,7 +62,7 @@ class OrderActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.orderNotifyingActions.observe(this) { orderNotifyingActions ->
+        orderViewModel.orderNotifyingActions.observe(this) { orderNotifyingActions ->
             orderNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is OrderNotifyingActions.NotifyCartCompleted -> {
