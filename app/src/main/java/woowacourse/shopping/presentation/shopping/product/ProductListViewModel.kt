@@ -32,6 +32,7 @@ class ProductListViewModel(
     val navigateToDetailEvent: SingleLiveData<Long> = _navigateToDetailEvent
     private val _errorEvent = MutableSingleLiveData<ProductListErrorEvent>()
     val errorEvent: SingleLiveData<ProductListErrorEvent> = _errorEvent
+    private var productLoadJob: Job? = null
 
     init {
         loadProducts()
@@ -40,7 +41,7 @@ class ProductListViewModel(
     }
 
     override fun loadProducts() {
-        viewModelScope.launch {
+        productLoadJob = viewModelScope.launch {
             val currentPage = _uiState.value?.currentPage ?: return@launch
             productRepository.loadProducts(currentPage, PAGE_SIZE)
                 .onSuccess {
@@ -62,6 +63,8 @@ class ProductListViewModel(
 
     fun loadCartProducts() {
         viewModelScope.launch {
+            // 아직 Product 가 최초 로드되지 않았으면 대기
+            if (productLoadJob?.isActive == true) productLoadJob?.join()
             val ids = uiState.value?.products?.map { it.id } ?: return@launch
             loadCartUseCase(ids).onSuccess { newCart ->
                 val uiState = uiState.value ?: return@onSuccess
