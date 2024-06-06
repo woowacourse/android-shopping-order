@@ -23,7 +23,7 @@ interface CartItemApi {
     ): CartResponse
 
     @POST("cart-items")
-    suspend fun postCartItem(
+    suspend fun addCartItem(
         @Header("accept") accept: String = "*/*",
         @Body cartItemRequest: CartItemRequest,
     ) : Response<Unit>
@@ -35,7 +35,7 @@ interface CartItemApi {
     )
 
     @PATCH("cart-items/{id}")
-    suspend fun patchCartItem(
+    suspend fun updateCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
         @Body quantityRequest: QuantityRequest,

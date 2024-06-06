@@ -10,7 +10,6 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -72,25 +71,24 @@ class RepositoryImpl(
     }
 
     override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> {
-        return remoteDataSource.postCartItem(cartItemRequest)
+        return remoteDataSource.addCartItem(cartItemRequest)
             .mapCatching { it.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0 }
             .recoverCatching { throw it }
     }
 
-    // todo post,patch
-    override suspend fun patchCartItem(
+    override suspend fun updateCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
     ): Result<Unit> {
-        return remoteDataSource.patchCartItem(id, quantityRequest).recoverCatching { throw it }
+        return remoteDataSource.updateCartItem(id, quantityRequest).recoverCatching { throw it }
     }
 
     override suspend fun deleteCartItem(id: Int): Result<Unit> {
         return remoteDataSource.deleteCartItem(id).recoverCatching { throw it }
     }
 
-    override suspend fun postOrders(orderRequest: OrderRequest): Result<Unit> {
-        return remoteDataSource.postOrders(orderRequest).recoverCatching { throw it }
+    override suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit> {
+        return remoteDataSource.submitOrders(orderRequest).recoverCatching { throw it }
     }
 
     override fun findCartByPaging(

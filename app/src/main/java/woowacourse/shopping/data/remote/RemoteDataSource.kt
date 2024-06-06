@@ -6,7 +6,6 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.ProductRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.Cart
-import woowacourse.shopping.data.remote.dto.response.CartResponse
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
@@ -29,17 +28,16 @@ interface RemoteDataSource {
         size: Int = 20,
     ): Result<List<Cart>>
 
-    // todo header의 id값은 어떻게 가져올 것인가?
-    suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Response<Unit>>
+    suspend fun addCartItem(cartItemRequest: CartItemRequest): Result<Response<Unit>>
 
     suspend fun deleteCartItem(id: Int): Result<Unit>
 
-    suspend fun patchCartItem(
+    suspend fun updateCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
     ): Result<Unit>
 
-    suspend fun getCartItemsCounts() : Result<QuantityResponse>
+    suspend fun getCartItemsCounts(): Result<QuantityResponse>
 
-    suspend fun postOrders(orderRequest: OrderRequest): Result<Unit>
+    suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit>
 }

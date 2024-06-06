@@ -66,7 +66,7 @@ class CurationViewModel(
                         it.cartId.toInt()
                     }
                 orderCartIds = orderCartIds + ids.map { it.toInt() }
-                repository.postOrders(
+                repository.submitOrders(
                     OrderRequest(
                         orderCartIds,
                     )
@@ -121,7 +121,7 @@ class CurationViewModel(
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
                 }
             } else {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 ).onSuccess {
@@ -140,7 +140,7 @@ class CurationViewModel(
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )

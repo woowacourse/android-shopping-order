@@ -128,7 +128,7 @@ class ProductDetailViewModel(
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
                 }
             } else {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = detailCartProduct.cartProduct.cartId.toInt(),
                     quantityRequest =
                     QuantityRequest(

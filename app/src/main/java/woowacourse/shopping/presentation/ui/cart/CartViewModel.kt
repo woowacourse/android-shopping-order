@@ -14,7 +14,6 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.shopping.NavigateUiState
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
-import kotlin.concurrent.thread
 
 class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
     var maxOffset: Int = 0
@@ -155,7 +154,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            repository.patchCartItem(
+            repository.updateCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
                 quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
@@ -183,7 +182,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             cartProducts[index].cartProduct.minusQuantity()
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            repository.patchCartItem(
+            repository.updateCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
                 quantityRequest = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
