@@ -13,7 +13,7 @@ interface CartDataSource {
         sort: String,
     ): Result<CartResponse>
 
-    fun addCartItem(cartItemRequest: CartItemRequest): Result<Unit>
+    fun addCartItem(cartItemRequest: CartItemRequest): Result<Int>
 
     fun deleteCartItem(productId: Int): Result<Unit>
 

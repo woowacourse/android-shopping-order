@@ -14,7 +14,7 @@ interface CartRepository {
     fun addCartItem(
         productId: Int,
         quantity: Int,
-    ): Result<Unit>
+    ): Result<Int>
 
     fun deleteCartItem(cartItemId: Int): Result<Unit>
 

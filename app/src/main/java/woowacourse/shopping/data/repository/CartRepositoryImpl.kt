@@ -33,12 +33,14 @@ class CartRepositoryImpl(
     override fun addCartItem(
         productId: Int,
         quantity: Int,
-    ): Result<Unit> {
-        var result: Result<Unit>? = null
+    ): Result<Int> {
+        var result: Result<Int>? = null
         thread {
             val cartItemRequest = CartItemRequest(productId, quantity)
             cartDataSourceImpl.addCartItem(cartItemRequest)
-                .onSuccess { result = Result.success(Unit) }
+                .onSuccess { cartItemId ->
+                    result = Result.success(cartItemId)
+                }
                 .onFailure { result = Result.failure(IllegalArgumentException()) }
         }.join()
         return result ?: throw Exception()

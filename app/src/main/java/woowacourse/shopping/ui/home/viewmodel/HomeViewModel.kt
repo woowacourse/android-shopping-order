@@ -30,7 +30,7 @@ class HomeViewModel(
         get() = _homeUiState
 
     private val loadedProductViewItems: MutableList<ProductViewItem> = mutableListOf()
-    private var cartItems: List<CartItem> = emptyList()
+    private val cartItems: MutableList<CartItem> = mutableListOf()
 
     private val _recentProducts = MutableLiveData<List<RecentProduct>>()
     val recentProducts: LiveData<List<RecentProduct>>
@@ -101,7 +101,8 @@ class HomeViewModel(
         runCatching {
             cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
         }.onSuccess {
-            cartItems = it.getOrNull() ?: emptyList()
+            cartItems.clear()
+            cartItems.addAll(it.getOrNull() ?: emptyList())
             _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
         }
     }
@@ -167,12 +168,13 @@ class HomeViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
-        val addedProduct = ProductViewItem(product, 1)
+        var cartItemId: Int = -1
         runCatching {
-            cartRepository.addCartItem(addedProduct.product.productId, addedProduct.quantity)
+            cartItemId = cartRepository.addCartItem(product.productId, 1).getOrNull() ?: return
         }.onSuccess {
-            updateProductViewItemQuantity(addedProduct.product, addedProduct.quantity)
-            loadCartItems()
+            updateProductViewItemQuantity(product, 1)
+            cartItems.add(CartItem(cartItemId, 1, product))
+            _cartTotalQuantity.value = cartTotalQuantity.value?.plus(1)
         }
     }
 
