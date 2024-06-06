@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -20,7 +19,6 @@ import woowacourse.shopping.presentation.common.ProductCountHandler
 class OrderRecommendViewModel(
     private val productHistoryRepository: ProductHistoryRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
-    private val orderRepository: OrderRepository,
 ) : BaseViewModel(), ProductCountHandler {
     private val _uiState: MutableLiveData<OrderRecommendUiState> =
         MutableLiveData(OrderRecommendUiState())
@@ -55,20 +53,6 @@ class OrderRecommendViewModel(
     }
 
     override fun retry() {}
-
-    fun order() {
-        viewModelScope.launch {
-            _uiState.value?.let { state ->
-                orderRepository.insertOrderByIds(state.orderCarts.keys.toList())
-                    .onSuccess {
-                        hideError()
-                        _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
-                    }.onFailure { e ->
-                        showError(e)
-                    }
-            }
-        }
-    }
 
     override fun plusProductQuantity(
         productId: Long,
@@ -187,17 +171,23 @@ class OrderRecommendViewModel(
         }
     }
 
+    fun navigateToPayment() {
+        _uiState.value?.let { state ->
+            _navigateAction.emit(
+                OrderRecommendNavigateAction.NavigateToPayment(orderCarts = state.orderCarts.values.toList()),
+            )
+        }
+    }
+
     companion object {
         fun factory(
             productHistoryRepository: ProductHistoryRepository,
             shoppingCartRepository: ShoppingCartRepository,
-            orderRepository: OrderRepository,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 OrderRecommendViewModel(
                     productHistoryRepository,
                     shoppingCartRepository,
-                    orderRepository,
                 )
             }
         }
