@@ -44,6 +44,7 @@ class RepositoryImpl(
                 throw it
             }
     }
+
     override suspend fun getProductsByPaging(): Result<List<CartProduct>?> {
         val data = productPagingSource.load()
         return when (data) {
@@ -57,19 +58,36 @@ class RepositoryImpl(
         }
     }
 
-    override fun getCartItems(
+    /*    override fun getCartItems(
+            page: Int,
+            size: Int,
+            callback: (Result<List<CartProduct>?>) -> Unit,
+        ) {
+            remoteDataSource.getCartItems { result ->
+                result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
+                    .onFailure { callback(Result.failure(it)) }
+            }
+        }*/
+
+    override suspend fun getCartItems(
         page: Int,
         size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit,
-    ) {
-        remoteDataSource.getCartItems { result ->
-            result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
-                .onFailure { callback(Result.failure(it)) }
-        }
+    ): Result<List<CartProduct>?> {
+        return remoteDataSource.getCartItems(page, size)
+            .mapCatching {
+                it.map { it.toDomain() }
+            }
+            .recoverCatching {
+                throw it
+            }
     }
 
-    override fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
-        runCatching {
+    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> {
+        return remoteDataSource.postCartItem(cartItemRequest)
+            .mapCatching { it.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0 }
+            .recoverCatching { throw it }
+    }
+       /* runCatching {
             val response = remoteDataSource.postCartItem(cartItemRequest)
             if (response.isSuccessful) {
                 return Result.success(
@@ -77,37 +95,30 @@ class RepositoryImpl(
                 )
             }
             return Result.failure(Throwable())
-        }
+        }*/
 
-    override fun patchCartItem(
+    // todo post,patch
+    override suspend fun patchCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
-    ): Result<Unit> =
-        runCatching {
+    ): Result<Unit> {
+       return remoteDataSource.patchCartItem(id, quantityRequest).recoverCatching { throw it  }
+    }
+       /* runCatching {
             val response = remoteDataSource.patchCartItem(id, quantityRequest)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }
             return Result.failure(Throwable())
-        }
+        }*/
 
-    override fun deleteCartItem(id: Int): Result<Unit> =
-        runCatching {
-            val response = remoteDataSource.deleteCartItem(id)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable())
-        }
+    override suspend fun deleteCartItem(id: Int): Result<Unit> {
+        return remoteDataSource.deleteCartItem(id).recoverCatching { throw it }
+    }
 
-    override fun postOrders(orderRequest: OrderRequest): Result<Unit> =
-        runCatching {
-            val response = remoteDataSource.postOrders(orderRequest)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable())
-        }
+    override suspend fun postOrders(orderRequest: OrderRequest): Result<Unit> {
+        return remoteDataSource.postOrders(orderRequest).recoverCatching { throw it }
+    }
 
     override fun findCartByPaging(
         offset: Int,
@@ -161,10 +172,10 @@ class RepositoryImpl(
             localDataSource.getMaxCartCount()
         }
 
-    override fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit) {
-        remoteDataSource.getCartItemsCounts { result ->
-            callback(result)
-        }
+    override suspend fun getCartItemsCounts() : Result<Int> {
+        return remoteDataSource.getCartItemsCounts()
+            .mapCatching { it.quantity }
+            .recoverCatching { throw it }
     }
 
     // todo cartApi

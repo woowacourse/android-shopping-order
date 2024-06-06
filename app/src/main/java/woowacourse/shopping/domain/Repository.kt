@@ -19,22 +19,21 @@ interface Repository {
 
     suspend fun getProductsByPaging(): Result<List<CartProduct>?>
 
-    fun getCartItems(
+   suspend fun getCartItems(
         page: Int,
         size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit,
-    )
+    ): Result<List<CartProduct>?>
 
-    fun postCartItem(cartItemRequest: CartItemRequest): Result<Int>
+    suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int>
 
-    fun patchCartItem(
+    suspend fun patchCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
     ): Result<Unit>
 
-    fun deleteCartItem(id: Int): Result<Unit>
+    suspend fun deleteCartItem(id: Int): Result<Unit>
 
-    fun postOrders(orderRequest: OrderRequest): Result<Unit>
+    suspend fun postOrders(orderRequest: OrderRequest): Result<Unit>
 
     fun findCartByPaging(
         offset: Int,
@@ -61,7 +60,7 @@ interface Repository {
 
     fun getMaxCartCount(): Result<Int>
 
-    fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit)
+    suspend fun getCartItemsCounts() : Result<Int>
 
     fun getCuration(callback: (Result<List<CartProduct>>) -> Unit)
 }

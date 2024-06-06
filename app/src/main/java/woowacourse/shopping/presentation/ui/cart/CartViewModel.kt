@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.ui.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
@@ -42,43 +44,47 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     val orderItems: List<CartProductUiModel> get() = _orderItems
 
     fun findCartByOffset() {
-        repository.getCartItems(offSet, 1000) { result ->
-            result.onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
-                } else {
-                    _carts.postValue(
-                        UiState.Success(
-                            it.map { cartProduct ->
-                                CartProductUiModel(
-                                    cartProduct,
-                                )
-                            },
-                        ),
-                    )
+        viewModelScope.launch {
+            repository.getCartItems(offSet, 1000)
+                .onSuccess {
+                    if (it == null) {
+                        _errorHandler.postValue(EventState(ShoppingViewModel.LOAD_ERROR))
+                    } else {
+                        _carts.postValue(
+                            UiState.Success(
+                                it.map { cartProduct ->
+                                    CartProductUiModel(
+                                        cartProduct,
+                                    )
+                                },
+                            ),
+                        )
+                    }
                 }
-            }.onFailure {
-                _errorHandler.value = EventState(CART_LOAD_ERROR)
-            }
+                .onFailure {
+                    _errorHandler.value = EventState(CART_LOAD_ERROR)
+                }
         }
     }
 
     override fun onDelete(cartProductUiModel: CartProductUiModel) {
-        thread {
+        viewModelScope.launch {
             updateUiModel.add(
                 cartProductUiModel.cartProduct.productId,
                 cartProductUiModel.cartProduct.copy(quantity = 0),
             )
-            repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
-                val updatedData = (_carts.value as UiState.Success).data.toMutableList()
-                updatedData.remove(cartProductUiModel)
-                _carts.postValue(
-                    UiState.Success(updatedData.toList()),
-                )
-                updateRecentProduct(cartProductUiModel.cartProduct.productId, 0, 0)
-            }.onFailure {
-                _errorHandler.postValue(EventState(CART_DELETE_ERROR))
-            }
+            repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt())
+                .onSuccess {
+                    val updatedData = (_carts.value as UiState.Success).data.toMutableList()
+                    updatedData.remove(cartProductUiModel)
+                    _carts.postValue(
+                        UiState.Success(updatedData.toList()),
+                    )
+                    updateRecentProduct(cartProductUiModel.cartProduct.productId, 0, 0)
+                }
+                .onFailure {
+                    _errorHandler.postValue(EventState(CART_DELETE_ERROR))
+                }
         }
     }
 
@@ -139,7 +145,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     }
 
     override fun onPlus(cartProduct: CartProduct) {
-        thread {
+        viewModelScope.launch {
             val cartProducts =
                 (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
             val index =
@@ -154,11 +160,12 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
-                    updateRecentProduct(
+                    // todo recentProduct update suspend
+                  /*  updateRecentProduct(
                         cartProducts[index].cartProduct.productId,
                         cartProducts[index].cartProduct.quantity,
                         cartProducts[index].cartProduct.cartId,
-                    )
+                    )*/
                 }
                 .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -168,7 +175,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     override fun onMinus(cartProduct: CartProduct) {
         if (cartProduct.quantity == 1) return
-        thread {
+        viewModelScope.launch {
             val cartProducts =
                 (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
             val index =
@@ -182,11 +189,12 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
-                    updateRecentProduct(
-                        cartProducts[index].cartProduct.productId,
-                        cartProducts[index].cartProduct.quantity,
-                        cartProducts[index].cartProduct.cartId,
-                    )
+                    // todo recentProduct update suspend
+                    /* updateRecentProduct(
+                         cartProducts[index].cartProduct.productId,
+                         cartProducts[index].cartProduct.quantity,
+                         cartProducts[index].cartProduct.cartId,
+                     )*/
                 }
                 .onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))

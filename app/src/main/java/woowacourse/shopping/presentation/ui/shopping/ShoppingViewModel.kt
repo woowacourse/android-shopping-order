@@ -69,7 +69,7 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    fun loadProductByOffset()  = viewModelScope.launch {
+    fun loadProductByOffset() = viewModelScope.launch {
         repository.getProductsByPaging().onSuccess { it ->
             if (it == null) {
                 _errorHandler.postValue(EventState(LOAD_ERROR))
@@ -85,7 +85,19 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     fun loadCartByOffset() {
-        repository.getCartItems(0, 2000) { result ->
+        viewModelScope.launch {
+            repository.getCartItems(0, 2000)
+                .onSuccess {
+                    if(it == null){
+                        _errorHandler.postValue(EventState(LOAD_ERROR))
+                    }else{
+                        _carts.postValue(UiState.Success(it)) }
+                    }
+                .onFailure {
+                    _errorHandler.postValue(EventState(CartViewModel.CART_LOAD_ERROR))
+                }
+        }
+      /*  repository.getCartItems(0, 2000) { result ->
             result.onSuccess {
                 if (it == null) {
                     _errorHandler.postValue(EventState(LOAD_ERROR))
@@ -95,12 +107,12 @@ class ShoppingViewModel(private val repository: Repository) :
             }.onFailure {
                 _errorHandler.postValue(EventState(CartViewModel.CART_LOAD_ERROR))
             }
-        }
+        }*/
     }
 
     fun getCartItemCounts() {
-        repository.getCartItemsCounts { result ->
-            result.onSuccess { _cartCount.postValue(it.quantity) }
+        viewModelScope.launch {
+            repository.getCartItemsCounts().onSuccess { _cartCount.postValue(it) }
                 .onFailure { _errorHandler.postValue(EventState(LOAD_ERROR)) }
         }
     }
@@ -132,9 +144,46 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
+    /*    override fun onPlus(cartProduct: CartProduct) {
+            thread {
+                val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+                val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
+
+                cartProducts[index].plusQuantity()
+
+                if (cartProducts[index].quantity == 1) {
+                    repository.postCartItem(
+                        CartItemRequest(
+                            productId = cartProducts[index].productId.toInt(),
+                            quantity = cartProducts[index].quantity,
+                        ),
+                    )
+                        .onSuccess {
+                            cartProducts[index].cartId = it.toLong()
+                            this.cartProducts.postValue(UiState.Success(cartProducts))
+                            _cartCount.postValue(_cartCount.value?.plus(1))
+                        }
+                        .onFailure {
+                            _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        }
+                } else {
+                    repository.patchCartItem(
+                        id = cartProducts[index].cartId.toInt(),
+                        quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
+                    )
+                        .onSuccess {
+                            this.cartProducts.postValue(UiState.Success(cartProducts))
+                            _cartCount.postValue(_cartCount.value?.plus(1))
+                        }
+                        .onFailure {
+                            _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        }
+                }
+            }
+        }*/
     override fun onPlus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+        viewModelScope.launch {
+            val cartProducts = (cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
 
             cartProducts[index].plusQuantity()
@@ -148,7 +197,7 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -160,7 +209,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
@@ -168,11 +217,46 @@ class ShoppingViewModel(private val repository: Repository) :
                     }
             }
         }
+        /*    thread {
+                val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+                val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
+
+                cartProducts[index].plusQuantity()
+
+                if (cartProducts[index].quantity == 1) {
+                    repository.postCartItem(
+                        CartItemRequest(
+                            productId = cartProducts[index].productId.toInt(),
+                            quantity = cartProducts[index].quantity,
+                        ),
+                    )
+                        .onSuccess {
+                            cartProducts[index].cartId = it.toLong()
+                            this.cartProducts.postValue(UiState.Success(cartProducts))
+                            _cartCount.postValue(_cartCount.value?.plus(1))
+                        }
+                        .onFailure {
+                            _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        }
+                } else {
+                    repository.patchCartItem(
+                        id = cartProducts[index].cartId.toInt(),
+                        quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
+                    )
+                        .onSuccess {
+                            this.cartProducts.postValue(UiState.Success(cartProducts))
+                            _cartCount.postValue(_cartCount.value?.plus(1))
+                        }
+                        .onFailure {
+                            _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        }
+                }
+            }*/
     }
 
     override fun onMinus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+        viewModelScope.launch {
+            val cartProducts = (cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].minusQuantity()
 
@@ -182,7 +266,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                         _cartCount.postValue(_cartCount.value?.minus(1))
                     }
                     .onFailure {
@@ -190,7 +274,7 @@ class ShoppingViewModel(private val repository: Repository) :
                     }
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
-                    this.cartProducts.postValue(UiState.Success(cartProducts))
+                    this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                     _cartCount.postValue(_cartCount.value?.minus(1))
                 }.onFailure {
                     _errorHandler.postValue(EventState("아이템 증가 오류"))
@@ -198,6 +282,36 @@ class ShoppingViewModel(private val repository: Repository) :
             }
         }
     }
+    /*
+        override fun onMinus(cartProduct: CartProduct) {
+            thread {
+                val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+                val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
+                cartProducts[index].minusQuantity()
+
+                if (cartProducts[index].quantity > 0) {
+                    repository.patchCartItem(
+                        id = cartProducts[index].cartId.toInt(),
+                        quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
+                    )
+                        .onSuccess {
+                            this.cartProducts.postValue(UiState.Success(cartProducts))
+                            _cartCount.postValue(_cartCount.value?.minus(1))
+                        }
+                        .onFailure {
+                            _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        }
+                } else {
+                    repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+                        this.cartProducts.postValue(UiState.Success(cartProducts))
+                        _cartCount.postValue(_cartCount.value?.minus(1))
+                    }.onFailure {
+                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                    }
+                }
+            }
+        }
+    */
 
     fun syncProduct() {
         viewModelScope.launch {

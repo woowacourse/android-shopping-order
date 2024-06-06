@@ -8,8 +8,8 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequest
 
 interface OrderApi {
     @POST("orders")
-    fun submitOrders(
+    suspend fun submitOrders(
         @Header("accept") accept: String = "*/*",
         @Body orderRequest: OrderRequest,
-    ): Call<Unit>
+    )
 }

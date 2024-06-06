@@ -10,7 +10,7 @@ data class Product(
     val price: Int,
     val imageUrl: String,
     val category: String,
-){
+)/*{
     fun toDomain(): CartProduct {
         return CartProduct(
             productId = id.toLong(),
@@ -22,3 +22,4 @@ data class Product(
         )
     }
 }
+*/

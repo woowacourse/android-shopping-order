@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -43,9 +45,9 @@ class ProductDetailViewModel(
                 DetailCartProduct(
                     isNew = cartProduct.quantity == 0,
                     cartProduct =
-                        cartProduct.copy(
-                            quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
-                        ),
+                    cartProduct.copy(
+                        quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
+                    ),
                 )
             _product.value = UiState.Success(detailCartProduct)
         }
@@ -65,7 +67,7 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun onAddToCart(detailCartProduct: DetailCartProduct) {
+    /*override fun onAddToCart(detailCartProduct: DetailCartProduct) {
         thread {
             updateUiModel.add(
                 detailCartProduct.cartProduct.productId,
@@ -101,6 +103,44 @@ class ProductDetailViewModel(
                     }
             }
 
+            _cartHandler.postValue(EventState(updateUiModel))
+        }
+    }*/
+
+    override fun onAddToCart(detailCartProduct: DetailCartProduct) {
+        viewModelScope.launch {
+            updateUiModel.add(
+                detailCartProduct.cartProduct.productId,
+                detailCartProduct.cartProduct,
+            )
+
+            if (detailCartProduct.isNew) {
+                repository.postCartItem(
+                    CartItemRequest(
+                        productId = detailCartProduct.cartProduct.productId.toInt(),
+                        quantity = detailCartProduct.cartProduct.quantity,
+                    ),
+                ).onSuccess {
+                    detailCartProduct.cartProduct.cartId = it.toLong()
+                    _product.postValue(UiState.Success(detailCartProduct))
+                    saveRecentProduct(detailCartProduct.cartProduct)
+                }.onFailure {
+                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                }
+            } else {
+                repository.patchCartItem(
+                    id = detailCartProduct.cartProduct.cartId.toInt(),
+                    quantityRequest =
+                    QuantityRequest(
+                        detailCartProduct.cartProduct.quantity,
+                    ),
+                ).onSuccess {
+                    _product.postValue(UiState.Success(detailCartProduct))
+                    saveRecentProduct(detailCartProduct.cartProduct)
+                }.onFailure {
+                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                }
+            }
             _cartHandler.postValue(EventState(updateUiModel))
         }
     }
