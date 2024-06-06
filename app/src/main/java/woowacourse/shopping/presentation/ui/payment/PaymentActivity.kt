@@ -60,6 +60,12 @@ class PaymentActivity : BaseActivity<ActivityPaymentBinding>(R.layout.activity_p
             }
         }
 
+        viewModel.message.observeEvent(this) { message ->
+            when (message) {
+                is PaymentMessage.PaymentSuccessMessage -> showToastMessage(message.getMessage(this))
+            }
+        }
+
         viewModel.uiState.observe(this) { state ->
             couponsAdapter.submitList(state.couponsState)
         }

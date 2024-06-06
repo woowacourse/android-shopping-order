@@ -76,6 +76,7 @@ class PaymentViewModel(
             val state = uiState.value ?: return@launch
             orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
                 hideError()
+                showMessage(PaymentMessage.PaymentSuccessMessage)
                 _navigateAction.emit(PaymentNavigateAction.NavigateToProductList)
             }.onFailure { e ->
                 showError(e)
