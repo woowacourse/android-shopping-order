@@ -78,3 +78,22 @@ DataSource와 Repository를 나누는 이유는 코드의 구조화와 유지보
 지금 당장 생각나는 솔루션은 로딩 상태를 Base에서 관리하는 것이 아니라 각 페이지별로 각 컴포넌트의 로딩을 관리하는 것이다.
 즉, 페이지에서 로딩이 필요한 컴포넌트마다 개별적으로 로딩 상태를 관리하는 것이다. 
 모바일 특성상 로딩이 필요한 컴포넌트가 많지 않을 것으로 예상되므로, 이러한 방식이 문제를 해결할 수 있는 방법이 될 것 같다.
+
+## 비즈니스 로직을 어디서 처리하는 게 좋을까?(ViewModel vs Repository)
+
+## 비동기를 어디서 처리하는 게 좋을까?(ViewModel vs Repository)
+
+## 코루틴 어디까지 알아?
+
+### 코루틴이란?
+
+### 코루틴은 동시성 보장을 어떻게 할까?
+
+### 코루틴 예외 전파
+https://co-zi.medium.com/coroutine-%EC%97%90%EC%84%9C%EC%9D%98-error-handling-fb3a88dcd358
+
+### 코루틴을 지원하는 jetpack 라이브러리는 뭐가 있을까? (그 외 라이브러리도!!!)
+
+### room ktx ???
+https://developer.android.com/kotlin/ktx#room
+error: To use Coroutine features, you must add `ktx` artifact from Room as a dependency. androidx.room:room-ktx:<version> public abstract java.lang.Object insertProductHistory(@org.jetbrains.annotations.NotNull
