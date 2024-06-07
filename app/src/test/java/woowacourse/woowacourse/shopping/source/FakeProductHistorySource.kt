@@ -5,7 +5,7 @@ import woowacourse.shopping.data.history.ProductHistoryDataSource
 class FakeProductHistorySource(
     private val history: MutableList<Long> = ArrayDeque(MAX_SIZE),
 ) : ProductHistoryDataSource {
-    override fun saveProductHistory(productId: Long) {
+    override suspend fun saveProductHistory(productId: Long) {
         if (history.contains(productId)) {
             history.remove(productId)
         }
@@ -17,15 +17,15 @@ class FakeProductHistorySource(
         history.add(productId)
     }
 
-    override fun fetchProductHistory(productId: Long): Long? = history.find { it == productId }
+    override suspend fun fetchProductHistory(productId: Long): Long? = history.find { it == productId }
 
-    override fun fetchLatestProduct(): Long = history.last()
+    override suspend fun fetchLatestProduct(): Long = history.last()
 
-    override fun fetchProductsHistory(): List<Long> {
+    override suspend fun fetchProductsHistory(): List<Long> {
         return history
     }
 
-    override fun deleteProductsHistory() {
+    override suspend fun deleteProductsHistory() {
         history.clear()
     }
 

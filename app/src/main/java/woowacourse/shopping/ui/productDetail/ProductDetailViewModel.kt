@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.productDetail
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.SingleLiveData
@@ -18,7 +18,6 @@ import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.OnProductItemClickListener
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val productId: Long,
@@ -26,8 +25,6 @@ class ProductDetailViewModel(
     private val productHistoryRepository: ProductHistoryRepository,
     private val cartItemRepository: CartItemRepository,
 ) : ViewModel(), OnItemQuantityChangeListener, OnProductItemClickListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
     private val _currentProduct: MutableLiveData<Product> = MutableLiveData()
     val currentProduct: LiveData<Product> get() = _currentProduct
 
@@ -44,7 +41,7 @@ class ProductDetailViewModel(
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     fun loadAll() {
-        thread {
+        viewModelScope.launch {
             val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
             val latestProduct =
                 try {
@@ -53,20 +50,17 @@ class ProductDetailViewModel(
                     Product.NULL
                 }
 
-            uiHandler.post {
-                _currentProduct.value = currentProduct
-                _productCount.value = 1
-                _latestProduct.value = latestProduct
-                _isLoading.value = false
-            }
-
+            _currentProduct.value = currentProduct
+            _productCount.value = 1
+            _latestProduct.value = latestProduct
+            _isLoading.value = false
             productHistoryRepository.saveProductHistory(productId)
         }
     }
 
     fun addProductToCart() {
         val productCount = productCount.value ?: return
-        thread {
+        viewModelScope.launch {
             cartItemRepository.updateProductQuantity(productId, productCount)
         }
     }

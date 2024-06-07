@@ -9,18 +9,14 @@ import woowacourse.shopping.remote.product.ProductsApiService
 class ProductRemoteDataSource(
     private val productsApiService: ProductsApiService,
 ) : ProductDataSource {
-    override fun loadByPaged(page: Int): ResponseResult<ProductResponse> =
-        handleExecute { productsApiService.requestProducts(page = page).execute() }
+    override suspend fun loadByPaged(page: Int): ResponseResult<ProductResponse> =
+        handleExecute { productsApiService.requestProducts(page = page) }
 
-    override fun loadById(id: Long): ResponseResult<ProductDto> =
-        handleExecute {
-            productsApiService.requestProduct(id.toInt()).execute()
-        }
+    override suspend fun loadById(id: Long): ResponseResult<ProductDto> =
+        handleExecute { productsApiService.requestProduct(id.toInt()) }
 
-    override fun loadByCategory(category: String): ResponseResult<ProductResponse> =
-        handleExecute {
-            productsApiService.requestProducts(category).execute()
-        }
+    override suspend fun loadByCategory(category: String): ResponseResult<ProductResponse> =
+        handleExecute { productsApiService.requestProducts(category) }
 
     override fun shutDown(): Boolean {
         // TODO: 연결 끊기

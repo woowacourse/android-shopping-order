@@ -9,20 +9,20 @@ import woowacourse.shopping.data.model.HistoryProduct
 @Dao
 interface HistoryProductDao {
     @Insert
-    fun insert(historyProduct: HistoryProduct): Long
+    suspend fun insert(historyProduct: HistoryProduct): Long
 
     @Query("SELECT * from history_products WHERE id = :id")
-    fun findById(id: Long): HistoryProduct?
+    suspend fun findById(id: Long): HistoryProduct?
 
     @Query("SELECT * from history_products ORDER BY timestamp DESC LIMIT 1")
-    fun findLatest(): HistoryProduct?
+    suspend fun findLatest(): HistoryProduct?
 
     @Query("SELECT * from history_products ORDER BY timestamp ASC")
-    fun findAll(): List<HistoryProduct>
+    suspend fun findAll(): List<HistoryProduct>
 
     @Delete
-    fun delete(historyProduct: HistoryProduct)
+    suspend fun delete(historyProduct: HistoryProduct)
 
     @Query("DELETE FROM history_products")
-    fun deleteAll()
+    suspend fun deleteAll()
 }

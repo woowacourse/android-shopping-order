@@ -5,13 +5,13 @@ import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.remote.cart.CartItemResponse
 
 interface CartItemDataSource {
-    fun fetchCartItems(): ResponseResult<CartItemResponse>
+    suspend fun fetchCartItems(): ResponseResult<CartItemResponse>
 
-    fun saveCartItem(productIdsCount: ProductIdsCount): ResponseResult<Unit>
+    suspend fun saveCartItem(productIdsCount: ProductIdsCount): ResponseResult<Unit>
 
-    fun deleteCartItem(cartItemId: Long): ResponseResult<Unit>
+    suspend fun deleteCartItem(cartItemId: Long): ResponseResult<Unit>
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
     ): ResponseResult<Unit>

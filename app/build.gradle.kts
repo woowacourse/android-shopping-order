@@ -93,6 +93,7 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
     implementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     implementation("com.google.code.gson:gson:2.8.7")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     // mockwebserver testimplementation
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")

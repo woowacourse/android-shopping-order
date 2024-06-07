@@ -5,20 +5,21 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.common.MutableSingleLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
-import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
 import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.model.OrderInformation
-import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val cartItemRepository: CartItemRepository,
@@ -28,8 +29,6 @@ class ShoppingCartViewModel(
     OnCartItemSelectedListener,
     OnAllCartItemSelectedListener,
     OnNavigationOrderListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
     private var _cartItems = MutableLiveData<List<CartItem>>()
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
@@ -52,24 +51,18 @@ class ShoppingCartViewModel(
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     fun loadAll() {
-        thread {
+        viewModelScope.launch {
             val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
-
-            uiHandler.post {
-                _cartItems.value = currentItems
-                _isLoading.value = false
-            }
+            _cartItems.value = currentItems
+            _isLoading.value = false
         }
     }
 
     fun deleteItem(cartItemId: Long) {
-        thread {
+        viewModelScope.launch  {
             cartItemRepository.delete(cartItemId)
             val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
-
-            uiHandler.post {
-                _cartItems.value = currentItems
-            }
+            _cartItems.value = currentItems
         }
         updateSelectedCartItemsCount()
     }
@@ -101,13 +94,11 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch  {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             val currentItems = cartItemRepository.loadCartItems()
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-            }
+            updateCartItems(currentItems)
+            updateTotalPrice()
         }
     }
 
@@ -115,14 +106,12 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch  {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             val currentItems = cartItemRepository.loadCartItems()
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-                updateSelectedCartItemsCount()
-            }
+            updateCartItems(currentItems)
+            updateTotalPrice()
+            updateSelectedCartItemsCount()
         }
     }
 

@@ -4,7 +4,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 object ResponseHandlingUtils {
-    fun <T : Any> handleExecute(execute: () -> Response<T>): ResponseResult<T> {
+    suspend fun <T : Any> handleExecute(execute: suspend () -> Response<T>): ResponseResult<T> {
         return try {
             val response = execute()
             val body = response.body()

@@ -4,7 +4,7 @@ import woowacourse.shopping.data.model.HistoryProduct
 import woowacourse.shopping.local.history.HistoryProductDao
 
 class ProductHistoryLocalDataSource(private val dao: HistoryProductDao) : ProductHistoryDataSource {
-    override fun saveProductHistory(productId: Long) {
+    override suspend fun saveProductHistory(productId: Long) {
         val id = dao.findById(productId)
 
         if (id != null) {
@@ -14,13 +14,13 @@ class ProductHistoryLocalDataSource(private val dao: HistoryProductDao) : Produc
         dao.insert(HistoryProduct(productId))
     }
 
-    override fun fetchProductHistory(productId: Long): Long? = dao.findById(productId)?.id
+    override suspend fun fetchProductHistory(productId: Long): Long? = dao.findById(productId)?.id
 
-    override fun fetchLatestProduct(): Long = dao.findLatest()?.id ?: EMPTY
+    override suspend fun fetchLatestProduct(): Long = dao.findLatest()?.id ?: EMPTY
 
-    override fun fetchProductsHistory(): List<Long> = dao.findAll().map { it.id }
+    override suspend fun fetchProductsHistory(): List<Long> = dao.findAll().map { it.id }
 
-    override fun deleteProductsHistory() {
+    override suspend fun deleteProductsHistory() {
         dao.deleteAll()
     }
 

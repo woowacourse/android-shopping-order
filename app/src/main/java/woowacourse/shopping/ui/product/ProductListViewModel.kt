@@ -1,12 +1,14 @@
 package woowacourse.shopping.ui.product
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.common.MutableSingleLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnProductItemClickListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.common.currentPageIsNullException
@@ -17,9 +19,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.common.OnItemQuantityChangeListener
-import woowacourse.shopping.common.OnProductItemClickListener
-import kotlin.concurrent.thread
 
 class ProductListViewModel(
     private val productsRepository: ProductRepository,
@@ -28,8 +27,6 @@ class ProductListViewModel(
     private var _currentPage: MutableLiveData<Int> = MutableLiveData(FIRST_PAGE),
 ) : ViewModel(), OnProductItemClickListener, OnItemQuantityChangeListener {
     val currentPage: LiveData<Int> get() = _currentPage
-
-    private val uiHandler = Handler(Looper.getMainLooper())
 
     private val _loadedProducts: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val loadedProducts: LiveData<List<Product>> get() = _loadedProducts
@@ -53,7 +50,7 @@ class ProductListViewModel(
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     fun loadAll() {
-        thread {
+        viewModelScope.launch {
             val page = currentPage.value ?: currentPageIsNullException()
             val result = (FIRST_PAGE..page).flatMap { productsRepository.loadProducts(it) }
             val totalCartCount = cartItemRepository.calculateCartItemsCount()
@@ -61,18 +58,16 @@ class ProductListViewModel(
             val productHistory = productHistoryRepository.loadProductsHistory()
 
             _isLastPage.postValue(isLastPage)
-            uiHandler.post {
-                _loadedProducts.value = result
-                _cartProductTotalCount.value = totalCartCount
-                _productsHistory.value = productHistory
-                _isLoading.value = false
-            }
+            _loadedProducts.value = result
+            _cartProductTotalCount.value = totalCartCount
+            _productsHistory.value = productHistory
+            _isLoading.value = false
         }
     }
 
     fun loadNextPageProducts() {
-        thread {
-            if (isLastPage.value == true) return@thread
+        viewModelScope.launch {
+            if (isLastPage.value == true) return@launch
 
             val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
             val isLastPage = productsRepository.isFinalPage(nextPage)
@@ -81,10 +76,8 @@ class ProductListViewModel(
 
             _currentPage.postValue(nextPage)
             _isLastPage.postValue(isLastPage)
-            uiHandler.post {
-                _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(result) }
-                _cartProductTotalCount.value = totalCount
-            }
+            _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(result) }
+            _cartProductTotalCount.value = totalCount
         }
     }
 
@@ -100,7 +93,7 @@ class ProductListViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch {
             try {
                 cartItemRepository.updateProductQuantity(productId, quantity)
             } catch (e: NoSuchElementException) {
@@ -116,11 +109,11 @@ class ProductListViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch {
             cartItemRepository.updateProductQuantity(productId, quantity)
             val totalCount = cartItemRepository.calculateCartItemsCount()
             updateProductQuantity(productId, DECREASE_VARIATION, totalCount)
-            return@thread
+            return@launch
         }
     }
 
@@ -129,14 +122,12 @@ class ProductListViewModel(
         variation: Int,
         totalCount: Int,
     ) {
-        uiHandler.post {
-            _loadedProducts.value =
-                loadedProducts.value?.map { product ->
-                    val quantity: Int = product.quantity + variation
-                    product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
-                }
-            _cartProductTotalCount.value = totalCount
-        }
+        _loadedProducts.value =
+            loadedProducts.value?.map { product ->
+                val quantity: Int = product.quantity + variation
+                product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
+            }
+        _cartProductTotalCount.value = totalCount
     }
 
     companion object {

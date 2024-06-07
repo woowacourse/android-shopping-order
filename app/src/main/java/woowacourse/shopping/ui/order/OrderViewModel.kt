@@ -1,12 +1,14 @@
 package woowacourse.shopping.ui.order
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
 import woowacourse.shopping.data.order.OrderRemoteRepository
@@ -15,12 +17,9 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.common.OnItemQuantityChangeListener
-import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.listener.OnOrderListener
-import kotlin.concurrent.thread
 
 class OrderViewModel(
     private val orderInformation: OrderInformation,
@@ -28,8 +27,6 @@ class OrderViewModel(
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel(), OnOrderListener, OnItemQuantityChangeListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
     private val _recommendProducts = MutableLiveData<List<Product>>(emptyList())
     val recommendProducts: LiveData<List<Product>> get() = _recommendProducts
 
@@ -43,15 +40,13 @@ class OrderViewModel(
     val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
 
     override fun createOrder() {
-        thread {
-            val recommendProducts: List<Product> = recommendProducts.value ?: return@thread
+        viewModelScope.launch {
+            val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
             val cartItems: List<CartItem> = cartItemRepository.loadCartItems()
             val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
             orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
-            uiHandler.post {
-                _isOrderSuccess.setValue(true)
-            }
+            _isOrderSuccess.setValue(true)
         }
     }
 
@@ -59,7 +54,7 @@ class OrderViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch {
             try {
                 cartItemRepository.updateProductQuantity(productId, quantity)
             } catch (e: NoSuchElementException) {
@@ -77,7 +72,7 @@ class OrderViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
+        viewModelScope.launch {
             cartItemRepository.updateProductQuantity(productId, quantity)
             updateProductQuantity(productId, DECREASE_VARIATION)
             val product = productRepository.loadProduct(productId)
@@ -87,7 +82,7 @@ class OrderViewModel(
     }
 
     fun loadRecommendedProducts() {
-        thread {
+        viewModelScope.launch {
             _recommendProducts.postValue(orderRepository.loadRecommendedProducts())
         }
     }
@@ -96,27 +91,21 @@ class OrderViewModel(
         productId: Long,
         variation: Int,
     ) {
-        uiHandler.post {
-            _recommendProducts.value =
-                recommendProducts.value?.map { product ->
-                    val quantity: Int = product.quantity + variation
-                    product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
-                }
-        }
+        _recommendProducts.value =
+            recommendProducts.value?.map { product ->
+                val quantity: Int = product.quantity + variation
+                product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
+            }
     }
 
     private fun updateOrderAmount(amountVariation: Int) {
         val currentOrderAmount = orderAmount.value ?: 0
-        uiHandler.post {
-            _orderAmount.value = currentOrderAmount + amountVariation
-        }
+        _orderAmount.value = currentOrderAmount + amountVariation
     }
 
     private fun updateOrdersCount(countVariation: Int) {
         val currentOrdersCount = ordersCount.value ?: 0
-        uiHandler.post {
-            _ordersCount.value = currentOrdersCount + countVariation
-        }
+        _ordersCount.value = currentOrdersCount + countVariation
     }
 
     companion object {

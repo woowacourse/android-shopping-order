@@ -10,32 +10,32 @@ class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
     private val productDataSource: ProductDataSource,
 ) : ProductHistoryRepository {
-    override fun saveProductHistory(productId: Long) {
+    override suspend fun saveProductHistory(productId: Long) {
         productHistoryDataSource.saveProductHistory(productId)
     }
 
-    override fun loadProductsHistory(): List<Product> {
+    override suspend fun loadProductsHistory(): List<Product> {
         val productIds = productHistoryDataSource.fetchProductsHistory()
         return productIds.map { loadProduct(it) }
     }
 
-    override fun loadProductHistory(productId: Long): Product {
+    override suspend fun loadProductHistory(productId: Long): Product {
         val id =
             productHistoryDataSource.fetchProductHistory(productId)
                 ?: throw NoSuchElementException("there is no product history with id $productId")
         return loadProduct(id)
     }
 
-    override fun loadLatestProduct(): Product {
+    override suspend fun loadLatestProduct(): Product {
         val productId: Long = productHistoryDataSource.fetchLatestProduct()
         return loadProduct(productId)
     }
 
-    override fun deleteProductsHistory() {
+    override suspend fun deleteProductsHistory() {
         productHistoryDataSource.deleteProductsHistory()
     }
 
-    private fun loadProduct(productId: Long): Product =
+    private suspend fun loadProduct(productId: Long): Product =
         handleResponse(productDataSource.loadById(productId)).toDomain(quantity = DEFAULT_QUANTITY)
 
     companion object {

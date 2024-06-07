@@ -9,23 +9,23 @@ import woowacourse.shopping.remote.cart.CartItemResponse
 
 class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
     CartItemDataSource {
-    override fun fetchCartItems(): ResponseResult<CartItemResponse> =
-        handleExecute { cartItemApiService.requestCartItems().execute() }
+    override suspend fun fetchCartItems(): ResponseResult<CartItemResponse> =
+        handleExecute { cartItemApiService.requestCartItems() }
 
-    override fun saveCartItem(productIdsCount: ProductIdsCount): ResponseResult<Unit> =
+    override suspend fun saveCartItem(productIdsCount: ProductIdsCount): ResponseResult<Unit> =
         handleExecute {
             cartItemApiService.addCartItem(
                 CartItemRequest(productIdsCount.productId, productIdsCount.quantity),
-            ).execute()
+            )
         }
 
-    override fun deleteCartItem(cartItemId: Long): ResponseResult<Unit> =
-        handleExecute { cartItemApiService.removeCartItem(cartItemId).execute() }
+    override suspend fun deleteCartItem(cartItemId: Long): ResponseResult<Unit> =
+        handleExecute { cartItemApiService.removeCartItem(cartItemId)}
 
-    override fun updateCartItemQuantity(
+    override suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
-    ): ResponseResult<Unit> = handleExecute { cartItemApiService.updateCartItemQuantity(cartItemId, quantity).execute() }
+    ): ResponseResult<Unit> = handleExecute { cartItemApiService.updateCartItemQuantity(cartItemId, quantity) }
 
     companion object {
         private const val TAG = "CartItemRemoteDataSource"

@@ -10,21 +10,21 @@ class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
-    override fun loadProducts(page: Int): List<Product> {
+    override suspend fun loadProducts(page: Int): List<Product> {
         return handleResponse(productDataSource.loadByPaged(page)).content.map { productDto ->
             productDto.toDomain(findCartItemQuantity(productDto.id))
         }
     }
 
-    override fun loadProduct(id: Long): Product = handleResponse(productDataSource.loadById(id))
+    override suspend fun loadProduct(id: Long): Product = handleResponse(productDataSource.loadById(id))
         .toDomain(findCartItemQuantity(id))
 
-    override fun isFinalPage(page: Int): Boolean {
+    override suspend fun isFinalPage(page: Int): Boolean {
         val totalPages = handleResponse(productDataSource.loadByPaged(page)).totalPages
         return (page + 1) == totalPages
     }
 
-    private fun findCartItemQuantity(productId: Long): Int =
+    private suspend fun findCartItemQuantity(productId: Long): Int =
         handleResponse(cartItemDataSource.fetchCartItems()).content.find { it.product.id == productId }?.quantity ?: DEFAULT_QUANTITY
 
     companion object {

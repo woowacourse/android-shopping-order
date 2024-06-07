@@ -9,7 +9,7 @@ class FakeProductDataSource(
 ) : ProductDataSource {
     override fun loadByPaged(page: Int): List<ProductData> = pagingStrategy.loadPagedData(page, allProducts)
 
-    override fun loadById(id: Long): ProductData =
+    override suspend fun loadById(id: Long): ProductData =
         allProducts.find { it.id == id }
             ?: throw NoSuchElementException("there is no product with id: $id")
 
