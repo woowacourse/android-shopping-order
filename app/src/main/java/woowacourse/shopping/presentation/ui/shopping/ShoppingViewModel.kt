@@ -107,14 +107,10 @@ class ShoppingViewModel(
                 val count = cartMap[product.id]?.quantity ?: 0
                 product.toUiModel(quantity = count)
             }
-
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            val currentProductModels =
-                (_shoppingProducts.value as? UiState.Success)?.data ?: emptyList()
-            val combinedProductModels = currentProductModels + newProductModels
-            _shoppingProducts.value = UiState.Success(combinedProductModels)
-        }, 1000) // 임시용
+        val currentProductModels =
+            (_shoppingProducts.value as? UiState.Success)?.data ?: emptyList()
+        val combinedProductModels = currentProductModels + newProductModels
+        _shoppingProducts.value = UiState.Success(combinedProductModels)
     }
 
     fun fetchRecentProducts() {
@@ -155,8 +151,7 @@ class ShoppingViewModel(
 
     override fun onProductItemClick(productId: Long) {
         val cartId = cartItems.find { it.product.id == productId }?.cartId ?: -1
-        val quantity = shoppingProductsData.find { it.id == productId }?.quantity ?: 0 // 이제 없애도 됨
-        _moveEvent.value = Event(FromShoppingToScreen.ProductDetail(productId, cartId, quantity))
+        _moveEvent.value = Event(FromShoppingToScreen.ProductDetail(productId, cartId))
     }
 
     override fun onLoadMoreClick() {
