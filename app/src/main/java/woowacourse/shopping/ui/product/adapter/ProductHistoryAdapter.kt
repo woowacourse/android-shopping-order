@@ -1,17 +1,16 @@
 package woowacourse.shopping.ui.product.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import woowacourse.shopping.common.OnProductItemClickListener
 import woowacourse.shopping.databinding.HolderProductHistoryBinding
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.common.OnProductItemClickListener
 
 class ProductHistoryAdapter(
     private val onProductItemClickListener: OnProductItemClickListener,
-) : RecyclerView.Adapter<ProductHistoryViewHolder>() {
-    private var products: List<Product> = emptyList()
+) : ListAdapter<Product, ProductHistoryViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -26,15 +25,25 @@ class ProductHistoryAdapter(
         holder: ProductHistoryViewHolder,
         position: Int,
     ) {
-        holder.bind(products[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = products.size
+    fun updateProductsHistory(newData: List<Product>) {
+        submitList(newData)
+    }
 
-    // TODO: 최적화
-    @SuppressLint("NotifyDataSetChanged")
-    fun update(newData: List<Product>) {
-        this.products = newData.reversed()
-        notifyDataSetChanged()
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<Product>() {
+            override fun areItemsTheSame(
+                oldItem: Product,
+                newItem: Product,
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }

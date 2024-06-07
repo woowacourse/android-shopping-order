@@ -86,7 +86,7 @@ class ProductListFragment : Fragment() {
 
     private fun observeProductsHistory() {
         viewModel.productsHistory.observe(viewLifecycleOwner) {
-            historyAdapter.update(it)
+            historyAdapter.updateProductsHistory(it)
         }
     }
 
