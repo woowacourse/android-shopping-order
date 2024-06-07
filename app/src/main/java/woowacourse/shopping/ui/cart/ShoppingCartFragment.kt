@@ -83,7 +83,7 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeItemsInCurrentPage() {
         viewModel.cartItems.observe(viewLifecycleOwner) { products ->
-            adapter.updateData(products)
+            adapter.updateCartItems(products)
             binding.shimmerCartList.stopShimmer()
         }
     }
