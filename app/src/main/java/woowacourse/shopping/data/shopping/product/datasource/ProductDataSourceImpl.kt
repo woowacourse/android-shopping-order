@@ -38,9 +38,9 @@ class ProductDataSourceImpl(
 
     override suspend fun fetchProductById(id: Long): Result<Product> {
         val response = productService.fetchDetailProduct(id)
-        val data = response.body()?.toProduct() ?: throw Exception("Empty body")
+        val product = response.body()?.toProduct() ?: throw Exception("Empty body")
         return if (response.isSuccessful) {
-            Result.success(data)
+            Result.success(product)
         } else {
             Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
         }

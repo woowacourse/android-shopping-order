@@ -1,21 +1,17 @@
 package woowacourse.shopping.data.cart.order
 
-import woowacourse.shopping.data.util.executeAsResult
 import woowacourse.shopping.remote.dto.request.OrderRequest
 import woowacourse.shopping.remote.service.OrderService
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
 
 class DefaultOrderDataSource(
-    private val ioExecutor: ExecutorService,
     private val orderService: OrderService,
 ) : OrderDataSource {
-    override fun orderProducts(productIds: List<Long>): Result<Unit> {
-        return ioExecutor.submit(
-            Callable {
-                orderService.orderProducts(OrderRequest(productIds))
-                    .executeAsResult()
-            },
-        ).get()
+    override suspend fun orderProducts(productIds: List<Long>): Result<Unit> {
+        val response = orderService.orderProducts(OrderRequest(productIds))
+        return if (response.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+        }
     }
 }
