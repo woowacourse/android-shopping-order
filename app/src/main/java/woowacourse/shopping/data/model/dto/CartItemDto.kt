@@ -3,7 +3,7 @@ package woowacourse.shopping.data.model.dto
 import com.google.gson.annotations.SerializedName
 
 data class CartItemDto(
-    @SerializedName("sort") val content: List<ContentDto>,
+    @SerializedName("content") val content: List<ContentDto>,
     @SerializedName("empty") val empty: Boolean,
     @SerializedName("first") val first: Boolean,
     @SerializedName("last") val last: Boolean,
