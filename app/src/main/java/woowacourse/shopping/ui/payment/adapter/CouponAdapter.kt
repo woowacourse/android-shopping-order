@@ -3,10 +3,10 @@ package woowacourse.shopping.ui.payment.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.data.coupon.Coupon
+import woowacourse.shopping.data.coupon.CouponState
 import woowacourse.shopping.databinding.ItemCouponBinding
 
-class CouponAdapter : ListAdapter<Coupon, CouponViewHolder>(CouponDiffUtil) {
+class CouponAdapter : ListAdapter<CouponState, CouponViewHolder>(CouponDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
