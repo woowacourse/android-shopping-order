@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.product.ProductRepository
@@ -44,6 +45,10 @@ class ProductDetailViewModel(
 
     private val _addCartComplete = MutableSingleLiveData<Unit>()
     val addCartComplete: SingleLiveData<Unit> get() = _addCartComplete
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        _error.value = true
+        _errorMsg.setValue(throwable.message.toString())
+    }
 
     init {
         loadProduct()
@@ -51,13 +56,10 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             productRepository.find(productId).onSuccess {
                 _error.value = false
                 _productWithQuantity.value = ProductWithQuantity(product = it)
-            }.onFailure {
-                _error.value = true
-                _errorMsg.setValue(it.toString())
             }
         }
     }

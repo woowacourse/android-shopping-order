@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
@@ -61,38 +62,35 @@ class CartViewModel(
     val order: SingleLiveData<List<Long>> = _order
 
     private var removeState: Boolean = true
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        error.setValue(throwable)
+    }
 
     init {
         loadCartItems()
     }
 
     override fun addCart(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.postCartItems(productId, 1).onSuccess {
                 changeRecommendProductCount(productId)
                 loadCartItems()
-            }.onFailure {
-                error.setValue(it)
             }
         }
     }
 
     override fun plusCount(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getCartItemByProductId(productId).onSuccess {
                 updateCountToPlus(it, productId)
-            }.onFailure {
-                error.setValue(it)
             }
         }
     }
 
     override fun minusCount(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getCartItemByProductId(productId).onSuccess {
                 updateCountToMinus(it, productId)
-            }.onFailure {
-                error.setValue(it)
             }
         }
     }
@@ -219,8 +217,6 @@ class CartViewModel(
                 changeRecommendProductCount(productId)
                 loadCartItems()
             }
-        }.onFailure {
-            error.setValue(it)
         }
     }
 
@@ -239,8 +235,6 @@ class CartViewModel(
                     changeRecommendProductCount(productId)
                     loadCartItems()
                 }
-            }.onFailure {
-                error.setValue(it)
             }
         }
     }
@@ -270,7 +264,7 @@ class CartViewModel(
     }
 
     private fun loadCartItems() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getAllCartItemsWithProduct().onSuccess {
                 _cart.value =
                     CartItemsUiState(
@@ -278,8 +272,6 @@ class CartViewModel(
                         isLoading = true,
                     )
                 _cart.value = cart.value?.copy(isLoading = false)
-            }.onFailure {
-                error.setValue(it)
             }
         }
     }
