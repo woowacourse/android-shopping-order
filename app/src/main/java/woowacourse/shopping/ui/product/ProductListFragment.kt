@@ -93,7 +93,7 @@ class ProductListFragment : Fragment() {
     private fun observeLoadedProducts() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
             if (products.isNotEmpty()) {
-                productsAdapter.updateAllLoadedProducts(products)
+                productsAdapter.updateProducts(products)
                 binding.shimmerProductList.stopShimmer()
             }
         }
