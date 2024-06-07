@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.model
 
+import woowacourse.shopping.domain.model.Coupon.Companion.INVALID_DISCOUNT_MESSAGE
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 
@@ -12,22 +13,18 @@ class BuyXgetYCoupon(
     private val getQuantity: Int,
 ) : Coupon {
     override fun available(cartItems: List<CartItem>): Boolean {
+        if (isExpired()) return false
         return cartItems.any { it.quantity.count >= buyQuantity + getQuantity }
     }
 
     override fun discountPrice(cartItems: List<CartItem>): Int {
         if (available(cartItems)) {
-            throw IllegalArgumentException(INVALID_DISCOUNT)
+            throw IllegalArgumentException(INVALID_DISCOUNT_MESSAGE)
         }
-
         val maxPriceCartItem =
             cartItems
                 .filter { it.quantity.count >= buyQuantity + getQuantity }
                 .maxBy { it.product.price }
         return maxPriceCartItem.product.price * getQuantity
-    }
-
-    companion object {
-        private const val INVALID_DISCOUNT = "적용할 수 없는 쿠폰입니다."
     }
 }

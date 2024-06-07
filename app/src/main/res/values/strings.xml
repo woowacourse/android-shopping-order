@@ -46,6 +46,6 @@
     <string name="payment">결제하기</string>
 
     <string name="expiration_date">만료일: %d년 %d월 %d일</string>
-    <string name="minimum_order_price">최소 주문 금액: %d,원</string>
+    <string name="minimum_order_price">최소 주문 금액: %,d원</string>
 
 </resources>

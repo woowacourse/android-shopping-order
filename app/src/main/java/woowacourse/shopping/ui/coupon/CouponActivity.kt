@@ -56,7 +56,7 @@ class CouponActivity : AppCompatActivity() {
     }
 
     private fun selectedCartItemIds(): List<Int> {
-        return intent.getIntegerArrayListExtra(SELECTED_CART_ITEM_IDS_KEY)?.toList() ?: emptyList()
+        return intent.getIntArrayExtra(SELECTED_CART_ITEM_IDS_KEY)?.toList() ?: emptyList()
     }
 
     companion object {

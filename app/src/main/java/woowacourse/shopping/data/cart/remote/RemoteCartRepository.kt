@@ -8,6 +8,11 @@ import woowacourse.shopping.domain.repository.CartRepository
 object RemoteCartRepository : CartRepository {
     private const val MAX_CART_ITEM_COUNT = 9999999
 
+    override suspend fun find(cartItemId: Int): Result<CartItem?> {
+        return retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
+            .map { it.toCartItems().find { cartItem -> cartItem.id == cartItemId } }
+    }
+
     override suspend fun findByProductId(productId: Int): Result<CartItem?> {
         return retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
             .map { it.toCartItems().find { cartItem -> cartItem.product.id == productId } }

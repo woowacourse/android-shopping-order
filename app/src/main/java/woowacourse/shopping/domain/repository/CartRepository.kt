@@ -4,6 +4,8 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Quantity
 
 interface CartRepository {
+    suspend fun find(cartItemId: Int): Result<CartItem?>
+
     suspend fun findByProductId(productId: Int): Result<CartItem?>
 
     suspend fun findAll(): Result<List<CartItem>>
