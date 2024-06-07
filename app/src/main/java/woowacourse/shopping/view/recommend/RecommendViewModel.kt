@@ -3,6 +3,8 @@ package woowacourse.shopping.view.recommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl.Companion.LOAD_RECOMMEND_ITEM_SIZE
@@ -50,29 +52,29 @@ class RecommendViewModel(
     }
 
     fun loadRecommendData() {
-        try {
+        viewModelScope.launch {
             val recentlyProduct = loadRecentlyProduct()
-            val myCartItems =
-                shoppingCartRepository.loadPagingCartItems(
-                    LOAD_SHOPPING_ITEM_OFFSET,
-                    LOAD_SHOPPING_ITEM_SIZE,
-                )
+            shoppingCartRepository.loadPagingCartItems(
+                LOAD_SHOPPING_ITEM_OFFSET,
+                LOAD_SHOPPING_ITEM_SIZE,
+            ).onSuccess {
+                val loadData =
+                    productRepository.loadCategoryProducts(
+                        size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+                        category = recentlyProduct.category,
+                    )
 
-            val loadData =
-                productRepository.loadCategoryProducts(
-                    size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
-                    category = recentlyProduct.category,
-                )
-
-            val recommendData =
-                getFilteredRandomProducts(
-                    myCartItems = myCartItems,
-                    loadData = loadData,
-                )
-            _products.value = recommendData
-            updateCheckItemData()
-        } catch (e: Exception) {
-            _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+                val recommendData =
+                    getFilteredRandomProducts(
+                        myCartItems = it,
+                        loadData = loadData,
+                    )
+                _products.value = recommendData
+                updateCheckItemData()
+            }
+                .onFailure {
+                    _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+                }
         }
     }
 
@@ -96,32 +98,33 @@ class RecommendViewModel(
 
     private fun updateCarItem(
         product: Product,
-        updateCartItemType: UpdateCartItemType,
+        updateCartItemType: UpdateCartItemType
     ) {
-        try {
-            val updateCartItemResult =
-                shoppingCartRepository.updateCartItem(
-                    product,
-                    updateCartItemType,
-                )
-            when (updateCartItemResult) {
-                UpdateCartItemResult.ADD -> addCartItem(product)
-                is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                is UpdateCartItemResult.UPDATED -> {
-                    product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                    _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
-                    updateCheckItemData()
-                }
-            }
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(RecommendEvent.UpdateProductEvent.Fail)
+        viewModelScope.launch {
+            val result = shoppingCartRepository.updateCartItem(product, updateCartItemType)
 
-                else -> _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
+            result.onSuccess { updateCartItemResult ->
+                when (updateCartItemResult) {
+                    UpdateCartItemResult.ADD -> addCartItem(product)
+                    is UpdateCartItemResult.DELETE -> deleteCartItem(product)
+                    is UpdateCartItemResult.UPDATED -> {
+                        product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
+                        _recommendEvent.postValue(RecommendEvent.UpdateProductEvent.Success(product))
+                        updateCheckItemData()
+                    }
+                }
+            }.onFailure { exception ->
+                when (exception) {
+                    is NoSuchDataException ->
+                        _errorEvent.postValue(RecommendEvent.UpdateProductEvent.Fail)
+
+                    else ->
+                        _errorEvent.postValue(RecommendEvent.ErrorEvent.NotKnownError)
+                }
             }
         }
     }
+
 
     private fun addCartItem(product: Product) {
         try {

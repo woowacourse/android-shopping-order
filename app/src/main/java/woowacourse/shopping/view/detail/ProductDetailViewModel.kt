@@ -3,6 +3,8 @@ package woowacourse.shopping.view.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
@@ -38,87 +40,91 @@ class ProductDetailViewModel(
     val productDetailEvent: SingleLiveData<ProductDetailEvent.SuccessEvent> = _productDetailEvent
 
     fun addShoppingCartItem(product: Product) {
-        try {
-            checkValidProduct(product)
-            when (cartItemId) {
-                DEFAULT_CART_ITEM_ID -> {
-                    shoppingCartRepository.addCartItem(product)
-                }
+        viewModelScope.launch {
+            try {
+                checkValidProduct(product)
+                when (cartItemId) {
+                    DEFAULT_CART_ITEM_ID -> {
+                        shoppingCartRepository.addCartItem(product)
+                    }
 
-                else -> {
-                    shoppingCartRepository.updateCartItem(
-                        product = product,
-                        UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
-                    )
+                    else -> {
+                        shoppingCartRepository.updateCartItem(
+                            product = product,
+                            UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
+                        )
+                    }
                 }
-            }
-            _productDetailEvent.setValue(
-                ProductDetailEvent.AddShoppingCart.Success(
-                    productId = product.id,
-                    count = product.cartItemCounter.itemCount,
-                ),
-            )
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.AddShoppingCart.Fail,
-                    )
+                _productDetailEvent.setValue(
+                    ProductDetailEvent.AddShoppingCart.Success(
+                        productId = product.id,
+                        count = product.cartItemCounter.itemCount,
+                    ),
+                )
+            } catch (e: Exception) {
+                when (e) {
+                    is NoSuchDataException ->
+                        _errorEvent.setValue(
+                            ProductDetailEvent.AddShoppingCart.Fail,
+                        )
 
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+                    else ->
+                        _errorEvent.setValue(
+                            ProductDetailEvent.ErrorEvent.NotKnownError,
+                        )
+                }
             }
         }
     }
 
-    fun loadProductItem(productId: Long) {
-        try {
-            val loadItemCounter = loadProductItemCount(productId)
-            val product = productRepository.getProduct(productId)
-            product.updateItemSelector(true)
-            product.updateCartItemCount(loadItemCounter.itemCount)
-            loadRecentlyProduct(product)
-            _product.value = product
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.LoadProductItem.Fail,
-                    )
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+    fun loadProductItem(productId: Long) = viewModelScope.launch {
+        val loadItemCounter = loadProductItemCount(productId)
+            .onSuccess {
+                val product = productRepository.getProduct(productId)
+                product.updateItemSelector(true)
+                product.updateCartItemCount(it.itemCount)
+                loadRecentlyProduct(product)
+                _product.value = product
             }
-        }
+            .onFailure {
+                when (it) {
+                    is NoSuchDataException ->
+                        _errorEvent.setValue(
+                            ProductDetailEvent.LoadProductItem.Fail,
+                        )
+
+                    else ->
+                        _errorEvent.setValue(
+                            ProductDetailEvent.ErrorEvent.NotKnownError,
+                        )
+                }
+            }
     }
 
-    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
-        try {
-            deletePrevRecentlyProduct(recentlyProduct.id)
-            val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
-            val product = productRepository.getProduct(recentlyProduct.productId)
-            product.updateItemSelector(true)
-            product.updateCartItemCount(loadItemCounter.itemCount)
-            _product.value = product
-            _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
-            _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.LoadProductItem.Fail,
-                    )
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) = viewModelScope.launch {
+        deletePrevRecentlyProduct(recentlyProduct.id)
+        loadProductItemCount(recentlyProduct.productId)
+            .onSuccess { loadItemCounter ->
+                val product = productRepository.getProduct(recentlyProduct.productId)
+                product.updateItemSelector(true)
+                product.updateCartItemCount(loadItemCounter.itemCount)
+                _product.value = product
+                _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
+                _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
             }
-        }
+            .onFailure {
+                when (it) {
+                    is NoSuchDataException ->
+                        _errorEvent.setValue(
+                            ProductDetailEvent.LoadProductItem.Fail,
+                        )
+
+                    else ->
+                        _errorEvent.setValue(
+                            ProductDetailEvent.ErrorEvent.NotKnownError,
+                        )
+                }
+            }
     }
 
     fun increaseItemCounter() {
@@ -155,23 +161,15 @@ class ProductDetailViewModel(
         )
     }
 
-    private fun loadProductItemCount(productId: Long): CartItemCounter {
-        return try {
-            val result =
-                shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
-            cartItemId = result.cartItemId
-            result.counter
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException -> CartItemCounter()
-
-                else ->
-                    _errorEvent.setValue(
-                        ProductDetailEvent.ErrorEvent.NotKnownError,
-                    )
+    private suspend fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
+        return shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
+            .mapCatching { result ->
+                cartItemId = result.cartItemId
+                result.counter
             }
-            CartItemCounter()
-        }
+            .recoverCatching {
+                CartItemCounter()
+            }
     }
 
     private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
