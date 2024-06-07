@@ -80,8 +80,8 @@ class CurationViewModel(
                     orderCartIds.forEach { id ->
                         cartProducts.find { it.cartId == id.toLong() }?.quantity = 0
                     }
-                    _eventHandler.postValue(EventState(CurationEvent.SuccessOrder))
-                    _cartProducts.postValue(UiState.Success(cartProducts))
+                    _eventHandler.value = (EventState(CurationEvent.SuccessOrder))
+                    _cartProducts.value = UiState.Success(cartProducts)
                 }.onFailure { }
             } else {
                 // Handle the case when _cartProducts.value is not UiState.Success
