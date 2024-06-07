@@ -142,15 +142,13 @@ class CartViewModel(
             OrderState.Recommend -> {
                 val cartItemIds = selectedCartItems.value?.map { it.cartId } ?: emptyList()
                 if (cartItemIds.isNotEmpty()) {
-                    orderRepository.completeOrder(cartItemIds) { result ->
-                        when (result) {
-                            is NetworkResult.Success -> {
+                    viewModelScope.launch {
+                        orderRepository.completeOrder(cartItemIds)
+                            .onSuccess {
                                 selectedCartItems.value?.forEach { cartModel -> _changedCartProducts[cartModel.productId] = 0 }
                                 _orderEvent.value = Event(OrderEvent.CompleteOrder)
                             }
-                            is NetworkResult.Error -> {
-                            }
-                        }
+                            .onFailure { }
                     }
                 }
             }
