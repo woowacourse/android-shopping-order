@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -52,21 +50,15 @@ class ProductDetailViewModel(
         }
     }
 
-    fun findOneRecentProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.findOne().onSuccess {
-                if (it == null) {
-                    withContext(Dispatchers.Main) {
-                        _recentProduct.value = UiState.Loading
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        _recentProduct.value = UiState.Success(it)
-                    }
-                }
-            }.onFailure {
-                _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
+    fun findOneRecentProduct() = viewModelScope.launch {
+        repository.findOne().onSuccess {
+            if (it == null) {
+                _recentProduct.value = UiState.Loading
+            } else {
+                _recentProduct.value = UiState.Success(it)
             }
+        }.onFailure {
+            _errorHandler.value = EventState(PRODUCT_NOT_FOUND)
         }
     }
 
@@ -133,24 +125,22 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentProduct(cartProduct: CartProduct) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.saveRecentProduct(
-                RecentProduct(
-                    cartProduct.productId,
-                    cartProduct.name,
-                    cartProduct.imgUrl,
-                    cartProduct.quantity,
-                    cartProduct.price,
-                    System.currentTimeMillis(),
-                    category = cartProduct.category,
-                    cartId = cartProduct.cartId,
-                ),
-            ).onSuccess {
+    private fun saveRecentProduct(cartProduct: CartProduct) = viewModelScope.launch {
+        repository.saveRecentProduct(
+            RecentProduct(
+                cartProduct.productId,
+                cartProduct.name,
+                cartProduct.imgUrl,
+                cartProduct.quantity,
+                cartProduct.price,
+                System.currentTimeMillis(),
+                category = cartProduct.category,
+                cartId = cartProduct.cartId,
+            ),
+        ).onSuccess {
 
-            }.onFailure {
-                _errorHandler.postValue(EventState("최근 아이템 추가 에러"))
-            }
+        }.onFailure {
+            _errorHandler.postValue(EventState("최근 아이템 추가 에러"))
         }
     }
 

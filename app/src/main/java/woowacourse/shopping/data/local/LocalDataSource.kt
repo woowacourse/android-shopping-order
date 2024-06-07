@@ -16,9 +16,9 @@ interface LocalDataSource {
         pageSize: Int,
     ): List<CartProductEntity>
 
-    fun findByLimit(limit: Int): List<RecentProductEntity>
+    suspend fun findByLimit(limit: Int): List<RecentProductEntity>
 
-    fun findOne(): RecentProductEntity?
+    suspend fun findOne(): RecentProductEntity?
 
     fun findProductById(id: Long): CartProductEntity?
 
@@ -30,9 +30,9 @@ interface LocalDataSource {
 
     fun getMaxCartCount(): Int
 
-    fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long
+    suspend fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long
 
-    fun updateRecentProduct(
+    suspend fun updateRecentProduct(
         productId: Long,
         quantity: Int,
         cartId: Long,

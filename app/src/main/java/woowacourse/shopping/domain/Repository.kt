@@ -39,17 +39,17 @@ interface Repository {
         pageSize: Int,
     ): Result<List<CartProduct>>
 
-    fun findByLimit(limit: Int): Result<List<RecentProduct>>
+    suspend fun findByLimit(limit: Int): Result<List<RecentProduct>>
 
-    fun findOne(): Result<RecentProduct?>
+    suspend fun findOne(): Result<RecentProduct?>
 
     fun saveCart(cart: Cart): Result<Long>
 
     fun saveRecent(recent: Recent): Result<Long>
 
-    fun saveRecentProduct(recentProduct: RecentProduct): Result<Long>
+    suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long>
 
-    fun updateRecentProduct(
+    suspend fun updateRecentProduct(
         productId: Long,
         quantity: Int,
         cartId: Long,

@@ -1,8 +1,5 @@
 package woowacourse.shopping.data
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.local.LocalDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
@@ -102,12 +99,12 @@ class RepositoryImpl(
             localDataSource.findCartByPaging(offset, pageSize).map { it.toDomain() }
         }
 
-    override fun findByLimit(limit: Int): Result<List<RecentProduct>> =
+    override suspend fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
             localDataSource.findByLimit(limit).map { it.toDomain() }
         }
 
-    override fun findOne(): Result<RecentProduct?> =
+    override suspend fun findOne(): Result<RecentProduct?> =
         runCatching {
             localDataSource.findOne()?.toDomain()
         }
@@ -123,12 +120,12 @@ class RepositoryImpl(
             localDataSource.saveRecent(recent.toEntity())
         }
 
-    override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
+    override suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
         runCatching {
             localDataSource.saveRecentProduct(recentProduct.toEntity())
         }
 
-    override fun updateRecentProduct(
+    override suspend fun updateRecentProduct(
         productId: Long,
         quantity: Int,
         cartId: Long,
@@ -152,14 +149,13 @@ class RepositoryImpl(
             .recoverCatching { throw it }
     }
 
-    // todo cartApi
-    override suspend fun getCuration(): Result<List<CartProduct>?> = coroutineScope {
+    override suspend fun getCuration(): Result<List<CartProduct>?> = runCatching {
         localDataSource.findOne()?.toDomain()?.let {
-            val productResponseAsync = async { remoteDataSource.getProducts(it.category, 0, 10) }
-            val cartResponseAsync = async { remoteDataSource.getCartItems(0, 1000) }
+            val productResponseAsync = remoteDataSource.getProducts(it.category, 0, 10)
+            val cartResponseAsync = remoteDataSource.getCartItems(0, 1000)
 
-            val productResponse = productResponseAsync.await()
-            val cartResponse = cartResponseAsync.await()
+            val productResponse = productResponseAsync
+            val cartResponse = cartResponseAsync
 
             if (productResponse.isSuccess && cartResponse.isSuccess) {
                 val products = productResponse.getOrNull()
@@ -181,11 +177,10 @@ class RepositoryImpl(
                         quantity = cart?.quantity ?: 0,
                     )
                 }
-                return@coroutineScope Result.success(cartProducts)
+                cartProducts
             } else {
-                return@coroutineScope Result.failure(Throwable())
+                throw Throwable()
             }
-        }
-        return@coroutineScope Result.failure(Throwable())
+        } ?: throw Throwable()
     }
 }

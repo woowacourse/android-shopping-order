@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
@@ -13,7 +12,6 @@ import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.shopping.NavigateUiState
-import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
 class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
     var maxOffset: Int = 0
@@ -200,7 +198,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         productId: Long,
         quantity: Int,
         cartId: Long,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    ) = viewModelScope.launch {
         repository.updateRecentProduct(productId, quantity, cartId)
     }
 

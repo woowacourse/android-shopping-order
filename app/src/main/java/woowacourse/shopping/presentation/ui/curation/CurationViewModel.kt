@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -33,34 +31,32 @@ class CurationViewModel(
     val orderProducts: LiveData<UiState<List<CartProduct>>> get() = _orderProducts
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.getCuration()
                 .onSuccess {
-                    withContext(Dispatchers.Main) {
-                        _cartProducts.value = UiState.Success(it ?: emptyList())
-                    }
-                }
-                .onFailure {
-                    withContext(Dispatchers.Main) {
-                        _errorHandler.value = EventState(LOAD_ERROR)
-                    }
-                }
-        }
-        viewModelScope.launch {
-            repository.getCartItems(0, 1000)
-                .onSuccess {
-                    if (it == null) {
-                        _errorHandler.value = EventState(LOAD_ERROR)
-                    } else {
-                        val filteredCartItems =
-                            it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
-                        _orderProducts.value = UiState.Success(filteredCartItems)
-                    }
+                    _cartProducts.value = UiState.Success(it ?: emptyList())
+                    orderProducts()
                 }
                 .onFailure {
                     _errorHandler.value = EventState(LOAD_ERROR)
                 }
         }
+    }
+
+    private suspend fun orderProducts() {
+        repository.getCartItems(0, 1000)
+            .onSuccess {
+                if (it == null) {
+                    _errorHandler.value = EventState(LOAD_ERROR)
+                } else {
+                    val filteredCartItems =
+                        it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
+                    _orderProducts.value = UiState.Success(filteredCartItems)
+                }
+            }
+            .onFailure {
+                _errorHandler.value = EventState(LOAD_ERROR)
+            }
     }
 
     override fun order() {

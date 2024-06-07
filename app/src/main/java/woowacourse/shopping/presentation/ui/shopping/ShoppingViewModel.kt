@@ -5,10 +5,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -201,15 +199,11 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    fun findAllRecent() = viewModelScope.launch(Dispatchers.IO) {
+    fun findAllRecent() = viewModelScope.launch {
         repository.findByLimit(10).onSuccess {
-            withContext(Dispatchers.Main) {
-                _recentProducts.value = UiState.Success(it)
-            }
+            _recentProducts.value = UiState.Success(it)
         }.onFailure {
-            withContext(Dispatchers.Main) {
-                _errorHandler.value = (EventState("최근 아이템 로드 에러"))
-            }
+            _errorHandler.value = (EventState("최근 아이템 로드 에러"))
         }
     }
 
