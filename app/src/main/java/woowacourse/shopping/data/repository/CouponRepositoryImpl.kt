@@ -13,8 +13,9 @@ import woowacourse.shopping.domain.model.coupon.FreeShipping
 import woowacourse.shopping.domain.model.coupon.MiracleCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
-class CouponRepositoryImpl(private val dataSource:CouponDataSource = RemoteCouponDataSource()) : CouponRepository {
-    override suspend  fun getCoupons(): List<Coupon> = dataSource.getCoupons().map { it.toDomain() }
+class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
+    CouponRepository {
+    override suspend fun getCoupons(): List<Coupon> = dataSource.getCoupons().map { it.toDomain() }
 
     private fun woowacourse.shopping.data.remote.dto.response.Coupon.toDomain(): Coupon =
         when (this) {
@@ -23,11 +24,11 @@ class CouponRepositoryImpl(private val dataSource:CouponDataSource = RemoteCoupo
             )
 
             is FixedDiscountCoupon -> Discount5000(
-                id, description, discountType, expirationDate, discount, minimumAmount, code
+                id, description, expirationDate, discountType, discount, minimumAmount, code
             )
 
             is FreeShippingCoupon -> FreeShipping(
-                id, code, description, expirationDate, discountType, minimumAmount,
+                id, code, description, expirationDate, minimumAmount, discountType
             )
 
             is PercentageDiscountCoupon -> MiracleCoupon(
@@ -35,8 +36,8 @@ class CouponRepositoryImpl(private val dataSource:CouponDataSource = RemoteCoupo
                 code,
                 description,
                 expirationDate,
-                discountType,
                 discount,
+                discountType,
                 availableTime.start,
                 availableTime.end
             )

@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartWithProduct
-import woowacourse.shopping.domain.model.ProductWithQuantity
 import java.time.LocalDate
 
 data class FreeShipping(
@@ -9,11 +8,12 @@ data class FreeShipping(
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDate,
-    override val discountType: String,
     val minimumAmount: Int,
-) : Coupon {
+    val type:String,
+) : Coupon(type) {
     override fun canUse(products: List<CartWithProduct>): Boolean {
-        val isMoreThanMinimumAmount = products.sumOf { it.product.price * it.quantity.value  } >= minimumAmount
+        val isMoreThanMinimumAmount =
+            products.sumOf { it.product.price * it.quantity.value } >= minimumAmount
         val isNotExpired = LocalDate.now().isAfter(expirationDate)
         return isNotExpired && isMoreThanMinimumAmount
     }

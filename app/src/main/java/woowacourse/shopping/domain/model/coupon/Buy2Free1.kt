@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartWithProduct
-import woowacourse.shopping.domain.model.ProductWithQuantity
 import java.time.LocalDate
 
 data class Buy2Free1(
@@ -9,10 +8,10 @@ data class Buy2Free1(
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDate,
-    override val discountType: String,
+    val type: String,
     val buyQuantity: Int,
     val getQuantity: Int,
-) : Coupon {
+) : Coupon(type) {
     private val applyCount = buyQuantity + getQuantity
 
     override fun canUse(products: List<CartWithProduct>): Boolean {
