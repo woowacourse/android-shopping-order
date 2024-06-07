@@ -33,9 +33,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="18dp"
+            android:text="@{coupon.description}"
             android:textColor="@color/gray5"
             android:textSize="18sp"
-            android:text="@{coupon.description}"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/cb_coupon"
             app:layout_constraintTop_toTopOf="parent"
@@ -49,6 +49,7 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/gray5"
             android:textSize="12sp"
+            app:expirationDate="@{coupon.expirationDate}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_title"
             tools:text="만료일: 2024년 11월 30일" />

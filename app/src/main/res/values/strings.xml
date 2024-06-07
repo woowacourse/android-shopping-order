@@ -22,4 +22,5 @@
     <string name="delivery_amount_comment">배송비</string>
     <string name="total_amount_comment">총 결제 금액</string>
     <string name="payment_comment">결제하기</string>
+    <string name="coupon_expiration_date">만료일: yyyy년 MM월 dd일</string>
 </resources>
