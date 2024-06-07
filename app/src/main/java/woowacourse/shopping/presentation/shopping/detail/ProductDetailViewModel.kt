@@ -103,12 +103,10 @@ class ProductDetailViewModel(
     }
 
     private fun loadProduct(id: Long) {
-        viewModelScope.launch {
-            shoppingRepository.productById(id).onSuccess {
-                _uiState.value = uiState.value?.copy(cartProduct = it.toCartUiModel())
-            }.onFailure {
-                _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
-            }
+        shoppingRepository.productById(id).onSuccess {
+            _uiState.value = uiState.value?.copy(cartProduct = it.toCartUiModel())
+        }.onFailure {
+            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
         }
     }
 
