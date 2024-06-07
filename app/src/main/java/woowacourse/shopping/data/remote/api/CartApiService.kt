@@ -30,7 +30,7 @@ interface CartApiService {
     @DELETE("/cart-items/{id}")
     suspend fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
+        @Path("id") id: Long,
     ): Response<Unit>
 
     @PATCH("/cart-items/{id}")

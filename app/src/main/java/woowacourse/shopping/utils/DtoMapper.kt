@@ -17,7 +17,7 @@ object DtoMapper {
 
     fun CartItemDto.toCartItem(): CartItem {
         return CartItem(
-            id = id.toLong(),
+            id = id,
             product = product.toProduct(quantity),
         )
     }
