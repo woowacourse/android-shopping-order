@@ -58,7 +58,10 @@ sealed class Coupon(
             id, code, description, discountType, expirationDate
     ) {
         override fun isValid(cartProducts: List<CartProduct>): Boolean {
-            return cartProducts.any { it.quantity >= buyQuantity }
+            val currentDate = LocalDate.now()
+            val expirationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_DATE)
+
+            return currentDate <= expirationDate && cartProducts.any { it.quantity >= buyQuantity }
         }
 
         override fun getPriceDiscount(cartProducts: List<CartProduct>): Int {

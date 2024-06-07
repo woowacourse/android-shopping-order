@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.payment
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,7 +54,7 @@ class PaymentActionViewModel(
             if (it.coupon.id == couponUiModel.coupon.id) {
                 it.copy(isChecked = !it.isChecked)
             } else {
-                it
+                it.copy(isChecked = false)
             }
         }?.let {
             _coupons.postValue(_coupons.value?.copy(couponUiModels = it))
