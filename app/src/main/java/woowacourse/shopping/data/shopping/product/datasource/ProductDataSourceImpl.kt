@@ -9,7 +9,7 @@ import woowacourse.shopping.data.util.executeAsResult
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.remote.service.ProductService
 
-class DefaultProductDataSource(
+class ProductDataSourceImpl(
     private val productService: ProductService,
 ) : ProductDataSource {
     override suspend fun products(

@@ -8,7 +8,7 @@ object ProductDataSourceInjector {
 
     fun productDataSource(): ProductDataSource =
         instance ?: synchronized(this) {
-            instance ?: DefaultProductDataSource(
+            instance ?: ProductDataSourceImpl(
                 ProductService.instance(),
             ).also {
                 instance = it
