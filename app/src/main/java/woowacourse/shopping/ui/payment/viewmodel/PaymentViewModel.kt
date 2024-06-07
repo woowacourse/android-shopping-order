@@ -16,6 +16,8 @@ import woowacourse.shopping.data.coupon.Fixed5000
 import woowacourse.shopping.data.coupon.Freeshipping
 import woowacourse.shopping.data.coupon.MiracleSale
 import woowacourse.shopping.ui.payment.CouponClickListener
+import woowacourse.shopping.ui.payment.CouponUiModel
+import woowacourse.shopping.ui.payment.toUiModel
 
 class PaymentViewModel(
     private val orderedCartItemIds: List<Long>,
@@ -29,20 +31,22 @@ class PaymentViewModel(
             it.sumOf { it.product.price * it.quantity.value }
         }
 
-    private val _coupons: MutableLiveData<List<CouponState>> = MutableLiveData()
-    val coupons: MediatorLiveData<List<CouponState>> =
-        MediatorLiveData<List<CouponState>>().apply {
+    val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
+    val coupons: MediatorLiveData<List<CouponUiModel>> =
+        MediatorLiveData<List<CouponUiModel>>().apply {
             addSource(_coupons) { value = availableCoupons() }
             addSource(orderedProducts) { value = availableCoupons() }
         }
 
-    private val _checkedCoupon: MutableLiveData<CouponState> = MutableLiveData()
-    val checkedCoupon: LiveData<CouponState> = _checkedCoupon
+    val checkedCoupon: LiveData<CouponUiModel?> =
+        _coupons.map {
+            it.firstOrNull { it.isChecked }
+        }
 
     val totalAmount: MediatorLiveData<Int> =
         MediatorLiveData<Int>().apply {
             addSource(orderAmount) { value = totalAmount() }
-            addSource(_checkedCoupon) { value = totalAmount() }
+            addSource(checkedCoupon) { value = totalAmount() }
         }
 
     init {
@@ -50,35 +54,12 @@ class PaymentViewModel(
         loadCoupons()
     }
 
-    private fun totalAmount(): Int {
-        val orderAmount = orderAmount.value ?: 0
-        val couponDiscount = _checkedCoupon.value?.discountAmount() ?: 0
-        return orderAmount + DELIVERY_AMOUNT - couponDiscount
-    }
-
-    override fun clickCoupon(couponId: Long) {
-        val coupon = _coupons.value?.find { it.coupon.id == couponId }
-        _checkedCoupon.value = coupon
-    }
-
-    private fun availableCoupons(): List<CouponState> {
-        val orderAmount = orderedProducts.value?.sumOf { it.product.price * it.quantity.value } ?: 0
-        val coupons =
-            _coupons.value?.map {
-                couponState(it, orderAmount)
-            } ?: emptyList()
-        return coupons.filter { it.isValid() }
-    }
-
-    private fun couponState(
-        couponState: CouponState,
-        orderAmount: Int,
-    ) = when (couponState) {
-        is Fixed5000 -> couponState.copy(orderAmount = orderAmount)
-        is Freeshipping -> couponState.copy(orderAmount = orderAmount)
-        is MiracleSale -> couponState.copy(orderAmount = orderAmount)
-        is Bogo -> couponState.copy(orderedProduct = orderedProducts.value ?: emptyList())
-        else -> throw IllegalStateException()
+    override fun checkCoupon(couponId: Long) {
+        val checkedCoupon = findCheckedCoupon(couponId)
+        val currentList = getCoupons()
+        currentList[currentList.indexOf(checkedCoupon.copy(isChecked = false))] =
+            checkedCoupon.copy(isChecked = !checkedCoupon.isChecked)
+        _coupons.value = currentList
     }
 
     private fun loadOrderedCartItems() {
@@ -93,10 +74,51 @@ class PaymentViewModel(
         }
     }
 
+    private fun getCoupons() = requireNotNull(_coupons.value?.map { it.copy(isChecked = false) }?.toMutableList())
+
+    private fun findCheckedCoupon(couponId: Long): CouponUiModel {
+        val checkedCoupon =
+            requireNotNull(_coupons.value?.find { it.couponState.coupon.id == couponId })
+        return checkedCoupon
+    }
+
+    private fun totalAmount(): Int {
+        val orderAmount = orderAmount.value ?: 0
+        val couponDiscount = checkedCoupon.value?.couponState?.discountAmount() ?: 0
+        return orderAmount + DELIVERY_AMOUNT - couponDiscount
+    }
+
+    private fun availableCoupons(): List<CouponUiModel> {
+        val orderAmount = orderedProducts.value?.sumOf { it.product.price * it.quantity.value } ?: 0
+        val coupons =
+            _coupons.value?.map { couponUiModel ->
+                updateCouponUiModel(
+                    couponUiModel.couponState,
+                    orderAmount,
+                ).copy(isChecked = couponUiModel.isChecked)
+            } ?: emptyList()
+
+        return coupons.filter { it.couponState.isValid() }
+    }
+
+    private fun updateCouponUiModel(
+        couponState: CouponState,
+        orderAmount: Int,
+    ) = when (couponState) {
+        is Fixed5000 -> couponState.copy(orderAmount = orderAmount).toUiModel()
+        is Freeshipping -> couponState.copy(orderAmount = orderAmount).toUiModel()
+        is MiracleSale -> couponState.copy(orderAmount = orderAmount).toUiModel()
+        is Bogo ->
+            couponState.copy(orderedProduct = orderedProducts.value ?: emptyList())
+                .toUiModel()
+
+        else -> throw IllegalStateException()
+    }
+
     private fun loadCoupons() {
         viewModelScope.launch {
             couponRepository.getCoupons().onSuccess {
-                _coupons.value = it
+                _coupons.value = it.map { it.toUiModel() }
             }
         }
     }

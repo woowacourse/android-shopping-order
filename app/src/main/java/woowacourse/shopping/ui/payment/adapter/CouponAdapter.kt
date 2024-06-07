@@ -3,13 +3,13 @@ package woowacourse.shopping.ui.payment.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.data.coupon.CouponState
 import woowacourse.shopping.databinding.ItemCouponBinding
 import woowacourse.shopping.ui.payment.CouponClickListener
+import woowacourse.shopping.ui.payment.CouponUiModel
 
 class CouponAdapter(
     private val couponClickListener: CouponClickListener,
-) : ListAdapter<CouponState, CouponViewHolder>(CouponDiffUtil) {
+) : ListAdapter<CouponUiModel, CouponViewHolder>(CouponDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

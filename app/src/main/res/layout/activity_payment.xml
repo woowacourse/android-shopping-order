@@ -131,7 +131,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="18dp"
-            android:text="@{@string/product_price(-1 * vm.checkedCoupon.discountAmount())}"
+            android:text="@{@string/product_price(-1 * vm.checkedCoupon.couponState.discountAmount())}"
             android:textColor="@color/black"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"

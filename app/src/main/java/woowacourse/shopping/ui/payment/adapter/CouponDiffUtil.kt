@@ -1,20 +1,20 @@
 package woowacourse.shopping.ui.payment.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.data.coupon.CouponState
+import woowacourse.shopping.ui.payment.CouponUiModel
 
-object CouponDiffUtil : DiffUtil.ItemCallback<CouponState>() {
+object CouponDiffUtil : DiffUtil.ItemCallback<CouponUiModel>() {
     override fun areItemsTheSame(
-        oldItem: CouponState,
-        newItem: CouponState,
+        oldItem: CouponUiModel,
+        newItem: CouponUiModel,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
-        oldItem: CouponState,
-        newItem: CouponState,
+        oldItem: CouponUiModel,
+        newItem: CouponUiModel,
     ): Boolean {
-        return oldItem.coupon == newItem.coupon
+        return oldItem == newItem
     }
 }
