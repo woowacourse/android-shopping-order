@@ -50,17 +50,15 @@ class ProductDetailViewModel(
     }
 
     private fun fetchInitialData() {
-        productRepository.loadById(productId) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val product = result.data
+        viewModelScope.launch {
+            productRepository.loadById(productId)
+                .onSuccess { product ->
                     _product.value = product.toUiModel(DEFAULT_PRODUCT_COUNT)
                     saveRecentProduct(product)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(DetailError.ProductItemsNotFound)
                 }
-            }
         }
     }
 

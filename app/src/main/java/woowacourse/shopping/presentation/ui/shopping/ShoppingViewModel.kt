@@ -26,7 +26,7 @@ import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
 import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ShoppingViewModel(
-    private val productRepository: ProductRepository = ProductRepositoryImpl(),
+    private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(), ShoppingHandler {
@@ -86,17 +86,14 @@ class ShoppingViewModel(
     }
 
     private fun fetchInitialProducts(carts: List<Cart>) {
-        productRepository.load(currentPage, PRODUCT_PAGE_SIZE) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val loadedProducts = result.data
+        viewModelScope.launch {
+            productRepository.load(currentPage, PRODUCT_PAGE_SIZE)
+                .onSuccess { result ->
                     currentPage++
-                    addProductModels(loadedProducts, carts)
-                }
-                is NetworkResult.Error -> {
+                    addProductModels(result, carts)
+                }.onFailure {
                     _error.value = Event(ShoppingError.ProductItemsNotFound)
                 }
-            }
         }
     }
 
@@ -158,22 +155,20 @@ class ShoppingViewModel(
 
     override fun onProductItemClick(productId: Long) {
         val cartId = cartItems.find { it.product.id == productId }?.cartId ?: -1
-        val quantity = shoppingProductsData.find { it.id == productId }?.quantity ?: 0
+        val quantity = shoppingProductsData.find { it.id == productId }?.quantity ?: 0 // 이제 없애도 됨
         _moveEvent.value = Event(FromShoppingToScreen.ProductDetail(productId, cartId, quantity))
     }
 
     override fun onLoadMoreClick() {
-        productRepository.load(currentPage, PRODUCT_PAGE_SIZE) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val loadedProducts = result.data
+        viewModelScope.launch(Dispatchers.IO) {
+            productRepository.load(currentPage, PRODUCT_PAGE_SIZE)
+                .onSuccess { result ->
                     currentPage++
-                    addProductModels(loadedProducts, cartItems)
+                    addProductModels(result, cartItems)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(ShoppingError.AllProductsLoaded)
                 }
-            }
         }
     }
 

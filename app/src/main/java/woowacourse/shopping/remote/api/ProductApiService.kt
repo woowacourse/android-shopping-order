@@ -1,6 +1,6 @@
 package woowacourse.shopping.remote.api
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -9,20 +9,20 @@ import woowacourse.shopping.remote.dto.response.ProductResponse
 
 interface ProductApiService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ProductResponse>
+    ): Response<ProductResponse>
 
     @GET("/products")
-    fun requestProductsWithCategory(
+    suspend fun requestProductsWithCategory(
         @Query("category") category: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ProductResponse>
+    ): Response<ProductResponse>
 
     @GET("/products/{id}")
-    fun requestProductDetail(
+    suspend fun requestProductDetail(
         @Path(value = "id") productId: Int,
-    ): Call<ProductDto>
+    ): Response<ProductDto>
 }
