@@ -4,6 +4,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.PageInfo
 import woowacourse.shopping.domain.model.Product
@@ -56,37 +62,44 @@ class ShoppingViewModel(
         get() = _isLoading
 
     fun loadProducts() {
-        val totalProducts: List<Product> = getProductListWithSettingPageInfo()
-        loadCartItemsThenCombineWithProducts(totalProducts)
-        updateTotalCartItemsQuantity()
-    }
-
-    private fun getProductListWithSettingPageInfo(): List<Product> {
-        var products: List<Product> = shoppingProducts.value?.map { it.product }.orEmpty()
-        val response = shoppingItemsRepository.fetchProductsWithPage(nextPage, PAGE_SIZE)
-        response.onSuccess { productListInfo ->
-            products = products + productListInfo.products
-            _pageInfo.postValue(productListInfo.pageInfo)
-            nextPage = productListInfo.pageInfo.currentPage + 1
-        }.onFailure {
-            _isLoading.postValue(Event(false))
-            Log.d(this::class.java.simpleName, "$it")
+        viewModelScope.launch {
+            val totalProducts: List<Product> =
+                async { asyncGetProductListWithSettingPageInfo() }.await()
+            val cartItems: List<CartItem> =
+                async { asyncLoadCartItems() }.await()
+            combineProductsWithCartItems(totalProducts, cartItems)
+            updateTotalCartItemsQuantity()
         }
-        return products
     }
 
-    private fun loadCartItemsThenCombineWithProducts(products: List<Product>) {
-        var cartItems: List<CartItem>?
-        cartItemsRepository.fetchCartItemsInfo { result ->
-            result.onSuccess { items ->
-                cartItems = items
-                combineProductsWithCartItems(products, cartItems)
+    private suspend fun asyncGetProductListWithSettingPageInfo(): List<Product> = coroutineScope {
+        var products: List<Product> = shoppingProducts.value?.map { it.product }.orEmpty()
+        withContext(Dispatchers.IO) {
+            val result = shoppingItemsRepository.fetchProductsWithPage(nextPage, PAGE_SIZE)
+            result.onSuccess { productListInfo ->
+                products = products + productListInfo.products
+                withContext(Dispatchers.Main) { _pageInfo.value = productListInfo.pageInfo }
+                nextPage = productListInfo.pageInfo.currentPage + 1
             }.onFailure {
-                combineProductsWithCartItems(products, emptyList())
-                _isLoading.postValue(Event(false))
+                withContext(Dispatchers.Main) { _isLoading.value = Event(false) }
                 Log.d(this::class.java.simpleName, "$it")
             }
         }
+        products
+    }
+
+    private suspend fun asyncLoadCartItems(): List<CartItem> = coroutineScope {
+        var cartItems: List<CartItem> = emptyList()
+        withContext(Dispatchers.IO) {
+            val result = cartItemsRepository.fetchCartItemsInfo()
+            result.onSuccess { items ->
+                cartItems = items
+            }.onFailure {
+                withContext(Dispatchers.Main) { _isLoading.value = Event(false) }
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+        cartItems
     }
 
     private fun combineProductsWithCartItems(
@@ -94,19 +107,9 @@ class ShoppingViewModel(
         cartItems: List<CartItem>?,
     ) {
         if (products != null && cartItems != null) {
-            _shoppingProducts.postValue(convertToShoppingProductList(products, cartItems))
-            _changedIds.postValue(products.map { it.id }.toSet())
-            _isLoading.postValue(Event(false))
-        }
-    }
-
-    private fun updateTotalCartItemsQuantity() {
-        cartItemsRepository.fetchTotalQuantity { result ->
-            result.onSuccess { totalQuantity ->
-                _totalCartItemsQuantity.postValue(totalQuantity)
-            }.onFailure {
-                Log.d(this::class.java.simpleName, "$it")
-            }
+            _shoppingProducts.value = convertToShoppingProductList(products, cartItems)
+            _changedIds.value = products.map { it.id }.toSet()
+            _isLoading.value = Event(false)
         }
     }
 
@@ -124,19 +127,38 @@ class ShoppingViewModel(
         }
     }
 
+    private fun updateTotalCartItemsQuantity() {
+        viewModelScope.launch {
+            val result = cartItemsRepository.fetchTotalQuantity()
+            result.onSuccess { totalQuantity ->
+                _totalCartItemsQuantity.value = totalQuantity
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+    }
+
     fun setLoadingStart() {
         _isLoading.value = Event(true)
     }
 
     override fun onProductClick(productId: Long) {
         _navigateToDetail.value = Event(productId)
-        val product = shoppingItemsRepository.findProductItem(productId) ?: return
-        updateRecentProducts(product)
+        viewModelScope.launch {
+            val result = shoppingItemsRepository.findProductItem(productId)
+            result.onSuccess { product ->
+                updateRecentProducts(product)
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
     }
 
     private fun updateRecentProducts(product: Product) {
-        recentProductRepository.save(product)
-        _recentProducts.value = recentProductRepository.loadLatestList()
+        viewModelScope.launch {
+            recentProductRepository.save(product)
+            _recentProducts.value = recentProductRepository.loadLatestList()
+        }
     }
 
     override fun onLoadMoreButtonClick() {
@@ -155,11 +177,12 @@ class ShoppingViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        cartItemsRepository.addCartItem(productId, quantity.inc()) { result ->
+        viewModelScope.launch {
+            val result = cartItemsRepository.addCartItem(productId, quantity.inc())
             result.onSuccess {
-                _shoppingProducts.postValue(getQuantityChangedList(productId, quantity.inc()))
-                _totalCartItemsQuantity.postValue(totalCartItemsQuantity.value?.inc())
-                _changedIds.postValue(setOf(productId))
+                _shoppingProducts.value = getQuantityChangedList(productId, quantity.inc())
+                _totalCartItemsQuantity.value = totalCartItemsQuantity.value?.inc()
+                _changedIds.value = setOf(productId)
             }.onFailure {
                 Log.d(this::class.java.simpleName, "$it")
             }
@@ -171,24 +194,27 @@ class ShoppingViewModel(
         quantity: Int,
     ) {
         if (quantity > 1) {
-            cartItemsRepository.updateCartItemQuantityWithProductId(
-                productId,
-                quantity.dec(),
-            ) { result ->
+            viewModelScope.launch {
+                val result =
+                    cartItemsRepository.updateCartItemQuantityWithProductId(
+                        productId,
+                        quantity.dec(),
+                    )
                 result.onSuccess {
-                    _shoppingProducts.postValue(getQuantityChangedList(productId, quantity.dec()))
-                    _totalCartItemsQuantity.postValue(totalCartItemsQuantity.value?.dec())
-                    _changedIds.postValue(setOf(productId))
+                    _shoppingProducts.value = getQuantityChangedList(productId, quantity.dec())
+                    _totalCartItemsQuantity.value = totalCartItemsQuantity.value?.dec()
+                    _changedIds.value = setOf(productId)
                 }.onFailure {
                     Log.d(this::class.java.simpleName, "$it")
                 }
             }
         } else {
-            cartItemsRepository.deleteCartItemWithProductId(productId) { result ->
+            viewModelScope.launch {
+                val result = cartItemsRepository.deleteCartItemWithProductId(productId)
                 result.onSuccess {
-                    _shoppingProducts.postValue(getQuantityChangedList(productId, 0))
-                    _totalCartItemsQuantity.postValue(totalCartItemsQuantity.value?.dec())
-                    _changedIds.postValue(setOf(productId))
+                    _shoppingProducts.value = getQuantityChangedList(productId, 0)
+                    _totalCartItemsQuantity.value = totalCartItemsQuantity.value?.dec()
+                    _changedIds.value = setOf(productId)
                 }.onFailure {
                     Log.d(this::class.java.simpleName, "$it")
                 }

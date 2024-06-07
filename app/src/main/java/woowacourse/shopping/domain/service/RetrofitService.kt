@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.service
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -17,50 +17,50 @@ import woowacourse.shopping.data.model.dto.ShoppingProductDto
 
 interface RetrofitService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
-    ): Call<ProductResponseDto>
+    ): Response<ProductResponseDto>
 
     @GET("/products/{id}")
-    fun requestProduct(
+    suspend fun requestProduct(
         @Path("id") id: Long,
-    ): Call<ProductDto>
+    ): Response<ProductDto>
 
     @GET("/products")
-    fun requestProductWithCategory(
+    suspend fun requestProductWithCategory(
         @Query("category") category: String,
         @Query("query") page: Int = 0,
         @Query("size") size: Int = 50,
-    ): Call<ProductResponseDto>
+    ): Response<ProductResponseDto>
 
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 50,
-    ): Call<CartItemDto>
+    ): Response<CartItemDto>
 
     @GET("/cart-items/counts")
-    fun requestCartItemsCount(): Call<QuantityDto>
+    suspend fun requestCartItemsCount(): Response<QuantityDto>
 
     @POST("/cart-items")
-    fun addCartItem(
+    suspend fun addCartItem(
         @Body shoppingProductDto: ShoppingProductDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         @Path("id") id: Long,
         @Body quantity: Int,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") id: Long,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @POST("/orders")
-    fun makeOrder(
+    suspend fun makeOrder(
         @Body cartItemIds: CartItemsDto,
-    ): Call<Unit>
+    ): Response<Unit>
 }

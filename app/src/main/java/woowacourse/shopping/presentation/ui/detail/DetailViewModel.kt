@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -48,21 +50,34 @@ class DetailViewModel(
     }
 
     private fun loadShoppingProductData() {
-        val shoppingProduct =
-            ShoppingProduct(
-                product = shoppingRepository.findProductItem(productId) ?: return,
-                quantity = fetchQuantity(),
-            )
-        _shoppingProduct.value = shoppingProduct
+        viewModelScope.launch {
+            val result = shoppingRepository.findProductItem(productId)
+            result.onSuccess {
+                val shoppingProduct =
+                    ShoppingProduct(
+                        product = it,
+                        quantity = fetchQuantity(),
+                    )
+                _shoppingProduct.value = shoppingProduct
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
     }
 
     private fun fetchQuantity(): Int {
-        return cartRepository.findCartItemWithProductId(productId)?.quantity ?: 1
+        var quantity = 1
+        viewModelScope.launch {
+            quantity = cartRepository.findCartItemWithProductId(productId)?.quantity ?: 1
+        }
+        return quantity
     }
 
     private fun loadRecentProductData() {
-        val recentProduct = recentProductRepository.loadSecondLatest() ?: return
-        _recentProduct.value = recentProduct
+        viewModelScope.launch {
+            val recentProduct = recentProductRepository.loadSecondLatest() ?: return@launch
+            _recentProduct.value = recentProduct
+        }
     }
 
     private fun checkRecentProductVisibility() {
@@ -77,22 +92,23 @@ class DetailViewModel(
     fun createShoppingCartItem() {
         val productId = shoppingProduct.value?.product?.id ?: return
         val quantity = shoppingProduct.value?.quantity() ?: return
-        cartRepository.addCartItem(productId, quantity) { result ->
+        viewModelScope.launch {
+            val result = cartRepository.addCartItem(productId, quantity)
             result.onSuccess {
-                _isAddCartSuccess.postValue(Event(true))
+                _isAddCartSuccess.value = Event(true)
             }.onFailure {
-                _isAddCartSuccess.postValue(Event(false))
+                _isAddCartSuccess.value = Event(false)
                 Log.d(this::class.java.simpleName, "$it")
             }
         }
     }
 
     override fun onRecentProductClicked(productId: Long) {
-        _navigateToDetail.postValue(Event(productId))
+        _navigateToDetail.value = Event(productId)
     }
 
     override fun onBackButtonClicked() {
-        _moveBack.postValue(Event(true))
+        _moveBack.value = Event(true)
     }
 
     override fun increaseCount(

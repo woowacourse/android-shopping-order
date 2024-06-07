@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
@@ -82,9 +84,14 @@ class RecommendViewModel(
     }
 
     private fun loadRecommendationProducts() {
-        val recentProduct = recentProductRepository.loadLatest()
-        if (recentProduct != null) {
-            cartRepository.fetchCartItemsInfo { result ->
+        viewModelScope.launch {
+            val recentProduct = recentProductRepository.loadLatest()
+            if (recentProduct == null) {
+                _recommendItemsState.value = UIState.Empty
+                setLoadingState(false)
+                return@launch
+            } else {
+                val result = cartRepository.fetchCartItemsInfo()
                 result.onSuccess { items ->
                     val cartItemIds = items.map { it.productId }
                     val recommendItems =
@@ -99,17 +106,14 @@ class RecommendViewModel(
                     Log.d(this::class.java.simpleName, "$it")
                 }
             }
-        } else {
-            _recommendItemsState.value = UIState.Empty
-            setLoadingState(false)
         }
     }
 
     private fun setUpUIState(recommendItems: List<ShoppingProduct>) {
         if (recommendItems.isEmpty()) {
-            _recommendItemsState.postValue(UIState.Empty)
+            _recommendItemsState.value = (UIState.Empty)
         } else {
-            _recommendItemsState.postValue(UIState.Success(recommendItems))
+            _recommendItemsState.value = (UIState.Success(recommendItems))
         }
         setLoadingState(false)
     }
@@ -120,7 +124,8 @@ class RecommendViewModel(
 
     fun completeOrder() {
         val currentOrder = _order.value ?: return
-        cartRepository.makeOrder(currentOrder) { result ->
+        viewModelScope.launch {
+            val result = cartRepository.makeOrder(currentOrder)
             result.onSuccess {
                 clearOrder()
             }.onFailure {
@@ -146,16 +151,18 @@ class RecommendViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc()) { result ->
+        viewModelScope.launch {
+            val result =
+                cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc())
             result.onSuccess {
                 val cartItem =
                     cartRepository.findCartItemWithProductId(productId)
-                        ?: return@updateCartItemQuantityWithProductId
+                        ?: return@launch
                 val prevOrder = order.value ?: Order()
                 prevOrder.addCartItem(cartItem)
-                _order.postValue(prevOrder)
+                _order.value = prevOrder
                 changeShoppingProductQuantity(productId, quantity.inc())
-                _changedIds.postValue(setOf(productId))
+                _changedIds.value = setOf(productId)
                 updatePriceAndQuantity()
             }.onFailure {
                 Log.d(this::class.java.simpleName, "$it")
@@ -175,14 +182,15 @@ class RecommendViewModel(
     }
 
     private fun removeOrder(productId: Long) {
-        val cartItem = cartRepository.findCartItemWithProductId(productId) ?: return
-        cartRepository.deleteCartItemWithProductId(productId) { result ->
+        viewModelScope.launch {
+            val cartItem = cartRepository.findCartItemWithProductId(productId) ?: return@launch
+            val result = cartRepository.deleteCartItemWithProductId(productId)
             result.onSuccess {
                 val prevOrder = order.value ?: Order()
                 prevOrder.removeCartItem(cartItem.id)
-                _order.postValue(prevOrder)
+                _order.value = prevOrder
                 changeShoppingProductQuantity(productId, 0)
-                _changedIds.postValue(setOf(productId))
+                _changedIds.value = setOf(productId)
                 updatePriceAndQuantity()
             }.onFailure {
                 Log.d(this::class.java.simpleName, "$it")
@@ -194,19 +202,21 @@ class RecommendViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        cartRepository.updateCartItemQuantityWithProductId(
-            productId,
-            quantity.dec(),
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                cartRepository.updateCartItemQuantityWithProductId(
+                    productId,
+                    quantity.dec(),
+                )
             result.onSuccess {
                 val cartItem =
                     cartRepository.findCartItemWithProductId(productId)
-                        ?: return@updateCartItemQuantityWithProductId
+                        ?: return@launch
                 val prevOrder = order.value ?: Order()
                 prevOrder.addCartItem(cartItem)
-                _order.postValue(prevOrder)
+                _order.value = prevOrder
                 changeShoppingProductQuantity(productId, quantity.dec())
-                _changedIds.postValue(setOf(productId))
+                _changedIds.value = setOf(productId)
                 updatePriceAndQuantity()
             }.onFailure {
                 Log.d(this::class.java.simpleName, "$it")
@@ -226,7 +236,7 @@ class RecommendViewModel(
                     it
                 }
             }
-        _recommendItemsState.postValue(UIState.Success(changedShoppingProducts))
+        _recommendItemsState.value = UIState.Success(changedShoppingProducts)
     }
 
     companion object {

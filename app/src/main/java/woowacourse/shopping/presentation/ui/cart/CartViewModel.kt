@@ -1,11 +1,12 @@
 package woowacourse.shopping.presentation.ui.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.event.Event
@@ -40,14 +41,14 @@ class CartViewModel(
     private var lastPage: Int = DEFAULT_PAGE
 
     val cartItemsState: LiveData<UIState<List<CartItem>>> =
-        currentPage.switchMap { page ->
+        currentPage.switchMap {
             MutableLiveData<UIState<List<CartItem>>>().apply {
                 value =
                     try {
-                        setUpUIState(page)
+                        setUpUIState()
                     } catch (e: Exception) {
                         UIState.Error(e)
-                        setUpUIState(page)
+                        setUpUIState()
                     }
             }
         }
@@ -77,11 +78,10 @@ class CartViewModel(
     val totalQuantity: LiveData<Int>
         get() = _totalQuantity
 
-    private fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
+    private fun setUpUIState(): UIState<List<CartItem>> {
         var uiState: UIState<List<CartItem>> = UIState.Success(emptyList())
-        Log.d("ㅌㅅㅌ", "cartViewModel")
-        cartRepository.fetchCartItemsInfo { result ->
-            Log.d("ㅌㅅㅌ", "cartViewModel | result = $result")
+        viewModelScope.launch {
+            val result = cartRepository.fetchCartItemsInfo()
             result.fold(
                 onSuccess = { items ->
                     uiState =
@@ -93,11 +93,9 @@ class CartViewModel(
                 },
                 onFailure = {
                     uiState = UIState.Error(RuntimeException("something goes wrong. try again."))
-                    Log.d("ㅌㅅㅌ", "$it")
                 },
             )
         }
-        Log.d("ㅌㅅㅌ", "ui state : $uiState")
         return uiState
     }
 
@@ -128,7 +126,8 @@ class CartViewModel(
     }
 
     fun deleteItem(itemId: Long) {
-        cartRepository.deleteCartItem(itemId) {
+        viewModelScope.launch {
+            cartRepository.deleteCartItem(itemId)
         }
         loadPage()
     }
@@ -141,8 +140,8 @@ class CartViewModel(
         _navigateToShopping.postValue(Event(true))
     }
 
-    override fun navigateToDetail(productId: Long) {
-        _navigateToDetail.postValue(Event(productId))
+    override fun navigateToDetail(itemId: Long) {
+        _navigateToDetail.postValue(Event(itemId))
     }
 
     override fun deleteCartItem(itemId: Long) {
@@ -153,20 +152,27 @@ class CartViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val currentQuantity = cartRepository.fetchItemQuantityWithProductId(productId)
-        cartRepository.updateCartItemQuantityWithProductId(productId, currentQuantity + 1) {}
-        loadPage()
+        viewModelScope.launch {
+            val currentQuantity = cartRepository.fetchItemQuantityWithProductId(productId)
+            cartRepository.updateCartItemQuantityWithProductId(productId, currentQuantity + 1)
+            loadPage()
+        }
     }
 
     override fun decreaseCount(
         productId: Long,
         quantity: Int,
     ) {
-        val currentQuantity = cartRepository.fetchItemQuantityWithProductId(productId)
-        if (currentQuantity > 1) {
-            cartRepository.updateCartItemQuantityWithProductId(productId, currentQuantity - 1) {}
+        viewModelScope.launch {
+            val currentQuantity = cartRepository.fetchItemQuantityWithProductId(productId)
+            if (currentQuantity > 1) {
+                cartRepository.updateCartItemQuantityWithProductId(
+                    productId,
+                    currentQuantity - 1
+                )
+            }
+            loadPage()
         }
-        loadPage()
     }
 
     companion object {

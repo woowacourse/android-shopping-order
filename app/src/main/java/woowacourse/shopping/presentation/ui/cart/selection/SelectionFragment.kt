@@ -24,12 +24,7 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     private lateinit var selectionAdapter: SelectionAdapter
     private lateinit var fragmentEventListener: FragmentController
     private val viewModel: SelectionViewModel by lazy {
-        val viewModelFactory =
-            SelectionViewModelFactory(
-                shoppingRepository = RemoteShoppingRepositoryImpl(),
-                recentProductRepository = RecentProductRepositoryImpl(requireContext()),
-                cartRepository = RemoteCartRepositoryImpl(),
-            )
+        val viewModelFactory = SelectionViewModelFactory(RemoteCartRepositoryImpl())
         viewModelFactory.create(SelectionViewModel::class.java)
     }
 

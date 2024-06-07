@@ -4,14 +4,14 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductListInfo
 
 interface ShoppingItemsRepository {
-    fun fetchProductsWithPage(
+    suspend fun fetchProductsWithPage(
         page: Int,
         size: Int,
     ): Result<ProductListInfo>
 
-    fun findProductItem(id: Long): Product?
+    suspend fun findProductItem(id: Long): Result<Product>
 
-    fun recommendProducts(
+    suspend fun recommendProducts(
         category: String,
         count: Int,
         cartItemIds: List<Long>,
