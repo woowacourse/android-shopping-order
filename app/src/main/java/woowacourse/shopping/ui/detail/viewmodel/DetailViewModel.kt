@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -61,10 +63,12 @@ class DetailViewModel(
     }
 
     fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
-        _mostRecentProduct.value = recentProductRepository.findMostRecentProduct()
-        val currentProduct = product.value ?: return
-        recentProductRepository.save(currentProduct)
-        updateRecentProductVisible(isMostRecentProductClicked)
+        viewModelScope.launch {
+            _mostRecentProduct.value = recentProductRepository.findMostRecentProduct()
+            val currentProduct = product.value ?: return@launch
+            recentProductRepository.save(currentProduct)
+            updateRecentProductVisible(isMostRecentProductClicked)
+        }
     }
 
     fun updateRecentProductVisible(isMostRecentProductClicked: Boolean) {
@@ -77,36 +81,41 @@ class DetailViewModel(
     }
 
     private fun loadProduct() {
-        runCatching {
+        viewModelScope.launch {
             productRepository.getProductById(productId)
-        }.onSuccess {
-            val product = it.getOrNull() ?: return
-            _product.value = product
-            _detailUiState.value = UiState.Success(product)
-        }.onFailure {
-            _detailUiState.value = UiState.Error(it)
+                .onSuccess {
+                    val product = it
+                    _product.value = product
+                    _detailUiState.value = UiState.Success(product)
+                }.onFailure {
+                    _detailUiState.value = UiState.Error(it)
+                }
         }
     }
 
     private fun saveCartItem() {
         if (detailUiState.value is UiState.Success) {
-            runCatching {
+            viewModelScope.launch {
                 val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
                 cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER)
-            }.onSuccess {
-                val cartItems = it.getOrNull()
-                val cartItem =
-                    cartItems?.firstOrNull { cartItem ->
-                        cartItem.product.productId == productId
-                    }
-                val currentQuantity = cartItem?.quantity ?: 0
-                val quantity = quantity.value ?: 0
+                    .onSuccess {
+                        val cartItems = it
+                        val cartItem =
+                            cartItems.firstOrNull { cartItem ->
+                                cartItem.product.productId == productId
+                            }
+                        val currentQuantity = cartItem?.quantity ?: 0
+                        val quantity = quantity.value ?: 0
 
-                if (cartItem == null) {
-                    cartRepository.addCartItem(productId, quantity)
-                } else {
-                    cartRepository.updateCartItem(cartItem.cartItemId, quantity + currentQuantity)
-                }
+                        if (cartItem == null) {
+                            cartRepository.addCartItem(productId, quantity)
+                        } else {
+                            cartRepository.updateCartItem(
+                                cartItem.cartItemId,
+                                quantity + currentQuantity,
+                            )
+                        }
+                    }
             }
         }
     }

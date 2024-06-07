@@ -16,7 +16,7 @@ import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
 import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
 import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
-import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -74,7 +74,7 @@ class CartFragment : Fragment() {
         cartViewModel.cartUiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
-                is UiState.Loading -> showData(emptyList())
+                is UiState.Loading -> showData(List(5) { ShoppingCartViewItem.CartPlaceHolderViewItem() })
                 is UiState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
@@ -102,7 +102,7 @@ class CartFragment : Fragment() {
         }
     }
 
-    private fun showData(cartViewItems: List<CartViewItem>) {
+    private fun showData(cartViewItems: List<ShoppingCartViewItem>) {
         adapter.submitCartViewItems(cartViewItems.toList())
     }
 

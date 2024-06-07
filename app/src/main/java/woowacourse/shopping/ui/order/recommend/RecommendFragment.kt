@@ -19,7 +19,6 @@ import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
-import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.NavigateToDetail
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -84,14 +83,6 @@ class RecommendFragment : Fragment() {
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
                     )
-            }
-        }
-
-        recommendViewModel.recommendNavigationActions.observe(viewLifecycleOwner) { recommendNavigationActions ->
-            recommendNavigationActions.getContentIfNotHandled()?.let { action ->
-                when (action) {
-                    is NavigateToDetail -> navigateToDetail(action.productId)
-                }
             }
         }
     }

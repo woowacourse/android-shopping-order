@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -70,40 +72,43 @@ class HomeViewModel(
     }
 
     private fun loadRecentProducts() {
-        _recentProducts.value = recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+        viewModelScope.launch {
+            _recentProducts.value = recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+        }
     }
 
     private fun loadProductViewItems() {
-        runCatching {
+        viewModelScope.launch {
             productRepository.getProducts(
                 category = CATEGORY_UNDEFINED,
                 page = page,
                 size = PAGE_SIZE,
                 sort = ASCENDING_SORT_ORDER,
-            )
-        }.onSuccess {
-            page += 1
-            val products = it.getOrNull()?.products ?: emptyList()
-            val productViewItems =
-                products.map { product ->
-                    val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
-                    ProductViewItem(product, quantity)
-                }
-            _canLoadMore.value = it.getOrNull()?.canLoadMore
-            loadedProductViewItems.addAll(productViewItems)
-            _homeUiState.value = UiState.Success(loadedProductViewItems)
-        }.onFailure {
-            _homeUiState.value = UiState.Error(it)
+            ).onSuccess {
+                page += 1
+                val products = it.products
+                val productViewItems =
+                    products.map { product ->
+                        val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
+                        ProductViewItem(product, quantity)
+                    }
+                _canLoadMore.value = it.canLoadMore
+                loadedProductViewItems.addAll(productViewItems)
+                _homeUiState.value = UiState.Success(loadedProductViewItems)
+            }.onFailure {
+                _homeUiState.value = UiState.Error(it)
+            }
         }
     }
 
     private fun loadCartItems() {
-        runCatching {
+        viewModelScope.launch {
             cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
-        }.onSuccess {
-            cartItems.clear()
-            cartItems.addAll(it.getOrNull() ?: emptyList())
-            _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
+                .onSuccess {
+                    cartItems.clear()
+                    cartItems.addAll(it)
+                    _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
+                }
         }
     }
 
@@ -166,38 +171,42 @@ class HomeViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
-        var cartItemId: Int = -1
-        runCatching {
-            cartItemId = cartRepository.addCartItem(product.productId, 1).getOrNull() ?: return
-        }.onSuccess {
-            updateProductViewItemQuantity(product, 1)
-            cartItems.add(CartItem(cartItemId, 1, product))
-            _cartTotalQuantity.value = cartTotalQuantity.value?.plus(1)
+        var cartItemId: Int
+        viewModelScope.launch {
+            cartRepository.addCartItem(product.productId, 1)
+                .onSuccess {
+                    cartItemId = it
+                    updateProductViewItemQuantity(product, 1)
+                    cartItems.add(CartItem(cartItemId, 1, product))
+                    _cartTotalQuantity.value = cartTotalQuantity.value?.plus(1)
+                }
         }
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
         val cartItem = getCartItemByProductId(productId) ?: return
-        runCatching {
+        viewModelScope.launch {
             cartRepository.updateCartItem(cartItem.cartItemId, cartItem.quantity + 1)
-        }.onSuccess {
-            updateProductViewItemQuantity(cartItem.product, cartItem.quantity + 1)
-            loadCartItems()
+                .onSuccess {
+                    updateProductViewItemQuantity(cartItem.product, cartItem.quantity + 1)
+                    loadCartItems()
+                }
         }
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
         val cartItem = getCartItemByProductId(productId) ?: return
-        runCatching {
+        viewModelScope.launch {
             cartRepository.updateCartItem(cartItem.cartItemId, cartItem.quantity - 1)
-        }.onSuccess {
-            if (cartItem.quantity == 1) {
-                cartRepository.deleteCartItem(cartItem.cartItemId)
-            } else {
-                cartRepository.updateCartItem(cartItem.cartItemId, cartItem.quantity - 1)
-            }
-            updateProductViewItemQuantity(cartItem.product, cartItem.quantity - 1)
-            loadCartItems()
+                .onSuccess {
+                    if (cartItem.quantity == 1) {
+                        cartRepository.deleteCartItem(cartItem.cartItemId)
+                    } else {
+                        cartRepository.updateCartItem(cartItem.cartItemId, cartItem.quantity - 1)
+                    }
+                    updateProductViewItemQuantity(cartItem.product, cartItem.quantity - 1)
+                    loadCartItems()
+                }
         }
     }
 

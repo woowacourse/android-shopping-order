@@ -14,10 +14,12 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.ui.detail.action.DetailNavigationActions
+import woowacourse.shopping.ui.detail.action.DetailNavigationActions.NavigateToBack
+import woowacourse.shopping.ui.detail.action.DetailNavigationActions.NavigateToRecentDetail
 import woowacourse.shopping.ui.detail.action.DetailNotifyingActions
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModelFactory
+import woowacourse.shopping.ui.home.HomeActivity
 import woowacourse.shopping.ui.state.UiState
 
 class DetailActivity : AppCompatActivity() {
@@ -29,6 +31,7 @@ class DetailActivity : AppCompatActivity() {
             DEFAULT_IS_MOST_RECENT_PRODUCT_CLICKED,
         )
     }
+
     private val viewModel: DetailViewModel by viewModels {
         DetailViewModelFactory(
             cartRepository = CartRepositoryImpl(cartDataSourceImpl),
@@ -72,8 +75,11 @@ class DetailActivity : AppCompatActivity() {
         viewModel.detailNavigationActions.observe(this) { detailNavigationActions ->
             detailNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is DetailNavigationActions.NavigateToRecentDetail -> navigateToDetail()
-                    is DetailNavigationActions.NavigateToBack -> finish()
+                    is NavigateToRecentDetail -> navigateToDetail()
+                    is NavigateToBack -> {
+                        finish()
+                        startActivity(HomeActivity.createIntent(this))
+                    }
                 }
             }
         }

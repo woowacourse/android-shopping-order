@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -47,19 +49,23 @@ class CartViewModel(
     }
 
     fun updateCartUiState() {
-        _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+        if (cartUiState.value is UiState.Success) {
+            _cartUiState.value =
+                UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+        }
     }
 
     private fun loadCartViewItems() {
-        runCatching {
+        viewModelScope.launch {
             val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
             cartRepository.getCartItems(0, cartTotalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
-        }.onSuccess {
-            val cartViewItems = it.getOrNull()?.map(::CartViewItem) ?: return
-            orderViewModel.updateCartViewItems(cartViewItems)
-            _cartUiState.value = UiState.Success(cartViewItems)
-        }.onFailure {
-            _cartUiState.value = UiState.Error(it)
+                .onSuccess {
+                    val cartViewItems = it.map(::CartViewItem)
+                    orderViewModel.updateCartViewItems(cartViewItems)
+                    _cartUiState.value = UiState.Success(cartViewItems)
+                }.onFailure {
+                    _cartUiState.value = UiState.Error(it)
+                }
         }
     }
 
@@ -81,15 +87,20 @@ class CartViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
-        var cartItemId = -1
-        runCatching {
-            cartItemId = cartRepository.addCartItem(product.productId, 1).getOrNull() ?: return
-        }.onSuccess {
-            val updatedCartItem = CartViewItem(CartItem(cartItemId, 1, product))
-            val newCartViewItems =
-                orderViewModel.cartViewItems.value?.plus(updatedCartItem) ?: return
-            orderViewModel.updateCartViewItems(newCartViewItems)
-            _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+        var cartItemId: Int
+        viewModelScope.launch {
+            cartRepository.addCartItem(product.productId, 1)
+                .onSuccess {
+                    cartItemId = it
+                    val updatedCartItem = CartViewItem(CartItem(cartItemId, 1, product))
+                    val newCartViewItems =
+                        orderViewModel.cartViewItems.value?.plus(updatedCartItem)
+                            ?: return@onSuccess
+
+                    orderViewModel.updateCartViewItems(newCartViewItems)
+                    _cartUiState.value =
+                        UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+                }
         }
     }
 

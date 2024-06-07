@@ -14,6 +14,7 @@ import woowacourse.shopping.app.ShoppingApplication.Companion.orderDataSourceImp
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.ui.home.HomeActivity
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
 import woowacourse.shopping.ui.order.action.OrderNotifyingActions
 import woowacourse.shopping.ui.order.cart.CartFragment
@@ -53,7 +54,10 @@ class OrderActivity : AppCompatActivity() {
         orderViewModel.orderNavigationActions.observe(this) { orderNavigationActions ->
             orderNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is OrderNavigationActions.NavigateToBack -> finish()
+                    is OrderNavigationActions.NavigateToBack -> {
+                        finish()
+                        startActivity(HomeActivity.createIntent(this))
+                    }
                     is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
                 }
             }
@@ -63,8 +67,9 @@ class OrderActivity : AppCompatActivity() {
             orderNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is OrderNotifyingActions.NotifyCartCompleted -> {
-                        notifyOrderCompleted()
                         finish()
+                        startActivity(HomeActivity.createIntent(this))
+                        notifyOrderCompleted()
                     }
 
                     is OrderNotifyingActions.NotifyCanNotOrder -> {

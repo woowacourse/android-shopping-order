@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
-import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartPlaceHolderViewItem
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
 
@@ -58,14 +57,8 @@ class CartAdapter(
         }
     }
 
-    fun submitCartViewItems(cartItems: List<CartViewItem>) {
-        val list =
-            if (currentList.isEmpty()) {
-                List(5) { CartPlaceHolderViewItem() }
-            } else {
-                cartItems
-            }
-        super.submitList(list)
+    fun submitCartViewItems(cartItems: List<ShoppingCartViewItem>) {
+        super.submitList(cartItems)
     }
 
     companion object {

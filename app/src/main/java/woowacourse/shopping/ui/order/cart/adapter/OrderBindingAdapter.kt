@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order.adapter
+package woowacourse.shopping.ui.order.cart.adapter
 
 import android.view.View
 import android.widget.TextView

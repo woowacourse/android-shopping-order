@@ -5,20 +5,20 @@ import woowacourse.shopping.data.dto.CartQuantityDto
 import woowacourse.shopping.data.dto.CartResponse
 
 interface CartDataSource {
-    fun getCartResponse(
+    suspend fun getCartResponse(
         page: Int,
         size: Int,
         sort: String,
     ): Result<CartResponse>
 
-    fun addCartItem(cartItemRequest: CartItemRequest): Result<Int>
+    suspend fun addCartItem(cartItemRequest: CartItemRequest): Result<Int>
 
-    fun deleteCartItem(productId: Int): Result<Unit>
+    suspend fun deleteCartItem(productId: Int): Result<Unit>
 
-    fun updateCartItem(
+    suspend fun updateCartItem(
         productId: Int,
         cartQuantityDto: CartQuantityDto,
     ): Result<Unit>
 
-    fun getCartTotalQuantity(): Result<Int>
+    suspend fun getCartTotalQuantity(): Result<Int>
 }

@@ -11,7 +11,6 @@ import woowacourse.shopping.databinding.ItemProductPlaceholderBinding
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.Companion.PRODUCT_PLACEHOLDER_VIEW_TYPE
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.Companion.PRODUCT_VIEW_TYPE
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.LoadMoreViewItem
-import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductPlaceHolderViewItem
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.viewmodel.HomeViewModel
 
@@ -80,15 +79,10 @@ class ProductAdapter(
     }
 
     fun submitProductViewItems(
-        productViewItems: List<ProductViewItem>,
+        productViewItems: List<HomeViewItem>,
         canLoadMore: Boolean = false,
     ) {
-        val list =
-            if (currentList.isEmpty()) {
-                List(20) { ProductPlaceHolderViewItem() }
-            } else {
-                if (canLoadMore) productViewItems + LoadMoreViewItem() else productViewItems
-            }
+        val list = if (canLoadMore) productViewItems + LoadMoreViewItem() else productViewItems
         super.submitList(list)
     }
 

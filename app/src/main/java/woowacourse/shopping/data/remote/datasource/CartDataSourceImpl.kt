@@ -9,21 +9,20 @@ import woowacourse.shopping.data.remote.service.CartService
 class CartDataSourceImpl(
     private val cartService: CartService,
 ) : CartDataSource {
-    override fun getCartResponse(
+    override suspend fun getCartResponse(
         page: Int,
         size: Int,
         sort: String,
     ): Result<CartResponse> {
         return runCatching {
-            cartService.getCartItems(page, size, sort).execute().body()
-                ?: throw IllegalArgumentException()
+            cartService.getCartItems(page, size, sort)
         }
     }
 
-    override fun addCartItem(cartItemRequest: CartItemRequest): Result<Int> {
+    override suspend fun addCartItem(cartItemRequest: CartItemRequest): Result<Int> {
         return runCatching {
             val location =
-                cartService.addCartItem(cartItemRequest).execute().headers()["location"]
+                cartService.addCartItem(cartItemRequest).headers()["location"]
                     ?: throw IllegalArgumentException()
             val segments = location.split("/")
             val cartItemId = segments.last().toInt()
@@ -31,24 +30,24 @@ class CartDataSourceImpl(
         }
     }
 
-    override fun deleteCartItem(productId: Int): Result<Unit> {
+    override suspend fun deleteCartItem(productId: Int): Result<Unit> {
         return runCatching {
-            cartService.deleteCartItem(productId).execute()
+            cartService.deleteCartItem(productId)
         }
     }
 
-    override fun updateCartItem(
+    override suspend fun updateCartItem(
         productId: Int,
         cartQuantityDto: CartQuantityDto,
     ): Result<Unit> {
         return runCatching {
-            cartService.updateCartItem(productId, cartQuantityDto).execute()
+            cartService.updateCartItem(productId, cartQuantityDto)
         }
     }
 
-    override fun getCartTotalQuantity(): Result<Int> {
+    override suspend fun getCartTotalQuantity(): Result<Int> {
         return runCatching {
-            cartService.getCartTotalQuantity().execute().body()?.quantity ?: 0
+            cartService.getCartTotalQuantity().body()?.quantity ?: 0
         }
     }
 }

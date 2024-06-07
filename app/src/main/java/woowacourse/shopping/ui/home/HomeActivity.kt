@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.home
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -15,8 +17,8 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.action.HomeNavigationActions
+import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
-import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.adapter.product.ProductAdapter
 import woowacourse.shopping.ui.home.adapter.recent.RecentProductAdapter
 import woowacourse.shopping.ui.home.viewmodel.HomeViewModel
@@ -76,7 +78,7 @@ class HomeActivity : AppCompatActivity() {
         viewModel.homeUiState.observe(this) { state ->
             when (state) {
                 is UiState.Success -> showData(state.data)
-                is UiState.Loading -> showData(emptyList())
+                is UiState.Loading -> showData(List(20) { HomeViewItem.ProductPlaceHolderViewItem() })
                 is UiState.Error ->
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
@@ -98,7 +100,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showData(data: List<ProductViewItem>) {
+    private fun showData(data: List<HomeViewItem>) {
         productAdapter.submitProductViewItems(data.toList(), viewModel.canLoadMore.value ?: false)
     }
 
@@ -112,5 +114,11 @@ class HomeActivity : AppCompatActivity() {
 
     private fun navigateToCart() {
         startActivity(OrderActivity.createIntent(this))
+    }
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, HomeActivity::class.java)
+        }
     }
 }
