@@ -49,7 +49,9 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
             EventObserver {
                 when (it) {
                     is FromDetailToScreen.ProductDetail -> {
+                        ShoppingActivity.startWithNewProductQuantity(this)
                         startWithIsLastViewed(this, it.productId)
+                        finish()
                     }
 
                     is FromDetailToScreen.ShoppingWithUpdated -> {
@@ -77,7 +79,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
             productId: Long,
         ) {
             Intent(context, ProductDetailActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra(EXTRA_PRODUCT_ID, productId)
                 putExtra(EXTRA_IS_LAST_VIEWED_PRODUCT, true)
                 context.startActivity(this)
