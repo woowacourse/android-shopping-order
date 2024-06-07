@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.state
 
-sealed class OrderState {
-    data object Cart : OrderState()
+sealed interface OrderState {
+    data object Cart : OrderState
 
-    data object Recommend : OrderState()
+    data object Recommend : OrderState
 }

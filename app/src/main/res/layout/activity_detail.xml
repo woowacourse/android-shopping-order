@@ -128,7 +128,7 @@
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_marginBottom="35dp"
-            android:background="@drawable/shopping_cart_item_gridview"
+            android:background="@drawable/item_gridview"
             android:onClick="@{() -> viewModel.onRecentProductClick()}"
             app:layout_constraintBottom_toTopOf="@id/btn_put_cart"
             app:layout_constraintLeft_toLeftOf="@id/tv_detail_price"

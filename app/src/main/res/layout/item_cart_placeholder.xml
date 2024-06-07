@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:background="@drawable/shopping_cart_item_gridview">
+        android:background="@drawable/item_gridview">
 
         <ImageView
             android:id="@+id/iv_placeholder_product_name"

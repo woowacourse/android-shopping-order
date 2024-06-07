@@ -21,6 +21,7 @@ import woowacourse.shopping.ui.order.cart.CartFragment
 import woowacourse.shopping.ui.order.recommend.RecommendFragment
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModelFactory
+import woowacourse.shopping.ui.payment.PaymentActivity
 
 class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
@@ -56,9 +57,11 @@ class OrderActivity : AppCompatActivity() {
                 when (action) {
                     is OrderNavigationActions.NavigateToBack -> {
                         finish()
-                        startActivity(HomeActivity.createIntent(this))
+                        navigateToHome()
                     }
+
                     is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
+                    is OrderNavigationActions.NavigateToPayment -> navigateToPayment()
                 }
             }
         }
@@ -66,7 +69,7 @@ class OrderActivity : AppCompatActivity() {
         orderViewModel.orderNotifyingActions.observe(this) { orderNotifyingActions ->
             orderNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is OrderNotifyingActions.NotifyCartCompleted -> {
+                    is OrderNotifyingActions.NotifyOrderCompleted -> {
                         finish()
                         startActivity(HomeActivity.createIntent(this))
                         notifyOrderCompleted()
@@ -86,6 +89,14 @@ class OrderActivity : AppCompatActivity() {
             replace(R.id.fragment_cart, fragment)
             addToBackStack(null)
         }
+    }
+
+    private fun navigateToHome() {
+        startActivity(HomeActivity.createIntent(this))
+    }
+
+    private fun navigateToPayment() {
+        startActivity(PaymentActivity.createIntent(this))
     }
 
     private fun notifyOrderCompleted() {

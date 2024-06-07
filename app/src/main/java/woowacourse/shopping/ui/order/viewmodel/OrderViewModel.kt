@@ -137,8 +137,7 @@ class OrderViewModel(
             cartRepository.updateCartItem(
                 updatedCartItem.cartItem.cartItemId,
                 updatedCartItem.cartItem.quantity,
-            )
-                .onSuccess {
+            ).onSuccess {
                     val position =
                         getCartViewItemPosition(updatedCartItem.cartItem.cartItemId)
                             ?: return@onSuccess
@@ -221,22 +220,29 @@ class OrderViewModel(
         if (selectedCartViewItemSize.value == 0) {
             _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyCanNotOrder)
         } else {
-            if (orderState.value is OrderState.Cart) {
-                _orderState.value = OrderState.Recommend
-                _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToRecommend)
-            } else {
-                viewModelScope.launch {
-                    val selectedCartItemIds =
-                        _selectedCartViewItems.value?.map { selectedCartViewItem ->
-                            selectedCartViewItem.cartItem.cartItemId
-                        } ?: return@launch
-                    orderRepository.postOrder(selectedCartItemIds)
-                        .onSuccess {
-                            _orderNotifyingActions.value =
-                                Event(OrderNotifyingActions.NotifyCartCompleted)
-                        }
+            val orderState = orderState.value ?: return
+            when(orderState) {
+                is OrderState.Cart -> {
+                    _orderState.value = OrderState.Recommend
+                    _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToRecommend)
+                }
+
+                is OrderState.Recommend -> {
+                    _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToPayment)
+//                    viewModelScope.launch {
+//                        val selectedCartItemIds =
+//                            _selectedCartViewItems.value?.map { selectedCartViewItem ->
+//                                selectedCartViewItem.cartItem.cartItemId
+//                            } ?: return@launch
+//                        orderRepository.postOrder(selectedCartItemIds)
+//                            .onSuccess {
+//                                _orderNotifyingActions.value =
+//                                    Event(OrderNotifyingActions.NotifyOrderCompleted)
+//                            }
+//                    }
                 }
             }
+
         }
     }
 
