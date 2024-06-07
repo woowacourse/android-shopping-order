@@ -78,12 +78,15 @@ class ProductListViewModel(
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
-            _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+        viewModelScope.launch {
+            var uiState = _uiState.value ?: return@launch
+            val product = uiState.findProduct(id) ?: return@launch
+            cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
+                uiState = _uiState.value ?: return@launch
+                _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+            }
         }
     }
 
@@ -96,10 +99,12 @@ class ProductListViewModel(
             return
         }
         val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
-            _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+        viewModelScope.launch {
+            cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
+                _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+            }
         }
     }
 

@@ -15,7 +15,7 @@ interface CartDataSource {
         count: Int,
     ): Result<Long>
 
-    fun updateCartCount(
+    suspend fun updateCartCount(
         cartId: Long,
         count: Int,
     ): Result<Unit>

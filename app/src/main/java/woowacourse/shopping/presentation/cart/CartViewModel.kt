@@ -29,29 +29,33 @@ class CartViewModel(
     }
 
     override fun increaseProductCount(id: Long) {
-        val product = _uiState.value?.findProductAtCurrentPage(id) ?: return
-        val uiState = _uiState.value ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
-            val newUiState = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-            updateUiState(newUiState)
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            _errorEvent.setValue(CartErrorEvent.UpdateCartProducts)
+        viewModelScope.launch {
+            val product = _uiState.value?.findProductAtCurrentPage(id) ?: return@launch
+            val uiState = _uiState.value ?: return@launch
+            cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
+                val newUiState = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+                updateUiState(newUiState)
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(CartErrorEvent.UpdateCartProducts)
+            }
         }
     }
 
     override fun decreaseProductCount(id: Long) {
-        val product = _uiState.value?.findProductAtCurrentPage(id) ?: return
-        val uiState = _uiState.value ?: return
-        if (!uiState.canDecreaseProductCount(id, CART_PRODUCT_COUNT_LIMIT)) {
-            return _errorEvent.setValue(CartErrorEvent.DecreaseCartCountLimit)
-        }
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
-            val newUiState = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-            updateUiState(newUiState)
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            _errorEvent.setValue(CartErrorEvent.UpdateCartProducts)
+        viewModelScope.launch {
+            val product = _uiState.value?.findProductAtCurrentPage(id) ?: return@launch
+            val uiState = _uiState.value ?: return@launch
+            if (!uiState.canDecreaseProductCount(id, CART_PRODUCT_COUNT_LIMIT)) {
+                return@launch _errorEvent.setValue(CartErrorEvent.DecreaseCartCountLimit)
+            }
+            cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
+                val newUiState = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+                updateUiState(newUiState)
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(CartErrorEvent.UpdateCartProducts)
+            }
         }
     }
 

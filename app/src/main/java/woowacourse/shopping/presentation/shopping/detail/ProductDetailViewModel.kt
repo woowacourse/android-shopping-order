@@ -80,12 +80,14 @@ class ProductDetailViewModel(
     }
 
     override fun addCartProduct() {
-        val cartProduct = uiState.value?.cartProduct ?: return
-        cartRepository.updateCartProduct(cartProduct.product.id, cartProduct.count).onSuccess {
-            _addCartEvent.setValue(Unit)
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.AddCartProduct)
+        viewModelScope.launch {
+            val cartProduct = uiState.value?.cartProduct ?: return@launch
+            cartRepository.updateCartProduct(cartProduct.product.id, cartProduct.count).onSuccess {
+                _addCartEvent.setValue(Unit)
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.AddCartProduct)
+            }
         }
     }
 

@@ -44,7 +44,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         productId: Long,
         count: Int,
     ): Result<Unit> {

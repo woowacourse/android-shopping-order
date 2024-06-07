@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.cart.datasource
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import woowacourse.shopping.data.cart.model.CartPageData
 import woowacourse.shopping.data.cart.toData
@@ -18,8 +20,12 @@ class CartDataSourceImpl(
         currentPage: Int,
         productSize: Int,
     ): Result<CartPageData> {
-        return cartService.fetchCartItems(currentPage, productSize)
-            .executeAsResult().mapCatching { it.toData() }
+        val result =
+            withContext(Dispatchers.IO) {
+                cartService.fetchCartItems(currentPage, productSize).executeAsResult()
+                    .mapCatching { it.toData() }
+            }
+        return result
     }
 
     override fun loadTotalCarts(): Result<CartPageData> {
@@ -54,15 +60,15 @@ class CartDataSourceImpl(
         }
     }
 
-    override fun updateCartCount(
+    override suspend fun updateCartCount(
         cartId: Long,
         count: Int,
     ): Result<Unit> {
-        return ioExecutors.submit(
-            Callable {
+        val result =
+            withContext(Dispatchers.IO) {
                 cartService.patchCartItem(cartId, UpdateCartCountRequest(count)).executeAsResult()
-            },
-        ).get()
+            }
+        return result
     }
 
     override fun deleteCartProduct(cartId: Long): Result<Unit> {

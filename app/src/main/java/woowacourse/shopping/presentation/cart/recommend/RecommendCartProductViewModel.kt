@@ -55,18 +55,20 @@ class RecommendCartProductViewModel(
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT)
-            .onSuccess {
-                _uiState.value =
-                    uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-                _updateCartEvent.setValue(Unit)
-            }
+        viewModelScope.launch {
+            var uiState = _uiState.value ?: return@launch
+            val product = uiState.findProduct(id) ?: return@launch
+            cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT)
+                .onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+                    _updateCartEvent.setValue(Unit)
+                }
+        }
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
+        var uiState = _uiState.value ?: return
         if (uiState.shouldDeleteFromCart(id)) {
             cartRepository.deleteCartProduct(id).onSuccess {
                 _uiState.value =
@@ -79,12 +81,14 @@ class RecommendCartProductViewModel(
             return
         }
         val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)
-            .onSuccess {
-                _uiState.value =
-                    uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-                _updateCartEvent.setValue(Unit)
-            }
+        viewModelScope.launch {
+            cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)
+                .onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+                    _updateCartEvent.setValue(Unit)
+                }
+        }
     }
 
     companion object {

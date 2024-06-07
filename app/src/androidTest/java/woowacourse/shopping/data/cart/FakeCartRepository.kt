@@ -34,7 +34,7 @@ class FakeCartRepository(
         return Result.success(products.filter { it.product.id in productIds })
     }
 
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         productId: Long,
         count: Int,
     ): Result<Unit> {
