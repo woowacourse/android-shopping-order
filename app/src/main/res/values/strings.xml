@@ -20,4 +20,9 @@
     <string name="not_fount_error">잘못된 접근입니다. 다시 이용해주세요</string>
     <string name="unauthorized_error">로그인 후 다시 이용해주세요</string>
     <string name="unknown_error">앱을 다시 이용해주세요</string>
+    <string name="coupon_title">결제하기</string>
+    <string name="coupon_expire">만료일: %s</string>
+    <string name="coupon_minimum_amount">최소 주문 금액: %,d원</string>
+    <string name="coupon_available_time">적용 가능 시간: %s ~ $s</string>
+    <string name="coupon_discount_price">-$,d원</string>
 </resources>
