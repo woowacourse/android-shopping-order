@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 
 data class Coupon(
     val id: Long,
-    val code: String,
+    val code: CouponCode,
     val description: String,
     val expirationDate: LocalDate,
     val discountType: String,
@@ -16,12 +16,22 @@ data class Coupon(
     val buyQuantity: Int = 0,
     val getQuantity: Int = 0,
     val availableTime: AvailableTime? = null,
-)
+) {
+    fun couponCondition(): String = when (code) {
+        CouponCode.FIXED5000 -> code.condition.format(minimumAmount)
+        CouponCode.BOGO -> code.condition
+        CouponCode.FREESHIPPING -> code.condition.format(minimumAmount)
+        CouponCode.MIRACLESALE -> code.condition.format(
+            availableTime?.start?.hour,
+            availableTime?.end?.hour
+        )
+    }
+}
 
 fun ResponseCouponDto.toCoupon(): Coupon {
     return Coupon(
         id = this.id,
-        code = this.code,
+        code = CouponCode.findCode(this.code),
         description = this.description,
         expirationDate = this.expirationDate.toLocalDate(),
         discountType = this.discountType,
@@ -35,4 +45,5 @@ fun ResponseCouponDto.toCoupon(): Coupon {
 
 fun String.toLocalTime(): LocalTime = LocalTime.parse(this, DateTimeFormatter.ofPattern("HH:mm:ss"))
 
-fun String.toLocalDate(): LocalDate = LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+fun String.toLocalDate(): LocalDate =
+    LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
