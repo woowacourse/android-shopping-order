@@ -28,3 +28,23 @@ fun fakePercentageCoupon(
         availableEndTime = LocalTime.of(availableEndTime, 0),
     )
 }
+
+fun fakeFreeShippingCoupon(
+    isExpired: Boolean = false,
+    minimumAmount: Long = 50_000,
+): FreeShippingCoupon {
+    val targetDateTime = LocalDateTime.now()
+    val expirationDate = if (isExpired) {
+        targetDateTime.minusDays(1)
+    } else {
+        targetDateTime.plusDays(1)
+    }
+    return FreeShippingCoupon(
+        id = 1,
+        code = "FREE_SHIPPING",
+        description = "무료 배송 쿠폰",
+        targetDateTime = targetDateTime,
+        expirationDate = expirationDate,
+        minimumAmount = minimumAmount,
+    )
+}
