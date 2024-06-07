@@ -10,7 +10,7 @@ import woowacourse.shopping.utils.exception.NoSuchDataException
 class ProductRepositoryImpl : ProductRepository {
     private val mockProductService: ProductService = MockProductService()
 
-    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
+    override suspend fun loadPagingProducts(offset: Int): Result<List<Product>> {
         return executeWithLatch {
             val pagingData = mockProductService.findPagingProducts(offset, PRODUCT_LOAD_PAGING_SIZE)
             if (pagingData.isEmpty()) throw NoSuchDataException()
@@ -18,7 +18,7 @@ class ProductRepositoryImpl : ProductRepository {
         }
     }
 
-    override fun loadCategoryProducts(
+    override suspend fun loadCategoryProducts(
         size: Int,
         category: String,
     ): Result<List<Product>> {
@@ -29,7 +29,7 @@ class ProductRepositoryImpl : ProductRepository {
         }
     }
 
-    override fun getProduct(productId: Long): Result<Product> {
+    override suspend fun getProduct(productId: Long): Result<Product> {
         return executeWithLatch {
             val product = mockProductService.findProductById(productId)
             product ?: throw NoSuchDataException()

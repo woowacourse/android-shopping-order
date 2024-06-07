@@ -5,46 +5,56 @@ import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.utils.DtoMapper.toProduct
-import woowacourse.shopping.utils.LatchUtils.executeWithLatch
 import woowacourse.shopping.utils.exception.NoSuchDataException
 
 class RemoteProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
 ) : ProductRepository {
-    override fun loadPagingProducts(offset: Int): Result<List<Product>> {
-        return executeWithLatch {
+    override suspend fun loadPagingProducts(offset: Int): Result<List<Product>> {
+        return try {
             val page = offset / PRODUCT_LOAD_PAGING_SIZE
-            val response = productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE).execute()
+            val response = productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE)
             if (response.isSuccessful && response.body() != null) {
-                response.body()?.productDto?.map { it.toProduct() }
+                Result.success(response.body()?.productDto?.map { it.toProduct() } ?: emptyList())
             } else {
-                throw NoSuchDataException()
+                Result.failure(NoSuchDataException())
             }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    override fun loadCategoryProducts(
+    override suspend fun loadCategoryProducts(
         size: Int,
         category: String,
     ): Result<List<Product>> {
-        return executeWithLatch {
-            val response = productDataSource.loadCategoryProducts(DEFAULT_PAGE, RECOMMEND_PRODUCT_LOAD_PAGING_SIZE, category).execute()
+        return try {
+            val response =
+                productDataSource.loadCategoryProducts(
+                    DEFAULT_PAGE,
+                    RECOMMEND_PRODUCT_LOAD_PAGING_SIZE,
+                    category,
+                )
             if (response.isSuccessful && response.body() != null) {
-                response.body()?.productDto?.map { it.toProduct() }
+                Result.success(response.body()?.productDto?.map { it.toProduct() } ?: emptyList())
             } else {
-                throw NoSuchDataException()
+                Result.failure(NoSuchDataException())
             }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    override fun getProduct(productId: Long): Result<Product> {
-        return executeWithLatch {
-            val response = productDataSource.loadProduct(productId.toInt()).execute()
+    override suspend fun getProduct(productId: Long): Result<Product> {
+        return try {
+            val response = productDataSource.loadProduct(productId.toInt())
             if (response.isSuccessful && response.body() != null) {
-                response.body()?.toProduct()
+                Result.success(response.body()!!.toProduct())
             } else {
-                throw NoSuchDataException()
+                Result.failure(NoSuchDataException())
             }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

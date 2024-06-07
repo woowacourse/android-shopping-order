@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.source
 
-import retrofit2.Call
+import retrofit2.Response
 import woowacourse.shopping.data.remote.api.CartApiService
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
@@ -11,27 +11,27 @@ import woowacourse.shopping.data.source.CartItemDataSource
 class CartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),
 ) : CartItemDataSource {
-    override fun loadCartItems(): Call<CartItemResponse> {
+    override suspend fun loadCartItems(): Response<CartItemResponse> {
         return cartApiService.requestCartItems(
             page = DEFAULT_ITEM_OFFSET,
             size = MAX_CART_ITEM_SIZE,
         )
     }
 
-    override fun loadCartItems(
+    override suspend fun loadCartItems(
         page: Int,
         size: Int,
-    ): Call<CartItemResponse> {
+    ): Response<CartItemResponse> {
         return cartApiService.requestCartItems(
             page = page,
             size = size,
         )
     }
 
-    override fun addCartItem(
-        productId: Int,
+    override suspend fun addCartItem(
+        productId: Long,
         quantity: Int,
-    ): Call<Unit> {
+    ): Response<Unit> {
         return cartApiService.insertCartItem(
             cartItemRequest =
                 CartItemRequest(
@@ -41,21 +41,21 @@ class CartItemDataSourceImpl(
         )
     }
 
-    override fun deleteCartItem(id: Int): Call<Unit> {
+    override suspend fun deleteCartItem(id: Long): Response<Unit> {
         return cartApiService.deleteCartItem(id = id)
     }
 
-    override fun updateCartItem(
-        id: Int,
+    override suspend fun updateCartItem(
+        id: Long,
         quantity: Int,
-    ): Call<Unit> {
+    ): Response<Unit> {
         return cartApiService.updateCartItem(
             id = id,
             quantity = CartItemQuantityDto(quantity),
         )
     }
 
-    override fun loadCartItemCount(): Call<CartItemQuantityDto> {
+    override suspend fun loadCartItemCount(): Response<CartItemQuantityDto> {
         return cartApiService.requestCartItemCount()
     }
 

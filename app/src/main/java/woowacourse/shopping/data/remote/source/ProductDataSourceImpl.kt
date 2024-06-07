@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.source
 
-import retrofit2.Call
+import retrofit2.Response
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.api.ProductApiService
 import woowacourse.shopping.data.remote.dto.product.ProductDto
@@ -10,21 +10,21 @@ import woowacourse.shopping.data.source.ProductDataSource
 class ProductDataSourceImpl(
     private val productApiService: ProductApiService = NetworkManager.productService(),
 ) : ProductDataSource {
-    override fun loadProducts(
+    override suspend fun loadProducts(
         page: Int,
         size: Int,
-    ): Call<ProductResponse> {
+    ): Response<ProductResponse> {
         return productApiService.requestProducts(
             page = page,
             size = size,
         )
     }
 
-    override fun loadCategoryProducts(
+    override suspend fun loadCategoryProducts(
         page: Int,
         size: Int,
         category: String,
-    ): Call<ProductResponse> {
+    ): Response<ProductResponse> {
         return productApiService.requestCategoryProducts(
             page = page,
             size = size,
@@ -32,7 +32,7 @@ class ProductDataSourceImpl(
         )
     }
 
-    override fun loadProduct(id: Int): Call<ProductDto> {
+    override suspend fun loadProduct(id: Int): Response<ProductDto> {
         return productApiService.requestProduct(id = id)
     }
 }

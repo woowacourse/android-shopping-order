@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.source
 
-import retrofit2.Call
+import retrofit2.Response
 
 interface OrderDataSource {
-    fun orderItems(ids: List<Int>): Call<Unit>
+    suspend fun orderItems(ids: List<Int>): Response<Unit>
 }
