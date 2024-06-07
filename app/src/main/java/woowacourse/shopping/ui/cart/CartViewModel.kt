@@ -78,7 +78,7 @@ class CartViewModel(
 
     private fun loadProduct(cartItem: CartItem) =
         viewModelScope.launch {
-            productRepository.find(cartItem.productId)
+            productRepository.find(cartItem.product.id)
                 .onSuccess { product ->
                     updateCartUiModels(product, cartItem)
                     updateCart()

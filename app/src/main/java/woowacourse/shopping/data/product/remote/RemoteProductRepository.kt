@@ -35,7 +35,7 @@ object RemoteProductRepository : ProductRepository {
             .onSuccess { categoryProducts ->
                 val recommendCategoryProducts =
                     categoryProducts
-                        .filter { product -> cartItems.none { it.productId == product.id } }
+                        .filter { product -> cartItems.none { it.product.id == product.id } }
                         .take(RECOMMEND_PRODUCTS_COUNT)
                 Result.success(recommendCategoryProducts)
             }

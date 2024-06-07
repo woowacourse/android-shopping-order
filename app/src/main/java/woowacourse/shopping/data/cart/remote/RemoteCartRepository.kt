@@ -10,7 +10,7 @@ object RemoteCartRepository : CartRepository {
 
     override suspend fun findByProductId(productId: Int): Result<CartItem?> {
         return retrofitApi.requestCartItems(page = 0, size = MAX_CART_ITEM_COUNT)
-            .map { it.toCartItems().find { cartItem -> cartItem.productId == productId } }
+            .map { it.toCartItems().find { cartItem -> cartItem.product.id == productId } }
     }
 
     override suspend fun findAll(): Result<List<CartItem>> {
