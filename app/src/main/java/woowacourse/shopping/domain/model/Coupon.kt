@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.model
 
 import java.time.LocalDate
 
-interface Coupon {
+sealed interface Coupon {
     val id: Int
     val code: String
     val description: String

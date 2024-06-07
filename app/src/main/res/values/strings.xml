@@ -45,4 +45,7 @@
     <string name="total_order_price">총 결제 금액</string>
     <string name="payment">결제하기</string>
 
+    <string name="expiration_date">만료일: %d년 %d월 %d일</string>
+    <string name="minimum_order_price">최소 주문 금액: %d,원</string>
+
 </resources>

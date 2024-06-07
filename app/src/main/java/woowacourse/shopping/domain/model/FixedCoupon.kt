@@ -9,10 +9,10 @@ class FixedCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     private val discount: Int,
-    private val minimumAmount: Int,
+    val minimumPrice: Int,
 ) : Coupon {
     override fun available(cartItems: List<CartItem>): Boolean {
-        return totalOrderPrice(cartItems) >= minimumAmount
+        return totalOrderPrice(cartItems) >= minimumPrice
     }
 
     override fun discountPrice(cartItems: List<CartItem>): Int {

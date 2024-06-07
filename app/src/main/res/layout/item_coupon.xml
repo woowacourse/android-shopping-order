@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.ui.coupon.CouponUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,17 +24,19 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
             android:buttonTint="@color/teal_500"
-            app:layout_constraintEnd_toStartOf="@id/tv_coupon_title"
+            android:checked="@{coupon.selected}"
+            app:layout_constraintEnd_toStartOf="@id/tv_coupon_description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_coupon_title"
+            android:id="@+id/tv_coupon_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="@{coupon.description}"
             android:textColor="@color/gray_500"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -47,9 +52,11 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/gray_500"
             android:textSize="12sp"
+            app:expirationDate="@{coupon.expirationDate}"
             app:layout_constraintBottom_toTopOf="@id/tv_coupon_min_order_price"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_coupon_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_description"
+            app:layout_goneMarginBottom="36dp"
             tools:text="만료일: 2024년 11월 30일" />
 
         <TextView
@@ -57,11 +64,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
+            android:text="@{@string/minimum_order_price(coupon.minimumPrice)}"
             android:textColor="@color/gray_500"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_coupon_expiration_date"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_expiration_date"
+            app:visibility="@{coupon.minimumPrice != null}"
             tools:text="최소 주문 금액: 100,000원" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

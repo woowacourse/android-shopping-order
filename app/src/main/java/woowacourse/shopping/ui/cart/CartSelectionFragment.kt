@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 
@@ -49,15 +47,6 @@ class CartSelectionFragment : Fragment() {
         viewModel.cartUiModels.observe(viewLifecycleOwner) {
             adapter.submitList(it.uiModels)
         }
-
-        viewModel.cartErrorEvent.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled() ?: return@observe
-            showToastCartFailure()
-        }
-    }
-
-    private fun showToastCartFailure() {
-        Toast.makeText(requireContext(), R.string.common_error_retry, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -1,21 +1,19 @@
 package woowacourse.shopping.ui.cart
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.local.ShoppingCartDataBase
-import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.ui.coupon.CouponActivity
 
 class CartActivity : AppCompatActivity() {
     private val cartSelectionFragment: Fragment by lazy { CartSelectionFragment() }
@@ -31,7 +29,6 @@ class CartActivity : AppCompatActivity() {
                 ).recentProductDao(),
             ),
             RemoteCartRepository,
-            RemoteOrderRepository,
         )
     }
 
@@ -92,37 +89,24 @@ class CartActivity : AppCompatActivity() {
             if (isVisibleCartSelectionFragment()) {
                 addFragment(cartRecommendFragment)
             } else {
-                viewModel.createOrder()
+                viewModel.navigateCoupon()
             }
         }
-        viewModel.isSuccessCreateOrder.observe(this) {
-            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
-            if (isSuccessCreateOrder) {
-                showDialogSuccessCreateOrder()
-            } else {
-                showToastFailureCreateOrder()
-            }
+        viewModel.selectedCartItemIds.observe(this) {
+            navigateToCouponView(it)
+        }
+        viewModel.cartErrorEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            showToastCartFailure()
         }
     }
 
-    private fun showDialogSuccessCreateOrder() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.create_order_success_title))
-            .setMessage(getString(R.string.create_order_success))
-            .setPositiveButton(getString(R.string.common_confirm)) { _, _ ->
-                navigateToProductsView()
-            }
-            .setCancelable(false)
-            .show()
+    private fun showToastCartFailure() {
+        Toast.makeText(this, R.string.common_error_retry, Toast.LENGTH_SHORT).show()
     }
 
-    private fun navigateToProductsView() {
-        val intent = Intent(this, CartActivity::class.java)
+    private fun navigateToCouponView(selectedCartItemIds: List<Int>) {
+        val intent = CouponActivity.newIntent(this, selectedCartItemIds)
         startActivity(intent)
-        finish()
-    }
-
-    private fun showToastFailureCreateOrder() {
-        Toast.makeText(this, R.string.create_order_failure, Toast.LENGTH_SHORT).show()
     }
 }

@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
@@ -20,7 +19,6 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartListener {
     private val _cartUiModels = MutableLiveData<CartUiModels>()
     val cartUiModels: LiveData<CartUiModels> get() = _cartUiModels
@@ -46,9 +44,6 @@ class CartViewModel(
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
 
-    private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
-    val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
-
     private val _orderEvent = MutableLiveData<Event<Unit>>()
     val orderEvent: LiveData<Event<Unit>> get() = _orderEvent
 
@@ -57,6 +52,9 @@ class CartViewModel(
 
     private val _totalQuantity = MutableLiveData<Int>(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
+
+    private val _selectedCartItemIds = MutableLiveData<List<Int>>()
+    val selectedCartItemIds: LiveData<List<Int>> get() = _selectedCartItemIds
 
     fun loadAllCartItems() =
         viewModelScope.launch {
@@ -262,27 +260,10 @@ class CartViewModel(
                 }
         }
 
-    fun createOrder() =
-        viewModelScope.launch {
-            val cartItemIds = cartUiModels().selectedCartItemIds()
-            orderRepository.createOrder(cartItemIds)
-                .onSuccess {
-                    _isSuccessCreateOrder.value = Event(true)
-                    deleteCartItems(cartItemIds)
-                }.onFailure {
-                    _isSuccessCreateOrder.value = Event(false)
-                }
-        }
-
-    private fun deleteCartItems(cartItemIds: List<Int>) =
-        viewModelScope.launch {
-            _changedCartEvent.value = Event(Unit)
-            cartItemIds.forEach { cartItemId ->
-                cartRepository.delete(cartItemId)
-                    .onSuccess { deleteCartItem(cartItemId) }
-                    .onFailure { setError() }
-            }
-        }
+    fun navigateCoupon() {
+        val cartItemIds = cartUiModels().selectedCartItemIds()
+        _selectedCartItemIds.value = cartItemIds
+    }
 
     private fun setError() {
         _cartErrorEvent.value = Event(Unit)
