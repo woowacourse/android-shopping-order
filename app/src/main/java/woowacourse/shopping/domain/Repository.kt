@@ -61,5 +61,5 @@ interface Repository {
 
     suspend fun getCartItemsCounts(): Result<Int>
 
-    fun getCuration(callback: (Result<List<CartProduct>>) -> Unit)
+    suspend fun getCuration(): Result<List<CartProduct>?>
 }

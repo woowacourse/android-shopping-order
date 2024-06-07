@@ -1,5 +1,8 @@
 package woowacourse.shopping.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.local.LocalDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
@@ -150,37 +153,39 @@ class RepositoryImpl(
     }
 
     // todo cartApi
-    override fun getCuration(callback: (Result<List<CartProduct>>) -> Unit) {
-        /*  localDataSource.findOne()?.toDomain()?.let {
-              remoteDataSource.getProducts(it.category, 0, 10) { productResult ->
-                  productResult.onSuccess { products ->
-                      remoteDataSource.getCartItems(0, 1000) { cartResult ->
-                          cartResult.onSuccess { cartItems ->
-                              val cartProductIds = cartItems.content.map { it.product.id }.toSet()
+    override suspend fun getCuration(): Result<List<CartProduct>?> = coroutineScope {
+        localDataSource.findOne()?.toDomain()?.let {
+            val productResponseAsync = async { remoteDataSource.getProducts(it.category, 0, 10) }
+            val cartResponseAsync = async { remoteDataSource.getCartItems(0, 1000) }
 
-                              val filteredProducts =
-                                  products.content.filter { product -> product.id !in cartProductIds }
+            val productResponse = productResponseAsync.await()
+            val cartResponse = cartResponseAsync.await()
 
-                              val cartProducts =
-                                  filteredProducts.map { product ->
-                                      val cart =
-                                          cartItems.content.find { it.product.id == product.id }
+            if (productResponse.isSuccess && cartResponse.isSuccess) {
+                val products = productResponse.getOrNull()
+                val cartItems = cartResponse.getOrNull()
 
-                                      CartProduct(
-                                          productId = product.id.toLong(),
-                                          name = product.name,
-                                          imgUrl = product.imageUrl,
-                                          price = product.price.toLong(),
-                                          category = product.category,
-                                          cartId = cart?.id?.toLong() ?: 0,
-                                          quantity = cart?.quantity ?: 0,
-                                      )
-                                  }
-                              callback(Result.success(cartProducts))
-                          }
-                      }
-                  }
-              }
-          }*/
+                val cartProductIds = cartItems?.map { it.product.id }?.toSet()
+                val filteredProducts =
+                    products?.filter { product -> product.id !in cartProductIds!! }
+                val cartProducts = filteredProducts?.map { product ->
+                    val cart = cartItems?.find { it.product.id == product.id }
+
+                    CartProduct(
+                        productId = product.id.toLong(),
+                        name = product.name,
+                        imgUrl = product.imageUrl,
+                        price = product.price.toLong(),
+                        category = product.category,
+                        cartId = cart?.id?.toLong() ?: 0,
+                        quantity = cart?.quantity ?: 0,
+                    )
+                }
+                return@coroutineScope Result.success(cartProducts)
+            } else {
+                return@coroutineScope Result.failure(Throwable())
+            }
+        }
+        return@coroutineScope Result.failure(Throwable())
     }
 }
