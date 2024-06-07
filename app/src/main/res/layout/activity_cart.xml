@@ -80,7 +80,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:productCount="@{vm.checkedItemCount + vm.cartOfRecommendProductCount}"
+            app:productCount="@{vm.checkedItemCount}"
             app:totalPrice="@{vm.totalPrice}"
             app:vm="@{vm}" />
 

@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
@@ -21,7 +20,6 @@ import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
 import woowacourse.shopping.ui.cart.CartUiModel
-import woowacourse.shopping.ui.products.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
@@ -38,15 +36,9 @@ class CartViewModel(
 
     val products: LiveData<List<ProductWithQuantity>> = _products
 
-    val cartOfRecommendProductCount: LiveData<Int> =
-        _products.map {
-            it.sumOf { it.quantity.value }
-        }
-
-    val totalPrice: MediatorLiveData<Int> =
-        MediatorLiveData<Int>().apply {
-            addSource(_cart) { value = totalPrice() }
-            addSource(_products) { value = totalPrice() }
+    val totalPrice: LiveData<Int> =
+        _cart.map {
+            it.cartItems.filter { it.isChecked }.sumOf { it.totalPrice }
         }
 
     val isTotalChbChecked: LiveData<Boolean> =
@@ -56,19 +48,17 @@ class CartViewModel(
 
     val checkedItemCount: LiveData<Int> =
         _cart.map {
-            it.cartItems.filter { it.isChecked }.size
+            it.cartItems.filter { it.isChecked }.sumOf { it.quantity.value }
         }
 
     val isRecommendPage: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> = MediatorLiveData()
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
     val error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
 
-    private val _order = MutableSingleLiveData<Unit>()
-    val order: SingleLiveData<Unit> = _order
+    private val _order = MutableSingleLiveData<List<Long>>()
+    val order: SingleLiveData<List<Long>> = _order
 
     private var removeState: Boolean = true
 
@@ -89,7 +79,7 @@ class CartViewModel(
 
     override fun plusCount(productId: Long) {
         viewModelScope.launch {
-            cartRepository.getCartItem(productId).onSuccess {
+            cartRepository.getCartItemByProductId(productId).onSuccess {
                 updateCountToPlus(it, productId)
             }.onFailure {
                 error.setValue(it)
@@ -99,7 +89,7 @@ class CartViewModel(
 
     override fun minusCount(productId: Long) {
         viewModelScope.launch {
-            cartRepository.getCartItem(productId).onSuccess {
+            cartRepository.getCartItemByProductId(productId).onSuccess {
                 updateCountToMinus(it, productId)
             }.onFailure {
                 error.setValue(it)
@@ -134,7 +124,7 @@ class CartViewModel(
 
     fun clickOrderButton() {
         if (isRecommendPage.value == true) {
-            _order.setValue(Unit)
+            _order.setValue(orderItemIds())
             return
         }
         viewModelScope.launch {
@@ -169,13 +159,6 @@ class CartViewModel(
         }
     }
 
-    private fun totalPrice(): Int {
-        val carts = _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice } ?: 0
-        val recommends =
-            _products.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice } ?: 0
-        return carts + recommends
-    }
-
     fun totalCheckBoxCheck() {
         val currentCarts = requireNotNull(_cart.value)
         _cart.value =
@@ -200,8 +183,20 @@ class CartViewModel(
     }
 
     private fun findIsCheckedByProductId(productId: Long): Boolean {
+        val recommendProducts = _products.value
         val current = _cart.value ?: return false
+        if (isRecommendProduct(recommendProducts, productId)) return true
         return current.cartItems.firstOrNull { it.productId == productId }?.isChecked ?: false
+    }
+
+    private fun isRecommendProduct(
+        recommendProducts: List<ProductWithQuantity>?,
+        productId: Long,
+    ): Boolean {
+        if (recommendProducts != null) {
+            if (recommendProducts.any { it.product.id == productId }) return true
+        }
+        return false
     }
 
     private suspend fun updateCountToPlus(
@@ -236,6 +231,7 @@ class CartViewModel(
                     loadCartItems()
                 } else {
                     changeRecommendProductCount(productId)
+                    loadCartItems()
                 }
             }.onFailure {
                 error.setValue(it)
@@ -245,7 +241,7 @@ class CartViewModel(
 
     private fun changeRecommendProductCount(productId: Long) {
         viewModelScope.launch {
-            cartRepository.getCartItem(productId).onSuccess {
+            cartRepository.getCartItemByProductId(productId).onSuccess {
                 val current = productWithQuantities(productId, it.quantity)
                 _products.value = current
             }.onFailure {
@@ -280,6 +276,14 @@ class CartViewModel(
                 error.setValue(it)
             }
         }
+    }
+
+    private fun orderItemIds(): List<Long> {
+        val cartIds =
+            _cart.value?.cartItems?.filter { it.isChecked }
+                ?.map { it.id }
+                ?.toList() ?: emptyList()
+        return cartIds
     }
 
     private fun findCartIdByProductId(productId: Long): Long {

@@ -1,7 +1,9 @@
 package woowacourse.shopping.data.cart
 
 interface CartRepository {
-    suspend fun getCartItem(productId: Long): Result<CartWithProduct>
+    suspend fun getCartItemByProductId(productId: Long): Result<CartWithProduct>
+
+    suspend fun getCartItemByCartId(cartId: Long): Result<CartWithProduct>
 
     suspend fun getAllCartItems(): Result<List<Cart>>
 

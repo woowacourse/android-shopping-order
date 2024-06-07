@@ -15,9 +15,15 @@ class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
     private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : CartRepository {
-    override suspend fun getCartItem(productId: Long): Result<CartWithProduct> =
+    override suspend fun getCartItemByProductId(productId: Long): Result<CartWithProduct> =
         getAllCartItemsWithProduct().mapCatching {
             it.firstOrNull { it.product.id == productId }
+                ?: throw ShoppingException(ShoppingError.CartNotFound)
+        }
+
+    override suspend fun getCartItemByCartId(cartId: Long): Result<CartWithProduct> =
+        getAllCartItemsWithProduct().mapCatching {
+            it.firstOrNull { it.id == cartId }
                 ?: throw ShoppingException(ShoppingError.CartNotFound)
         }
 
@@ -75,7 +81,8 @@ class CartRepositoryImpl(
         productId: Long,
         quantity: Int,
     ): Result<Unit> {
-        val cart: Cart? = getAllCartItems().getOrThrow().firstOrNull { it.productId == productId }
+        val cart: Cart? =
+            getAllCartItems().getOrThrow().firstOrNull { it.productId == productId }
         if (cart == null) {
             return postCartItems(productId, quantity)
         }

@@ -60,8 +60,8 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun observeOrder() {
-        viewModel.order.observe(this) {
-            PaymentActivity.startActivity(this)
+        viewModel.order.observe(this) { ids ->
+            PaymentActivity.startActivity(this, ids)
         }
     }
 
