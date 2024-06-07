@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -24,9 +27,37 @@ android {
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
     }
 
+    fun loadProperties(fileName: String): Properties {
+        val properties = Properties()
+        val file = project.rootProject.file(fileName)
+        if (file.exists()) {
+            properties.load(FileInputStream(file))
+        }
+        return properties
+    }
+
+    val localProperties = loadProperties("local.properties")
+
+    val baseUrlDev: String = localProperties.getProperty("BASE_URL_DEV")
+    val basicAuthUserDev: String = localProperties.getProperty("BASIC_AUTH_USER_DEV")
+    val basicAuthPasswordDev: String = localProperties.getProperty("BASIC_AUTH_PASSWORD_DEV")
+
+    val baseUrlProd: String = localProperties.getProperty("BASE_URL_PROD")
+    val basicAuthUserProd: String = localProperties.getProperty("BASIC_AUTH_USER_PROD")
+    val basicAuthPasswordProd: String = localProperties.getProperty("BASIC_AUTH_PASSWORD_PROD")
+
     buildTypes {
+        debug {
+            buildConfigField(type = "String", name = "BASE_URL_DEV", value = "\"$baseUrlDev\"")
+            buildConfigField("String", "BASIC_AUTH_USER_DEV", "\"$basicAuthUserDev\"")
+            buildConfigField("String", "BASIC_AUTH_PASSWORD_DEV", "\"$basicAuthPasswordDev\"")
+        }
+
         release {
             isMinifyEnabled = false
+            buildConfigField("String", "BASE_URL_PROD", "\"$baseUrlProd\"")
+            buildConfigField("String", "BASIC_AUTH_USER_PROD", "\"$basicAuthUserProd\"")
+            buildConfigField("String", "BASIC_AUTH_PASSWORD_PROD", "\"$basicAuthPasswordProd\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -48,6 +79,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 

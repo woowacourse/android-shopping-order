@@ -73,3 +73,5 @@ API 문서: http://54.180.95.212:8080/swagger-ui/index.html
 
 - [ ] navigation 을 더 MVVM 답게
 
+- [ ] local.properties
+- 
