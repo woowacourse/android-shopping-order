@@ -79,31 +79,27 @@ class ProductDetailViewModel(
     }
 
     override fun onAddCartClick() {
-        cartRepository.getCount { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val count = result.data
-                    findCartItem(count)
+        viewModelScope.launch {
+            cartRepository.getCount()
+                .onSuccess { cartCount ->
+                    findCartItem(cartCount)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(DetailError.CartItemNotFound)
                 }
-            }
         }
     }
 
     private fun findCartItem(pageSize: Int) {
-        cartRepository.load(0, pageSize) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val carts = result.data
+        viewModelScope.launch {
+            cartRepository.load(0, pageSize)
+                .onSuccess { carts ->
                     val cartItem = carts.find { it.product.id == productId }
                     addCartItem(cartItem)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(DetailError.CartItemNotFound)
                 }
-            }
         }
     }
 
@@ -118,15 +114,14 @@ class ProductDetailViewModel(
     }
 
     private fun saveNewCartItem(product: ProductModel) {
-        cartRepository.saveNewCartItem(productId, product.quantity) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
+        viewModelScope.launch {
+            cartRepository.saveNewCartItem(productId, product.quantity)
+                .onSuccess {
                     _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(DetailError.CartItemNotFound)
                 }
-            }
         }
     }
 
@@ -135,15 +130,10 @@ class ProductDetailViewModel(
         product: ProductModel,
     ) {
         val newQuantity = cartItem.quantity + product.quantity
-        cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity))
-                }
-                is NetworkResult.Error -> {
-                    _error.value = Event(DetailError.CartItemNotFound)
-                }
-            }
+        viewModelScope.launch {
+            cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity)
+                .onSuccess { _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity)) }
+                .onFailure { _error.value = Event(DetailError.CartItemNotFound) }
         }
     }
 
@@ -172,14 +162,10 @@ class ProductDetailViewModel(
         class Factory(private val productId: Long, private val isLastViewedItem: Boolean) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 return ProductDetailViewModel(
-                    ProductRepositoryImpl(),
-                    CartRepositoryImpl(
-                        localCartDataSource = LocalCartDataSource(cartDao),
-                        remoteCartDataSource = RemoteCartDataSource(),
-                    ),
-                    RecentProductRepositoryImpl(recentDao),
+                    ProductRepositoryImpl(RemoteProductDataSourceImpl()),
+                    CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl()),
+                    RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(recentDao)),
                     productId,
                     isLastViewedItem,
                 ) as T

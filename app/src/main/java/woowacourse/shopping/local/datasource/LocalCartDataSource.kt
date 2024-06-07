@@ -1,6 +1,6 @@
 package woowacourse.shopping.local.datasource
 
-import woowacourse.shopping.data.cart.LocalCartDataSource
+import woowacourse.shopping.data.datasource.local.LocalCartDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.local.dao.CartDao

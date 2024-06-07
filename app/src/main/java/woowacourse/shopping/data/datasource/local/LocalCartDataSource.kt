@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.cart
+package woowacourse.shopping.data.datasource.local
 
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
