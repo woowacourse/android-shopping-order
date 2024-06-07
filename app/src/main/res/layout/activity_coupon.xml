@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.ui.cart.CartViewModel" />
+            type="woowacourse.shopping.ui.coupon.CouponViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,8 +45,26 @@
             android:text="@string/coupon_description"
             android:textColor="@color/gray_500"
             android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_empty_coupon"
             app:layout_constraintStart_toStartOf="@id/tv_coupon_available"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_available" />
+
+        <TextView
+            android:id="@+id/tv_empty_coupon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingVertical="50dp"
+            android:text="@string/coupon_empty"
+            android:textColor="@color/gray_500"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/rv_coupon"
+            tools:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_description_coupon"
+            app:visibility="@{viewModel.couponUiModels.empty}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupon"
@@ -61,7 +79,8 @@
             app:layout_constraintBottom_toTopOf="@id/divider_coupon1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_description_coupon"
+            app:layout_constraintTop_toBottomOf="@id/tv_empty_coupon"
+            app:visibility="@{!viewModel.couponUiModels.empty}"
             tools:itemCount="2"
             tools:listitem="@layout/item_coupon" />
 

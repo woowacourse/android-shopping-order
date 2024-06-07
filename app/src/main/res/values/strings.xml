@@ -44,7 +44,7 @@
     <string name="delivery_fee">배송비</string>
     <string name="total_order_price">총 결제 금액</string>
     <string name="payment">결제하기</string>
-
+    <string name="coupon_empty">적용 가능한 쿠폰이 없습니다.</string>
     <string name="expiration_date">만료일: %d년 %d월 %d일</string>
     <string name="minimum_order_price">최소 주문 금액: %,d원</string>
 
