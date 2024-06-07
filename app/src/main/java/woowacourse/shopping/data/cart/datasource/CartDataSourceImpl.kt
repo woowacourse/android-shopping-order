@@ -1,11 +1,8 @@
 package woowacourse.shopping.data.cart.datasource
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 import woowacourse.shopping.data.cart.model.CartPageData
 import woowacourse.shopping.data.cart.toData
-import woowacourse.shopping.data.util.executeAsResult
 import woowacourse.shopping.remote.dto.request.CartItemRequest
 import woowacourse.shopping.remote.dto.request.UpdateCartCountRequest
 import woowacourse.shopping.remote.service.CartService
@@ -17,41 +14,38 @@ class CartDataSourceImpl(
         currentPage: Int,
         productSize: Int,
     ): Result<CartPageData> {
-        val result =
-            withContext(Dispatchers.IO) {
-                cartService.fetchCartItems(currentPage, productSize).executeAsResult()
-                    .mapCatching { it.toData() }
-            }
-        return result
+        val response = cartService.fetchCartItems(currentPage, productSize)
+        val cartPageData = response.body()?.toData() ?: throw Exception("Empty body")
+        return if (response.isSuccessful) {
+            Result.success(cartPageData)
+        } else {
+            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+        }
     }
 
     override suspend fun loadTotalCarts(): Result<CartPageData> {
-        val result =
-            withContext(Dispatchers.IO) {
-                val totalCountResult = cartService.fetchCartItemCount().executeAsResult()
-                if (totalCountResult.isSuccess) {
-                    val totalCount = totalCountResult.getOrThrow().quantity
-                    cartService.fetchCartItems(0, totalCount)
-                        .executeAsResult()
-                        .mapCatching { it.toData() }
-                } else {
-                    error("Failed to fetch total cart count")
-                }
-            }
-        return result
+        val totalCountResponse = cartService.fetchCartItemCount()
+        val totalCount = totalCountResponse.body()?.quantity ?: throw Exception("Empty body")
+        val cartItemsResponse = cartService.fetchCartItems(0, totalCount)
+        val cartPageData = cartItemsResponse.body()?.toData() ?: throw Exception("Empty body")
+        return if (totalCountResponse.isSuccessful) {
+            Result.success(cartPageData)
+        } else {
+            Result.failure(Exception("Error: ${totalCountResponse.code()} - ${totalCountResponse.message()}"))
+        }
     }
 
     override suspend fun createCartProduct(
         productId: Long,
         count: Int,
     ): Result<Long> {
-        return runCatching {
-            withContext(Dispatchers.IO) {
-                val request = CartItemRequest(productId, count)
-                val response = cartService.createCartItems(request).execute()
-                val id = response.toIdOrNull() ?: error("Failed to create cart product")
-                id
-            }
+        val request = CartItemRequest(productId, count)
+        val response = cartService.createCartItems(request)
+        val id = response.toIdOrNull() ?: error("Failed to create cart product")
+        return if (response.isSuccessful) {
+            Result.success(id)
+        } else {
+            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
         }
     }
 
@@ -59,19 +53,21 @@ class CartDataSourceImpl(
         cartId: Long,
         count: Int,
     ): Result<Unit> {
-        val result =
-            withContext(Dispatchers.IO) {
-                cartService.patchCartItem(cartId, UpdateCartCountRequest(count)).executeAsResult()
-            }
-        return result
+        val response = cartService.patchCartItem(cartId, UpdateCartCountRequest(count))
+        return if (response.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+        }
     }
 
     override suspend fun deleteCartProduct(cartId: Long): Result<Unit> {
-        val result =
-            withContext(Dispatchers.IO) {
-                cartService.deleteCartItem(cartId).executeAsResult()
-            }
-        return result
+        val response = cartService.deleteCartItem(cartId)
+        return if (response.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+        }
     }
 
     private fun <T> Response<T>.toIdOrNull(): Long? {
