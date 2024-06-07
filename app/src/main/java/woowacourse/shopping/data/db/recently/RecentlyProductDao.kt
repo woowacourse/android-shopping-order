@@ -12,7 +12,7 @@ interface RecentlyProductDao {
     fun addRecentlyProduct(recentlyProduct: RecentlyProductEntity): Long
 
     @Query("SELECT * FROM $RECENTLY_ITEM_DB_NAME ORDER BY id DESC LIMIT 1")
-    fun getMostRecentlyProduct(): RecentlyProductEntity?
+    fun getMostRecentlyProduct(): RecentlyProductEntity
 
     @Query("SELECT * FROM $RECENTLY_ITEM_DB_NAME ORDER BY id DESC LIMIT :pagingSize")
     fun findPagingRecentlyProduct(pagingSize: Int): List<RecentlyProductEntity>

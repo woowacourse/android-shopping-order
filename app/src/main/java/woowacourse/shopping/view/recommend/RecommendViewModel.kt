@@ -48,7 +48,7 @@ class RecommendViewModel(
     val totalCount: LiveData<Int> get() = _totalCount
 
     private suspend fun loadRecentlyProduct(): Result<RecentlyProduct> {
-        return recentlyRepository.getMostRecentlyProduct()
+        return runCatching { recentlyRepository.getMostRecentlyProduct().getOrThrow() }
     }
 
     fun loadRecommendData() {
