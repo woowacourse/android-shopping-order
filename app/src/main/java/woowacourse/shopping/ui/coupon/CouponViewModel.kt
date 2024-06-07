@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.coupon
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -19,12 +20,26 @@ class CouponViewModel(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-) : ViewModel() {
-    private val _couponUiModels = MutableLiveData<List<CouponUiModel>>()
-    val couponUiModels: LiveData<List<CouponUiModel>> get() = _couponUiModels
+) : ViewModel(), CouponListener {
+    private val coupons = MutableLiveData<List<Coupon>>()
+
+    private val _couponUiModels = MutableLiveData<CouponUiModels>()
+    val couponUiModels: LiveData<CouponUiModels> get() = _couponUiModels
+
+    val isEmptyCoupon = coupons.map { it.isEmpty() }
 
     private val _couponErrorEvent = MutableLiveData<Event<Unit>>()
     val couponErrorEvent: LiveData<Event<Unit>> get() = _couponErrorEvent
+
+    private val selectedCartItems = MutableLiveData<List<CartItem>>()
+
+    val orderPrice: LiveData<Int> =
+        selectedCartItems.map { it.sumOf { cartItem -> cartItem.totalPrice() } }
+
+    private val _discountPrice = MutableLiveData<Int>()
+    val discountPrice: LiveData<Int> get() = _discountPrice
+
+    val totalOrderPrice: LiveData<Int> = _discountPrice.map { (orderPrice.value ?: 0) - it }
 
     init {
         if (selectedCartItemIds.isEmpty()) setError()
@@ -34,9 +49,12 @@ class CouponViewModel(
     private fun loadCoupons() =
         viewModelScope.launch {
             val selectedCartItems = selectedCartItemIds.toCartItems(this)
+            this@CouponViewModel.selectedCartItems.value = selectedCartItems
             couponRepository.findAll()
                 .onSuccess {
-                    val availableCoupons = it.filter { coupon -> coupon.available(selectedCartItems) }
+                    val availableCoupons =
+                        it.filter { coupon -> coupon.available(selectedCartItems) }
+                    coupons.value = availableCoupons
                     _couponUiModels.value = availableCoupons.toCouponUiModels()
                 }
                 .onFailure { setError() }
@@ -52,11 +70,33 @@ class CouponViewModel(
         return cartItemsDeferred.await().filterNotNull()
     }
 
-    private fun List<Coupon>.toCouponUiModels(): List<CouponUiModel> {
-        return map { CouponUiModel.from(it) }
+    private fun List<Coupon>.toCouponUiModels(): CouponUiModels {
+        val uiModels = map { CouponUiModel.from(it) }
+        return CouponUiModels(uiModels)
     }
 
     private fun setError() {
         _couponErrorEvent.value = Event(Unit)
+    }
+
+    override fun selectCoupon(couponId: Int) {
+        val couponUiModels = couponUiModels()
+        if (couponUiModels.isSelect(couponId)) {
+            _couponUiModels.value = couponUiModels().unselectCoupon(couponId)
+            _discountPrice.value = 0
+            return
+        }
+        _couponUiModels.value = couponUiModels().selectCoupon(couponId)
+        val coupon = findCoupon(couponId) ?: return
+        _discountPrice.value = coupon.discountPrice(selectedCartItems()) * -1
+    }
+
+    private fun couponUiModels(): CouponUiModels = _couponUiModels.value ?: CouponUiModels()
+
+    private fun selectedCartItems(): List<CartItem> = selectedCartItems.value ?: emptyList()
+
+    private fun findCoupon(couponId: Int): Coupon? {
+        val coupons = this.coupons.value ?: return null
+        return coupons.find { it.id == couponId }
     }
 }

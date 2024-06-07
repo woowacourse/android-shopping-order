@@ -5,6 +5,13 @@
 
     <data>
 
+        <variable
+            name="title"
+            type="String" />
+
+        <variable
+            name="price"
+            type="int" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,6 +27,7 @@
             android:textColor="@color/gray_800"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:text="@{title}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,6 +37,7 @@
             android:id="@+id/tv_coupon_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/product_price(price)}"
             android:textColor="@color/gray_800"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"

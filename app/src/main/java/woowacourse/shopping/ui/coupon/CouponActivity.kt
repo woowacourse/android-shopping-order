@@ -39,11 +39,11 @@ class CouponActivity : AppCompatActivity() {
     }
 
     private fun initializeCouponList() {
-        val adapter = CouponAdapter()
+        val adapter = CouponAdapter(viewModel)
         binding.rvCoupon.itemAnimator = null
         binding.rvCoupon.adapter = adapter
         viewModel.couponUiModels.observe(this) {
-            adapter.submitList(it)
+            adapter.submitList(it.uiModels)
         }
     }
 

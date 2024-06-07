@@ -19,7 +19,7 @@ class PercentageCoupon(
     }
 
     override fun discountPrice(cartItems: List<CartItem>): Int {
-        if (available(cartItems)) {
+        if (!available(cartItems)) {
             throw IllegalArgumentException(INVALID_DISCOUNT_MESSAGE)
         }
         return (totalOrderPrice(cartItems) * (discount.toDouble() / 100)).toInt()

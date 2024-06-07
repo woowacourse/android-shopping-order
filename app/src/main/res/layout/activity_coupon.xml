@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="woowacourse.shopping.domain.model.Coupon" />
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.ui.coupon.CouponViewModel" />
@@ -60,11 +62,11 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/rv_coupon"
-            tools:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_description_coupon"
-            app:visibility="@{viewModel.couponUiModels.empty}" />
+            app:visibility="@{viewModel.emptyCoupon}"
+            tools:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupon"
@@ -80,7 +82,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_empty_coupon"
-            app:visibility="@{!viewModel.couponUiModels.empty}"
+            app:visibility="@{!viewModel.emptyCoupon}"
             tools:itemCount="2"
             tools:listitem="@layout/item_coupon" />
 
@@ -103,7 +105,9 @@
             app:layout_constraintBottom_toTopOf="@id/layout_discount_price_coupon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider_coupon1" />
+            app:layout_constraintTop_toBottomOf="@id/divider_coupon1"
+            app:price="@{viewModel.orderPrice}"
+            app:title="@{@string/order_price}" />
 
         <include
             android:id="@+id/layout_discount_price_coupon"
@@ -113,7 +117,9 @@
             app:layout_constraintBottom_toTopOf="@id/layout_delivery_fee_coupon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_order_price_coupon" />
+            app:layout_constraintTop_toBottomOf="@id/layout_order_price_coupon"
+            app:price="@{viewModel.discountPrice}"
+            app:title="@{@string/coupon_discount_price}" />
 
         <include
             android:id="@+id/layout_delivery_fee_coupon"
@@ -124,7 +130,9 @@
             app:layout_constraintBottom_toTopOf="@id/divider_coupon2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_discount_price_coupon" />
+            app:layout_constraintTop_toBottomOf="@id/layout_discount_price_coupon"
+            app:price="@{Coupon.DELIVERY_FEE}"
+            app:title="@{@string/delivery_fee}" />
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider_coupon2"
@@ -142,25 +150,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="68dp"
-            app:layout_constraintBottom_toTopOf="@id/btn_payment_coupon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider_coupon2" />
+            app:layout_constraintTop_toBottomOf="@id/divider_coupon2"
+            app:price="@{viewModel.totalOrderPrice}"
+            app:title="@{@string/total_order_price}" />
 
         <Button
             android:id="@+id/btn_payment_coupon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/teal_500"
+            android:paddingVertical="12dp"
             android:text="@string/payment"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_total_order_price_coupon" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

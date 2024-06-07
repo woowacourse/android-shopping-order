@@ -18,7 +18,7 @@ class FixedCoupon(
     }
 
     override fun discountPrice(cartItems: List<CartItem>): Int {
-        if (available(cartItems)) {
+        if (!available(cartItems)) {
             throw IllegalArgumentException(INVALID_DISCOUNT_MESSAGE)
         }
         return discount
