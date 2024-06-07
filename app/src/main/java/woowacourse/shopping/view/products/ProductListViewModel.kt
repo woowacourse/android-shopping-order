@@ -48,31 +48,29 @@ class ProductListViewModel(
         loadPagingRecentlyProduct()
     }
 
-    fun loadPagingProduct() {
-        _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
-//        Handler(Looper.getMainLooper()).postDelayed({
+    fun loadPagingProduct() = viewModelScope.launch {
+        _loadingEvent.postValue(ProductListEvent.LoadProductEvent.Loading)
         try {
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-            val pagingData = productRepository.loadPagingProducts(itemSize)
+            val pagingData = productRepository.loadPagingProducts(itemSize).getOrThrow()
             _products.value = _products.value?.plus(pagingData)
 
-            _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
-            _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+            _loadingEvent.postValue(ProductListEvent.LoadProductEvent.Success)
+            _productListEvent.postValue(ProductListEvent.LoadProductEvent.Success)
         } catch (e: Exception) {
             when (e) {
-                is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
-                else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+                is NoSuchDataException -> _errorEvent.postValue(ProductListEvent.LoadProductEvent.Fail)
+                else -> _errorEvent.postValue(ProductListEvent.ErrorEvent.NotKnownError)
             }
         }
-//        }, 1000)
     }
 
-    fun loadPagingRecentlyProduct() {
+    fun loadPagingRecentlyProduct() = viewModelScope.launch {
         try {
-            val pagingData = recentlyProductRepository.getRecentlyProductList()
+            val pagingData = recentlyProductRepository.getRecentlyProductList().getOrThrow()
             _recentlyProducts.value = pagingData
         } catch (e: Exception) {
-            _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+            _errorEvent.postValue(ProductListEvent.ErrorEvent.NotKnownError)
         }
     }
 

@@ -40,7 +40,7 @@ class MockProductRepository : ProductRepository {
             ),
         )
 
-    override fun loadPagingProducts(offset: Int): List<Product> {
+    override suspend fun loadPagingProducts(offset: Int): List<Product> {
         val products =
             listOf(
                 Product(id = 1, name = "Product 1", price = 1000, imageUrl = "", category = ""),
@@ -50,7 +50,7 @@ class MockProductRepository : ProductRepository {
         return products.subList(0, 3)
     }
 
-    override fun loadCategoryProducts(
+    override suspend fun loadCategoryProducts(
         size: Int,
         category: String,
     ): List<Product> {
@@ -60,7 +60,7 @@ class MockProductRepository : ProductRepository {
         return products.subList(size, 3)
     }
 
-    override fun getProduct(productId: Long): Product {
+    override suspend fun getProduct(productId: Long): Product {
         return products.firstOrNull { it.id == productId } ?: defaultProduct
     }
 

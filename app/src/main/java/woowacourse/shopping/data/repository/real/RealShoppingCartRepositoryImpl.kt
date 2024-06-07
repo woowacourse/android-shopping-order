@@ -12,30 +12,12 @@ import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.DtoMapper.toCartItem
-import woowacourse.shopping.utils.exception.LatchUtils.awaitOrThrow
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 class RealShoppingCartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(NetworkManager.getApiClient()),
 ) : ShoppingCartRepository {
-    private fun executeWithLatch(action: () -> Unit) {
-        val latch = CountDownLatch(1)
-        var exception: Exception? = null
-        thread {
-            try {
-                action()
-            } catch (e: Exception) {
-                exception = e
-            } finally {
-                latch.countDown()
-            }
-        }
-        latch.awaitOrThrow(exception)
-    }
-
     override suspend fun addCartItem(product: Product): Result<Unit> {
         return cartItemDataSource.addCartItem(
             product.id.toInt(),

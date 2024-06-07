@@ -47,13 +47,13 @@ class RecommendViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    private fun loadRecentlyProduct(): RecentlyProduct {
+    private suspend fun loadRecentlyProduct(): Result<RecentlyProduct> {
         return recentlyRepository.getMostRecentlyProduct()
     }
 
     fun loadRecommendData() {
         viewModelScope.launch {
-            val recentlyProduct = loadRecentlyProduct()
+            val recentlyProduct = loadRecentlyProduct().getOrThrow()
             shoppingCartRepository.loadPagingCartItems(
                 LOAD_SHOPPING_ITEM_OFFSET,
                 LOAD_SHOPPING_ITEM_SIZE,
@@ -62,7 +62,7 @@ class RecommendViewModel(
                     productRepository.loadCategoryProducts(
                         size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
                         category = recentlyProduct.category,
-                    )
+                    ).getOrThrow()
 
                 val recommendData =
                     getFilteredRandomProducts(

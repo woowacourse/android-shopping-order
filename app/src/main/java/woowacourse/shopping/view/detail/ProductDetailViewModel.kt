@@ -80,7 +80,7 @@ class ProductDetailViewModel(
     fun loadProductItem(productId: Long) = viewModelScope.launch {
         val loadItemCounter = loadProductItemCount(productId)
             .onSuccess {
-                val product = productRepository.getProduct(productId)
+                val product = productRepository.getProduct(productId).getOrThrow()
                 product.updateItemSelector(true)
                 product.updateCartItemCount(it.itemCount)
                 loadRecentlyProduct(product)
@@ -105,7 +105,7 @@ class ProductDetailViewModel(
         deletePrevRecentlyProduct(recentlyProduct.id)
         loadProductItemCount(recentlyProduct.productId)
             .onSuccess { loadItemCounter ->
-                val product = productRepository.getProduct(recentlyProduct.productId)
+                val product = productRepository.getProduct(recentlyProduct.productId).getOrThrow()
                 product.updateItemSelector(true)
                 product.updateCartItemCount(loadItemCounter.itemCount)
                 _product.value = product
@@ -150,7 +150,7 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentlyProduct(product: Product) {
+    private fun saveRecentlyProduct(product: Product) = viewModelScope.launch {
         recentlyProductRepository.addRecentlyProduct(
             RecentlyProduct(
                 productId = product.id,
@@ -172,13 +172,13 @@ class ProductDetailViewModel(
             }
     }
 
-    private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) = viewModelScope.launch {
         recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
     }
 
-    private fun loadRecentlyProduct(product: Product) {
+    private fun loadRecentlyProduct(product: Product) = viewModelScope.launch {
         try {
-            val recentlyProduct = recentlyProductRepository.getMostRecentlyProduct()
+            val recentlyProduct = recentlyProductRepository.getMostRecentlyProduct().getOrThrow()
             _recentlyProduct.value = recentlyProduct
             _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
             if (recentlyProduct.productId != product.id) {

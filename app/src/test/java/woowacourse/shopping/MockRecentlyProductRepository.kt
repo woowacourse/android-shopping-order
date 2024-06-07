@@ -4,15 +4,15 @@ import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 
 class MockRecentlyProductRepository : RecentlyProductRepository {
-    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {}
+    override suspend fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {}
 
-    override fun getMostRecentlyProduct(): RecentlyProduct {
+    override suspend fun getMostRecentlyProduct(): RecentlyProduct {
         return RecentlyProduct.defaultRecentlyProduct
     }
 
-    override fun getRecentlyProductList(): List<RecentlyProduct> {
+    override suspend fun getRecentlyProductList(): List<RecentlyProduct> {
         return listOf(RecentlyProduct.defaultRecentlyProduct)
     }
 
-    override fun deleteRecentlyProduct(id: Long) {}
+    override suspend fun deleteRecentlyProduct(id: Long) {}
 }

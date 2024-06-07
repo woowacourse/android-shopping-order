@@ -3,12 +3,12 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun loadPagingProducts(offset: Int): List<Product>
+    suspend fun loadPagingProducts(offset: Int): Result<List<Product>>
 
-    fun loadCategoryProducts(
+    suspend fun loadCategoryProducts(
         size: Int,
         category: String,
-    ): List<Product>
+    ): Result<List<Product>>
 
-    fun getProduct(productId: Long): Product
+    suspend fun getProduct(productId: Long): Result<Product>
 }
