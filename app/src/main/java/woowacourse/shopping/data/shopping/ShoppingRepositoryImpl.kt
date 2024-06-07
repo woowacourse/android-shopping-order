@@ -71,7 +71,7 @@ class ShoppingRepositoryImpl(
         }
     }
 
-    override fun saveRecentProduct(id: Long): Result<Long> {
+    override suspend fun saveRecentProduct(id: Long): Result<Long> {
         return recentProductDataSource.saveRecentProduct(RecentProductData(id, LocalDateTime.now()))
     }
 }

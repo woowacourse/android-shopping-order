@@ -23,5 +23,5 @@ interface ShoppingRepository {
 
     suspend fun recentProducts(size: Int): Result<List<Product>>
 
-    fun saveRecentProduct(id: Long): Result<Long>
+    suspend fun saveRecentProduct(id: Long): Result<Long>
 }

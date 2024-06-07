@@ -91,10 +91,12 @@ class ProductDetailViewModel(
 
     fun navigateToRecentProduct() {
         val recentId = _uiState.value?.recentProduct?.id ?: return
-        shoppingRepository.saveRecentProduct(recentId).onSuccess {
-            _recentProductEvent.setValue(recentId)
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
+        viewModelScope.launch {
+            shoppingRepository.saveRecentProduct(recentId).onSuccess {
+                _recentProductEvent.setValue(recentId)
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
+            }
         }
     }
 

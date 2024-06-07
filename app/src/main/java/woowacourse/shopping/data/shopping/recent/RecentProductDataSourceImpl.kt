@@ -1,35 +1,30 @@
 package woowacourse.shopping.data.shopping.recent
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import woowacourse.shopping.local.dao.RecentProductDao
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.TimeUnit
 
 class RecentProductDataSourceImpl(
-    private val executors: ExecutorService,
     private val recentProductDao: RecentProductDao,
 ) : RecentProductDataSource {
-    override fun recentProducts(size: Int): Result<List<RecentProductData>> {
+    override suspend fun recentProducts(size: Int): Result<List<RecentProductData>> {
         return runCatching {
-            executors.submit(
-                Callable {
+            val recentProductsDeferred =
+                CoroutineScope(Dispatchers.IO).async {
                     recentProductDao.loadProducts(size)
-                },
-            )[TIME_OUT, TimeUnit.SECONDS].map { it.toData() }
+                }
+            recentProductsDeferred.await().map { it.toData() }
         }
     }
 
-    override fun saveRecentProduct(product: RecentProductData): Result<Long> {
+    override suspend fun saveRecentProduct(product: RecentProductData): Result<Long> {
         return runCatching {
-            executors.submit(
-                Callable {
+            val idDeferred =
+                CoroutineScope(Dispatchers.IO).async {
                     recentProductDao.saveProduct(product.toEntity())
-                },
-            )[TIME_OUT, TimeUnit.SECONDS]
+                }
+            idDeferred.await()
         }
-    }
-
-    companion object {
-        private const val TIME_OUT = 3L
     }
 }

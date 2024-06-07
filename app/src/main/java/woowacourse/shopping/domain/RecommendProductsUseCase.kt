@@ -19,7 +19,7 @@ class RecommendProductsUseCase(
 
     suspend operator fun invoke(): List<Product> {
         val productsDeferred =
-            CoroutineScope(Dispatchers.Main).async { obtainRecommendProducts() }
+            CoroutineScope(Dispatchers.IO).async { obtainRecommendProducts() }
         return productsDeferred.await()
     }
 
