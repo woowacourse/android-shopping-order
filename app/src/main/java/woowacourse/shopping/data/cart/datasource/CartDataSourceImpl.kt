@@ -3,6 +3,7 @@ package woowacourse.shopping.data.cart.datasource
 import retrofit2.Response
 import woowacourse.shopping.data.cart.model.CartPageData
 import woowacourse.shopping.data.cart.toData
+import woowacourse.shopping.data.util.handleResponse
 import woowacourse.shopping.remote.dto.request.CartItemRequest
 import woowacourse.shopping.remote.dto.request.UpdateCartCountRequest
 import woowacourse.shopping.remote.service.CartService
@@ -16,11 +17,7 @@ class CartDataSourceImpl(
     ): Result<CartPageData> {
         val response = cartService.fetchCartItems(currentPage, productSize)
         val cartPageData = response.body()?.toData() ?: throw Exception("Empty body")
-        return if (response.isSuccessful) {
-            Result.success(cartPageData)
-        } else {
-            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-        }
+        return handleResponse(response, cartPageData)
     }
 
     override suspend fun loadTotalCarts(): Result<CartPageData> {
@@ -28,11 +25,7 @@ class CartDataSourceImpl(
         val totalCount = totalCountResponse.body()?.quantity ?: throw Exception("Empty body")
         val cartItemsResponse = cartService.fetchCartItems(0, totalCount)
         val cartPageData = cartItemsResponse.body()?.toData() ?: throw Exception("Empty body")
-        return if (totalCountResponse.isSuccessful) {
-            Result.success(cartPageData)
-        } else {
-            Result.failure(Exception("Error: ${totalCountResponse.code()} - ${totalCountResponse.message()}"))
-        }
+        return handleResponse(totalCountResponse, cartPageData)
     }
 
     override suspend fun createCartProduct(
@@ -42,11 +35,7 @@ class CartDataSourceImpl(
         val request = CartItemRequest(productId, count)
         val response = cartService.createCartItems(request)
         val id = response.toIdOrNull() ?: error("Failed to create cart product")
-        return if (response.isSuccessful) {
-            Result.success(id)
-        } else {
-            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-        }
+        return handleResponse(response, id)
     }
 
     override suspend fun updateCartCount(
@@ -54,20 +43,12 @@ class CartDataSourceImpl(
         count: Int,
     ): Result<Unit> {
         val response = cartService.patchCartItem(cartId, UpdateCartCountRequest(count))
-        return if (response.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-        }
+        return handleResponse(response, Unit)
     }
 
     override suspend fun deleteCartProduct(cartId: Long): Result<Unit> {
         val response = cartService.deleteCartItem(cartId)
-        return if (response.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
-        }
+        return handleResponse(response, Unit)
     }
 
     private fun <T> Response<T>.toIdOrNull(): Long? {
