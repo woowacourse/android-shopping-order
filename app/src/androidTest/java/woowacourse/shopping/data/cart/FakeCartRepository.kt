@@ -48,7 +48,7 @@ class FakeCartRepository(
         return Result.success(Unit)
     }
 
-    override fun deleteCartProduct(productId: Long): Result<Unit> {
+    override suspend fun deleteCartProduct(productId: Long): Result<Unit> {
         cart = cart.remove(fakeProduct(id = productId, name = "오둥이 $productId"))
         return Result.success(Unit)
     }

@@ -69,17 +69,20 @@ class RecommendCartProductViewModel(
 
     override fun decreaseProductCount(id: Long) {
         var uiState = _uiState.value ?: return
-        if (uiState.shouldDeleteFromCart(id)) {
-            cartRepository.deleteCartProduct(id).onSuccess {
-                _uiState.value =
-                    uiState.decreaseProductCount(
-                        id,
-                        INCREMENT_AMOUNT,
-                    )
-                _updateCartEvent.setValue(Unit)
+        viewModelScope.launch {
+            if (uiState.shouldDeleteFromCart(id)) {
+                cartRepository.deleteCartProduct(id).onSuccess {
+                    _uiState.value =
+                        uiState.decreaseProductCount(
+                            id,
+                            INCREMENT_AMOUNT,
+                        )
+                    _updateCartEvent.setValue(Unit)
+                }
+                return@launch
             }
-            return
         }
+
         val product = uiState.findProduct(id) ?: return
         viewModelScope.launch {
             cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)

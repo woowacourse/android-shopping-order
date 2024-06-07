@@ -20,5 +20,5 @@ interface CartDataSource {
         count: Int,
     ): Result<Unit>
 
-    fun deleteCartProduct(cartId: Long): Result<Unit>
+    suspend fun deleteCartProduct(cartId: Long): Result<Unit>
 }

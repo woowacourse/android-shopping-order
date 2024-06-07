@@ -43,12 +43,12 @@ class CartViewModel(
     }
 
     override fun decreaseProductCount(id: Long) {
+        val product = _uiState.value?.findProductAtCurrentPage(id) ?: return
+        val uiState = _uiState.value ?: return
+        if (!uiState.canDecreaseProductCount(id, CART_PRODUCT_COUNT_LIMIT)) {
+            return _errorEvent.setValue(CartErrorEvent.DecreaseCartCountLimit)
+        }
         viewModelScope.launch {
-            val product = _uiState.value?.findProductAtCurrentPage(id) ?: return@launch
-            val uiState = _uiState.value ?: return@launch
-            if (!uiState.canDecreaseProductCount(id, CART_PRODUCT_COUNT_LIMIT)) {
-                return@launch _errorEvent.setValue(CartErrorEvent.DecreaseCartCountLimit)
-            }
             cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
                 val newUiState = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
                 updateUiState(newUiState)
@@ -60,11 +60,13 @@ class CartViewModel(
     }
 
     override fun deleteProduct(product: CartProductUi) {
-        cartRepository.deleteCartProduct(product.product.id).onSuccess {
-            refreshCartProducts()
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            _errorEvent.setValue(CartErrorEvent.DeleteCartProduct)
+        viewModelScope.launch {
+            cartRepository.deleteCartProduct(product.product.id).onSuccess {
+                refreshCartProducts()
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(CartErrorEvent.DeleteCartProduct)
+            }
         }
     }
 

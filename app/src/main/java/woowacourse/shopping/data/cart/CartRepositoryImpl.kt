@@ -67,7 +67,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun deleteCartProduct(productId: Long): Result<Unit> {
+    override suspend fun deleteCartProduct(productId: Long): Result<Unit> {
         val cartDetailData =
             cartProductMapByProductId[productId] ?: return Result.failure(
                 NoSuchElementException("there's no any CartProducts response to $productId"),

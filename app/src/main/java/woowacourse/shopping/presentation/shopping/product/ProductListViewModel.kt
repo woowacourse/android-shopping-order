@@ -91,15 +91,16 @@ class ProductListViewModel(
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        if (uiState.shouldDeleteFromCart(id)) {
-            cartRepository.deleteCartProduct(id).onSuccess {
-                _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-            }
-            return
-        }
-        val product = uiState.findProduct(id) ?: return
+        var uiState = _uiState.value ?: return
         viewModelScope.launch {
+            if (uiState.shouldDeleteFromCart(id)) {
+                cartRepository.deleteCartProduct(id).onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+                }
+                return@launch
+            }
+            val product = uiState.findProduct(id) ?: return@launch
             cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
                 _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
             }.onFailure {

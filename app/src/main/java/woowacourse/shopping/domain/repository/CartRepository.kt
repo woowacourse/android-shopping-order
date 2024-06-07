@@ -17,7 +17,7 @@ interface CartRepository {
         count: Int,
     ): Result<Unit>
 
-    fun deleteCartProduct(productId: Long): Result<Unit>
+    suspend fun deleteCartProduct(productId: Long): Result<Unit>
 
     fun canLoadMoreCartProducts(
         currentPage: Int,

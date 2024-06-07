@@ -71,12 +71,12 @@ class CartDataSourceImpl(
         return result
     }
 
-    override fun deleteCartProduct(cartId: Long): Result<Unit> {
-        return ioExecutors.submit(
-            Callable {
+    override suspend fun deleteCartProduct(cartId: Long): Result<Unit> {
+        val result =
+            withContext(Dispatchers.IO) {
                 cartService.deleteCartItem(cartId).executeAsResult()
-            },
-        ).get()
+            }
+        return result
     }
 
     private fun <T> Response<T>.toIdOrNull(): Long? {
