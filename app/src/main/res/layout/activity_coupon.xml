@@ -161,6 +161,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/teal_500"
+            android:onClick="@{() -> viewModel.createOrder()}"
             android:paddingVertical="12dp"
             android:text="@string/payment"
             android:textColor="@color/white"

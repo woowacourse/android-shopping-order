@@ -12,6 +12,7 @@ import woowacourse.shopping.data.coupon.remote.RemoteCouponRepository
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
 import woowacourse.shopping.databinding.ActivityCouponBinding
 import woowacourse.shopping.ui.coupon.adapter.CouponAdapter
+import woowacourse.shopping.ui.products.ProductsActivity
 
 class CouponActivity : AppCompatActivity() {
     private val binding by lazy { ActivityCouponBinding.inflate(layoutInflater) }
@@ -35,6 +36,7 @@ class CouponActivity : AppCompatActivity() {
 
     private fun initializeView() {
         initializeCouponList()
+        initializeToolbar()
         observeData()
     }
 
@@ -47,13 +49,39 @@ class CouponActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeData() {
-        viewModel.couponErrorEvent.observe(this) {
-            showToastCouponError()
+    private fun initializeToolbar() {
+        binding.toolbarCart.setNavigationOnClickListener {
+            finish()
         }
     }
 
-    private fun showToastCouponError() {
+    private fun observeData() {
+        viewModel.couponErrorEvent.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            showToastCouponFailure()
+        }
+        viewModel.isSuccessCreateOrder.observe(this) {
+            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
+            if (isSuccessCreateOrder) {
+                showToastOrderSuccess()
+                navigateProductsView()
+            } else {
+                showToastCouponFailure()
+            }
+        }
+    }
+
+    private fun showToastOrderSuccess() {
+        Toast.makeText(this, R.string.create_order_success, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun navigateProductsView() {
+        val intent = Intent(this, ProductsActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+    }
+
+    private fun showToastCouponFailure() {
         Toast.makeText(this, R.string.common_error_retry, Toast.LENGTH_SHORT).show()
     }
 
@@ -73,30 +101,3 @@ class CouponActivity : AppCompatActivity() {
         }
     }
 }
-//
-// viewModel.isSuccessCreateOrder.observe(this) {
-//    val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
-//    if (isSuccessCreateOrder) {
-//        showDialogSuccessCreateOrder()
-//    } else {
-//        showToastFailureCreateOrder()
-//    }
-// }
-
-//        orderRepository.createOrder(cartItemIds)
-//            .onSuccess {
-//                _isSuccessCreateOrder.value = Event(true)
-//                deleteCartItems(cartItemIds)
-//            }.onFailure {
-//                _isSuccessCreateOrder.value = Event(false)
-//            }
-
-// private fun deleteCartItems(cartItemIds: List<Int>) =
-//    viewModelScope.launch {
-//        _changedCartEvent.value = Event(Unit)
-//        cartItemIds.forEach { cartItemId ->
-//            cartRepository.delete(cartItemId)
-//                .onSuccess { deleteCartItem(cartItemId) }
-//                .onFailure { setError() }
-//        }
-//    }

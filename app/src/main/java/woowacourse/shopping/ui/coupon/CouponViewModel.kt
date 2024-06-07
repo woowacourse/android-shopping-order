@@ -42,6 +42,9 @@ class CouponViewModel(
 
     val totalOrderPrice = MediatorLiveData<Int>(0)
 
+    private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
+    val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
+
     init {
         if (selectedCartItemIds.isEmpty()) setError()
         loadCoupons()
@@ -82,9 +85,15 @@ class CouponViewModel(
         return CouponUiModels(uiModels)
     }
 
-    private fun setError() {
-        _couponErrorEvent.value = Event(Unit)
-    }
+    fun createOrder() =
+        viewModelScope.launch {
+            orderRepository.createOrder(selectedCartItemIds)
+                .onSuccess {
+                    _isSuccessCreateOrder.value = Event(true)
+                }.onFailure {
+                    _isSuccessCreateOrder.value = Event(false)
+                }
+        }
 
     override fun selectCoupon(couponId: Int) {
         val couponUiModels = couponUiModels()
@@ -96,6 +105,10 @@ class CouponViewModel(
         _couponUiModels.value = couponUiModels().selectCoupon(couponId)
         val coupon = findCoupon(couponId) ?: return
         _discountPrice.value = coupon.discountPrice(selectedCartItems()) * -1
+    }
+
+    private fun setError() {
+        _couponErrorEvent.value = Event(Unit)
     }
 
     private fun couponUiModels(): CouponUiModels = _couponUiModels.value ?: CouponUiModels()
