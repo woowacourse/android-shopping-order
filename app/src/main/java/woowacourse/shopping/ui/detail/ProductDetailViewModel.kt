@@ -46,7 +46,7 @@ class ProductDetailViewModel(
     val lastRecentProduct: LiveData<LastRecentProductUiModel> get() = _lastRecentProduct
 
     val isVisibleLastRecentProduct: LiveData<Boolean> =
-        _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
+        _lastRecentProduct.map { !lastSeenProductVisible && it.productId != productId }
 
     init {
         loadLastRecentProduct()
