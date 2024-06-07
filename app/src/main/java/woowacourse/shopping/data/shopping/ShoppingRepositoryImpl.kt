@@ -34,7 +34,7 @@ class ShoppingRepositoryImpl(
             }
     }
 
-    override fun products(
+    override suspend fun products(
         category: String,
         currentPage: Int,
         size: Int,
@@ -43,7 +43,7 @@ class ShoppingRepositoryImpl(
             .mapCatching { it.products }
     }
 
-    override fun productById(id: Long): Result<Product> {
+    override suspend fun productById(id: Long): Result<Product> {
         val cachedProduct = cachedProductsById[id] ?: return productDataSource.fetchProductById(id)
         return Result.success(cachedProduct)
     }
