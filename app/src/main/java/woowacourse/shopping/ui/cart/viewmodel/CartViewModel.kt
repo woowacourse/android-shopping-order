@@ -131,7 +131,7 @@ class CartViewModel(
             recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
                 setRecommendProducts(recentProduct)
             }.onFailure {
-                error.setValue(it)
+                setRecommendPageFlag()
             }
         }
     }
@@ -144,6 +144,12 @@ class CartViewModel(
             setRecommendProducts(product)
         }.onFailure {
             error.setValue(it)
+        }
+    }
+
+    private fun setRecommendPageFlag() {
+        if (isRecommendPage.value == false) {
+            isRecommendPage.value = true
         }
     }
 

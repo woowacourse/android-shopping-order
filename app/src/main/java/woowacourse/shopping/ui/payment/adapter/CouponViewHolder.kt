@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.payment.adapter
 
-import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCouponBinding
 import woowacourse.shopping.ui.payment.CouponClickListener
