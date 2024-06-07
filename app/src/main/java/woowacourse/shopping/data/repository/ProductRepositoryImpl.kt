@@ -1,25 +1,15 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.HttpException
-import retrofit2.Response
 import woowacourse.shopping.data.datasource.RemoteCartDataSource
 import woowacourse.shopping.data.datasource.RemoteProductDataSource
 import woowacourse.shopping.data.local.database.RecentProductDao
 import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
 import woowacourse.shopping.data.model.toCartData
-import woowacourse.shopping.data.model.toCartDomain
 import woowacourse.shopping.data.model.toOrderableProduct
 import woowacourse.shopping.data.model.toProductDomain2
-import woowacourse.shopping.data.model.toProductItemDomain
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
-import woowacourse.shopping.domain.model.ProductDomain2
-import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
@@ -32,7 +22,7 @@ class ProductRepositoryImpl(
         page: Int,
         size: Int,
         sort: String
-    ): Result<ProductDomain2> {
+    ): Result<ProductDomain> {
         return runCatching {
             remoteProductDataSource.getProducts(category, page, size, sort)
                 .toProductDomain2(getEntireCartItems())

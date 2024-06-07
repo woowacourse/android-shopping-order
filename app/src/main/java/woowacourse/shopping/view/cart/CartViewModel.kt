@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -15,7 +16,6 @@ import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.list.CartItemClickListener
 import woowacourse.shopping.view.cart.list.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.view.cart.recommend.RecommendProductEventListener
-import woowacourse.shopping.view.home.product.HomeViewItem
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.state.CartListUiEvent
 import woowacourse.shopping.view.state.CartListUiState
@@ -78,7 +78,7 @@ class CartViewModel(
                 uiState.copy(
                     isLoading = false,
                     recommendedProducts = recommendedProducts.map {
-                        ProductViewItem(it.productItemDomain, it.cartData?.quantity ?: 0)
+                        ProductViewItem(it)
                     }
                 )
         }
@@ -116,11 +116,18 @@ class CartViewModel(
 
     override fun onDeleteButtonClick(itemId: Int) {
         viewModelScope.launch {
+            println("delete cart item id : $itemId")
             val result = cartRepository.deleteCartItem(itemId).getOrNull()
             val uiState = cartUiState.value
             if (result == null || uiState == null) {
                 return@launch
             }
+            _cartListUiState.value = cartListUiState.value?.copy(
+                cartViewItems = cartListUiState.value?.cartViewItems?.filter {
+                    it.cartItem.cartItemId != itemId
+                } ?: return@launch
+            )
+
             _cartUiState.value = uiState.copy(
                 selectedCartItemIds = uiState.selectedCartItemIds.filter { it != itemId }
             )
@@ -182,14 +189,17 @@ class CartViewModel(
             if (result == null || uiState == null || entireCartItems == null) {
                 return@launch
             }
-            val target =
-                uiState.recommendedProducts.firstOrNull { it.product.id == product.id }?.increase()
-            val cartItemId = entireCartItems.firstOrNull { it.productId == product.id }?.cartItemId
-            if (target == null || cartItemId == null) {
+            val changedItem =
+                entireCartItems.firstOrNull { it.productId == product.id }
+            if (changedItem == null) {
                 return@launch
             }
             val updatedProducts = uiState.recommendedProducts.map {
-                if (it.product.id == target.product.id) target else it
+                if (it.orderableProduct.productItemDomain.id == changedItem.productId) it.copy(
+                    orderableProduct = it.orderableProduct.copy(
+                        cartData = changedItem
+                    )
+                ) else it
             }
             _recommendedListUiState.value =
                 recommendedListUiState.value?.copy(
@@ -197,7 +207,7 @@ class CartViewModel(
                 )
             _cartUiState.value = cartUiState.value?.copy(
                 selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                    cartItemId
+                    changedItem.cartItemId
                 ) ?: return@launch
             )
         }
@@ -235,7 +245,7 @@ class CartViewModel(
     }
 
     private fun loadCartItems() {
-        viewModelScope.launch {
+        viewModelScope.launch() {
             _cartListUiState.value = cartListUiState.value?.copy(isLoading = true)
             val cartListUiState = cartListUiState.value
             val cartUiState = cartUiState.value
@@ -306,3 +316,123 @@ class CartViewModel(
         )
     }
 }
+
+/**
+ * 예외 처리
+ * val coroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
+ *     // setting(uiState...)
+ * }
+ * private val scope = (viewModelScope + coroutineExceptionHandler)
+ * scope.launch { /* ... */ }
+ * 차이? : 미리 만들어두고 사용 -> 매개변수에 넣어줄 필요 사라짐
+ * viewModelScope.launch(coroutineExceptionHandler) {
+ *
+ * }
+ */
+
+/**
+ * fun getAllCartProducts() {
+ *  viewModel.launch(coroutineExceptionHandler) {
+ *      launch {
+ *          throw Exception()
+ *      }
+ *      에러를 잡을 수 있음. => structured concurrency의 이유.
+ *      자식에서 예외가 발생했을 때, 부모에게까지 영향을 준다.(예외가 잡히면 하는 행동을 한 후, 부모도 종료됨)
+ *  }
+ * }
+ */
+
+/**
+ * fun getAllCartProducts() {
+ *  try {
+ *    launch { throw RuntimeException("") } // 에러를 잡을 수 없음.
+ *  } catch (e: Exception) {
+ *
+ *  }
+ * }
+ */
+
+/**
+ * fun getAllCartProducts() {
+ *  viewModelScope.launch(coroutineExceptionHandler) {
+ *      launch(coroutineExceptionHandler) { // ***이래도 전파를 못 막는다.***
+ *          throw Exception()
+ *      }
+ *      자식에서 예외가 발생했을 때, 부모에게까지 영향을 준다.(예외가 잡히면 하는 행동을 한 후, 부모도 종료됨)
+ *  }
+ * }
+ */
+
+/**
+ * fun getAllCartProducts() {
+ *  viewModelScope.launch(coroutineExceptionHandler) {
+ *      launch(coroutineExceptionHandler2) { // ***이래도 전파가 되는가?!***
+ *          throw Exception()
+ *      }
+ *      자식에서 예외가 발생했을 때, 부모에게까지 영향을 준다.(예외가 잡히면 하는 행동을 한 후, 부모도 종료됨)
+ *  }
+ * }
+ */
+
+/** 전파를 막는 방법 : supervisorScope : 자식의 에러가 부모 코루틴으로 전파되지 않는다!
+ * fun getAllCartProducts() {
+ *  viewModel.launch(coroutineExceptionHandler) {
+ *      supervisorScope {
+ *          // ...
+ *      }
+ *  }
+ * }
+ */
+
+/** retrofit을 활용한 예외 핸들링 방법
+ * suspend fun getAllCArtProducts(): Result<> {
+ *  val response = service.getCartItems()
+ *  return if (response.isSuccessful) {
+ *      Result.success(response.body() ?: emptyList())
+ *  } else {
+ *      Result.failure(RuntimeException("responseCode : ${response.code}"))
+ *      // 예외를 터뜨리지 않고 result 객체로 감싸면, 동작 중 예외가 발생할 위험을 막을 수 있음.
+ *  }
+ * }
+ */
+
+/** retrofit을 활용한 예외 핸들링 방법
+ * sealed interface Result<T> {
+ *      data class Success<T>(data: T)
+ *      data object NotFount
+ *      data object UnAuthorized
+ * }
+ * suspend fun getAllCArtProducts(): Result<T> {
+ *  val response = service.getCartItems()
+ *  return if (response.isSuccessful) {
+ *      Result.Success(response.body() ?: emptyList())
+ *  } else if (response.code() == 404) {
+ *      Result.Notfound
+ *  } else if (response.code() == 401) {
+ *      Result.UnAuthorized
+ *  }
+ * }
+ */
+
+/**
+ * suspend fun getAllCart
+ */
+
+//suspend fun main() {
+//    var a = 1
+//    val coroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
+//        println("t! : $t, a : $a")
+//        a = 2
+//    }
+//    val coroutineExceptionHandler2 = CoroutineExceptionHandler { _, t ->
+//        println("t2! : $t, a : $a")
+//        a = 3
+//    }
+//    coroutineScope {
+//        launch(coroutineExceptionHandler) {
+//            launch(coroutineExceptionHandler) {
+//                throw Exception()
+//            }
+//        }
+//    }
+//}

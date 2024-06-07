@@ -23,7 +23,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> shoppingClickListener.navigateToDetail(productItem.product.id)}"
+        android:onClick="@{() -> shoppingClickListener.navigateToDetail(productItem.orderableProduct.productItemDomain.id)}"
         android:paddingBottom="12dp">
 
         <ImageView
@@ -32,7 +32,7 @@
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="H,1:1"
             android:layout_margin="12dp"
-            app:imageUrl="@{productItem.product.imageUrl}"
+            app:imageUrl="@{productItem.orderableProduct.productItemDomain.imageUrl}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +44,7 @@
             android:layout_height="48dp"
             android:layout_margin="8dp"
             android:background="@drawable/shape_circle"
-            android:onClick="@{() -> shoppingClickListener.addToCart(productItem.product)}"
+            android:onClick="@{() -> shoppingClickListener.addToCart(productItem.orderableProduct.productItemDomain)}"
             android:src="@drawable/ic_plus"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintRight_toRightOf="@id/iv_product"
@@ -59,8 +59,8 @@
             app:clickListener="@{quantityClickListener}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="@id/iv_product"
-            app:itemId="@{productItem.product.id}"
-            app:quantity="@{productItem.quantity}"
+            app:itemId="@{productItem.orderableProduct.cartData.cartItemId}"
+            app:quantity="@{productItem.orderableProduct.cartData.quantity}"
             app:viewVisibility="@{productItem.quantityControlVisible}" />
 
         <TextView
@@ -70,7 +70,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:padding="6dp"
-            android:text="@{productItem.product.name}"
+            android:text="@{productItem.orderableProduct.productItemDomain.name}"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -90,7 +90,7 @@
             app:layout_constraintRight_toRightOf="@id/iv_product"
             app:layout_constraintStart_toStartOf="@id/iv_product"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
-            app:price="@{productItem.product.price}"
+            app:price="@{productItem.orderableProduct.productItemDomain.price}"
             tools:text="10,000원" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

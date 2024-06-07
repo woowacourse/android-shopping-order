@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
-import woowacourse.shopping.domain.model.ProductDomain2
 import woowacourse.shopping.domain.model.ProductItemDomain
 
 data class ProductResponse(
@@ -22,12 +21,6 @@ data class ProductResponse(
     val totalPages: Int,
 )
 
-//fun ProductResponse.toProductDomain(): ProductDomain =
-//    ProductDomain(
-//        products = products.map(Product::toProductItemDomain),
-//        last = last,
-//    )
-
 fun Product.toProductItemDomain(): ProductItemDomain =
     ProductItemDomain(
         category = category,
@@ -37,8 +30,8 @@ fun Product.toProductItemDomain(): ProductItemDomain =
         price = price,
     )
 
-fun ProductResponse.toProductDomain2(cartData: List<CartData>): ProductDomain2 =
-    ProductDomain2(
+fun ProductResponse.toProductDomain2(cartData: List<CartData>): ProductDomain =
+    ProductDomain(
         orderableProducts = products.map { product ->
             val targetCartData = cartData.firstOrNull { cart -> cart.productId == product.id }
             product.toOrderableProduct(targetCartData)

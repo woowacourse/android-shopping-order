@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.OrderableProduct
-import woowacourse.shopping.domain.model.ProductDomain2
+import woowacourse.shopping.domain.model.ProductDomain
 
 interface ProductRepository {
     suspend fun getProducts(
@@ -9,7 +9,7 @@ interface ProductRepository {
         page: Int,
         size: Int,
         sort: String,
-    ): Result<ProductDomain2>
+    ): Result<ProductDomain>
 
     suspend fun getProductById(id: Int): Result<OrderableProduct>
 
