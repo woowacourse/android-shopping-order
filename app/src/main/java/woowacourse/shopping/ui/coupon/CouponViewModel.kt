@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.coupon
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
@@ -36,14 +37,20 @@ class CouponViewModel(
     val orderPrice: LiveData<Int> =
         selectedCartItems.map { it.sumOf { cartItem -> cartItem.totalPrice() } }
 
-    private val _discountPrice = MutableLiveData<Int>()
+    private val _discountPrice = MutableLiveData<Int>(0)
     val discountPrice: LiveData<Int> get() = _discountPrice
 
-    val totalOrderPrice: LiveData<Int> = _discountPrice.map { (orderPrice.value ?: 0) - it }
+    val totalOrderPrice = MediatorLiveData<Int>(0)
 
     init {
         if (selectedCartItemIds.isEmpty()) setError()
         loadCoupons()
+        totalOrderPrice.addSource(_discountPrice) {
+            totalOrderPrice.value = (orderPrice.value ?: 0) + it + Coupon.DELIVERY_FEE
+        }
+        totalOrderPrice.addSource(orderPrice) {
+            totalOrderPrice.value = it + (_discountPrice.value ?: 0) + Coupon.DELIVERY_FEE
+        }
     }
 
     private fun loadCoupons() =
