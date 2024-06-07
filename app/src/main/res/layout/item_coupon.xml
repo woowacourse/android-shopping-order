@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="onClickShoppingCart"
+            type="woowacourse.shopping.view.cart.OnClickShoppingCart" />
+
+        <variable
+            name="onClickNavigateShoppingCart"
+            type="woowacourse.shopping.view.cart.OnClickNavigateShoppingCart" />
+
+        <variable
+            name="cartItem"
+            type="woowacourse.shopping.domain.model.CartItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/shape_border"
+        android:onClick="@{()->onClickNavigateShoppingCart.clickCartItem(cartItem.product.id)}">
+
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tv_cart_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{cartItem.product.name}"
+            android:textColor="@color/gray_5"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox"
+            app:layout_constraintStart_toEndOf="@+id/checkBox"
+            app:layout_constraintTop_toTopOf="@+id/checkBox"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/tv_expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:textSize="15dp"
+            android:text="@{@string/expiration_date(1)}"
+            android:textColor="@color/gray_5"
+            app:layout_constraintStart_toStartOf="@+id/checkBox"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox"
+            tools:text="10,000원" />
+
+        <TextView
+            android:id="@+id/tv_minimum_order_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:textSize="15dp"
+            android:text="@{@string/minimum_order_amount(1000)}"
+            android:textColor="@color/gray_5"
+            app:layout_constraintStart_toStartOf="@+id/tv_expiration_date"
+            app:layout_constraintTop_toBottomOf="@+id/tv_expiration_date"
+            tools:text="10,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
