@@ -5,14 +5,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.data.coupon.CouponState
 import woowacourse.shopping.databinding.ItemCouponBinding
+import woowacourse.shopping.ui.payment.CouponClickListener
 
-class CouponAdapter : ListAdapter<CouponState, CouponViewHolder>(CouponDiffUtil) {
+class CouponAdapter(
+    private val couponClickListener: CouponClickListener,
+) : ListAdapter<CouponState, CouponViewHolder>(CouponDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): CouponViewHolder {
         val binding = ItemCouponBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CouponViewHolder(binding)
+        return CouponViewHolder(binding, couponClickListener)
     }
 
     override fun onBindViewHolder(

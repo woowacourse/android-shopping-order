@@ -15,12 +15,13 @@ import woowacourse.shopping.data.coupon.CouponState
 import woowacourse.shopping.data.coupon.Fixed5000
 import woowacourse.shopping.data.coupon.Freeshipping
 import woowacourse.shopping.data.coupon.MiracleSale
+import woowacourse.shopping.ui.payment.CouponClickListener
 
 class PaymentViewModel(
     private val orderedCartItemIds: List<Long>,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
-) : ViewModel() {
+) : ViewModel(), CouponClickListener {
     private val orderedProducts: MutableLiveData<List<CartWithProduct>> =
         MutableLiveData(emptyList())
     val orderAmount: LiveData<Int> =
@@ -35,9 +36,29 @@ class PaymentViewModel(
             addSource(orderedProducts) { value = availableCoupons() }
         }
 
+    private val _checkedCoupon: MutableLiveData<CouponState> = MutableLiveData()
+    val checkedCoupon: LiveData<CouponState> = _checkedCoupon
+
+    val totalAmount: MediatorLiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            addSource(orderAmount) { value = totalAmount() }
+            addSource(_checkedCoupon) { value = totalAmount() }
+        }
+
     init {
         loadOrderedCartItems()
         loadCoupons()
+    }
+
+    private fun totalAmount(): Int {
+        val orderAmount = orderAmount.value ?: 0
+        val couponDiscount = _checkedCoupon.value?.discountAmount() ?: 0
+        return orderAmount + DELIVERY_AMOUNT - couponDiscount
+    }
+
+    override fun clickCoupon(couponId: Long) {
+        val coupon = _coupons.value?.find { it.coupon.id == couponId }
+        _checkedCoupon.value = coupon
     }
 
     private fun availableCoupons(): List<CouponState> {

@@ -9,6 +9,10 @@
             name="couponState"
             type="woowacourse.shopping.data.coupon.CouponState" />
 
+        <variable
+            name="couponClickListener"
+            type="woowacourse.shopping.ui.payment.CouponClickListener" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +26,7 @@
             android:id="@+id/cb_coupon"
             android:layout_width="@dimen/default_icon_size"
             android:layout_height="@dimen/default_icon_size"
+            android:onClick="@{() -> couponClickListener.clickCoupon(couponState.coupon.id)}"
             android:layout_marginStart="12dp"
             android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="parent"

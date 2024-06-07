@@ -50,7 +50,7 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun setCouponAdapter() {
         binding.rvCoupon.itemAnimator = null
-        adapter = CouponAdapter()
+        adapter = CouponAdapter(viewModel)
         binding.rvCoupon.adapter = adapter
     }
 

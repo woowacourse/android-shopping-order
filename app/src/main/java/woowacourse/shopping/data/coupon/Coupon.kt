@@ -6,16 +6,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-abstract class CouponState {
-    abstract val coupon: Coupon
-
-    abstract fun condition(): String
-
-    abstract fun isValid(): Boolean
-
-    abstract fun discountAmount(): Int
-}
-
 data class Coupon(
     val id: Long,
     val code: CouponCode,
@@ -30,14 +20,6 @@ data class Coupon(
     private val orderAmount: Int = 0,
     private val currentDateTime: LocalDateTime = LocalDateTime.now(),
 )
-
-fun ResponseCouponDto.toDomain(): CouponState =
-    when (CouponCode.findCode(this.code)) {
-        CouponCode.FIXED5000 -> Fixed5000(coupon = this.toCoupon())
-        CouponCode.BOGO -> Bogo(coupon = this.toCoupon())
-        CouponCode.FREESHIPPING -> Freeshipping(coupon = this.toCoupon())
-        CouponCode.MIRACLESALE -> MiracleSale(coupon = this.toCoupon())
-    }
 
 fun ResponseCouponDto.toCoupon(): Coupon {
     return Coupon(
