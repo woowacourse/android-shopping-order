@@ -3,7 +3,7 @@ package woowacourse.shopping.data.cart.datasource
 import woowacourse.shopping.data.cart.model.CartPageData
 
 interface CartDataSource {
-    fun loadCarts(
+    suspend fun loadCarts(
         currentPage: Int,
         productSize: Int,
     ): Result<CartPageData>

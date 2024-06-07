@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.entity.CartProduct
 
 interface CartRepository {
-    fun cartProducts(
+    suspend fun cartProducts(
         currentPage: Int,
         pageSize: Int,
     ): Result<List<CartProduct>>

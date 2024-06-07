@@ -14,16 +14,12 @@ class CartDataSourceImpl(
     private val ioExecutors: ExecutorService,
     private val cartService: CartService,
 ) : CartDataSource {
-    override fun loadCarts(
+    override suspend fun loadCarts(
         currentPage: Int,
         productSize: Int,
     ): Result<CartPageData> {
-        return ioExecutors.submit(
-            Callable {
-                cartService.fetchCartItems(currentPage, productSize).executeAsResult()
-                    .mapCatching { it.toData() }
-            },
-        ).get()
+        return cartService.fetchCartItems(currentPage, productSize)
+            .executeAsResult().mapCatching { it.toData() }
     }
 
     override fun loadTotalCarts(): Result<CartPageData> {

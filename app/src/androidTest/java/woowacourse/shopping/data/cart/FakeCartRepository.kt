@@ -10,7 +10,7 @@ class FakeCartRepository(
 ) : CartRepository {
     private val products: List<CartProduct> get() = cart.cartProducts()
 
-    override fun cartProducts(
+    override suspend fun cartProducts(
         currentPage: Int,
         pageSize: Int,
     ): Result<List<CartProduct>> {

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
@@ -105,13 +107,15 @@ class CartViewModel(
     }
 
     private fun loadCurrentPageCartProducts(page: Int) {
-        cartRepository.cartProducts(page - 1, PAGE_SIZE).onSuccess { carts ->
-            val newProducts = carts.map { it.toUiModel() }
-            val uiState = _uiState.value ?: return
-            val newUiState = uiState.updateTargetPageProducts(newProducts, page)
-            updateUiState(newUiState)
-        }.onFailure {
-            _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
+        viewModelScope.launch {
+            cartRepository.cartProducts(page - 1, PAGE_SIZE).onSuccess { carts ->
+                val newProducts = carts.map { it.toUiModel() }
+                val uiState = _uiState.value ?: return@launch
+                val newUiState = uiState.updateTargetPageProducts(newProducts, page)
+                updateUiState(newUiState)
+            }.onFailure {
+                _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
+            }
         }
     }
 

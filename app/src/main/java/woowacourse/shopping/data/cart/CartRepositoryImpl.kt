@@ -21,7 +21,7 @@ class CartRepositoryImpl(
         totalCartProducts()
     }
 
-    override fun cartProducts(
+    override suspend fun cartProducts(
         currentPage: Int,
         pageSize: Int,
     ): Result<List<CartProduct>> {
