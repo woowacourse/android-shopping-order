@@ -1,9 +1,8 @@
-package woowacourse.shopping.domain
+package woowacourse.shopping.domain.entity
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.entity.Cart
 
 class CartTest {
     @Test

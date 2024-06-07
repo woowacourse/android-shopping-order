@@ -1,6 +1,4 @@
-package woowacourse.shopping.domain
-
-import woowacourse.shopping.domain.entity.CartProduct
+package woowacourse.shopping.domain.entity
 
 fun fakeCartProduct(
     productId: Long = 1L,
