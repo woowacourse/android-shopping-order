@@ -75,11 +75,7 @@ class RecommendCartProductViewModel(
         viewModelScope.launch {
             if (uiState.shouldDeleteFromCart(id)) {
                 cartRepository.deleteCartProduct(id).onSuccess {
-                    _uiState.value =
-                        uiState.decreaseProductCount(
-                            id,
-                            INCREMENT_AMOUNT,
-                        )
+                    _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
                     _updateCartEvent.setValue(Unit)
                 }
                 return@launch
@@ -106,11 +102,7 @@ class RecommendCartProductViewModel(
             recommendProductsUseCase: RecommendProductsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
-                RecommendCartProductViewModel(
-                    orders,
-                    cartRepository,
-                    recommendProductsUseCase,
-                )
+                RecommendCartProductViewModel(orders, cartRepository, recommendProductsUseCase)
             }
         }
     }
