@@ -5,6 +5,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 import woowacourse.shopping.data.provider.AuthProvider
 import woowacourse.shopping.remote.interceptor.AuthorizationInterceptor
 import woowacourse.shopping.remote.interceptor.HttpExceptionInterceptor
@@ -34,4 +35,6 @@ class NetworkModule(authProvider: AuthProvider, baseUrl: String) {
     val cartService: CartService = retrofit.create(CartService::class.java)
 
     val orderService: OrderService = retrofit.create(OrderService::class.java)
+
+    val couponService: CouponService = retrofit.create(CouponService::class.java)
 }

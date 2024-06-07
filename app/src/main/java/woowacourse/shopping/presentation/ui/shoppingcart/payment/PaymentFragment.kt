@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.shoppingcart.payment
 import android.os.Build
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.app.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentPaymentBinding
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.base.BaseFragment
@@ -10,7 +11,10 @@ import woowacourse.shopping.presentation.base.observeEvent
 
 class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
     private val viewModel: PaymentViewModel by viewModels {
-        PaymentViewModel.factory()
+        PaymentViewModel.factory(
+            (requireContext().applicationContext as ShoppingApplication).couponRepository,
+            (requireContext().applicationContext as ShoppingApplication).orderRepository,
+        )
     }
 
     override fun initViewCreated() {

@@ -3,12 +3,17 @@ package woowacourse.shopping.presentation.ui.shoppingcart.payment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.emit
 
-class PaymentViewModel : BaseViewModel() {
+class PaymentViewModel(
+    private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
+) : BaseViewModel() {
     private val _navigateAction: MutableLiveData<Event<PaymentNavigateAction>> =
         MutableLiveData(null)
     val navigateAction: LiveData<Event<PaymentNavigateAction>> get() = _navigateAction
@@ -20,9 +25,15 @@ class PaymentViewModel : BaseViewModel() {
     }
 
     companion object {
-        fun factory(): ViewModelProvider.Factory {
+        fun factory(
+            couponRepository: CouponRepository,
+            orderRepository: OrderRepository,
+        ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
-                PaymentViewModel()
+                PaymentViewModel(
+                    couponRepository,
+                    orderRepository,
+                )
             }
         }
     }
