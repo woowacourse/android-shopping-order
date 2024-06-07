@@ -228,18 +228,18 @@ class CartViewModel(
     }
 
     fun buildRecommendProducts() {
-        recentRepository.loadMostRecent().onSuccess { product ->
-            val recentViewedCategory = product?.category ?: return
-            productRepository.loadWithCategory(recentViewedCategory, 0, 20) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        val recommendedProducts = result.data
-                        val existingCartItem = cartItemsData.groupBy { it.productId }
-                        _recommendedProduct.value =
-                            recommendedProducts.asSequence().filter { existingCartItem[it.id] == null }
-                                .map { it.toUiModel() }.associateBy { it.id }
-                    }
-                    is NetworkResult.Error -> {}
+        viewModelScope.launch {
+            recentRepository.loadMostRecent().onSuccess { product ->
+                val recentViewedCategory = product?.category ?: return@launch
+                viewModelScope.launch {
+                    productRepository.loadWithCategory(recentViewedCategory, 0, 20)
+                        .onSuccess { products ->
+                            val existingCartItem = cartItemsData.groupBy { it.productId }
+                            _recommendedProduct.value =
+                                products.asSequence().filter { existingCartItem[it.id] == null }
+                                    .map { it.toUiModel() }.associateBy { it.id }
+                        }
+                        .onFailure { }
                 }
             }
         }

@@ -5,22 +5,23 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
-import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.local.database.AppDatabase
-import woowacourse.shopping.local.datasource.LocalCartDataSource
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.ui.model.ProductModel
 import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
-import woowacourse.shopping.remote.datasource.RemoteCartDataSource
-import kotlin.concurrent.thread
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -64,18 +65,22 @@ class ProductDetailViewModel(
     }
 
     private fun saveRecentProduct(product: Product) {
-        thread { recentRepository.add(product) }.join()
+        viewModelScope.launch {
+            recentRepository.add(product)
+        }
     }
 
     private fun loadLastProduct() {
-        recentRepository.loadMostRecent()
-            .onSuccess { product ->
-                product?.let {
-                    _lastProduct.value = it.toUiModel()
+        viewModelScope.launch {
+            recentRepository.loadMostRecent()
+                .onSuccess { product ->
+                    product?.let {
+                        _lastProduct.value = it.toUiModel()
+                    }
+                }.onFailure {
+                    _error.value = Event(DetailError.RecentItemNotFound)
                 }
-            }.onFailure {
-                _error.value = Event(DetailError.RecentItemNotFound)
-            }
+        }
     }
 
     override fun onAddCartClick() {

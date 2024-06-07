@@ -9,11 +9,11 @@ import woowacourse.shopping.local.entity.RecentProductEntity
 @Dao
 interface RecentProductDao {
     @Query("SELECT * FROM recentProducts ORDER BY datetime(date_time) DESC LIMIT 10;")
-    fun loadAll(): List<RecentProductEntity>
+    suspend fun loadAll(): List<RecentProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(recentProduct: RecentProductEntity): Long
+    suspend fun insert(recentProduct: RecentProductEntity): Long
 
     @Query("SELECT * FROM recentProducts ORDER BY datetime(date_time) DESC LIMIT 1;")
-    fun getMostRecent(): RecentProductEntity?
+    suspend fun getMostRecent(): RecentProductEntity?
 }
