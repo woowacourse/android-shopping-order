@@ -45,7 +45,7 @@ class ProductDetailFragment :
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             val id = arguments?.getLong(PRODUCT_ID, -1) ?: return
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.Main).launch {
                 viewModel.loadCartProduct(id)
             }
         }
@@ -64,7 +64,7 @@ class ProductDetailFragment :
         initListeners()
         initObservers()
         initErrorEvent()
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             viewModel.refreshDetailProduct()
         }
     }

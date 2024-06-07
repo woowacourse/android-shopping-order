@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.entity.Product
@@ -39,7 +40,7 @@ class ProductListViewModel(
     override fun loadProducts() {
         var uiState = _uiState.value ?: return
         val currentPage = uiState.currentPage
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             shoppingRepository.products(currentPage - 1, PAGE_SIZE)
                 .onSuccess {
                     uiState = _uiState.value ?: return@launch
@@ -54,7 +55,7 @@ class ProductListViewModel(
     fun loadCartProducts() {
         var uiState = _uiState.value ?: return
         val ids = uiState.products.map { it.id }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             cartRepository.filterCartProducts(ids)
                 .onSuccess { newCartProducts ->
                     uiState = _uiState.value ?: return@launch
@@ -67,7 +68,7 @@ class ProductListViewModel(
     }
 
     fun loadRecentProducts() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
                 val uiState = _uiState.value ?: return@launch
                 _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
