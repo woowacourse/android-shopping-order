@@ -10,6 +10,7 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.Coupons
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -151,11 +152,8 @@ class RepositoryImpl(
 
     override suspend fun getCuration(): Result<List<CartProduct>?> = runCatching {
         localDataSource.findOne()?.toDomain()?.let {
-            val productResponseAsync = remoteDataSource.getProducts(it.category, 0, 10)
-            val cartResponseAsync = remoteDataSource.getCartItems(0, 1000)
-
-            val productResponse = productResponseAsync
-            val cartResponse = cartResponseAsync
+            val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
+            val cartResponse = remoteDataSource.getCartItems(0, 1000)
 
             if (productResponse.isSuccess && cartResponse.isSuccess) {
                 val products = productResponse.getOrNull()
@@ -182,5 +180,10 @@ class RepositoryImpl(
                 throw Throwable()
             }
         } ?: throw Throwable()
+    }
+
+    override suspend fun getCoupons(): Result<List<Coupons>> {
+        return remoteDataSource.getCoupons()
+            .recoverCatching { throw it }
     }
 }

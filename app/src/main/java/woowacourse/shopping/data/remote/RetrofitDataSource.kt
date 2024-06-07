@@ -6,9 +6,11 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.ProductRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.dto.response.Cart
+import woowacourse.shopping.data.remote.dto.response.Coupons
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.data.remote.service.CartItemApi
+import woowacourse.shopping.data.remote.service.CouponApi
 import woowacourse.shopping.data.remote.service.OrderApi
 import woowacourse.shopping.data.remote.service.ProductApi
 
@@ -16,6 +18,7 @@ class RetrofitDataSource(
     private val productApi: ProductApi = RetrofitModule.productApi,
     private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
     private val orderApi: OrderApi = RetrofitModule.orderApi,
+    private val couponApi: CouponApi = RetrofitModule.couponApi
 ) : RemoteDataSource {
     override suspend fun getProducts(
         category: String?,
@@ -44,7 +47,6 @@ class RetrofitDataSource(
         cartItemApi.getCartItems(page = page, size = size).content
     }
 
-    // todo 함수명 수정
     override suspend fun addCartItem(cartItemRequest: CartItemRequest): Result<Response<Unit>> =
         runCatching {
             cartItemApi.addCartItem(cartItemRequest = cartItemRequest)
@@ -65,29 +67,11 @@ class RetrofitDataSource(
         cartItemApi.getCartItemsCounts()
     }
 
-    /*        cartItemApi.getCartItemsCounts().enqueue(
-                object : Callback<QuantityResponse> {
-                    override fun onResponse(
-                        call: Call<QuantityResponse>,
-                        response: Response<QuantityResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            response.body()?.let { callback(Result.success(it)) }
-                        } else {
-                            callback(Result.failure(Exception("Error: ${response.code()}")))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<QuantityResponse>,
-                        t: Throwable,
-                    ) {
-                        callback(Result.failure(t))
-                    }
-                },
-            )*/
-
     override suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit> = runCatching {
         orderApi.submitOrders(orderRequest = orderRequest)
+    }
+
+    override suspend fun getCoupons(): Result<List<Coupons>> = runCatching {
+        couponApi.getCoupons()
     }
 }
