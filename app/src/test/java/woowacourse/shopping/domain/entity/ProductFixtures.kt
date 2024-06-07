@@ -2,7 +2,7 @@ package woowacourse.shopping.domain
 
 import woowacourse.shopping.domain.entity.Product
 
-fun product(
+fun fakeProduct(
     id: Long = 1,
     price: Int = 1000,
     name: String = "콜라",
