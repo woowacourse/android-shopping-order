@@ -24,4 +24,5 @@
     <string name="payment_comment">결제하기</string>
     <string name="coupon_expiration_date">만료일: yyyy년 MM월 dd일</string>
     <string name="no_available_coupon_comment">사용 가능한 쿠폰이 없습니다.</string>
+    <string name="paying_complete_comment">주문 완료!</string>
 </resources>

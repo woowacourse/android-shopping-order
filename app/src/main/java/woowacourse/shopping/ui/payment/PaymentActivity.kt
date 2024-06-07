@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -18,8 +18,10 @@ import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.ui.payment.adapter.CouponAdapter
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModel
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModelFactory
+import woowacourse.shopping.ui.products.ProductContentsActivity
 
 class PaymentActivity : AppCompatActivity() {
+    private var toast: Toast? = null
     private lateinit var binding: ActivityPaymentBinding
     private lateinit var adapter: CouponAdapter
     private val orderedCartItemIds by lazy {
@@ -41,9 +43,13 @@ class PaymentActivity : AppCompatActivity() {
         initBinding()
         setCouponAdapter()
         observeCoupons()
+        observePaying()
+        initToolbarBinding()
+    }
 
-        viewModel._coupons.observe(this) {
-            Log.e("seogi", "activity: $it")
+    private fun initToolbarBinding() {
+        binding.toolbarPayment.setNavigationOnClickListener {
+            finish()
         }
     }
 
@@ -67,6 +73,20 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun orderedCartItemIds(): List<Long> {
         return intent.getLongArrayExtra(PaymentKey.ORDERED_CART_ITEM_IDS)?.toList() ?: emptyList()
+    }
+
+    private fun observePaying() {
+        viewModel.paying.observe(this) {
+            toast?.cancel()
+            toast =
+                Toast.makeText(
+                    this,
+                    getString(R.string.paying_complete_comment),
+                    Toast.LENGTH_SHORT,
+                )
+            toast?.show()
+            ProductContentsActivity.startActivity(this)
+        }
     }
 
     companion object {

@@ -18,6 +18,8 @@ import woowacourse.shopping.data.coupon.MiracleSale
 import woowacourse.shopping.ui.payment.CouponClickListener
 import woowacourse.shopping.ui.payment.CouponUiModel
 import woowacourse.shopping.ui.payment.toUiModel
+import woowacourse.shopping.ui.utils.MutableSingleLiveData
+import woowacourse.shopping.ui.utils.SingleLiveData
 
 class PaymentViewModel(
     private val orderedCartItemIds: List<Long>,
@@ -31,7 +33,7 @@ class PaymentViewModel(
             it.sumOf { it.product.price * it.quantity.value }
         }
 
-    val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
+    private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
     val coupons: MediatorLiveData<List<CouponUiModel>> =
         MediatorLiveData<List<CouponUiModel>>().apply {
             addSource(_coupons) { value = availableCoupons() }
@@ -49,6 +51,9 @@ class PaymentViewModel(
             addSource(checkedCoupon) { value = totalAmount() }
         }
 
+    private val _paying: MutableSingleLiveData<Unit> = MutableSingleLiveData()
+    val paying: SingleLiveData<Unit> = _paying
+
     init {
         loadOrderedCartItems()
         loadCoupons()
@@ -60,6 +65,13 @@ class PaymentViewModel(
         currentList[currentList.indexOf(checkedCoupon.copy(isChecked = false))] =
             checkedCoupon.copy(isChecked = !checkedCoupon.isChecked)
         _coupons.value = currentList
+    }
+
+    fun paying() {
+        viewModelScope.launch {
+            orderedProducts.value?.let { cartRepository.order(it.map { it.id }) }
+        }
+        _paying.setValue(Unit)
     }
 
     private fun loadOrderedCartItems() {

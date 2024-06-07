@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.products
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -115,6 +117,14 @@ class ProductContentsActivity : AppCompatActivity() {
         viewModel.productDetailId.observe(this) {
             ProductDetailActivity.startActivity(this, it, true)
         }
+    }
+
+    companion object {
+        fun startActivity(context: Context) =
+            Intent(context, ProductContentsActivity::class.java).run {
+                setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                context.startActivity(this)
+            }
     }
 }
 

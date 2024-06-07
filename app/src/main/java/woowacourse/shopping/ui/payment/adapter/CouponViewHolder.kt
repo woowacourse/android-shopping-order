@@ -12,7 +12,6 @@ class CouponViewHolder(
 ) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(couponUiModel: CouponUiModel) {
-        Log.e("seogi", "viewHolder: $couponUiModel")
         binding.couponUiModel = couponUiModel
         binding.couponClickListener = couponClickListener
     }
