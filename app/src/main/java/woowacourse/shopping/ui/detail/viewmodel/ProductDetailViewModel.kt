@@ -45,10 +45,11 @@ class ProductDetailViewModel(
 
     private val _addCartComplete = MutableSingleLiveData<Unit>()
     val addCartComplete: SingleLiveData<Unit> get() = _addCartComplete
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _error.value = true
-        _errorMsg.setValue(throwable.message.toString())
-    }
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            _error.value = true
+            _errorMsg.setValue(throwable.message.toString())
+        }
 
     init {
         loadProduct()

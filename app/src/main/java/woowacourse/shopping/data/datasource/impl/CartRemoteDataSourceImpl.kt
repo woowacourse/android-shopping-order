@@ -16,7 +16,7 @@ class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemot
     ): Result<ResponseCartItemsGetDto> =
         runCatching {
             service.getCartItems(page = page, size = size).body() ?: throw ShoppingException(
-                ShoppingError.CartNotFound
+                ShoppingError.CartNotFound,
             )
         }
 

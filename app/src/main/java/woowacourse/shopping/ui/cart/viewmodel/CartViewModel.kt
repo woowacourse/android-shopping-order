@@ -62,9 +62,10 @@ class CartViewModel(
     val order: SingleLiveData<List<Long>> = _order
 
     private var removeState: Boolean = true
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        error.setValue(throwable)
-    }
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            error.setValue(throwable)
+        }
 
     init {
         loadCartItems()
