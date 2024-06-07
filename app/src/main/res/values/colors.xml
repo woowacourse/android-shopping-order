@@ -8,7 +8,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray_200">#FFEBEBEB</color>
     <color name="gray">#FFAAAAAA</color>
     <color name="gray_500">#FF555555</color>
+    <color name="gray_700">#FF333333</color>
     <color name="skeleton_background">#E2E2E2</color>
 </resources>
