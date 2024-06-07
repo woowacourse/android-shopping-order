@@ -8,9 +8,9 @@ interface CartDataSource {
         productSize: Int,
     ): Result<CartPageData>
 
-    fun loadTotalCarts(): Result<CartPageData>
+    suspend fun loadTotalCarts(): Result<CartPageData>
 
-    fun createCartProduct(
+    suspend fun createCartProduct(
         productId: Long,
         count: Int,
     ): Result<Long>

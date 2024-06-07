@@ -26,7 +26,7 @@ class FakeCartRepository(
         return Result.success(products.subList(startIndex, endIndex))
     }
 
-    override fun totalCartProducts(): Result<List<CartProduct>> {
+    override suspend fun totalCartProducts(): Result<List<CartProduct>> {
         return Result.success(products)
     }
 
@@ -62,7 +62,7 @@ class FakeCartRepository(
         return Result.success(startIndex < products.size)
     }
 
-    override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
+    override suspend fun orderCartProducts(productIds: List<Long>): Result<Unit> {
         TODO("Not yet implemented")
     }
 }

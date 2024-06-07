@@ -32,7 +32,8 @@ class RecommendCartProductViewModel(
     init {
         val uiState = _uiState.value
         viewModelScope.launch {
-            val recommendProducts = recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
+            val recommendProducts =
+                recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
             if (uiState != null) {
                 _uiState.value = uiState.copy(recommendProducts = recommendProducts)
             } else {
@@ -46,12 +47,14 @@ class RecommendCartProductViewModel(
     }
 
     fun orderProducts() {
-        val uiState = _uiState.value ?: return
-        cartRepository.orderCartProducts(uiState.totalOrderIds)
-            .onSuccess {
-                _updateCartEvent.setValue(Unit)
-                _finishOrderEvent.setValue(Unit)
-            }
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
+            cartRepository.orderCartProducts(uiState.totalOrderIds)
+                .onSuccess {
+                    _updateCartEvent.setValue(Unit)
+                    _finishOrderEvent.setValue(Unit)
+                }
+        }
     }
 
     override fun increaseProductCount(id: Long) {

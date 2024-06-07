@@ -98,20 +98,6 @@ class CartViewModel(
         _navigateToRecommendEvent.setValue(orderedProductIds)
     }
 
-    private fun updateUiState(
-        newUiState: CartUiState,
-        currentPage: Int = newUiState.currentPage,
-    ) {
-        val canLoadPrevPage = canLoadMoreCartProducts(currentPage - INCREMENT_AMOUNT)
-        val canLoadNextPage = canLoadMoreCartProducts(currentPage + INCREMENT_AMOUNT)
-        _uiState.value =
-            newUiState.copy(
-                currentPage = currentPage,
-                canLoadPrevPage = canLoadPrevPage,
-                canLoadNextPage = canLoadNextPage,
-            )
-    }
-
     private fun loadCurrentPageCartProducts(page: Int) {
         viewModelScope.launch {
             cartRepository.cartProducts(page - 1, PAGE_SIZE).onSuccess { carts ->
@@ -126,17 +112,33 @@ class CartViewModel(
     }
 
     fun loadTotalCartProducts() {
-        val uiState = _uiState.value ?: return
-        _uiState.value = uiState.copy(isLoading = true)
-        cartRepository.totalCartProducts().onSuccess { carts ->
-            val newProducts = carts.map { it.toUiModel() }
-            val newUiState = uiState.updatePagingProducts(newProducts)
-            _uiState.value = newUiState.copy(isLoading = false)
-            updateUiState(newUiState, currentPage = START_PAGE)
-        }.onFailure {
-            _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
-            _uiState.value = uiState.copy(isLoading = false)
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
+            _uiState.value = uiState.copy(isLoading = true)
+            cartRepository.totalCartProducts().onSuccess { carts ->
+                val newProducts = carts.map { it.toUiModel() }
+                var newUiState = uiState.updatePagingProducts(newProducts)
+                newUiState = newUiState.copy(isLoading = false)
+                updateUiState(newUiState, currentPage = START_PAGE)
+            }.onFailure {
+                _errorEvent.setValue(CartErrorEvent.LoadCartProducts)
+                _uiState.value = uiState.copy(isLoading = false)
+            }
         }
+    }
+
+    private fun updateUiState(
+        newUiState: CartUiState,
+        currentPage: Int = newUiState.currentPage,
+    ) {
+        val canLoadPrevPage = canLoadMoreCartProducts(currentPage - INCREMENT_AMOUNT)
+        val canLoadNextPage = canLoadMoreCartProducts(currentPage + INCREMENT_AMOUNT)
+        _uiState.value =
+            newUiState.copy(
+                currentPage = currentPage,
+                canLoadPrevPage = canLoadPrevPage,
+                canLoadNextPage = canLoadNextPage,
+            )
     }
 
     private fun refreshCartProducts() {

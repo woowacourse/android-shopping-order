@@ -9,11 +9,8 @@ import woowacourse.shopping.data.util.executeAsResult
 import woowacourse.shopping.remote.dto.request.CartItemRequest
 import woowacourse.shopping.remote.dto.request.UpdateCartCountRequest
 import woowacourse.shopping.remote.service.CartService
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
 
 class CartDataSourceImpl(
-    private val ioExecutors: ExecutorService,
     private val cartService: CartService,
 ) : CartDataSource {
     override suspend fun loadCarts(
@@ -28,9 +25,9 @@ class CartDataSourceImpl(
         return result
     }
 
-    override fun loadTotalCarts(): Result<CartPageData> {
-        return ioExecutors.submit(
-            Callable {
+    override suspend fun loadTotalCarts(): Result<CartPageData> {
+        val result =
+            withContext(Dispatchers.IO) {
                 val totalCountResult = cartService.fetchCartItemCount().executeAsResult()
                 if (totalCountResult.isSuccess) {
                     val totalCount = totalCountResult.getOrThrow().quantity
@@ -40,23 +37,21 @@ class CartDataSourceImpl(
                 } else {
                     error("Failed to fetch total cart count")
                 }
-            },
-        ).get()
+            }
+        return result
     }
 
-    override fun createCartProduct(
+    override suspend fun createCartProduct(
         productId: Long,
         count: Int,
     ): Result<Long> {
         return runCatching {
-            ioExecutors.submit(
-                Callable {
-                    val request = CartItemRequest(productId, count)
-                    val response = cartService.createCartItems(request).execute()
-                    val id = response.toIdOrNull() ?: error("Failed to create cart product")
-                    id
-                },
-            ).get()
+            withContext(Dispatchers.IO) {
+                val request = CartItemRequest(productId, count)
+                val response = cartService.createCartItems(request).execute()
+                val id = response.toIdOrNull() ?: error("Failed to create cart product")
+                id
+            }
         }
     }
 

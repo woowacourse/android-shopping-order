@@ -11,12 +11,6 @@ class RecommendProductsUseCase(
     private val productRepository: ShoppingRepository,
     private val cartRepository: CartRepository,
 ) {
-    private val cartProducts: List<Product>
-        get() {
-            val cart = cartRepository.totalCartProducts().getOrNull() ?: emptyList()
-            return cart.map { it.product }
-        }
-
     suspend operator fun invoke(): List<Product> {
         val productsDeferred =
             CoroutineScope(Dispatchers.IO).async { obtainRecommendProducts() }
@@ -31,8 +25,13 @@ class RecommendProductsUseCase(
         var recommendProducts = loadRecommendProducts(category)
         // 카트에 있는 상품은 추천 상품에서 제외한다.
         recommendProducts =
-            recommendProducts.filterNot { cartProducts.contains(it) }.take(RECOMMEND_PRODUCT_SIZE)
+            recommendProducts.filterNot { obtainCartProducts().contains(it) }.take(RECOMMEND_PRODUCT_SIZE)
         return recommendProducts
+    }
+
+    private suspend fun obtainCartProducts(): List<Product> {
+        val cart = cartRepository.totalCartProducts().getOrNull() ?: emptyList()
+        return cart.map { it.product }
     }
 
     private suspend fun loadRecommendProducts(category: String?): List<Product> {

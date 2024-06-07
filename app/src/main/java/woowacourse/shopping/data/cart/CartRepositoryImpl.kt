@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.cart
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.datasource.CartDataSource
 import woowacourse.shopping.data.cart.model.CartItemData
 import woowacourse.shopping.data.cart.model.CartPageData
@@ -18,7 +21,9 @@ class CartRepositoryImpl(
     private val cartProductMapByProductId = ConcurrentHashMap<Long, CartItemData>()
 
     init {
-        totalCartProducts()
+        CoroutineScope(Dispatchers.Main).launch {
+            totalCartProducts()
+        }
     }
 
     override suspend fun cartProducts(
@@ -30,7 +35,7 @@ class CartRepositoryImpl(
             .toCartProducts()
     }
 
-    override fun totalCartProducts(): Result<List<CartProduct>> {
+    override suspend fun totalCartProducts(): Result<List<CartProduct>> {
         return cartDataSource.loadTotalCarts().toCartProducts()
     }
 
@@ -93,7 +98,7 @@ class CartRepositoryImpl(
         return Result.success(cartPageData.totalProductSize > minSize)
     }
 
-    override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
+    override suspend fun orderCartProducts(productIds: List<Long>): Result<Unit> {
         val cartIds =
             productIds.mapNotNull {
                 cartProductMapByProductId[it]?.cartId

@@ -8,7 +8,7 @@ interface CartRepository {
         pageSize: Int,
     ): Result<List<CartProduct>>
 
-    fun totalCartProducts(): Result<List<CartProduct>>
+    suspend fun totalCartProducts(): Result<List<CartProduct>>
 
     suspend fun filterCartProducts(productIds: List<Long>): Result<List<CartProduct>>
 
@@ -24,5 +24,5 @@ interface CartRepository {
         pageSize: Int,
     ): Result<Boolean>
 
-    fun orderCartProducts(productIds: List<Long>): Result<Unit>
+    suspend fun orderCartProducts(productIds: List<Long>): Result<Unit>
 }
