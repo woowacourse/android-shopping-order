@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -56,6 +57,7 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun observeCoupons() {
         viewModel.coupons.observe(this) {
+            Log.e("seogi", "$it")
             adapter.submitList(it)
         }
     }

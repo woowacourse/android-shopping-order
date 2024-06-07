@@ -1,5 +1,7 @@
 package woowacourse.shopping.ui.payment.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
@@ -15,26 +17,29 @@ class PaymentViewModel(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
-    private val _coupons: MutableLiveData<List<Coupon>> = MutableLiveData()
-    val coupons: MutableLiveData<List<Coupon>> = _coupons
-
-    private val orderedProducts: MutableLiveData<List<CartWithProduct>> = MutableLiveData()
-    val orderAmount =
+    private val orderedProducts: MutableLiveData<List<CartWithProduct>> =
+        MutableLiveData(emptyList())
+    val orderAmount: LiveData<Int> =
         orderedProducts.map {
             it.sumOf { it.product.price * it.quantity.value }
         }
 
+    private val _coupons: MutableLiveData<List<Coupon>> = MutableLiveData()
+    val coupons: MediatorLiveData<List<Coupon>> =
+        MediatorLiveData<List<Coupon>>().apply {
+            addSource(_coupons) { value = availableCoupons() }
+            addSource(orderedProducts) { value = availableCoupons() }
+        }
+
     init {
-        loadCoupons()
         loadOrderedCartItems()
+        loadCoupons()
     }
 
-    private fun loadCoupons() {
-        viewModelScope.launch {
-            couponRepository.getCoupons().onSuccess {
-                _coupons.value = it
-            }
-        }
+    private fun availableCoupons(): List<Coupon> {
+        val orderAmount = orderedProducts.value?.sumOf { it.product.price * it.quantity.value } ?: 0
+        val coupons = _coupons.value?.map { it.copy(orderAmount = orderAmount) } ?: emptyList()
+        return coupons.filter { it.isValid() }
     }
 
     private fun loadOrderedCartItems() {
@@ -45,6 +50,14 @@ class PaymentViewModel(
                     cartWithProducts.add(it)
                     orderedProducts.value = cartWithProducts
                 }
+            }
+        }
+    }
+
+    private fun loadCoupons() {
+        viewModelScope.launch {
+            couponRepository.getCoupons().onSuccess {
+                _coupons.value = it.map { it.copy(orderAmount = orderAmount.value ?: 0) }
             }
         }
     }
