@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.curation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,7 +28,7 @@ class CurationViewModel(
     private val _eventHandler = MutableLiveData<EventState<CurationEvent>>()
     val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
 
-    private var _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
+    private val _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val orderProducts: LiveData<UiState<List<CartProduct>>> get() = _orderProducts
 
     init {
@@ -120,6 +121,8 @@ class CurationViewModel(
                 ).onSuccess {
                     cartProducts[index].cartId = it.toLong()
                     _cartProducts.value = UiState.Success(cartProducts)
+                    _orderProducts.value =
+                        UiState.Success((_orderProducts.value as UiState.Success).data + cartProducts[index])
                 }.onFailure {
                     _errorHandler.value = EventState("아이템 증가 오류")
                 }
@@ -129,6 +132,15 @@ class CurationViewModel(
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 ).onSuccess {
                     _cartProducts.value = UiState.Success(cartProducts)
+                    _orderProducts.value = UiState.Success(
+                        (_orderProducts.value as UiState.Success).data.map {
+                            if (it.productId == cartProduct.productId) {
+                                it.copy(quantity = cartProducts[index].quantity)
+                            } else {
+                                it
+                            }
+                        }
+                    )
                 }.onFailure {
                     _errorHandler.value = EventState("아이템 증가 오류")
                 }
@@ -149,6 +161,15 @@ class CurationViewModel(
                 )
                     .onSuccess {
                         _cartProducts.value = UiState.Success(cartProducts)
+                        _orderProducts.value = UiState.Success(
+                            (_orderProducts.value as UiState.Success).data.map {
+                                if (it.productId == cartProduct.productId) {
+                                    it.copy(quantity = cartProducts[index].quantity)
+                                } else {
+                                    it
+                                }
+                            }
+                        )
                     }
                     .onFailure {
                         _errorHandler.value = EventState("아이템 감소 오류")
@@ -156,6 +177,8 @@ class CurationViewModel(
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
                     _cartProducts.value = UiState.Success(cartProducts)
+                    _orderProducts.value =
+                        UiState.Success((_orderProducts.value as UiState.Success).data - cartProduct)
                 }.onFailure {
                     _errorHandler.value = EventState("아이템 감소 오류")
                 }
