@@ -35,7 +35,7 @@ class PaymentAdapter(
                     oldItem: CouponUiModel,
                     newItem: CouponUiModel,
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.coupon.id == newItem.coupon.id
                 }
 
                 override fun areContentsTheSame(

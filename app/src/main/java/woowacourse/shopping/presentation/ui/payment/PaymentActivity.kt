@@ -6,11 +6,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.ViewModelFactory
-import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.payment.adapter.PaymentAdapter
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
@@ -51,7 +49,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     private fun initObserver() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-        viewModel.getTickets()
+        viewModel.loadCoupons()
         viewModel.coupons.observe(this) {
             paymentAdapter.submitList(it.couponUiModels)
         }

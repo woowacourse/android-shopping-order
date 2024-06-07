@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="@{couponUiModel.description}"
+            android:text="@{couponUiModel.coupon.description}"
             android:checked="@{couponUiModel.checked}"
             android:onClick="@{() -> paymentActionHandler.checkCoupon(couponUiModel)}"
             android:gravity="center_vertical"
@@ -40,7 +40,7 @@
             app:layout_constraintTop_toBottomOf="@id/cb_coupon_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="@{couponUiModel.expirationDate}" />
+            android:text="@{couponUiModel.coupon.expirationDate}" />
 
         <TextView
             android:id="@+id/tv_coupon_price"
@@ -49,7 +49,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_validation"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="@{String.valueOf(couponUiModel.minimumAmount)}" />
+            android:text="@{String.valueOf(couponUiModel.coupon.minimumAmount)}" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,7 +16,7 @@ import woowacourse.shopping.presentation.ui.payment.model.toUiModel
 
 class PaymentActionViewModel(
     private val repository: Repository
-): ViewModel(), PaymentActionHandler {
+) : ViewModel(), PaymentActionHandler {
 
     private val _coupons = MutableLiveData<PaymentUiModel>()
     val coupons: LiveData<PaymentUiModel> get() = _coupons
@@ -30,24 +30,27 @@ class PaymentActionViewModel(
     fun setPaymentUiModel(paymentUiModel: PaymentUiModel) {
         _coupons.value = paymentUiModel
     }
+
     override fun pay() = viewModelScope.launch {
-        if(_coupons.value == null) return@launch
-            repository.postOrders(
-                OrderRequestDto(
-                    _coupons.value!!.cartProductIds,
-                ),
-            ).onSuccess {
-                _navigateHandler.postValue(EventState(NavigateUiState.ToShopping))
-            }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
-            }
+        if (_coupons.value == null)
+            return@launch
+
+        repository.postOrders(
+            OrderRequestDto(
+                _coupons.value!!.cartProductIds,
+            ),
+        ).onSuccess {
+            _navigateHandler.postValue(EventState(NavigateUiState.ToShopping))
+        }.onFailure {
+            _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
         }
+    }
 
     override fun checkCoupon(couponUiModel: CouponUiModel) {
-        if(_coupons.value == null) return
+        if (_coupons.value == null) return
 
         _coupons.value?.couponUiModels?.map {
-            if (it.id == couponUiModel.id) {
+            if (it.coupon.id == couponUiModel.coupon.id) {
                 it.copy(isChecked = !it.isChecked)
             } else {
                 it
@@ -57,12 +60,11 @@ class PaymentActionViewModel(
         }
     }
 
-    fun getTickets() = viewModelScope.launch {
-        if(_coupons.value == null) return@launch
-
+    fun loadCoupons() = viewModelScope.launch {
+        if (_coupons.value == null) return@launch
         repository.getCoupons()
             .onSuccess {
-                _coupons.postValue(_coupons.value?.copy(couponUiModels = it.map { it.toUiModel() }))
+                _coupons.postValue(_coupons.value?.copy(couponUiModels = it.filter { it.isValid(cartProducts = _coupons.value!!.cartProducts) }.map { it.toUiModel() }))
             }
             .onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_COUPON_LOAD))

@@ -179,6 +179,5 @@ class RepositoryImpl(
         }
         return Result.failure(Throwable(response.errorBody().toString()))
     }.onFailure {
-        Log.d("DFSFDSFDFSX", it.message.toString())
     }
 }
