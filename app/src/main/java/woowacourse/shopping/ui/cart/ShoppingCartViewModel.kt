@@ -160,16 +160,11 @@ class ShoppingCartViewModel(
     }
 
     override fun selectedAll() {
-        if (isAllSelected.value == true) {
-            updateCartItemsChecked(checked = false)
-            updateTotalPrice()
-            _isAllSelected.value = false
-            return
-        }
-        updateCartItemsChecked(checked = true)
+        val isAllSelected = isAllSelected.value ?: false
+        updateCartItemsChecked(checked = isAllSelected.not())
         updateTotalPrice()
-        updateSelectedCartItemsCount()
-        _isAllSelected.value = true
+        _isAllSelected.value = isAllSelected.not()
+        if (isAllSelected.not()) updateSelectedCartItemsCount()
     }
 
     private fun updateCartItemsChecked(checked: Boolean) {
