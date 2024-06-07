@@ -9,17 +9,17 @@ class ShoppingCart : Serializable {
     private val _cartItems: MutableLiveData<List<CartItem>> = MutableLiveData(listOf())
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
-    fun updateProducts(cartItems: List<CartItem>) {
-        _cartItems.value = emptyList()
-        _cartItems.postValue(cartItems)
-    }
-
     fun addProducts(cartItems: List<CartItem>) {
         _cartItems.value = cartItems
     }
 
     fun addProduct(cartItem: CartItem) {
-        _cartItems.value = _cartItems.value?.plus(cartItem)
+        val existingCartItem = _cartItems.value?.find { it.id == cartItem.id }
+        if (existingCartItem != null) {
+            existingCartItem.product.cartItemCounter.updateCount(cartItem.product.cartItemCounter.itemCount)
+        } else {
+            _cartItems.value = _cartItems.value?.plus(cartItem)
+        }
         _cartItems.postValue(_cartItems.value)
     }
 
