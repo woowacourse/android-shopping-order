@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.ui.cart.CartViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.cart.CartActivity">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_cart"
+            style="@style/ToolbarStyle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/payment" />
+
+        <TextView
+            android:id="@+id/tv_coupon_available"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/available_coupon"
+            android:textColor="@color/gray_800"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
+
+        <TextView
+            android:id="@+id/tv_description_coupon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/coupon_description"
+            android:textColor="@color/gray_500"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/tv_coupon_available"
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_available" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_coupon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/divider_coupon1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_description_coupon"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_coupon" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider_coupon1"
+            android:layout_width="0dp"
+            android:layout_height="7dp"
+            app:dividerColor="@color/gray_100"
+            app:layout_constraintBottom_toTopOf="@id/layout_order_price_coupon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_coupon" />
+
+        <include
+            android:id="@+id/layout_order_price_coupon"
+            layout="@layout/layout_coupon_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            app:layout_constraintBottom_toTopOf="@id/layout_discount_price_coupon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_coupon1" />
+
+        <include
+            android:id="@+id/layout_discount_price_coupon"
+            layout="@layout/layout_coupon_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/layout_delivery_fee_coupon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_order_price_coupon" />
+
+        <include
+            android:id="@+id/layout_delivery_fee_coupon"
+            layout="@layout/layout_coupon_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintBottom_toTopOf="@id/divider_coupon2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_discount_price_coupon" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider_coupon2"
+            android:layout_width="0dp"
+            android:layout_height="7dp"
+            app:dividerColor="@color/gray_100"
+            app:layout_constraintBottom_toTopOf="@id/divider_coupon2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_delivery_fee_coupon" />
+
+        <include
+            android:id="@+id/layout_total_order_price_coupon"
+            layout="@layout/layout_coupon_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="68dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_payment_coupon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_coupon2" />
+
+        <Button
+            android:id="@+id/btn_payment_coupon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/teal_500"
+            android:text="@string/payment"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_total_order_price_coupon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
