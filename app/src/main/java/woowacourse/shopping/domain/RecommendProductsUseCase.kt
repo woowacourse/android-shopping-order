@@ -1,8 +1,5 @@
 package woowacourse.shopping.domain
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ShoppingRepository
@@ -12,9 +9,7 @@ class RecommendProductsUseCase(
     private val cartRepository: CartRepository,
 ) {
     suspend operator fun invoke(): List<Product> {
-        val productsDeferred =
-            CoroutineScope(Dispatchers.IO).async { obtainRecommendProducts() }
-        return productsDeferred.await()
+        return obtainRecommendProducts()
     }
 
     private suspend fun obtainRecommendProducts(): List<Product> {
