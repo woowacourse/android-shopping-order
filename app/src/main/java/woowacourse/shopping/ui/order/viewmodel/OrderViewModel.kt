@@ -138,24 +138,24 @@ class OrderViewModel(
                 updatedCartItem.cartItem.cartItemId,
                 updatedCartItem.cartItem.quantity,
             ).onSuccess {
-                    val position =
-                        getCartViewItemPosition(updatedCartItem.cartItem.cartItemId)
-                            ?: return@onSuccess
-                    val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return@onSuccess
-                    newCartViewItems[position] = updatedCartItem
-                    _cartViewItems.value = newCartViewItems
+                val position =
+                    getCartViewItemPosition(updatedCartItem.cartItem.cartItemId)
+                        ?: return@onSuccess
+                val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return@onSuccess
+                newCartViewItems[position] = updatedCartItem
+                _cartViewItems.value = newCartViewItems
 
-                    val selectedPosition =
-                        _selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
-                            selectedCartViewItem.cartItem.cartItemId == updatedCartItem.cartItem.cartItemId
-                        } ?: return@onSuccess
-                    if (selectedPosition != -1) {
-                        val newSelectedCatViewItems =
-                            _selectedCartViewItems.value?.toMutableList() ?: return@onSuccess
-                        newSelectedCatViewItems[selectedPosition] = updatedCartItem
-                        _selectedCartViewItems.value = newSelectedCatViewItems
-                    }
+                val selectedPosition =
+                    _selectedCartViewItems.value?.indexOfFirst { selectedCartViewItem ->
+                        selectedCartViewItem.cartItem.cartItemId == updatedCartItem.cartItem.cartItemId
+                    } ?: return@onSuccess
+                if (selectedPosition != -1) {
+                    val newSelectedCatViewItems =
+                        _selectedCartViewItems.value?.toMutableList() ?: return@onSuccess
+                    newSelectedCatViewItems[selectedPosition] = updatedCartItem
+                    _selectedCartViewItems.value = newSelectedCatViewItems
                 }
+            }
         }
     }
 
@@ -221,7 +221,7 @@ class OrderViewModel(
             _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyCanNotOrder)
         } else {
             val orderState = orderState.value ?: return
-            when(orderState) {
+            when (orderState) {
                 is OrderState.Cart -> {
                     _orderState.value = OrderState.Recommend
                     _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToRecommend)
@@ -229,20 +229,8 @@ class OrderViewModel(
 
                 is OrderState.Recommend -> {
                     _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToPayment)
-//                    viewModelScope.launch {
-//                        val selectedCartItemIds =
-//                            _selectedCartViewItems.value?.map { selectedCartViewItem ->
-//                                selectedCartViewItem.cartItem.cartItemId
-//                            } ?: return@launch
-//                        orderRepository.postOrder(selectedCartItemIds)
-//                            .onSuccess {
-//                                _orderNotifyingActions.value =
-//                                    Event(OrderNotifyingActions.NotifyOrderCompleted)
-//                            }
-//                    }
                 }
             }
-
         }
     }
 

@@ -5,7 +5,7 @@ import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.data.dto.ProductResponse
 import woowacourse.shopping.data.remote.service.ProductService
 
-class ProductDataSourceImpl(private val productService: ProductService) : ProductDataSource {
+class RemoteProductDataSource(private val productService: ProductService) : ProductDataSource {
     override suspend fun getProductResponse(
         category: String?,
         page: Int,

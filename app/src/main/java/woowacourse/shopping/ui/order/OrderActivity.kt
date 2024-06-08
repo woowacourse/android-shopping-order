@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
-import woowacourse.shopping.app.ShoppingApplication.Companion.orderDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
+import woowacourse.shopping.app.ShoppingApplication.Companion.remoteOrderDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
@@ -29,8 +29,8 @@ class OrderActivity : AppCompatActivity() {
     private val recommendFragment by lazy { RecommendFragment.newInstance() }
     private val orderViewModel: OrderViewModel by viewModels {
         OrderViewModelFactory(
-            orderRepository = OrderRepositoryImpl(orderDataSourceImpl),
-            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+            orderRepository = OrderRepositoryImpl(remoteOrderDataSource),
+            cartRepository = CartRepositoryImpl(remoteCartDataSource),
         )
     }
 
@@ -61,7 +61,12 @@ class OrderActivity : AppCompatActivity() {
                     }
 
                     is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
-                    is OrderNavigationActions.NavigateToPayment -> navigateToPayment()
+                    is OrderNavigationActions.NavigateToPayment -> {
+                        val cartItemIds =
+                            orderViewModel.selectedCartViewItems.value?.map { it.cartItem.cartItemId }
+                                ?: return@observe
+                        navigateToPayment(cartItemIds)
+                    }
                 }
             }
         }
@@ -69,12 +74,6 @@ class OrderActivity : AppCompatActivity() {
         orderViewModel.orderNotifyingActions.observe(this) { orderNotifyingActions ->
             orderNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is OrderNotifyingActions.NotifyOrderCompleted -> {
-                        finish()
-                        startActivity(HomeActivity.createIntent(this))
-                        notifyOrderCompleted()
-                    }
-
                     is OrderNotifyingActions.NotifyCanNotOrder -> {
                         notifyCanNotOrder()
                     }
@@ -95,12 +94,8 @@ class OrderActivity : AppCompatActivity() {
         startActivity(HomeActivity.createIntent(this))
     }
 
-    private fun navigateToPayment() {
-        startActivity(PaymentActivity.createIntent(this))
-    }
-
-    private fun notifyOrderCompleted() {
-        Toast.makeText(this, ORDER_COMPLETED_MESSAGE, Toast.LENGTH_SHORT).show()
+    private fun navigateToPayment(cartItemIds: List<Int>) {
+        startActivity(PaymentActivity.createIntent(this, cartItemIds))
     }
 
     private fun notifyCanNotOrder() {
@@ -108,7 +103,6 @@ class OrderActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val ORDER_COMPLETED_MESSAGE = "상품 주문이 완료되었습니다!"
         private const val CAN_NOT_ORDER_MESSAGE = "최소 1개 이상의 상품을 주문해주세요!"
 
         fun createIntent(context: Context): Intent {

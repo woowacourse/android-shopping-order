@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.cartDataSourceImpl
+import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.ui.detail.DetailActivity
@@ -31,7 +31,7 @@ class CartFragment : Fragment() {
     private val orderViewModel by activityViewModels<OrderViewModel>()
     private val cartViewModel by viewModels<CartViewModel> {
         CartViewModelFactory(
-            cartRepository = CartRepositoryImpl(cartDataSourceImpl),
+            cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderViewModel = orderViewModel,
         )
     }

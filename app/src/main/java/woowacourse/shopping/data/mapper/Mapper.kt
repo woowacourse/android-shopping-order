@@ -1,10 +1,14 @@
 package woowacourse.shopping.data.mapper
 
+import woowacourse.shopping.data.dto.AvailableTimeDto
 import woowacourse.shopping.data.dto.CartItemDto
 import woowacourse.shopping.data.dto.CartResponse
+import woowacourse.shopping.data.dto.CouponDto
 import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.data.local.recent.RecentProductEntity
+import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Product
 import java.time.LocalDateTime
 
@@ -34,4 +38,27 @@ fun CartResponse.toCartItems(): List<CartItem> {
 
 fun CartItemDto.toCartItem(): CartItem {
     return CartItem(cartItemId, quantity, productDto.toProduct())
+}
+
+fun List<CouponDto>.toCoupons(): List<Coupon> {
+    return map { it.toCouPon() }
+}
+
+fun CouponDto.toCouPon(): Coupon {
+    return Coupon(
+        id,
+        code,
+        description,
+        expirationDate,
+        discount,
+        minimumAmount,
+        buyQuantity,
+        getQuantity,
+        availableTime?.toAvailableTime(),
+        discountType,
+    )
+}
+
+fun AvailableTimeDto.toAvailableTime(): AvailableTime {
+    return AvailableTime(start, end)
 }

@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.mapper.toProduct
-import woowacourse.shopping.data.remote.datasource.ProductDataSourceImpl
+import woowacourse.shopping.data.remote.datasource.RemoteProductDataSource
 import woowacourse.shopping.domain.model.HomeInfo
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
-    private val productDataSourceImpl: ProductDataSourceImpl,
+    private val remoteProductDataSource: RemoteProductDataSource,
 ) : ProductRepository {
     override suspend fun getProducts(
         category: String?,
@@ -15,7 +15,7 @@ class ProductRepositoryImpl(
         size: Int,
         sort: String,
     ): Result<HomeInfo> {
-        return productDataSourceImpl.getProductResponse(category, page, size, sort)
+        return remoteProductDataSource.getProductResponse(category, page, size, sort)
             .mapCatching { productResponse ->
                 val products =
                     productResponse.products.map { productDto -> productDto.toProduct() }
@@ -25,7 +25,7 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun getProductById(id: Int): Result<Product> {
-        return productDataSourceImpl.getProductById(id).mapCatching {
+        return remoteProductDataSource.getProductById(id).mapCatching {
             it.toProduct()
         }
     }

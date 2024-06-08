@@ -6,7 +6,7 @@ import woowacourse.shopping.data.dto.CartQuantityDto
 import woowacourse.shopping.data.dto.CartResponse
 import woowacourse.shopping.data.remote.service.CartService
 
-class CartDataSourceImpl(
+class RemoteCartDataSource(
     private val cartService: CartService,
 ) : CartDataSource {
     override suspend fun getCartResponse(

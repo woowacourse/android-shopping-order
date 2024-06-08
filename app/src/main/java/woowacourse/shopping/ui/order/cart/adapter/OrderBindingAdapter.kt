@@ -7,24 +7,24 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.ui.state.OrderState
 import woowacourse.shopping.ui.state.UiState
 
-@BindingAdapter("app:isEmpty", "app:state", requireAll = true)
+@BindingAdapter("app:isCartEmpty", "app:cartUiState", requireAll = true)
 fun <T> setEmptyCartVisibility(
     textView: TextView,
-    isEmpty: Boolean,
-    state: UiState<T>,
+    isCartEmpty: Boolean,
+    cartUiState: UiState<T>,
 ) {
     textView.visibility =
-        if (state is UiState.Success && isEmpty) View.VISIBLE else View.GONE
+        if (cartUiState is UiState.Success && isCartEmpty) View.VISIBLE else View.GONE
 }
 
-@BindingAdapter("app:isEmpty", "app:state", requireAll = true)
+@BindingAdapter("app:isCartEmpty", "app:cartUiState", requireAll = true)
 fun <T> setCartVisibility(
     recyclerView: RecyclerView,
-    isEmpty: Boolean,
-    state: UiState<T>,
+    isCartEmpty: Boolean,
+    cartUiState: UiState<T>,
 ) {
     recyclerView.visibility =
-        if ((state is UiState.Success && !isEmpty) || state is UiState.Loading) View.VISIBLE else View.GONE
+        if ((cartUiState is UiState.Success && !isCartEmpty) || cartUiState is UiState.Loading) View.VISIBLE else View.GONE
 }
 
 @BindingAdapter("app:allCheckBoxVisibility")
