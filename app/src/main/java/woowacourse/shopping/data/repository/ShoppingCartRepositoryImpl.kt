@@ -10,8 +10,8 @@ import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
 import woowacourse.shopping.domain.model.cart.UpdateCartItemType
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.EntityMapper.toCartItem
-import woowacourse.shopping.utils.EntityMapper.toCartItemEntity
+import woowacourse.shopping.utils.Mapper.CartItemMapper.toCartItem
+import woowacourse.shopping.utils.Mapper.CartItemMapper.toCartItemEntity
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 

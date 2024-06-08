@@ -4,11 +4,10 @@ import woowacourse.shopping.data.remote.api.CartApiService
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
-import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
-import woowacourse.shopping.utils.DtoMapper.toCartItems
-import woowacourse.shopping.utils.DtoMapper.toQuantity
+import woowacourse.shopping.utils.Mapper.CartItemMapper.toCartItems
+import woowacourse.shopping.utils.Mapper.CartItemMapper.toQuantity
 import woowacourse.shopping.utils.exception.ErrorEvent
 
 class CartItemDataSourceImpl(
