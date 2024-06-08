@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.products
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
@@ -14,10 +15,12 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductAdapter
 import woowacourse.shopping.ui.products.adapter.RecentProductAdapter
+import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.LoadingUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModelFactory
+import woowacourse.shopping.ui.utils.showToastMessage
 
 class ProductContentsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProductContentsBinding
@@ -40,6 +43,7 @@ class ProductContentsActivity : AppCompatActivity() {
         observeProductItems()
         observeRecentProductItems()
         moveToProductDetailPage()
+        observeError()
     }
 
     override fun onResume() {
@@ -94,6 +98,28 @@ class ProductContentsActivity : AppCompatActivity() {
     private fun moveToProductDetailPage() {
         viewModel.productDetailId.observe(this) {
             ProductDetailActivity.startActivity(this, it, true)
+        }
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(this) { error ->
+            when (error) {
+                ProductListError.AddCart -> showToastMessage(R.string.cart_error)
+                ProductListError.InvalidAuthorized -> showToastMessage(R.string.unauthorized_error)
+                ProductListError.Network -> showToastMessage(R.string.server_error)
+                ProductListError.LoadProduct -> showToastMessage(R.string.product_list_error)
+                ProductListError.LoadRecentProduct -> recentProductVisibility(false)
+                ProductListError.UnKnown -> showToastMessage(R.string.server_error)
+                ProductListError.UpdateCount -> showToastMessage(R.string.cart_error)
+            }
+        }
+    }
+
+    private fun recentProductVisibility(isVisible:Boolean) {
+        with(binding) {
+            tvRecentProductComment.isVisible = isVisible
+            horizonLine.isVisible = isVisible
+            rvRecentProducts.isVisible = isVisible
         }
     }
 }

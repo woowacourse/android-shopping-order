@@ -1,19 +1,10 @@
 package woowacourse.shopping.ui.products.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.ApiResponse
-import woowacourse.shopping.data.repository.Error
-import woowacourse.shopping.data.repository.onError
-import woowacourse.shopping.data.repository.onException
-import woowacourse.shopping.data.repository.onSuccess
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
@@ -21,13 +12,17 @@ import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.response.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
+import woowacourse.shopping.ui.products.uimodel.checkError
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
+import woowacourse.shopping.ui.utils.viewModelLaunch
 
 class ProductContentsViewModel(
     private val productRepository: ProductRepository,
@@ -65,8 +60,8 @@ class ProductContentsViewModel(
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
 
-    private val _error: MutableSingleLiveData<Error<Nothing>> = MutableSingleLiveData()
-    val error: SingleLiveData<Error<Nothing>> get() = _error
+    private val _error: MutableSingleLiveData<ProductListError> = MutableSingleLiveData()
+    val error: SingleLiveData<ProductListError> get() = _error
 
     private fun currentProduct(): ProductWithQuantityUiState =
         productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
@@ -76,42 +71,46 @@ class ProductContentsViewModel(
     }
 
     fun loadProducts() {
-        viewModelScope.launch {
+        viewModelLaunch(::productExceptionHandler) {
             productWithQuantity.value = currentProduct().copy(isLoading = true)
 
-            productRepository.getProducts(
+            productRepository.allProductsResponse(
                 currentProduct().productWithQuantities.size / PAGE_SIZE,
                 PAGE_SIZE,
             ).onSuccess { loadedProducts ->
                 products.value = (products.value ?: emptyList()) + loadedProducts
-            }.onError { error ->
-                _error.setValue(error)
-            }.onException {
-                Log.d(this.javaClass.simpleName, "${it.e}")
+            }.checkError {
+                _error.setValue(it)
             }
         }
     }
 
     override fun plusCount(productId: Long) {
-        viewModelScope.launch {
+        viewModelLaunch(::updateCountExceptionHandler) {
             cartRepository.patchCartItem(
                 findCartItemByProductId(productId),
                 findCartItemQuantityByProductId(productId).inc().value,
-            )
-            loadCartItems()
+            ).onSuccess {
+                loadCartItems()
+            }.checkError {
+                _error.setValue(it)
+            }
+
         }
     }
 
     override fun minusCount(productId: Long) {
-        viewModelScope.launch {
+        viewModelLaunch(::updateCountExceptionHandler) {
             val currentCount = findCartItemQuantityByProductId(productId).dec().value
-            if (currentCount == 0) {
+            if (currentCount == NO_CART_STATE) {
                 cartRepository.deleteCartItem(findCartItemByProductId(productId))
+                    .checkError { _error.setValue(it) }.onSuccess { loadCartItems() }
             } else {
                 cartRepository.patchCartItem(findCartItemByProductId(productId), currentCount)
+                    .checkError { _error.setValue(it) }.onSuccess { loadCartItems() }
             }
-            loadCartItems()
         }
+
     }
 
     override fun itemClickListener(productId: Long) {
@@ -119,52 +118,41 @@ class ProductContentsViewModel(
     }
 
     override fun addCart(productId: Long) {
-        viewModelScope.launch {
-            cartRepository.postCartItems(productId, 1)
-            loadCartItems()
+        viewModelLaunch(::addCartExceptionHandler) {
+            cartRepository.postCartItems(productId, 1).onSuccess {
+                loadCartItems()
+            }.checkError { _error.setValue(it) }
         }
     }
 
     fun loadCartItems() {
-        viewModelScope.launch {
-            runCatching {
-                productWithQuantity.value = currentProduct().copy(isLoading = true)
-                cartRepository.getAllCartItems()
-            }.onSuccess { carts ->
+        viewModelLaunch(::cartExceptionHandler) {
+            productWithQuantity.value = currentProduct().copy(isLoading = true)
+            cartRepository.allCartItemsResponse().onSuccess { carts ->
                 cart.value = carts
+            }.checkError {
+                _error.setValue(it)
             }
         }
     }
 
     fun loadRecentProducts() {
-        viewModelScope.launch {
-            runCatching {
-                recentProductRepository.findAll()
-            }.onSuccess { recentProducts ->
+        viewModelLaunch(::recentExceptionHandler) {
+            recentProductRepository.allRecentProductsResponse().onSuccess { recentProducts ->
                 _recentProducts.value =
-                    recentProducts.mapNotNull { productByIdOrNull(it.productId) }
-            }
-        }
-    }
-
-    private suspend fun productByIdOrNull(productId: Long): Product? {
-        val response = viewModelScope.async { productRepository.find(productId) }.await()
-        return when (response) {
-            is ApiResponse.Success -> response.data
-            is Error -> null
-            is ApiResponse.Exception -> {
-                Log.d(this.javaClass.simpleName, "${response.e}")
-                null
+                    recentProducts.mapNotNull { productRepository.productByIdOrNull(it.productId) }
+            }.checkError {
+                _error.setValue(it)
             }
         }
     }
 
     private fun updateProductWithQuantity(): ProductWithQuantityUiState {
+
         val currentProducts = products.value ?: emptyList()
-        val updatedList =
-            currentProducts.map { product ->
-                ProductWithQuantity(product = product, quantity = getQuantity(product.id))
-            }
+        val updatedList = currentProducts.map { product ->
+            ProductWithQuantity(product = product, quantity = getQuantity(product.id))
+        }
 
         return currentProduct().copy(
             productWithQuantities = updatedList.map { it.toUiModel() },
@@ -194,8 +182,29 @@ class ProductContentsViewModel(
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
+    private fun addCartExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductListError.AddCart)
+    }
+
+    private fun updateCountExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductListError.UpdateCount)
+    }
+
+    private fun productExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductListError.LoadProduct)
+    }
+
+    private fun recentExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductListError.LoadProduct)
+    }
+
+    private fun cartExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductListError.LoadProduct)
+    }
+
     companion object {
         private const val DEFAULT_CART_ITEMS_COUNT = 0
         private const val PAGE_SIZE = 20
+        private const val NO_CART_STATE = 0
     }
 }
