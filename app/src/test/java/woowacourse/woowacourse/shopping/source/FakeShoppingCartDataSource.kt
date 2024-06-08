@@ -1,8 +1,9 @@
 package woowacourse.shopping.source
 
+import woowacourse.shopping.data.model.CartItemData
+import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.remote.model.response.CartItemResponse
 import woowacourse.shopping.remote.model.response.ProductResponse
 
@@ -13,34 +14,23 @@ class FakeShoppingCartDataSource(
 
     override fun findByProductId(productId: Long): ProductIdsCountData {
         val foundItem =
-            cartItemResponses.find { cartItemDto -> cartItemDto.product.id == productId }
+            cartItemResponses.find { cartItemResponse -> cartItemResponse.product.id == productId }
                 ?: throw NoSuchElementException("there is no product $productId")
 
         return ProductIdsCountData(foundItem.id, foundItem.quantity)
     }
 
-    override fun loadAllCartItems(): List<CartItemResponse> = cartItemResponses
+    override fun loadAllCartItems(): List<CartItemData> {
+        TODO("Not yet implemented")
+    }
 
-    override fun addNewProduct(productIdsCount: ProductIdsCount) {
-        val newId = cartItemResponses.size.toLong() + 1
-        val newCartItem =
-            CartItemResponse(
-                newId,
-                productIdsCount.quantity,
-                ProductResponse(
-                    productIdsCount.productId,
-                    "1",
-                    1,
-                    "1",
-                    "unit",
-                ),
-            )
-        cartItemResponses = cartItemResponses + newCartItem
+    override fun addNewProduct(productIdsCountData: ProductIdsCountData) {
+        TODO("Not yet implemented")
     }
 
     override fun removeCartItem(cartItemId: Long) {
         val foundItem =
-            cartItemResponses.find { cartItemDto -> cartItemDto.id == cartItemId }
+            cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
                 ?: throw NoSuchElementException()
         cartItemResponses = cartItemResponses - foundItem
     }
@@ -64,13 +54,113 @@ class FakeShoppingCartDataSource(
         newQuantity: Int,
     ) {
         val foundItem =
-            cartItemResponses.find { cartItemDto -> cartItemDto.id == cartItemId }
+            cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
                 ?: throw NoSuchElementException()
         val updatedItem = foundItem.copy(quantity = newQuantity)
         val newCartItems =
-            cartItemResponses.map { cartItemDto ->
-                if (cartItemDto.id == cartItemId) updatedItem else cartItemDto
+            cartItemResponses.map { cartItemResponse ->
+                if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
             }
         cartItemResponses = newCartItems
     }
+
+    override suspend fun findByProductId2(productId: Long): Result<ProductIdsCountData> =
+        runCatching {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.product.id == productId }
+                    ?: throw NoSuchElementException("there is no product $productId")
+
+            ProductIdsCountData(foundItem.id, foundItem.quantity)
+        }
+
+    override suspend fun loadAllCartItems2(): Result<List<CartItemData>> =
+        runCatching {
+            cartItemResponses.map { cartItemResponse ->
+                CartItemData(
+                    id = cartItemResponse.id,
+                    quantity = cartItemResponse.quantity,
+                    product =
+                        ProductData(
+                            id = cartItemResponse.product.id,
+                            name = cartItemResponse.product.name,
+                            price = cartItemResponse.product.price,
+                            imgUrl = cartItemResponse.product.imageUrl,
+                        ),
+                )
+            }
+        }
+
+    override suspend fun addNewProduct2(productIdsCountData: ProductIdsCountData): Result<Unit> =
+        runCatching {
+            val newCartItemResponse =
+                CartItemResponse(
+                    id = productIdsCountData.productId,
+                    quantity = productIdsCountData.quantity,
+                    product =
+                        ProductResponse(
+                            id = productIdsCountData.productId,
+                            name = "name",
+                            price = 1000,
+                            imageUrl = "url",
+                            category = "category",
+                        ),
+                )
+            cartItemResponses = cartItemResponses + newCartItemResponse
+        }
+
+    override suspend fun removeCartItem2(cartItemId: Long): Result<Unit> =
+        runCatching {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
+                    ?: throw NoSuchElementException()
+            cartItemResponses = cartItemResponses - foundItem
+        }
+
+    override suspend fun plusProductsIdCount2(
+        cartItemId: Long,
+        quantity: Int,
+    ): Result<Unit> =
+        runCatching {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
+                    ?: throw NoSuchElementException()
+            val updatedItem = foundItem.copy(quantity = foundItem.quantity + quantity)
+            val newCartItems =
+                cartItemResponses.map { cartItemResponse ->
+                    if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
+                }
+            cartItemResponses = newCartItems
+        }
+
+    override suspend fun minusProductsIdCount2(
+        cartItemId: Long,
+        quantity: Int,
+    ): Result<Unit> =
+        runCatching {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
+                    ?: throw NoSuchElementException()
+            val updatedItem = foundItem.copy(quantity = foundItem.quantity - quantity)
+            val newCartItems =
+                cartItemResponses.map { cartItemResponse ->
+                    if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
+                }
+            cartItemResponses = newCartItems
+        }
+
+    override suspend fun updateProductsCount2(
+        cartItemId: Long,
+        newQuantity: Int,
+    ): Result<Unit> =
+        runCatching {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
+                    ?: throw NoSuchElementException()
+            val updatedItem = foundItem.copy(quantity = newQuantity)
+            val newCartItems =
+                cartItemResponses.map { cartItemResponse ->
+                    if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
+                }
+            cartItemResponses = newCartItems
+        }
 }
