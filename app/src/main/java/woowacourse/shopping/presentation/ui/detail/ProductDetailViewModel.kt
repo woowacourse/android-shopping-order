@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -64,7 +65,12 @@ class ProductDetailViewModel(
                     repository.postCartItem(CartItemRequestDto.fromCartProduct(detailCartProduct.cartProduct))
                         .onSuccess {
                             _cartProduct.postValue(UiState.Success(detailCartProduct))
-                            saveRecentProduct(detailCartProduct.cartProduct)
+                            Log.d("FIRST LOG", "${it.toLong()}")
+                            saveRecentProduct(detailCartProduct.cartProduct.copy(cartId = it.toLong()))
+                            updateUiModel.add(
+                                detailCartProduct.cartProduct.productId,
+                                detailCartProduct.cartProduct.copy(cartId = it.toLong()),
+                            )
                         }.onFailure {
                             _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                         }
@@ -80,15 +86,15 @@ class ProductDetailViewModel(
                     ).onSuccess {
                         _cartProduct.postValue(UiState.Success(detailCartProduct))
                         saveRecentProduct(detailCartProduct.cartProduct)
+                        updateUiModel.add(
+                            detailCartProduct.cartProduct.productId,
+                            detailCartProduct.cartProduct,
+                        )
                     }.onFailure {
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS_MINUS))
                     }
                 }
             }
-            updateUiModel.add(
-                detailCartProduct.cartProduct.productId,
-                detailCartProduct.cartProduct,
-            )
             _cartHandler.postValue(EventState(updateUiModel))
         }
 

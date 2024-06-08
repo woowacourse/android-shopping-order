@@ -196,6 +196,7 @@ class ShoppingViewModel(private val repository: Repository) :
         updateUiModel.updatedItems.forEach { updatedItem ->
             val cartProductToUpdate = cartProducts.find { it.productId == updatedItem.key }
             cartProductToUpdate?.quantity = updatedItem.value.quantity
+            cartProductToUpdate?.cartId = updatedItem.value.cartId
         }
         this.cartProducts.value = UiState.Success(cartProducts)
     }

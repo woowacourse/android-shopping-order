@@ -88,10 +88,12 @@ class RepositoryImpl(
         quantityRequestDto: QuantityRequestDto,
     ): Result<Unit> =
         runCatching {
+            Log.d("SDFEFS", "${id}")
             val response = remoteDataSource.patchCartItem(id, quantityRequestDto)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }
+            Log.d("SDFEFS", response.toString())
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
