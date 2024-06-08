@@ -57,7 +57,9 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
         }
         viewModel.recentProduct.observe(this) { state ->
             when (state) {
-                is UiState.Loading -> {}
+                is UiState.Loading -> {
+                    binding.layoutRecent.isVisible = false
+                }
                 is UiState.Success -> {
                     binding.layoutRecent.isVisible = !(intent.getBooleanExtra(EXTRA_OVERLAY, false))
                     binding.recentProduct = state.data

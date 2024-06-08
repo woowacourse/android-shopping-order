@@ -48,9 +48,7 @@ class ProductDetailViewModel(
     fun findOneRecentProduct() =
         viewModelScope.launch {
             repository.findOneRecent().onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
-                } else {
+                if (it != null) {
                     _recentProduct.postValue(UiState.Success(it))
                 }
             }.onFailure {
