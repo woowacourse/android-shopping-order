@@ -14,7 +14,6 @@ import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 val imageUrl = "https://www.naver.com/"
 val name = "올리브"
@@ -25,7 +24,7 @@ fun product(id: Int) = Product(id = id, imageUrl = imageUrl, name = name, price 
 
 fun products(size: Int) = List(size) { product(it) }
 
-fun recentProduct(productId: Int) = RecentProduct(0, product(productId), LocalDateTime.now())
+fun recentProduct(productId: Int) = RecentProduct(0, product(productId))
 
 fun recentProducts(size: Int) = List(size) { recentProduct(it) }
 

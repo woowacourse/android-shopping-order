@@ -3,7 +3,6 @@ package woowacourse.shopping.fake
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import java.time.LocalDateTime
 
 class FakeRecentProductRepository(savedRecentProducts: List<RecentProduct> = emptyList()) : RecentProductRepository {
     private val recentProducts: MutableList<RecentProduct> = savedRecentProducts.toMutableList()
@@ -28,7 +27,7 @@ class FakeRecentProductRepository(savedRecentProducts: List<RecentProduct> = emp
         if (recentProduct != null) {
             recentProducts.remove(recentProduct)
         }
-        recentProducts.add(RecentProduct(id++, product, LocalDateTime.now()))
+        recentProducts.add(RecentProduct(id++, product))
         return Result.success(Unit)
     }
 
