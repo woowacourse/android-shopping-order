@@ -2,8 +2,19 @@
     <string name="app_name">Shopping</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="price_format">%1$,d원</string>
+    <string name="price_discount_format">-%1$,d원</string>
     <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
     <string name="order_format">주문하기(%d)</string>
+    <string name="date_format">yyyy년 MM월 dd일</string>
     <string name="button_previous_page"><![CDATA[<]]></string>
     <string name="button_next_page"><![CDATA[>]]></string>
+    <string name="button_order">결제하기</string>
+    <string name="order_coupons_title">적용 가능한 쿠폰</string>
+    <string name="order_coupons_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_order_price">주문 금액</string>
+    <string name="order_coupon_price">쿠폰 할인 금액</string>
+    <string name="order_shipping_price">배송비</string>
+    <string name="order_total_price">총 결제 금액</string>
+    <string name="order_expiration_date">만료일: %s</string>
+    <string name="order_minimum_price">최소 주문 금액: %s</string>
 </resources>
