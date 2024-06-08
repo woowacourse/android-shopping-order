@@ -77,7 +77,7 @@ class CouponActivity : AppCompatActivity() {
 
     private fun navigateProductsView() {
         val intent = Intent(this, ProductsActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
 
