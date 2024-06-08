@@ -8,7 +8,7 @@ object FakeRecentProductDao : RecentProductDao {
     private var id: Long = 0
     private val recentProducts = mutableMapOf<Long, RecentProduct>()
 
-    override fun insert(recentProduct: RecentProduct): Long {
+    override suspend fun insert(recentProduct: RecentProduct): Long {
         val recentTime = LocalDateTime.now()
         val oldRecentProduct =
             recentProducts.values.find { it.productId == recentProduct.productId }
@@ -22,18 +22,18 @@ object FakeRecentProductDao : RecentProductDao {
         return oldRecentProduct.id
     }
 
-    override fun deleteAll() {
+    override suspend fun deleteAll() {
         recentProducts.clear()
     }
 
-    override fun findMostRecentProduct(): RecentProduct? {
+    override suspend fun findMostRecentProduct(): RecentProduct? {
         if (recentProducts.isEmpty()) {
             return null
         }
         return recentProducts.values.maxBy { it.recentTime }
     }
 
-    override fun findAll(): List<RecentProduct> {
+    override suspend fun findAll(): List<RecentProduct> {
         return recentProducts.values.sortedByDescending { it.recentTime }
     }
 }
