@@ -4,11 +4,26 @@ import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
 import woowacourse.shopping.domain.Coupon
 
 fun CouponResponseDto.toDomain(): Coupon {
-    return when(this.code) {
-        "FIXED5000" -> Coupon.Fixed5000(id, code, description, discountType, expirationDate, discount!!, minimumAmount!!)
-        "BOGO" -> Coupon.Bogo(id, code, description, expirationDate, buyQuantity!!, getQuantity!!, discountType)
-        "FREESHIPPING" -> Coupon.FreeShipping(id, code, description, expirationDate, minimumAmount!!, discountType)
-        "MIRACLESALE" -> Coupon.MiracleSale(id, code, description, expirationDate, discount!!, availableTime!!.start!!, availableTime.end!!, discountType)
-        else -> {Coupon.Unknown(id, code, description, expirationDate, discountType)}
+    return when(CouponType.fromCode(code)) {
+        CouponType.FIXED5000 -> Coupon.Fixed5000(id, code, description, discountType, expirationDate, discount!!, minimumAmount!!)
+        CouponType.BOGO -> Coupon.Bogo(id, code, description, expirationDate, buyQuantity!!, getQuantity!!, discountType)
+        CouponType.FREESHIPPING -> Coupon.FreeShipping(id, code, description, expirationDate, minimumAmount!!, discountType)
+        CouponType.MIRACLESALE -> Coupon.MiracleSale(id, code, description, expirationDate, discount!!, availableTime!!.start!!, availableTime.end!!, discountType)
+        CouponType.UNKNOWN -> {Coupon.Unknown(id, code, description, expirationDate, discountType)}
+    }
+}
+
+enum class CouponType(val code: String) {
+    FIXED5000("FIXED5000"),
+    BOGO("BOGO"),
+    FREESHIPPING("FREESHIPPING"),
+    MIRACLESALE("MIRACLESALE"),
+    UNKNOWN("UNKNOWN")
+    ;
+
+    companion object {
+        fun fromCode(code: String): CouponType {
+            return entries.find { couponType -> couponType.code == code } ?: UNKNOWN
+        }
     }
 }
