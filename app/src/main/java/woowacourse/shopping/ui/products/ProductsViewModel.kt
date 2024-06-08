@@ -55,13 +55,13 @@ class ProductsViewModel(
             productRepository.findPage(page, PAGE_SIZE)
                 .onSuccess { products ->
                     updateProductUiModels(products)
+                    loadIsPageLast()
                     _showLoadMore.value = false
                     page++
                 }.onFailure {
                     setError()
                 }
             _isLoadingProducts.value = false
-            loadIsPageLast()
         }
 
     private fun updateProductUiModels(products: List<Product>) =
