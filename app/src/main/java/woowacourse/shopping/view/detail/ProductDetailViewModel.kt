@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.detail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,10 @@ class ProductDetailViewModel(
 
     fun addShoppingCartItem(product: Product) =
         viewModelScope.launch {
-            checkValidProduct(product)
+            if (isInValidProduct(product)) {
+                handleException(ErrorEvent.AddCartEvent())
+                return@launch
+            }
             when (cartItemId) {
                 DEFAULT_CART_ITEM_ID -> {
                     shoppingCartRepository.addCartItem(product)
@@ -145,11 +147,7 @@ class ProductDetailViewModel(
                     name = product.name,
                     category = product.category,
                 ),
-            ).onSuccess {
-                Log.d("sdlfjsdlfsjd", product.name)
-            }.onFailure {
-                Log.d("sdlfjsdlfsjd", "dsfljsdfl")
-            }
+            )
         }
 
     private fun deletePrevRecentlyProduct(recentlyProductId: Long) =
@@ -201,9 +199,8 @@ class ProductDetailViewModel(
                 }
         }
 
-    private fun checkValidProduct(product: Product) {
-        if (product.id == DEFAULT_PRODUCT_ID) throw ErrorEvent.LoadDataEvent()
-        if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw ErrorEvent.LoadDataEvent()
+    private fun isInValidProduct(product: Product): Boolean {
+        return product.id == DEFAULT_PRODUCT_ID || product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT
     }
 
     override fun clickIncrease(product: Product) {
