@@ -66,10 +66,12 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
             EventObserver {
                 when (it) {
                     is CurationEvent.SuccessOrder -> {
-                        Toast.makeText(this, "주문이 성공적으로 진행되었습니다.", Toast.LENGTH_SHORT).show()
-                        PaymentActivity.createIntent(this, orderItemsId.map { it.toInt() }).also {
-                            startActivity(it)
-                        }
+                        PaymentActivity.createIntent(
+                            this,
+                            (viewModel.orderProducts.value as UiState.Success).data.map { it.cartId.toInt() })
+                            .also {
+                                startActivity(it)
+                            }
                     }
                 }
             },

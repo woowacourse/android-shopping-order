@@ -88,7 +88,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:background="#04C09E"
-                android:onClick="@{() -> curationActionHandler.order()}">
+                android:onClick="@{() -> curationActionHandler.onOrderClick()}">
 
                 <TextView
                     android:id="@+id/tv_order_title"

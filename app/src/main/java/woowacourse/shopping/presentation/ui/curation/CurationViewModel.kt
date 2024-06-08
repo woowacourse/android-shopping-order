@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
@@ -59,34 +58,8 @@ class CurationViewModel(
             }
     }
 
-    override fun order() {
-        viewModelScope.launch {
-            if (_cartProducts.value is UiState.Success) {
-                var orderCartIds =
-                    (_cartProducts.value as UiState.Success).data.filter {
-                        it.quantity > 0
-                    }.map {
-                        it.cartId.toInt()
-                    }
-                orderCartIds = orderCartIds + ids.map { it.toInt() }
-                repository.submitOrders(
-                    OrderRequest(
-                        orderCartIds,
-                    )
-                ).onSuccess {
-                    val cartProducts =
-                        (this@CurationViewModel.cartProducts.value as UiState.Success).data.map { it.copy() }
-
-                    orderCartIds.forEach { id ->
-                        cartProducts.find { it.cartId == id.toLong() }?.quantity = 0
-                    }
-                    _eventHandler.value = (EventState(CurationEvent.SuccessOrder))
-                    _cartProducts.value = UiState.Success(cartProducts)
-                }.onFailure { }
-            } else {
-                // Handle the case when _cartProducts.value is not UiState.Success
-            }
-        }
+    override fun onOrderClick() {
+        _eventHandler.value = (EventState(CurationEvent.SuccessOrder))
     }
 
     override fun onProductClick(cartProduct: CartProduct) {

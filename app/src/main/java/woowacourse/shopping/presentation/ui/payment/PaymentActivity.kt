@@ -2,12 +2,15 @@ package woowacourse.shopping.presentation.ui.payment
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCouponBinding
 import woowacourse.shopping.presentation.base.BindingActivity
+import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity
 
 class PaymentActivity :
     BindingActivity<ActivityCouponBinding>() {
@@ -15,7 +18,6 @@ class PaymentActivity :
         get() = R.layout.activity_coupon
 
 
-    // Todo : curation에서 상품을 추가하면 orderItemsId에 추가되는데, 이를 어떻게 처리할지 고민해보기
     private val orderItemsId: List<Long> by lazy {
         intent.getIntegerArrayListExtra(EXTRA_ORDER_PRODUCT)?.map { it.toLong() } ?: emptyList()
     }
@@ -47,6 +49,38 @@ class PaymentActivity :
 
             }
         }
+
+        viewModel.orderProducts.observe(this) {
+            when (it) {
+                is UiState.Loading -> {}
+                is UiState.Success -> {
+                    binding.tvPaymentPrice.text =
+                        getString(
+                            R.string.won,
+                            it.data.sumOf {
+                                it.quantity * it.price
+                            },
+                        )
+
+                    binding.tvPaymentDeliveryPrice.text = getString(R.string.won, 3000)
+                }
+            }
+        }
+
+        viewModel.eventHandler.observe(
+            this,
+            EventObserver {
+                when (it) {
+                    is CouponEvent.SuccessPay -> {
+                        Toast.makeText(this, "주문이 성공적으로 진행되었습니다.", Toast.LENGTH_SHORT).show()
+                        ShoppingActionActivity.createIntent(this).run {
+                            startActivity(this)
+                            finish()
+                        }
+                    }
+                }
+            }
+        )
 
     }
 
