@@ -18,4 +18,5 @@
     <string name="order_expiration_date">만료일: %s</string>
     <string name="order_minimum_price">최소 주문 금액: %s</string>
     <string name="order_toolbar">결제하기</string>
+    <string name="order_completion_message">주문이 정상적으로 완료되었습니다.</string>
 </resources>

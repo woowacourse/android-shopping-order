@@ -55,8 +55,11 @@ class OrderActivity : AppCompatActivity() {
     private fun observeEvent() {
         viewModel.orderUiEvent.observe(this) { event ->
             when (event.getContentIfNotHandled() ?: return@observe) {
-                is OrderUiEvent.NavigateBackToHome -> navigateBackToHome()
-                is OrderUiEvent.Error -> showError()
+                is OrderUiEvent.NavigateBackToHome -> {
+                    showToastMessage(getString(R.string.order_completion_message))
+                    navigateBackToHome()
+                }
+                is OrderUiEvent.Error -> showToastMessage(getString(R.string.unknown_error))
             }
         }
     }
@@ -88,8 +91,8 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-    private fun showError() {
-        Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_SHORT).show()
+    private fun showToastMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
