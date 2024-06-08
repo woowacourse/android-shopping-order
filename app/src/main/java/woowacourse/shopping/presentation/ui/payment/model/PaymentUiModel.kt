@@ -9,31 +9,22 @@ data class PaymentUiModel(
     val couponUiModels: List<CouponUiModel> = emptyList(),
     val cartProducts: List<CartProduct> = emptyList()
 ): Parcelable {
-
-    val isCheckedAlready: Boolean get() = couponUiModels.any { it.isChecked }
-
     val cartProductIds get() = cartProducts.map { it.cartId.toInt() }
     val orderPrice get() = cartProducts.sumOf { it.price * it.quantity }
-    val deliveryPrice get() = DEFAULT_DELIVERY_PRICE
 
-    val discountPrice: Int get() = couponUiModels.firstOrNull { it.isChecked }?.let {
+    val priceDiscount: Int get() = couponUiModels.firstOrNull { it.isChecked }?.let {
             return@let it.coupon.getPriceDiscount(cartProducts = cartProducts)
         } ?: DEFAULT_DISCOUNT_PRICE
 
-    val deliveryDiscountPrice: Int get() = couponUiModels.firstOrNull { it.isChecked }?.let {
+    val deliveryDiscount: Int get() = couponUiModels.firstOrNull { it.isChecked }?.let {
         return@let it.coupon.getDeliveryDiscount(cartProducts = cartProducts)
     } ?: DEFAULT_DISCOUNT_PRICE
     
-    val totalPrice get() = orderPrice + totalDeliveryPrice - discountPrice
-    val totalDeliveryPrice get() = deliveryPrice - deliveryDiscountPrice
-
+    val totalPrice get() = orderPrice + totalDeliveryPrice - priceDiscount
+    val totalDeliveryPrice get() = DEFAULT_DELIVERY_PRICE - deliveryDiscount
 
     companion object {
         const val DEFAULT_DISCOUNT_PRICE = 0
         const val DEFAULT_DELIVERY_PRICE = 3000
-        const val FIXED5000 = "FIXED5000"
-        const val BOGO = "BOGO"
-        const val FREESHIPPING = "FREESHIPPING"
-        const val MIRACLESALE = "MIRACLESALE"
     }
 }

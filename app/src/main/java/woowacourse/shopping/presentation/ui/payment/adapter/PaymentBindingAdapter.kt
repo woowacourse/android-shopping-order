@@ -4,7 +4,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.ui.payment.model.CouponUiModel
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 @BindingAdapter("orderTotalPrice")
@@ -13,7 +12,7 @@ fun TextView.setOrderTotalPrice(paymentUiModel: PaymentUiModel?) {
 }
 @BindingAdapter("disCountTotalPrice")
 fun TextView.setDiscountTotalPrice(paymentUiModel: PaymentUiModel?) {
-    this.text = this.context.getString(R.string.won, paymentUiModel?.discountPrice)
+    this.text = this.context.getString(R.string.won, paymentUiModel?.priceDiscount)
 }
 
 @BindingAdapter("deliveryTotalPrice")

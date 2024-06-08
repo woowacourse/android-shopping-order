@@ -10,6 +10,7 @@ import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
+import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.payment.model.CouponUiModel
 import woowacourse.shopping.presentation.ui.payment.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
@@ -28,6 +29,9 @@ class PaymentActionViewModel(
     private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
     val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
 
+    private val updateUiModel: UpdateUiModel = UpdateUiModel()
+
+
     fun setPaymentUiModel(paymentUiModel: PaymentUiModel) {
         _coupons.value = paymentUiModel
     }
@@ -36,12 +40,16 @@ class PaymentActionViewModel(
         if (_coupons.value == null)
             return@launch
 
+        _coupons.value!!.cartProducts.forEach {
+            updateUiModel.add(it.productId, it.copy(quantity = 0))
+        }
+
         repository.postOrders(
             OrderRequestDto(
                 _coupons.value!!.cartProductIds,
             ),
         ).onSuccess {
-            _navigateHandler.postValue(EventState(NavigateUiState.ToShopping))
+            _navigateHandler.postValue(EventState(NavigateUiState.ToShopping(updateUiModel)))
         }.onFailure {
             _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
         }

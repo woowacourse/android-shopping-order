@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shopping
 
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -42,6 +43,11 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         initData()
         initObserver()
         initLauncher()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        restoreData(intent)
     }
 
     private fun initTitle() {
@@ -127,6 +133,15 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
             }
     }
 
+    private fun restoreData(intent: Intent?) {
+        intent?.getParcelableExtraCompat<UpdateUiModel>(
+            EXTRA_UPDATED_PRODUCT,
+        )
+            ?.let {
+                viewModel.updateCartProducts(it)
+            }
+    }
+
     private val spanManager =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -141,5 +156,13 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     companion object {
         const val GRIDLAYOUT_COL = 2
         const val EXTRA_UPDATED_PRODUCT = "updatedProduct"
+
+        fun createIntent(context: Context, updateUiModel: UpdateUiModel): Intent {
+            return Intent(context, ShoppingActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                putExtra(EXTRA_UPDATED_PRODUCT, updateUiModel)
+            }
+        }
     }
 }
