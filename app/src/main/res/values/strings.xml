@@ -11,4 +11,6 @@
     <string name="error_load_cart">카트 불러오기에 실패했습니다</string>
     <string name="curation_title">Curation</string>
     <string name="payment_title">결제하기</string>
+    <string name="validation_title">만료일 : %s</string>
+    <string name="minimum_amount">최소주문금액 : %,d원</string>
 </resources>

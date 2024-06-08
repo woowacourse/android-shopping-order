@@ -40,7 +40,7 @@
             app:layout_constraintTop_toBottomOf="@id/cb_coupon_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="@{couponUiModel.coupon.expirationDate}" />
+            couponValidation="@{couponUiModel.coupon.expirationDate}" />
 
         <TextView
             android:id="@+id/tv_coupon_price"
@@ -49,7 +49,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_validation"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="@{String.valueOf(couponUiModel.coupon.minimumAmount)}" />
+            couponMinimumAmount="@{couponUiModel.coupon.minimumAmount}" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
