@@ -4,7 +4,7 @@
 찾아보니까 여러 방법이 있네요.
 
 
-## 1. 여러 레트로핏 서비슬르 만든다.
+## 1. 여러 레트로핏 서비스를 만든다.
 
 ```kotlin
 object RetrofitServiceFactory {
@@ -180,3 +180,8 @@ class ProductRemoteDataSource(productsApiService: ProductsApiService) : ProductD
 장점 딱 한가지는, selaed 로 묶었을 때 새 API 가 추가하고 나서, BaseUrlResolver 에서 처리를 안 해주면,  
 컴파일 에러가 나기 때문에, 런타임 에러를 방지할 수 있다는 것 정도..?  
 그래서 별로임..  
+
+
+### 일단 2에서의 방법을 조금 다듬어서 적용했음. 
+### 애노테이션 이용해서 멋있게 할 수 있을 것도 같은데....
+[읽었더 글](https://proandroiddev.com/dynamic-multiple-base-url-with-annotations-android-f3af03e3cd4)

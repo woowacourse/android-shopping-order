@@ -1,17 +1,10 @@
 package woowacourse.shopping.remote.source
 
-import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.source.ProductDataSource
-import woowacourse.shopping.remote.RetrofitService
 import woowacourse.shopping.remote.service.ProductsApiService
 
 class ProductRemoteDataSource(private val productsApiService: ProductsApiService) : ProductDataSource {
-
-    init {
-        RetrofitService.baseUrlInterceptor.setBaseUrl(BuildConfig.BASE_URL_DEV) // 다른 base url 이 없어서 그냥 기거로 함.
-    }
-
     override fun findByPaged(page: Int): List<ProductData> {
         val response =
             productsApiService.requestProducts(page = page).execute().body()?.content

@@ -17,9 +17,15 @@ import woowacourse.shopping.remote.source.OrderRemoteDataSource
 import woowacourse.shopping.remote.source.ProductRemoteDataSource
 
 class ShoppingApp : Application() {
-    private val productsApi: ProductsApiService by lazy { RetrofitService.retrofitService.create(ProductsApiService::class.java) }
-    private val cartItemApi: CartItemApiService by lazy { RetrofitService.retrofitService.create(CartItemApiService::class.java) }
-    private val orderApi: OrderApiService by lazy { RetrofitService.retrofitService.create(OrderApiService::class.java) }
+    private val productsApi: ProductsApiService by lazy {
+        RetrofitService.createRetorift(BuildConfig.BASE_PRODUCTS_URL_DEV).create(ProductsApiService::class.java)
+    }
+    private val cartItemApi: CartItemApiService by lazy {
+        RetrofitService.createRetorift(BuildConfig.BASE_CART_ITEMS_URL_DEV).create(CartItemApiService::class.java)
+    }
+    private val orderApi: OrderApiService by lazy {
+        RetrofitService.createRetorift(BuildConfig.BASE_ORDERS_URL_DEV).create(OrderApiService::class.java)
+    }
 
     private val historyProductDb: HistoryProductDatabase by lazy { HistoryProductDatabase.database(context = this) }
     private val historyProductDao: HistoryProductDao by lazy { historyProductDb.dao() }
