@@ -7,8 +7,6 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
-import woowacourse.shopping.domain.model.cart.CartItemCounter
-import woowacourse.shopping.domain.model.cart.CartItemResult
 import woowacourse.shopping.utils.DtoMapper.toCartItems
 import woowacourse.shopping.utils.DtoMapper.toQuantity
 import woowacourse.shopping.utils.exception.ErrorEvent
@@ -16,14 +14,6 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 class CartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),
 ) : CartItemDataSource {
-    override suspend fun loadCartItems(): Result<CartItemResponse> {
-        return runCatching {
-            cartApiService.requestCartItems(
-                page = DEFAULT_ITEM_OFFSET,
-                size = MAX_CART_ITEM_SIZE,
-            )
-        }
-    }
 
     override suspend fun loadCartItems(
         page: Int,
@@ -37,22 +27,13 @@ class CartItemDataSourceImpl(
         }
     }
 
-    override suspend fun loadCartItemResult(productId: Long): Result<CartItemResult> {
+    override suspend fun loadCartItem(productId: Long): Result<CartItem> {
         return runCatching {
             cartApiService.requestCartItems(
                 page = DEFAULT_ITEM_OFFSET,
                 size = MAX_CART_ITEM_SIZE,
             ).toCartItems().find { it.product.id == productId } ?: throw ErrorEvent.LoadDataEvent()
         }
-            .mapCatching { cartItem ->
-                CartItemResult(
-                    cartItemId = cartItem.id,
-                    counter = cartItem.product.cartItemCounter,
-                )
-            }
-            .recoverCatching {
-                CartItemResult(CartItem.DEFAULT_CART_ITEM_ID, CartItemCounter())
-            }
     }
 
     override suspend fun addCartItem(
@@ -62,10 +43,10 @@ class CartItemDataSourceImpl(
         return runCatching {
             cartApiService.insertCartItem(
                 cartItemRequest =
-                    CartItemRequest(
-                        productId = productId,
-                        quantity = quantity,
-                    ),
+                CartItemRequest(
+                    productId = productId,
+                    quantity = quantity,
+                ),
             )
         }
     }

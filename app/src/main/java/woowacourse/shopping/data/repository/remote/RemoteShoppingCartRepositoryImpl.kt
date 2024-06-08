@@ -4,6 +4,7 @@ import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
+import woowacourse.shopping.domain.model.cart.CartItemCounter
 import woowacourse.shopping.domain.model.cart.CartItemResult
 import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
 import woowacourse.shopping.domain.model.cart.UpdateCartItemType
@@ -35,7 +36,16 @@ class RemoteShoppingCartRepositoryImpl(
     }
 
     override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
-        return cartItemDataSource.loadCartItemResult(productId)
+        return cartItemDataSource.loadCartItem(productId)
+            .mapCatching { cartItem ->
+                CartItemResult(
+                    cartItemId = cartItem.id,
+                    counter = cartItem.product.cartItemCounter,
+                )
+            }
+            .recoverCatching {
+                CartItemResult(DEFAULT_CART_ITEM_ID, CartItemCounter())
+            }
     }
 
     override suspend fun updateCartItem(
