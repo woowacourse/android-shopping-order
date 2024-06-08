@@ -23,6 +23,8 @@
         <activity
             android:name=".ui.detail.ProductDetailActivity"
             android:exported="false" />
+        <activity android:name=".ui.coupon.CouponActivity"
+            android:exported="false"/>
         <activity
             android:name=".ui.products.ProductContentsActivity"
             android:exported="true">
