@@ -26,7 +26,7 @@ class BuyXGetYCouponTest {
     }
 
     @Test
-    fun `2 + 1 할인일 때, 3개 주문하면 할인이 안된다`() {
+    fun `2 + 1 할인일 때, 2개 주문하면 할인이 안된다`() {
         // given
         val cart = Cart(fakeCartProduct(price = 1000, count = 2))
         val buyXGetYCoupon = fakeBuyXGetYCoupon(
@@ -61,6 +61,23 @@ class BuyXGetYCouponTest {
         assertSoftly {
             expect shouldBe actual
             expectPayment shouldBe actual.paymentPrice
+        }
+    }
+
+    @Test
+    fun `2 + 1 할인일 때, 7개 주문하면 2개 할인 된다`() {
+        // given
+        val cart = Cart(fakeCartProduct(price = 1000, count = 7))
+        val buyXGetYCoupon = fakeBuyXGetYCoupon(
+            buyCount = 2,
+            freeCount = 1
+        )
+        // when
+        val actual = buyXGetYCoupon.discount(cart, 0)
+        // then
+        val expected = DiscountResult(orderPrice = 7000, discountPrice = 2000, 0)
+        assertSoftly {
+            actual shouldBe expected
         }
     }
 }

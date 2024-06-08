@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
 import java.time.LocalDateTime
 
-class BuyXGetYCoupon(
+data class BuyXGetYCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,

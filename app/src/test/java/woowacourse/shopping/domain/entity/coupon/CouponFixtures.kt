@@ -4,6 +4,14 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+private val targetDateTime = LocalDateTime.of(2024, 5, 1, 0, 0)
+private val targetDate = LocalDate.of(2024, 5, 1)
+fun fakeCoupons(vararg coupons: Coupon): Coupons {
+    return Coupons(
+        coupons.toList()
+    )
+}
+
 fun fakePercentageCoupon(
     isExpired: Boolean = false,
     discountRate: Float = 0.3f,
@@ -11,7 +19,7 @@ fun fakePercentageCoupon(
     availableStartTime: Int = 4,
     availableEndTime: Int = 7,
 ): PercentageCoupon {
-    val targetDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(currentTime, 0))
+    val targetDateTime = LocalDateTime.of(targetDate, LocalTime.of(currentTime, 0))
     val expirationDate = if (isExpired) {
         targetDateTime.minusDays(1)
     } else {
@@ -31,9 +39,9 @@ fun fakePercentageCoupon(
 
 fun fakeFreeShippingCoupon(
     isExpired: Boolean = false,
-    minimumAmount: Long = 50_000,
+    discountableMinPrice: Long = 50_000,
 ): FreeShippingCoupon {
-    val targetDateTime = LocalDateTime.now()
+    val targetDateTime = targetDateTime
     val expirationDate = if (isExpired) {
         targetDateTime.minusDays(1)
     } else {
@@ -45,7 +53,7 @@ fun fakeFreeShippingCoupon(
         description = "무료 배송 쿠폰",
         targetDateTime = targetDateTime,
         expirationDate = expirationDate,
-        minimumAmount = minimumAmount,
+        discountableMinPrice = discountableMinPrice,
     )
 }
 
@@ -54,7 +62,7 @@ fun fakeBuyXGetYCoupon(
     buyCount: Int = 2,
     freeCount: Int = 1,
 ): BuyXGetYCoupon {
-    val targetDateTime = LocalDateTime.now()
+    val targetDateTime = targetDateTime
     val expirationDate = if (isExpired) {
         targetDateTime.minusDays(1)
     } else {
@@ -76,7 +84,7 @@ fun fakeFixedCoupon(
     discountableMinPrice: Long = 100_000,
     isExpired: Boolean = false,
 ): FixedCoupon {
-    val targetDateTime = LocalDateTime.now()
+    val targetDateTime = targetDateTime
     val expirationDate = if (isExpired) {
         targetDateTime.minusDays(1)
     } else {

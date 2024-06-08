@@ -14,7 +14,7 @@ class FreeShippingCouponTest {
         // given
         val cartProduct = fakeCartProduct(price = 50_000, count = 1)
         val percentageCoupon = fakeFreeShippingCoupon(
-            minimumAmount = 50_000
+            discountableMinPrice = 50_000
         )
         val cart = Cart(cartProduct)
         // when
@@ -33,7 +33,7 @@ class FreeShippingCouponTest {
         // given
         val cartProduct = fakeCartProduct(price = 49_999, count = 1)
         val percentageCoupon = fakeFreeShippingCoupon(
-            minimumAmount = 50_000
+            discountableMinPrice = 50_000
         )
         val cart = Cart(cartProduct)
         // when

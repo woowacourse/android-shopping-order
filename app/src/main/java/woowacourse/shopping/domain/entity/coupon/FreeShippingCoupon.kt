@@ -9,10 +9,10 @@ data class FreeShippingCoupon(
     override val description: String,
     override val expirationDate: LocalDateTime,
     override val targetDateTime: LocalDateTime,
-    val minimumAmount: Long,
+    val discountableMinPrice: Long,
 ) : Coupon(id, code, description, expirationDate, targetDateTime) {
     override fun available(cart: Cart, shippingFee: Long): Boolean {
-        return !isExpired && cart.totalPrice() >= minimumAmount
+        return !isExpired && cart.totalPrice() >= discountableMinPrice
     }
 
     override fun calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult {
