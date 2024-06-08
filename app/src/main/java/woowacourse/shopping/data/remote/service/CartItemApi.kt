@@ -9,6 +9,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.remote.RetrofitModule
 import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
 import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
 import woowacourse.shopping.data.remote.dto.response.CartResponseDto
@@ -45,4 +46,11 @@ interface CartItemApi {
     suspend fun getCartItemsCounts(
         @Header("accept") accept: String = "*/*",
     ): Response<QuantityResponseDto>
+
+    companion object {
+        private var service: CartItemApi? = null
+        fun service(): CartItemApi {
+            return service ?: RetrofitModule.defaultBuild.create(CartItemApi::class.java)
+        }
+    }
 }

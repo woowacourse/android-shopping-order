@@ -7,6 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.remote.RetrofitModule
 import woowacourse.shopping.data.remote.dto.request.ProductRequestDto
 import woowacourse.shopping.data.remote.dto.response.Product
 import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
@@ -37,4 +38,11 @@ interface ProductApi {
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
     ): Response<Unit>
+
+    companion object {
+        private var service: ProductApi? = null
+        fun service(): ProductApi {
+            return service ?: RetrofitModule.defaultBuild.create(ProductApi::class.java)
+        }
+    }
 }

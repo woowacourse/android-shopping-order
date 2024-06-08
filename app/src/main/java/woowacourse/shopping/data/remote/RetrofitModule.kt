@@ -8,20 +8,12 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.remote.service.CartItemApi
-import woowacourse.shopping.data.remote.service.CouponApi
-import woowacourse.shopping.data.remote.service.OrderApi
-import woowacourse.shopping.data.remote.service.ProductApi
 
 object RetrofitModule {
     private const val BASE_URL = BuildConfig.BASE_URL
-    private const val PRODUCT_BASE_URL = "${BASE_URL}/products/"
-    private const val CART_ITEMS_BASE_URL = "${BASE_URL}/cart-items/"
-    private const val ORDER_BASE_URL = "${BASE_URL}/orders/"
-    private const val COUPON_BASE_URL = "${BASE_URL}/coupons/"
     private val contentType = "application/json".toMediaType()
 
-    private val basicAuthInterceptor =
+    private val defaultAuthInterceptor =
         Interceptor { chain ->
             val user = BuildConfig.USER
             val password = BuildConfig.PASSWORD
@@ -33,40 +25,14 @@ object RetrofitModule {
             chain.proceed(request)
         }
 
-    private val okHttpClient =
+    private val defaultOkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(basicAuthInterceptor)
+            .addInterceptor(defaultAuthInterceptor)
             .build()
 
-    val productApi: ProductApi =
-        Retrofit.Builder()
-            .baseUrl(PRODUCT_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
-            .build()
-            .create(ProductApi::class.java)
-
-    val cartItemsApi: CartItemApi =
-        Retrofit.Builder()
-            .baseUrl(CART_ITEMS_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
-            .build()
-            .create(CartItemApi::class.java)
-
-    val orderApi: OrderApi =
-        Retrofit.Builder()
-            .baseUrl(ORDER_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
-            .build()
-            .create(OrderApi::class.java)
-
-    val couponApi: CouponApi =
-        Retrofit.Builder()
-            .baseUrl(COUPON_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
-            .build()
-            .create(CouponApi::class.java)
+    val defaultBuild: Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(Json.asConverterFactory(contentType))
+        .client(defaultOkHttpClient)
+        .build()
 }

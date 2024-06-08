@@ -16,10 +16,10 @@ import woowacourse.shopping.data.remote.service.OrderApi
 import woowacourse.shopping.data.remote.service.ProductApi
 
 class RetrofitDataSource(
-    private val productApi: ProductApi = RetrofitModule.productApi,
-    private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
-    private val orderApi: OrderApi = RetrofitModule.orderApi,
-    private val couponApi: CouponApi = RetrofitModule.couponApi
+    private val productApi: ProductApi = ProductApi.service(),
+    private val cartItemApi: CartItemApi = CartItemApi.service(),
+    private val orderApi: OrderApi = OrderApi.service(),
+    private val couponApi: CouponApi = CouponApi.service()
 ) : RemoteDataSource {
     override suspend fun getProducts(
         category: String?,
