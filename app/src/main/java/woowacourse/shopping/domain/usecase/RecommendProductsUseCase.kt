@@ -5,17 +5,16 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 interface RecommendProductsUseCase {
-    suspend operator fun invoke(): List<Product>
+    suspend operator fun invoke(amount: Int): List<Product>
 }
 
 class DefaultRecommendProductsUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : RecommendProductsUseCase {
-    override suspend fun invoke(): List<Product> {
+    override suspend fun invoke(amount: Int): List<Product> {
         val recentProducts = productRepository.loadRecentProducts(1).getOrNull() ?: emptyList()
-        val firstProduct = recentProducts.firstOrNull()
-        val category = firstProduct?.category
+        val category = recentProducts.firstOrNull()?.category
         val cart = cartRepository.loadCart().getOrNull() ?: return emptyList()
         val products: List<Product> =
             // 카테고리가 없으면 전체 상품에서 추천 상품을 가져온다.
@@ -29,11 +28,10 @@ class DefaultRecommendProductsUseCase(
         return products.filterNot {
             // 카트에 있는 상품은 추천 상품에서 제외한다.
             cart.hasProductId(it.id)
-        }.take(RECOMMEND_PRODUCT_SIZE)
+        }.take(amount)
     }
 
     companion object {
-        const val RECOMMEND_PRODUCT_SIZE = 10
         const val PRODUCT_SIZE = 1000
 
         @Volatile

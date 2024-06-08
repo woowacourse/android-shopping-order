@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.order.OrderCartProductsUseCase
 import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
+import woowacourse.shopping.domain.usecase.order.OrderCartProductsUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.CartItemListener
 import woowacourse.shopping.presentation.cart.CartProductUi
@@ -39,7 +39,7 @@ class OrderViewModel(
     init {
         viewModelScope.launch {
             val recommendProducts =
-                recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
+                recommendProductsUseCase(RECOMMEND_PRODUCT_SIZE).map { it.toCartUiModel(initCount = 0) }
             val uiState = _uiState.value
             if (uiState != null) {
                 _uiState.value = uiState.copy(recommendProducts = recommendProducts)
@@ -99,7 +99,7 @@ class OrderViewModel(
 
     companion object {
         private const val INCREMENT_AMOUNT = 1
-
+        private const val RECOMMEND_PRODUCT_SIZE = 10
         fun factory(
             orders: List<CartProductUi>,
             orderCartProductsUseCase: OrderCartProductsUseCase,
