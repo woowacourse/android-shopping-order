@@ -1,17 +1,24 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
 import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
 import woowacourse.shopping.data.datasource.impl.ApiHandleCartDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ApiHandleProductDataSourceImpl
 import woowacourse.shopping.data.remote.api.ApiResult
+import woowacourse.shopping.data.remote.api.result
+import woowacourse.shopping.data.remote.api.resultOrNull
+import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
+import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.response.Fail
+import woowacourse.shopping.domain.response.Response
+import woowacourse.shopping.domain.response.handleApiResult
+import woowacourse.shopping.domain.response.handleError
+import woowacourse.shopping.domain.response.result
+import woowacourse.shopping.domain.response.resultOrNull
 import kotlin.math.min
 
 class ProductRepositoryImpl(
@@ -19,89 +26,99 @@ class ProductRepositoryImpl(
     private val cartDataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl(),
 ) :
     ProductRepository {
-    override suspend fun getProducts(
-        page: Int,
-        size: Int,
-    ): ApiResponse<List<Product>> =
-        handleResponse(
+
+    override suspend fun productById(id: Long): Product = handleApiResult(
+        productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
+    ).result()
+
+    override suspend fun productByIdOrNull(id: Long): Product? = handleApiResult(
+        productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
+    ).resultOrNull()
+
+    override suspend fun productByIdResponse(id: Long): Response<Product> = handleApiResult(
+        productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
+    )
+
+    override suspend fun allProducts(page: Int, size: Int): List<Product> {
+        val result = handleApiResult(
             productDataSource.getProductsByOffset(page, size),
-            transform = ::toProductList,
+            transform = ResponseProductsGetDto::toProductList
+        )
+        return if (result is Fail.NotFound) emptyList() else result.result()
+    }
+
+    override suspend fun allProductsResponse(page: Int, size: Int): Response<List<Product>> =
+        handleApiResult(
+            productDataSource.getProductsByOffset(page, size),
+            transform = ResponseProductsGetDto::toProductList
         )
 
-    override suspend fun find(id: Long): ApiResponse<Product> =
-        handleResponse(productDataSource.getProductsById(id), transform = ::toProduct)
+    override suspend fun allProductsByCategory(category: String): List<Product> = coroutineScope {
+        val count: Int = cartDataSource.getCartItemCounts().resultOrNull()?.quantity
+            ?: DEFAULT_CART_COUNT
+        val cartResponse =
+            cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
+                ?: emptyList()
+        val carts: List<CartWithProduct> = cartResponse.map { it.toCartWithProduct() }
+        var page = START_PRODUCT_PAGE
+        var allProducts = mutableListOf<Product>()
+        var loadedProducts = emptyList<Product>()
+        while (true) {
+            loadedProducts =
+                productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL).result()
+                    .toProductList()
 
-    override suspend fun productsByCategory(category: String): ApiResponse<List<Product>> =
+            if (noMoreProductOrMaxProduct(loadedProducts, allProducts)) break
+            allProducts.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
+            page++
+        }
+        return@coroutineScope allProducts
+    }
+
+    override suspend fun allProductsByCategoryResponse(category: String): Response<List<Product>> =
         coroutineScope {
             try {
-                // 전체 장바구니 개수
-                val count: Int = cartCount()
-
-                // 장바구니 리스트를 가져오는 로직
+                val count: Int = cartDataSource.getCartItemCounts().resultOrNull()?.quantity
+                    ?: DEFAULT_CART_COUNT
                 val cartResponse =
-                    async(exceptionHandler()) {
-                        cartDataSource.getCartItems(
-                            START_CART_PAGE,
-                            count,
-                        )
-                    }.await()
-                val carts: List<CartWithProduct> =
-                    when (cartResponse) {
-                        is ApiResult.Success -> cartResponse.data.content.map { it.toCartWithProduct() }
-                        is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
-                        is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
-                            cartResponse.e,
-                        )
-                    }
+                    cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
+                        ?: emptyList()
+                val carts: List<CartWithProduct> = cartResponse.map { it.toCartWithProduct() }
 
                 var page = START_PRODUCT_PAGE
-                var products = mutableListOf<Product>() // 전체 상품 리스트
-                var loadedProducts = listOf<Product>() // 새로 가져온 20개의 상품 리스트
+                var allProducts = mutableListOf<Product>()
+                var loadedProducts = listOf<Product>()
                 while (true) {
                     val productResponse =
-                        async(
-                            exceptionHandler(),
-                        ) {
-                            productDataSource.getProductsByOffset(
-                                page,
-                                LOAD_PRODUCT_INTERVAL,
-                            )
-                        }.await()
+                        productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL)
                     when (productResponse) {
-                        is ApiResult.Success -> loadedProducts = toProductList(productResponse.data)
+                        is ApiResult.Success -> loadedProducts =
+                            productResponse.data.toProductList()
+
                         is ApiResult.Error -> return@coroutineScope handleError(productResponse)
-                        is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
+                        is ApiResult.Exception -> return@coroutineScope Response.Exception(
                             productResponse.e,
                         )
                     }
 
-                    // 새로 로딩된 상품 리스트가 비어있거나, 전체 리스트가 10개 이상일 경우 break
-                    if (loadedProducts.isEmpty() || products.size >= MAX_RECOMMEND_SIZE) break
-                    products.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
+                    if (noMoreProductOrMaxProduct(loadedProducts, allProducts)) break
+                    allProducts.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
                     page++
                 }
 
-                return@coroutineScope ApiResponse.Success(
-                    products.subList(
-                        0,
-                        min(MAX_RECOMMEND_SIZE, products.size),
-                    ),
+                return@coroutineScope Response.Success(
+                    allProducts.subList(0, min(MAX_RECOMMEND_SIZE, allProducts.size)),
                 )
             } catch (e: Exception) {
-                return@coroutineScope ApiResponse.Exception(e)
+                return@coroutineScope Response.Exception(e)
             }
         }
 
-    private suspend fun CoroutineScope.cartCount(): Int {
-        val countResponse = async(exceptionHandler()) { cartDataSource.getCartItemCounts() }.await()
-        val count: Int =
-            when (countResponse) {
-                is ApiResult.Success -> countResponse.data.quantity
-                is ApiResult.Error -> DEFAULT_CART_COUNT
-                is ApiResult.Exception -> DEFAULT_CART_COUNT
-            }
-        return count
-    }
+    private fun noMoreProductOrMaxProduct(
+        loadedProducts: List<Product>,
+        allProducts: MutableList<Product>
+    ) = loadedProducts.isEmpty() || allProducts.size >= MAX_RECOMMEND_SIZE
+
 
     private fun List<Product>.filterCategoryAndNotInCart(
         category: String,
@@ -109,7 +126,6 @@ class ProductRepositoryImpl(
     ) = this.filter { it.category == category }
         .filterNot { carts.map { it.product.id }.contains(it.id) }
 
-    private fun exceptionHandler() = CoroutineExceptionHandler { _, exception -> throw exception }
 
     companion object {
         private const val DEFAULT_CART_COUNT = 300

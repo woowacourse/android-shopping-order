@@ -12,6 +12,11 @@ fun ResponseCartItemsGetDto.Content.toCartWithProduct() = CartWithProduct(
     id = id, product = this.product.toProduct(), quantity = Quantity(this.quantity)
 )
 
+
+fun ResponseCartItemsGetDto.toCartWithProduct():List<CartWithProduct> = this.content.map { CartWithProduct(
+    id = it.id, product = it.product.toProduct(), quantity = Quantity(it.quantity)
+)
+}
 fun ResponseCartItemsGetDto.Product.toProduct() =
     Product(
         id = this.id,
@@ -21,18 +26,18 @@ fun ResponseCartItemsGetDto.Product.toProduct() =
         category = this.category,
     )
 
-fun toProductList(dto: ResponseProductsGetDto): List<Product> {
-    val productDto = dto.content
+fun ResponseProductsGetDto.toProductList(): List<Product> {
+    val productDto = this.content
     return productDto.map {
         Product(it.id, it.imageUrl, it.name, it.price, it.category)
     }
 }
 
-fun toProduct(dto: ResponseProductIdGetDto): Product =
+fun ResponseProductIdGetDto.toProduct(): Product =
     Product(
-        dto.id,
-        dto.imageUrl,
-        dto.name,
-        dto.price,
-        dto.category,
+        id,
+        imageUrl,
+        name,
+        price,
+        category,
     )
