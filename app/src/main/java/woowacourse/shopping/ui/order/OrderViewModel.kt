@@ -17,6 +17,9 @@ import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.order.OrderRemoteRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductIdsCount
+import woowacourse.shopping.domain.model.ProductIdsCount.Companion.DECREASE_VARIATION
+import woowacourse.shopping.domain.model.ProductIdsCount.Companion.INCREASE_VARIATION
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
@@ -61,46 +64,32 @@ class OrderViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        viewModelScope.launch {
-            try {
-                cartItemRepository.updateProductQuantity(productId, quantity)
-            } catch (e: NoSuchElementException) {
-                cartItemRepository.updateProductQuantity(productId, quantity)
-            } finally {
-                updateProductQuantity(productId, INCREASE_VARIATION)
-                productRepository.loadProduct(productId).onSuccess { product ->
-                    updateOrderAmount(product.price)
-                }.onError { code, message ->
-                    // TODO: Error Handling
-                }.onException {
-                    // TODO: Exception Handling
-                }
-                updateOrdersCount(INCREASE_VARIATION)
-            }
-        }
+        updateQuantity(ProductIdsCount(productId, quantity), INCREASE_VARIATION) { price -> price }
     }
 
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
-        viewModelScope.launch {
-            cartItemRepository.updateProductQuantity(productId, quantity)
-            updateProductQuantity(productId, DECREASE_VARIATION)
-            productRepository.loadProduct(productId).onSuccess { product ->
-                updateOrderAmount(-product.price)
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-            updateOrdersCount(DECREASE_VARIATION)
-        }
+        updateQuantity(ProductIdsCount(productId, quantity), DECREASE_VARIATION) { price -> -price }
     }
 
     fun loadRecommendedProducts() {
         viewModelScope.launch {
             _recommendProducts.postValue(orderRepository.loadRecommendedProducts())
+        }
+    }
+
+    private fun updateQuantity(
+        productQuantity: ProductIdsCount,
+        variation: Int,
+        priceConvert: (price: Int) -> Int
+    ) {
+        viewModelScope.launch {
+            cartItemRepository.updateProductQuantity(productQuantity.productId, productQuantity.quantity)
+            updateProductQuantity(productQuantity.productId, variation)
+            updateOrderAmount(productQuantity.productId, priceConvert)
+            updateOrdersCount(variation)
         }
     }
 
@@ -115,9 +104,15 @@ class OrderViewModel(
             }
     }
 
-    private fun updateOrderAmount(amountVariation: Int) {
-        val currentOrderAmount = orderAmount.value ?: 0
-        _orderAmount.value = currentOrderAmount + amountVariation
+    private suspend fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
+        productRepository.loadProduct(productId).onSuccess { product ->
+            val currentOrderAmount = orderAmount.value ?: 0
+            _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+        }.onError { code, message ->
+            // TODO: Error Handling
+        }.onException {
+            // TODO: Exception Handling
+        }
     }
 
     private fun updateOrdersCount(countVariation: Int) {
@@ -127,8 +122,6 @@ class OrderViewModel(
 
     companion object {
         private const val TAG = "ProductDetailViewModel"
-        private const val INCREASE_VARIATION = 1
-        private const val DECREASE_VARIATION = -1
 
         fun factory(
             orderInformation: OrderInformation,

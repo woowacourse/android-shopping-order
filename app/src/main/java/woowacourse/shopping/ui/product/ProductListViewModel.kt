@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.product
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,7 @@ import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.history.DefaultProductHistoryRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
@@ -132,30 +134,28 @@ class ProductListViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        viewModelScope.launch {
-            cartItemRepository.updateProductQuantity(productId, quantity)
-            cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
-                updateProductQuantity(productId, INCREASE_VARIATION, totalCount)
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-        }
+        updateQuantity(ProductIdsCount(productId, quantity), INCREASE_VARIATION)
     }
 
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
+        updateQuantity(ProductIdsCount(productId, quantity), DECREASE_VARIATION)
+    }
+
+    private fun updateQuantity(
+        productIdsCount: ProductIdsCount,
+        variation: Int,
+    ) {
         viewModelScope.launch {
-            cartItemRepository.updateProductQuantity(productId, quantity)
+            cartItemRepository.updateProductQuantity(productIdsCount.productId, productIdsCount.quantity)
             cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
-                updateProductQuantity(productId, DECREASE_VARIATION, totalCount)
+                updateProductQuantity(productIdsCount.productId, variation, totalCount)
             }.onError { code, message ->
-                // TODO: Error Handling
+                Log.d("hye", "ServerError: $code - $message")
             }.onException {
-                // TODO: Exception Handling
+                Log.d("hye", "Exception: $it")
             }
         }
     }
