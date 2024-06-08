@@ -14,6 +14,7 @@ import woowacourse.shopping.data.model.dto.ProductDto
 import woowacourse.shopping.data.model.dto.ProductResponseDto
 import woowacourse.shopping.data.model.dto.QuantityDto
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
+import woowacourse.shopping.data.model.dto.coupon.CouponDto
 
 interface RetrofitService {
     @GET("/products")
@@ -63,4 +64,7 @@ interface RetrofitService {
     suspend fun makeOrder(
         @Body cartItemIds: CartItemsDto,
     ): Response<Unit>
+
+    @GET("/coupons")
+    suspend fun requestCoupons(): Response<CouponDto>
 }

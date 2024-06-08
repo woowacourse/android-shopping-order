@@ -1,19 +1,26 @@
-package woowacourse.shopping.data.database
+package woowacourse.shopping.data.database.client
 
 import android.util.Base64
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.model.dto.coupon.CouponDto
 import woowacourse.shopping.domain.service.RetrofitService
 
 object ProductClient {
     private const val BASE_URL = "http://54.180.95.212:8080"
+
+    private val gsonCouponParser = GsonBuilder()
+        .registerTypeAdapter(CouponDto::class.java, CouponDeserializer())
+        .create()
+
     val client: Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gsonCouponParser))
             .client(provideOkHttpClient(AppInterceptor()))
             .build()
 
