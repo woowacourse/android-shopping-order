@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
@@ -41,6 +43,7 @@ class PaymentActionViewModel(
             return@launch
 
         _coupons.value!!.cartProducts.forEach {
+            updateRecentProduct(it)
             updateUiModel.add(it.productId, it.copy(quantity = 0))
         }
 
@@ -54,6 +57,13 @@ class PaymentActionViewModel(
             _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
         }
     }
+
+    fun updateRecentProduct(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            repository.saveRecentProduct(cartProduct.toRecentProduct().copy(quantity = 0)).onFailure {
+                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
+            }
+        }
 
     override fun checkCoupon(couponUiModel: CouponUiModel) {
         if (_coupons.value == null) return
