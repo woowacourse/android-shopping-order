@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.order
+package woowacourse.shopping.presentation.order.recommend
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,12 +9,12 @@ import woowacourse.shopping.presentation.cart.CartItemListener
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.util.ItemDiffCallback
 
-class OrderAdapter(
+class RecommendProductAdapter(
     private val cartItemListener: CartItemListener,
 ) :
-    ListAdapter<CartProductUi, OrderAdapter.RecommendProductsViewHolder>(
-            cartProductComparator,
-        ) {
+    ListAdapter<CartProductUi, RecommendProductAdapter.RecommendProductsViewHolder>(
+        cartProductComparator,
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

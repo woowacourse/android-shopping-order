@@ -1,10 +1,10 @@
-package woowacourse.shopping.presentation.cart.order
+package woowacourse.shopping.presentation.order.recommend
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.presentation.cart.CartProductUi
 
 @Parcelize
-data class OrderNavArgs(
+data class RecommendProductNavArgs(
     val orderProducts: List<CartProductUi>,
 ) : Parcelable

@@ -1,11 +1,11 @@
-package woowacourse.shopping.presentation.cart.order
+package woowacourse.shopping.presentation.order.recommend
 
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.cart.toDomain
 import woowacourse.shopping.presentation.cart.toUiModel
 
-data class OrderUiState(
+data class RecommendProductUiState(
     private val orderedProducts: List<CartProductUi> = emptyList(),
     val recommendProducts: List<CartProductUi> = emptyList(),
 ) {

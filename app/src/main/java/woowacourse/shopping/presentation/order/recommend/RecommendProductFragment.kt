@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.order
+package woowacourse.shopping.presentation.order.recommend
 
 import android.os.Bundle
 import android.view.Menu
@@ -15,7 +15,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.data.order.OrderRepositoryInjector
 import woowacourse.shopping.data.shopping.ProductRepositoryInjector
-import woowacourse.shopping.databinding.FragmentOrderProductBinding
+import woowacourse.shopping.databinding.FragmentRecommendProductBinding
 import woowacourse.shopping.domain.usecase.cart.DefaultDecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.cart.DefaultIncreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.order.DefaultOrderCartProductsUseCase
@@ -28,17 +28,17 @@ import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 import woowacourse.shopping.presentation.util.parcelable
 import woowacourse.shopping.presentation.util.showToast
 
-class OrderFragment :
-    BindingFragment<FragmentOrderProductBinding>(R.layout.fragment_order_product) {
-    private val viewModel by viewModels<OrderViewModel> {
+class RecommendProductFragment :
+    BindingFragment<FragmentRecommendProductBinding>(R.layout.fragment_recommend_product) {
+    private val viewModel by viewModels<RecommendProductViewModel> {
         val orders: List<CartProductUi> =
-            arguments?.parcelable<OrderNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
+            arguments?.parcelable<RecommendProductNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
                 ?: emptyList()
         val cartRepository = CartRepositoryInjector.cartRepository()
         val productRepository =
             ProductRepositoryInjector.productRepository(requireContext().applicationContext)
         val orderRepository = OrderRepositoryInjector.orderRepository()
-        OrderViewModel.factory(
+        RecommendProductViewModel.factory(
             orders,
             DefaultOrderCartProductsUseCase.instance(
                 productRepository,
@@ -56,7 +56,7 @@ class OrderFragment :
 
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
-    private lateinit var adapter: OrderAdapter
+    private lateinit var adapter: RecommendProductAdapter
 
     override fun onViewCreated(
         view: View,
@@ -74,7 +74,7 @@ class OrderFragment :
     }
 
     private fun initViews() {
-        adapter = OrderAdapter(viewModel)
+        adapter = RecommendProductAdapter(viewModel)
         binding?.rvRecommendProducts?.adapter = adapter
     }
 
@@ -143,11 +143,11 @@ class OrderFragment :
     }
 
     companion object {
-        val TAG: String? = OrderFragment::class.java.canonicalName
+        val TAG: String? = RecommendProductFragment::class.java.canonicalName
 
         private const val ORDERED_PRODUCTS_KEY = "ORDERED_PRODUCTS_KEY"
 
-        fun args(navArgs: OrderNavArgs): Bundle =
+        fun args(navArgs: RecommendProductNavArgs): Bundle =
             Bundle().apply {
                 putParcelable(ORDERED_PRODUCTS_KEY, navArgs)
             }

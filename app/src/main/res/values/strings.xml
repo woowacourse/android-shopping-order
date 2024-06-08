@@ -11,7 +11,7 @@
     <string name="decrease_cart_count">-</string>
     <string name="increase_cart_part">+</string>
     <string name="load_more_products">더보기</string>
-
+    <string name="coupon_date">만료일: %s</string>
     <!--    dialog msg-->
     <string name="order_dialog_title">주문하기</string>
     <string name="order_dialog_message">상품 주문 하시겠습니까?</string>
