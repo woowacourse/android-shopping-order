@@ -7,8 +7,9 @@ data class CouponModel(
     val id: Long,
     val description: String,
     val expiredDate: String,
-    val minimumAmount: String,
+    val minimumAmount: Int,
     val discountAmount: Int,
+    val isChecked: Boolean,
 )
 
 fun Coupon.toUiModel(): CouponModel {
@@ -17,7 +18,8 @@ fun Coupon.toUiModel(): CouponModel {
         id = id.toLong(),
         description = description,
         expiredDate = expirationDate.format(formatter),
-        minimumAmount = if (minimumOrderedAmount == 0) "" else minimumOrderedAmount.toString(),
+        minimumAmount = minimumOrderedAmount,
         discountAmount = discountAmount,
+        isChecked = false,
     )
 }

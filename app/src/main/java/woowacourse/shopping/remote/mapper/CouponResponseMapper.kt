@@ -17,11 +17,12 @@ fun CouponResponse.toDomain(
     orderedTime: LocalTime,
     orderedItems: List<Cart>,
 ): Coupon? {
+    val expiredDate = LocalDate.parse(expirationDate)
     return Coupon(
         id = id,
         code = code,
         description = description,
-        expirationDate = LocalDate.parse(expirationDate),
+        expirationDate = expiredDate,
         discountStrategy = this.generateDiscountStrategy(shippingFee, orderedTime, orderedItems) ?: return null,
         minimumOrderedAmount = minimumAmount ?: 0,
     )
