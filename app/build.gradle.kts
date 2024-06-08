@@ -5,7 +5,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
     id("kotlin-kapt")
-    id("kotlin-parcelize")
     kotlin("plugin.serialization") version "1.9.22"
 }
 
@@ -100,9 +99,6 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-
-    // gson
-    implementation("com.google.code.gson:gson:2.10.1")
 
     // preference
     implementation("androidx.preference:preference-ktx:1.2.1")
