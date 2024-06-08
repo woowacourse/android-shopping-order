@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.presentation.ui.order.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -59,11 +62,16 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupons"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="280dp"
             android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/vw_divider_1"
             app:layout_constraintEnd_toEndOf="@id/gl_end"
             app:layout_constraintStart_toStartOf="@id/gl_start"
-            app:layout_constraintTop_toBottomOf="@id/tv_coupon_selection_content" />
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_selection_content"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_coupon"/>
 
         <View
             android:id="@+id/vw_divider_1"
@@ -88,6 +96,7 @@
 
         <TextView
             android:id="@+id/tv_order_price_content_1"
+            bindTextFormattedCurrency="@{viewModel.totalPriceWithoutDiscount}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -109,6 +118,7 @@
 
         <TextView
             android:id="@+id/tv_order_price_content_2"
+            bindTextFormattedCurrency="@{(viewModel.discountAmount * -1)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -129,6 +139,7 @@
 
         <TextView
             android:id="@+id/tv_order_price_content_3"
+            bindTextFormattedCurrency="@{viewModel.shippingFee}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -160,6 +171,7 @@
 
         <TextView
             android:id="@+id/tv_total_order_price_content"
+            bindTextFormattedCurrency="@{viewModel.totalPriceWithDiscount}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -178,6 +190,7 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:onClick="@{() -> viewModel.onPayButtonClicked()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

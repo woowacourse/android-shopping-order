@@ -24,4 +24,6 @@
     <string name="order_price">주문 금액</string>
     <string name="order_shipping_price">배송비</string>
     <string name="order_total_price">총 결제 금액</string>
+    <string name="coupon_item_info_1_head">만료일:</string>
+    <string name="coupon_item_info_2_head">최소 주문 금액:</string>
 </resources>

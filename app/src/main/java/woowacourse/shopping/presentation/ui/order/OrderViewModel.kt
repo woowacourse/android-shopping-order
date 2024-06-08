@@ -26,7 +26,7 @@ class OrderViewModel(
     private val orderRepository: OrderRepository,
     private val selectedCartIds: List<Long>,
     val totalPriceWithoutDiscount: Long,
-) : ViewModel() {
+) : ViewModel(), OrderHandler {
     private val _coupons: MutableLiveData<UiState<List<CouponModel>>> = MutableLiveData()
     val coupons: LiveData<UiState<List<CouponModel>>> = _coupons
 
@@ -55,6 +55,22 @@ class OrderViewModel(
                 }
         }
     }
+
+    override fun onCheckBoxClicked(couponId: Long) {
+        val selectedCoupon = couponsData.find { it.id == couponId } ?: return
+        val updated =
+            couponsData.map {
+                if (it.id != couponId) {
+                    it.copy(isChecked = false)
+                } else {
+                    it.copy(isChecked = !it.isChecked)
+                }
+            }
+        _coupons.value = UiState.Success(updated)
+        _discountAmount.value = selectedCoupon.discountAmount
+    }
+
+    override fun onPayButtonClicked() {}
 
     companion object {
         class Factory(
