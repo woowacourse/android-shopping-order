@@ -15,7 +15,7 @@ class FixedCouponTest {
         val cart = Cart(fakeCartProduct(price = 10_000))
         val coupon = fakeFixedCoupon(discount = 5_000, discountableMinPrice = 10_000)
         // when
-        val available = coupon.available(cart, 0)
+        val available = coupon.available(cart)
         val discount = coupon.discount(cart, 0)
         // then
         val expect = DiscountResult(10_000, 5_000, 0)
@@ -31,7 +31,7 @@ class FixedCouponTest {
         val cart = Cart(fakeCartProduct(price = 9_999))
         val coupon = fakeFixedCoupon(discount = 5_000, discountableMinPrice = 10_000)
         // when
-        val available = coupon.available(cart, 0)
+        val available = coupon.available(cart)
         val discount = coupon.discount(cart, 0)
         // then
         val expect = DiscountResult(9_999, 0, 0)

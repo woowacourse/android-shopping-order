@@ -18,7 +18,7 @@ class BuyXGetYCouponTest {
             freeCount = 1
         )
         // when
-        val actual = buyXGetYCoupon.available(cart, 200)
+        val actual = buyXGetYCoupon.available(cart)
         // then
         assertSoftly {
             actual.shouldBeTrue()
@@ -34,7 +34,7 @@ class BuyXGetYCouponTest {
             freeCount = 1
         )
         // when
-        val actual = buyXGetYCoupon.available(cart, 200)
+        val actual = buyXGetYCoupon.available(cart)
         // then
         assertSoftly {
             actual.shouldBeFalse()

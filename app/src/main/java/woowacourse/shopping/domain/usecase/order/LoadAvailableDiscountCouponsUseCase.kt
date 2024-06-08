@@ -34,11 +34,10 @@ class DefaultLoadAvailableDiscountCouponsUseCase(
         val coupons =
             couponsJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
 
-        Result.success(coupons.availableCoupons(cart, SHOPPING_FEE))
+        Result.success(coupons.availableCoupons(cart))
     }
 
     companion object {
-        private const val SHOPPING_FEE = 3000L
         private var instance: LoadAvailableDiscountCouponsUseCase? = null
 
         fun instance(

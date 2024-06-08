@@ -16,10 +16,10 @@ sealed class Coupon(
     val isExpired: Boolean
         get() = expirationDate.isBefore(targetDateTime)
 
-    abstract fun available(cart: Cart, shippingFee: Long): Boolean
+    abstract fun available(cart: Cart): Boolean
 
     fun discount(cart: Cart, shippingFee: Long): DiscountResult {
-        return if (available(cart, shippingFee)) {
+        return if (available(cart)) {
             calculateDiscount(cart, shippingFee)
         } else {
             noDiscount(cart, shippingFee)
@@ -38,7 +38,7 @@ sealed class Coupon(
         return DiscountResult(cart.totalPrice(), 0, shippingFee)
     }
 
-    protected abstract fun  calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult
+    protected abstract fun calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult
 }
 
 

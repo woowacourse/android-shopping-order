@@ -15,7 +15,7 @@ data class BuyXGetYCoupon(
 ) : Coupon(id, code, description, 0L, expirationDate, targetDateTime) {
     private val discountLimitCount = buyCount + freeCount
 
-    override fun available(cart: Cart, shippingFee: Long): Boolean {
+    override fun available(cart: Cart): Boolean {
         return !isExpired && cart.cartProducts.any { it.count >= discountLimitCount }
     }
 
