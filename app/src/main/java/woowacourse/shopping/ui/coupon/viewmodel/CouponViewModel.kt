@@ -120,6 +120,5 @@ class CouponViewModel(
         }
     }
 
-    private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean =
-        this?.firstOrNull { it.id == couponId }?.isChecked ?: false
+    private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean = this?.firstOrNull { it.id == couponId }?.isChecked ?: false
 }

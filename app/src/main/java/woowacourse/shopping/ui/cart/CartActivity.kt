@@ -72,7 +72,9 @@ class CartActivity : AppCompatActivity() {
                 startActivity(
                     CouponActivity.newIntent(
                         this,
-                        viewModel.cart.value?.cartItems?.filter { it.isChecked } ?: emptyList()))
+                        viewModel.cart.value?.cartItems?.filter { it.isChecked } ?: emptyList(),
+                    ),
+                )
             }
         }
     }

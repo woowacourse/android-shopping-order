@@ -38,18 +38,19 @@ class ProductRepositoryImpl(
                 val count: Int = cartCount()
 
                 // 장바구니 리스트를 가져오는 로직
-                val cartResponse = async(exceptionHandler()) {
-                    cartDataSource.getCartItems(
-                        START_CART_PAGE,
-                        count
-                    )
-                }.await()
+                val cartResponse =
+                    async(exceptionHandler()) {
+                        cartDataSource.getCartItems(
+                            START_CART_PAGE,
+                            count,
+                        )
+                    }.await()
                 val carts: List<Cart> =
                     when (cartResponse) {
                         is ApiResult.Success -> cartResponse.data.content.map { it.toCart() }
                         is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
                         is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
-                            cartResponse.e
+                            cartResponse.e,
                         )
                     }
 
@@ -63,7 +64,7 @@ class ProductRepositoryImpl(
                         ) {
                             productDataSource.getProductsByOffset(
                                 page,
-                                LOAD_PRODUCT_INTERVAL
+                                LOAD_PRODUCT_INTERVAL,
                             )
                         }.await()
                     when (productResponse) {
@@ -83,8 +84,8 @@ class ProductRepositoryImpl(
                 return@coroutineScope ApiResponse.Success(
                     products.subList(
                         0,
-                        min(MAX_RECOMMEND_SIZE, products.size)
-                    )
+                        min(MAX_RECOMMEND_SIZE, products.size),
+                    ),
                 )
             } catch (e: Exception) {
                 return@coroutineScope ApiResponse.Exception(e)

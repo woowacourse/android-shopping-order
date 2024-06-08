@@ -4,7 +4,6 @@ import woowacourse.shopping.domain.model.CartWithProduct
 import java.time.LocalDate
 
 sealed class Coupon(val discountType: DiscountType) {
-
     abstract val id: Long
     abstract val code: String
     abstract val description: String

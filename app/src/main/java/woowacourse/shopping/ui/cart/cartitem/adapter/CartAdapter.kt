@@ -30,9 +30,10 @@ class CartAdapter(
     }
 
     companion object {
-        val diffCallback = ItemDiffCallback<CartUiModel>(
-            onItemsTheSame = { old, new -> old.productId == new.productId},
-            onContentsTheSame = { old, new -> old == new },
-        )
+        val diffCallback =
+            ItemDiffCallback<CartUiModel>(
+                onItemsTheSame = { old, new -> old.productId == new.productId },
+                onContentsTheSame = { old, new -> old == new },
+            )
     }
 }

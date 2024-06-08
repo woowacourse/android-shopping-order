@@ -11,8 +11,7 @@ class RemoteCartDataSource : CartDataSource {
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): ResponseCartItemsGetDto =
-        ShoppingRetrofit.cartItemService.getCartItems(page, size).body() ?: error("body가 비어있습니다.")
+    ): ResponseCartItemsGetDto = ShoppingRetrofit.cartItemService.getCartItems(page, size).body() ?: error("body가 비어있습니다.")
 
     override suspend fun postCartItems(request: RequestCartItemPostDto) {
         ShoppingRetrofit.cartItemService.postCartItem(request)

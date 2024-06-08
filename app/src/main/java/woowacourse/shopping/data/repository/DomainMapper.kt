@@ -7,8 +7,7 @@ import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 
-fun ResponseCartItemsGetDto.Content.toCart() =
-    Cart(id = id, productId = product.id, quantity = Quantity(quantity))
+fun ResponseCartItemsGetDto.Content.toCart() = Cart(id = id, productId = product.id, quantity = Quantity(quantity))
 
 fun ResponseCartItemsGetDto.Product.toProduct() =
     Product(

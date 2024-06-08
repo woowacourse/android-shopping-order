@@ -28,9 +28,10 @@ class RecentProductAdapter(
     }
 
     companion object {
-        val diffCallback = ItemDiffCallback<Product>(
-            onItemsTheSame = { old, new -> old.id == new.id},
-            onContentsTheSame = { old, new -> old == new },
-        )
+        val diffCallback =
+            ItemDiffCallback<Product>(
+                onItemsTheSame = { old, new -> old.id == new.id },
+                onContentsTheSame = { old, new -> old == new },
+            )
     }
 }

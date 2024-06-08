@@ -33,9 +33,10 @@ class RecommendProductAdapter(
     }
 
     companion object {
-        val diffCallback = ItemDiffCallback<ProductWithQuantityUiModel>(
-            onItemsTheSame = { old, new -> old == new},
-            onContentsTheSame = { old, new -> old == new },
-        )
+        val diffCallback =
+            ItemDiffCallback<ProductWithQuantityUiModel>(
+                onItemsTheSame = { old, new -> old == new },
+                onContentsTheSame = { old, new -> old == new },
+            )
     }
 }

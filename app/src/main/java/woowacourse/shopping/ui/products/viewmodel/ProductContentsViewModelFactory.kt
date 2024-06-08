@@ -16,7 +16,7 @@ class ProductContentsViewModelFactory(
         return ProductContentsViewModel(
             productRepository,
             recentProductRepository,
-            cartRepository
+            cartRepository,
         ) as T
     }
 }

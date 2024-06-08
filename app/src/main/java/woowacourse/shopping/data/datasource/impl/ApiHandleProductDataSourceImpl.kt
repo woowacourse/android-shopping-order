@@ -11,8 +11,7 @@ class ApiHandleProductDataSourceImpl : ApiHandleProductDataSource {
     override suspend fun getProductsByOffset(
         page: Int,
         size: Int,
-    ): ApiResult<ResponseProductsGetDto> =
-        handleApi { ShoppingRetrofit.productService.getProductsByOffset(page = page, size = size) }
+    ): ApiResult<ResponseProductsGetDto> = handleApi { ShoppingRetrofit.productService.getProductsByOffset(page = page, size = size) }
 
     override suspend fun getProductsById(id: Long): ApiResult<ResponseProductIdGetDto> =
         handleApi { ShoppingRetrofit.productService.getProductsById(id = id) }

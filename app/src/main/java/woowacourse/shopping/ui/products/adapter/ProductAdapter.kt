@@ -50,10 +50,11 @@ class ProductAdapter(
     }
 
     companion object {
-        val diffCallback = ItemDiffCallback<ProductUiModel>(
-            onItemsTheSame = { old, new -> old == new},
-            onContentsTheSame = { old, new -> old == new },
-        )
+        val diffCallback =
+            ItemDiffCallback<ProductUiModel>(
+                onItemsTheSame = { old, new -> old == new },
+                onContentsTheSame = { old, new -> old == new },
+            )
     }
 }
 
