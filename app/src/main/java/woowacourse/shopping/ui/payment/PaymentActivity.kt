@@ -15,6 +15,7 @@ import woowacourse.shopping.data.datasource.impl.CouponRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.databinding.ActivityPaymentBinding
+import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.payment.adapter.CouponAdapter
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModel
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModelFactory
@@ -45,6 +46,7 @@ class PaymentActivity : AppCompatActivity() {
         observeCoupons()
         observePaying()
         initToolbarBinding()
+        observeError()
     }
 
     private fun initToolbarBinding() {
@@ -86,6 +88,14 @@ class PaymentActivity : AppCompatActivity() {
                 )
             toast?.show()
             ProductContentsActivity.startActivity(this)
+        }
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(this) {
+            val errMsg = handleError(it)
+            toast = Toast.makeText(this, errMsg, Toast.LENGTH_SHORT)
+            toast?.show()
         }
     }
 

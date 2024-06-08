@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
@@ -54,6 +55,14 @@ class PaymentViewModel(
     private val _paying: MutableSingleLiveData<Unit> = MutableSingleLiveData()
     val paying: SingleLiveData<Unit> = _paying
 
+    private val _error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
+    val error: SingleLiveData<Throwable> = _error
+
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            _error.setValue(throwable)
+        }
+
     init {
         loadOrderedCartItems()
         loadCoupons()
@@ -68,7 +77,7 @@ class PaymentViewModel(
     }
 
     fun paying() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             orderedProducts.value?.let { cartRepository.order(it.map { it.id }) }
         }
         _paying.setValue(Unit)
@@ -76,7 +85,7 @@ class PaymentViewModel(
 
     private fun loadOrderedCartItems() {
         val cartWithProducts = mutableListOf<CartWithProduct>()
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             orderedCartItemIds.forEach {
                 cartRepository.getCartItemByCartId(it).onSuccess {
                     cartWithProducts.add(it)
@@ -89,9 +98,7 @@ class PaymentViewModel(
     private fun getCoupons() = requireNotNull(_coupons.value?.map { it.copy(isChecked = false) }?.toMutableList())
 
     private fun findCheckedCoupon(couponId: Long): CouponUiModel {
-        val checkedCoupon =
-            requireNotNull(_coupons.value?.find { it.couponState.coupon.id == couponId })
-        return checkedCoupon
+        return requireNotNull(_coupons.value?.find { it.couponState.coupon.id == couponId })
     }
 
     private fun totalAmount(): Int {
@@ -128,7 +135,7 @@ class PaymentViewModel(
     }
 
     private fun loadCoupons() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             couponRepository.getCoupons().onSuccess {
                 _coupons.value = it.map { it.toUiModel() }
             }
