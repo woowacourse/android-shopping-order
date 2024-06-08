@@ -73,5 +73,9 @@ API 문서: http://54.180.95.212:8080/swagger-ui/index.html
 
 - [ ] navigation 을 더 MVVM 답게
 
-- [ ] local.properties
-- 
+- [x] local.properties 에 url, id, password 저장.
+- [x] gson 선택 이유, adapter 의 생성 시점과 방법.
+- [x] Retrofit 의 execute, enqueue 차이, 장/단점 고찰.
+- [ ] 여러 url 을 사용한다면?
+
+R
