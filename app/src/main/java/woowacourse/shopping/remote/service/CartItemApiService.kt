@@ -33,4 +33,26 @@ interface CartItemApiService {
     fun removeCartItem(
         @Path("id") id: Long,
     ): Call<Unit>
+
+    @GET("/cart-items")
+    suspend fun requestCartItems2(
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+    ): CartItemListResponse
+
+    @POST("/cart-items")
+    suspend fun addCartItem2(
+        @Body cartItemRequest: CartItemRequest,
+    )
+
+    @PATCH("/cart-items/{id}")
+    suspend fun updateCartItemQuantity2(
+        @Path("id") id: Long,
+        @Body quantity: Int,
+    )
+
+    @DELETE("/cart-items/{id}")
+    suspend fun removeCartItem2(
+        @Path("id") id: Long,
+    )
 }
