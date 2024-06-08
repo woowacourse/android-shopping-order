@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCouponBinding
+import woowacourse.shopping.ui.coupon.uimodel.CouponClickListener
+import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
 import woowacourse.shopping.ui.utils.ItemDiffCallback
 
 class CouponAdapter(

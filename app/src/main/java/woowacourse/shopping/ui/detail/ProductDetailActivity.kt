@@ -14,6 +14,7 @@ import woowacourse.shopping.data.repository.Error
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.ui.detail.uimodel.MostRecentProductClickListener
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModelFactory
 import woowacourse.shopping.ui.utils.showToastMessage

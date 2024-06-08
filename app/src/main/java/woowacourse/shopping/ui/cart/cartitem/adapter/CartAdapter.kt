@@ -1,10 +1,10 @@
-package woowacourse.shopping.ui.cart.cartitem
+package woowacourse.shopping.ui.cart.cartitem.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.utils.ItemDiffCallback
 

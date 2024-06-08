@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.cartitem
+package woowacourse.shopping.ui.cart.cartitem.uimodel
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

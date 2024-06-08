@@ -8,7 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCouponBinding
-import woowacourse.shopping.ui.cart.cartitem.CartUiModel
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
+import woowacourse.shopping.ui.coupon.uimodel.CouponClickListener
+import woowacourse.shopping.ui.coupon.viewmodel.CouponViewModel
+import woowacourse.shopping.ui.coupon.viewmodel.CouponViewModelFactory
 import woowacourse.shopping.ui.products.ProductContentsActivity
 import woowacourse.shopping.ui.utils.parcelableList
 

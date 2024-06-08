@@ -1,12 +1,11 @@
-package woowacourse.shopping.ui.cart.recommend
+package woowacourse.shopping.ui.cart.recommend.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.ui.cart.cartitem.CartUiModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
-import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.utils.ItemDiffCallback
 
 class RecommendProductAdapter(

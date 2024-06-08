@@ -23,8 +23,8 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.CountButtonClickListener
-import woowacourse.shopping.ui.cart.cartitem.CartItemsUiState
-import woowacourse.shopping.ui.cart.cartitem.CartUiModel
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartItemsUiState
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData

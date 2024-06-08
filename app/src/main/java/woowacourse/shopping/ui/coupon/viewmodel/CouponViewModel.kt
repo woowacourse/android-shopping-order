@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.coupon
+package woowacourse.shopping.ui.coupon.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +11,10 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.ui.cart.cartitem.CartUiModel
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
+import woowacourse.shopping.ui.coupon.toUiModel
+import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
+import woowacourse.shopping.ui.coupon.uimodel.PaymentInfoUiModel
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 

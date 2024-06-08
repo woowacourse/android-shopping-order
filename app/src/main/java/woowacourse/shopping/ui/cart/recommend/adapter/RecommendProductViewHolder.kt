@@ -1,9 +1,9 @@
-package woowacourse.shopping.ui.cart.recommend
+package woowacourse.shopping.ui.cart.recommend.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
-import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiModel
 
 class RecommendProductViewHolder(
     private val binding: ItemProductBinding,

@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.coupon
+package woowacourse.shopping.ui.coupon.uimodel
 
 data class PaymentInfoUiModel(
     val orderPrice: Int,

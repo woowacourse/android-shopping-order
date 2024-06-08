@@ -5,6 +5,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.Discount5000
 import woowacourse.shopping.domain.model.coupon.FreeShipping
 import woowacourse.shopping.domain.model.coupon.MiracleCoupon
+import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
 
 fun Coupon.toUiModel() =
     when (this) {

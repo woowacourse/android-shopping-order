@@ -7,11 +7,11 @@
 
         <variable
             name="coupon"
-            type="woowacourse.shopping.ui.coupon.CouponUiModel" />
+            type="woowacourse.shopping.ui.coupon.uimodel.CouponUiModel" />
 
         <variable
             name="CouponClickListener"
-            type="woowacourse.shopping.ui.coupon.CouponClickListener" />
+            type="woowacourse.shopping.ui.coupon.uimodel.CouponClickListener" />
 
     </data>
 

@@ -6,10 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemProductSkeletonBinding
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.ui.products.LoadingUiModel
-import woowacourse.shopping.ui.products.ProductUiModel
-import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
+import woowacourse.shopping.ui.products.uimodel.LoadingUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import woowacourse.shopping.ui.utils.ItemDiffCallback
 
