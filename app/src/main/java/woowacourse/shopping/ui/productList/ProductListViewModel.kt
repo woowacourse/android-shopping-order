@@ -118,9 +118,9 @@ class ProductListViewModel(
 
     private fun foundCartItem(productId: Long) =
         (
-                cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
-                    ?: throw NoSuchElementException()
-                )
+            cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
+                ?: throw NoSuchElementException()
+        )
 
     private fun updateLoadedProduct(
         productId: Long,

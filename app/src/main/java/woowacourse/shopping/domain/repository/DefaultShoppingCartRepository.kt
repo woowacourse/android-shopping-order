@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingCartRepository(
@@ -32,7 +32,7 @@ class DefaultShoppingCartRepository(
         productId: Long,
         quantity: Int,
     ) {
-        cartSource.addNewProduct(ProductIdsCount(productId, quantity))
+        cartSource.addNewProduct(ProductIdsCountData(productId, quantity))
     }
 
     override fun removeShoppingCartProduct(cartItemId: Long) {

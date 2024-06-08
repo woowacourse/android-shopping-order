@@ -3,9 +3,7 @@ package woowacourse.shopping.remote.source
 import woowacourse.shopping.data.model.CartItemData
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.remote.model.request.CartItemRequest
-import woowacourse.shopping.remote.model.response.CartItemResponse
 import woowacourse.shopping.remote.model.response.toData
 import woowacourse.shopping.remote.service.CartItemApiService
 
@@ -34,12 +32,12 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         }
     }
 
-    override fun addNewProduct(productIdsCount: ProductIdsCount) {
+    override fun addNewProduct(productIdsCountData: ProductIdsCountData) {
         val call =
             cartItemApiService.addCartItem(
                 CartItemRequest(
-                    productIdsCount.productId,
-                    productIdsCount.quantity,
+                    productIdsCountData.productId,
+                    productIdsCountData.quantity,
                 ),
             )
         call.execute()
