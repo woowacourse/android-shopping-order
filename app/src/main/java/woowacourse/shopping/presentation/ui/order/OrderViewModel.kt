@@ -70,7 +70,13 @@ class OrderViewModel(
         _discountAmount.value = selectedCoupon.discountAmount
     }
 
-    override fun onPayButtonClicked() {}
+    override fun onPayButtonClicked() {
+        viewModelScope.launch {
+            orderRepository.completeOrder(selectedCartIds)
+                .onSuccess { _completeOrder.value = Event(true) }
+                .onFailure { }
+        }
+    }
 
     companion object {
         class Factory(

@@ -191,5 +191,9 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                 throw IllegalAccessError("해당 메서드는 액티비티에서 호출해야 합니다")
             }
         }
+
+        fun createIntent(context: Context): Intent {
+            return Intent(context, ShoppingActivity::class.java)
+        }
     }
 }

@@ -9,6 +9,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
+import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
+import woowacourse.shopping.presentation.util.EventObserver
 
 class OrderActivity : BindingActivity<ActivityOrderBinding>() {
     private val viewModel: OrderViewModel by viewModels {
@@ -48,6 +50,17 @@ class OrderActivity : BindingActivity<ActivityOrderBinding>() {
                 is UiState.Loading -> {}
             }
         }
+
+        viewModel.completeOrder.observe(
+            this,
+            EventObserver {
+                if (it) {
+                    showToast(getString(R.string.order_complete_success_message))
+                    finish()
+                    startActivity(ShoppingActivity.createIntent(this))
+                }
+            },
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
