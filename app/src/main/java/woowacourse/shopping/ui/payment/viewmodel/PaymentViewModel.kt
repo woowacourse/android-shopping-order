@@ -89,6 +89,10 @@ class PaymentViewModel(
         _paying.setValue(Unit)
     }
 
+    fun isCouponsEmpty(): Boolean {
+        return coupons.value?.isEmpty() ?: true
+    }
+
     private fun loadOrderedCartItems() {
         val cartWithProducts = mutableListOf<CartWithProduct>()
         viewModelScope.launch(coroutineExceptionHandler) {
@@ -101,7 +105,8 @@ class PaymentViewModel(
         }
     }
 
-    private fun getCoupons() = requireNotNull(_coupons.value?.map { it.copy(isChecked = false) }?.toMutableList())
+    private fun getCoupons() =
+        requireNotNull(_coupons.value?.map { it.copy(isChecked = false) }?.toMutableList())
 
     private fun findCheckedCoupon(couponId: Long): CouponUiModel {
         return requireNotNull(_coupons.value?.find { it.couponState.coupon.id == couponId })
