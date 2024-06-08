@@ -12,7 +12,7 @@ data class BuyXGetYCoupon(
     override val targetDateTime: LocalDateTime,
     val buyCount: Int,
     val freeCount: Int,
-) : Coupon(id, code, description, expirationDate, targetDateTime) {
+) : Coupon(id, code, description, 0L, expirationDate, targetDateTime) {
     private val discountLimitCount = buyCount + freeCount
 
     override fun available(cart: Cart, shippingFee: Long): Boolean {

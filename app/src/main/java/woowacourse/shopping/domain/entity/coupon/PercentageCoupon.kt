@@ -13,7 +13,7 @@ data class PercentageCoupon(
     val discountRate: Float,
     val availableStartTime: LocalTime,
     val availableEndTime: LocalTime,
-) : Coupon(id, code, description, expirationDate, targetDateTime) {
+) : Coupon(id, code, description, 0, expirationDate, targetDateTime) {
     override fun available(cart: Cart, shippingFee: Long): Boolean {
         return !isExpired && targetDateTime.toLocalTime()
             .isBetween(availableStartTime, availableEndTime)

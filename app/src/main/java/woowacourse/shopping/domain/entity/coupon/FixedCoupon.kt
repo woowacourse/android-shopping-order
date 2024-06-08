@@ -7,11 +7,11 @@ data class FixedCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,
+    override val discountableMinPrice: Long,
     override val expirationDate: LocalDateTime,
     override val targetDateTime: LocalDateTime,
     val discount: Long,
-    val discountableMinPrice: Long,
-) : Coupon(id, code, description, expirationDate, targetDateTime) {
+) : Coupon(id, code, description, discountableMinPrice, expirationDate, targetDateTime) {
     override fun available(cart: Cart, shippingFee: Long): Boolean {
         return !isExpired && cart.totalPrice() >= discountableMinPrice
     }
