@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.repository.ShoppingProductsRepository
 import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.model.CartItem2
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
@@ -46,8 +47,11 @@ class ProductListViewModel(
     private val _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val shoppingCartDestination: SingleLiveData<Boolean> get() = _shoppingCartDestination
 
-    private val _cartProducts: MutableLiveData<List<CartItem>> = MutableLiveData()
-    private val cartProducts: LiveData<List<CartItem>> get() = _cartProducts
+//    private val _cartProducts: MutableLiveData<List<CartItem>> = MutableLiveData()
+//    private val cartProducts: LiveData<List<CartItem>> get() = _cartProducts
+
+    private val _cartProducts: MutableLiveData<List<CartItem2>> = MutableLiveData()
+    private val cartProducts: LiveData<List<CartItem2>> get() = _cartProducts
 
     fun loadAll() {
         val page = currentPage.value ?: currentPageIsNullException()
@@ -57,7 +61,8 @@ class ProductListViewModel(
             _cartProductTotalCount.postValue(shoppingCartRepository.shoppingCartProductQuantity())
             _isLastPage.postValue(productsRepository.isFinalPage(page))
             _productsHistory.postValue(productHistoryRepository.loadAllProductHistory())
-            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+//            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems2())
         }.join()
     }
 
@@ -90,12 +95,14 @@ class ProductListViewModel(
     ) {
         try {
             val foundCartItem = foundCartItem(productId)
-            updateProductQuantity(foundCartItem, INCREASE_AMOUNT)
+//            updateProductQuantity(foundCartItem, INCREASE_AMOUNT)
+            updateProductQuantity2(foundCartItem, INCREASE_AMOUNT)
         } catch (e: NoSuchElementException) {
             addNewProduct(productId)
         } finally {
             thread {
-                _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+//                _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+                _cartProducts.postValue(shoppingCartRepository.loadAllCartItems2())
             }.join()
 
             updateProductsTotalCount()
@@ -136,10 +143,12 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         val find = foundCartItem(productId)
-        updateProductQuantity(find, DECREASE_AMOUNT)
+//        updateProductQuantity(find, DECREASE_AMOUNT)
+        updateProductQuantity2(find, DECREASE_AMOUNT)
 
         thread {
-            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+//            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
+            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems2())
         }.join()
 
         updateLoadedProduct(productId, DECREASE_AMOUNT)
@@ -148,6 +157,15 @@ class ProductListViewModel(
 
     private fun updateProductQuantity(
         find: CartItem,
+        changeAmount: Int,
+    ) {
+        thread {
+            shoppingCartRepository.updateProductQuantity(find.id, find.quantity + changeAmount)
+        }.join()
+    }
+
+    private fun updateProductQuantity2(
+        find: CartItem2,
         changeAmount: Int,
     ) {
         thread {

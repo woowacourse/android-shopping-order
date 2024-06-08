@@ -8,7 +8,7 @@
 
         <variable
             name="cartItem"
-            type="woowacourse.shopping.ui.model.CartItem" />
+            type="woowacourse.shopping.ui.model.CartItem2" />
 
         <variable
             name="listener"
@@ -66,7 +66,7 @@
 
         <ImageView
             android:id="@+id/cart_product_image"
-            imageUrl="@{cartItem.product.imageUrl}"
+            imageUrl="@{cartItem.product.imgUrl}"
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginTop="16dp"
