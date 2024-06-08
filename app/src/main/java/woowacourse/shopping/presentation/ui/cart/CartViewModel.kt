@@ -141,16 +141,9 @@ class CartViewModel(
 
             OrderState.Recommend -> {
                 val cartItemIds = selectedCartItems.value?.map { it.cartId } ?: emptyList()
-                if (cartItemIds.isNotEmpty()) {
-                    viewModelScope.launch {
-                        orderRepository.completeOrder(cartItemIds)
-                            .onSuccess {
-                                selectedCartItems.value?.forEach { cartModel -> _changedCartProducts[cartModel.productId] = 0 }
-                                _orderEvent.value = Event(OrderEvent.CompleteOrder)
-                            }
-                            .onFailure { }
-                    }
-                }
+                val totalPrice = totalPrice.value ?: 0
+                if (cartItemIds.isEmpty()) return
+                _orderEvent.value = Event(OrderEvent.MoveToPayment(cartItemIds, totalPrice))
             }
         }
     }

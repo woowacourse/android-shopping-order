@@ -12,6 +12,7 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.cart.cartList.CartListFragment
 import woowacourse.shopping.presentation.ui.cart.recommend.RecommendFragment
 import woowacourse.shopping.presentation.ui.model.UpdatedProductData
+import woowacourse.shopping.presentation.ui.order.OrderActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
 
@@ -48,11 +49,8 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             this,
             EventObserver {
                 when (it) {
-                    OrderEvent.CompleteOrder -> {
-                        showToast("상품이 성공적으로 주문되었습니다!")
-                        val updatedProducts = generateUpdateProducts()
-                        ShoppingActivity.startWithNewProductQuantities(this, updatedProducts)
-                        finish()
+                    is OrderEvent.MoveToPayment -> {
+                        OrderActivity.start(this, it.selectedCartIds, it.totalPrice)
                     }
 
                     OrderEvent.MoveToRecommend -> {
