@@ -8,7 +8,11 @@ sealed interface DiscountStrategy {
     fun calculateDiscountAmount(): Int
 }
 
-class FixedDiscountStrategy(private val orderedItems: List<Cart>, private val discountAmount: Int, private val minimumAmount: Int) : DiscountStrategy {
+class FixedDiscountStrategy(
+    private val orderedItems: List<Cart>,
+    private val discountAmount: Int,
+    private val minimumAmount: Int,
+) : DiscountStrategy {
     override fun isApplicable(): Boolean {
         return orderedItems.sumOf { it.calculatedPrice } >= minimumAmount
     }
@@ -18,7 +22,11 @@ class FixedDiscountStrategy(private val orderedItems: List<Cart>, private val di
     }
 }
 
-class BuyXGetYDiscountStrategy(private val orderedItems: List<Cart>, private val buyQuantity: Int, private val getQuantity: Int) : DiscountStrategy {
+class BuyXGetYDiscountStrategy(
+    private val orderedItems: List<Cart>,
+    private val buyQuantity: Int,
+    private val getQuantity: Int,
+) : DiscountStrategy {
     override fun isApplicable(): Boolean {
         return orderedItems.any { it.quantity >= (buyQuantity + getQuantity) }
     }
@@ -29,7 +37,11 @@ class BuyXGetYDiscountStrategy(private val orderedItems: List<Cart>, private val
     }
 }
 
-class FreeShippingDiscountStrategy(private val orderedItems: List<Cart>, private val shippingFee: Int, private val minimumAmount: Int) : DiscountStrategy {
+class FreeShippingDiscountStrategy(
+    private val orderedItems: List<Cart>,
+    private val shippingFee: Int,
+    private val minimumAmount: Int,
+) : DiscountStrategy {
     override fun isApplicable(): Boolean {
         return orderedItems.sumOf { it.calculatedPrice } >= minimumAmount
     }
@@ -39,13 +51,18 @@ class FreeShippingDiscountStrategy(private val orderedItems: List<Cart>, private
     }
 }
 
-class PercentageDiscountStrategy(private val orderedItems: List<Cart>, private val discountPercentage: Int, private val availableTime: AvailableTime, private val orderedTime: LocalTime) : DiscountStrategy {
+class PercentageDiscountStrategy(
+    private val orderedItems: List<Cart>,
+    private val discountPercentage: Int,
+    private val availableTime: AvailableTime,
+    private val orderedTime: LocalTime,
+) : DiscountStrategy {
     override fun isApplicable(): Boolean {
         return availableTime.isWithinTimeRange(orderedTime)
     }
 
     override fun calculateDiscountAmount(): Int {
         val totalAmount = orderedItems.sumOf { it.calculatedPrice }
-        return totalAmount * (discountPercentage / 100)
+        return totalAmount * discountPercentage / 100
     }
 }
