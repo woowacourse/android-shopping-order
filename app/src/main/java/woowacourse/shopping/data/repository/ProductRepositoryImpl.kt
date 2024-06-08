@@ -16,17 +16,17 @@ import kotlin.math.min
 
 class ProductRepositoryImpl(
     private val productDataSource: ApiHandleProductDataSource = ApiHandleProductDataSourceImpl(),
-    private val cartDataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl()
+    private val cartDataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl(),
 ) :
     ProductRepository {
     override suspend fun getProducts(
         page: Int,
         size: Int,
-    ): ApiResponse<List<Product>> = handleResponse(
-        productDataSource.getProductsByOffset(page, size),
-        transform = ::toProductList
-    )
-
+    ): ApiResponse<List<Product>> =
+        handleResponse(
+            productDataSource.getProductsByOffset(page, size),
+            transform = ::toProductList,
+        )
 
     override suspend fun find(id: Long): ApiResponse<Product> =
         handleResponse(productDataSource.getProductsById(id), transform = ::toProduct)
@@ -38,23 +38,39 @@ class ProductRepositoryImpl(
                 val count: Int = cartCount()
 
                 // 장바구니 리스트를 가져오는 로직
-                val cartResponse = async(exceptionHandler()) { cartDataSource.getCartItems(START_CART_PAGE, count) }.await()
-                val carts: List<Cart> = when (cartResponse) {
-                    is ApiResult.Success -> cartResponse.data.content.map { it.toCart() }
-                    is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
-                    is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(cartResponse.e)
-                }
+                val cartResponse = async(exceptionHandler()) {
+                    cartDataSource.getCartItems(
+                        START_CART_PAGE,
+                        count
+                    )
+                }.await()
+                val carts: List<Cart> =
+                    when (cartResponse) {
+                        is ApiResult.Success -> cartResponse.data.content.map { it.toCart() }
+                        is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
+                        is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
+                            cartResponse.e
+                        )
+                    }
 
                 var page = START_PRODUCT_PAGE
                 var products = mutableListOf<Product>() // 전체 상품 리스트
                 var loadedProducts = listOf<Product>() // 새로 가져온 20개의 상품 리스트
                 while (true) {
-                    val productResponse = async(exceptionHandler()) { productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL) }.await()
+                    val productResponse =
+                        async(
+                            exceptionHandler(),
+                        ) {
+                            productDataSource.getProductsByOffset(
+                                page,
+                                LOAD_PRODUCT_INTERVAL
+                            )
+                        }.await()
                     when (productResponse) {
                         is ApiResult.Success -> loadedProducts = toProductList(productResponse.data)
                         is ApiResult.Error -> return@coroutineScope handleError(productResponse)
                         is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
-                            productResponse.e
+                            productResponse.e,
                         )
                     }
 
@@ -64,7 +80,12 @@ class ProductRepositoryImpl(
                     page++
                 }
 
-                return@coroutineScope ApiResponse.Success(products.subList(0, min(MAX_RECOMMEND_SIZE, products.size)))
+                return@coroutineScope ApiResponse.Success(
+                    products.subList(
+                        0,
+                        min(MAX_RECOMMEND_SIZE, products.size)
+                    )
+                )
             } catch (e: Exception) {
                 return@coroutineScope ApiResponse.Exception(e)
             }
@@ -72,17 +93,20 @@ class ProductRepositoryImpl(
 
     private suspend fun CoroutineScope.cartCount(): Int {
         val countResponse = async(exceptionHandler()) { cartDataSource.getCartItemCounts() }.await()
-        val count: Int = when (countResponse) {
-            is ApiResult.Success -> countResponse.data.quantity
-            is ApiResult.Error -> DEFAULT_CART_COUNT
-            is ApiResult.Exception -> DEFAULT_CART_COUNT
-        }
+        val count: Int =
+            when (countResponse) {
+                is ApiResult.Success -> countResponse.data.quantity
+                is ApiResult.Error -> DEFAULT_CART_COUNT
+                is ApiResult.Exception -> DEFAULT_CART_COUNT
+            }
         return count
     }
 
-    private fun List<Product>.filterCategoryAndNotInCart(category: String, carts: List<Cart>) =
-        this.filter { it.category == category }
-            .filterNot { carts.map { it.productId }.contains(it.id) }
+    private fun List<Product>.filterCategoryAndNotInCart(
+        category: String,
+        carts: List<Cart>,
+    ) = this.filter { it.category == category }
+        .filterNot { carts.map { it.productId }.contains(it.id) }
 
     private fun exceptionHandler() = CoroutineExceptionHandler { _, exception -> throw exception }
 
@@ -93,7 +117,4 @@ class ProductRepositoryImpl(
         private const val START_PRODUCT_PAGE = 0
         private const val MAX_RECOMMEND_SIZE = 10
     }
-
-
 }
-

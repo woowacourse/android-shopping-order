@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendProductBinding
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel

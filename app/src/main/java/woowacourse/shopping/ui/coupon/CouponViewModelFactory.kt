@@ -7,12 +7,12 @@ import woowacourse.shopping.domain.repository.OrderRepository
 
 class CouponViewModelFactory(
     private val couponRepository: CouponRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return CouponViewModel(
             couponRepository,
-            orderRepository
+            orderRepository,
         ) as T
     }
 }

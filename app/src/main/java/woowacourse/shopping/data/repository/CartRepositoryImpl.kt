@@ -5,9 +5,7 @@ import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
 import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
-import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 
@@ -20,7 +18,6 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
     }
 
     override suspend fun getAllCartItems(): List<Cart> {
-
         val response = dataSource.getCartItems(0, dataSource.getCartItemCounts().quantity)
 
         return response.content.map { it.toCart() }
@@ -51,7 +48,6 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
 
     override suspend fun getCartItemCounts(): Int = dataSource.getCartItemCounts().quantity
 
-
     override suspend fun patchCartItem(
         id: Long,
         quantity: Int,
@@ -70,5 +66,4 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         }
         patchCartItem(cart.id, cart.quantity.value + quantity)
     }
-
 }

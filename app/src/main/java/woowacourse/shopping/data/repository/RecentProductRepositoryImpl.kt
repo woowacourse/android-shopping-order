@@ -15,7 +15,6 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
             ),
         )
 
-
     override suspend fun findMostRecentProduct(): RecentProduct? =
         recentProductDao.findMostRecentProduct()
 

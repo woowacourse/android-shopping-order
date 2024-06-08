@@ -17,4 +17,3 @@ sealed interface Error<T : Any?> : ApiResponse<T> {
 
     data class Unknown<T : Any?>(override val message: String?) : Error<T>
 }
-

@@ -18,7 +18,6 @@ data class Buy2Free1(
         val isProductWithQuantity3 = products.any { it.quantity.value == applyCount }
         val isNotExpired = LocalDate.now().isBefore(expirationDate)
         return isProductWithQuantity3 && isNotExpired
-
     }
 
     override fun discountPrice(products: List<CartWithProduct>): Int {

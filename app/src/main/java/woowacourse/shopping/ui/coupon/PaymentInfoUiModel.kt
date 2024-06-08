@@ -4,5 +4,5 @@ data class PaymentInfoUiModel(
     val orderPrice: Int,
     val discountPrice: Int,
     val shipping: Int,
-    val totalPrice: Int
+    val totalPrice: Int,
 )

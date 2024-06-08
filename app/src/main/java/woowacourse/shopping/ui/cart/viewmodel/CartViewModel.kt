@@ -108,7 +108,6 @@ class CartViewModel(
                 noRecommendProductState.value = true
                 Log.d(this.javaClass.simpleName, "${it.e}")
             }
-
         }
     }
 

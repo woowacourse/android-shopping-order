@@ -8,9 +8,11 @@ import woowacourse.shopping.data.remote.dto.response.ResponseCartItemCountsGetDt
 import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 
 class RemoteCartDataSource : CartDataSource {
-    override suspend fun getCartItems(page: Int, size: Int): ResponseCartItemsGetDto =
+    override suspend fun getCartItems(
+        page: Int,
+        size: Int,
+    ): ResponseCartItemsGetDto =
         ShoppingRetrofit.cartItemService.getCartItems(page, size).body() ?: error("body가 비어있습니다.")
-
 
     override suspend fun postCartItems(request: RequestCartItemPostDto) {
         ShoppingRetrofit.cartItemService.postCartItem(request)
@@ -20,11 +22,13 @@ class RemoteCartDataSource : CartDataSource {
         ShoppingRetrofit.cartItemService.deleteCartItem(id)
     }
 
-    override suspend fun patchCartItems(id: Long, request: RequestCartItemsPatchDto) {
-        ShoppingRetrofit.cartItemService.patchCartItem(id,request)
+    override suspend fun patchCartItems(
+        id: Long,
+        request: RequestCartItemsPatchDto,
+    ) {
+        ShoppingRetrofit.cartItemService.patchCartItem(id, request)
     }
 
     override suspend fun getCartItemCounts(): ResponseCartItemCountsGetDto =
         ShoppingRetrofit.cartItemService.getCartItemCounts().body() ?: error("body가 비어있습니다.")
-
 }

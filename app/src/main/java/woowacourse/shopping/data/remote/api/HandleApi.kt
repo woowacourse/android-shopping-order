@@ -3,9 +3,7 @@ package woowacourse.shopping.data.remote.api
 import retrofit2.HttpException
 import retrofit2.Response
 
-suspend fun <T : Any?> handleApi(
-    execute: suspend () -> Response<T>
-): ApiResult<T> {
+suspend fun <T : Any?> handleApi(execute: suspend () -> Response<T>): ApiResult<T> {
     return try {
         val response = execute()
         val body = response.body()

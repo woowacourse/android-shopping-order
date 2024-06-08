@@ -116,10 +116,10 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_products"
-                    android:paddingHorizontal="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:paddingHorizontal="20dp"
                     android:paddingTop="14dp"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2"

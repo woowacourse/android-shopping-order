@@ -13,14 +13,13 @@ import woowacourse.shopping.ui.products.ProductContentsActivity
 import woowacourse.shopping.ui.utils.parcelableList
 
 class CouponActivity : AppCompatActivity(), CouponClickListener {
-
     private lateinit var binding: ActivityCouponBinding
     private lateinit var adapter: CouponAdapter
 
     private val viewModel: CouponViewModel by viewModels {
         CouponViewModelFactory(
             CouponRepositoryImpl(),
-            OrderRepositoryImpl()
+            OrderRepositoryImpl(),
         )
     }
 
@@ -61,7 +60,7 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
         viewModel.updatePaymentInfo(carts, couponId)
     }
 
-    private fun clickOrder(){
+    private fun clickOrder() {
         binding.btnCouponPay.setOnClickListener {
             viewModel.order(carts)
         }
@@ -74,14 +73,14 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
     }
 
     companion object {
-
         private const val EXTRA_CART_IDS = "cartIds"
 
         fun newIntent(
             context: Context,
-            carts: List<CartUiModel>
-        ): Intent = Intent(context, CouponActivity::class.java).apply {
-            this.putParcelableArrayListExtra(EXTRA_CART_IDS, ArrayList(carts))
-        }
+            carts: List<CartUiModel>,
+        ): Intent =
+            Intent(context, CouponActivity::class.java).apply {
+                this.putParcelableArrayListExtra(EXTRA_CART_IDS, ArrayList(carts))
+            }
     }
 }

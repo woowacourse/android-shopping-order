@@ -19,8 +19,7 @@ interface ProductService {
     ): Response<ResponseProductsGetDto>
 
     @GET("/products")
-    suspend fun getProducts(
-    ): Response<ResponseProductsGetDto>
+    suspend fun getProducts(): Response<ResponseProductsGetDto>
 
     @POST("/products")
     suspend fun postProducts(

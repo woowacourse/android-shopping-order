@@ -19,19 +19,19 @@ import woowacourse.shopping.data.remote.service.OrderService
 import woowacourse.shopping.data.remote.service.ProductService
 
 object ShoppingRetrofit {
-
-    private val json = Json {
-        serializersModule = SerializersModule {
-            polymorphic(Coupon::class) {
-                subclass(FixedDiscountCoupon::class)
-                subclass(BuyXGetYCoupon::class)
-                subclass(FreeShippingCoupon::class)
-                subclass(PercentageDiscountCoupon::class)
-            }
-            classDiscriminator = "coupon_type"
+    private val json =
+        Json {
+            serializersModule =
+                SerializersModule {
+                    polymorphic(Coupon::class) {
+                        subclass(FixedDiscountCoupon::class)
+                        subclass(BuyXGetYCoupon::class)
+                        subclass(FreeShippingCoupon::class)
+                        subclass(PercentageDiscountCoupon::class)
+                    }
+                    classDiscriminator = "coupon_type"
+                }
         }
-    }
-
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()

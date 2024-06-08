@@ -2,7 +2,6 @@ package woowacourse.shopping.data.remote.dto.response
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -10,7 +9,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
@@ -92,7 +90,10 @@ object LocalDateSerializer : KSerializer<LocalDate> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: LocalDate) {
+    override fun serialize(
+        encoder: Encoder,
+        value: LocalDate,
+    ) {
         encoder.encodeString(value.format(formatter))
     }
 
@@ -108,7 +109,10 @@ object LocalTimeSerializer : KSerializer<LocalTime> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("LocalTime", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: LocalTime) {
+    override fun serialize(
+        encoder: Encoder,
+        value: LocalTime,
+    ) {
         encoder.encodeString(value.format(formatter))
     }
 

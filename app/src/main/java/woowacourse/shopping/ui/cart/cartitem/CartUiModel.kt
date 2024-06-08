@@ -2,7 +2,6 @@ package woowacourse.shopping.ui.cart.cartitem
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import woowacourse.shopping.domain.model.Quantity
 
 @Parcelize
 data class CartUiModel(
@@ -14,6 +13,6 @@ data class CartUiModel(
     val imageUrl: String,
     val isChecked: Boolean = false,
     val isLoading: Boolean = true,
-):Parcelable {
+) : Parcelable {
     val totalPrice = price * quantity
 }

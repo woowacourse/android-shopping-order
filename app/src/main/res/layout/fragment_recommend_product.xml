@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="vm"
             type="woowacourse.shopping.ui.cart.viewmodel.CartViewModel" />
@@ -12,14 +13,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@color/white"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="추천 상품이 없습니다."
             android:layout_marginStart="20dp"
+            android:text="추천 상품이 없습니다."
             android:textSize="20dp"
             app:isVisible="@{vm.noRecommendProductState}"
             app:layout_constraintBottom_toBottomOf="parent"

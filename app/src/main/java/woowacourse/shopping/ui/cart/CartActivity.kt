@@ -4,17 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CheckBox
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.lifecycle.map
 import woowacourse.shopping.R
+import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.cartitem.CartItemFragment
@@ -43,7 +41,6 @@ class CartActivity : AppCompatActivity() {
 
         onClickOrderBtn()
         onClickTotalCheckBox()
-
     }
 
     private fun initFragment() {
@@ -72,7 +69,10 @@ class CartActivity : AppCompatActivity() {
                     addToBackStack(null)
                 }
             } else if (supportFragmentManager.findFragmentById(R.id.fcv_cart) is RecommendFragment) {
-                startActivity(CouponActivity.newIntent(this, viewModel.cart.value?.cartItems?.filter { it.isChecked }?: emptyList() ))
+                startActivity(
+                    CouponActivity.newIntent(
+                        this,
+                        viewModel.cart.value?.cartItems?.filter { it.isChecked } ?: emptyList()))
             }
         }
     }

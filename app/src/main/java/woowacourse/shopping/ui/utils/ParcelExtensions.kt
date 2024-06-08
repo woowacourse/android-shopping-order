@@ -15,6 +15,7 @@ inline fun <reified T> Intent.intentParcelable(
         this.getParcelableExtra(key)
     }
 }
+
 inline fun <reified T> Bundle.bundleParcelable(
     key: String,
     clazz: Class<T>,

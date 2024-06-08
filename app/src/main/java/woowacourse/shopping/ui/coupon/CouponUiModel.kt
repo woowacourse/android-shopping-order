@@ -26,7 +26,7 @@ data class CouponUiModel(
         expireDate.format(dateFormatter),
         minimumAmount,
         availableStartTime?.format(timeFormatter),
-        availableEndTime?.format(timeFormatter)
+        availableEndTime?.format(timeFormatter),
     )
 
     companion object {

@@ -15,7 +15,6 @@ import woowacourse.shopping.data.repository.Error
 import woowacourse.shopping.data.repository.onError
 import woowacourse.shopping.data.repository.onException
 import woowacourse.shopping.data.repository.onSuccess
-import woowacourse.shopping.data.repository.toErrorNothing
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.model.Quantity
@@ -142,7 +141,8 @@ class ProductContentsViewModel(
             runCatching {
                 recentProductRepository.findAll()
             }.onSuccess { recentProducts ->
-                _recentProducts.value = recentProducts.mapNotNull { productByIdOrNull(it.productId) }
+                _recentProducts.value =
+                    recentProducts.mapNotNull { productByIdOrNull(it.productId) }
             }
         }
     }
@@ -158,7 +158,6 @@ class ProductContentsViewModel(
             }
         }
     }
-
 
     private fun updateProductWithQuantity(): ProductWithQuantityUiState {
         val currentProducts = products.value ?: emptyList()

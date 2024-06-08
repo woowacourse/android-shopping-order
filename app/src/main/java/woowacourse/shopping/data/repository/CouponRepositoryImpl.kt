@@ -19,27 +19,48 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
 
     private fun woowacourse.shopping.data.remote.dto.response.Coupon.toDomain(): Coupon =
         when (this) {
-            is BuyXGetYCoupon -> Buy2Free1(
-                id, code, description, expirationDate, discountType, buyQuantity, getQuantity
-            )
+            is BuyXGetYCoupon ->
+                Buy2Free1(
+                    id,
+                    code,
+                    description,
+                    expirationDate,
+                    discountType,
+                    buyQuantity,
+                    getQuantity,
+                )
 
-            is FixedDiscountCoupon -> Discount5000(
-                id, description, expirationDate, discountType, discount, minimumAmount, code
-            )
+            is FixedDiscountCoupon ->
+                Discount5000(
+                    id,
+                    description,
+                    expirationDate,
+                    discountType,
+                    discount,
+                    minimumAmount,
+                    code,
+                )
 
-            is FreeShippingCoupon -> FreeShipping(
-                id, code, description, expirationDate, minimumAmount, discountType
-            )
+            is FreeShippingCoupon ->
+                FreeShipping(
+                    id,
+                    code,
+                    description,
+                    expirationDate,
+                    minimumAmount,
+                    discountType,
+                )
 
-            is PercentageDiscountCoupon -> MiracleCoupon(
-                id,
-                code,
-                description,
-                expirationDate,
-                discount,
-                discountType,
-                availableTime.start,
-                availableTime.end
-            )
+            is PercentageDiscountCoupon ->
+                MiracleCoupon(
+                    id,
+                    code,
+                    description,
+                    expirationDate,
+                    discount,
+                    discountType,
+                    availableTime.start,
+                    availableTime.end,
+                )
         }
 }

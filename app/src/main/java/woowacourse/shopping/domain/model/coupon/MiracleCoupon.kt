@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartWithProduct
-import woowacourse.shopping.domain.model.ProductWithQuantity
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -11,11 +10,10 @@ data class MiracleCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     val discount: Int,
-    val type:String,
+    val type: String,
     val availableStartTime: LocalTime,
-    val availableEndTime: LocalTime
+    val availableEndTime: LocalTime,
 ) : Coupon(type) {
-
     override fun canUse(products: List<CartWithProduct>): Boolean {
         val currentTime = LocalTime.now()
         val isAvailableTime =
@@ -26,8 +24,7 @@ data class MiracleCoupon(
 
     override fun discountPrice(products: List<CartWithProduct>): Int {
         if (!canUse(products)) error("$description 쿠폰을 적용할 수 없습니다.")
-        val totalPrice = products.sumOf {  it.product.price * it.quantity.value}
+        val totalPrice = products.sumOf { it.product.price * it.quantity.value }
         return totalPrice * (1 - discount / 100.0).toInt()
     }
-
 }

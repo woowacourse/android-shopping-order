@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="vm"
             type="woowacourse.shopping.ui.coupon.CouponViewModel" />
@@ -65,8 +66,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="15dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:layout_marginTop="15dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintTop_toBottomOf="@id/tv_coupon_guide"
                     tools:listitem="@layout/item_coupon" />
 
@@ -97,10 +98,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="21dp"
                     android:layout_marginEnd="18dp"
+                    android:text="@{@string/product_price(vm.payment.orderPrice)}"
                     android:textColor="#333333"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:text="@{@string/product_price(vm.payment.orderPrice)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/horizon_line"
                     tools:text="204,200원" />
@@ -124,9 +125,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
+                    android:text="@{@string/coupon_discount_price(vm.payment.discountPrice)}"
                     android:textColor="#333333"
                     android:textSize="18sp"
-                    android:text="@{@string/coupon_discount_price(vm.payment.discountPrice)}"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_coupon_total_order_price"
@@ -151,10 +152,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
+                    android:text="@{@string/product_price(vm.payment.shipping)}"
                     android:textColor="#333333"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:text="@{@string/product_price(vm.payment.shipping)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_coupon_total_discount_price"
                     tools:text="3,000원" />
@@ -186,10 +187,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
+                    android:text="@{@string/product_price(vm.payment.totalPrice)}"
                     android:textColor="#333333"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:text="@{@string/product_price(vm.payment.totalPrice)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/horizon_line2"
                     tools:text="202,200원" />

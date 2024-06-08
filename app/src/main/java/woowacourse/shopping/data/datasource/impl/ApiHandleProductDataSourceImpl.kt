@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.datasource.impl
 
 import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
-import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.remote.api.ApiResult
 import woowacourse.shopping.data.remote.api.ShoppingRetrofit
 import woowacourse.shopping.data.remote.api.handleApi

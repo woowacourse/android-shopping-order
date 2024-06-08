@@ -4,11 +4,13 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.DiscountType
 
 class Order(val coupons: List<Coupon>) {
-
     fun canUseCoupons(products: List<CartWithProduct>): List<Coupon> =
         coupons.filter { it.canUse(products) }
 
-    fun discountPrice(products: List<CartWithProduct>, selectedCouponId: Long): Int {
+    fun discountPrice(
+        products: List<CartWithProduct>,
+        selectedCouponId: Long,
+    ): Int {
         require(canUseCoupons(products).map { it.id }.contains(selectedCouponId)) {
             "$selectedCouponId 에 해당하는 쿠폰을 사용할 수 없습니다."
         }
@@ -16,7 +18,10 @@ class Order(val coupons: List<Coupon>) {
         return coupon.discountPrice(products)
     }
 
-    fun shippingPrice(products: List<CartWithProduct>, selectedCouponId: Long): Int {
+    fun shippingPrice(
+        products: List<CartWithProduct>,
+        selectedCouponId: Long,
+    ): Int {
         require(canUseCoupons(products).map { it.id }.contains(selectedCouponId)) {
             "$selectedCouponId 에 해당하는 쿠폰을 사용할 수 없습니다."
         }
@@ -25,14 +30,18 @@ class Order(val coupons: List<Coupon>) {
         return if (coupon.discountType == DiscountType.FreeShipping) SHIPPING_FREE_PRICE else SHIPPING_PRICE
     }
 
-    fun paymentPrice(products: List<CartWithProduct>, selectedCouponId: Long): Int {
+    fun paymentPrice(
+        products: List<CartWithProduct>,
+        selectedCouponId: Long,
+    ): Int {
         require(canUseCoupons(products).map { it.id }.contains(selectedCouponId)) {
             "$selectedCouponId 에 해당하는 쿠폰을 사용할 수 없습니다."
         }
-        return products.sumOf { it.product.price * it.quantity.value } - discountPrice(
-            products,
-            selectedCouponId
-        ) + shippingPrice(products, selectedCouponId)
+        return products.sumOf { it.product.price * it.quantity.value } -
+                discountPrice(
+                    products,
+                    selectedCouponId,
+                ) + shippingPrice(products, selectedCouponId)
     }
 
     companion object {

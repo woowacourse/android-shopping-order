@@ -58,7 +58,6 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct() {
-
         viewModelScope.launch {
             productRepository.find(productId).onSuccess {
                 _productWithQuantity.value = ProductWithQuantity(product = it)
@@ -110,7 +109,7 @@ class ProductDetailViewModel(
                 runCatching {
                     productByIdOrNull(it.productId)
                 }.onSuccess {
-                    if (!lastSeenProductState || it==null) return@launch
+                    if (!lastSeenProductState || it == null) return@launch
                     _mostRecentProduct.value = it
                     setMostRecentVisibility(it.id, productId)
                 }.onFailure {
@@ -137,12 +136,10 @@ class ProductDetailViewModel(
         }
     }
 
-
     private fun setMostRecentVisibility(
         mostRecentProductId: Long,
         currentProductId: Long,
     ) {
         _mostRecentProductVisibility.value = (mostRecentProductId != currentProductId)
     }
-
 }

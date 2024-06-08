@@ -9,7 +9,7 @@ data class FreeShipping(
     override val description: String,
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
-    val type:String,
+    val type: String,
 ) : Coupon(type) {
     override fun canUse(products: List<CartWithProduct>): Boolean {
         val isMoreThanMinimumAmount =
@@ -23,5 +23,4 @@ data class FreeShipping(
     companion object {
         const val NO_DISCOUNT = 0
     }
-
 }

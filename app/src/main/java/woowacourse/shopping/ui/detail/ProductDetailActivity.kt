@@ -4,15 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.Error
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
@@ -84,7 +83,7 @@ class ProductDetailActivity :
 
     private fun observeErrorMessage() {
         viewModel.error.observe(this) { error ->
-            when(error) {
+            when (error) {
                 is Error.Network -> showToastMessage(R.string.server_error)
                 is Error.NotFound -> showToastMessage(R.string.not_fount_error)
                 is Error.Unauthorized -> showToastMessage(R.string.unauthorized_error)

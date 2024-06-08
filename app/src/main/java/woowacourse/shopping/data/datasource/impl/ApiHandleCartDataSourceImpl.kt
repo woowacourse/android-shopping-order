@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.datasource.impl
 
 import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
-import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.remote.api.ApiResult
 import woowacourse.shopping.data.remote.api.ShoppingRetrofit
 import woowacourse.shopping.data.remote.api.handleApi
@@ -20,9 +19,10 @@ class ApiHandleCartDataSourceImpl : ApiHandleCartDataSource {
     override suspend fun postCartItems(request: RequestCartItemPostDto): ApiResult<Unit> =
         handleApi { ShoppingRetrofit.cartItemService.postCartItem(request = request) }
 
-    override suspend fun deleteCartItems(id: Long): ApiResult<Unit> = handleApi {
-        ShoppingRetrofit.cartItemService.deleteCartItem(id = id)
-    }
+    override suspend fun deleteCartItems(id: Long): ApiResult<Unit> =
+        handleApi {
+            ShoppingRetrofit.cartItemService.deleteCartItem(id = id)
+        }
 
     override suspend fun patchCartItems(
         id: Long,
