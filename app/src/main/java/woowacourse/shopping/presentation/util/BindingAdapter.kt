@@ -7,7 +7,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import okhttp3.internal.format
 import woowacourse.shopping.R
+import woowacourse.shopping.domain.BuyXGetYCoupon
+import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.FixedCoupon
+import woowacourse.shopping.domain.FreeShippingCoupon
+import woowacourse.shopping.domain.PercentageCoupon
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.RecentProductItem
 import woowacourse.shopping.presentation.ui.UiState
@@ -77,5 +83,19 @@ fun Long.currency(context: Context): String {
     return when (Locale.getDefault().country) {
         Locale.KOREA.country -> context.getString(R.string.price_format_kor, this)
         else -> NumberFormat.getCurrencyInstance(Locale.getDefault()).format(this)
+    }
+}
+
+@BindingAdapter("bindCouponDetail")
+fun TextView.couponDetail(coupon: Coupon?) {
+    coupon?.let {
+        val string =
+            when (coupon) {
+                is BuyXGetYCoupon -> format("${coupon.buyQuantity}개 사면 ${coupon.getQuantity}개 더 증정")
+                is FixedCoupon -> format("최소 주문 금액: %s", coupon.minimumAmount)
+                is FreeShippingCoupon -> "배송비 할인"
+                is PercentageCoupon -> format("할인율: %s%%", coupon.discount)
+            }
+        text = string
     }
 }

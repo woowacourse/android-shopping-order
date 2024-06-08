@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
+import woowacourse.shopping.data.coupon.CouponRepositoryImpl
+import woowacourse.shopping.data.coupon.remote.RemoteCouponDataSource
 import woowacourse.shopping.data.local.AppDatabase
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.RemoteOrderDataSource
@@ -11,6 +13,7 @@ import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
+import woowacourse.shopping.presentation.ui.payment.PaymentViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
 class ViewModelFactory() : ViewModelProvider.Factory {
@@ -41,7 +44,6 @@ class ViewModelFactory() : ViewModelProvider.Factory {
 
             modelClass.isAssignableFrom(CartViewModel::class.java) -> {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 CartViewModel(
                     cartRepository =
                         CartRepositoryImpl(
@@ -54,6 +56,18 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                             RemoteOrderDataSource(),
                             RemoteCartDataSource(),
                         ),
+                ) as T
+            }
+
+            modelClass.isAssignableFrom(PaymentViewModel::class.java) -> {
+                PaymentViewModel(
+                    cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSource()),
+                    orderRepository =
+                        OrderRepositoryImpl(
+                            RemoteOrderDataSource(),
+                            RemoteCartDataSource(),
+                        ),
+                    couponRepository = CouponRepositoryImpl(remoteCouponDataSource = RemoteCouponDataSource()),
                 ) as T
             }
 
