@@ -75,6 +75,7 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
             adapter.submitList(uiState.couponUis)
         }
         viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
+            showToast(getString(R.string.msg_success_payment))
             val destination = ProductListFragment.TAG ?: return@observe
             navigator.popBackStack(destination, inclusive = false)
         }
