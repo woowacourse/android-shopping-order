@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.state
 
+import woowacourse.shopping.domain.model.CartItemDomain
+
 sealed interface HomeUiEvent {
     data class NavigateToDetail(val productId: Int) : HomeUiEvent
 
@@ -38,4 +40,14 @@ sealed interface RecommendListUiEvent {
     ) : RecommendListUiEvent
 
     data object NavigateBackToHome : RecommendListUiEvent
+
+    data class NavigateToOrder(
+        val cartItems: List<CartItemDomain>
+    ) : RecommendListUiEvent
+}
+
+sealed interface OrderUiEvent {
+    data object NavigateBackToHome : OrderUiEvent
+
+    data object Error : OrderUiEvent
 }

@@ -20,6 +20,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.view.cart.list.CartFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.detail.DetailActivity
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.state.CartListUiEvent
 import woowacourse.shopping.view.state.RecommendListUiEvent
 
@@ -99,7 +100,10 @@ class CartActivity : AppCompatActivity() {
                     )
                 }
 
-                RecommendListUiEvent.NavigateBackToHome -> finish()
+                is RecommendListUiEvent.NavigateBackToHome -> finish()
+                is RecommendListUiEvent.NavigateToOrder -> {
+                    startActivity(OrderActivity.createIntent(this, event.cartItems))
+                }
             }
         }
 

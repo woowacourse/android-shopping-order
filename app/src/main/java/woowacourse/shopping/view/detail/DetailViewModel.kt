@@ -6,14 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.toProduct
-import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityEventListener
 import woowacourse.shopping.view.state.DetailUiEvent
-import woowacourse.shopping.view.state.HomeUiEvent
 import woowacourse.shopping.view.state.ProductDetailUiState
 
 class DetailViewModel(
@@ -92,7 +90,7 @@ class DetailViewModel(
     private fun loadProduct() {
         viewModelScope.launch {
             val result = productRepository.getProductById(id = productId).getOrNull()
-            val entireCartItems = cartRepository.getEntireCartItems().getOrNull() ?: emptyList()
+            val entireCartItems = cartRepository.getEntireCartData().getOrNull() ?: emptyList()
             if (result == null) {
                 notifyError()
                 return@launch

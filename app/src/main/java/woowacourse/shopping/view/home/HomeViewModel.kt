@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
@@ -44,21 +43,17 @@ class HomeViewModel(
     }
 
     override fun addQuantity(cartItemId: Int) {
-        println("add quantity : $cartItemId")
         val targetCartItem =
             homeProductUiState.value?.cartItems?.firstOrNull { it.cartItemId == cartItemId }
                 ?: return
-        println("add quantity - target cart : $targetCartItem")
         val updatedCartItem = targetCartItem.increaseQuantity()
         updateQuantity(updatedCartItem)
     }
 
     override fun subtractQuantity(cartItemId: Int) {
-        println("subtract quantity : $cartItemId")
         val targetCartItem =
             homeProductUiState.value?.cartItems?.firstOrNull { it.cartItemId == cartItemId }
                 ?: return
-        println("subtract quantity - target cart : $targetCartItem")
         val updatedCartItem = targetCartItem.decreaseQuantity()
         if (updatedCartItem.quantity == 0) {
             removeCartItem(updatedCartItem)
@@ -125,7 +120,7 @@ class HomeViewModel(
     override fun addToCart(product: ProductItemDomain) {
         viewModelScope.launch {
             val result = cartRepository.addCartItem(product.id, 1).getOrNull()
-            val cartData = cartRepository.getEntireCartItems().getOrNull()
+            val cartData = cartRepository.getEntireCartData().getOrNull()
             val changedItem = cartData?.firstOrNull { it.productId == product.id }
             val uiState = homeProductUiState.value
 

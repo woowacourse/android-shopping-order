@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -92,9 +91,17 @@ class CartViewModel(
             }
 
             CurrentScreen.RECOMMEND -> {
-                makeOrder()
+                _recommendListUiEvent.value = Event(
+                    RecommendListUiEvent.NavigateToOrder(
+                        cartUiState.value?.selectedCartItems ?: return
+                    )
+                )
             }
         }
+    }
+
+    private fun showError() {
+
     }
 
     fun navigateBackToHome() {
@@ -129,7 +136,7 @@ class CartViewModel(
             )
 
             _cartUiState.value = uiState.copy(
-                selectedCartItemIds = uiState.selectedCartItemIds.filter { it != itemId }
+                selectedCartItems = uiState.selectedCartItems.filter { it.cartItemId != itemId }
             )
         }
     }
@@ -150,15 +157,15 @@ class CartViewModel(
                 ?: return
         if (isSelected) {
             _cartUiState.value = cartUiState.value?.copy(
-                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                    itemId
+                selectedCartItems = cartUiState.value?.selectedCartItems?.plus(
+                    cartItem.cartItem
                 ) ?: return
             )
         } else {
             _cartUiState.value = cartUiState.value?.copy(
-                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.minus(
-                    itemId
-                ) ?: return
+                selectedCartItems = cartUiState.value?.selectedCartItems?.filter {
+                    it.cartItemId != cartItem.cartItem.cartItemId
+                } ?: return
             )
         }
         setTotalPrice()
@@ -190,14 +197,14 @@ class CartViewModel(
                 return@launch
             }
             val changedItem =
-                entireCartItems.firstOrNull { it.productId == product.id }
+                entireCartItems.firstOrNull { it.product.id == product.id }
             if (changedItem == null) {
                 return@launch
             }
             val updatedProducts = uiState.recommendedProducts.map {
-                if (it.orderableProduct.productItemDomain.id == changedItem.productId) it.copy(
+                if (it.orderableProduct.productItemDomain.id == changedItem.product.id) it.copy(
                     orderableProduct = it.orderableProduct.copy(
-                        cartData = changedItem
+                        cartData = CartData(changedItem.cartItemId, changedItem.product.id, quantity = changedItem.quantity)
                     )
                 ) else it
             }
@@ -206,8 +213,8 @@ class CartViewModel(
                     recommendedProducts = updatedProducts,
                 )
             _cartUiState.value = cartUiState.value?.copy(
-                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                    changedItem.cartItemId
+                selectedCartItems = cartUiState.value?.selectedCartItems?.plus(
+                    changedItem
                 ) ?: return@launch
             )
         }
@@ -260,7 +267,7 @@ class CartViewModel(
                         cartItems.cartItems.map { cartItem ->
                             CartViewItem(
                                 cartItem,
-                                cartUiState.isEntireCheckboxSelected || cartItem.cartItemId in (cartUiState.selectedCartItemIds),
+                                cartUiState.isEntireCheckboxSelected || cartItem.cartItemId in (cartUiState.selectedCartItems.map { it.cartItemId }),
                             )
                         },
                     )
@@ -270,17 +277,17 @@ class CartViewModel(
         }
     }
 
-    private fun makeOrder() {
-        viewModelScope.launch {
-            orderRepository.postOrder(
-                cartUiState.value?.selectedCartItemIds ?: return@launch
-            ).onSuccess {
-                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
-            }.onFailure {
-
-            }
-        }
-    }
+//    private fun makeOrder() {
+//        viewModelScope.launch {
+//            orderRepository.postOrder(
+//                cartUiState.value?.selectedCartItemIds ?: return@launch
+//            ).onSuccess {
+//                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
+//            }.onFailure {
+//
+//            }
+//        }
+//    }
 
     private fun updateCartQuantity(
         cartItemId: Int,
