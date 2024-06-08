@@ -29,9 +29,9 @@ data class CouponResponse(
 ) {
     @Serializable
     data class AvailableTime(
-        @SerialName("endTime")
+        @SerialName("end")
         val endTime: String = "",
-        @SerialName("startTime")
+        @SerialName("start")
         val startTime: String = ""
     )
 }
