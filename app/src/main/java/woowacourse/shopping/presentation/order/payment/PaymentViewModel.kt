@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import woowacourse.shopping.domain.entity.coupon.DiscountResult
 import woowacourse.shopping.domain.usecase.order.LoadAvailableDiscountCouponsUseCase
 import woowacourse.shopping.domain.usecase.order.LoadShippingFeeUseCase
 import woowacourse.shopping.domain.usecase.order.OrderCartProductsUseCase
@@ -38,8 +39,12 @@ class PaymentViewModel(
         _uiState.value =
             _uiState.value?.copy(
                 cart = cart,
-                paymentPrice = cart.totalPrice(),
-                shippingFee = loadShippingFeeUseCase(),
+                discountResult =
+                    DiscountResult(
+                        cart.totalPrice(),
+                        0,
+                        loadShippingFeeUseCase(),
+                    ),
             )
         loadCoupons(orders.map { it.product.id })
     }
@@ -97,8 +102,7 @@ class PaymentViewModel(
                     uiState.couponUis.map {
                         it.copy(isSelected = it.id == couponId)
                     },
-                discountPrice = discountResult.discountPrice,
-                paymentPrice = discountResult.paymentPrice,
+                discountResult = discountResult,
             )
     }
 
@@ -107,8 +111,7 @@ class PaymentViewModel(
         _uiState.value =
             uiState.copy(
                 couponUis = uiState.couponUis.map { it.copy(isSelected = false) },
-                discountPrice = 0,
-                paymentPrice = uiState.totalPrice,
+                discountResult = uiState.discountResult.copy(discountPrice = 0),
             )
     }
 

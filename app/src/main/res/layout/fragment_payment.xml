@@ -131,7 +131,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="@{@string/price_format(vm.uiState.discountPrice)}"
+                            android:text="@{@string/price_format(vm.uiState.discountResult.discountPrice)}"
                             android:textColor="@color/black"
                             android:textSize="18sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -161,7 +161,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="@{@string/price_format(vm.uiState.shippingFee)}"
+                            android:text="@{@string/price_format(vm.uiState.discountResult.shippingFee)}"
                             android:textColor="@color/black"
                             android:textSize="18sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -200,7 +200,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="@{@string/price_format(vm.uiState.paymentPrice)}"
+                            android:text="@{@string/price_format(vm.uiState.discountResult.paymentPrice)}"
                             android:textColor="@color/black"
                             android:textSize="18sp"
                             app:layout_constraintBottom_toBottomOf="parent"

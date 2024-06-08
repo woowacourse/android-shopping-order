@@ -25,7 +25,7 @@ class FreeShippingCouponTest {
         assertSoftly {
             available.shouldBeTrue()
             actual.discountPrice.shouldBe(3000)
-            actual.paymentPrice.shouldBe(47_000)
+            actual.paymentPrice.shouldBe(50_000)
         }
     }
 

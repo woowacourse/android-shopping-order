@@ -20,6 +20,6 @@ data class FreeShippingCoupon(
         shippingFee: Long,
     ): DiscountResult {
         val totalPrice = cart.totalPrice()
-        return DiscountResult(totalPrice, discountPrice = shippingFee, shippingFee = 0)
+        return DiscountResult(totalPrice, discountPrice = shippingFee, shippingFee = shippingFee)
     }
 }
