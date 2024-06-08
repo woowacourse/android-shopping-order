@@ -86,8 +86,4 @@ class FakeCartRepository(
         val startIndex = currentPage * pageSize
         return Result.success(startIndex < products.size)
     }
-
-    override suspend fun orderCartProducts(productIds: List<Long>): Result<Unit> {
-        TODO("Not yet implemented")
-    }
 }

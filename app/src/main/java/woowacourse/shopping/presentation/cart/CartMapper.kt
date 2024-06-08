@@ -19,6 +19,10 @@ fun CartProductUi.toDomain(): CartProduct {
     return CartProduct(id = id, product = product.toDomain(), count = count)
 }
 
+fun List<CartProductUi>.toCart(): Cart {
+    return Cart(map { it.toDomain() })
+}
+
 fun CartErrorEvent.toErrorMessageFrom(context: Context): String {
     return when (this) {
         CartErrorEvent.LoadCartProducts -> context.getString(R.string.error_msg_load_cart_products)

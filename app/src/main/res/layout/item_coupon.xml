@@ -3,9 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="coupon"
-            type="woowacourse.shopping.domain.entity.coupon.Coupon" />
+            type="woowacourse.shopping.presentation.order.payment.CouponUiModel" />
+
+        <variable
+            name="listener"
+            type="woowacourse.shopping.presentation.order.payment.CouponClickListener" />
     </data>
 
     <LinearLayout
@@ -13,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:background="@drawable/shape_border"
+        android:onClick="@{() -> listener.toggleCoupon(coupon.id)}"
         android:orientation="vertical">
 
         <LinearLayout
@@ -25,17 +31,18 @@
             android:orientation="horizontal">
 
             <CheckBox
-                android:enabled="false"
                 android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                android:checked="@{coupon.isSelected}"
+                android:enabled="false" />
 
             <TextView
-                android:text="@{coupon.description}"
                 android:id="@+id/tv_cart_item_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:text="@{coupon.name}"
                 android:textColor="@color/gray500"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -43,19 +50,19 @@
         </LinearLayout>
 
         <TextView
-            android:text="@{@string/coupon_date(coupon)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:text="@{@string/coupon_date(coupon.expirationDate)}"
             tools:text="만료일: 2024년 11월 30일" />
 
         <TextView
+            android:id="@+id/minimumAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text=""
             android:layout_marginBottom="18dp"
-            android:id="@+id/minimumAmount"
+            android:text="@{@string/min_available_coupon_price(coupon.minimumPrice)}"
             tools:text="최소 주문 금액: 1,000원" />
     </LinearLayout>
 </layout>

@@ -15,7 +15,13 @@ interface ShoppingNavigator {
     )
 
     fun navigateToRecommend(
-        orderIds: List<CartProductUi>,
+        orderProducts: List<CartProductUi>,
+        addBackStack: Boolean,
+        tag: String?,
+    )
+
+    fun navigateToPayment(
+        orderProducts: List<CartProductUi>,
         addBackStack: Boolean,
         tag: String?,
     )
