@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +12,9 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
@@ -52,17 +54,34 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         viewModelScope.launch {
-            val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
-            _cartItems.value = currentItems
-            _isLoading.value = false
+            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+                _cartItems.value = cartItems
+                _isLoading.value = false
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
         }
     }
 
     fun deleteItem(cartItemId: Long) {
         viewModelScope.launch  {
-            cartItemRepository.delete(cartItemId)
-            val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
-            _cartItems.value = currentItems
+            cartItemRepository.delete(cartItemId).onSuccess {
+                Log.d("hye", "Success: 장바구니 아이템 삭제 성공")
+            }.onError { code, message ->
+                Log.e("hye", "ServerError: $code - $message")
+            }.onException {
+                Log.e("hye", "Exception: ${it.message}")
+            }
+
+            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+                _cartItems.value = cartItems
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
         }
         updateSelectedCartItemsCount()
     }
@@ -96,8 +115,13 @@ class ShoppingCartViewModel(
     ) {
         viewModelScope.launch  {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
-            val currentItems = cartItemRepository.loadCartItems()
-            updateCartItems(currentItems)
+            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+                updateCartItems(cartItems)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
             updateTotalPrice()
         }
     }
@@ -108,8 +132,13 @@ class ShoppingCartViewModel(
     ) {
         viewModelScope.launch  {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
-            val currentItems = cartItemRepository.loadCartItems()
-            updateCartItems(currentItems)
+            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+                updateCartItems(cartItems)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
             updateTotalPrice()
             updateSelectedCartItemsCount()
         }

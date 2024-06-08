@@ -20,7 +20,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.listener.OnOrderListener
 
@@ -46,9 +45,14 @@ class OrderViewModel(
         viewModelScope.launch {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
-            val cartItems: List<CartItem> = cartItemRepository.loadCartItems()
-            val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
-            orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
+            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+                val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
+                orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
             _isOrderSuccess.setValue(true)
         }
     }

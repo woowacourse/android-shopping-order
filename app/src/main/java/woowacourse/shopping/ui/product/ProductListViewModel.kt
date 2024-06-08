@@ -58,6 +58,7 @@ class ProductListViewModel(
             (FIRST_PAGE..page).forEach {
                 productsRepository.loadProducts(it).onSuccess { products ->
                     _loadedProducts.value = products
+                    _isLoading.value = false
                 }.onError { code, message ->
                     // TODO: Error Handling
                 }.onException {
@@ -73,11 +74,16 @@ class ProductListViewModel(
                 // TODO: Exception Handling
             }
 
+            cartItemRepository.calculateCartItemsCount().onSuccess { totalCartCount ->
+                _cartProductTotalCount.value = totalCartCount
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
             val productHistory = productHistoryRepository.loadProductsHistory()
-            val totalCartCount = cartItemRepository.calculateCartItemsCount()
-            _cartProductTotalCount.value = totalCartCount
             _productsHistory.value = productHistory
-            _isLoading.value = false
         }
     }
 
@@ -102,9 +108,15 @@ class ProductListViewModel(
                 // TODO: Exception Handling
             }
 
-            val totalCount = cartItemRepository.calculateCartItemsCount()
+            cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
+                _cartProductTotalCount.value = totalCount
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
             _currentPage.postValue(nextPage)
-            _cartProductTotalCount.value = totalCount
         }
     }
 
@@ -121,13 +133,13 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            try {
-                cartItemRepository.updateProductQuantity(productId, quantity)
-            } catch (e: NoSuchElementException) {
-                cartItemRepository.updateProductQuantity(productId, quantity)
-            } finally {
-                val totalCount = cartItemRepository.calculateCartItemsCount()
+            cartItemRepository.updateProductQuantity(productId, quantity)
+            cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
                 updateProductQuantity(productId, INCREASE_VARIATION, totalCount)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
             }
         }
     }
@@ -138,9 +150,13 @@ class ProductListViewModel(
     ) {
         viewModelScope.launch {
             cartItemRepository.updateProductQuantity(productId, quantity)
-            val totalCount = cartItemRepository.calculateCartItemsCount()
-            updateProductQuantity(productId, DECREASE_VARIATION, totalCount)
-            return@launch
+            cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
+                updateProductQuantity(productId, DECREASE_VARIATION, totalCount)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
         }
     }
 
