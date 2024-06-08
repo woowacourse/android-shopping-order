@@ -10,7 +10,7 @@ data class OrderUiState(
     val cartItems: List<CartItemDomain> = emptyList(),
     val coupons: List<CouponViewItem.CouponItem> = emptyList(),
     val shippingPrice: Int = DEFAULT_SHIPPING_PRICE,
-    val orderPrice: Int = cartItems.sumOf { it.totalPrice() } + shippingPrice,
+    val orderPrice: Int = cartItems.sumOf { it.totalPrice() },
     val discount: Int = DEFAULT_DISCOUNT_PRICE,
     val selectedCoupon: Coupon? = null,
 ) {

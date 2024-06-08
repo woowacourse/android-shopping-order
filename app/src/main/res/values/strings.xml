@@ -17,4 +17,5 @@
     <string name="order_total_price">총 결제 금액</string>
     <string name="order_expiration_date">만료일: %s</string>
     <string name="order_minimum_price">최소 주문 금액: %s</string>
+    <string name="order_toolbar">결제하기</string>
 </resources>

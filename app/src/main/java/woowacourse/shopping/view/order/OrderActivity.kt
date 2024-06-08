@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -39,23 +40,49 @@ class OrderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        initializeBindingVariables()
+        initializeToolbar()
+        observeEvent()
+        observeState()
+    }
+
+    private fun initializeBindingVariables() {
         binding.viewModel = viewModel
         binding.adapter = adapter
         binding.lifecycleOwner = this
+    }
 
+    private fun observeEvent() {
         viewModel.orderUiEvent.observe(this) { event ->
             when (event.getContentIfNotHandled() ?: return@observe) {
-                is OrderUiEvent.NavigateBackToHome -> {
-                    Intent(this, HomeActivity::class.java).also {
-                        it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        startActivity(it)
-                    }
-                }
-
+                is OrderUiEvent.NavigateBackToHome -> navigateBackToHome()
                 is OrderUiEvent.Error -> showError()
             }
         }
+    }
 
+    private fun navigateBackToHome() {
+        Intent(this, HomeActivity::class.java).also {
+            it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(it)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> navigateBackToHome()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun initializeToolbar() {
+        setSupportActionBar(binding.toolbarOrder)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_back_vector)
+    }
+
+    private fun observeState() {
         viewModel.orderUiState.observe(this) { state ->
             adapter.submitList(state.coupons)
         }

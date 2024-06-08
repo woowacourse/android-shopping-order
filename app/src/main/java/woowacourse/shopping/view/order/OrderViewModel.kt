@@ -31,7 +31,7 @@ class OrderViewModel(
         get() = _couponUiEvent
 
     val totalPrice: LiveData<Int> = orderUiState.map {
-        it.orderPrice - it.discount
+        it.orderPrice - it.discount + it.shippingPrice
     }.distinctUntilChanged()
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, _ ->
@@ -86,7 +86,7 @@ class OrderViewModel(
                 isLoading = false,
                 cartItems = cartItems,
                 coupons = couponViewItems,
-                orderPrice = cartItems.sumOf { it.totalPrice() } + 3000
+                orderPrice = cartItems.sumOf { it.totalPrice() },
             )?.filterAvailableCoupons()
         }
     }
