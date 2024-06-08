@@ -26,11 +26,7 @@ class ProductRepositoryImpl : ProductRepository {
 
     override suspend fun getProduct(productId: Long): Result<Product> {
         return runCatching {
-            mockProductService.findProductById(productId)
-        }.mapCatching {
-            it ?: throw ErrorEvent.LoadDataEvent()
-        }.recoverCatching {
-            throw ErrorEvent.LoadDataEvent()
+            mockProductService.findProductById(productId) ?: throw ErrorEvent.LoadDataEvent()
         }
     }
 

@@ -36,16 +36,15 @@ class RemoteShoppingCartRepositoryImpl(
     }
 
     override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
-        return cartItemDataSource.loadCartItem(productId)
-            .mapCatching { cartItem ->
-                CartItemResult(
-                    cartItemId = cartItem.id,
-                    counter = cartItem.product.cartItemCounter,
-                )
-            }
-            .recoverCatching {
-                CartItemResult(DEFAULT_CART_ITEM_ID, CartItemCounter())
-            }
+        return runCatching {
+            val cartItem = cartItemDataSource.loadCartItem(productId).getOrThrow()
+            CartItemResult(
+                cartItemId = cartItem.id,
+                counter = cartItem.product.cartItemCounter,
+            )
+        }.recoverCatching {
+            CartItemResult(DEFAULT_CART_ITEM_ID, CartItemCounter())
+        }
     }
 
     override suspend fun updateCartItem(
@@ -79,9 +78,6 @@ class RemoteShoppingCartRepositoryImpl(
                     }
                 }
             }
-            .recoverCatching {
-                throw ErrorEvent.UpdateCartEvent()
-            }
     }
 
     private suspend fun addCartItemResult(
@@ -92,10 +88,9 @@ class RemoteShoppingCartRepositoryImpl(
         return addCartItem(product)
             .mapCatching {
                 UpdateCartItemResult.ADD
+            }.getOrElse {
+                throw ErrorEvent.UpdateCartEvent()
             }
-            .recover {
-                throw ErrorEvent.AddCartEvent()
-            }.getOrThrow()
     }
 
     private fun increaseItem(
@@ -113,20 +108,18 @@ class RemoteShoppingCartRepositoryImpl(
         )
             .mapCatching {
                 UpdateCartItemResult.UPDATED(cartItemResult)
-            }
-            .recover {
+            }.getOrElse {
                 throw ErrorEvent.UpdateCartEvent()
-            }.getOrThrow()
+            }
     }
 
     private suspend fun deleteCartItemResult(cartItemResult: CartItemResult): UpdateCartItemResult {
         return deleteCartItem(cartItemResult.cartItemId)
             .mapCatching {
                 UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
-            }
-            .recover {
+            }.getOrElse {
                 throw ErrorEvent.DeleteCartEvent()
-            }.getOrThrow()
+            }
     }
 
     override suspend fun getTotalCartItemCount(): Result<Int> {

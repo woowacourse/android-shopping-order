@@ -29,15 +29,13 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         pagingSize: Int,
     ): Result<List<CartItem>> {
         return runCatching {
-            cartItemDao.findPagingCartItem(offset, pagingSize).map { it.toCartItem() }
+            val cartItems =
+                cartItemDao.findPagingCartItem(offset, pagingSize).map { it.toCartItem() }
+            if (cartItems.isEmpty()) throw ErrorEvent.MaxPagingDataEvent()
+            cartItems
+        }.recoverCatching {
+            throw ErrorEvent.LoadDataEvent()
         }
-            .mapCatching { cartItems ->
-                if (cartItems.isEmpty()) throw ErrorEvent.MaxPagingDataEvent()
-                cartItems
-            }
-            .recoverCatching {
-                throw ErrorEvent.LoadDataEvent()
-            }
     }
 
     override suspend fun deleteCartItem(itemId: Long): Result<Unit> {
@@ -48,20 +46,17 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
 
     override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         return runCatching {
-            cartItemDao.findCartItemByProductId(productId)?.toCartItem()
+            val cartItem = cartItemDao.findCartItemByProductId(productId)?.toCartItem()
+            CartItemResult(
+                cartItemId = cartItem?.id ?: throw ErrorEvent.LoadDataEvent(),
+                counter = cartItem.product.cartItemCounter,
+            )
+        }.recoverCatching {
+            CartItemResult(
+                cartItemId = DEFAULT_CART_ITEM_ID,
+                counter = CartItemCounter(),
+            )
         }
-            .mapCatching {
-                CartItemResult(
-                    cartItemId = it?.id ?: throw ErrorEvent.LoadDataEvent(),
-                    counter = it.product.cartItemCounter,
-                )
-            }
-            .recoverCatching {
-                CartItemResult(
-                    cartItemId = DEFAULT_CART_ITEM_ID,
-                    counter = CartItemCounter(),
-                )
-            }
     }
 
     override suspend fun updateCartItem(
@@ -95,9 +90,6 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                     }
                 }
             }
-            .recoverCatching {
-                throw ErrorEvent.AddCartEvent()
-            }
     }
 
     private fun isValidCartId(id: Long): Boolean {
@@ -109,13 +101,10 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
     }
 
     private suspend fun addCartItemResult(product: Product): UpdateCartItemResult {
-        return addCartItem(product)
-            .mapCatching {
-                UpdateCartItemResult.ADD
-            }
-            .recover {
-                throw ErrorEvent.AddCartEvent()
-            }.getOrThrow()
+        return run {
+            addCartItem(product).getOrNull() ?: throw ErrorEvent.AddCartEvent()
+            UpdateCartItemResult.ADD
+        }
     }
 
     private suspend fun updateCartItemCount(cartItemResult: CartItemResult): UpdateCartItemResult {
@@ -124,23 +113,17 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                 itemId = cartItemResult.cartItemId,
                 count = cartItemResult.counter.itemCount,
             )
+            UpdateCartItemResult.UPDATED(cartItemResult)
+        }.getOrElse {
+            throw ErrorEvent.UpdateCartEvent()
         }
-            .mapCatching {
-                UpdateCartItemResult.UPDATED(cartItemResult)
-            }
-            .recover {
-                throw ErrorEvent.UpdateCartEvent()
-            }.getOrThrow()
     }
 
     private suspend fun deleteCartItemResult(cartItemResult: CartItemResult): UpdateCartItemResult {
-        return deleteCartItem(cartItemResult.cartItemId)
-            .mapCatching {
-                UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
-            }
-            .recover {
-                throw ErrorEvent.DeleteCartEvent()
-            }.getOrThrow()
+        return run {
+            deleteCartItem(cartItemResult.cartItemId).getOrNull() ?: throw ErrorEvent.DeleteCartEvent()
+            UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
+        }
     }
 
     override suspend fun getTotalCartItemCount(): Result<Int> {

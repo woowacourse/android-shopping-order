@@ -22,21 +22,16 @@ class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepositor
 
     override suspend fun getMostRecentlyProduct(): Result<RecentlyProduct> {
         return runCatching {
-            recentlyProductDao.getMostRecentlyProduct()
-        }.mapCatching {
-            it?.toRecentlyProduct() ?: throw ErrorEvent.LoadDataEvent()
-        }.recoverCatching {
-            throw ErrorEvent.LoadDataEvent()
+            recentlyProductDao.getMostRecentlyProduct()?.toRecentlyProduct()
+                ?: throw ErrorEvent.LoadDataEvent()
         }
     }
 
     override suspend fun getRecentlyProductList(): Result<List<RecentlyProduct>> {
         return runCatching {
             recentlyProductDao.findPagingRecentlyProduct(CURRENT_CART_ITEM_LOAD_PAGING_SIZE)
+                .map { it.toRecentlyProduct() }
         }
-            .mapCatching { products ->
-                products.map { it.toRecentlyProduct() }
-            }
             .recoverCatching {
                 throw ErrorEvent.LoadDataEvent()
             }
