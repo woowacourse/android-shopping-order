@@ -1,16 +1,25 @@
 package woowacourse.shopping.data.remote.dto.response
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@Serializable
+@Serializable(with = ModuleSerializer::class)
 sealed class Coupon {
     abstract val id: Long
     abstract val code: String
@@ -22,7 +31,6 @@ sealed class Coupon {
 }
 
 @Serializable
-@SerialName("fixed")
 data class FixedDiscountCoupon(
     override val id: Long,
     override val code: String,
@@ -35,7 +43,6 @@ data class FixedDiscountCoupon(
 ) : Coupon()
 
 @Serializable
-@SerialName("buyXgetY")
 data class BuyXGetYCoupon(
     override val id: Long,
     override val code: String,
@@ -48,7 +55,6 @@ data class BuyXGetYCoupon(
 ) : Coupon()
 
 @Serializable
-@SerialName("freeShipping")
 data class FreeShippingCoupon(
     override val id: Long,
     override val code: String,
@@ -60,7 +66,6 @@ data class FreeShippingCoupon(
 ) : Coupon()
 
 @Serializable
-@SerialName("percentage")
 data class PercentageDiscountCoupon(
     override val id: Long,
     override val code: String,
@@ -84,17 +89,15 @@ data class AvailableTime(
 object LocalDateSerializer : KSerializer<LocalDate> {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    override fun serialize(
-        output: Encoder,
-        obj: LocalDate,
-    ) {
-        val string = obj.format(formatter)
-        output.encodeString(string)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: LocalDate) {
+        encoder.encodeString(value.format(formatter))
     }
 
-    override fun deserialize(input: Decoder): LocalDate {
-        val string = input.decodeString()
-        return LocalDate.parse(string, formatter)
+    override fun deserialize(decoder: Decoder): LocalDate {
+        return LocalDate.parse(decoder.decodeString(), formatter)
     }
 }
 
@@ -102,17 +105,26 @@ object LocalDateSerializer : KSerializer<LocalDate> {
 object LocalTimeSerializer : KSerializer<LocalTime> {
     private val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-    override fun serialize(
-        output: Encoder,
-        obj: LocalTime,
-    ) {
-        val string = obj.format(formatter)
-        output.encodeString(string)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("LocalTime", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: LocalTime) {
+        encoder.encodeString(value.format(formatter))
     }
 
-    override fun deserialize(input: Decoder): LocalTime {
-        val string = input.decodeString()
-        return LocalTime.parse(string, formatter)
+    override fun deserialize(decoder: Decoder): LocalTime {
+        return LocalTime.parse(decoder.decodeString(), formatter)
     }
 }
 
+object ModuleSerializer : JsonContentPolymorphicSerializer<Coupon>(Coupon::class) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out Coupon> {
+        return when (element.jsonObject["discountType"]?.jsonPrimitive?.content) {
+            "fixed" -> FixedDiscountCoupon.serializer()
+            "buyXgetY" -> BuyXGetYCoupon.serializer()
+            "percentage" -> PercentageDiscountCoupon.serializer()
+            "freeShipping" -> FreeShippingCoupon.serializer()
+            else -> throw Exception("Unknown Module: key 'discountType' not found or does not matches any module type")
+        }
+    }
+}
