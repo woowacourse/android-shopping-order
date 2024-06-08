@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
@@ -56,6 +57,10 @@ class ProductContentsViewModel(
 
     private val _error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
     val error: SingleLiveData<Throwable> = _error
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            _error.setValue(throwable)
+        }
 
     private var currentOffset = 0
 
@@ -66,17 +71,18 @@ class ProductContentsViewModel(
     }
 
     override fun plusCount(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.patchCartItem(
                 findCartItemByProductId(productId),
                 findCartItemQuantityByProductId(productId).inc().value,
-            )
-            loadCartItems()
+            ).onSuccess {
+                loadCartItems()
+            }
         }
     }
 
     override fun minusCount(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             val currentCount = findCartItemQuantityByProductId(productId).dec().value
             if (currentCount == 0) {
                 cartRepository.deleteCartItem(findCartItemByProductId(productId))
@@ -99,30 +105,26 @@ class ProductContentsViewModel(
     }
 
     fun loadProducts() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             productRepository.getProducts(currentOffset++, 20).onSuccess {
                 items.addAll(it)
                 products.value = items
                 productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
-            }.onFailure {
-                _error.setValue(it)
             }
         }
     }
 
     fun loadCartItems() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getAllCartItems().onSuccess {
                 cart.value = it
                 productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
-            }.onFailure {
-                _error.setValue(it)
             }
         }
     }
 
     fun loadRecentProducts() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             recentProductRepository.findAll().onSuccess {
                 _recentProducts.value = it.map { productRepository.find(it.productId).getOrThrow() }
             }
