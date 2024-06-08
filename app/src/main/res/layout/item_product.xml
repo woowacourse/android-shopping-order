@@ -18,11 +18,16 @@
             name="addCartClickListener"
             type="woowacourse.shopping.ui.utils.AddCartClickListener" />
 
+        <variable
+            name="productItemClickListener"
+            type="woowacourse.shopping.ui.products.ProductItemClickListener" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/item_layout"
         android:layout_width="wrap_content"
+        android:onClick="@{() -> productItemClickListener.itemClickListener(productWithQuantity.product.id)}"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:animateLayoutChanges="true"

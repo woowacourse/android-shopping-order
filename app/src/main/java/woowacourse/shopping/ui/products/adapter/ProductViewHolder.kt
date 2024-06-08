@@ -18,8 +18,6 @@ class ProductViewHolder(
         binding.productWithQuantity = productWithQuantity
         binding.countButtonClickListener = countButtonClickListener
         binding.addCartClickListener = addCartClickListener
-        binding.itemLayout.setOnClickListener {
-            productItemClickListener.itemClickListener(productWithQuantity.product.id)
-        }
+        binding.productItemClickListener = productItemClickListener
     }
 }
