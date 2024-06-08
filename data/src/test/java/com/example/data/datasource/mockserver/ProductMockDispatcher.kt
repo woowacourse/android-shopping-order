@@ -15,18 +15,17 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import woowacourse.shopping.data.dummy.dummyProductList
 
-class MockWebProductServerDispatcher() : Dispatcher() {
+class ProductMockDispatcher() : Dispatcher() {
     override fun dispatch(request: RecordedRequest): MockResponse {
         val url = request.requestUrl ?: return makeErrorResponse()
         val segments = url.pathSegments
         when (segments[0]) {
             PRODUCTS -> {
-                if (segments.size == 1)
-                    {
-                        val page = url.queryParameter("page")?.toInt() ?: 0
-                        val size = url.queryParameter("size")?.toInt() ?: 0
-                        return getProductsResponse(page, size)
-                    }
+                if (segments.size == 1) {
+                    val page = url.queryParameter("page")?.toInt() ?: 0
+                    val size = url.queryParameter("size")?.toInt() ?: 0
+                    return getProductsResponse(page, size)
+                }
                 println(segments[1])
                 return getProductResponse(segments[1].toInt())
             }

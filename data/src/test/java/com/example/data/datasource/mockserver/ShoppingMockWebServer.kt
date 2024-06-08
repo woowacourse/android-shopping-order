@@ -4,7 +4,7 @@ import com.example.data.datasource.mockserver.MockWebServerPath.BASE_PORT
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockWebServer
 
-class MockWebProductServer(
+class ShoppingMockWebServer(
     private val dispatcher: Dispatcher,
 ) {
     val server: MockWebServer = MockWebServer()

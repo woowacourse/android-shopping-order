@@ -1,8 +1,8 @@
 package com.example.data.datasource
 
-import com.example.data.datasource.mockserver.MockWebProductServer
-import com.example.data.datasource.mockserver.MockWebProductServerDispatcher
 import com.example.data.datasource.mockserver.MockWebServerPath
+import com.example.data.datasource.mockserver.ProductMockDispatcher
+import com.example.data.datasource.mockserver.ShoppingMockWebServer
 import com.example.data.datasource.remote.RemoteProductDataSource
 import com.example.data.datasource.remote.retrofit.RetrofitClient
 import com.example.domain.datasource.DataResponse
@@ -18,7 +18,7 @@ import woowacourse.shopping.data.dummy.dummyProductList
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
 class RemoteProductDataSourceTest {
-    private val server = MockWebProductServer(MockWebProductServerDispatcher())
+    private val server = ShoppingMockWebServer(ProductMockDispatcher())
     private val client = RetrofitClient(baseUrl = MockWebServerPath.BASE_URL)
     private val dataSource: ProductDataSource =
         RemoteProductDataSource(
