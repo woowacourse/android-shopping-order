@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.coupon.Coupon
 
 class RepositoryImpl(
     private val localDataSource: LocalDataSource,
@@ -182,8 +183,9 @@ class RepositoryImpl(
         } ?: throw Throwable()
     }
 
-    override suspend fun getCoupons(): Result<List<Coupons>> {
+    override suspend fun getCoupons(): Result<List<Coupon>> {
         return remoteDataSource.getCoupons()
+            .mapCatching { it.map { it.toDomain() } }
             .recoverCatching { throw it }
     }
 }

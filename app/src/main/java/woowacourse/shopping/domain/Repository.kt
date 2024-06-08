@@ -3,7 +3,7 @@ package woowacourse.shopping.domain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.data.remote.dto.response.Coupons
+import woowacourse.shopping.domain.coupon.Coupon
 
 interface Repository {
     fun findProductByPaging(
@@ -64,5 +64,5 @@ interface Repository {
 
     suspend fun getCuration(): Result<List<CartProduct>?>
 
-    suspend fun getCoupons(): Result<List<Coupons>>
+    suspend fun getCoupons(): Result<List<Coupon>>
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -26,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:text="@{String.valueOf(coupon.description)}"
                 android:textAppearance="@style/H2"
                 tools:text="5000원 할인 쿠폰" />
         </LinearLayout>
@@ -35,8 +37,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:text="@{}"
             android:textAppearance="@style/B2"
             android:textColor="#555555"
+            app:expirationDate="@{coupon.expirationDate}"
             tools:text="만료일: 2024년 11월 30일" />
 
         <TextView
@@ -45,9 +49,22 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="18dp"
+            app:minimumAmountIsVisible="@{coupon.minimumAmount}"
             android:textAppearance="@style/B2"
             android:textColor="#555555"
             tools:text="최소 주문 금액: 100,000원" />
     </LinearLayout>
+
+    <data>
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.coupon.Coupon" />
+
+
+        <variable
+            name="couponActionHandler"
+            type="woowacourse.shopping.presentation.ui.payment.CouponActionHandler" />
+    </data>
 
 </layout>

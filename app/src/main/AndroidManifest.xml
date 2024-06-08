@@ -24,6 +24,9 @@
             android:name=".presentation.ui.detail.ProductDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".presentation.ui.payment.PaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.ui.shopping.ShoppingActionActivity"
             android:exported="true">
             <intent-filter>

@@ -10,7 +10,7 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
-import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 
 class CurationActivity : BindingActivity<ActivityCurationBinding>() {
     override val layoutResourceId: Int
@@ -67,7 +67,7 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
                 when (it) {
                     is CurationEvent.SuccessOrder -> {
                         Toast.makeText(this, "주문이 성공적으로 진행되었습니다.", Toast.LENGTH_SHORT).show()
-                        ShoppingActionActivity.createIntent(this).also {
+                        PaymentActivity.createIntent(this, orderItemsId.map { it.toInt() }).also {
                             startActivity(it)
                         }
                     }
