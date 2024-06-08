@@ -21,7 +21,6 @@ import woowacourse.shopping.data.remote.service.ProductService
 object ShoppingRetrofit {
 
     private val json = Json {
-        ignoreUnknownKeys = true
         serializersModule = SerializersModule {
             polymorphic(Coupon::class) {
                 subclass(FixedDiscountCoupon::class)
@@ -29,6 +28,7 @@ object ShoppingRetrofit {
                 subclass(FreeShippingCoupon::class)
                 subclass(PercentageDiscountCoupon::class)
             }
+            classDiscriminator = "coupon_type"
         }
     }
 
