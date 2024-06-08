@@ -20,7 +20,7 @@ import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
-import woowacourse.shopping.ui.cart.CartUiModel
+import woowacourse.shopping.ui.cart.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
@@ -293,15 +293,4 @@ class CartViewModel(
         return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.id
             ?: throw ShoppingException(ShoppingError.CartNotFound)
     }
-
-    private fun CartWithProduct.toUiModel(isChecked: Boolean) =
-        CartUiModel(
-            this.id,
-            this.product.id,
-            this.product.name,
-            this.product.price,
-            this.quantity,
-            this.product.imageUrl,
-            isChecked,
-        )
 }

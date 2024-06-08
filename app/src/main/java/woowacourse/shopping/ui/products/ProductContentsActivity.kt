@@ -127,5 +127,3 @@ class ProductContentsActivity : AppCompatActivity() {
             }
     }
 }
-
-fun List<ProductUiModel>.isLoading() = this + LoadingUiModel + LoadingUiModel
