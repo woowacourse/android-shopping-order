@@ -8,11 +8,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.domain.repository.RecentProductRepository
 import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultProductRepository
+import woowacourse.shopping.ShoppingCartApplication
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.products.ProductsActivity
@@ -20,13 +18,7 @@ import woowacourse.shopping.presentation.products.ProductsActivity
 class ProductDetailActivity : AppCompatActivity() {
     private val binding by lazy { ActivityProductDetailBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<ProductDetailViewModel> {
-        ProductDetailViewModelFactory(
-            productId(),
-            DefaultProductRepository(),
-            com.example.domain.repository.RecentProductRepository.getInstance(),
-            DefaultCartRepository(),
-            isNavigatedFromDetailView(),
-        )
+        (application as ShoppingCartApplication).getProductDetailViewModelFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +29,8 @@ class ProductDetailActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.onClickLastRecentProductListener =
             OnClickLastRecentProductListener { productId ->
-                val intent = newIntent(this@ProductDetailActivity, productId, lastSeenProductVisible = true)
+                val intent =
+                    newIntent(this@ProductDetailActivity, productId, lastSeenProductVisible = true)
                 startActivity(intent)
                 finish()
             }

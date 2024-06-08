@@ -1,7 +1,6 @@
 package woowacourse.shopping
 
 import android.app.Application
-import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.example.data.datasource.local.room.ShoppingCartDataBase
 import com.example.data.datasource.remote.RemoteCartDataSource
@@ -13,6 +12,8 @@ import com.example.data.repository.DefaultOrderRepository
 import com.example.data.repository.DefaultProductRepository
 import com.example.data.repository.DefaultRecentProductRepository
 import woowacourse.shopping.presentation.cart.CartViewModelFactory
+import woowacourse.shopping.presentation.detail.ProductDetailViewModelFactory
+import woowacourse.shopping.presentation.products.ProductsViewModelFactory
 
 class ShoppingCartApplication : Application() {
     private val db: ShoppingCartDataBase by lazy {
@@ -29,11 +30,25 @@ class ShoppingCartApplication : Application() {
     private val defaultCartRepository = DefaultCartRepository(remoteCartDataSource)
     private val defaultOrderRepository = DefaultOrderRepository(remoteOrderDataSource)
 
-    fun getCartViewModelFactory(): ViewModelProvider.Factory =
+    fun getProductsViewModelFactory(): ProductsViewModelFactory =
+        ProductsViewModelFactory(
+            defaultProductRepository,
+            defaultRecentProductRepository,
+            defaultCartRepository,
+        )
+
+    fun getCartViewModelFactory(): CartViewModelFactory =
         CartViewModelFactory(
             defaultProductRepository,
             defaultRecentProductRepository,
             defaultCartRepository,
             defaultOrderRepository,
+        )
+
+    fun getProductDetailViewModelFactory(): ProductDetailViewModelFactory =
+        ProductDetailViewModelFactory(
+            defaultProductRepository,
+            defaultRecentProductRepository,
+            defaultCartRepository,
         )
 }
