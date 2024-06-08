@@ -94,7 +94,7 @@ class CouponCalculator {
         coupon: Coupon,
         shoppingCart: ShoppingCart,
     ): SelectCouponResult {
-        return if (coupon.isPastDate() || coupon.isAvailableTime()) {
+        return if (coupon.isPastDate() || !coupon.isAvailableTime()) {
             SelectCouponResult.InValidDate
         } else {
             val discountPrice = shoppingCart.getTotalPrice() * coupon.discount / 100
