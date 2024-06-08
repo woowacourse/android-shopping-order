@@ -5,15 +5,15 @@ import woowacourse.shopping.data.local.entity.RecentProductEntity
 
 class RoomDataSource(private val recentProductDao: RecentProductDao) : LocalDataSource {
     override suspend fun findByLimit(limit: Int): List<RecentProductEntity> {
-        return recentProductDao.findByLimit(limit)
+        return recentProductDao.findAllByLimit(limit)
     }
 
     override suspend fun findOne(): RecentProductEntity? {
-        return recentProductDao.findOne()
+        return recentProductDao.findOrNull()
     }
 
     override suspend fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long {
-        recentProductDao.saveRecentProduct(recentProductEntity)
+        recentProductDao.save(recentProductEntity)
         return recentProductEntity.productId
     }
 }
