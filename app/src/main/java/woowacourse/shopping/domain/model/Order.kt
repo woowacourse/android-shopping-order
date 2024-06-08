@@ -32,4 +32,8 @@ class Order {
     fun getTotalQuantity(): Int {
         return _map.values.sumOf { it.quantity }
     }
+
+    companion object {
+        const val DEFAULT_SHIPPING_FEE = 3000
+    }
 }
