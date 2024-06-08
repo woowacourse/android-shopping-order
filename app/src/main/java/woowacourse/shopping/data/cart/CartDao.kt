@@ -48,11 +48,15 @@ interface CartDao {
     fun minusQuantityByProductId(productId: Long) {
         val cart = findByProductId(productId)
         if (cart != null) {
-            if (cart.quantity.value > 1) {
-                updateQuantityIfGreaterThanOne(productId)
-            } else {
-                deleteByProductId(productId)
-            }
+            updateQuantity(cart, productId)
+        }
+    }
+
+    fun updateQuantity(cart: Cart, productId: Long) {
+        if (cart.quantity.value > 1) {
+            updateQuantityIfGreaterThanOne(productId)
+        } else {
+            deleteByProductId(productId)
         }
     }
 
