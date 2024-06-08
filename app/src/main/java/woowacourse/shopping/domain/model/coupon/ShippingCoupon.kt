@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.model.coupon
 import woowacourse.shopping.domain.model.CartWithProduct
 import java.time.LocalDate
 
-data class FreeShipping(
+data class ShippingCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,

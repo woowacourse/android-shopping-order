@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartWithProduct
 import java.time.LocalDate
 import java.time.LocalTime
 
-data class MiracleCoupon(
+data class PercentageCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,

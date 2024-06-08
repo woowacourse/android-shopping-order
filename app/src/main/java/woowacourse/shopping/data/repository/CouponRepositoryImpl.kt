@@ -6,11 +6,11 @@ import woowacourse.shopping.data.remote.dto.response.BuyXGetYCoupon
 import woowacourse.shopping.data.remote.dto.response.FixedDiscountCoupon
 import woowacourse.shopping.data.remote.dto.response.FreeShippingCoupon
 import woowacourse.shopping.data.remote.dto.response.PercentageDiscountCoupon
-import woowacourse.shopping.domain.model.coupon.Buy2Free1
+import woowacourse.shopping.domain.model.coupon.BuyXFreeYCoupon
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.model.coupon.Discount5000
-import woowacourse.shopping.domain.model.coupon.FreeShipping
-import woowacourse.shopping.domain.model.coupon.MiracleCoupon
+import woowacourse.shopping.domain.model.coupon.FixedCoupon
+import woowacourse.shopping.domain.model.coupon.ShippingCoupon
+import woowacourse.shopping.domain.model.coupon.PercentageCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
@@ -20,7 +20,7 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
     private fun woowacourse.shopping.data.remote.dto.response.Coupon.toDomain(): Coupon =
         when (this) {
             is BuyXGetYCoupon ->
-                Buy2Free1(
+                BuyXFreeYCoupon(
                     id,
                     code,
                     description,
@@ -30,7 +30,7 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                 )
 
             is FixedDiscountCoupon ->
-                Discount5000(
+                FixedCoupon(
                     id,
                     description,
                     expirationDate,
@@ -40,7 +40,7 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                 )
 
             is FreeShippingCoupon ->
-                FreeShipping(
+                ShippingCoupon(
                     id,
                     code,
                     description,
@@ -49,7 +49,7 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                 )
 
             is PercentageDiscountCoupon ->
-                MiracleCoupon(
+                PercentageCoupon(
                     id,
                     code,
                     description,

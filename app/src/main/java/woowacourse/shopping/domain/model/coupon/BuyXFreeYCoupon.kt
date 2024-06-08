@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.model.coupon
 import woowacourse.shopping.domain.model.CartWithProduct
 import java.time.LocalDate
 
-data class Buy2Free1(
+data class BuyXFreeYCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,
@@ -21,7 +21,7 @@ data class Buy2Free1(
 
     override fun discountPrice(products: List<CartWithProduct>): Int {
         if (!canUse(products)) error("$description 쿠폰을 적용할 수 없습니다.")
-        val productsQuantity3 = products.filter { it.quantity.value == applyCount }
-        return productsQuantity3.maxOf { it.product.price }
+        val canApplyProducts = products.filter { it.quantity.value == applyCount }
+        return canApplyProducts.maxOf { it.product.price } * getQuantity
     }
 }
