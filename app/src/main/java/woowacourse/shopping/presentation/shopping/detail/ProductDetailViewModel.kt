@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.usecase.AddCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.AddCartProductUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.toDomain
 import woowacourse.shopping.presentation.shopping.toCartUiModel

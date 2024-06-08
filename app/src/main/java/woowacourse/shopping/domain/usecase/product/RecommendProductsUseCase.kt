@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.usecase
+package woowacourse.shopping.domain.usecase.product
 
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository

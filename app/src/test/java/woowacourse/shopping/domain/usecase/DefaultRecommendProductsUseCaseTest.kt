@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.entity.fakeCartProduct
 import woowacourse.shopping.domain.entity.fakeProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.usecase.product.DefaultRecommendProductsUseCase
 
 @ExtendWith(MockKExtension::class)
 class DefaultRecommendProductsUseCaseTest {

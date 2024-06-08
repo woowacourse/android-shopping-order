@@ -11,9 +11,9 @@ import timber.log.Timber
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.LoadCartUseCase
+import woowacourse.shopping.domain.usecase.cart.DecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.IncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.LoadCartUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.shopping.toShoppingUiModel
 import woowacourse.shopping.presentation.shopping.toUiModel

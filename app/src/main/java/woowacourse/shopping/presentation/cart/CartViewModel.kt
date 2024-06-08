@@ -9,11 +9,11 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.DeleteCartProductUseCase
-import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.LoadCartUseCase
-import woowacourse.shopping.domain.usecase.LoadPagingCartUseCase
+import woowacourse.shopping.domain.usecase.cart.DecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.DeleteCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.IncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.LoadCartUseCase
+import woowacourse.shopping.domain.usecase.cart.LoadPagingCartUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData

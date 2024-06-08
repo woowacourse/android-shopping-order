@@ -1,10 +1,10 @@
-package woowacourse.shopping.domain.usecase
+package woowacourse.shopping.domain.usecase.cart
 
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
-interface DecreaseCartProductUseCase {
+interface IncreaseCartProductUseCase {
     suspend operator fun invoke(
         productId: Long,
         amount: Int = DEFAULT_AMOUNT,
@@ -15,10 +15,10 @@ interface DecreaseCartProductUseCase {
     }
 }
 
-class DefaultDecreaseCartProductUseCase(
+class DefaultIncreaseCartProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-) : DecreaseCartProductUseCase {
+) : IncreaseCartProductUseCase {
     override suspend fun invoke(
         productId: Long,
         amount: Int,
@@ -30,29 +30,25 @@ class DefaultDecreaseCartProductUseCase(
                 .getOrThrow()
         // 2. cart 에서 product id 를 가진 상품을 찾는다.
         val cartProduct =
-            cartRepository.findCartProduct(product.id).onFailure {
-                return Result.failure(it)
-            }.getOrThrow()
-        // 2. cartProduct 수량을 감소시킬 수 없으면 삭제한다.
-        if (cartProduct.canDecreaseCount(amount).not()) {
-            return cartRepository.deleteCartProduct(productId)
-        }
-        // 3. cartProduct 수량을 감소시킨다.
-        val newCartProduct = cartProduct.decreaseCount(amount)
+            cartRepository.findCartProduct(product.id).getOrNull()
+            // 3. cartProduct 가 없으면 새로 생성한다.
+                ?: return cartRepository.createCartProduct(product, amount)
+        // 4. cartProduct 수량을 증가시킨다.
+        val newCartProduct = cartProduct.increaseCount(amount)
         return cartRepository.updateCartProduct(cartProduct.product, newCartProduct.count)
     }
 
     companion object {
-        @Volatile
-        private var instance: DecreaseCartProductUseCase? = null
+        private var instance: IncreaseCartProductUseCase? = null
 
         fun instance(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
-        ): DecreaseCartProductUseCase {
-            return instance ?: DefaultDecreaseCartProductUseCase(productRepository, cartRepository)
-                .also { instance = it }
+        ): IncreaseCartProductUseCase {
+            return instance ?: DefaultIncreaseCartProductUseCase(
+                productRepository,
+                cartRepository,
+            ).also { instance = it }
         }
     }
 }
-

@@ -16,10 +16,10 @@ import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.data.order.OrderRepositoryInjector
 import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentOrderProductBinding
-import woowacourse.shopping.domain.usecase.DefaultDecreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.DefaultIncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.DefaultDecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.DefaultIncreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.order.DefaultOrderCartProductsUseCase
-import woowacourse.shopping.domain.usecase.DefaultRecommendProductsUseCase
+import woowacourse.shopping.domain.usecase.product.DefaultRecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
