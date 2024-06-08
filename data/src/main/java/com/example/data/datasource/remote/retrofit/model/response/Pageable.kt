@@ -1,6 +1,5 @@
-package com.example.data.datasource.remote.retrofit.model.response.product
+package com.example.data.datasource.remote.retrofit.model.response
 
-import com.example.data.datasource.remote.retrofit.model.response.Sort
 import kotlinx.serialization.Serializable
 
 @Serializable

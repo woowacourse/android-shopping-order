@@ -50,7 +50,7 @@ class DefaultRecentProductRepository(
             val categoryProducts = recentProductDao.findCategory(category).toRecentProducts()
             val recommendCategoryProducts =
                 categoryProducts.filter { recentProduct ->
-                    cartItems.none { it.productId == recentProduct.product.id }
+                    cartItems.none { it.product.id == recentProduct.product.id }
                 }
             recommendProducts =
                 recommendCategoryProducts

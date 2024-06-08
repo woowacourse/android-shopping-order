@@ -1,5 +1,6 @@
 package com.example.data.datasource.remote.retrofit.model.response.product
 
+import com.example.data.datasource.remote.retrofit.model.response.Pageable
 import com.example.data.datasource.remote.retrofit.model.response.Sort
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

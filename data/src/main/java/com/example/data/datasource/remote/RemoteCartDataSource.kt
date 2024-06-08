@@ -22,13 +22,13 @@ class RemoteCartDataSource(
 
     override fun increaseQuantity(productId: Int) {
         findByProductId(productId).map { cartItem ->
-            changeQuantity(cartItem.productId, cartItem.quantity.inc())
+            changeQuantity(cartItem.product.id, cartItem.quantity.inc())
         }
     }
 
     override fun decreaseQuantity(productId: Int) {
         findByProductId(productId).map { cartItem ->
-            changeQuantity(cartItem.productId, cartItem.quantity.dec())
+            changeQuantity(cartItem.product.id, cartItem.quantity.dec())
         }
     }
 
@@ -44,7 +44,7 @@ class RemoteCartDataSource(
 
     override fun findByProductId(productId: Int): DataResponse<CartItem> =
         findAll().map { wholeList ->
-            wholeList.find { it.productId == productId }
+            wholeList.find { it.product.id == productId }
         }
 
     override fun findRange(
