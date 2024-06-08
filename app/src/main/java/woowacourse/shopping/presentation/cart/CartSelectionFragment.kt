@@ -22,6 +22,7 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         binding.rvCart.adapter = adapter
 
         viewModel.cartUiState.observe(viewLifecycleOwner) {
+            /*
             val cartUiState = it.getContentIfNotHandled() ?: return@observe
             when (cartUiState) {
                 CartUiState.Failure -> {
@@ -38,6 +39,7 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
                     adapter.submitList(cartUiState.cartUiModels)
                 }
             }
+             */
         }
         return binding.root
     }

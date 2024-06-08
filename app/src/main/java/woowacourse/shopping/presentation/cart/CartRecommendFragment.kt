@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.databinding.FragmentCartRecommendBinding
-import woowacourse.shopping.presentation.detail.ProductDetailActivity
 
 class CartRecommendFragment(val viewModel: CartViewModel) : Fragment() {
     private var _binding: FragmentCartRecommendBinding? = null
@@ -37,8 +36,8 @@ class CartRecommendFragment(val viewModel: CartViewModel) : Fragment() {
     }
 
     private fun navigateToProductDetailView(productId: Int) {
-        val intent = ProductDetailActivity.newIntent(requireContext(), productId)
-        startActivity(intent)
+        // val intent = ProductDetailActivity.newIntent(requireContext(), productId)
+        // startActivity(intent)
     }
 
     override fun onDestroyView() {

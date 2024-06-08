@@ -25,6 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
+            android:onClick="@{() -> actionHandler.onClickProduct(productUiModel.product.id)}"
             app:imageUrl="@{productUiModel.product.imageUrl}"
             app:layout_constraintBottom_toTopOf="@+id/tv_product_title"
             app:layout_constraintDimensionRatio="1:1"
@@ -75,9 +76,9 @@
             android:text="@string/plus"
             android:textColor="@color/gray_500"
             android:textSize="30sp"
+            app:countPlusVisible="@{productUiModel.quantity.isMin()}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:countPlusVisible="@{productUiModel.quantity.isMin()}" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <include
             android:id="@+id/btn_add_cart_quantity"
@@ -86,12 +87,12 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            app:onPlusClickListener="@{() -> actionHandler.onClickPlusQuantityButton(productUiModel.product.id)}"
-            app:onMinusClickListener="@{() -> actionHandler.onClickMinusQuantityButton(productUiModel.product.id)}"
-            app:countNum = "@{productUiModel.quantity.count}"
+            app:countNum="@{productUiModel.quantity.count}"
+            app:countViewVisible="@{productUiModel.quantity.isMin()}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="parent"
-            app:countViewVisible="@{productUiModel.quantity.isMin()}"
+            app:onMinusClickListener="@{() -> actionHandler.onClickMinusQuantityButton(productUiModel.product.id)}"
+            app:onPlusClickListener="@{() -> actionHandler.onClickPlusQuantityButton(productUiModel.product.id)}"
             tools:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

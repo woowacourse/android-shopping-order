@@ -14,6 +14,8 @@ import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
+import woowacourse.shopping.common.Event
+import woowacourse.shopping.common.emit
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 import woowacourse.shopping.presentation.products.uimodel.toRecentProdutUiModels
@@ -27,14 +29,14 @@ class ProductsViewModel(
     private val _productsUiState = MutableLiveData(ProductsUiState())
     val productsUiState: LiveData<ProductsUiState> = _productsUiState
 
-    private val _showLoadMore = MutableLiveData<Boolean>(false)
-    val showLoadMore: LiveData<Boolean> get() = _showLoadMore
-
     private val _cartTotalCount: MutableLiveData<Int> = MutableLiveData()
     val cartTotalCount: LiveData<Int> get() = _cartTotalCount
 
     private val _recentProductUiModels = MutableLiveData<List<RecentProductUiModel>?>()
     val recentProductUiModels: LiveData<List<RecentProductUiModel>?> get() = _recentProductUiModels
+
+    private val _navigateAction = MutableLiveData<Event<ProductsNavigateAction>>()
+    val navigateAction get() = _navigateAction
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -140,7 +142,7 @@ class ProductsViewModel(
     }
 
     override fun onClickProduct(productId: Int) {
-        TODO("Not yet implemented")
+        _navigateAction.emit(ProductsNavigateAction.ProductDetailNavigateAction(productId))
     }
 
     override fun onClickLoadMoreButton() {
@@ -156,7 +158,7 @@ class ProductsViewModel(
     }
 
     override fun onClickShoppingCart() {
-        TODO("Not yet implemented")
+        _navigateAction.emit(ProductsNavigateAction.CartNavigateAction)
     }
 
     companion object {

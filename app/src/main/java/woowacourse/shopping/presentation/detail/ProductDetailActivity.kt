@@ -29,8 +29,6 @@ class ProductDetailActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.onClickLastRecentProductListener =
             OnClickLastRecentProductListener { productId ->
-                val intent =
-                    newIntent(this@ProductDetailActivity, productId, lastSeenProductVisible = true)
                 startActivity(intent)
                 finish()
             }
@@ -59,12 +57,6 @@ class ProductDetailActivity : AppCompatActivity() {
         }
 
         viewModel.isSuccessAddCart.observe(this) { isSuccessEvent ->
-            val isSuccess = isSuccessEvent.getContentIfNotHandled() ?: return@observe
-            if (isSuccess) {
-                showAddCartSuccessDialog()
-            } else {
-                showAddCartFailureToast()
-            }
         }
     }
 
@@ -93,7 +85,6 @@ class ProductDetailActivity : AppCompatActivity() {
 
     private fun initializeProductLoadError() {
         viewModel.productLoadError.observe(this) { errorEvent ->
-            errorEvent.getContentIfNotHandled() ?: return@observe
             showErrorSnackBar()
         }
     }
@@ -107,13 +98,6 @@ class ProductDetailActivity : AppCompatActivity() {
 
     private fun productId(): Int = intent.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
 
-    private fun isNavigatedFromDetailView(): Boolean {
-        return intent.getBooleanExtra(
-            LAST_SEEN_PRODUCT_VISIBLE_KEY,
-            LAST_SEEN_PRODUCT_VISIBLE_DEFAULT_VALUE,
-        )
-    }
-
     private fun setRequireActivityResult() {
         val resultIntent = Intent().putExtra(ProductsActivity.PRODUCT_ID_KEY, productId())
         setResult(Activity.RESULT_OK, resultIntent)
@@ -122,17 +106,15 @@ class ProductDetailActivity : AppCompatActivity() {
     companion object {
         private const val PRODUCT_ID_KEY = "product_id_key"
         private const val PRODUCT_ID_DEFAULT_VALUE = -1
-        private const val LAST_SEEN_PRODUCT_VISIBLE_KEY = "last_seen_product_visible"
-        private const val LAST_SEEN_PRODUCT_VISIBLE_DEFAULT_VALUE = false
 
-        fun newIntent(
+        fun startActivity(
             context: Context,
             productId: Int,
-            lastSeenProductVisible: Boolean = false,
-        ): Intent {
-            return Intent(context, ProductDetailActivity::class.java)
-                .putExtra(PRODUCT_ID_KEY, productId)
-                .putExtra(LAST_SEEN_PRODUCT_VISIBLE_KEY, lastSeenProductVisible)
+        ) {
+            val intent =
+                Intent(context, ProductDetailActivity::class.java)
+                    .putExtra(PRODUCT_ID_KEY, productId)
+            context.startActivity(intent)
         }
     }
 }

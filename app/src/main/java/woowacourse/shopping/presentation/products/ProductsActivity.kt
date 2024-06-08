@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.products
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.detail.ProductDetailActivity
@@ -82,8 +82,16 @@ class ProductsActivity : AppCompatActivity() {
             }
             binding.layoutProductsSkeleton.visibility = View.GONE
             binding.rvProducts.visibility = View.VISIBLE
-            Log.d("product", productsUiState.toString())
             adapter.updateProducts(productsUiState)
+        }
+        viewModel.navigateAction.observeEvent(this) { navigateAction ->
+            when (navigateAction) {
+                is ProductsNavigateAction.ProductDetailNavigateAction ->
+                    ProductDetailActivity.startActivity(this, navigateAction.productId)
+
+                is ProductsNavigateAction.CartNavigateAction ->
+                    CartActivity.startActivity(this)
+            }
         }
     }
 
@@ -102,11 +110,6 @@ class ProductsActivity : AppCompatActivity() {
             adapter.updateRecentProducts(it ?: return@observe)
         }
          */
-    }
-
-    private fun navigateToProductDetailView(productId: Int) {
-        val intent = ProductDetailActivity.newIntent(this, productId)
-        productDetailActivityResultLauncher.launch(intent)
     }
 
     private fun initializeToolbar() {

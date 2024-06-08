@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -27,8 +28,16 @@ class CartActivity : AppCompatActivity() {
         supportFragmentManager.fragmentFactory = CartFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        cartSelectionFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartSelectionFragment::class.java.name)
-        cartRecommendFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, CartRecommendFragment::class.java.name)
+        cartSelectionFragment =
+            supportFragmentManager.fragmentFactory.instantiate(
+                classLoader,
+                CartSelectionFragment::class.java.name,
+            )
+        cartRecommendFragment =
+            supportFragmentManager.fragmentFactory.instantiate(
+                classLoader,
+                CartRecommendFragment::class.java.name,
+            )
         // binding = DataBindingUtil.setContentView(this, layoutId)
 
         changeFragment(cartSelectionFragment)
@@ -43,16 +52,17 @@ class CartActivity : AppCompatActivity() {
         initializeToolbar()
         initializeCartAdapter()
         viewModel.changedCartEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
             setResult(Activity.RESULT_OK)
         }
         viewModel.isSuccessCreateOrder.observe(this) {
+            /*
             val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
             if (isSuccessCreateOrder) {
                 showDialogSuccessCreateOrder()
             } else {
                 showToastFailureCreateOrder()
             }
+             */
         }
     }
 
@@ -93,12 +103,20 @@ class CartActivity : AppCompatActivity() {
 
     private fun initializeCartAdapter() {
         viewModel.navigateEvent.observeEvent(this) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
+            val fragment =
+                supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
             if (fragment is CartSelectionFragment) {
                 changeFragment(cartRecommendFragment)
             } else {
                 // viewModel.createOrder()
             }
+        }
+    }
+
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, CartActivity::class.java)
+            context.startActivity(intent)
         }
     }
 }

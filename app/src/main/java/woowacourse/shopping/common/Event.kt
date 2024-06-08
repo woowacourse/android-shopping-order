@@ -2,23 +2,22 @@ package woowacourse.shopping.common
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 
-open class Event<out T>(private val content: T) {
-    private var hasBeenHandled = false
+open class Event<T>(value: T) {
+    var value = value
+        private set
 
-    fun getContentIfNotHandled(): T? {
-        return if (hasBeenHandled) {
-            null
+    private var isAlreadyHandled = false
+
+    fun isActive(): Boolean =
+        if (isAlreadyHandled) {
+            false
         } else {
-            hasBeenHandled = true
-            content
+            isAlreadyHandled = true
+            true
         }
-    }
-
-    fun peekContent(): T = content
-
-    fun isActive(): Boolean = !hasBeenHandled
 }
 
 fun <T> LiveData<Event<T>>.observeEvent(
@@ -27,7 +26,9 @@ fun <T> LiveData<Event<T>>.observeEvent(
 ) = observe(owner) {
     it?.let {
         if (it.isActive()) {
-            observer.onChanged(it.peekContent())
+            observer.onChanged(it.value)
         }
     }
 }
+
+fun <T> MutableLiveData<Event<T>>.emit(value: T) = postValue(Event(value))
