@@ -14,7 +14,7 @@ data class FreeShipping(
     override fun canUse(products: List<CartWithProduct>): Boolean {
         val isMoreThanMinimumAmount =
             products.sumOf { it.product.price * it.quantity.value } >= minimumAmount
-        val isNotExpired = LocalDate.now().isAfter(expirationDate)
+        val isNotExpired = LocalDate.now().isBefore(expirationDate)
         return isNotExpired && isMoreThanMinimumAmount
     }
 

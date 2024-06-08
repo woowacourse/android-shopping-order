@@ -5,8 +5,6 @@ import woowacourse.shopping.domain.model.coupon.DiscountType
 
 class Order(val coupons: List<Coupon>) {
 
-    val shippingPrice = 3_000
-
     fun canUseCoupons(products: List<CartWithProduct>): List<Coupon> =
         coupons.filter { it.canUse(products) }
 
@@ -24,7 +22,7 @@ class Order(val coupons: List<Coupon>) {
         }
 
         val coupon = coupons.first { it.id == selectedCouponId }
-        return if (coupon.discountType == DiscountType.FreeShipping) SHIPPING_FREE_PRICE else shippingPrice
+        return if (coupon.discountType == DiscountType.FreeShipping) SHIPPING_FREE_PRICE else SHIPPING_PRICE
     }
 
     fun paymentPrice(products: List<CartWithProduct>, selectedCouponId: Long): Int {
@@ -39,5 +37,7 @@ class Order(val coupons: List<Coupon>) {
 
     companion object {
         const val SHIPPING_FREE_PRICE = 0
+        const val SHIPPING_PRICE = 3_000
+        const val INIT_DISCOUNT_PRICE = 0
     }
 }
