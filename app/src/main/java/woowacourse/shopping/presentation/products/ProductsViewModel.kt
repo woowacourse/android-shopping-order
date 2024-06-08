@@ -5,19 +5,18 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.domain.model.Product
+import com.example.domain.model.RecentProduct
+import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.repository.DataCallback
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
 
 class ProductsViewModel(
     private val productRepository: DefaultProductRepository,
-    private val recentProductRepository: RecentProductRepository,
+    private val recentProductRepository: com.example.domain.repository.RecentProductRepository,
     private val cartRepository: DefaultCartRepository,
 ) : ViewModel() {
     private val _productsUiState = MutableLiveData<Event<ProductsUiState>>(Event(ProductsUiState()))
@@ -49,8 +48,8 @@ class ProductsViewModel(
         productRepository.findProducts(
             page,
             PAGE_SIZE,
-            object : DataCallback<List<Product>> {
-                override fun onSuccess(result: List<Product>) {
+            object : DataCallback<List<com.example.domain.model.Product>> {
+                override fun onSuccess(result: List<com.example.domain.model.Product>) {
                     val additionalProductUiModels = result.toProductUiModels()
                     val newProductUiModels =
                         (productUiModels() ?: emptyList()) + additionalProductUiModels
@@ -101,11 +100,11 @@ class ProductsViewModel(
         updateTotalCount()
     }
 
-    private fun List<Product>.toProductUiModels(): List<ProductUiModel> {
+    private fun List<com.example.domain.model.Product>.toProductUiModels(): List<ProductUiModel> {
         return map { it.toProductUiModel() }
     }
 
-    private fun Product.toProductUiModel(): ProductUiModel {
+    private fun com.example.domain.model.Product.toProductUiModel(): ProductUiModel {
         val cartTotalCount = cartRepository.syncGetCartQuantityCount()
         val cartItem = cartRepository.syncFindByProductId(id, cartTotalCount)
         return if (cartItem == null) {
@@ -120,7 +119,7 @@ class ProductsViewModel(
             recentProductRepository.findRecentProducts().toRecentProductUiModels()
     }
 
-    private fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
+    private fun List<com.example.domain.model.RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel>? {
         return map {
             val product = productRepository.syncFind(it.product.id)
             RecentProductUiModel(
@@ -173,8 +172,8 @@ class ProductsViewModel(
         val productUiModels = productUiModels()?.toMutableList() ?: return
         productRepository.find(
             productId,
-            object : DataCallback<Product> {
-                override fun onSuccess(result: Product) {
+            object : DataCallback<com.example.domain.model.Product> {
+                override fun onSuccess(result: com.example.domain.model.Product) {
                     val newProductUiModel = result.toProductUiModel()
                     val position = productUiModels.indexOfFirst { it.productId == productId }
                     productUiModels[position] = newProductUiModel

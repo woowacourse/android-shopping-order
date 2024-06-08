@@ -8,12 +8,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.domain.repository.RecentProductRepository
 import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.products.ProductsActivity
 
@@ -23,7 +23,7 @@ class ProductDetailActivity : AppCompatActivity() {
         ProductDetailViewModelFactory(
             productId(),
             DefaultProductRepository(),
-            RecentProductRepository.getInstance(),
+            com.example.domain.repository.RecentProductRepository.getInstance(),
             DefaultCartRepository(),
             isNavigatedFromDetailView(),
         )

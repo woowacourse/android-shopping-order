@@ -57,8 +57,10 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation(project(":data"))
+    implementation(project(":domain"))
+    implementation("androidx.room:room-ktx:2.6.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testImplementation("org.assertj:assertj-core:3.25.3")
     testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
@@ -75,14 +77,6 @@ dependencies {
 
     // glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
-    // room
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
-
-    // okhttp
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
     // gson
     implementation("com.google.code.gson:gson:2.10.1")

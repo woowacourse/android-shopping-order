@@ -1,10 +1,10 @@
 package woowacourse.shopping.presentation.utils
 
-import woowacourse.shopping.domain.model.Quantity
+import com.example.domain.model.Quantity
 
 class AddCartQuantityBundle(
     val productId: Int,
-    val quantity: Quantity,
+    val quantity: com.example.domain.model.Quantity,
     val onIncreaseProductQuantity: (productId: Int) -> Unit,
     val onDecreaseProductQuantity: (productId: Int) -> Unit,
 )

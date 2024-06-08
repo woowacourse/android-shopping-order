@@ -1,33 +1,39 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping.data.datasource.local.dummy.dummyProducts
-import woowacourse.shopping.data.datasource.local.room.ShoppingCartDataBase
-import woowacourse.shopping.data.datasource.remote.mockk.MockWebProductServer
-import woowacourse.shopping.data.datasource.remote.mockk.MockWebProductServerDispatcher
-import woowacourse.shopping.data.datasource.remote.mockk.MockWebServerProductRepository
-import woowacourse.shopping.data.repository.DefaultRecentProductRepository
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import androidx.lifecycle.ViewModelProvider
+import androidx.room.Room
+import com.example.data.datasource.local.room.ShoppingCartDataBase
+import com.example.data.datasource.remote.RemoteCartDataSource
+import com.example.data.datasource.remote.RemoteOrderDataSource
+import com.example.data.datasource.remote.RemoteProductDataSource
+import com.example.data.datasource.remote.retrofit.RetrofitClient
+import com.example.data.repository.DefaultCartRepository
+import com.example.data.repository.DefaultOrderRepository
+import com.example.data.repository.DefaultProductRepository
+import com.example.data.repository.DefaultRecentProductRepository
+import woowacourse.shopping.presentation.cart.CartViewModelFactory
 
 class ShoppingCartApplication : Application() {
-    private val productServer: MockWebProductServer by lazy {
-        MockWebProductServer(
-            MockWebProductServerDispatcher(dummyProducts),
+    private val db: ShoppingCartDataBase by lazy {
+        Room.databaseBuilder(this, ShoppingCartDataBase::class.java, "database").build()
+    }
+    private val retrofitClient = RetrofitClient()
+    private val remoteProductDataSource = RemoteProductDataSource(retrofitClient.productService)
+    private val remoteCartDataSource = RemoteCartDataSource(retrofitClient.cartItemService)
+    private val remoteOrderDataSource = RemoteOrderDataSource(retrofitClient.orderService)
+
+    private val defaultProductRepository = DefaultProductRepository(remoteProductDataSource)
+    private val defaultRecentProductRepository =
+        DefaultRecentProductRepository(db.recentProductDao())
+    private val defaultCartRepository = DefaultCartRepository(remoteCartDataSource)
+    private val defaultOrderRepository = DefaultOrderRepository(remoteOrderDataSource)
+
+    fun getCartViewModelFactory(): ViewModelProvider.Factory =
+        CartViewModelFactory(
+            defaultProductRepository,
+            defaultRecentProductRepository,
+            defaultCartRepository,
+            defaultOrderRepository,
         )
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        productServer.start()
-        ProductRepository.setInstance(MockWebServerProductRepository(productServer))
-        RecentProductRepository.setInstance(DefaultRecentProductRepository(ShoppingCartDataBase.instance(this).recentProductDao()))
-        CartRepository.setInstance(RoomCartRepository(ShoppingCartDataBase.instance(this).cartDao()))
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        productServer.shutDown()
-    }
 }

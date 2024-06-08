@@ -19,9 +19,7 @@ import org.hamcrest.CoreMatchers.not
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.FakeCartRepository
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.fakerepository.FakeCartRepository
 import woowacourse.shopping.firstProduct
 import woowacourse.shopping.hasSizeRecyclerView
 
@@ -29,7 +27,7 @@ import woowacourse.shopping.hasSizeRecyclerView
 class CartActivityTest {
     @Test
     fun `장바구니에_상품이_없는_경우_장바구니가_비어있다는_화면이_보인다`() {
-        CartRepository.setInstance(FakeCartRepository())
+        com.example.domain.repository.CartRepository.setInstance(FakeCartRepository())
 
         ActivityScenario.launch(CartActivity::class.java)
 
@@ -167,8 +165,8 @@ class CartActivityTest {
     }
 
     private fun setUpCart(cartSize: Int) {
-        val products = ProductRepository.getInstance().findRange(0, cartSize)
-        CartRepository.setInstance(FakeCartRepository())
-        products.forEach { CartRepository.getInstance().increaseQuantity(it.id) }
+        val products = com.example.domain.repository.ProductRepository.getInstance().findRange(0, cartSize)
+        com.example.domain.repository.CartRepository.setInstance(FakeCartRepository())
+        products.forEach { com.example.domain.repository.CartRepository.getInstance().increaseQuantity(it.id) }
     }
 }

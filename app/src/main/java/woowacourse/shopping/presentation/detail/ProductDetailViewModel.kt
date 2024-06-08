@@ -4,19 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.example.domain.model.Product
+import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.repository.DataCallback
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
 import woowacourse.shopping.presentation.utils.AddCartQuantityBundle
 
 class ProductDetailViewModel(
     private val productId: Int,
     private val productRepository: DefaultProductRepository,
-    private val recentProductRepository: RecentProductRepository,
+    private val recentProductRepository: com.example.domain.repository.RecentProductRepository,
     private val cartRepository: DefaultCartRepository,
     private val lastSeenProductVisible: Boolean,
 ) : ViewModel() {
@@ -55,8 +54,8 @@ class ProductDetailViewModel(
         productRepository.find(
             productId,
             dataCallback =
-                object : DataCallback<Product> {
-                    override fun onSuccess(result: Product) {
+                object : DataCallback<com.example.domain.model.Product> {
+                    override fun onSuccess(result: com.example.domain.model.Product) {
                         _productUiModel.postValue(result.toProductUiModel())
                     }
 
@@ -67,7 +66,7 @@ class ProductDetailViewModel(
         )
     }
 
-    private fun Product.toProductUiModel(): ProductUiModel {
+    private fun com.example.domain.model.Product.toProductUiModel(): ProductUiModel {
         val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
         val cartItem =
             cartRepository.syncFindByProductId(id, totalQuantityCount)
@@ -79,8 +78,8 @@ class ProductDetailViewModel(
         val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
         productRepository.find(
             lastRecentProduct.product.id,
-            object : DataCallback<Product> {
-                override fun onSuccess(result: Product) {
+            object : DataCallback<com.example.domain.model.Product> {
+                override fun onSuccess(result: com.example.domain.model.Product) {
                     _lastRecentProduct.postValue(LastRecentProductUiModel(result.id, result.name))
                 }
 

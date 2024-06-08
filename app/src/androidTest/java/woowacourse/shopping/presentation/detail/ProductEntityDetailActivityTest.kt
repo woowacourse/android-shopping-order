@@ -15,11 +15,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.FakeCartRepository
 import woowacourse.shopping.data.datasource.local.room.entity.product.ProductEntity
-import woowacourse.shopping.data.recent.FakeRecentProductRepository
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.fakerepository.FakeCartRepository
+import woowacourse.shopping.fakerepository.FakeRecentProductRepository
 import woowacourse.shopping.firstProduct
 
 @RunWith(AndroidJUnit4::class)
@@ -29,11 +27,13 @@ class ProductEntityDetailActivityTest {
 
     @Before
     fun setUp() {
-        RecentProductRepository.setInstance(FakeRecentProductRepository())
-        CartRepository.setInstance(FakeCartRepository())
+        com.example.domain.repository.RecentProductRepository.setInstance(
+            FakeRecentProductRepository(),
+        )
+        com.example.domain.repository.CartRepository.setInstance(FakeCartRepository())
         intent =
             Intent(ApplicationProvider.getApplicationContext(), ProductDetailActivity::class.java)
-                .putExtra("product_id_key", productEntity.id)
+                .putExtra("product_id_key", productEntity.productId)
     }
 
     @Test

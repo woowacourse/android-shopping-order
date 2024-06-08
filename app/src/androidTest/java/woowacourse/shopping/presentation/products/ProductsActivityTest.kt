@@ -17,8 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.recent.FakeRecentProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.fakerepository.FakeRecentProductRepository
 import woowacourse.shopping.firstProduct
 import woowacourse.shopping.presentation.products.adapter.ProductsViewHolder
 
@@ -26,7 +25,9 @@ import woowacourse.shopping.presentation.products.adapter.ProductsViewHolder
 class ProductsActivityTest {
     @Before
     fun setUp() {
-        RecentProductRepository.setInstance(FakeRecentProductRepository())
+        com.example.domain.repository.RecentProductRepository.setInstance(
+            FakeRecentProductRepository(),
+        )
     }
 
     @Test

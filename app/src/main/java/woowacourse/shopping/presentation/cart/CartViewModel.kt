@@ -4,20 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.example.domain.model.CartItem
+import com.example.domain.model.Product
+import com.example.domain.model.Quantity
+import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.repository.DataCallback
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultOrderRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Quantity
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
 
 class CartViewModel(
     private val productRepository: DefaultProductRepository,
-    private val recommendRepository: RecentProductRepository,
+    private val recommendRepository: com.example.domain.repository.RecentProductRepository,
     private val cartRepository: DefaultCartRepository,
     private val orderRepository: DefaultOrderRepository,
 ) : ViewModel(), CartListener {
@@ -56,6 +55,7 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
+        /*
         val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
         cartRepository.getAllCartItem(
             totalQuantityCount,
@@ -70,6 +70,7 @@ class CartViewModel(
                 }
             },
         )
+         */
         updateTotalPrice()
     }
 
@@ -83,7 +84,8 @@ class CartViewModel(
         _orderButtonEnabled.value = totalPrice != 0
     }
 
-    private fun loadProduct(cartItem: CartItem) {
+    private fun loadProduct(cartItem: com.example.domain.model.CartItem) {
+        /*
         productRepository.find(
             cartItem.productId,
             object : DataCallback<Product> {
@@ -96,12 +98,14 @@ class CartViewModel(
                 }
             },
         )
+
+         */
     }
 
     @Synchronized
     private fun updateCartUiState(
-        product: Product,
-        cartItem: CartItem,
+        product: com.example.domain.model.Product,
+        cartItem: com.example.domain.model.CartItem,
     ) {
         val oldCartUiModels = cartUiModels() ?: emptyList()
         val oldCartUiModel = cartUiModel(product.id) ?: CartUiModel.from(product, cartItem)
@@ -128,6 +132,7 @@ class CartViewModel(
     override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         val cartUiModel = cartUiModel(productId) ?: return
+        /*
         cartRepository.deleteCartItem(
             cartUiModel.cartItemId,
             object : DataCallback<Unit> {
@@ -140,6 +145,7 @@ class CartViewModel(
                 }
             },
         )
+         */
     }
 
     private fun updateDeletedCart() {
@@ -197,7 +203,7 @@ class CartViewModel(
 
     private fun setQuantity(
         cartItemId: Int,
-        quantity: Quantity,
+        quantity: com.example.domain.model.Quantity,
     ) {
         cartRepository.setCartItemQuantity(
             cartItemId,
@@ -282,7 +288,7 @@ class CartViewModel(
         }
     }
 
-    private fun CartUiModel.toCartItem() = CartItem(cartItemId, productId, quantity)
+    private fun CartUiModel.toCartItem() = com.example.domain.model.CartItem(cartItemId, productId, quantity)
 
     private fun setError() {
         _cartUiState.value = Event(CartUiState.Failure)
