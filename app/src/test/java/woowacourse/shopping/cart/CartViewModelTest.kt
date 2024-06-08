@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartItem
-import woowacourse.shopping.cartItems
+import woowacourse.shopping.cartItemsBySize
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
@@ -41,7 +41,7 @@ class CartViewModelTest {
         runBlocking {
             // given
             val products = products(20)
-            val cartItems = cartItems(20)
+            val cartItems = cartItemsBySize(20)
             setUpViewModel(savedProducts = products, savedCartItems = cartItems)
 
             // when
@@ -57,7 +57,7 @@ class CartViewModelTest {
     fun `장바구니에 담긴 상품을 삭제한다`(): Unit =
         runBlocking {
             // given
-            val cartItems = cartItems(1)
+            val cartItems = cartItemsBySize(1)
             setUpViewModel(savedProducts = products(1), savedCartItems = cartItems)
             viewModel.loadAllCartItems()
 
@@ -88,7 +88,7 @@ class CartViewModelTest {
     fun `장바구니에 1개의 상품이 있고 1개의 상품을 삭제하면 장바구니가 비어있다`(): Unit =
         runBlocking {
             // given
-            setUpViewModel(savedProducts = products(5), savedCartItems = cartItems(1))
+            setUpViewModel(savedProducts = products(5), savedCartItems = cartItemsBySize(1))
             viewModel.loadAllCartItems()
 
             // when
@@ -167,7 +167,7 @@ class CartViewModelTest {
     fun `최근 본 상품이 없는 경우 상품을 추천하지 않는다`(): Unit =
         runBlocking {
             // given
-            setUpViewModel(savedProducts = products(5), savedCartItems = cartItems(3))
+            setUpViewModel(savedProducts = products(5), savedCartItems = cartItemsBySize(3))
             viewModel.loadAllCartItems()
 
             // when
@@ -220,7 +220,7 @@ class CartViewModelTest {
             setUpViewModel(
                 savedProducts = products,
                 savedRecentProducts = recentProducts,
-                savedCartItems = cartItems(15),
+                savedCartItems = cartItemsBySize(15),
             )
             viewModel.loadAllCartItems()
 
@@ -235,7 +235,7 @@ class CartViewModelTest {
     @Test
     fun `장바구니에 상품이 3개가 있고 1개를 선택한 경우 모든 상품이 선택되지 않았다`() {
         // given
-        setUpViewModel(savedProducts = products(5), savedCartItems = cartItems(3))
+        setUpViewModel(savedProducts = products(5), savedCartItems = cartItemsBySize(3))
         viewModel.loadAllCartItems()
 
         // when
@@ -250,7 +250,7 @@ class CartViewModelTest {
     fun `장바구니에 상품이 3개가 있고 3개를 선택한 경우 모든 상품이 선택되었다`(): Unit =
         runBlocking {
             // given
-            setUpViewModel(savedProducts = products(5), savedCartItems = cartItems(3))
+            setUpViewModel(savedProducts = products(5), savedCartItems = cartItemsBySize(3))
             viewModel.loadAllCartItems()
 
             // when
@@ -267,7 +267,7 @@ class CartViewModelTest {
     fun `하나 이상의 상품을 선택한 경우 주문할 수 있다`(): Unit =
         runBlocking {
             // given
-            setUpViewModel(savedProducts = products(5), savedCartItems = cartItems(3))
+            setUpViewModel(savedProducts = products(5), savedCartItems = cartItemsBySize(3))
             viewModel.loadAllCartItems()
 
             // when
@@ -282,7 +282,7 @@ class CartViewModelTest {
     fun `상품을 하나도 선택하지 않은 경우 주문할 수 없다`(): Unit =
         runBlocking {
             // given
-            setUpViewModel(savedProducts = products(5), savedCartItems = cartItems(3))
+            setUpViewModel(savedProducts = products(5), savedCartItems = cartItemsBySize(3))
             viewModel.loadAllCartItems()
 
             // when

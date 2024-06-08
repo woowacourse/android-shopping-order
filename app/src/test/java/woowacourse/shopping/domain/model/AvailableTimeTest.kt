@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.availableTime
 import java.lang.IllegalArgumentException
 import java.time.LocalTime
 
@@ -66,14 +67,5 @@ class AvailableTimeTest {
 
         // then
         assertThat(actual).isFalse
-    }
-
-    private fun availableTime(
-        startHour: Int,
-        endHour: Int,
-    ): AvailableTime {
-        val start = LocalTime.of(startHour, 0)
-        val end = LocalTime.of(endHour, 0)
-        return AvailableTime(start, end)
     }
 }

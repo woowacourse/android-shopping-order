@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.FixedCoupon
@@ -14,6 +15,7 @@ import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
+import java.time.LocalTime
 
 val imageUrl = "https://www.naver.com/"
 val name = "올리브"
@@ -33,7 +35,11 @@ fun cartItem(
     quantity: Int,
 ) = CartItem(id, product(id), Quantity(quantity))
 
-fun cartItems(size: Int) = List(size) { cartItem(it, 1) }
+fun cartItemsBySize(size: Int) = List(size) { cartItem(it, 1) }
+
+fun cartItemsByTotalPrice(totalPrice: Int): List<CartItem> {
+    return listOf(CartItem(id = 0, product = Product(0, "", totalPrice, "", ""), quantity = Quantity(1)))
+}
 
 suspend fun List<Product>.toProductUiModels(cartRepository: CartRepository): List<ProductUiModel> {
     return map { product ->
@@ -71,4 +77,13 @@ fun fixedCoupon(
 
 fun List<Coupon>.toCouponUiModels(): List<CouponUiModel> {
     return map { CouponUiModel.from(it) }
+}
+
+fun availableTime(
+    startHour: Int,
+    endHour: Int,
+): AvailableTime {
+    val start = LocalTime.of(startHour, 0)
+    val end = LocalTime.of(endHour, 0)
+    return AvailableTime(start, end)
 }
