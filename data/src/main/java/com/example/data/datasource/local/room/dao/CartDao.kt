@@ -14,20 +14,20 @@ interface CartDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(cartItemEntity: CartItemEntity)
 
-    @Query("UPDATE cart SET quantity = :quantity WHERE product_id = :productId")
+    @Query("UPDATE cart SET quantity = :quantity WHERE productId = :productId")
     fun changeQuantity(
         productId: Int,
         quantity: com.example.domain.model.Quantity,
     )
 
-    @Query("DELETE FROM cart WHERE product_id = :productId")
+    @Query("DELETE FROM cart WHERE productId = :productId")
     fun delete(productId: Int)
 
     fun find(productId: Int): CartItemEntity {
         return findOrNull(productId) ?: throw IllegalArgumentException()
     }
 
-    @Query("SELECT * FROM cart WHERE product_id = :productId")
+    @Query("SELECT * FROM cart WHERE productId = :productId")
     fun findOrNull(productId: Int): CartItemEntity?
 
     @Query("SELECT * FROM cart LIMIT :pageSize OFFSET :page * :pageSize")

@@ -2,45 +2,31 @@ package woowacourse.shopping.presentation.products.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.databinding.ItemLoadMoreBinding
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemRecentProductsBinding
-import woowacourse.shopping.presentation.products.adapter.recent.OnClickRecentProductItem
-import woowacourse.shopping.presentation.products.adapter.recent.RecentProductUiModel
-import woowacourse.shopping.presentation.products.adapter.recent.RecentProductsAdapter
-import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
-import woowacourse.shopping.presentation.utils.AddCartQuantityBundle
-import woowacourse.shopping.presentation.utils.OnDecreaseProductQuantity
-import woowacourse.shopping.presentation.utils.OnIncreaseProductQuantity
+import woowacourse.shopping.presentation.products.ProductsActionHandler
+import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
+import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 
 sealed class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    class ProductViewHolder(private val binding: ItemProductBinding) :
+    class ProductViewHolder(
+        private val binding: ItemProductBinding,
+        private val actionHandler: ProductsActionHandler,
+    ) :
         ProductsViewHolder(binding.root) {
-        fun bind(
-            productUiModel: ProductUiModel,
-            onClickProductItem: OnClickProductItem,
-            onIncreaseProductQuantity: OnIncreaseProductQuantity,
-            onDecreaseProductQuantity: OnDecreaseProductQuantity,
-        ) {
+        fun bind(productUiModel: ProductUiModel) {
             binding.productUiModel = productUiModel
-            binding.addCartQuantityBundle =
-                AddCartQuantityBundle(
-                    productUiModel.productId,
-                    productUiModel.quantity,
-                    onIncreaseProductQuantity,
-                    onDecreaseProductQuantity,
-                )
-            binding.ivProduct.setOnClickListener {
-                onClickProductItem(productUiModel.productId)
-            }
+            binding.actionHandler = actionHandler
         }
     }
 
     class RecentProductsViewHolder(
         binding: ItemRecentProductsBinding,
-        onClickRecentProductItem: OnClickRecentProductItem,
+        private val actionHandler: ProductsActionHandler,
     ) : ProductsViewHolder(binding.root) {
         private val adapter by lazy {
-            RecentProductsAdapter(onClickRecentProductItem = onClickRecentProductItem)
+            RecentProductsAdapter(actionHandler)
         }
 
         init {
@@ -52,6 +38,14 @@ sealed class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             adapter.submitList(recentProducts)
         }
     }
-}
 
-typealias OnClickProductItem = (productId: Int) -> Unit
+    class LoadMoreViewHolder(
+        private val binding: ItemLoadMoreBinding,
+        private val actionHandler: ProductsActionHandler,
+    ) : ProductsViewHolder(binding.root) {
+        fun bind(isLastPage: Boolean) {
+            binding.isLastPage = isLastPage
+            binding.actionHandler = actionHandler
+        }
+    }
+}

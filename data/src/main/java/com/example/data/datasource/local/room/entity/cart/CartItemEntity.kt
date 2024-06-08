@@ -11,6 +11,6 @@ import com.example.domain.model.Quantity
 data class CartItemEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @Embedded
-    @ColumnInfo(name = "product") val product: ProductEntity,
+    val product: ProductEntity,
     @ColumnInfo(name = "quantity") var quantity: Quantity,
 )

@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.products
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,26 +12,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingCartApplication
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.products.adapter.ProductsAdapter
-import woowacourse.shopping.presentation.products.adapter.ProductsSpanSizeLookUp
+import woowacourse.shopping.presentation.products.adapter.ProductsAdapterManager
+import woowacourse.shopping.presentation.products.adapter.ProductsViewType
 
 class ProductsActivity : AppCompatActivity() {
+    private lateinit var shoppingApplication: ShoppingApplication
     private val binding: ActivityProductsBinding by lazy {
         ActivityProductsBinding.inflate(layoutInflater)
     }
     private val viewModel by viewModels<ProductsViewModel> {
-        (application as ShoppingCartApplication).getProductsViewModelFactory()
+        shoppingApplication.getProductsViewModelFactory()
     }
     private val adapter by lazy {
         ProductsAdapter(
-            onClickProductItem = { navigateToProductDetailView(it) },
-            onClickRecentProductItem = { navigateToProductDetailView(it) },
-            onIncreaseProductQuantity = { viewModel.increaseQuantity(it) },
-            onDecreaseProductQuantity = { viewModel.decreaseQuantity(it) },
+            actionHandler = viewModel,
         )
     }
 
@@ -42,7 +42,7 @@ class ProductsActivity : AppCompatActivity() {
                 val changedProductId =
                     result.data?.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
                         ?: return@registerForActivityResult
-                viewModel.loadProduct(changedProductId)
+                // viewModel.loadProduct(changedProductId)
                 viewModel.loadRecentProducts()
             }
         }
@@ -52,12 +52,13 @@ class ProductsActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                viewModel.loadProducts()
+                // viewModel.loadProducts()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        shoppingApplication = application as ShoppingApplication
         setContentView(binding.root)
 
         binding.lifecycleOwner = this
@@ -69,36 +70,38 @@ class ProductsActivity : AppCompatActivity() {
         initializeProductAdapter()
         initializeToolbar()
         initializePage()
-        viewModel.productsUiState.observe(this) {
-            val productsUiState = it.getContentIfNotHandled() ?: return@observe
+        viewModel.productsUiState.observe(this) { productsUiState ->
             if (productsUiState.isLoading) {
                 binding.layoutProductsSkeleton.visibility = View.VISIBLE
                 binding.rvProducts.visibility = View.GONE
-                return@observe
-            }
-            if (productsUiState.productUiModels != null) {
-                binding.layoutProductsSkeleton.visibility = View.GONE
-                binding.rvProducts.visibility = View.VISIBLE
-                adapter.updateProducts(productsUiState.productUiModels)
                 return@observe
             }
             if (productsUiState.isError) {
                 Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
                 return@observe
             }
+            binding.layoutProductsSkeleton.visibility = View.GONE
+            binding.rvProducts.visibility = View.VISIBLE
+            Log.d("product", productsUiState.toString())
+            adapter.updateProducts(productsUiState)
         }
     }
 
     private fun initializeProductAdapter() {
         binding.rvProducts.itemAnimator = null
-        binding.rvProducts.layoutManager =
-            GridLayoutManager(this, PRODUCT_LIST_SPAN_SIZE).apply {
-                spanSizeLookup = ProductsSpanSizeLookUp(adapter)
-            }
         binding.rvProducts.adapter = adapter
+        binding.rvProducts.layoutManager =
+            ProductsAdapterManager(
+                context = this,
+                adapter = adapter,
+                spanCount = 2,
+                productViewType = ProductsViewType.Product.ordinal,
+            )
+        /*
         viewModel.recentProductUiModels.observe(this) {
             adapter.updateRecentProducts(it ?: return@observe)
         }
+         */
     }
 
     private fun navigateToProductDetailView(productId: Int) {
@@ -127,15 +130,13 @@ class ProductsActivity : AppCompatActivity() {
                     val lastPosition =
                         (recyclerView.layoutManager as GridLayoutManager).findLastCompletelyVisibleItemPosition()
                     val productsLastPosition = adapter.findProductsLastPosition(lastPosition)
-                    viewModel.changeSeeMoreVisibility(productsLastPosition)
+                    // viewModel.changeSeeMoreVisibility(productsLastPosition)
                 }
             }
         binding.rvProducts.addOnScrollListener(onScrollListener)
     }
 
     companion object {
-        private const val PRODUCT_LIST_SPAN_SIZE = 2
-
         const val PRODUCT_ID_KEY = "changed_product_id_key"
         private const val PRODUCT_ID_DEFAULT_VALUE = -1
     }

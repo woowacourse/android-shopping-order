@@ -3,7 +3,7 @@ package com.example.data
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.data.datasource.local.room.ShoppingCartDataBase
+import com.example.data.datasource.local.room.ShoppingDatabase
 import com.example.data.datasource.local.room.dao.RecentProductDao
 import com.example.data.datasource.local.room.entity.product.toProduct
 import com.example.data.datasource.local.room.entity.product.toProductEntity
@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class LocalRecentDataSourceTest {
-    private lateinit var recentProductDataBase: ShoppingCartDataBase
+    private lateinit var recentProductDataBase: ShoppingDatabase
     private lateinit var recentProductDao: RecentProductDao
 
     @Before
@@ -25,7 +25,7 @@ class LocalRecentDataSourceTest {
         recentProductDataBase =
             Room.databaseBuilder(
                 ApplicationProvider.getApplicationContext(),
-                ShoppingCartDataBase::class.java,
+                ShoppingDatabase::class.java,
                 "recent_products",
             ).build()
         recentProductDataBase.clearAllTables()

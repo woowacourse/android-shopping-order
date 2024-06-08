@@ -1,12 +1,16 @@
-package woowacourse.shopping.presentation.products.adapter.recent
+package woowacourse.shopping.presentation.products.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemRecentProductBinding
+import woowacourse.shopping.presentation.products.ProductsActionHandler
+import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 
-class RecentProductsAdapter(private val onClickRecentProductItem: OnClickRecentProductItem) :
+class RecentProductsAdapter(
+    private val actionHandler: ProductsActionHandler,
+) :
     ListAdapter<RecentProductUiModel, RecentProductViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -14,6 +18,7 @@ class RecentProductsAdapter(private val onClickRecentProductItem: OnClickRecentP
     ): RecentProductViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemRecentProductBinding.inflate(inflater, parent, false)
+        binding.actionHandler = actionHandler
         return RecentProductViewHolder(binding)
     }
 
@@ -21,7 +26,7 @@ class RecentProductsAdapter(private val onClickRecentProductItem: OnClickRecentP
         holder: RecentProductViewHolder,
         position: Int,
     ) {
-        holder.bind(getItem(position), onClickRecentProductItem)
+        holder.bind(getItem(position))
     }
 
     companion object {
@@ -31,7 +36,7 @@ class RecentProductsAdapter(private val onClickRecentProductItem: OnClickRecentP
                     oldItem: RecentProductUiModel,
                     newItem: RecentProductUiModel,
                 ): Boolean {
-                    return oldItem.productId == newItem.productId
+                    return oldItem.product.id == newItem.product.id
                 }
 
                 override fun areContentsTheSame(

@@ -1,10 +1,11 @@
 package woowacourse.shopping
 
+/*
 import com.example.domain.model.CartItem
 import com.example.domain.model.Product
 import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
-import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
+import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 
 val imageUrl = "https://www.naver.com/"
 val name = "올리브"
@@ -59,3 +60,4 @@ fun convertProductUiModel(
             .getOrElse { ProductUiModel.from(product) }
     }
 }
+*/

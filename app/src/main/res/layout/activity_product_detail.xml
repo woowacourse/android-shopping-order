@@ -31,7 +31,7 @@
             android:id="@+id/iv_product_detail"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:imageUrl="@{viewModel.productUiModel.imageUrl}"
+            app:imageUrl="@{viewModel.productUiModel.product.imageUrl}"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
             android:layout_marginTop="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{viewModel.productUiModel.title}"
+            android:text="@{viewModel.productUiModel.product.name}"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/product_price(viewModel.productUiModel.totalPrice)}"
+            android:text="@{@string/product_price(3000)}"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,12 +79,11 @@
 
         <include
             android:id="@+id/btn_add_cart_quantity"
-            layout="@layout/button_add_cart_quantity"
+            layout="@layout/btn_add_cart_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="14dp"
-            app:bundle="@{viewModel.addCartQuantityBundle}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/divider_product_detail" />
 
@@ -99,7 +98,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_add_cart_quantity"
-            app:visibility="@{viewModel.isVisibleLastRecentProduct}">
+            app:visibility="@{true}">
 
             <TextView
                 android:id="@+id/iv_product_detail_last_recent_product"

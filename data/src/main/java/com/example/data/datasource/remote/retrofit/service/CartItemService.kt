@@ -32,18 +32,18 @@ interface CartItemService {
     fun postCartItem(
         @Header("accept") accept: String = "*/*",
         @Body addCartItemRequest: AddCartItemRequest,
-    )
+    ): Call<DataResponse<Unit>>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int = 0,
-    )
+    ): Call<DataResponse<Unit>>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItemQuantity(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int = 0,
         @Body quantity: CartItemQuantityRequest,
-    )
+    ): Call<DataResponse<Unit>>
 }

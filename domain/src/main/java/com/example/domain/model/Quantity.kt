@@ -15,9 +15,9 @@ data class Quantity(val count: Int = DEFAULT_VALUE) {
         return Quantity(count - 1)
     }
 
-    fun isMin() = count == MIN_VALUE
+    fun isMin(): Boolean = count == MIN_VALUE
 
-    fun isGreaterThanMin() = count > MIN_VALUE
+    fun isGreaterThanMin(): Boolean = count > MIN_VALUE
 
     companion object {
         private const val DEFAULT_VALUE = 0

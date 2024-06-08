@@ -10,7 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingCartApplication
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.products.ProductsActivity
@@ -18,7 +18,7 @@ import woowacourse.shopping.presentation.products.ProductsActivity
 class ProductDetailActivity : AppCompatActivity() {
     private val binding by lazy { ActivityProductDetailBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<ProductDetailViewModel> {
-        (application as ShoppingCartApplication).getProductDetailViewModelFactory()
+        (application as ShoppingApplication).getProductDetailViewModelFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +55,7 @@ class ProductDetailActivity : AppCompatActivity() {
 
     private fun initializeAddCartButton() {
         binding.btnProductDetailAddCart.setOnClickListener {
-            viewModel.addCartProduct()
+            // viewModel.addCartProduct()
         }
 
         viewModel.isSuccessAddCart.observe(this) { isSuccessEvent ->

@@ -4,20 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import com.example.domain.model.Product
+import com.example.domain.repository.CartRepository
+import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
+import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 import woowacourse.shopping.presentation.utils.AddCartQuantityBundle
 
 class ProductDetailViewModel(
-    private val productId: Int,
-    private val productRepository: DefaultProductRepository,
-    private val recentProductRepository: com.example.domain.repository.RecentProductRepository,
-    private val cartRepository: DefaultCartRepository,
-    private val lastSeenProductVisible: Boolean,
+    private val productRepository: ProductRepository,
+    private val recentProductRepository: RecentProductRepository,
+    private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _productUiModel = MutableLiveData<ProductUiModel>()
     val productUiModel: LiveData<ProductUiModel> get() = _productUiModel
@@ -31,7 +28,7 @@ class ProductDetailViewModel(
     val addCartQuantityBundle: LiveData<AddCartQuantityBundle> =
         _productUiModel.map {
             AddCartQuantityBundle(
-                productId = it.productId,
+                productId = it.product.id,
                 quantity = it.quantity,
                 onIncreaseProductQuantity = { increaseQuantity() },
                 onDecreaseProductQuantity = { decreaseQuantity() },
@@ -41,9 +38,22 @@ class ProductDetailViewModel(
     private val _lastRecentProduct = MutableLiveData<LastRecentProductUiModel>()
     val lastRecentProduct: LiveData<LastRecentProductUiModel> get() = _lastRecentProduct
 
+    /*
     val isVisibleLastRecentProduct: LiveData<Boolean> =
         _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
+     */
 
+    private fun increaseQuantity() {
+        var quantity = _productUiModel.value?.quantity ?: return
+        _productUiModel.value = _productUiModel.value?.copy(quantity = ++quantity)
+    }
+
+    private fun decreaseQuantity() {
+        var quantity = _productUiModel.value?.quantity ?: return
+        _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
+    }
+
+    /*
     init {
         loadProduct()
         loadLastRecentProduct()
@@ -66,7 +76,7 @@ class ProductDetailViewModel(
         )
     }
 
-    private fun com.example.domain.model.Product.toProductUiModel(): ProductUiModel {
+    private fun Product.toProductUiModel(): ProductUiModel {
         val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
         val cartItem =
             cartRepository.syncFindByProductId(id, totalQuantityCount)
@@ -135,4 +145,6 @@ class ProductDetailViewModel(
     private fun setError() {
         _productLoadError.postValue(Event(Unit))
     }
+
+     */
 }

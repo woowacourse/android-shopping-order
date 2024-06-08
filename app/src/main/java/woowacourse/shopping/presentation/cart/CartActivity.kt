@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingCartApplication
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.databinding.ActivityCartBinding
 
@@ -20,7 +20,7 @@ class CartActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityCartBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CartViewModel> {
-        (application as ShoppingCartApplication).getCartViewModelFactory()
+        (application as ShoppingApplication).getCartViewModelFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,7 +97,7 @@ class CartActivity : AppCompatActivity() {
             if (fragment is CartSelectionFragment) {
                 changeFragment(cartRecommendFragment)
             } else {
-                viewModel.createOrder()
+                // viewModel.createOrder()
             }
         }
     }

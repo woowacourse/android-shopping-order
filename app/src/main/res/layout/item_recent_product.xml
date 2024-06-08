@@ -7,7 +7,10 @@
 
         <variable
             name="recentProduct"
-            type="woowacourse.shopping.presentation.products.adapter.recent.RecentProductUiModel" />
+            type="woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel" />
+        <variable
+            name="actionHandler"
+            type="woowacourse.shopping.presentation.products.ProductsActionHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +27,9 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{() -> actionHandler.onClickProduct(recentProduct.product.id)}"
+            />
 
         <TextView
             android:id="@+id/tv_recent_product_title"

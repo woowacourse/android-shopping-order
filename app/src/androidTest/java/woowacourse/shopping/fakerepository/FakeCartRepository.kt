@@ -1,11 +1,12 @@
 package woowacourse.shopping.fakerepository
 
-import woowacourse.shopping.data.datasource.local.room.entity.cart.CartItemEntity
+import com.example.data.datasource.local.room.entity.cart.CartItemEntity
+import com.example.domain.repository.CartRepository
 import java.lang.IllegalArgumentException
 import kotlin.math.min
 
 class FakeCartRepository(savedCartItemEntities: List<CartItemEntity> = emptyList()) :
-    com.example.domain.repository.CartRepository {
+    CartRepository {
     private val cart: MutableList<CartItemEntity> = savedCartItemEntities.toMutableList()
     private var id: Int = 0
 

@@ -11,7 +11,7 @@ interface CartDataSource {
     fun decreaseQuantity(productId: Int)
 
     fun changeQuantity(
-        productId: Int,
+        cartItemId: Int,
         quantity: Quantity,
     )
 

@@ -1,12 +1,15 @@
 package com.example.data.datasource.remote
 
+import com.example.data.datasource.remote.retrofit.model.request.AddCartItemRequest
 import com.example.data.datasource.remote.retrofit.model.request.CartItemQuantityRequest
 import com.example.data.datasource.remote.retrofit.model.response.cart.toCartItems
 import com.example.data.datasource.remote.retrofit.service.CartItemService
 import com.example.domain.datasource.CartDataSource
 import com.example.domain.datasource.DataResponse
+import com.example.domain.datasource.DataResponse.Companion.NULL_BODY_ERROR_CODE
 import com.example.domain.datasource.chain
 import com.example.domain.datasource.map
+import com.example.domain.datasource.onFailure
 import com.example.domain.model.CartItem
 import com.example.domain.model.Quantity
 
@@ -22,25 +25,34 @@ class RemoteCartDataSource(
 
     override fun increaseQuantity(productId: Int) {
         findByProductId(productId).map { cartItem ->
-            changeQuantity(cartItem.product.id, cartItem.quantity.inc())
+            changeQuantity(cartItem.id, cartItem.quantity.inc())
+        }.onFailure { code, error ->
+            if (code == NULL_BODY_ERROR_CODE || code == 400) {
+                val request = AddCartItemRequest(productId, 1)
+                cartItemService.postCartItem(addCartItemRequest = request).execute()
+            }
         }
     }
 
     override fun decreaseQuantity(productId: Int) {
         findByProductId(productId).map { cartItem ->
-            changeQuantity(cartItem.product.id, cartItem.quantity.dec())
+            changeQuantity(cartItem.id, cartItem.quantity.dec())
         }
     }
 
     override fun changeQuantity(
-        productId: Int,
+        cartItemId: Int,
         quantity: Quantity,
-    ) = cartItemService.patchCartItemQuantity(
-        id = productId,
-        quantity = CartItemQuantityRequest(quantity.count),
-    )
+    ) {
+        cartItemService.patchCartItemQuantity(
+            id = cartItemId,
+            quantity = CartItemQuantityRequest(quantity.count),
+        ).executeForDataResponse()
+    }
 
-    override fun deleteByProductIdCartItem(productId: Int) = cartItemService.deleteCartItem(id = productId)
+    override fun deleteByProductIdCartItem(productId: Int) {
+        cartItemService.deleteCartItem(id = productId)
+    }
 
     override fun findByProductId(productId: Int): DataResponse<CartItem> =
         findAll().map { wholeList ->
@@ -51,9 +63,10 @@ class RemoteCartDataSource(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<CartItem>> =
-        cartItemService.requestCartItems(page = page, size = pageSize).executeForDataResponse().map { cartResponse ->
-            cartResponse.toCartItems()
-        }
+        cartItemService.requestCartItems(page = page, size = pageSize).executeForDataResponse()
+            .map { cartResponse ->
+                cartResponse.toCartItems()
+            }
 
     override fun totalCartItemCount(): DataResponse<Int> =
         cartItemService.requestCartQuantityCount().executeForDataResponse().map {

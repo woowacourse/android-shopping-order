@@ -3,22 +3,18 @@ package woowacourse.shopping.presentation.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import com.example.domain.model.CartItem
-import com.example.domain.model.Product
-import com.example.domain.model.Quantity
+import com.example.domain.repository.CartRepository
+import com.example.domain.repository.OrderRepository
+import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultOrderRepository
-import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
+import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 
 class CartViewModel(
-    private val productRepository: DefaultProductRepository,
-    private val recommendRepository: com.example.domain.repository.RecentProductRepository,
-    private val cartRepository: DefaultCartRepository,
-    private val orderRepository: DefaultOrderRepository,
+    private val productRepository: ProductRepository,
+    private val recommendRepository: RecentProductRepository,
+    private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartListener {
     private val _cartUiState = MutableLiveData<Event<CartUiState>>()
     val cartUiState: LiveData<Event<CartUiState>> get() = _cartUiState
@@ -31,9 +27,11 @@ class CartViewModel(
 
     private val _cartItemSelectedCount = MutableLiveData<Int>(0)
     val cartItemSelectedCount: LiveData<Int> get() = _cartItemSelectedCount
-
+/*
     val cartItemAllSelected: LiveData<Boolean> =
         _cartItemSelectedCount.map { it == cartUiModels()?.size }
+
+ */
 
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
@@ -50,6 +48,34 @@ class CartViewModel(
     private val _orderButtonEnabled = MutableLiveData(false)
     val orderButtonEnabled: LiveData<Boolean> get() = _orderButtonEnabled
 
+    override fun deleteCartItem(productId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun increaseQuantity(productId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun decreaseQuantity(productId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun selectCartItem(
+        productId: Int,
+        isSelected: Boolean,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun selectAllCartItem(isChecked: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun navigateCartRecommend() {
+        TODO("Not yet implemented")
+    }
+
+    /*
     init {
         loadAllCartItems()
     }
@@ -70,7 +96,7 @@ class CartViewModel(
                 }
             },
         )
-         */
+     */
         updateTotalPrice()
     }
 
@@ -99,7 +125,7 @@ class CartViewModel(
             },
         )
 
-         */
+     */
     }
 
     @Synchronized
@@ -145,7 +171,7 @@ class CartViewModel(
                 }
             },
         )
-         */
+     */
     }
 
     private fun updateDeletedCart() {
@@ -305,4 +331,5 @@ class CartViewModel(
         }
         return null
     }
+     */
 }

@@ -1,11 +1,13 @@
 package com.example.data.datasource.remote
 
+import com.example.data.datasource.remote.retrofit.model.response.product.toPagingProduct
 import com.example.data.datasource.remote.retrofit.model.response.product.toProduct
 import com.example.data.datasource.remote.retrofit.model.response.product.toProductList
 import com.example.data.datasource.remote.retrofit.service.ProductService
 import com.example.domain.datasource.DataResponse
 import com.example.domain.datasource.ProductDataSource
 import com.example.domain.datasource.map
+import com.example.domain.model.PagingProduct
 import com.example.domain.model.Product
 
 class RemoteProductDataSource(
@@ -20,4 +22,11 @@ class RemoteProductDataSource(
     ): DataResponse<List<Product>> =
         productService.requestProducts(page = page, size = pageSize).executeForDataResponse()
             .map { it.toProductList() }
+
+    override fun findPage(
+        page: Int,
+        size: Int,
+    ): DataResponse<PagingProduct> =
+        productService.requestProducts(page = page, size = size).executeForDataResponse()
+            .map { it.toPagingProduct() }
 }

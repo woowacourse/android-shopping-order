@@ -3,41 +3,39 @@ package woowacourse.shopping.presentation.products.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.databinding.ItemLoadMoreBinding
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemRecentProductsBinding
-import woowacourse.shopping.presentation.products.adapter.recent.OnClickRecentProductItem
-import woowacourse.shopping.presentation.products.adapter.recent.RecentProductUiModel
-import woowacourse.shopping.presentation.products.adapter.type.ProductUiModel
-import woowacourse.shopping.presentation.products.adapter.type.ProductsView
-import woowacourse.shopping.presentation.products.adapter.type.ProductsViewType
-import woowacourse.shopping.presentation.products.adapter.type.RecentProductsUiModel
-import woowacourse.shopping.presentation.utils.OnDecreaseProductQuantity
-import woowacourse.shopping.presentation.utils.OnIncreaseProductQuantity
+import woowacourse.shopping.presentation.products.ProductsActionHandler
+import woowacourse.shopping.presentation.products.ProductsUiState
+import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
+import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 
 class ProductsAdapter(
-    private val onClickProductItem: OnClickProductItem,
-    private val onClickRecentProductItem: OnClickRecentProductItem,
-    private val onIncreaseProductQuantity: OnIncreaseProductQuantity,
-    private val onDecreaseProductQuantity: OnDecreaseProductQuantity,
-) :
-    RecyclerView.Adapter<ProductsViewHolder>() {
-    private val productsViews: MutableList<ProductsView> = mutableListOf()
-
+    private var productsUiState: ProductsUiState =
+        ProductsUiState(),
+    private var recentProductUiModels: List<RecentProductUiModel> = listOf(),
+    private val actionHandler: ProductsActionHandler,
+) : RecyclerView.Adapter<ProductsViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): ProductsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val productsViewType = ProductsViewType.from(viewType)
-        return when (productsViewType) {
-            ProductsViewType.RECENT_PRODUCTS -> {
+        return when (ProductsViewType.entries[viewType]) {
+            ProductsViewType.RecentProducts -> {
                 val binding = ItemRecentProductsBinding.inflate(inflater, parent, false)
-                ProductsViewHolder.RecentProductsViewHolder(binding, onClickRecentProductItem)
+                ProductsViewHolder.RecentProductsViewHolder(binding, actionHandler)
             }
 
-            ProductsViewType.PRODUCTS_UI_MODEL -> {
+            ProductsViewType.Product -> {
                 val binding = ItemProductBinding.inflate(inflater, parent, false)
-                ProductsViewHolder.ProductViewHolder(binding)
+                ProductsViewHolder.ProductViewHolder(binding, actionHandler)
+            }
+
+            ProductsViewType.LoadMore -> {
+                val binding = ItemLoadMoreBinding.inflate(inflater, parent, false)
+                ProductsViewHolder.LoadMoreViewHolder(binding, actionHandler)
             }
         }
     }
@@ -48,71 +46,55 @@ class ProductsAdapter(
     ) {
         when (holder) {
             is ProductsViewHolder.RecentProductsViewHolder -> {
-                holder.bind((productsViews[position] as RecentProductsUiModel).recentProductUiModels)
+                holder.bind(recentProductUiModels)
             }
 
             is ProductsViewHolder.ProductViewHolder -> {
                 holder.bind(
-                    productsViews[position] as ProductUiModel,
-                    onClickProductItem,
-                    onIncreaseProductQuantity,
-                    onDecreaseProductQuantity,
+                    productsUiState.productUiModels[position - 1],
+                )
+            }
+
+            is ProductsViewHolder.LoadMoreViewHolder -> {
+                holder.bind(
+                    productsUiState.isLast,
                 )
             }
         }
     }
 
-    override fun getItemCount(): Int = productsViews.size
+    override fun getItemCount(): Int = productsUiState.productUiModels.size + ProductsViewType.entries.size - 1
 
-    override fun getItemViewType(position: Int): Int = productsViews[position].viewType.type
-
-    fun updateProducts(updatedProducts: List<ProductUiModel>) {
-        val products = productsViews.filterIsInstance<ProductUiModel>()
-        val newProducts = updatedProducts.subtract(products.toSet())
-
-        if (products.size < updatedProducts.size) {
-            insertRangeProducts(newProducts)
-            return
-        }
-
-        if (products.size == updatedProducts.size) {
-            newProducts.forEach { changeProduct(it) }
+    override fun getItemViewType(position: Int): Int {
+        return when {
+            (position == 0) -> ProductsViewType.RecentProducts.ordinal
+            (position == itemCount - 1) -> ProductsViewType.LoadMore.ordinal
+            else -> ProductsViewType.Product.ordinal
         }
     }
 
-    private fun insertRangeProducts(newProducts: Set<ProductUiModel>) {
-        productsViews.addAll(newProducts)
-        notifyItemRangeInserted(productsViews.size, newProducts.size)
+    fun updateProducts(updatedUiState: ProductsUiState) {
+        val products = productsUiState.productUiModels
+        val updatedProducts = updatedUiState.productUiModels
+
+        productsUiState = updatedUiState
+        val diff = updatedProducts - products.toSet()
+        notifyItemRangeInserted(products.size, diff.size + 1)
+
+        diff.forEach { changeProduct(it) }
+        // notifyDataSetChanged()
     }
 
     private fun changeProduct(newProduct: ProductUiModel) {
         val position =
-            productsViews.indexOfFirst { it is ProductUiModel && it.productId == newProduct.productId }
-        productsViews[position] = newProduct
-        notifyItemChanged(position)
+            productsUiState.productUiModels.indexOfFirst { it.product.id == newProduct.product.id }
+        notifyItemChanged(position + 1)
     }
 
-    fun updateRecentProducts(recentProducts: List<RecentProductUiModel>) {
-        if (isExistedRecentProducts()) {
-            productsViews[RECENT_PRODUCTS_INDEX] = RecentProductsUiModel(recentProducts)
-            notifyItemChanged(RECENT_PRODUCTS_INDEX)
-            return
-        }
-        productsViews.add(RECENT_PRODUCTS_INDEX, RecentProductsUiModel(recentProducts))
-        notifyItemInserted(RECENT_PRODUCTS_INDEX)
-    }
-
-    private fun isExistedRecentProducts(): Boolean {
-        if (productsViews.isEmpty()) return false
-        return ProductsViewType.from(getItemViewType(RECENT_PRODUCTS_INDEX)) == ProductsViewType.RECENT_PRODUCTS
-    }
+    private fun isExistedRecentProducts(): Boolean = recentProductUiModels.isEmpty()
 
     fun findProductsLastPosition(lastPosition: Int): Int {
         if (isExistedRecentProducts()) return lastPosition - 1
         return lastPosition
-    }
-
-    companion object {
-        private const val RECENT_PRODUCTS_INDEX = 0
     }
 }

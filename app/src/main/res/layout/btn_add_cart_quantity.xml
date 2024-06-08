@@ -4,10 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
-            name="bundle"
-            type="woowacourse.shopping.presentation.utils.AddCartQuantityBundle" />
+            name="onPlusClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="onMinusClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="countNum"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +24,7 @@
             android:id="@+id/btn_cart_quantity_minus"
             style="@style/AddCartQuantityTextStyle"
             android:background="@android:color/transparent"
-            android:onClick="@{() -> bundle.onDecreaseProductQuantity.invoke(bundle.productId)}"
+            android:onClick="@{onMinusClickListener::onClick}"
             android:text="@string/minus"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +34,7 @@
             android:id="@+id/tv_cart_quantity"
             style="@style/AddCartQuantityTextStyle"
             android:layout_height="0dp"
-            android:text="@{String.valueOf(bundle.quantity.count)}"
+            android:text="@{countNum.toString()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_cart_quantity_plus"
             app:layout_constraintStart_toEndOf="@id/btn_cart_quantity_minus"
@@ -40,7 +45,7 @@
             android:id="@+id/btn_cart_quantity_plus"
             style="@style/AddCartQuantityTextStyle"
             android:background="@android:color/transparent"
-            android:onClick="@{() -> bundle.onIncreaseProductQuantity.invoke(bundle.productId)}"
+            android:onClick="@{onPlusClickListener::onClick}"
             android:text="@string/plus"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
