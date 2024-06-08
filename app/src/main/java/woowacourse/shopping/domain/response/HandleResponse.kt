@@ -28,19 +28,13 @@ inline fun <T : Any?> Response<T>.onSuccess(executable: (T) -> Unit): Response<T
         }
     }
 
-inline fun <T : Any?> Response<T>.onError(executable: (Fail<Nothing>) -> Unit): Response<T> =
+inline fun <T : Any?> Response<T>.onFail(executable: (Fail<T>) -> Unit): Response<T> =
     apply {
         if (this is Fail) {
-            executable(this.toErrorNothing())
+            executable(this)
         }
     }
 
-inline fun <T : Any?> Fail<T>.toErrorNothing(): Fail<Nothing> =
-    when (this) {
-        is Fail.NotFound -> Fail.NotFound(message)
-        is Fail.Network -> Fail.Network(message)
-        is Fail.InvalidAuthorized -> Fail.InvalidAuthorized(message)
-    }
 
 inline fun <T : Any?> Response<T>.onException(executable: (Response.Exception<Throwable>) -> Unit): Response<T> =
     apply {
