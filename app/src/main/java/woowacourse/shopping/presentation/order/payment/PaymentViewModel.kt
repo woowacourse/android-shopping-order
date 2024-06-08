@@ -36,7 +36,11 @@ class PaymentViewModel(
     init {
         val cart = orders.toCart()
         _uiState.value =
-            _uiState.value?.copy(cart = cart, paymentPrice = cart.totalPrice())
+            _uiState.value?.copy(
+                cart = cart,
+                paymentPrice = cart.totalPrice(),
+                shippingFee = loadShippingFeeUseCase()
+            )
         loadCoupons(orders.map { it.product.id })
     }
 
@@ -90,10 +94,9 @@ class PaymentViewModel(
         _uiState.value =
             uiState.copy(
                 couponUis =
-                    uiState.couponUis.map {
-                        it.copy(isSelected = it.id == couponId)
-                    },
-                shippingFee = discountResult.shippingFee,
+                uiState.couponUis.map {
+                    it.copy(isSelected = it.id == couponId)
+                },
                 discountPrice = discountResult.discountPrice,
                 paymentPrice = discountResult.paymentPrice,
             )
@@ -104,7 +107,6 @@ class PaymentViewModel(
         _uiState.value =
             uiState.copy(
                 couponUis = uiState.couponUis.map { it.copy(isSelected = false) },
-                shippingFee = 0,
                 discountPrice = 0,
                 paymentPrice = uiState.totalPrice,
             )

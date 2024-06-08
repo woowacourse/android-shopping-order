@@ -72,7 +72,7 @@ private fun CouponResponse.toPercentageCoupon(): PercentageCoupon {
         description = description,
         expirationDate = expirationDate.toLocalDateTime(),
         targetDateTime = LocalDateTime.now(),
-        discountRate = 100.0f - discount,
+        discountRate = discount.toFloat() / 100,
         availableStartTime = LocalTime.parse(availableTime.startTime, timeFormatter),
         availableEndTime = LocalTime.parse(availableTime.endTime, timeFormatter),
     )

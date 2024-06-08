@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.entity.Cart
 @JvmInline
 value class Coupons(val coupons: List<Coupon>) {
     fun availableCoupons(cart: Cart): Coupons {
-        return coupons.filter { !it.isExpired }
+        return coupons
             .filter { it.available(cart) }
             .let(::Coupons)
     }

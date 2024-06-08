@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="18dp"
-            android:text="@{@string/min_available_coupon_price(coupon.minimumPrice)}"
+            android:text="@{(coupon.minimumPrice > 0)? @string/min_available_coupon_price(coupon.minimumPrice) : null}"
             tools:text="최소 주문 금액: 1,000원" />
     </LinearLayout>
 </layout>

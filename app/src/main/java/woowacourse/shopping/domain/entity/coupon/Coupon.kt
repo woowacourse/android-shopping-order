@@ -42,7 +42,7 @@ sealed class Coupon(
         return discount(Cart(orderProduct), shippingFee)
     }
 
-    protected fun noDiscount(
+    private fun noDiscount(
         cart: Cart,
         shippingFee: Long,
     ): DiscountResult {
