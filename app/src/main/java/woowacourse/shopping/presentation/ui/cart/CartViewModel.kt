@@ -148,7 +148,7 @@ class CartViewModel(
             }
 
             is OrderState.Recommend -> {
-                _orderEvent.value = Event(OrderEvent.CompleteOrder)
+                _orderEvent.value = Event(OrderEvent.MoveToPayment)
             }
 
             null -> throw IllegalAccessError()
