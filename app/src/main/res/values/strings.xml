@@ -9,4 +9,12 @@
     <string name="product_not_found">아이템을 찾을 수 없습니다</string>
     <string name="cart_title">Cart</string>
     <string name="error_load_cart">카트 불러오기에 실패했습니다</string>
+    <string name="payment">결제하기</string>
+    <string name="payment_coupon_title">적용 가능한 쿠폰</string>
+    <string name="payment_coupon_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="payment_price_title">주문 금액</string>
+    <string name="payment_coupon_discount_title">쿠폰 할인 금액</string>
+    <string name="payment_delivery_title">배송비</string>
+    <string name="payment_total_title">총 결제 금액</string>
+    <string name="payment_price">%,d원</string>
 </resources>
