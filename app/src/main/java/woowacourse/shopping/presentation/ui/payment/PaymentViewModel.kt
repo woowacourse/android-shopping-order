@@ -9,23 +9,34 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.CouponRepository
 import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.DiscountType
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.presentation.util.Event
 
 class PaymentViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
-) : ViewModel() {
-    private val _coupon = MutableLiveData<List<Coupon>>()
-    val coupon: LiveData<List<Coupon>> get() = _coupon
+) : ViewModel(), PaymentHandler {
+    private val _coupons = MutableLiveData<List<Coupon>>()
+    val coupons: LiveData<List<Coupon>> get() = _coupons
 
     private val carts = MutableLiveData<List<ProductListItem.ShoppingProductItem>>()
 
-    private val selectedCoupon: LiveData<Coupon> =
-        _coupon.map { coupons ->
-            coupons[0]
+    private val selectedCoupon: LiveData<Coupon?> =
+        coupons.map { coupons ->
+            coupons.firstOrNull { it.isChecked }
+        }
+
+    val deliveryPrice =
+        selectedCoupon.map {
+            if (it == null || it.discountType != DiscountType.FreeShipping) {
+                DELIVERY_PRICE
+            } else {
+                0L
+            }
         }
 
     val totalPrice: LiveData<Long> =
@@ -36,6 +47,10 @@ class PaymentViewModel(
     val discount: MediatorLiveData<Long> = MediatorLiveData()
 
     val discountedPrice: MediatorLiveData<Long> = MediatorLiveData()
+
+    private val _paymentEvent = MutableLiveData<Event<PaymentEvent>>()
+
+    val paymentEvent: LiveData<Event<PaymentEvent>> = _paymentEvent
 
     init {
         initDiscountMediateLivedata()
@@ -56,30 +71,41 @@ class PaymentViewModel(
     private fun initDiscountedPriceMediateLivedata() {
         discountedPrice.apply {
             addSource(totalPrice) {
-                value = checkDiscountedPrice(totalPrice, discount)
+                value = checkDiscountedPrice(totalPrice, discount, deliveryPrice)
             }
             addSource(discount) {
-                value = checkDiscountedPrice(totalPrice, discount)
+                value = checkDiscountedPrice(totalPrice, discount, deliveryPrice)
+            }
+            addSource(deliveryPrice) {
+                value = checkDiscountedPrice(totalPrice, discount, deliveryPrice)
             }
         }
     }
 
     private fun checkDiscount(
         carts: LiveData<List<ProductListItem.ShoppingProductItem>>,
-        selectedCoupon: LiveData<Coupon>,
+        selectedCoupon: LiveData<Coupon?>,
     ): Long {
-        return carts.value?.let { selectedCoupon.value?.calculateDiscount(it) ?: 0L } ?: 0L
+        return carts.value?.let {
+            val selectedCoupon = selectedCoupon.value
+            if (selectedCoupon == null || selectedCoupon.discountType == DiscountType.FreeShipping) {
+                0L
+            } else {
+                selectedCoupon.calculateDiscount(it)
+            }
+        } ?: 0L
     }
 
     private fun checkDiscountedPrice(
         totalPrice: LiveData<Long>,
         discount: MediatorLiveData<Long>,
+        deliveryPrice: LiveData<Long>,
     ): Long {
-        return totalPrice.value?.let { totalPrice ->
-            discount.value?.let { discountPrice ->
-                totalPrice - discountPrice
-            }
-        } ?: 0
+        return if (totalPrice.value != null && discount.value != null && deliveryPrice.value != null) {
+            totalPrice.value!! + deliveryPrice.value!! - discount.value!!
+        } else {
+            0
+        }
     }
 
     fun fetchInitialData() {
@@ -90,7 +116,7 @@ class PaymentViewModel(
     private fun fetchCoupon() {
         viewModelScope.launch {
             couponRepository.requestCoupons().onSuccess {
-                _coupon.value = it
+                _coupons.value = it
             }.onFailure {
                 // TODO
             }
@@ -105,5 +131,32 @@ class PaymentViewModel(
                 // TODO
             }
         }
+    }
+
+    override fun onCouponClicked(coupon: Coupon) {
+        val coupons = coupons.value ?: return
+        val updatedCoupon =
+            coupons.map {
+                if (it.id == coupon.id) {
+                    it.updateCheck(!it.isChecked)
+                } else {
+                    it.updateCheck(false)
+                }
+            }
+        _coupons.value = updatedCoupon
+    }
+
+    override fun onPaymentClicked() {
+        val cartItem = carts.value ?: return
+        val productItemIds = cartItem.map { it.id }
+        viewModelScope.launch {
+            orderRepository.completeOrder(productItemIds).onSuccess {
+                _paymentEvent.value = Event(PaymentEvent.FinishOrder)
+            }.onFailure {}
+        }
+    }
+
+    companion object {
+        private const val DELIVERY_PRICE = 3_000L
     }
 }

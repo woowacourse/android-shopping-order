@@ -11,6 +11,7 @@ sealed class Coupon(
     val description: String,
     val expirationDate: LocalDate,
     val discountType: DiscountType,
+    val isChecked: Boolean = false,
 ) {
     protected fun isValidPeriod(nowDate: LocalDate): Boolean {
         val duration = Duration.between(expirationDate.atStartOfDay(), nowDate.atStartOfDay())
@@ -18,6 +19,8 @@ sealed class Coupon(
     }
 
     abstract fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long
+
+    abstract fun updateCheck(isChecked: Boolean): Coupon
 }
 
 class FixedCoupon(
@@ -26,9 +29,10 @@ class FixedCoupon(
     description: String,
     expirationDate: LocalDate,
     discountType: DiscountType,
+    isChecked: Boolean,
     val discount: Int,
     val minimumAmount: Int,
-) : Coupon(id, code, description, expirationDate, discountType) {
+) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
     private fun isValid(totalPrice: Long) = (minimumAmount <= totalPrice) && isValidPeriod(LocalDate.now())
 
     override fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long {
@@ -39,6 +43,19 @@ class FixedCoupon(
             0
         }
     }
+
+    override fun updateCheck(isChecked: Boolean): Coupon {
+        return FixedCoupon(
+            id = this.id,
+            code = this.code,
+            description = this.description,
+            expirationDate = this.expirationDate,
+            discountType = this.discountType,
+            isChecked = isChecked,
+            discount = this.discount,
+            minimumAmount = this.minimumAmount,
+        )
+    }
 }
 
 class BuyXGetYCoupon(
@@ -47,9 +64,10 @@ class BuyXGetYCoupon(
     description: String,
     expirationDate: LocalDate,
     discountType: DiscountType,
+    isChecked: Boolean,
     val buyQuantity: Int,
     val getQuantity: Int,
-) : Coupon(id, code, description, expirationDate, discountType) {
+) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
     private fun isValid(products: List<ProductListItem.ShoppingProductItem>): Boolean =
         (products.any { it.quantity == buyQuantity }) && isValidPeriod(LocalDate.now())
 
@@ -62,6 +80,19 @@ class BuyXGetYCoupon(
             0
         }
     }
+
+    override fun updateCheck(isChecked: Boolean): Coupon {
+        return BuyXGetYCoupon(
+            id = this.id,
+            code = this.code,
+            description = this.description,
+            expirationDate = this.expirationDate,
+            discountType = this.discountType,
+            isChecked = isChecked,
+            buyQuantity = this.buyQuantity,
+            getQuantity = this.getQuantity,
+        )
+    }
 }
 
 class FreeShippingCoupon(
@@ -70,7 +101,8 @@ class FreeShippingCoupon(
     description: String,
     expirationDate: LocalDate,
     discountType: DiscountType,
-) : Coupon(id, code, description, expirationDate, discountType) {
+    isChecked: Boolean,
+) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
     private fun isValid() = isValidPeriod(LocalDate.now())
 
     override fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long {
@@ -80,6 +112,16 @@ class FreeShippingCoupon(
             0
         }
     }
+
+    override fun updateCheck(isChecked: Boolean): Coupon =
+        FreeShippingCoupon(
+            id = this.id,
+            code = this.code,
+            description = this.description,
+            expirationDate = this.expirationDate,
+            discountType = this.discountType,
+            isChecked = isChecked,
+        )
 }
 
 class PercentageCoupon(
@@ -88,9 +130,10 @@ class PercentageCoupon(
     description: String,
     expirationDate: LocalDate,
     discountType: DiscountType,
+    isChecked: Boolean,
     val discount: Int,
     val availableTime: AvailableTime,
-) : Coupon(id, code, description, expirationDate, discountType) {
+) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
     private fun isValid(nowTime: LocalTime): Boolean =
         nowTime.isAfter(availableTime.start) && nowTime.isBefore(availableTime.end) &&
             isValidPeriod(
@@ -105,4 +148,16 @@ class PercentageCoupon(
             0
         }
     }
+
+    override fun updateCheck(isChecked: Boolean): Coupon =
+        PercentageCoupon(
+            id = this.id,
+            code = this.code,
+            description = this.description,
+            expirationDate = this.expirationDate,
+            discountType = this.discountType,
+            isChecked = isChecked,
+            discount = this.discount,
+            availableTime = this.availableTime,
+        )
 }

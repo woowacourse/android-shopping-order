@@ -180,5 +180,17 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
                 throw IllegalAccessError("해당 메서드는 액티비티에서 호출해야 합니다")
             }
         }
+
+        fun start(context: Context) {
+            if (context is Activity) {
+                Intent(context, ShoppingActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    context.setResult(Activity.RESULT_OK, this)
+                    context.startActivity(this)
+                }
+            } else {
+                throw IllegalAccessError("해당 메서드는 액티비티에서 호출해야 합니다")
+            }
+        }
     }
 }

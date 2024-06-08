@@ -54,11 +54,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                             RecommendFragment(),
                         ).addToBackStack(null).commit()
                     }
-
-                    OrderEvent.FinishOrder -> {
-                        showToast("상품 주문 성공")
-                        finish()
-                    }
                 }
             },
         )

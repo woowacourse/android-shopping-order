@@ -9,6 +9,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.ui.payment.adapter.CouponAdapter
+import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
+import woowacourse.shopping.presentation.util.EventObserver
 
 class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     override val layoutResourceId = R.layout.activity_payment
@@ -18,20 +21,42 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     override fun initStartView(savedInstanceState: Bundle?) {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        couponAdapter = CouponAdapter()
-        binding.rvCoupon.adapter = couponAdapter
-        binding.rvCoupon.layoutManager = LinearLayoutManager(this)
-
-        initActionBarTitle()
         viewModel.fetchInitialData()
-        viewModel.coupon.observe(this) {
-            couponAdapter.submitList(it)
-        }
+        initActionBarTitle()
+        initRecyclerViewAdapter()
+        observeCoupon()
+        observePaymentEvent()
     }
 
     private fun initActionBarTitle() {
         title = getString(R.string.cart_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun initRecyclerViewAdapter() {
+        couponAdapter = CouponAdapter(viewModel)
+        binding.rvCoupon.adapter = couponAdapter
+        binding.rvCoupon.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun observeCoupon() {
+        viewModel.coupons.observe(this) {
+            couponAdapter.submitList(it.toList())
+        }
+    }
+
+    private fun observePaymentEvent() {
+        viewModel.paymentEvent.observe(
+            this,
+            EventObserver { event ->
+                when (event) {
+                    PaymentEvent.FinishOrder -> {
+                        showToast("상품을 주문했습니다.")
+                        ShoppingActivity.start(this)
+                    }
+                }
+            },
+        )
     }
 
     companion object {

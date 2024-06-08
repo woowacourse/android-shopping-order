@@ -22,4 +22,9 @@
     <string name="coupon_discount_price">쿠폰 할인 금액</string>
     <string name="delivery_price">배송비</string>
     <string name="total_order_price">총 결제 금액</string>
+    <string name="payment">결제하기</string>
+    <string name="recommend_comment">이런 상품은 어떠세요?</string>
+    <string name="recommend_comment_detail">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+    <string name="available_coupon">적용 가능한 쿠폰</string>
+    <string name="available_coupon_comment">* 쿠폰은 1개만 적용 가능합니다.</string>
 </resources>

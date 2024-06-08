@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shopping
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -49,12 +48,9 @@ class ShoppingViewModel(
 
     fun loadInitialShoppingItems() {
         if (shoppingProducts.value !is UiState.Success) {
-//            val handler = Handler(Looper.getMainLooper())
-//            handler.postDelayed({
             fetchAllRecentProducts()
             fetchCartItemCount()
             fetchInitialCartProducts()
-//            }, 1000)
         }
     }
 
@@ -96,7 +92,6 @@ class ShoppingViewModel(
                 currentPage++
                 addShoppingProducts(productModel.products, productModel.isLast)
             }.onFailure {
-                Log.d("ㅌㅅㅌ", "error : ${it.message}")
                 _error.value = Event(ShoppingError.ProductItemsNotFound)
             }
         }

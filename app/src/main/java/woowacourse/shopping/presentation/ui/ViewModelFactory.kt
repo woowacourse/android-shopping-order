@@ -51,11 +51,6 @@ class ViewModelFactory() : ViewModelProvider.Factory {
                         ),
                     productRepository = ProductRepositoryImpl(),
                     recentRepository = RecentProductRepositoryImpl(recentDao),
-                    orderRepository =
-                        OrderRepositoryImpl(
-                            RemoteOrderDataSource(),
-                            RemoteCartDataSource(),
-                        ),
                 ) as T
             }
 

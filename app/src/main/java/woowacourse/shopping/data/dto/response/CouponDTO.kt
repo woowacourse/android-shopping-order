@@ -31,6 +31,7 @@ data class CouponDTO(
                     description = description,
                     expirationDate = toLocalDate(expirationDate),
                     discountType = DiscountType.FreeShipping,
+                    isChecked = false,
                 )
             }
 
@@ -43,6 +44,7 @@ data class CouponDTO(
                     discountType = DiscountType.Fixed,
                     discount = discount!!,
                     minimumAmount = minimumAmount!!,
+                    isChecked = false,
                 )
             }
 
@@ -55,6 +57,7 @@ data class CouponDTO(
                     discountType = DiscountType.BuyXGetY,
                     buyQuantity = buyQuantity!!,
                     getQuantity = getQuantity!!,
+                    isChecked = false,
                 )
             }
 
@@ -67,6 +70,7 @@ data class CouponDTO(
                     discountType = DiscountType.Percentage,
                     discount = discount!!,
                     availableTime = availableTime!!.toDomain(),
+                    isChecked = false,
                 )
             }
         }

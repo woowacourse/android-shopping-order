@@ -8,6 +8,10 @@
         <variable
             name="coupon"
             type="woowacourse.shopping.domain.Coupon" />
+
+        <variable
+            name="handler"
+            type="woowacourse.shopping.presentation.ui.payment.PaymentHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,12 +20,15 @@
         android:layout_marginHorizontal="18dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/radius_4_strock"
+        android:onClick="@{()->handler.onCouponClicked(coupon)}"
         android:padding="18dp">
 
         <CheckBox
             android:id="@+id/check_box_coupon"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:onClick="@{()->handler.onCouponClicked(coupon)}"
+            android:checked="@{coupon.isChecked}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
