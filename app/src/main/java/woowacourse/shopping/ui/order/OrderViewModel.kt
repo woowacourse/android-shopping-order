@@ -11,6 +11,9 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.order.OrderRemoteRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
@@ -61,8 +64,13 @@ class OrderViewModel(
                 cartItemRepository.updateProductQuantity(productId, quantity)
             } finally {
                 updateProductQuantity(productId, INCREASE_VARIATION)
-                val product = productRepository.loadProduct(productId)
-                updateOrderAmount(product.price)
+                productRepository.loadProduct(productId).onSuccess { product ->
+                    updateOrderAmount(product.price)
+                }.onError { code, message ->
+                    // TODO: Error Handling
+                }.onException {
+                    // TODO: Exception Handling
+                }
                 updateOrdersCount(INCREASE_VARIATION)
             }
         }
@@ -75,8 +83,13 @@ class OrderViewModel(
         viewModelScope.launch {
             cartItemRepository.updateProductQuantity(productId, quantity)
             updateProductQuantity(productId, DECREASE_VARIATION)
-            val product = productRepository.loadProduct(productId)
-            updateOrderAmount(-product.price)
+            productRepository.loadProduct(productId).onSuccess { product ->
+                updateOrderAmount(-product.price)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
             updateOrdersCount(DECREASE_VARIATION)
         }
     }

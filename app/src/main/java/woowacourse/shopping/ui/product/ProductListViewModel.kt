@@ -13,6 +13,9 @@ import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.common.currentPageIsNullException
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.history.DefaultProductHistoryRepository
 import woowacourse.shopping.data.product.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
@@ -52,13 +55,26 @@ class ProductListViewModel(
     fun loadAll() {
         viewModelScope.launch {
             val page = currentPage.value ?: currentPageIsNullException()
-            val result = (FIRST_PAGE..page).flatMap { productsRepository.loadProducts(it) }
-            val totalCartCount = cartItemRepository.calculateCartItemsCount()
-            val isLastPage = productsRepository.isFinalPage(page)
-            val productHistory = productHistoryRepository.loadProductsHistory()
+            (FIRST_PAGE..page).forEach {
+                productsRepository.loadProducts(it).onSuccess { products ->
+                    _loadedProducts.value = products
+                }.onError { code, message ->
+                    // TODO: Error Handling
+                }.onException {
+                    // TODO: Exception Handling
+                }
+            }
 
-            _isLastPage.postValue(isLastPage)
-            _loadedProducts.value = result
+            productsRepository.isFinalPage(page).onSuccess {
+                _isLastPage.postValue(it)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
+            val productHistory = productHistoryRepository.loadProductsHistory()
+            val totalCartCount = cartItemRepository.calculateCartItemsCount()
             _cartProductTotalCount.value = totalCartCount
             _productsHistory.value = productHistory
             _isLoading.value = false
@@ -68,15 +84,26 @@ class ProductListViewModel(
     fun loadNextPageProducts() {
         viewModelScope.launch {
             if (isLastPage.value == true) return@launch
-
             val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
-            val isLastPage = productsRepository.isFinalPage(nextPage)
-            val result = productsRepository.loadProducts(nextPage)
-            val totalCount = cartItemRepository.calculateCartItemsCount()
 
+            productsRepository.isFinalPage(nextPage).onSuccess {
+                _isLastPage.postValue(it)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
+            productsRepository.loadProducts(nextPage).onSuccess { products ->
+                _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(products) }
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
+            val totalCount = cartItemRepository.calculateCartItemsCount()
             _currentPage.postValue(nextPage)
-            _isLastPage.postValue(isLastPage)
-            _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(result) }
             _cartProductTotalCount.value = totalCount
         }
     }

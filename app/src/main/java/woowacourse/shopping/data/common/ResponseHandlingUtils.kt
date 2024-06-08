@@ -27,4 +27,28 @@ object ResponseHandlingUtils {
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
+
+    suspend fun <T : Any> ResponseResult<T>.onSuccess(
+        executable: suspend (T) -> Unit
+    ): ResponseResult<T> = apply {
+        if (this is ResponseResult.Success<T>) {
+            executable(data)
+        }
+    }
+
+    suspend fun <T : Any> ResponseResult<T>.onError(
+        executable: suspend (code: Int, message: String?) -> Unit
+    ): ResponseResult<T> = apply {
+        if (this is ResponseResult.Error<T>) {
+            executable(code, message)
+        }
+    }
+
+    suspend fun <T : Any> ResponseResult<T>.onException(
+        executable: suspend (e: Throwable) -> Unit
+    ): ResponseResult<T> = apply {
+        if (this is ResponseResult.Exception<T>) {
+            executable(e)
+        }
+    }
 }

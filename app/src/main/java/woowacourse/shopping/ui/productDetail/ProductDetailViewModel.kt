@@ -18,6 +18,9 @@ import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.OnProductItemClickListener
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 
 class ProductDetailViewModel(
     private val productId: Long,
@@ -42,18 +45,23 @@ class ProductDetailViewModel(
 
     fun loadAll() {
         viewModelScope.launch {
-            val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
+            shoppingProductsRepository.loadProduct(id = productId).onSuccess { product ->
+                _currentProduct.value = product
+                _productCount.value = product.quantity
+                _isLoading.value = false
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
             val latestProduct =
                 try {
                     productHistoryRepository.loadLatestProduct()
                 } catch (e: NoSuchElementException) {
                     Product.NULL
                 }
-
-            _currentProduct.value = currentProduct
-            _productCount.value = 1
             _latestProduct.value = latestProduct
-            _isLoading.value = false
             productHistoryRepository.saveProductHistory(productId)
         }
     }
