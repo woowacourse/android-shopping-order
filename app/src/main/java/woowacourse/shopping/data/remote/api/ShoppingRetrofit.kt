@@ -29,7 +29,7 @@ object ShoppingRetrofit {
                         subclass(FreeShippingCoupon::class)
                         subclass(PercentageDiscountCoupon::class)
                     }
-                    classDiscriminator = "coupon_type"
+                    classDiscriminator = "discountType"
                 }
         }
 

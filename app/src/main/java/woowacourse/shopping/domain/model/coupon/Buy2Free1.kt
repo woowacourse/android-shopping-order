@@ -8,10 +8,9 @@ data class Buy2Free1(
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDate,
-    val type: String,
     val buyQuantity: Int,
     val getQuantity: Int,
-) : Coupon(type) {
+) : Coupon(DiscountType.BuyXGetY) {
     private val applyCount = buyQuantity + getQuantity
 
     override fun canUse(products: List<CartWithProduct>): Boolean {

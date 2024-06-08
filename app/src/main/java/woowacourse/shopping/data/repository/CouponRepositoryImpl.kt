@@ -25,7 +25,6 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                     code,
                     description,
                     expirationDate,
-                    discountType,
                     buyQuantity,
                     getQuantity,
                 )
@@ -35,7 +34,6 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                     id,
                     description,
                     expirationDate,
-                    discountType,
                     discount,
                     minimumAmount,
                     code,
@@ -48,7 +46,6 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                     description,
                     expirationDate,
                     minimumAmount,
-                    discountType,
                 )
 
             is PercentageDiscountCoupon ->
@@ -58,7 +55,6 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                     description,
                     expirationDate,
                     discount,
-                    discountType,
                     availableTime.start,
                     availableTime.end,
                 )

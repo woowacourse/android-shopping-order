@@ -10,10 +10,9 @@ data class MiracleCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     val discount: Int,
-    val type: String,
     val availableStartTime: LocalTime,
     val availableEndTime: LocalTime,
-) : Coupon(type) {
+) : Coupon(DiscountType.Percentage) {
     override fun canUse(products: List<CartWithProduct>): Boolean {
         val currentTime = LocalTime.now()
         val isAvailableTime =
