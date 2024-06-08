@@ -39,7 +39,7 @@ class PaymentViewModel(
             _uiState.value?.copy(
                 cart = cart,
                 paymentPrice = cart.totalPrice(),
-                shippingFee = loadShippingFeeUseCase()
+                shippingFee = loadShippingFeeUseCase(),
             )
         loadCoupons(orders.map { it.product.id })
     }
@@ -94,9 +94,9 @@ class PaymentViewModel(
         _uiState.value =
             uiState.copy(
                 couponUis =
-                uiState.couponUis.map {
-                    it.copy(isSelected = it.id == couponId)
-                },
+                    uiState.couponUis.map {
+                        it.copy(isSelected = it.id == couponId)
+                    },
                 discountPrice = discountResult.discountPrice,
                 paymentPrice = discountResult.paymentPrice,
             )

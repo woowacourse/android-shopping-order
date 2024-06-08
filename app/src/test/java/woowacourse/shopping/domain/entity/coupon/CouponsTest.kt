@@ -11,7 +11,6 @@ class CouponsTest {
         // given
         val cartProducts = listOf(fakeCartProduct(productId = 1L, price = 50_000))
         val cart = Cart(cartProducts)
-        val shippingFee = 3_000L
         val coupons =
             fakeCoupons(
                 fakePercentageCoupon(currentTime = 5, availableStartTime = 4, availableEndTime = 6),
