@@ -106,8 +106,7 @@ class ProductsViewModel(
             val productUiModels = productUiModels()?.toMutableList() ?: return@launch
 
             productUiModels.forEachIndexed { index, productUiModel ->
-                val product =
-                    productRepository.find(productUiModel.productId).getOrNull() ?: return@launch
+                val product = productRepository.find(productUiModel.productId).getOrNull() ?: return@launch
                 productUiModels[index] = product.toProductUiModel(this)
             }
             _isLoadingProducts.value = false
@@ -130,11 +129,7 @@ class ProductsViewModel(
             scope.async {
                 map {
                     val product = productRepository.find(it.product.id).getOrNull() ?: return@async null
-                    RecentProductUiModel(
-                        product.id,
-                        product.imageUrl,
-                        product.name,
-                    )
+                    RecentProductUiModel(product.id, product.imageUrl, product.name)
                 }
             }
         return recentProductUiModelsDeferred.await()?.ifEmpty { null }
@@ -149,15 +144,28 @@ class ProductsViewModel(
         val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.inc())
         updateCartQuantity(newProductUiModel)
-        updateProductUiModel(productId)
     }
 
     fun decreaseQuantity(productId: Int) {
         val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.dec())
         updateCartQuantity(newProductUiModel)
-        updateProductUiModel(productId)
     }
+
+    private fun updateCartQuantity(productUiModel: ProductUiModel) =
+        viewModelScope.launch {
+            val cartItem = cartRepository.findByProductId(productUiModel.productId).getOrNull()
+            if (cartItem == null) {
+                addCartItem(productUiModel.productId)
+            } else if (productUiModel.quantity.isMin()) {
+                deleteCartItem(cartItem)
+            } else {
+                cartRepository.changeQuantity(cartItem.id, productUiModel.quantity)
+                    .onFailure { setError() }
+            }
+
+            updateProductUiModel(productUiModel.productId)
+        }
 
     private fun updateProductUiModel(productId: Int) =
         viewModelScope.launch {
@@ -166,8 +174,7 @@ class ProductsViewModel(
                 .onSuccess { product ->
                     viewModelScope.launch {
                         val newProductUiModel = product.toProductUiModel(this)
-                        val position =
-                            productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
+                        val position = productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
                         productUiModels[position] = newProductUiModel
                         _productUiModels.value = productUiModels
                         updateTotalCount()
@@ -181,24 +188,6 @@ class ProductsViewModel(
         viewModelScope.launch {
             cartRepository.getTotalQuantity()
                 .onSuccess { _cartTotalQuantity.value = it }
-                .onFailure { setError() }
-        }
-
-    private fun updateCartQuantity(productUiModel: ProductUiModel) =
-        viewModelScope.launch {
-            val cartItem = cartRepository.findByProductId(productUiModel.productId).getOrNull()
-
-            if (cartItem == null) {
-                addCartItem(productUiModel.productId)
-                return@launch
-            }
-
-            if (productUiModel.quantity.isMin()) {
-                deleteCartItem(cartItem)
-                return@launch
-            }
-
-            cartRepository.changeQuantity(cartItem.id, productUiModel.quantity)
                 .onFailure { setError() }
         }
 
