@@ -4,7 +4,6 @@ import woowacourse.shopping.domain.entity.coupon.Coupons
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class DefaultOrderRepository(private val orderDataSource: OrderDataSource) : OrderRepository {
-
     override suspend fun orderCartProducts(productIds: List<Long>): Result<Unit> {
         return orderDataSource.orderProducts(productIds)
     }

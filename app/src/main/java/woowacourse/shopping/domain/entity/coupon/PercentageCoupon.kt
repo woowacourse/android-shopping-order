@@ -15,15 +15,22 @@ data class PercentageCoupon(
     val availableEndTime: LocalTime,
 ) : Coupon(id, code, description, 0, expirationDate, targetDateTime) {
     override fun available(cart: Cart): Boolean {
-        return !isExpired && targetDateTime.toLocalTime()
-            .isBetween(availableStartTime, availableEndTime)
+        return !isExpired &&
+            targetDateTime.toLocalTime()
+                .isBetween(availableStartTime, availableEndTime)
     }
 
-    private fun LocalTime.isBetween(start: LocalTime, end: LocalTime): Boolean {
+    private fun LocalTime.isBetween(
+        start: LocalTime,
+        end: LocalTime,
+    ): Boolean {
         return (this.isBefore(start) || this.isAfter(end)).not()
     }
 
-    override fun calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult {
+    override fun calculateDiscount(
+        cart: Cart,
+        shippingFee: Long,
+    ): DiscountResult {
         return DiscountResult(cart.totalPrice(), cart.totalPrice().discount(), shippingFee)
     }
 

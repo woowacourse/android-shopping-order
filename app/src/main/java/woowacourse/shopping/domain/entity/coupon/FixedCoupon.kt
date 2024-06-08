@@ -16,7 +16,10 @@ data class FixedCoupon(
         return !isExpired && cart.totalPrice() >= discountableMinPrice
     }
 
-    override fun calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult {
+    override fun calculateDiscount(
+        cart: Cart,
+        shippingFee: Long,
+    ): DiscountResult {
         val totalPrice = cart.totalPrice()
         return DiscountResult(totalPrice, discount, shippingFee)
     }

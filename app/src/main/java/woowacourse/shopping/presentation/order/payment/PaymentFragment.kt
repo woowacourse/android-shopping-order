@@ -43,12 +43,12 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
             DefaultOrderCartProductsUseCase.instance(
                 productRepository,
                 cartRepository,
-                orderRepository
+                orderRepository,
             ),
             DefaultLoadAvailableDiscountCouponsUseCase.instance(
                 productRepository,
                 cartRepository,
-                orderRepository
+                orderRepository,
             ),
         )
     }
@@ -56,7 +56,10 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
     private lateinit var adapter: CouponAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
             vm = viewModel

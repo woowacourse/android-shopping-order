@@ -8,10 +8,10 @@ import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.cart.CartFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
-import woowacourse.shopping.presentation.order.recommend.RecommendProductFragment
-import woowacourse.shopping.presentation.order.recommend.OrderProductNavArgs
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.order.payment.PaymentFragment
+import woowacourse.shopping.presentation.order.recommend.OrderProductNavArgs
+import woowacourse.shopping.presentation.order.recommend.RecommendProductFragment
 import woowacourse.shopping.presentation.shopping.detail.ProductDetailFragment
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 
@@ -75,7 +75,7 @@ class ShoppingActivity :
     override fun navigateToPayment(
         orderProducts: List<CartProductUi>,
         addBackStack: Boolean,
-        tag: String?
+        tag: String?,
     ) {
         supportFragmentManager.commit {
             replace<PaymentFragment>(

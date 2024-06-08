@@ -6,13 +6,14 @@ import woowacourse.shopping.remote.service.OrderService
 object OrderRepositoryInjector {
     private var instance: OrderRepository? = null
 
-    fun orderRepository(): OrderRepository = instance ?: synchronized(this) {
-        instance ?: DefaultOrderRepository(
-            DefaultOrderDataSource(
-                OrderService.instance()
-            )
-        ).also {
-            instance = it
+    fun orderRepository(): OrderRepository =
+        instance ?: synchronized(this) {
+            instance ?: DefaultOrderRepository(
+                DefaultOrderDataSource(
+                    OrderService.instance(),
+                ),
+            ).also {
+                instance = it
+            }
         }
-    }
 }

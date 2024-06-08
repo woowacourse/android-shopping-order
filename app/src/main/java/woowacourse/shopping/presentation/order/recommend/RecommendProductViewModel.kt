@@ -68,10 +68,11 @@ class RecommendProductViewModel(
         viewModelScope.launch {
             decreaseCartProductUseCase(id).onSuccess {
                 val uiState = _uiState.value ?: return@launch
-                _uiState.value = uiState.decreaseProductCount(
-                    id,
-                    INCREMENT_AMOUNT,
-                )
+                _uiState.value =
+                    uiState.decreaseProductCount(
+                        id,
+                        INCREMENT_AMOUNT,
+                    )
                 _updateCartEvent.setValue(Unit)
             }.onFailure {
                 Timber.e(it)
@@ -83,6 +84,7 @@ class RecommendProductViewModel(
     companion object {
         private const val INCREMENT_AMOUNT = 1
         private const val RECOMMEND_PRODUCT_SIZE = 10
+
         fun factory(
             orders: List<CartProductUi>,
             decreaseCartProductUseCase: DecreaseCartProductUseCase,
@@ -107,13 +109,13 @@ private fun RecommendProductUiState.increaseProductCount(
 ): RecommendProductUiState =
     copy(
         recommendProducts =
-        recommendProducts.map {
-            if (it.product.id == productId) {
-                it.copy(count = it.count + amount)
-            } else {
-                it
-            }
-        },
+            recommendProducts.map {
+                if (it.product.id == productId) {
+                    it.copy(count = it.count + amount)
+                } else {
+                    it
+                }
+            },
     )
 
 private fun RecommendProductUiState.decreaseProductCount(

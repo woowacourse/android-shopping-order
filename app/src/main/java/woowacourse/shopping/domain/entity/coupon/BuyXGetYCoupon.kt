@@ -19,9 +19,13 @@ data class BuyXGetYCoupon(
         return !isExpired && cart.cartProducts.any { it.count >= discountLimitCount }
     }
 
-    override fun calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult {
-        val discountProducts: List<CartProduct> = cart.cartProducts
-            .filter { it.count >= discountLimitCount }
+    override fun calculateDiscount(
+        cart: Cart,
+        shippingFee: Long,
+    ): DiscountResult {
+        val discountProducts: List<CartProduct> =
+            cart.cartProducts
+                .filter { it.count >= discountLimitCount }
         val discountProduct = discountProducts.maxBy { it.product.price }
         val discountPrice = discountProduct.discountPrice()
         return DiscountResult(cart.totalPrice(), discountPrice, shippingFee)

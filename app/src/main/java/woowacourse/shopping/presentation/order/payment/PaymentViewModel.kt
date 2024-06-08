@@ -20,9 +20,8 @@ class PaymentViewModel(
     orders: List<CartProductUi>,
     private val loadShippingFeeUseCase: LoadShippingFeeUseCase,
     private val orderCartProductsUseCase: OrderCartProductsUseCase,
-    private val loadAvailableDiscountCouponsUseCase: LoadAvailableDiscountCouponsUseCase
+    private val loadAvailableDiscountCouponsUseCase: LoadAvailableDiscountCouponsUseCase,
 ) : ViewModel(), CouponClickListener {
-
     private val _uiState = MutableLiveData<PaymentUiState>(PaymentUiState())
     val uiState: LiveData<PaymentUiState> get() = _uiState
     private val _updateCartEvent = MutableSingleLiveData<Unit>()
@@ -88,14 +87,16 @@ class PaymentViewModel(
             uiState.coupons.findCouponById(couponId)
                 ?.discount(uiState.cart, loadShippingFeeUseCase())
                 ?: return
-        _uiState.value = uiState.copy(
-            couponUis = uiState.couponUis.map {
-                it.copy(isSelected = it.id == couponId)
-            },
-            shippingFee = discountResult.shippingFee,
-            discountPrice = discountResult.discountPrice,
-            paymentPrice = discountResult.paymentPrice
-        )
+        _uiState.value =
+            uiState.copy(
+                couponUis =
+                    uiState.couponUis.map {
+                        it.copy(isSelected = it.id == couponId)
+                    },
+                shippingFee = discountResult.shippingFee,
+                discountPrice = discountResult.discountPrice,
+                paymentPrice = discountResult.paymentPrice,
+            )
     }
 
     private fun unSelectAllCoupons() {
@@ -105,7 +106,7 @@ class PaymentViewModel(
                 couponUis = uiState.couponUis.map { it.copy(isSelected = false) },
                 shippingFee = 0,
                 discountPrice = 0,
-                paymentPrice = uiState.totalPrice
+                paymentPrice = uiState.totalPrice,
             )
     }
 
@@ -114,14 +115,14 @@ class PaymentViewModel(
             orders: List<CartProductUi>,
             loadShippingFeeUseCase: LoadShippingFeeUseCase,
             orderCartProductsUseCase: OrderCartProductsUseCase,
-            loadAvailableDiscountCouponsUseCase: LoadAvailableDiscountCouponsUseCase
+            loadAvailableDiscountCouponsUseCase: LoadAvailableDiscountCouponsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 PaymentViewModel(
                     orders,
                     loadShippingFeeUseCase,
                     orderCartProductsUseCase,
-                    loadAvailableDiscountCouponsUseCase
+                    loadAvailableDiscountCouponsUseCase,
                 )
             }
         }

@@ -13,9 +13,10 @@ class FreeShippingCouponTest {
     fun `상품들의 총 금액 합이 50_000원 일때  주문 금액이 50_000원 이면 할인 가능하다`() {
         // given
         val cartProduct = fakeCartProduct(price = 50_000, count = 1)
-        val percentageCoupon = fakeFreeShippingCoupon(
-            discountableMinPrice = 50_000
-        )
+        val percentageCoupon =
+            fakeFreeShippingCoupon(
+                discountableMinPrice = 50_000,
+            )
         val cart = Cart(cartProduct)
         // when
         val available = percentageCoupon.available(cart)
@@ -32,9 +33,10 @@ class FreeShippingCouponTest {
     fun `상품들의 총 금액 합이 50_000원 일때  주문 금액이 49_999원 이면 할인 불가능`() {
         // given
         val cartProduct = fakeCartProduct(price = 49_999, count = 1)
-        val percentageCoupon = fakeFreeShippingCoupon(
-            discountableMinPrice = 50_000
-        )
+        val percentageCoupon =
+            fakeFreeShippingCoupon(
+                discountableMinPrice = 50_000,
+            )
         val cart = Cart(cartProduct)
         // when
         val available = percentageCoupon.available(cart)

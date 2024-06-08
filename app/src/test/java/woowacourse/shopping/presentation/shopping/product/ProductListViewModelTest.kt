@@ -25,7 +25,7 @@ import woowacourse.shopping.presentation.util.getOrAwaitValue
 @ExtendWith(
     InstantTaskExecutorExtension::class,
     MockKExtension::class,
-    CoroutinesTestExtension::class
+    CoroutinesTestExtension::class,
 )
 class ProductListViewModelTest {
     @RelaxedMockK
@@ -45,31 +45,32 @@ class ProductListViewModelTest {
 
     @Test
     @DisplayName("viewModel 이 초기화 될 때 상품이 추가 된다")
-    fun `init ViewModel`() = runTest {
-        // given
-        val expectProducts = listOf(fakeProduct().toShoppingUiModel())
-        coEvery { productRepository.loadProducts(currentPage = 0, size = 20) } returns
+    fun `init ViewModel`() =
+        runTest {
+            // given
+            val expectProducts = listOf(fakeProduct().toShoppingUiModel())
+            coEvery { productRepository.loadProducts(currentPage = 0, size = 20) } returns
                 Result.success(
                     listOf(fakeProduct()),
                 )
-        coEvery { productRepository.canLoadMore(page = 1, size = 20) } returns Result.success(false)
-        coEvery { loadCartUseCase(listOf(1)) } returns Result.success(Cart())
-        coEvery { productRepository.loadRecentProducts(10) } returns Result.success(emptyList())
-        // when
-        productListViewModel =
-            ProductListViewModel(
-                productRepository,
-                loadCartUseCase,
-                increaseCartProductUseCase,
-                decreaseCartProductUseCase,
-            )
-        // when
-        coVerify(exactly = 1) { productRepository.loadProducts(currentPage = 0, size = 20) }
-        coVerify(exactly = 2) { productRepository.canLoadMore(page = 1, size = 20) }
-        coVerify(exactly = 1) { loadCartUseCase(listOf(1)) }
-        coVerify(exactly = 1) { productRepository.loadRecentProducts(10) }
-        uiState.products shouldBe expectProducts
-    }
+            coEvery { productRepository.canLoadMore(page = 1, size = 20) } returns Result.success(false)
+            coEvery { loadCartUseCase(listOf(1)) } returns Result.success(Cart())
+            coEvery { productRepository.loadRecentProducts(10) } returns Result.success(emptyList())
+            // when
+            productListViewModel =
+                ProductListViewModel(
+                    productRepository,
+                    loadCartUseCase,
+                    increaseCartProductUseCase,
+                    decreaseCartProductUseCase,
+                )
+            // when
+            coVerify(exactly = 1) { productRepository.loadProducts(currentPage = 0, size = 20) }
+            coVerify(exactly = 2) { productRepository.canLoadMore(page = 1, size = 20) }
+            coVerify(exactly = 1) { loadCartUseCase(listOf(1)) }
+            coVerify(exactly = 1) { productRepository.loadRecentProducts(10) }
+            uiState.products shouldBe expectProducts
+        }
 
     @Test
     @DisplayName("viewModel 이 초기화 될 때 상품이 추가 되고, 다음 페이지를 로드할 수 있으면 더보기 버튼이 추가된다")
@@ -77,9 +78,9 @@ class ProductListViewModelTest {
         // given
         val expectProducts = listOf(fakeProduct().toShoppingUiModel(), ShoppingUiModel.LoadMore)
         coEvery { productRepository.loadProducts(currentPage = 0, size = 20) } returns
-                Result.success(
-                    listOf(fakeProduct()),
-                )
+            Result.success(
+                listOf(fakeProduct()),
+            )
         coEvery {
             productRepository.canLoadMore(page = 1, size = 20)
         } returns Result.success(true)
@@ -105,9 +106,9 @@ class ProductListViewModelTest {
         // given
         val expectProducts = listOf(fakeProduct().toShoppingUiModel())
         coEvery { productRepository.loadProducts(currentPage = 0, size = 20) } returns
-                Result.success(
-                    listOf(fakeProduct()),
-                )
+            Result.success(
+                listOf(fakeProduct()),
+            )
         coEvery { productRepository.canLoadMore(page = 1, size = 20) } returns Result.success(false)
         coEvery { loadCartUseCase(listOf(1)) } returns Result.success(Cart())
         coEvery { productRepository.loadRecentProducts(10) } returns Result.success(emptyList())

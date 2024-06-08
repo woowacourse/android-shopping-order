@@ -1,6 +1,5 @@
 package woowacourse.shopping.remote.dto.response
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,13 +24,13 @@ data class CouponResponse(
     @SerialName("id")
     val id: Long = 0,
     @SerialName("minimumAmount")
-    val discountableMinPrice: Long = 0
+    val discountableMinPrice: Long = 0,
 ) {
     @Serializable
     data class AvailableTime(
         @SerialName("end")
         val endTime: String = "",
         @SerialName("start")
-        val startTime: String = ""
+        val startTime: String = "",
     )
 }

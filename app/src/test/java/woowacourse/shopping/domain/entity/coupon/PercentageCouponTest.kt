@@ -12,12 +12,13 @@ class PercentageCouponTest {
     @Test
     fun `할인 가능한 시간이면, 할인율이 적용된다`() {
         // given
-        val percentageCoupon = fakePercentageCoupon(
-            isExpired = false,
-            currentTime = 5,
-            availableStartTime = 4,
-            availableEndTime = 7
-        )
+        val percentageCoupon =
+            fakePercentageCoupon(
+                isExpired = false,
+                currentTime = 5,
+                availableStartTime = 4,
+                availableEndTime = 7,
+            )
         val cart = Cart(fakeCartProduct(productId = 1, price = 2000, count = 1))
         // when
         val isExpired = percentageCoupon.isExpired
@@ -32,12 +33,13 @@ class PercentageCouponTest {
     @Test
     fun `할인 가능한 시간이 아니면, 할인율이 적용 안된다`() {
         // given
-        val percentageCoupon = fakePercentageCoupon(
-            isExpired = false,
-            currentTime = 3,
-            availableStartTime = 4,
-            availableEndTime = 7
-        )
+        val percentageCoupon =
+            fakePercentageCoupon(
+                isExpired = false,
+                currentTime = 3,
+                availableStartTime = 4,
+                availableEndTime = 7,
+            )
         val cart = Cart(fakeCartProduct(productId = 1, price = 2000, count = 1))
         // when
         val isExpired = percentageCoupon.isExpired
@@ -74,11 +76,12 @@ class PercentageCouponTest {
         val available = percentageCoupon.available(cart)
         val actual = percentageCoupon.discount(cart, shippingFee = 0)
         // then
-        val expect = DiscountResult(
-            orderPrice = 1000L,
-            discountPrice = 300L,
-            shippingFee = 0L
-        )
+        val expect =
+            DiscountResult(
+                orderPrice = 1000L,
+                discountPrice = 300L,
+                shippingFee = 0L,
+            )
         assertSoftly {
             isExpired.shouldBeFalse()
             available.shouldBeTrue()
@@ -86,4 +89,3 @@ class PercentageCouponTest {
         }
     }
 }
-

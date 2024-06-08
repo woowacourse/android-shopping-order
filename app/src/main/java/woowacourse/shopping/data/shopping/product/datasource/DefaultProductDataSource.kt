@@ -17,7 +17,6 @@ class DefaultProductDataSource(
             productService.fetchProducts(currentPage, size)
                 .toData()
         }
-
     }
 
     override suspend fun products(

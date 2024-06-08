@@ -28,49 +28,52 @@ class RecentProductDaoTest {
 
     @Test
     @DisplayName("최근 본 상품을 저장하고, id를 반환한다.")
-    fun `test`() = runTest {
-        // given
-        val product = fakeRecentProductEntity(id = 1L)
-        // when
-        val actualId = dao.saveProduct(product)
-        // then
-        val expectId = 1L
-        actualId shouldBe expectId
-    }
+    fun `test`() =
+        runTest {
+            // given
+            val product = fakeRecentProductEntity(id = 1L)
+            // when
+            val actualId = dao.saveProduct(product)
+            // then
+            val expectId = 1L
+            actualId shouldBe expectId
+        }
 
     @Test
     @DisplayName("최근 본 상품을 3개 저장 하고, 최근 상품 본 상품을 불러올 때, 최신 시간 순으로 정렬 된다.")
-    fun `test2`() = runTest {
-        // given: 최근 본 상품 3개 저장
-        val given =
-            fakeRecentProductEntities(
-                fakeRecentProductEntity(1L, dateTime().plusDays(1)),
-                fakeRecentProductEntity(2L, dateTime()),
-                fakeRecentProductEntity(3L, dateTime().plusDays(2)),
-            )
-        // when : 상품을 저장
-        given.forEach { dao.saveProduct(it) }
-        // then : 상품은 최신 시간순
-        val expect = given.sortedByDescending { it.createdTime }
-        val actual = dao.loadProducts(3)
-        actual shouldBe expect
-    }
+    fun `test2`() =
+        runTest {
+            // given: 최근 본 상품 3개 저장
+            val given =
+                fakeRecentProductEntities(
+                    fakeRecentProductEntity(1L, dateTime().plusDays(1)),
+                    fakeRecentProductEntity(2L, dateTime()),
+                    fakeRecentProductEntity(3L, dateTime().plusDays(2)),
+                )
+            // when : 상품을 저장
+            given.forEach { dao.saveProduct(it) }
+            // then : 상품은 최신 시간순
+            val expect = given.sortedByDescending { it.createdTime }
+            val actual = dao.loadProducts(3)
+            actual shouldBe expect
+        }
 
     @Test
     @DisplayName("중복되는 id를 저장하면, 제일 나중에 저장한 값으로 덮어씌워진다")
-    fun `save_duplicate`() = runTest {
-        // given & when
-        saveProduct(1L, dateTime().plusDays(1))
-        saveProduct(1L, dateTime())
-        saveProduct(1L, dateTime().plusDays(2))
-        // then
-        val expect =
-            fakeRecentProductEntities(
-                fakeRecentProductEntity(1L, dateTime().plusDays(2)),
-            )
-        val actual = dao.loadProducts(1)
-        actual shouldBe expect
-    }
+    fun `save_duplicate`() =
+        runTest {
+            // given & when
+            saveProduct(1L, dateTime().plusDays(1))
+            saveProduct(1L, dateTime())
+            saveProduct(1L, dateTime().plusDays(2))
+            // then
+            val expect =
+                fakeRecentProductEntities(
+                    fakeRecentProductEntity(1L, dateTime().plusDays(2)),
+                )
+            val actual = dao.loadProducts(1)
+            actual shouldBe expect
+        }
 
     private fun saveProduct(
         id: Long,

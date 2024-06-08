@@ -16,7 +16,6 @@ import woowacourse.shopping.local.entity.RecentProductEntity
 )
 @TypeConverters(ShoppingConverters::class)
 abstract class ShoppingDatabase : RoomDatabase() {
-
     abstract fun recentProductDao(): RecentProductDao
 
     companion object {

@@ -17,25 +17,28 @@ class DefaultLoadAvailableDiscountCouponsUseCase(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
 ) : LoadAvailableDiscountCouponsUseCase {
-    override suspend fun invoke(productIds: List<Long>): Result<Coupons> = coroutineScope {
-        productIds.forEach {
-            productRepository.findProductById(it)
-                .onFailure { return@coroutineScope Result.failure(it) }
-        }
-        val cartJob = async {
-            cartRepository.filterCartProducts(productIds)
-                .mapCatching { Cart(it.cartProducts) }
-        }
-        val couponsJob = async {
-            orderRepository.loadDiscountCoupons()
-        }
-        val cart =
-            cartJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
-        val coupons =
-            couponsJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
+    override suspend fun invoke(productIds: List<Long>): Result<Coupons> =
+        coroutineScope {
+            productIds.forEach {
+                productRepository.findProductById(it)
+                    .onFailure { return@coroutineScope Result.failure(it) }
+            }
+            val cartJob =
+                async {
+                    cartRepository.filterCartProducts(productIds)
+                        .mapCatching { Cart(it.cartProducts) }
+                }
+            val couponsJob =
+                async {
+                    orderRepository.loadDiscountCoupons()
+                }
+            val cart =
+                cartJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
+            val coupons =
+                couponsJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
 
-        Result.success(coupons.availableCoupons(cart))
-    }
+            Result.success(coupons.availableCoupons(cart))
+        }
 
     companion object {
         private var instance: LoadAvailableDiscountCouponsUseCase? = null
@@ -48,7 +51,7 @@ class DefaultLoadAvailableDiscountCouponsUseCase(
             return instance ?: DefaultLoadAvailableDiscountCouponsUseCase(
                 productRepository,
                 cartRepository,
-                orderRepository
+                orderRepository,
             )
                 .also { instance = it }
         }

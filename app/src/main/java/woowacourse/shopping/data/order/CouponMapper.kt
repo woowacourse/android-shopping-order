@@ -38,7 +38,7 @@ private fun CouponResponse.toFixedCoupon(): FixedCoupon {
         expirationDate = expirationDate.toLocalDateTime(),
         targetDateTime = LocalDateTime.now(),
         discount = discount,
-        discountableMinPrice = discountableMinPrice
+        discountableMinPrice = discountableMinPrice,
     )
 }
 
@@ -61,7 +61,7 @@ private fun CouponResponse.toFreeShippingCoupon(): FreeShippingCoupon {
         description = description,
         expirationDate = expirationDate.toLocalDateTime(),
         targetDateTime = LocalDateTime.now(),
-        discountableMinPrice = discountableMinPrice
+        discountableMinPrice = discountableMinPrice,
     )
 }
 
@@ -74,7 +74,7 @@ private fun CouponResponse.toPercentageCoupon(): PercentageCoupon {
         targetDateTime = LocalDateTime.now(),
         discountRate = 100.0f - discount,
         availableStartTime = LocalTime.parse(availableTime.startTime, timeFormatter),
-        availableEndTime = LocalTime.parse(availableTime.endTime, timeFormatter)
+        availableEndTime = LocalTime.parse(availableTime.endTime, timeFormatter),
     )
 }
 
@@ -86,4 +86,3 @@ private fun String.toLocalDateTime(): LocalDateTime {
 private fun String.toLocalTime(): LocalTime {
     return LocalTime.parse(this, timeFormatter)
 }
-

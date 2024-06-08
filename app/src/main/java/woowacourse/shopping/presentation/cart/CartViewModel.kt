@@ -211,9 +211,9 @@ private fun CartUiState.toggleAllOrderProducts(): CartUiState {
     val newPagingProducts =
         pagingProducts.map {
             it.key to
-                    it.value.map { cartProductUi ->
-                        cartProductUi.copy(isSelected = !isSelectedAll)
-                    }
+                it.value.map { cartProductUi ->
+                    cartProductUi.copy(isSelected = !isSelectedAll)
+                }
         }.toMap()
     return copy(
         pagingProducts = newPagingProducts,

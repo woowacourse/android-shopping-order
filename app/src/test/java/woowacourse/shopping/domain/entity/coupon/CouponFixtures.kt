@@ -6,9 +6,10 @@ import java.time.LocalTime
 
 private val targetDateTime = LocalDateTime.of(2024, 5, 1, 0, 0)
 private val targetDate = LocalDate.of(2024, 5, 1)
+
 fun fakeCoupons(vararg coupons: Coupon): Coupons {
     return Coupons(
-        coupons.toList()
+        coupons.toList(),
     )
 }
 
@@ -20,11 +21,12 @@ fun fakePercentageCoupon(
     availableEndTime: Int = 7,
 ): PercentageCoupon {
     val targetDateTime = LocalDateTime.of(targetDate, LocalTime.of(currentTime, 0))
-    val expirationDate = if (isExpired) {
-        targetDateTime.minusDays(1)
-    } else {
-        targetDateTime.plusDays(1)
-    }
+    val expirationDate =
+        if (isExpired) {
+            targetDateTime.minusDays(1)
+        } else {
+            targetDateTime.plusDays(1)
+        }
     return PercentageCoupon(
         id = 1,
         code = "PERCENTAGE",
@@ -42,11 +44,12 @@ fun fakeFreeShippingCoupon(
     discountableMinPrice: Long = 50_000,
 ): FreeShippingCoupon {
     val targetDateTime = targetDateTime
-    val expirationDate = if (isExpired) {
-        targetDateTime.minusDays(1)
-    } else {
-        targetDateTime.plusDays(1)
-    }
+    val expirationDate =
+        if (isExpired) {
+            targetDateTime.minusDays(1)
+        } else {
+            targetDateTime.plusDays(1)
+        }
     return FreeShippingCoupon(
         id = 1,
         code = "FREE_SHIPPING",
@@ -63,11 +66,12 @@ fun fakeBuyXGetYCoupon(
     freeCount: Int = 1,
 ): BuyXGetYCoupon {
     val targetDateTime = targetDateTime
-    val expirationDate = if (isExpired) {
-        targetDateTime.minusDays(1)
-    } else {
-        targetDateTime.plusDays(1)
-    }
+    val expirationDate =
+        if (isExpired) {
+            targetDateTime.minusDays(1)
+        } else {
+            targetDateTime.plusDays(1)
+        }
     return BuyXGetYCoupon(
         id = 1,
         code = "BUY_X_GET_Y",
@@ -85,11 +89,12 @@ fun fakeFixedCoupon(
     isExpired: Boolean = false,
 ): FixedCoupon {
     val targetDateTime = targetDateTime
-    val expirationDate = if (isExpired) {
-        targetDateTime.minusDays(1)
-    } else {
-        targetDateTime.plusDays(1)
-    }
+    val expirationDate =
+        if (isExpired) {
+            targetDateTime.minusDays(1)
+        } else {
+            targetDateTime.plusDays(1)
+        }
     return FixedCoupon(
         id = 1,
         code = "FIXED",

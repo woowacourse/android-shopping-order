@@ -4,7 +4,6 @@ import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
 import java.time.LocalDateTime
 
-
 sealed class Coupon(
     open val id: Long,
     open val code: String,
@@ -18,7 +17,10 @@ sealed class Coupon(
 
     abstract fun available(cart: Cart): Boolean
 
-    fun discount(cart: Cart, shippingFee: Long): DiscountResult {
+    fun discount(
+        cart: Cart,
+        shippingFee: Long,
+    ): DiscountResult {
         return if (available(cart)) {
             calculateDiscount(cart, shippingFee)
         } else {
@@ -26,21 +28,29 @@ sealed class Coupon(
         }
     }
 
-    fun discount(orderProducts: List<CartProduct>, shippingFee: Long): DiscountResult {
+    fun discount(
+        orderProducts: List<CartProduct>,
+        shippingFee: Long,
+    ): DiscountResult {
         return discount(Cart(orderProducts), shippingFee)
     }
 
-    fun discount(orderProduct: CartProduct, shippingFee: Long): DiscountResult {
+    fun discount(
+        orderProduct: CartProduct,
+        shippingFee: Long,
+    ): DiscountResult {
         return discount(Cart(orderProduct), shippingFee)
     }
 
-    protected fun noDiscount(cart: Cart, shippingFee: Long): DiscountResult {
+    protected fun noDiscount(
+        cart: Cart,
+        shippingFee: Long,
+    ): DiscountResult {
         return DiscountResult(cart.totalPrice(), 0, shippingFee)
     }
 
-    protected abstract fun calculateDiscount(cart: Cart, shippingFee: Long): DiscountResult
+    protected abstract fun calculateDiscount(
+        cart: Cart,
+        shippingFee: Long,
+    ): DiscountResult
 }
-
-
-
-

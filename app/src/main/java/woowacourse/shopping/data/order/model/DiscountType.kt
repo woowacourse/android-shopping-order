@@ -4,7 +4,8 @@ enum class DiscountType(val label: String) {
     FIXED("fixed"),
     BUY_X_GET_Y("buyXgetY"),
     FREE_SHIPPING("freeShipping"),
-    PERCENTAGE("percentage");
+    PERCENTAGE("percentage"),
+    ;
 
     companion object {
         fun from(label: String): DiscountType? {

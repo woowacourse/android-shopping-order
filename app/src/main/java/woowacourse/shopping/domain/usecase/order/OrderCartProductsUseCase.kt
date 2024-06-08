@@ -19,11 +19,12 @@ class DefaultOrderCartProductsUseCase(
                 .onFailure { return Result.failure(it) }
                 .getOrThrow()
         }
-        val cartIds = cartRepository.filterCartProducts(productIds)
-            .onFailure { return Result.failure(it) }
-            .getOrThrow()
-            .cartProducts
-            .map { it.id }
+        val cartIds =
+            cartRepository.filterCartProducts(productIds)
+                .onFailure { return Result.failure(it) }
+                .getOrThrow()
+                .cartProducts
+                .map { it.id }
 
         return orderRepository.orderCartProducts(cartIds).onSuccess {
             cartRepository.clearCart()
@@ -41,7 +42,7 @@ class DefaultOrderCartProductsUseCase(
             return instance ?: DefaultOrderCartProductsUseCase(
                 productRepository,
                 cartRepository,
-                orderRepository
+                orderRepository,
             )
                 .also { instance = it }
         }

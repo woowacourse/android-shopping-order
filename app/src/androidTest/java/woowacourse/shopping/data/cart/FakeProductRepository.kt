@@ -29,7 +29,7 @@ class FakeProductRepository(
         return Result.success(product)
     }
 
-    override  fun canLoadMore(
+    override fun canLoadMore(
         page: Int,
         size: Int,
     ): Result<Boolean> {
