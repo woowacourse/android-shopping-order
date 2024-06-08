@@ -4,12 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemProductBinding
+import woowacourse.shopping.ui.cart.cartitem.CartUiModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
+import woowacourse.shopping.ui.utils.ItemDiffCallback
 
 class RecommendProductAdapter(
     private val viewModel: CartViewModel,
-) : ListAdapter<ProductWithQuantityUiModel, RecommendProductViewHolder>(RecommendProductDiffUtil) {
+) : ListAdapter<ProductWithQuantityUiModel, RecommendProductViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -29,5 +31,12 @@ class RecommendProductAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return position
+    }
+
+    companion object {
+        val diffCallback = ItemDiffCallback<ProductWithQuantityUiModel>(
+            onItemsTheSame = { old, new -> old == new},
+            onContentsTheSame = { old, new -> old == new },
+        )
     }
 }

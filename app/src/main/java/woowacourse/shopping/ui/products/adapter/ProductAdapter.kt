@@ -6,14 +6,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemProductSkeletonBinding
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.ui.products.LoadingUiModel
 import woowacourse.shopping.ui.products.ProductUiModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
+import woowacourse.shopping.ui.utils.ItemDiffCallback
 
 class ProductAdapter(
     private val viewModel: ProductContentsViewModel,
-) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(ProductDiffUtil) {
+) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -46,6 +48,13 @@ class ProductAdapter(
             is LoadingUiModel -> ProductViewType.SKELETON.value
             else -> ProductViewType.PRODUCT.value
         }
+    }
+
+    companion object {
+        val diffCallback = ItemDiffCallback<ProductUiModel>(
+            onItemsTheSame = { old, new -> old == new},
+            onContentsTheSame = { old, new -> old == new },
+        )
     }
 }
 
