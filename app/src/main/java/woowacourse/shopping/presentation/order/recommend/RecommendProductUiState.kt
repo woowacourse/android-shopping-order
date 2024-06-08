@@ -10,16 +10,15 @@ data class RecommendProductUiState(
     val recommendProducts: List<CartProductUi> = emptyList(),
 ) {
     val orderedCart: Cart get() = Cart(orderedProducts.map { it.toDomain() })
+
     constructor(orderedCart: Cart, recommendProducts: List<CartProductUi>) : this(
         orderedProducts = orderedCart.cartProducts.map { it.toUiModel() },
         recommendProducts = recommendProducts,
     )
 
-    private val totalProducts
-        get() = orderedProducts + recommendProducts
+    val totalProducts
+        get() = orderedProducts + recommendProducts.filter { it.count > 0 }
 
-    val totalOrderIds
-        get() = totalProducts.map { it.product.id }
     val totalCount
         get() = totalProducts.sumOf { it.count }
 

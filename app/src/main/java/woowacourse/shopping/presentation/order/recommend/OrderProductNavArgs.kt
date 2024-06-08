@@ -5,6 +5,6 @@ import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.presentation.cart.CartProductUi
 
 @Parcelize
-data class RecommendProductNavArgs(
+data class OrderProductNavArgs(
     val orderProducts: List<CartProductUi>,
 ) : Parcelable

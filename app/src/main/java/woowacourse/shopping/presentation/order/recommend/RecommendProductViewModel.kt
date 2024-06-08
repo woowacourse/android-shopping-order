@@ -10,7 +10,6 @@ import timber.log.Timber
 import woowacourse.shopping.domain.usecase.cart.DecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.cart.IncreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.product.RecommendProductsUseCase
-import woowacourse.shopping.domain.usecase.order.OrderCartProductsUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.CartItemListener
 import woowacourse.shopping.presentation.cart.CartProductUi
@@ -20,7 +19,6 @@ import woowacourse.shopping.presentation.util.SingleLiveData
 
 class RecommendProductViewModel(
     orders: List<CartProductUi>,
-    private val orderCartProductsUseCase: OrderCartProductsUseCase,
     private val decreaseCartProductUseCase: DecreaseCartProductUseCase,
     private val increaseCartProductCountUseCase: IncreaseCartProductUseCase,
     recommendProductsUseCase: RecommendProductsUseCase,
@@ -29,10 +27,8 @@ class RecommendProductViewModel(
     val uiState: LiveData<RecommendProductUiState> get() = _uiState
     private val _updateCartEvent = MutableSingleLiveData<Unit>()
     val updateCartEvent: SingleLiveData<Unit> get() = _updateCartEvent
-    private val _showOrderDialogEvent = MutableSingleLiveData<Unit>()
-    val showOrderDialogEvent: SingleLiveData<Unit> get() = _showOrderDialogEvent
-    private val _finishOrderEvent = MutableSingleLiveData<Unit>()
-    val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
+    private val _navigateToPaymentEvent = MutableSingleLiveData<List<CartProductUi>>()
+    val navigateToPaymentEvent: SingleLiveData<List<CartProductUi>> get() = _navigateToPaymentEvent
     private val _errorEvent = MutableSingleLiveData<RecommendProductErrorEvent>()
     val errorEvent: SingleLiveData<RecommendProductErrorEvent> get() = _errorEvent
 
@@ -49,22 +45,9 @@ class RecommendProductViewModel(
         }
     }
 
-    fun startOrder() {
-        _showOrderDialogEvent.setValue(Unit)
-    }
-
-    fun orderProducts() {
-        viewModelScope.launch {
-            val uiState = _uiState.value ?: return@launch
-            orderCartProductsUseCase(uiState.totalOrderIds)
-                .onSuccess {
-                    _updateCartEvent.setValue(Unit)
-                    _finishOrderEvent.setValue(Unit)
-                }.onFailure {
-                    Timber.e(it)
-                    _errorEvent.setValue(RecommendProductErrorEvent.OrderProducts)
-                }
-        }
+    fun navigateToPayment() {
+        val uiState = _uiState.value ?: return
+        _navigateToPaymentEvent.setValue(uiState.totalProducts)
     }
 
     override fun increaseProductCount(id: Long) {
@@ -102,7 +85,6 @@ class RecommendProductViewModel(
         private const val RECOMMEND_PRODUCT_SIZE = 10
         fun factory(
             orders: List<CartProductUi>,
-            orderCartProductsUseCase: OrderCartProductsUseCase,
             decreaseCartProductUseCase: DecreaseCartProductUseCase,
             increaseCartProductCountUseCase: IncreaseCartProductUseCase,
             recommendProductsUseCase: RecommendProductsUseCase,
@@ -110,7 +92,6 @@ class RecommendProductViewModel(
             return BaseViewModelFactory {
                 RecommendProductViewModel(
                     orders,
-                    orderCartProductsUseCase,
                     decreaseCartProductUseCase,
                     increaseCartProductCountUseCase,
                     recommendProductsUseCase,

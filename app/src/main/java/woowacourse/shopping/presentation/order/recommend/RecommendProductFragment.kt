@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -13,18 +12,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
-import woowacourse.shopping.data.order.OrderRepositoryInjector
 import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentRecommendProductBinding
 import woowacourse.shopping.domain.usecase.cart.DefaultDecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.cart.DefaultIncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.order.DefaultOrderCartProductsUseCase
 import woowacourse.shopping.domain.usecase.product.DefaultRecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
-import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 import woowacourse.shopping.presentation.util.parcelable
 import woowacourse.shopping.presentation.util.showToast
 
@@ -32,19 +28,13 @@ class RecommendProductFragment :
     BindingFragment<FragmentRecommendProductBinding>(R.layout.fragment_recommend_product) {
     private val viewModel by viewModels<RecommendProductViewModel> {
         val orders: List<CartProductUi> =
-            arguments?.parcelable<RecommendProductNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
+            arguments?.parcelable<OrderProductNavArgs>(ORDERED_PRODUCTS_KEY)?.orderProducts
                 ?: emptyList()
         val cartRepository = CartRepositoryInjector.cartRepository()
         val productRepository =
             ProductRepositoryInjector.productRepository(requireContext().applicationContext)
-        val orderRepository = OrderRepositoryInjector.orderRepository()
         RecommendProductViewModel.factory(
             orders,
-            DefaultOrderCartProductsUseCase.instance(
-                productRepository,
-                cartRepository,
-                orderRepository
-            ),
             DefaultDecreaseCartProductUseCase.instance(productRepository, cartRepository),
             DefaultIncreaseCartProductUseCase.instance(productRepository, cartRepository),
             DefaultRecommendProductsUseCase.instance(
@@ -112,27 +102,9 @@ class RecommendProductFragment :
         viewModel.uiState.observe(viewLifecycleOwner) {
             adapter.submitList(it.recommendProducts)
         }
-        viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
-            val destination = ProductListFragment.TAG ?: return@observe
-            navigator.popBackStack(destination, inclusive = false)
+        viewModel.navigateToPaymentEvent.observe(viewLifecycleOwner) {
+            navigator.navigateToPayment(it, true, TAG)
         }
-        viewModel.showOrderDialogEvent.observe(viewLifecycleOwner) {
-            showOrderDialog()
-        }
-    }
-
-    private fun showOrderDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.order_dialog_title))
-            .setMessage(getString(R.string.order_dialog_message))
-            .setPositiveButton(getString(R.string.order_dialog_positiveBtn)) { _, _ ->
-                viewModel.orderProducts()
-            }
-            .setNegativeButton(getString(R.string.order_dialog_negativeBtn)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
     }
 
     private fun initErrorEvent() {
@@ -147,7 +119,7 @@ class RecommendProductFragment :
 
         private const val ORDERED_PRODUCTS_KEY = "ORDERED_PRODUCTS_KEY"
 
-        fun args(navArgs: RecommendProductNavArgs): Bundle =
+        fun args(navArgs: OrderProductNavArgs): Bundle =
             Bundle().apply {
                 putParcelable(ORDERED_PRODUCTS_KEY, navArgs)
             }
