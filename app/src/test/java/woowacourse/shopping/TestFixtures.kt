@@ -28,21 +28,18 @@ fun recentProducts(size: Int) = List(size) { recentProduct(it) }
 fun cartItem(
     id: Int,
     quantity: Int,
-) = CartItem(id, id, Quantity(quantity))
+) = CartItem(id, product(id), Quantity(quantity))
 
 fun cartItems(size: Int) = List(size) { cartItem(it, 1) }
 
-fun List<Product>.toProductUiModels(cartRepository: CartRepository): List<ProductUiModel> {
+suspend fun List<Product>.toProductUiModels(cartRepository: CartRepository): List<ProductUiModel> {
     return map { product ->
-        runCatching { cartRepository.syncFindByProductId(product.id) }
-            .map {
-                if (it == null) {
-                    ProductUiModel.from(product)
-                } else {
-                    ProductUiModel.from(product, it.quantity)
-                }
-            }
-            .getOrElse { ProductUiModel.from(product) }
+        val cartItem = cartRepository.findByProductId(product.id).getOrNull()
+        if (cartItem == null) {
+            ProductUiModel.from(product)
+        } else {
+            ProductUiModel.from(product, cartItem.quantity)
+        }
     }
 }
 
@@ -53,7 +50,7 @@ fun List<RecentProduct>.toRecentProductUiModels(): List<RecentProductUiModel> {
 fun List<CartItem>.toCartUiModels(products: List<Product>): CartUiModels {
     val uiModels =
         map { cartItem ->
-            val product = products.find { it.id == cartItem.productId }
+            val product = products.find { it.id == cartItem.product.id }
             product ?: throw IllegalArgumentException()
             CartUiModel.from(product, cartItem)
         }

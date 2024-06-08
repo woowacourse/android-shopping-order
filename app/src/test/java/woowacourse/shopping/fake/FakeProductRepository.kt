@@ -8,56 +8,45 @@ import kotlin.math.min
 class FakeProductRepository(savedProducts: List<Product> = emptyList()) : ProductRepository {
     private val products: MutableList<Product> = savedProducts.toMutableList()
 
-    override fun find(
-        id: Int,
-        callback: (Result<Product>) -> Unit,
-    ) {
+    override suspend fun find(id: Int): Result<Product> {
         val product = products.find { it.id == id }
         if (product != null) {
-            callback(Result.success(product))
-            return
+            return Result.success(product)
         }
-        callback(Result.failure(IllegalArgumentException()))
+        return Result.failure(IllegalArgumentException())
     }
 
-    override fun syncFind(id: Int): Product? {
-        return products.find { it.id == id }
-    }
-
-    override fun findPage(
+    override suspend fun findPage(
         page: Int,
         pageSize: Int,
-        callback: (Result<List<Product>>) -> Unit,
-    ) {
+    ): Result<List<Product>> {
         val fromIndex = page * pageSize
         val toIndex = min(fromIndex + pageSize, products.size)
         val products = products.subList(fromIndex, toIndex)
-        callback(Result.success(products))
+        return Result.success(products)
     }
 
-    override fun isLastPage(
+    override suspend fun isLastPage(
         page: Int,
         pageSize: Int,
-        callback: (Result<Boolean>) -> Unit,
-    ) {
+    ): Result<Boolean> {
         val maxPage = products.size / pageSize - 1
         val isLastPage = pageSize == maxPage
-        callback(Result.success(isLastPage))
+        return Result.success(isLastPage)
     }
 
-    override fun findRecommendProducts(
+    override suspend fun findRecommendProducts(
         category: String,
         cartItems: List<CartItem>,
-        callback: (Result<List<Product>>) -> Unit,
-    ) {
+    ): Result<List<Product>> {
         val categoryProducts = products.filter { it.category == category }
 
         val recommendProducts =
             categoryProducts
-                .filter { product -> cartItems.none { it.productId == product.id } }
+                .filter { product -> cartItems.none { it.product.id == product.id } }
                 .take(RECOMMEND_PRODUCTS_COUNT)
 
-        callback(Result.success(recommendProducts))
+        return Result.success(recommendProducts)
     }
 
     companion object {

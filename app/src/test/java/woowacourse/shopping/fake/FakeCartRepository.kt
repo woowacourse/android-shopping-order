@@ -3,57 +3,51 @@ package woowacourse.shopping.fake
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.product
 
 class FakeCartRepository(savedCartItemEntities: List<CartItem> = emptyList()) : CartRepository {
     private val cart: MutableList<CartItem> = savedCartItemEntities.toMutableList()
     private var id: Int = 0
 
-    override fun findByProductId(
-        productId: Int,
-        callback: (Result<CartItem?>) -> Unit,
-    ) {
-        val cartItem = cart.find { it.productId == productId }
-        callback(Result.success(cartItem))
+    override suspend fun find(cartItemId: Int): Result<CartItem?> {
+        val cartItem = cart.find { it.id == cartItemId }
+        return Result.success(cartItem)
     }
 
-    override fun syncFindByProductId(productId: Int): CartItem? {
-        return cart.find { it.productId == productId }
+    override suspend fun findByProductId(productId: Int): Result<CartItem?> {
+        val cartItem = cart.find { it.product.id == productId }
+        return Result.success(cartItem)
     }
 
-    override fun findAll(callback: (Result<List<CartItem>>) -> Unit) {
-        callback(Result.success(cart))
+    override suspend fun findAll(): Result<List<CartItem>> {
+        return Result.success(cart)
     }
 
-    override fun delete(
-        id: Int,
-        callback: (Result<Unit>) -> Unit,
-    ) {
+    override suspend fun delete(id: Int): Result<Unit> {
         cart.removeIf { it.id == id }
-        callback(Result.success(Unit))
+        return Result.success(Unit)
     }
 
-    override fun add(
+    override suspend fun add(
         productId: Int,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        val cartItem = CartItem(id++, productId, quantity)
+    ): Result<Unit> {
+        val cartItem = CartItem(id++, product(productId), quantity)
         cart.add(cartItem)
-        callback(Result.success(Unit))
+        return Result.success(Unit)
     }
 
-    override fun changeQuantity(
+    override suspend fun changeQuantity(
         id: Int,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
-    ) {
+    ): Result<Unit> {
         val position = cart.indexOfFirst { it.id == id }
         cart[position] = cart[position].copy(quantity = quantity)
-        callback(Result.success(Unit))
+        return Result.success(Unit)
     }
 
-    override fun getTotalQuantity(callback: (Result<Int>) -> Unit) {
+    override suspend fun getTotalQuantity(): Result<Int> {
         val totalQuantity = cart.fold(0) { acc, cartItem -> acc + cartItem.quantity.count }
-        callback(Result.success(totalQuantity))
+        return Result.success(totalQuantity)
     }
 }
