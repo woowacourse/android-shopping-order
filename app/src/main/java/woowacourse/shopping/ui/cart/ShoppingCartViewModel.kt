@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 import woowacourse.shopping.ui.cart.listener.ShoppingCartListener
-import woowacourse.shopping.ui.model.CartItem2
+import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
@@ -25,11 +25,8 @@ class ShoppingCartViewModel(
     ShoppingCartListener {
     private val uiHandler = Handler(Looper.getMainLooper())
 
-//    private var _cartItems = MutableLiveData<List<CartItem>>()
-//    val cartItems: LiveData<List<CartItem>> get() = _cartItems
-
-    private var _cartItems = MutableLiveData<List<CartItem2>>()
-    val cartItems: LiveData<List<CartItem2>> get() = _cartItems
+    private var _cartItems = MutableLiveData<List<CartItem>>()
+    val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
     private var _deletedItemId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val deletedItemId: SingleLiveData<Long> get() = _deletedItemId
@@ -48,10 +45,7 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         thread {
-//            val currentItems = shoppingCartRepository.loadAllCartItems()
-//            _cartItems.postValue(currentItems)
-
-            val currentItems = shoppingCartRepository.loadAllCartItems2()
+            val currentItems = shoppingCartRepository.loadAllCartItems()
             _cartItems.postValue(currentItems)
         }
     }
@@ -62,10 +56,7 @@ class ShoppingCartViewModel(
         }.join()
 
         thread {
-//            val currentItems = shoppingCartRepository.loadAllCartItems()
-//            _cartItems.postValue(currentItems)
-
-            val currentItems = shoppingCartRepository.loadAllCartItems2()
+            val currentItems = shoppingCartRepository.loadAllCartItems()
             _cartItems.postValue(currentItems)
         }.join()
 
@@ -112,12 +103,10 @@ class ShoppingCartViewModel(
                 cartItems.value?.find { it.id == productId }
                     ?: throw NoSuchElementException("There is no product with id: $productId")
             shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity + 1)
-//            val currentItems = shoppingCartRepository.loadAllCartItems()
-            val currentItems = shoppingCartRepository.loadAllCartItems2()
+            val currentItems = shoppingCartRepository.loadAllCartItems()
 
             uiHandler.post {
-//                updateCartItems(currentItems)
-                updateCartItems2(currentItems)
+                updateCartItems(currentItems)
 
                 updateTotalPrice()
                 updateSelectedCartItemsCount()
@@ -136,27 +125,17 @@ class ShoppingCartViewModel(
                     ?: throw NoSuchElementException("There is no product with id: $productId")
             shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity - 1)
 
-//            val currentItems = shoppingCartRepository.loadAllCartItems()
-            val currentItems = shoppingCartRepository.loadAllCartItems2()
+            val currentItems = shoppingCartRepository.loadAllCartItems()
 
             uiHandler.post {
-//                updateCartItems(currentItems)
-                updateCartItems2(currentItems)
+                updateCartItems(currentItems)
                 updateTotalPrice()
                 updateSelectedCartItemsCount()
             }
         }
     }
-//
-//    private fun updateCartItems(currentItems: List<CartItem>) {
-//        _cartItems.value =
-//            currentItems.map { cartItem ->
-//                // TODO: 널 단언 제거하기
-//                cartItem.copy(checked = cartItems.value?.find { it.id == cartItem.id }!!.checked)
-//            }
-//    }
 
-    private fun updateCartItems2(currentItems: List<CartItem2>) {
+    private fun updateCartItems(currentItems: List<CartItem>) {
         _cartItems.value =
             currentItems.map { cartItem ->
                 // TODO: 널 단언 제거하기
