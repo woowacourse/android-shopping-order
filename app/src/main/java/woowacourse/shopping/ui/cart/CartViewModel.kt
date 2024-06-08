@@ -61,7 +61,6 @@ class CartViewModel(
             _isLoadingCart.value = true
             cartRepository.findAll()
                 .onSuccess { cartItems ->
-                    _isLoadingCart.value = false
                     if (cartItems.isEmpty()) {
                         _cartUiModels.value = CartUiModels()
                         return@onSuccess
@@ -164,7 +163,6 @@ class CartViewModel(
         viewModelScope.launch {
             _changedCartEvent.value = Event(Unit)
             val cartUiModel = cartUiModels().find(cartItemId) ?: return@launch
-
             cartRepository.delete(cartUiModel.cartItemId)
                 .onSuccess {
                     updateDeletedCart(cartUiModel)
@@ -248,13 +246,15 @@ class CartViewModel(
 
     fun loadRecommendProducts() =
         viewModelScope.launch {
-            val recentProduct = recentProductRepository.findLastOrNull().getOrNull() ?: return@launch
+            val recentProduct =
+                recentProductRepository.findLastOrNull().getOrNull() ?: return@launch
             val recentProductCategory = recentProduct.product.category
             val cartItems = cartUiModels().toCartItems()
 
             productRepository.findRecommendProducts(recentProductCategory, cartItems)
                 .onSuccess { recommendProducts ->
-                    _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
+                    _recommendProductUiModels.value =
+                        recommendProducts.map { ProductUiModel.from(it) }
                 }.onFailure {
                     setError()
                 }

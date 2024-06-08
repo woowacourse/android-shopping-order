@@ -21,7 +21,7 @@ class ResultCall<T : Any>(private val call: Call<T>) : Call<Result<T>> {
                     response: Response<T>,
                 ) {
                     if (response.isSuccessful) {
-                        val body = response.body() ?: return
+                        val body: T = response.body() ?: Unit as T
                         callback.onResponse(this@ResultCall, Response.success(Result.success(body)))
                         return
                     }
