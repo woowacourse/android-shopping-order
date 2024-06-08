@@ -114,9 +114,69 @@ RetrofitService 에 어디서든지 접근해서 setBaseUrl 을 해줄 수 있�
 
 다른 방법 찾아보자.  
 
-## 3. Retrofit 의 baseUrl 을 동적으로 변경하는 방법
+## 3. Base URL Resolver 사용
 
+```kotlin
+object RetrofitService {
+    // ...
 
+    private val baseUrlResolver = BaseUrlResolver() // 3. Base URL Resolver 사용
 
+    // 3. Base URL Resolver 사용
+    fun createService(service: String): Retrofit {
+        val baseUrl = baseUrlResolver.getBaseUrl(service)
 
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(nullOnEmptyConverterFactory)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+  
+}
 
+class BaseUrlResolver {
+    fun getBaseUrl(service: String): String {
+        return when (service) {
+            "CartItemApiService" -> "https://api.example.com"
+            "OrderApiService" -> "https://api.otherexample.com"
+            "ProductsApiService" -> "https://api.anotherexample.com"
+            else -> throw IllegalArgumentException("Unknown service: $service")
+        }
+    }
+}
+```
+
+사용하는 클라이언트 코드에서는 
+```kotlin
+class ProductRemoteDataSource(productsApiService: ProductsApiService) : ProductDataSource {
+    private val service: ProductsApiService =
+        RetrofitService.createService("ProductsApiService").create(productsApiService::class.java)
+
+    override fun findByPaged(page: Int): List<ProductData> {
+        val response =
+            service.requestProducts(page = page).execute().body()?.content
+                ?: throw NoSuchElementException("there is no product with page: $page")
+        return response.map {
+            ProductData(
+                id = it.id,
+                imgUrl = it.imageUrl,
+                name = it.name,
+                price = it.price,
+            )
+        }
+    }
+    // ...
+}
+```
+이렇게 하면 될듯.
+
+여기서 BaseUrlResolver 의 getBaseUrl 의 파라미터 타입을 service: String 이 아닌, Interface 타입으로 만들 수도 있을 것 같다.  
+그렇다면 모든 ApiService 들을 하나의 인터페이스로 묶고,  
+하위에 있는 인터페이스들 (`CartItemApiService`, `OrderApiService`, `ProductsApiService`) 를 sealed 로 묶으면 더 좋을 것 같다.  
+
+하지만 이러헥 하더라도 [#1 여러 레트로핏 서비슬르 만든다.](#1-여러-레트로핏-서비슬르-만든다) 와 비슷한 방법이라고 생각된다.  
+장점 딱 한가지는, selaed 로 묶었을 때 새 API 가 추가하고 나서, BaseUrlResolver 에서 처리를 안 해주면,  
+컴파일 에러가 나기 때문에, 런타임 에러를 방지할 수 있다는 것 정도..?  
+그래서 별로임..  
