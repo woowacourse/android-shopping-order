@@ -25,7 +25,9 @@ class DefaultOrderCartProductsUseCase(
             .cartProducts
             .map { it.id }
 
-        return orderRepository.orderCartProducts(cartIds)
+        return orderRepository.orderCartProducts(cartIds).onSuccess {
+            cartRepository.clearCart()
+        }
     }
 
     companion object {

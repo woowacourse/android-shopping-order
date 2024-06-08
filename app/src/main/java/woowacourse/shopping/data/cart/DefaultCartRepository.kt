@@ -103,6 +103,11 @@ class DefaultCartRepository(
         return Result.success(cartPageData.totalProductSize > minSize)
     }
 
+    override fun clearCart() {
+        cachedCart = Cart()
+        cartPageData = null
+    }
+
     private fun Result<CartPageData>.toCart(): Result<Cart> {
         return mapCatching { cartData ->
             cartPageData = cartData

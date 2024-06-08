@@ -34,4 +34,6 @@ interface CartRepository {
         currentPage: Int,
         pageSize: Int,
     ): Result<Boolean>
+
+    fun clearCart()
 }
