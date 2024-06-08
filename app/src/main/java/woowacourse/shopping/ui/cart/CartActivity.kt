@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -31,6 +32,20 @@ class CartActivity : AppCompatActivity() {
             RemoteCartRepository,
         )
     }
+
+    private val removeFragment: () -> Unit = {
+        if (isVisibleCartSelectionFragment()) {
+            finish()
+        }
+        removeLastFragment()
+    }
+
+    private val backPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                removeFragment()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,11 +76,9 @@ class CartActivity : AppCompatActivity() {
 
     private fun initializeToolbar() {
         binding.toolbarCart.setNavigationOnClickListener {
-            if (isVisibleCartSelectionFragment()) {
-                finish()
-            }
-            removeLastFragment()
+            removeFragment()
         }
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
     }
 
     private fun isVisibleCartSelectionFragment(): Boolean {
