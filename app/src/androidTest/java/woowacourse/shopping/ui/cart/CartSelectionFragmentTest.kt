@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -29,6 +29,6 @@ class CartSelectionFragmentTest {
     @Test
     fun `장바구니_상품_목록이_보인다`() {
         onView(withId(R.id.rv_cart))
-            .check(matches(isDisplayed()))
+            .check(matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
     }
 }
