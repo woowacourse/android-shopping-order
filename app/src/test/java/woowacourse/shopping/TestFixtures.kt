@@ -1,15 +1,19 @@
 package woowacourse.shopping
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.FixedCoupon
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.CartUiModels
+import woowacourse.shopping.ui.coupon.CouponUiModel
 import woowacourse.shopping.ui.products.adapter.recent.RecentProductUiModel
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
 import java.lang.IllegalArgumentException
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 val imageUrl = "https://www.naver.com/"
@@ -55,4 +59,17 @@ fun List<CartItem>.toCartUiModels(products: List<Product>): CartUiModels {
             CartUiModel.from(product, cartItem)
         }
     return CartUiModels(uiModels)
+}
+
+fun fixedCoupon(
+    id: Int,
+    expirationDate: LocalDate = LocalDate.of(3000, 10, 10),
+    discount: Int,
+    minimumPrice: Int = 0,
+): FixedCoupon {
+    return FixedCoupon(id, "", "", expirationDate, discount, minimumPrice)
+}
+
+fun List<Coupon>.toCouponUiModels(): List<CouponUiModel> {
+    return map { CouponUiModel.from(it) }
 }

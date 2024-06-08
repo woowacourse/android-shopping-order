@@ -8,8 +8,7 @@ sealed interface Coupon {
     val description: String
     val expirationDate: LocalDate
 
-    fun isExpired(): Boolean {
-        val currentDate = LocalDate.now()
+    fun isExpired(currentDate: LocalDate = LocalDate.now()): Boolean {
         if (currentDate.isEqual(expirationDate)) return true
         return currentDate.isAfter(expirationDate)
     }
