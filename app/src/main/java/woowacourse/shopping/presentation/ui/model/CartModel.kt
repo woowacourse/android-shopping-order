@@ -10,10 +10,8 @@ data class CartModel(
     val price: Long,
     val quantity: Int,
     val isChecked: Boolean,
-) {
-    val calculatedPrice: Int
-        get() = (price * quantity).toInt()
-}
+    val calculatedPrice: Int,
+)
 
 fun Cart.toUiModel(isChecked: Boolean = false) =
-    CartModel(cartId, product.id, product.name, product.imgUrl, product.price, quantity, isChecked)
+    CartModel(cartId, product.id, product.name, product.imgUrl, product.price, quantity, isChecked, calculatedPrice)
