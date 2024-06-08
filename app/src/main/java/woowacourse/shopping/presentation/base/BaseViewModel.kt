@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.JsonParseException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -66,7 +65,6 @@ abstract class BaseViewModel : ViewModel() {
             is IOException -> showError("서버 오류", "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
             is TimeoutException -> showError("시간 초과 오류", "작업 시간이 초과되었습니다. 다시 시도해주세요.")
             is SQLException -> showError("데이터베이스 오류", "데이터베이스에 접근하는 중 오류가 발생했습니다.")
-            is JsonParseException -> showError("JSON 파싱 오류", "데이터를 처리하는 중 오류가 발생했습니다.")
             else -> {
                 if (onUnhandledError == {}) {
                     showError("알 수 없는 오류", "알 수 없는 오류가 발생했습니다. 다시 시도해주세요.")

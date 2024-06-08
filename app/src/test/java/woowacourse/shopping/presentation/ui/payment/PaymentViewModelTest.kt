@@ -65,7 +65,7 @@ class PaymentViewModelTest {
     fun `주문 상품을 주문할 수 있다`() =
         runTest {
             // given
-            coEvery { orderRepository.insertOrder(CARTS_WRAPPER.carts.map { it.id }) } returns
+            coEvery { orderRepository.insertOrder(CARTS_WRAPPER.cartUiModels.map { it.id }) } returns
                 Result.success(Unit)
 
             // when

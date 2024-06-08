@@ -5,12 +5,14 @@ import woowacourse.shopping.data.model.remote.AvailableTimeDto
 import woowacourse.shopping.data.model.remote.CartDto
 import woowacourse.shopping.data.model.remote.CouponDto
 import woowacourse.shopping.data.model.remote.ProductDto
+import woowacourse.shopping.domain.mapper.toPresentation
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.model.Pageable
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Sort
+import woowacourse.shopping.presentation.model.CartUiModel
 import woowacourse.shopping.presentation.model.CartsWrapper
 
 object DummyData {
@@ -130,20 +132,20 @@ object DummyData {
     val CARTS_WRAPPER =
         CartsWrapper(
             listOf(
-                Cart(
+                CartUiModel(
                     id = 1,
                     quantity = 3,
-                    product = PRODUCT.copy(id = 1L),
+                    product = PRODUCT.copy(id = 1L).toPresentation(),
                 ),
-                Cart(
+                CartUiModel(
                     id = 2,
                     quantity = 3,
-                    product = PRODUCT.copy(id = 2L),
+                    product = PRODUCT.copy(id = 2L).toPresentation(),
                 ),
-                Cart(
+                CartUiModel(
                     id = 3,
                     quantity = 3,
-                    product = PRODUCT.copy(id = 3L),
+                    product = PRODUCT.copy(id = 3L).toPresentation(),
                 ),
             ),
         )

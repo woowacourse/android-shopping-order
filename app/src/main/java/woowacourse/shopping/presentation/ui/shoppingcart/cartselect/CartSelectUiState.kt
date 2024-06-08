@@ -1,7 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.model.Cart
 
 data class CartSelectUiState(
@@ -24,11 +22,10 @@ data class PagingCartProduct(
     val last: Boolean = true,
 )
 
-@Parcelize
 data class CartProduct(
     val cart: Cart,
     val isChecked: Boolean,
-) : Parcelable
+)
 
 fun Cart.toCartProduct(isChecked: Boolean = false): CartProduct {
     return CartProduct(

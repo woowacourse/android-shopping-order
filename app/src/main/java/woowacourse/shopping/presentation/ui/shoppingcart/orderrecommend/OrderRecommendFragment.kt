@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.observeEvent
 import woowacourse.shopping.presentation.model.CartsWrapper
+import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartNavigateAction
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.adapter.RecommendAdapter
 
@@ -38,7 +39,7 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
             }
 
         cartsWrapper?.let {
-            viewModel.load(it.carts)
+            viewModel.load(it.cartUiModels.map { cartUiModel -> cartUiModel.toDomain() })
         }
     }
 

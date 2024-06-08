@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
+import woowacourse.shopping.domain.mapper.toPresentation
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.base.BaseActivity
 import woowacourse.shopping.presentation.model.CartsWrapper
@@ -41,7 +42,7 @@ class ShoppingCartActivity :
         val bundle = Bundle()
         bundle.putSerializable(
             OrderRecommendFragment.PUT_EXTRA_CART_IDS_KEY,
-            CartsWrapper(carts),
+            CartsWrapper(carts.map { it.toPresentation() }),
         )
 
         val orderRecommendFragment = OrderRecommendFragment()

@@ -13,6 +13,7 @@ import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.model.CartsWrapper
+import woowacourse.shopping.presentation.model.toDomain
 
 class PaymentViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -41,7 +42,7 @@ class PaymentViewModel(
             requireNotNull(savedStateHandle.get<CartsWrapper>(PaymentActivity.PUT_EXTRA_CARTS_WRAPPER_KEY))
 
         val state = uiState.value ?: return
-        _uiState.value = state.copy(orderCarts = cartsWrapper.carts)
+        _uiState.value = state.copy(orderCarts = cartsWrapper.cartUiModels)
     }
 
     private fun loadCoupons() {
@@ -49,7 +50,8 @@ class PaymentViewModel(
             couponRepository.getCoupons().onSuccess { coupons ->
                 hideError()
                 val state = uiState.value ?: return@launch
-                val couponsState = coupons.filter { it.isValidCoupon(state.orderCarts) }
+                val couponsState =
+                    coupons.filter { it.isValidCoupon(state.orderCarts.map { cartUiModel -> cartUiModel.toDomain() }) }
                 _uiState.postValue(state.copy(couponsState = couponsState))
             }.onFailure { e ->
                 showError(e)

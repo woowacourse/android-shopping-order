@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.domain.mapper.toPresentation
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -54,7 +55,7 @@ class OrderRecommendViewModel(
 
     fun order() {
         val state = uiState.value ?: return
-        _navigateAction.emit(OrderRecommendNavigateAction.NavigateToPayment(CartsWrapper(state.orderCarts)))
+        _navigateAction.emit(OrderRecommendNavigateAction.NavigateToPayment(CartsWrapper(state.orderCarts.map { it.toPresentation() })))
     }
 
     override fun plusProductQuantity(
