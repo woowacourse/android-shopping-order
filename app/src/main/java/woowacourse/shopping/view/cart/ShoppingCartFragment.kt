@@ -12,7 +12,7 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter

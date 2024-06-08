@@ -11,8 +11,8 @@ import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.utils.exception.ErrorEvent
+import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 

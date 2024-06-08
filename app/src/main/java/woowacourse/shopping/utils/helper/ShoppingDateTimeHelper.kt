@@ -1,20 +1,13 @@
-package woowacourse.shopping.utils
+package woowacourse.shopping.utils.helper
 
-import android.content.Context
-import android.widget.Toast
 import woowacourse.shopping.domain.model.coupon.Coupon
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-object ShoppingUtils {
+object ShoppingDateTimeHelper {
     const val EXPIRATION_FORMAT = "yyyy년 MM월 dd일"
     private const val AVAILABLE_TIME_FORMAT = "HH:mm:ss"
-
-    fun Context.makeToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT)
-            .show()
-    }
 
     fun Coupon.isPastDate(): Boolean {
         val formatter = DateTimeFormatter.ofPattern(EXPIRATION_FORMAT)
@@ -31,8 +24,9 @@ object ShoppingUtils {
             val currentTime = LocalTime.now()
             if (start.isBefore(end)) {
                 currentTime.isAfter(start) && currentTime.isBefore(end)
+            } else {
+                currentTime.isAfter(start) || currentTime.isBefore(end)
             }
-            currentTime.isAfter(start) || currentTime.isBefore(end)
         } ?: true
     }
 }

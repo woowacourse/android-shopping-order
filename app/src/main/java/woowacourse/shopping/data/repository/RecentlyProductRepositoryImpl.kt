@@ -31,10 +31,9 @@ class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepositor
         return runCatching {
             recentlyProductDao.findPagingRecentlyProduct(CURRENT_CART_ITEM_LOAD_PAGING_SIZE)
                 .map { it.toRecentlyProduct() }
+        }.recoverCatching {
+            throw ErrorEvent.LoadDataEvent()
         }
-            .recoverCatching {
-                throw ErrorEvent.LoadDataEvent()
-            }
     }
 
     override suspend fun deleteRecentlyProduct(id: Long): Result<Unit> {

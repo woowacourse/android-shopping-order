@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponType
 import woowacourse.shopping.domain.model.coupon.SelectCouponResult
-import woowacourse.shopping.utils.ShoppingUtils.isAvailableTime
-import woowacourse.shopping.utils.ShoppingUtils.isPastDate
+import woowacourse.shopping.utils.helper.ShoppingDateTimeHelper.isAvailableTime
+import woowacourse.shopping.utils.helper.ShoppingDateTimeHelper.isPastDate
 import woowacourse.shopping.view.cart.model.ShoppingCart
 
 class CouponCalculator {
