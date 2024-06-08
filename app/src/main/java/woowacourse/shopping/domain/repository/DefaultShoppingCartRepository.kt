@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -7,6 +9,7 @@ import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingCartRepository(
     private val cartSource: ShoppingCartDataSource,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ShoppingCartRepository {
     override fun loadAllCartItems(): List<CartItem> {
         return cartSource.loadAllCartItems().map {
@@ -38,4 +41,31 @@ class DefaultShoppingCartRepository(
     override fun removeShoppingCartProduct(cartItemId: Long) {
         cartSource.removeCartItem(cartItemId)
     }
+
+    override suspend fun loadAllCartItems2(): Result<List<CartItem>> =
+        cartSource.loadAllCartItems2().mapCatching { cartItemDatas ->
+            cartItemDatas.map { cartItemData ->
+                CartItem(
+                    id = cartItemData.id,
+                    product = cartItemData.product.toDomain(),
+                    quantity = cartItemData.quantity,
+                    checked = false,
+                )
+            }
+        }
+
+    override suspend fun shoppingCartProductQuantity2(): Result<Int> =
+        cartSource.loadAllCartItems2().mapCatching { cartItemDatas -> cartItemDatas.sumOf { it.quantity } }
+
+    override suspend fun updateProductQuantity2(
+        cartItemId: Long,
+        quantity: Int,
+    ): Result<Unit> = cartSource.updateProductsCount2(cartItemId, quantity)
+
+    override suspend fun addShoppingCartProduct2(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit> = cartSource.addNewProduct2(ProductIdsCountData(productId, quantity))
+
+    override suspend fun removeShoppingCartProduct2(cartItemId: Long): Result<Unit> = cartSource.removeCartItem2(cartItemId)
 }

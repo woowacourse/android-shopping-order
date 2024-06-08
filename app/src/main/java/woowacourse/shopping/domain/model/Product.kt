@@ -19,6 +19,15 @@ data class Product(
                 price = 0,
                 quantity = 0,
             )
+        val DEFAULT =
+            Product(
+                id = 0,
+                imgUrl = "",
+                name = "",
+                price = 0,
+                quantity = 0,
+                category = "",
+            )
     }
 }
 
