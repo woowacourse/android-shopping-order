@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.dto.response.BuyXGetYCoupon
-import woowacourse.shopping.data.remote.dto.response.Coupon
+import woowacourse.shopping.data.remote.dto.response.CouponDto
 import woowacourse.shopping.data.remote.dto.response.FixedDiscountCoupon
 import woowacourse.shopping.data.remote.dto.response.FreeShippingCoupon
 import woowacourse.shopping.data.remote.dto.response.PercentageDiscountCoupon
@@ -23,7 +23,7 @@ object ShoppingRetrofit {
         Json {
             serializersModule =
                 SerializersModule {
-                    polymorphic(Coupon::class) {
+                    polymorphic(CouponDto::class) {
                         subclass(FixedDiscountCoupon::class)
                         subclass(BuyXGetYCoupon::class)
                         subclass(FreeShippingCoupon::class)

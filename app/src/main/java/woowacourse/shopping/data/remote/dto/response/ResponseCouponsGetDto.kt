@@ -14,7 +14,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Serializable
-sealed class Coupon {
+sealed class CouponDto {
     abstract val id: Long
     abstract val code: String
     abstract val description: String
@@ -33,7 +33,7 @@ data class FixedDiscountCoupon(
     override val expirationDate: LocalDate,
     val discount: Int,
     val minimumAmount: Int,
-) : Coupon()
+) : CouponDto()
 
 @Serializable
 @SerialName("buyXgetY")
@@ -45,7 +45,7 @@ data class BuyXGetYCoupon(
     override val expirationDate: LocalDate,
     val buyQuantity: Int,
     val getQuantity: Int,
-) : Coupon()
+) : CouponDto()
 
 @Serializable
 @SerialName("freeShipping")
@@ -56,7 +56,7 @@ data class FreeShippingCoupon(
     @Serializable(with = LocalDateSerializer::class)
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
-) : Coupon()
+) : CouponDto()
 
 @Serializable
 @SerialName("percentage")
@@ -68,7 +68,7 @@ data class PercentageDiscountCoupon(
     override val expirationDate: LocalDate,
     val discount: Int,
     val availableTime: AvailableTime,
-) : Coupon()
+) : CouponDto()
 
 @Serializable
 data class AvailableTime(
