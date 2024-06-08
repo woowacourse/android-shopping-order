@@ -14,8 +14,8 @@ class RemoteCartDataSource(
     private val cartItemService: CartItemService,
 ) : CartDataSource {
     override fun findAll(): DataResponse<List<CartItem>> =
-        cartItemService.requestCartQuantityCount().map {
-            cartItemService.requestCartItems(page = 0, size = it.quantity)
+        cartItemService.requestCartQuantityCount().executeForDataResponse().map {
+            cartItemService.requestCartItems(page = 0, size = it.quantity).executeForDataResponse()
         }.chain {
             it.toCartItems()
         }
@@ -51,12 +51,12 @@ class RemoteCartDataSource(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<CartItem>> =
-        cartItemService.requestCartItems(page = page, size = pageSize).map { cartResponse ->
+        cartItemService.requestCartItems(page = page, size = pageSize).executeForDataResponse().map { cartResponse ->
             cartResponse.toCartItems()
         }
 
     override fun totalCartItemCount(): DataResponse<Int> =
-        cartItemService.requestCartQuantityCount().map {
+        cartItemService.requestCartQuantityCount().executeForDataResponse().map {
             it.quantity
         }
 }

@@ -11,14 +11,12 @@ import com.example.domain.model.Product
 class RemoteProductDataSource(
     private val productService: ProductService,
 ) : ProductDataSource {
-    override fun find(id: Int): DataResponse<Product> =
-        productService.requestProduct().execute().body()?.map { it.toProduct() }
-            ?: DataResponse.Failure(DataResponse.NULL_BODY_ERROR_CODE, DataResponse.NULL_BODY_ERROR_STRING)
+    override fun find(id: Int): DataResponse<Product> = productService.requestProduct().executeForDataResponse().map { it.toProduct() }
 
     override fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<Product>> =
-        productService.requestProducts(page = page, size = pageSize).execute().body()?.map { it.toProductList() }
-            ?: DataResponse.Failure(DataResponse.NULL_BODY_ERROR_CODE, DataResponse.NULL_BODY_ERROR_STRING)
+        productService.requestProducts(page = page, size = pageSize).executeForDataResponse()
+            .map { it.toProductList() }
 }
