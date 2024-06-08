@@ -6,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -90,6 +91,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.activity:activity:1.8.0")
     debugImplementation("androidx.fragment:fragment-testing:1.6.2")
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")

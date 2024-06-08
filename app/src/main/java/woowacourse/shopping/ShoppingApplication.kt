@@ -6,14 +6,21 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.datasource.DefaultRemoteCartDataSource
+import woowacourse.shopping.data.datasource.DefaultRemoteCouponDataSource
 import woowacourse.shopping.data.datasource.DefaultRemoteOrderDataSource
 import woowacourse.shopping.data.datasource.DefaultRemoteProductDataSource
+import woowacourse.shopping.data.datasource.RemoteCouponDataSource
 import woowacourse.shopping.data.local.database.RecentProductDatabase
 import woowacourse.shopping.data.local.preferences.ShoppingPreferencesManager
 import woowacourse.shopping.data.remote.BasicAuthInterceptor
 import woowacourse.shopping.data.remote.CartService
+import woowacourse.shopping.data.remote.CouponService
 import woowacourse.shopping.data.remote.OrderService
 import woowacourse.shopping.data.remote.ProductService
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 
 class ShoppingApplication : Application() {
     private val shoppingPreferencesManager: ShoppingPreferencesManager by lazy {
@@ -69,10 +76,14 @@ class ShoppingApplication : Application() {
         val productService = retrofit.create(ProductService::class.java)
         val cartService = retrofit.create(CartService::class.java)
         val orderService = retrofit.create(OrderService::class.java)
+        val couponService = retrofit.create(CouponService::class.java)
         remoteCartDataSource = DefaultRemoteCartDataSource(cartService)
         remoteProductDataSource = DefaultRemoteProductDataSource(productService)
         remoteOrderDataSource = DefaultRemoteOrderDataSource(orderService)
         recentProductDatabase = RecentProductDatabase.getInstance(this)
+        remoteCouponDataSource = DefaultRemoteCouponDataSource(couponService)
+        couponRepository = CouponRepositoryImpl(remoteCouponDataSource)
+        orderRepository = OrderRepositoryImpl(remoteOrderDataSource)
     }
 
     companion object {
@@ -81,5 +92,8 @@ class ShoppingApplication : Application() {
         lateinit var remoteCartDataSource: DefaultRemoteCartDataSource
         lateinit var remoteProductDataSource: DefaultRemoteProductDataSource
         lateinit var remoteOrderDataSource: DefaultRemoteOrderDataSource
+        lateinit var remoteCouponDataSource: RemoteCouponDataSource
+        lateinit var couponRepository: CouponRepository
+        lateinit var orderRepository: OrderRepository
     }
 }

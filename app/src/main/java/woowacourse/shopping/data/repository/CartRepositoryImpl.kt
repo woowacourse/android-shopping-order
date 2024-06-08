@@ -1,18 +1,15 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.HttpException
-import retrofit2.Response
 import woowacourse.shopping.data.datasource.RemoteCartDataSource
 import woowacourse.shopping.data.model.CartItem
 import woowacourse.shopping.data.model.CartItemRequestBody
 import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
 import woowacourse.shopping.data.model.toCartData
 import woowacourse.shopping.data.model.toCartDomain
+import woowacourse.shopping.data.model.toCartItemDomain
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.CartDomain
+import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
@@ -24,7 +21,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override suspend fun getEntireCartItems(): Result<List<CartData>> {
+    override suspend fun getEntireCartData(): Result<List<CartData>> {
         return runCatching {
             val totalCartQuantity = remoteCartDataSource.getCartTotalQuantity().quantity
             remoteCartDataSource.getCartItems(
@@ -32,6 +29,17 @@ class CartRepositoryImpl(
                 totalCartQuantity,
                 SORT_CART_ITEMS
             ).cartItems.map(CartItem::toCartData)
+        }
+    }
+
+    override suspend fun getEntireCartItems(): Result<List<CartItemDomain>> {
+        return runCatching {
+            val totalCartQuantity = remoteCartDataSource.getCartTotalQuantity().quantity
+            remoteCartDataSource.getCartItems(
+                PAGE_CART_ITEMS,
+                totalCartQuantity,
+                SORT_CART_ITEMS
+            ).cartItems.map(CartItem::toCartItemDomain)
         }
     }
 
