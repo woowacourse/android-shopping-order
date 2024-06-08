@@ -2,6 +2,7 @@ package woowacourse.shopping.local.dao
 
 import androidx.room.Room
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.DisplayName
@@ -27,7 +28,7 @@ class RecentProductDaoTest {
 
     @Test
     @DisplayName("최근 본 상품을 저장하고, id를 반환한다.")
-    fun `test`() {
+    fun `test`() = runTest {
         // given
         val product = fakeRecentProductEntity(id = 1L)
         // when
@@ -39,7 +40,7 @@ class RecentProductDaoTest {
 
     @Test
     @DisplayName("최근 본 상품을 3개 저장 하고, 최근 상품 본 상품을 불러올 때, 최신 시간 순으로 정렬 된다.")
-    fun `test2`() {
+    fun `test2`() = runTest {
         // given: 최근 본 상품 3개 저장
         val given =
             fakeRecentProductEntities(
@@ -57,7 +58,7 @@ class RecentProductDaoTest {
 
     @Test
     @DisplayName("중복되는 id를 저장하면, 제일 나중에 저장한 값으로 덮어씌워진다")
-    fun `save_duplicate`() {
+    fun `save_duplicate`() = runTest {
         // given & when
         saveProduct(1L, dateTime().plusDays(1))
         saveProduct(1L, dateTime())
@@ -74,7 +75,7 @@ class RecentProductDaoTest {
     private fun saveProduct(
         id: Long,
         createdTime: LocalDateTime,
-    ) {
+    ) = runTest {
         dao.saveProduct(fakeRecentProductEntity(id, createdTime))
     }
 }

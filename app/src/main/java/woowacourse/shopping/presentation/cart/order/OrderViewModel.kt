@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.OrderCartProductsUseCase
+import woowacourse.shopping.domain.usecase.order.OrderCartProductsUseCase
 import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.CartItemListener

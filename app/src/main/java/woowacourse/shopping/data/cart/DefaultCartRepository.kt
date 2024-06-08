@@ -2,7 +2,6 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.cart.datasource.CartDataSource
 import woowacourse.shopping.data.cart.model.CartPageData
-import woowacourse.shopping.data.cart.order.OrderDataSource
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.entity.Product
@@ -10,7 +9,6 @@ import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
     private val cartDataSource: CartDataSource,
-    private val orderDataSource: OrderDataSource,
 ) : CartRepository {
     private var cartPageData: CartPageData? = null
     private var cachedCart: Cart = Cart()
@@ -103,14 +101,6 @@ class DefaultCartRepository(
             )
         val minSize = currentPage * pageSize
         return Result.success(cartPageData.totalProductSize > minSize)
-    }
-
-    override suspend fun orderCartProducts(productIds: List<Long>): Result<Unit> {
-        val cart = cachedCart.filterByProductIds(productIds)
-        val cartIds = cart.cartProducts.map { it.id }
-        return orderDataSource.orderProducts(cartIds).onSuccess {
-            loadCart()
-        }
     }
 
     private fun Result<CartPageData>.toCart(): Result<Cart> {

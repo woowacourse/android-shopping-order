@@ -34,6 +34,4 @@ interface CartRepository {
         currentPage: Int,
         pageSize: Int,
     ): Result<Boolean>
-
-    suspend fun orderCartProducts(productIds: List<Long>): Result<Unit>
 }

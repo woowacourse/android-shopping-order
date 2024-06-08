@@ -6,14 +6,14 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class FakeProductRepository(
     private val products: List<Product>,
 ) : ProductRepository {
-    override fun loadProducts(
+    override suspend fun loadProducts(
         currentPage: Int,
         size: Int,
     ): Result<List<Product>> {
         TODO("Not yet implemented")
     }
 
-    override fun loadProducts(
+    override suspend fun loadProducts(
         category: String,
         currentPage: Int,
         size: Int,
@@ -21,7 +21,7 @@ class FakeProductRepository(
         return Result.success(products)
     }
 
-    override fun findProductById(id: Long): Result<Product> {
+    override suspend fun findProductById(id: Long): Result<Product> {
         val product =
             products.find { it.id == id } ?: return Result.failure(
                 NoSuchElementException("Invalid product id"),
@@ -29,18 +29,18 @@ class FakeProductRepository(
         return Result.success(product)
     }
 
-    override fun canLoadMore(
+    override  fun canLoadMore(
         page: Int,
         size: Int,
     ): Result<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override fun loadRecentProducts(size: Int): Result<List<Product>> {
+    override suspend fun loadRecentProducts(size: Int): Result<List<Product>> {
         TODO("Not yet implemented")
     }
 
-    override fun saveRecentProduct(id: Long): Result<Long> {
+    override suspend fun saveRecentProduct(id: Long): Result<Long> {
         TODO("Not yet implemented")
     }
 }

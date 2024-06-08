@@ -1,6 +1,7 @@
-package woowacourse.shopping.domain.usecase
+package woowacourse.shopping.domain.usecase.order
 
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 interface OrderCartProductsUseCase {
@@ -10,6 +11,7 @@ interface OrderCartProductsUseCase {
 class DefaultOrderCartProductsUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ) : OrderCartProductsUseCase {
     override suspend fun invoke(productIds: List<Long>): Result<Unit> {
         productIds.forEach {
@@ -17,7 +19,13 @@ class DefaultOrderCartProductsUseCase(
                 .onFailure { return Result.failure(it) }
                 .getOrThrow()
         }
-        return cartRepository.orderCartProducts(productIds)
+        val cartIds = cartRepository.filterCartProducts(productIds)
+            .onFailure { return Result.failure(it) }
+            .getOrThrow()
+            .cartProducts
+            .map { it.id }
+
+        return orderRepository.orderCartProducts(cartIds)
     }
 
     companion object {
@@ -26,8 +34,13 @@ class DefaultOrderCartProductsUseCase(
         fun instance(
             productRepository: ProductRepository,
             cartRepository: CartRepository,
+            orderRepository: OrderRepository,
         ): OrderCartProductsUseCase {
-            return instance ?: DefaultOrderCartProductsUseCase(productRepository, cartRepository)
+            return instance ?: DefaultOrderCartProductsUseCase(
+                productRepository,
+                cartRepository,
+                orderRepository
+            )
                 .also { instance = it }
         }
     }

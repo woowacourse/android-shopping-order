@@ -13,11 +13,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
+import woowacourse.shopping.data.order.OrderRepositoryInjector
 import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentOrderProductBinding
 import woowacourse.shopping.domain.usecase.DefaultDecreaseCartProductUseCase
 import woowacourse.shopping.domain.usecase.DefaultIncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.DefaultOrderCartProductsUseCase
+import woowacourse.shopping.domain.usecase.order.DefaultOrderCartProductsUseCase
 import woowacourse.shopping.domain.usecase.DefaultRecommendProductsUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
@@ -36,9 +37,14 @@ class OrderFragment :
         val cartRepository = CartRepositoryInjector.cartRepository()
         val productRepository =
             ProductRepositoryInjector.productRepository(requireContext().applicationContext)
+        val orderRepository = OrderRepositoryInjector.orderRepository()
         OrderViewModel.factory(
             orders,
-            DefaultOrderCartProductsUseCase.instance(productRepository, cartRepository),
+            DefaultOrderCartProductsUseCase.instance(
+                productRepository,
+                cartRepository,
+                orderRepository
+            ),
             DefaultDecreaseCartProductUseCase.instance(productRepository, cartRepository),
             DefaultIncreaseCartProductUseCase.instance(productRepository, cartRepository),
             DefaultRecommendProductsUseCase.instance(
