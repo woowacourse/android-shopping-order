@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import androidx.lifecycle.map
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
@@ -20,6 +21,7 @@ import woowacourse.shopping.ui.cart.cartitem.CartItemFragment
 import woowacourse.shopping.ui.cart.recommend.RecommendFragment
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
+import woowacourse.shopping.ui.coupon.CouponActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -42,7 +44,6 @@ class CartActivity : AppCompatActivity() {
         onClickOrderBtn()
         onClickTotalCheckBox()
 
-        observeIsOrder()
     }
 
     private fun initFragment() {
@@ -71,20 +72,7 @@ class CartActivity : AppCompatActivity() {
                     addToBackStack(null)
                 }
             } else if (supportFragmentManager.findFragmentById(R.id.fcv_cart) is RecommendFragment) {
-                viewModel.order()
-            }
-        }
-    }
-
-    private fun observeIsOrder() {
-        viewModel.isOrderSuccess.observe(this) { isSuccess ->
-            if (isSuccess) {
-                Toast.makeText(this, getString(R.string.order_success_message), Toast.LENGTH_SHORT)
-                    .show()
-                finish()
-            } else {
-                Toast.makeText(this, getString(R.string.order_fail_message), Toast.LENGTH_SHORT)
-                    .show()
+                startActivity(CouponActivity.newIntent(this, viewModel.cart.value?.cartItems?.filter { it.isChecked }?: emptyList() ))
             }
         }
     }

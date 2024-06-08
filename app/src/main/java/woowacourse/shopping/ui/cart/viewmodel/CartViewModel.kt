@@ -72,9 +72,6 @@ class CartViewModel(
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
-    val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
-
     private fun currentCartState(): CartItemsUiState =
         _cart.value ?: CartItemsUiState(emptyList(), true)
 
@@ -258,21 +255,6 @@ class CartViewModel(
         return current
     }
 
-    fun order() {
-        viewModelScope.launch {
-            runCatching {
-                val cartIds: List<Long> =
-                    _cart.value?.cartItems?.filter { it.isChecked }?.map { it.id } ?: emptyList()
-                orderRepository.order(cartIds)
-            }.onSuccess {
-                _isOrderSuccess.setValue(true)
-            }.onFailure {
-                _isOrderSuccess.setValue(false)
-                Log.d(this.javaClass.simpleName, "${it.message}")
-            }
-        }
-    }
-
     private fun findCartIdByProductId(productId: Long): Long {
         return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.id
             ?: error("일치하는 장바구니 아이템이 없습니다.")
@@ -284,7 +266,7 @@ class CartViewModel(
             this.product.id,
             this.product.name,
             this.product.price,
-            this.quantity,
+            this.quantity.value,
             this.product.imageUrl,
             isChecked,
         )
