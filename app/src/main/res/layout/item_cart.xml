@@ -87,7 +87,7 @@
             android:layout_marginBottom="6dp"
             app:layout_constraintBottom_toTopOf="@id/tv_product_price"
             app:layout_constraintEnd_toEndOf="parent"
-            bind:count="@{String.valueOf(cartUiModel.quantity.value)}"
+            bind:count="@{String.valueOf(cartUiModel.quantity)}"
             bind:countButtonClickListener="@{vm}"
             bind:productId="@{cartUiModel.productId}" />
 
