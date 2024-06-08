@@ -16,34 +16,38 @@ class CartRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : CartRepository {
     override suspend fun getCartItemByProductId(productId: Long): Result<CartWithProduct> =
-        getAllCartItemsWithProduct().mapCatching {
-            it.firstOrNull { it.product.id == productId }
+        getAllCartItemsWithProduct().mapCatching { cartWithProducts ->
+            cartWithProducts.firstOrNull { cartWithProduct -> cartWithProduct.product.id == productId }
                 ?: throw ShoppingException(ShoppingError.CartNotFound)
         }
 
     override suspend fun getCartItemByCartId(cartId: Long): Result<CartWithProduct> =
-        getAllCartItemsWithProduct().mapCatching {
-            it.firstOrNull { it.id == cartId }
+        getAllCartItemsWithProduct().mapCatching { cartWithProducts ->
+            cartWithProducts.firstOrNull { cartWithProduct -> cartWithProduct.id == cartId }
                 ?: throw ShoppingException(ShoppingError.CartNotFound)
         }
 
     override suspend fun getAllCartItems(): Result<List<Cart>> {
         val size = getCartItemCounts()
-        return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching {
-            it.content.map {
-                Cart(id = it.id, productId = it.product.id, quantity = Quantity(it.quantity))
+        return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching { dto ->
+            dto.content.map { content ->
+                Cart(
+                    id = content.id,
+                    productId = content.product.id,
+                    quantity = Quantity(content.quantity),
+                )
             }
         }
     }
 
     override suspend fun getAllCartItemsWithProduct(): Result<List<CartWithProduct>> {
         val size = getCartItemCounts()
-        return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching {
-            it.content.map {
+        return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching { dto ->
+            dto.content.map { content ->
                 CartWithProduct(
-                    it.id,
-                    it.product.toDomain(),
-                    Quantity(it.quantity),
+                    content.id,
+                    content.product.toDomain(),
+                    Quantity(content.quantity),
                 )
             }
         }

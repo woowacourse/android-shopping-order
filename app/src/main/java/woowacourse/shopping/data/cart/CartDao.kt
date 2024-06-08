@@ -52,7 +52,10 @@ interface CartDao {
         }
     }
 
-    fun updateQuantity(cart: Cart, productId: Long) {
+    fun updateQuantity(
+        cart: Cart,
+        productId: Long,
+    ) {
         if (cart.quantity.value > 1) {
             updateQuantityIfGreaterThanOne(productId)
         } else {

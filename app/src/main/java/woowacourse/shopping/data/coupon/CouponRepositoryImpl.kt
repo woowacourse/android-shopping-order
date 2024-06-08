@@ -6,8 +6,8 @@ class CouponRepositoryImpl(
     private val couponDataSource: CouponRemoteDataSource,
 ) : CouponRepository {
     override suspend fun getCoupons(): Result<List<CouponState>> {
-        return couponDataSource.getCoupons().mapCatching {
-            it.map { responseCouponDto ->
+        return couponDataSource.getCoupons().mapCatching { dto ->
+            dto.map { responseCouponDto ->
                 responseCouponDto.toDomain()
             }
         }

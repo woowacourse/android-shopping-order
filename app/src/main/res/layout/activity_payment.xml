@@ -71,7 +71,7 @@
             android:gravity="center"
             android:text="@string/no_available_coupon_comment"
             android:textSize="25sp"
-            app:isVisible="@{vm.coupons.size()==0}"
+            app:isVisible="@{vm.coupons.size() == 0}"
             app:layout_constraintBottom_toTopOf="@id/horizon_line"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_guide" />

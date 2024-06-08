@@ -10,18 +10,18 @@ class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDa
         page: Int,
         size: Int,
     ): Result<List<Product>> =
-        productRemoteDataSource.getProductsByOffset(page, size).mapCatching {
-            it.toProduct()
+        productRemoteDataSource.getProductsByOffset(page, size).mapCatching { dto ->
+            dto.toProduct()
         }
 
     override suspend fun find(id: Long): Result<Product> =
-        productRemoteDataSource.getProductsById(id).mapCatching {
+        productRemoteDataSource.getProductsById(id).mapCatching { dto ->
             Product(
-                id = it.id,
-                imageUrl = it.imageUrl,
-                name = it.name,
-                price = it.price,
-                category = it.category,
+                id = dto.id,
+                imageUrl = dto.imageUrl,
+                name = dto.name,
+                price = dto.price,
+                category = dto.category,
             )
         }
 
@@ -45,8 +45,8 @@ class ProductRepositoryImpl(private val productRemoteDataSource: ProductRemoteDa
         category: String,
         page: Int,
     ): Result<List<Product>> =
-        productRemoteDataSource.getProductsByCategory(category, page).mapCatching {
-            it.toProduct()
+        productRemoteDataSource.getProductsByCategory(category, page).mapCatching { dto ->
+            dto.toProduct()
         }
 
     private fun ResponseProductsGetDto.toProduct() =

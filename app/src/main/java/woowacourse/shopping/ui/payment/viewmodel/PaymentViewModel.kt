@@ -30,8 +30,8 @@ class PaymentViewModel(
     private val orderedProducts: MutableLiveData<List<CartWithProduct>> =
         MutableLiveData(emptyList())
     val orderAmount: LiveData<Int> =
-        orderedProducts.map {
-            it.sumOf { it.product.price * it.quantity.value }
+        orderedProducts.map { cartWithProducts ->
+            cartWithProducts.sumOf { it.product.price * it.quantity.value }
         }
 
     private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
@@ -42,8 +42,8 @@ class PaymentViewModel(
         }
 
     val checkedCoupon: LiveData<CouponUiModel?> =
-        _coupons.map {
-            it.firstOrNull { it.isChecked }
+        _coupons.map { couponUiModels ->
+            couponUiModels.firstOrNull { it.isChecked }
         }
 
     val totalAmount: MediatorLiveData<Int> =
@@ -78,7 +78,13 @@ class PaymentViewModel(
 
     fun paying() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            orderedProducts.value?.let { cartRepository.order(it.map { it.id }) }
+            orderedProducts.value?.let {
+                cartRepository.order(
+                    it.map { cartWithProduct ->
+                        cartWithProduct.id
+                    },
+                )
+            }
         }
         _paying.setValue(Unit)
     }
@@ -87,8 +93,8 @@ class PaymentViewModel(
         val cartWithProducts = mutableListOf<CartWithProduct>()
         viewModelScope.launch(coroutineExceptionHandler) {
             orderedCartItemIds.forEach {
-                cartRepository.getCartItemByCartId(it).onSuccess {
-                    cartWithProducts.add(it)
+                cartRepository.getCartItemByCartId(it).onSuccess { cartWithProduct ->
+                    cartWithProducts.add(cartWithProduct)
                     orderedProducts.value = cartWithProducts
                 }
             }
@@ -136,8 +142,8 @@ class PaymentViewModel(
 
     private fun loadCoupons() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            couponRepository.getCoupons().onSuccess {
-                _coupons.value = it.map { it.toUiModel() }
+            couponRepository.getCoupons().onSuccess { couponStates ->
+                _coupons.value = couponStates.map { it.toUiModel() }
             }
         }
     }

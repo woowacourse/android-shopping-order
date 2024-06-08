@@ -125,8 +125,9 @@ class ProductContentsViewModel(
 
     fun loadRecentProducts() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            recentProductRepository.findAll().onSuccess {
-                _recentProducts.value = it.map { productRepository.find(it.productId).getOrThrow() }
+            recentProductRepository.findAll().onSuccess { recentProducts ->
+                _recentProducts.value =
+                    recentProducts.map { productRepository.find(it.productId).getOrThrow() }
             }
         }
     }

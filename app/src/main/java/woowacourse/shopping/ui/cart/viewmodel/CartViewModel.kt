@@ -38,18 +38,18 @@ class CartViewModel(
     val products: LiveData<List<ProductWithQuantity>> = _products
 
     val totalPrice: LiveData<Int> =
-        _cart.map {
-            it.cartItems.filter { it.isChecked }.sumOf { it.totalPrice }
+        _cart.map { cartItemUiState ->
+            cartItemUiState.cartItems.filter { it.isChecked }.sumOf { it.totalPrice }
         }
 
     val isTotalChbChecked: LiveData<Boolean> =
-        _cart.map {
-            it.cartItems.all { it.isChecked } && it.cartItems.isNotEmpty()
+        _cart.map { cartItemUiState ->
+            cartItemUiState.cartItems.all { it.isChecked } && cartItemUiState.cartItems.isNotEmpty()
         }
 
     val checkedItemCount: LiveData<Int> =
-        _cart.map {
-            it.cartItems.filter { it.isChecked }.sumOf { it.quantity.value }
+        _cart.map { cartItemUiState ->
+            cartItemUiState.cartItems.filter { it.isChecked }.sumOf { it.quantity.value }
         }
 
     val isRecommendPage: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -153,11 +153,15 @@ class CartViewModel(
     }
 
     private suspend fun setRecommendProducts(it: Product) {
-        productRepository.getProductsByCategory(it.category).onSuccess {
+        productRepository.getProductsByCategory(it.category).onSuccess { products ->
             _products.value =
-                it.filterNot { product -> requireNotNull(_cart.value).cartItems.any { it.productId == product.id } }
+                products.filterNot { product ->
+                    requireNotNull(_cart.value).cartItems.any { cartUiModel ->
+                        cartUiModel.productId == product.id
+                    }
+                }
                     .map { ProductWithQuantity(product = it) }
-                    .subList(0, minOf(it.size, 10))
+                    .subList(0, minOf(products.size, 10))
             noRecommendProductState.value = false
         }.onFailure {
             noRecommendProductState.value = true
@@ -176,10 +180,10 @@ class CartViewModel(
     }
 
     private suspend fun updateCartLiveData() {
-        cartRepository.getAllCartItemsWithProduct().onSuccess {
+        cartRepository.getAllCartItemsWithProduct().onSuccess { cartWithProducts ->
             _cart.value =
                 CartItemsUiState(
-                    it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                    cartWithProducts.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
                     isLoading = false,
                 )
         }.onFailure {
@@ -269,7 +273,9 @@ class CartViewModel(
             cartRepository.getAllCartItemsWithProduct().onSuccess {
                 _cart.value =
                     CartItemsUiState(
-                        it.map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
+                        it.map { cartWithProduct ->
+                            cartWithProduct.toUiModel(findIsCheckedByProductId(cartWithProduct.product.id))
+                        },
                         isLoading = true,
                     )
                 _cart.value = cart.value?.copy(isLoading = false)
@@ -278,11 +284,9 @@ class CartViewModel(
     }
 
     private fun orderItemIds(): List<Long> {
-        val cartIds =
-            _cart.value?.cartItems?.filter { it.isChecked }
-                ?.map { it.id }
-                ?.toList() ?: emptyList()
-        return cartIds
+        return _cart.value?.cartItems?.filter { it.isChecked }
+            ?.map { it.id }
+            ?.toList() ?: emptyList()
     }
 
     private fun findCartIdByProductId(productId: Long): Long {
