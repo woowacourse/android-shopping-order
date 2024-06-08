@@ -91,7 +91,6 @@ class ProductDetailActivity :
 
     private fun observeErrorMessage() {
         viewModel.errorMsg.observe(this) {
-//            val errMsg = handleError(it)
             toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
             toast?.show()
         }
