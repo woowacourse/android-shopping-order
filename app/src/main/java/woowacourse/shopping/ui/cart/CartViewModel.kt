@@ -253,8 +253,7 @@ class CartViewModel(
 
             productRepository.findRecommendProducts(recentProductCategory, cartItems)
                 .onSuccess { recommendProducts ->
-                    _recommendProductUiModels.value =
-                        recommendProducts.map { ProductUiModel.from(it) }
+                    _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
                 }.onFailure {
                     setError()
                 }

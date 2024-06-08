@@ -32,15 +32,10 @@ object RemoteProductRepository : ProductRepository {
         cartItems: List<CartItem>,
     ): Result<List<Product>> {
         return findCategoryProducts(category)
-            .onSuccess { categoryProducts ->
-                val recommendCategoryProducts =
-                    categoryProducts
-                        .filter { product -> cartItems.none { it.product.id == product.id } }
-                        .take(RECOMMEND_PRODUCTS_COUNT)
-                Result.success(recommendCategoryProducts)
-            }
-            .onFailure {
-                Result.failure<List<Product>>(it)
+            .map { categoryProducts ->
+                categoryProducts
+                    .filter { product -> cartItems.none { it.product.id == product.id } }
+                    .take(RECOMMEND_PRODUCTS_COUNT)
             }
     }
 
