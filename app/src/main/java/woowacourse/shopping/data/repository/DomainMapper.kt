@@ -1,13 +1,16 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
+import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 
-fun ResponseCartItemsGetDto.Content.toCart() = Cart(id = id, productId = product.id, quantity = Quantity(quantity))
+
+fun ResponseCartItemsGetDto.Content.toCartWithProduct() = CartWithProduct(
+    id = id, product = this.product.toProduct(), quantity = Quantity(this.quantity)
+)
 
 fun ResponseCartItemsGetDto.Product.toProduct() =
     Product(

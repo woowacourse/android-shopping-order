@@ -9,12 +9,12 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.repository.ApiResponse
 import woowacourse.shopping.data.repository.Error
 import woowacourse.shopping.data.repository.onError
 import woowacourse.shopping.data.repository.onException
 import woowacourse.shopping.data.repository.onSuccess
+import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.model.Quantity
@@ -37,7 +37,7 @@ class ProductContentsViewModel(
     ViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
     private val products: MutableLiveData<List<Product>> = MutableLiveData()
 
-    private val cart: MutableLiveData<List<Cart>> = MutableLiveData()
+    private val cart: MutableLiveData<List<CartWithProduct>> = MutableLiveData()
 
     val productWithQuantity: MediatorLiveData<ProductWithQuantityUiState> =
         MediatorLiveData<ProductWithQuantityUiState>().apply {
@@ -68,7 +68,8 @@ class ProductContentsViewModel(
     private val _error: MutableSingleLiveData<Error<Nothing>> = MutableSingleLiveData()
     val error: SingleLiveData<Error<Nothing>> get() = _error
 
-    private fun currentProduct(): ProductWithQuantityUiState = productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
+    private fun currentProduct(): ProductWithQuantityUiState =
+        productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
 
     init {
         loadProducts()
@@ -176,20 +177,20 @@ class ProductContentsViewModel(
         return cart.quantity
     }
 
-    private fun findCartContainProduct(productId: Long): Cart? {
+    private fun findCartContainProduct(productId: Long): CartWithProduct? {
         cart.value?.let { items ->
-            return items.find { it.productId == productId }
+            return items.find { it.product.id == productId }
         }
         return null
     }
 
     private fun findCartItemByProductId(productId: Long): Long {
-        return cart.value?.firstOrNull { it.productId == productId }?.id
+        return cart.value?.firstOrNull { it.product.id == productId }?.id
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
     private fun findCartItemQuantityByProductId(productId: Long): Quantity {
-        return cart.value?.firstOrNull { it.productId == productId }?.quantity
+        return cart.value?.firstOrNull { it.product.id == productId }?.quantity
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 

@@ -8,8 +8,8 @@ import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
 import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
 import woowacourse.shopping.data.datasource.impl.ApiHandleCartDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ApiHandleProductDataSourceImpl
-import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.remote.api.ApiResult
+import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.math.min
@@ -45,9 +45,9 @@ class ProductRepositoryImpl(
                             count,
                         )
                     }.await()
-                val carts: List<Cart> =
+                val carts: List<CartWithProduct> =
                     when (cartResponse) {
-                        is ApiResult.Success -> cartResponse.data.content.map { it.toCart() }
+                        is ApiResult.Success -> cartResponse.data.content.map { it.toCartWithProduct() }
                         is ApiResult.Error -> return@coroutineScope handleError(cartResponse)
                         is ApiResult.Exception -> return@coroutineScope ApiResponse.Exception(
                             cartResponse.e,
@@ -105,9 +105,9 @@ class ProductRepositoryImpl(
 
     private fun List<Product>.filterCategoryAndNotInCart(
         category: String,
-        carts: List<Cart>,
+        carts: List<CartWithProduct>,
     ) = this.filter { it.category == category }
-        .filterNot { carts.map { it.productId }.contains(it.id) }
+        .filterNot { carts.map { it.product.id }.contains(it.id) }
 
     private fun exceptionHandler() = CoroutineExceptionHandler { _, exception -> throw exception }
 

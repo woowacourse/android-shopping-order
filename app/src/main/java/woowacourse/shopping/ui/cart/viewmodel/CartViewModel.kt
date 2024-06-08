@@ -82,7 +82,7 @@ class CartViewModel(
         viewModelScope.launch {
             runCatching {
                 _cart.value = currentCartState().copy(isLoading = true)
-                cartRepository.getAllCartItemsWithProduct()
+                cartRepository.getAllCartItems()
             }.onSuccess { carts ->
                 _cart.value =
                     currentCartState().copy(
@@ -137,7 +137,7 @@ class CartViewModel(
             }.onSuccess {
                 _cart.value =
                     CartItemsUiState(
-                        cartRepository.getAllCartItemsWithProduct()
+                        cartRepository.getAllCartItems()
                             .map { it.toUiModel(findIsCheckedByProductId(it.product.id)) },
                         isLoading = false,
                     )
