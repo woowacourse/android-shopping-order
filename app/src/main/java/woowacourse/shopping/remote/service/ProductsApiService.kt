@@ -4,8 +4,8 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.remote.model.ProductDto
-import woowacourse.shopping.remote.model.ProductResponse
+import woowacourse.shopping.remote.model.response.ProductListResponse
+import woowacourse.shopping.remote.model.response.ProductResponse
 
 interface ProductsApiService {
     @GET("/products")
@@ -13,10 +13,10 @@ interface ProductsApiService {
         @Query("category") category: String? = null,
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
-    ): Call<ProductResponse>
+    ): Call<ProductListResponse>
 
     @GET("/products/{id}")
     fun requestProduct(
         @Path("id") id: Int,
-    ): Call<ProductDto>
+    ): Call<ProductResponse>
 }

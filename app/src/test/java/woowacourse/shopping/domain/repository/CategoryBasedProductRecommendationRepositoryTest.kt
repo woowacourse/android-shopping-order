@@ -6,8 +6,8 @@ import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.remote.model.CartItemDto
-import woowacourse.shopping.remote.model.ProductDto
+import woowacourse.shopping.remote.model.response.CartItemResponse
+import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.source.FakeProductDataSource
 import woowacourse.shopping.source.FakeShoppingCartDataSource
 
@@ -72,8 +72,8 @@ class CategoryBasedProductRecommendationRepositoryTest {
             )
         cartSource =
             FakeShoppingCartDataSource(
-                CartItemDto(id = 101, quantity = 0, product = ProductDto(1, "", 1, "1", "fashion")),
-                CartItemDto(id = 102, quantity = 0, product = ProductDto(2, "", 1, "1", "fashion")),
+                CartItemResponse(id = 101, quantity = 0, product = ProductResponse(1, "", 1, "1", "fashion")),
+                CartItemResponse(id = 102, quantity = 0, product = ProductResponse(2, "", 1, "1", "fashion")),
             )
         repository = CategoryBasedProductRecommendationRepository(productSource, cartSource)
 

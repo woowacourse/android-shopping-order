@@ -3,31 +3,31 @@ package woowacourse.shopping.source
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.remote.model.CartItemDto
-import woowacourse.shopping.remote.model.ProductDto
+import woowacourse.shopping.remote.model.response.CartItemResponse
+import woowacourse.shopping.remote.model.response.ProductResponse
 
 class FakeShoppingCartDataSource(
-    private var cartItemDtos: List<CartItemDto> = listOf(),
+    private var cartItemResponses: List<CartItemResponse> = listOf(),
 ) : ShoppingCartDataSource {
-    constructor(vararg cartItemDtos: CartItemDto) : this(cartItemDtos.toList())
+    constructor(vararg cartItemResponses: CartItemResponse) : this(cartItemResponses.toList())
 
     override fun findByProductId(productId: Long): ProductIdsCountData {
         val foundItem =
-            cartItemDtos.find { cartItemDto -> cartItemDto.product.id == productId }
+            cartItemResponses.find { cartItemDto -> cartItemDto.product.id == productId }
                 ?: throw NoSuchElementException("there is no product $productId")
 
         return ProductIdsCountData(foundItem.id, foundItem.quantity)
     }
 
-    override fun loadAllCartItems(): List<CartItemDto> = cartItemDtos
+    override fun loadAllCartItems(): List<CartItemResponse> = cartItemResponses
 
     override fun addNewProduct(productIdsCount: ProductIdsCount) {
-        val newId = cartItemDtos.size.toLong() + 1
+        val newId = cartItemResponses.size.toLong() + 1
         val newCartItem =
-            CartItemDto(
+            CartItemResponse(
                 newId,
                 productIdsCount.quantity,
-                ProductDto(
+                ProductResponse(
                     productIdsCount.productId,
                     "1",
                     1,
@@ -35,14 +35,14 @@ class FakeShoppingCartDataSource(
                     "unit",
                 ),
             )
-        cartItemDtos = cartItemDtos + newCartItem
+        cartItemResponses = cartItemResponses + newCartItem
     }
 
     override fun removeCartItem(cartItemId: Long) {
         val foundItem =
-            cartItemDtos.find { cartItemDto -> cartItemDto.id == cartItemId }
+            cartItemResponses.find { cartItemDto -> cartItemDto.id == cartItemId }
                 ?: throw NoSuchElementException()
-        cartItemDtos = cartItemDtos - foundItem
+        cartItemResponses = cartItemResponses - foundItem
     }
 
     override fun plusProductsIdCount(
@@ -64,13 +64,13 @@ class FakeShoppingCartDataSource(
         newQuantity: Int,
     ) {
         val foundItem =
-            cartItemDtos.find { cartItemDto -> cartItemDto.id == cartItemId }
+            cartItemResponses.find { cartItemDto -> cartItemDto.id == cartItemId }
                 ?: throw NoSuchElementException()
         val updatedItem = foundItem.copy(quantity = newQuantity)
         val newCartItems =
-            cartItemDtos.map { cartItemDto ->
+            cartItemResponses.map { cartItemDto ->
                 if (cartItemDto.id == cartItemId) updatedItem else cartItemDto
             }
-        cartItemDtos = newCartItems
+        cartItemResponses = newCartItems
     }
 }

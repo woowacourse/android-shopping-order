@@ -57,7 +57,7 @@ class OrderViewModelTest {
         cartRepository =
             DefaultShoppingCartRepository(
                 FakeShoppingCartDataSource(
-                    cartItemDtos = listOf(),
+                    cartItemResponses = listOf(),
                 ),
             )
 
@@ -65,7 +65,7 @@ class OrderViewModelTest {
             CategoryBasedProductRecommendationRepository(
                 productsSource,
                 FakeShoppingCartDataSource(
-                    cartItemDtos = mutableListOf(),
+                    cartItemResponses = mutableListOf(),
                 ),
             )
 

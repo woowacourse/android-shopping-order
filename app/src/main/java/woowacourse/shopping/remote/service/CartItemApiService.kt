@@ -8,15 +8,15 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.remote.model.CartItemRequest
-import woowacourse.shopping.remote.model.CartItemResponse
+import woowacourse.shopping.remote.model.request.CartItemRequest
+import woowacourse.shopping.remote.model.response.CartItemListResponse
 
 interface CartItemApiService {
     @GET("/cart-items")
     fun requestCartItems(
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
-    ): Call<CartItemResponse>
+    ): Call<CartItemListResponse>
 
     @POST("/cart-items")
     fun addCartItem(

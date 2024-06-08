@@ -1,6 +1,6 @@
-package woowacourse.shopping.remote.model
+package woowacourse.shopping.remote.model.response
 
-data class ProductDto(
+data class ProductResponse(
     val id: Long,
     val name: String,
     val price: Int,
@@ -8,6 +8,6 @@ data class ProductDto(
     val category: String,
 ) {
     companion object {
-        val DEFAULT = ProductDto(0, "", 0, "", "")
+        val DEFAULT = ProductResponse(0, "", 0, "", "")
     }
 }

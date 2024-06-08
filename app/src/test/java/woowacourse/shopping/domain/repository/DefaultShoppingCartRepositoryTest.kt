@@ -4,8 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.remote.model.CartItemDto
-import woowacourse.shopping.remote.model.ProductDto
+import woowacourse.shopping.remote.model.response.CartItemResponse
+import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.source.FakeShoppingCartDataSource
 
 class DefaultShoppingCartRepositoryTest {
@@ -74,15 +74,15 @@ class DefaultShoppingCartRepositoryTest {
 fun cartItemDtoTestFixture(
     id: Int,
     quantity: Int = 1,
-    product: ProductDto = ProductDto.DEFAULT,
-): CartItemDto =
-    CartItemDto(
+    product: ProductResponse = ProductResponse.DEFAULT,
+): CartItemResponse =
+    CartItemResponse(
         id = id.toLong(),
         quantity = quantity,
         product = product,
     )
 
-fun cartItemDtosTestFixture(dataCount: Int): List<CartItemDto> =
+fun cartItemDtosTestFixture(dataCount: Int): List<CartItemResponse> =
     List(dataCount) {
         cartItemDtoTestFixture(
             id = it + 1,

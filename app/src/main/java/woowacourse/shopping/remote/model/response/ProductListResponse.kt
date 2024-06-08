@@ -1,15 +1,15 @@
-package woowacourse.shopping.remote.model
+package woowacourse.shopping.remote.model.response
 
-data class CartItemResponse(
+data class ProductListResponse(
+    val content: List<ProductResponse>,
+    val pageable: Pageable,
+    val last: Boolean,
     val totalPages: Int,
     val totalElements: Long,
     val sort: Sort,
     val first: Boolean,
-    val last: Boolean,
-    val pageable: Pageable,
     val number: Int,
     val numberOfElements: Int,
     val size: Int,
-    val content: List<CartItemDto>,
     val empty: Boolean,
 )

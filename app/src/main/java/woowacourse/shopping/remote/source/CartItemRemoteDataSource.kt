@@ -3,8 +3,8 @@ package woowacourse.shopping.remote.source
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.remote.model.CartItemDto
-import woowacourse.shopping.remote.model.CartItemRequest
+import woowacourse.shopping.remote.model.request.CartItemRequest
+import woowacourse.shopping.remote.model.response.CartItemResponse
 import woowacourse.shopping.remote.service.CartItemApiService
 
 class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
@@ -18,13 +18,13 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         return ProductIdsCountData(find.product.id, find.quantity)
     }
 
-    override fun loadAllCartItems(): List<CartItemDto> {
+    override fun loadAllCartItems(): List<CartItemResponse> {
         val response =
             cartItemApiService.requestCartItems().execute().body()?.content
                 ?: throw NoSuchElementException("there is no product")
 
         return response.map {
-            CartItemDto(
+            CartItemResponse(
                 id = it.id,
                 quantity = it.quantity,
                 product = it.product,
