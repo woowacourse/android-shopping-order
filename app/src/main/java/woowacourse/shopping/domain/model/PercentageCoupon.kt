@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.model
 import woowacourse.shopping.domain.model.Coupon.Companion.INVALID_DISCOUNT_MESSAGE
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 class PercentageCoupon(
     override val id: Int,
@@ -13,9 +13,12 @@ class PercentageCoupon(
     private val discount: Int,
     private val availableTime: AvailableTime,
 ) : Coupon {
-    override fun available(cartItems: List<CartItem>): Boolean {
-        if (isExpired()) return false
-        return availableTime.available(LocalTime.now())
+    override fun available(
+        cartItems: List<CartItem>,
+        currentDateTime: LocalDateTime,
+    ): Boolean {
+        if (isExpired(currentDateTime.toLocalDate())) return false
+        return availableTime.available(currentDateTime.toLocalTime())
     }
 
     override fun discountPrice(cartItems: List<CartItem>): Int {

@@ -3,6 +3,7 @@ package woowacourse.shopping.domain.model
 import woowacourse.shopping.domain.model.Coupon.Companion.INVALID_DISCOUNT_MESSAGE
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class FreeShippingCoupon(
     override val id: Int,
@@ -11,8 +12,11 @@ class FreeShippingCoupon(
     override val expirationDate: LocalDate,
     val minimumPrice: Int,
 ) : Coupon {
-    override fun available(cartItems: List<CartItem>): Boolean {
-        if (isExpired()) return false
+    override fun available(
+        cartItems: List<CartItem>,
+        currentDateTime: LocalDateTime,
+    ): Boolean {
+        if (isExpired(currentDateTime.toLocalDate())) return false
         return totalOrderPrice(cartItems) >= minimumPrice
     }
 

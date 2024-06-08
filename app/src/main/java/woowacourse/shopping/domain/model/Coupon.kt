@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.model
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 sealed interface Coupon {
     val id: Int
@@ -8,8 +9,8 @@ sealed interface Coupon {
     val description: String
     val expirationDate: LocalDate
 
-    fun isExpired(currentDate: LocalDate = LocalDate.now()): Boolean {
-        if (currentDate.isEqual(expirationDate)) return true
+    fun isExpired(currentDate: LocalDate): Boolean {
+        if (currentDate.isEqual(expirationDate)) return false
         return currentDate.isAfter(expirationDate)
     }
 
@@ -17,7 +18,10 @@ sealed interface Coupon {
         return cartItems.sumOf { it.totalPrice() }
     }
 
-    fun available(cartItems: List<CartItem>): Boolean
+    fun available(
+        cartItems: List<CartItem>,
+        currentDateTime: LocalDateTime = LocalDateTime.now(),
+    ): Boolean
 
     fun discountPrice(cartItems: List<CartItem>): Int
 
