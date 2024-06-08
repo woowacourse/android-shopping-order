@@ -1,10 +1,11 @@
 package com.example.domain.repository
 
+import com.example.domain.datasource.DataResponse
 import com.example.domain.model.CartItem
 import com.example.domain.model.Quantity
 
 interface CartRepository {
-    fun findAll(): List<CartItem>
+    fun findAll(): DataResponse<List<CartItem>>
 
     fun increaseQuantity(productId: Int)
 
@@ -17,12 +18,12 @@ interface CartRepository {
 
     fun deleteCartItem(productId: Int)
 
-    fun find(productId: Int): CartItem
+    fun find(productId: Int): DataResponse<CartItem>
 
     fun findRange(
         page: Int,
         pageSize: Int,
-    ): List<CartItem>
+    ): DataResponse<List<CartItem>>
 
-    fun totalCartItemCount(): Int
+    fun totalCartItemCount(): DataResponse<Int>
 }
