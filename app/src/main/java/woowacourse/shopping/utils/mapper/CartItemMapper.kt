@@ -1,4 +1,4 @@
-package woowacourse.shopping.utils.Mapper
+package woowacourse.shopping.utils.mapper
 
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.remote.dto.cart.CartItemDto
@@ -6,7 +6,7 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItemCounter
-import woowacourse.shopping.utils.Mapper.ProductMapper.toProduct
+import woowacourse.shopping.utils.mapper.ProductMapper.toProduct
 
 object CartItemMapper {
     fun CartItemResponse.toCartItems(): List<CartItem> {
@@ -28,14 +28,14 @@ object CartItemMapper {
         return CartItem(
             id = id,
             product =
-            product.copy(
-                id = product.id,
-                cartItemCounter = CartItemCounter(count),
-                imageUrl = product.imageUrl,
-                name = product.name,
-                price = product.price,
-                category = product.category,
-            ),
+                product.copy(
+                    id = product.id,
+                    cartItemCounter = CartItemCounter(count),
+                    imageUrl = product.imageUrl,
+                    name = product.name,
+                    price = product.price,
+                    category = product.category,
+                ),
         )
     }
 

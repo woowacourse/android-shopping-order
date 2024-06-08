@@ -3,7 +3,6 @@ package woowacourse.shopping.data.source
 import woowacourse.shopping.domain.model.cart.CartItem
 
 interface CartItemDataSource {
-
     suspend fun loadCartItems(
         page: Int,
         size: Int,

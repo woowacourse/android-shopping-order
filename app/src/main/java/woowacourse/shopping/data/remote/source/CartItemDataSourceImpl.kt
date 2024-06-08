@@ -6,14 +6,13 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
-import woowacourse.shopping.utils.Mapper.CartItemMapper.toCartItems
-import woowacourse.shopping.utils.Mapper.CartItemMapper.toQuantity
 import woowacourse.shopping.utils.exception.ErrorEvent
+import woowacourse.shopping.utils.mapper.CartItemMapper.toCartItems
+import woowacourse.shopping.utils.mapper.CartItemMapper.toQuantity
 
 class CartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),
 ) : CartItemDataSource {
-
     override suspend fun loadCartItems(
         page: Int,
         size: Int,
@@ -42,10 +41,10 @@ class CartItemDataSourceImpl(
         return runCatching {
             cartApiService.insertCartItem(
                 cartItemRequest =
-                CartItemRequest(
-                    productId = productId,
-                    quantity = quantity,
-                ),
+                    CartItemRequest(
+                        productId = productId,
+                        quantity = quantity,
+                    ),
             )
         }
     }

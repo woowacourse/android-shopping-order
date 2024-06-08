@@ -4,8 +4,8 @@ import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.api.ProductApiService
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.product.Product
-import woowacourse.shopping.utils.Mapper.ProductMapper.toProduct
-import woowacourse.shopping.utils.Mapper.ProductMapper.toProducts
+import woowacourse.shopping.utils.mapper.ProductMapper.toProduct
+import woowacourse.shopping.utils.mapper.ProductMapper.toProducts
 
 class ProductDataSourceImpl(
     private val productApiService: ProductApiService = NetworkManager.productService(),

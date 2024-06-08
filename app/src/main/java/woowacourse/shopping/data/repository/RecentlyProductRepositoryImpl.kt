@@ -4,9 +4,9 @@ import android.content.Context
 import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
-import woowacourse.shopping.utils.Mapper.ProductMapper.toRecentlyProduct
-import woowacourse.shopping.utils.Mapper.ProductMapper.toRecentlyProductEntity
 import woowacourse.shopping.utils.exception.ErrorEvent
+import woowacourse.shopping.utils.mapper.ProductMapper.toRecentlyProduct
+import woowacourse.shopping.utils.mapper.ProductMapper.toRecentlyProductEntity
 
 class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepository {
     private val recentlyProductDao =
