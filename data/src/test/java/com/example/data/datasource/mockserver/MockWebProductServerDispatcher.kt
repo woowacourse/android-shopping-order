@@ -18,11 +18,17 @@ import woowacourse.shopping.data.dummy.dummyProductList
 class MockWebProductServerDispatcher() : Dispatcher() {
     override fun dispatch(request: RecordedRequest): MockResponse {
         val url = request.requestUrl ?: return makeErrorResponse()
-        when (url.encodedPath) {
+        val segments = url.pathSegments
+        when (segments[0]) {
             PRODUCTS -> {
-                val page = url.queryParameter("page")?.toInt() ?: 0
-                val size = url.queryParameter("size")?.toInt() ?: 0
-                return getProductsResponse(page, size)
+                if (segments.size == 1)
+                    {
+                        val page = url.queryParameter("page")?.toInt() ?: 0
+                        val size = url.queryParameter("size")?.toInt() ?: 0
+                        return getProductsResponse(page, size)
+                    }
+                println(segments[1])
+                return getProductResponse(segments[1].toInt())
             }
         }
         return makeErrorResponse()

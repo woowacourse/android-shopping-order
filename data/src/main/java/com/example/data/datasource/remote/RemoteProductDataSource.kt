@@ -11,7 +11,8 @@ import com.example.domain.model.Product
 class RemoteProductDataSource(
     private val productService: ProductService,
 ) : ProductDataSource {
-    override fun find(id: Int): DataResponse<Product> = productService.requestProduct().executeForDataResponse().map { it.toProduct() }
+    override fun find(id: Int): DataResponse<Product> =
+        productService.requestProduct(id = id).executeForDataResponse().map { it.toProduct() }
 
     override fun findRange(
         page: Int,

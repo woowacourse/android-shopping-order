@@ -42,4 +42,13 @@ class RemoteProductDataSourceTest {
         val actual = dataSource.findRange(0, 20)
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `product id가 1인 물품을 가져온다`() {
+        val productId = 1
+        val product = dummyProductList.find { it.id == productId }
+        val expected = DataResponse.Success(product)
+        val actual = dataSource.find(productId)
+        assertThat(actual).isEqualTo(expected)
+    }
 }

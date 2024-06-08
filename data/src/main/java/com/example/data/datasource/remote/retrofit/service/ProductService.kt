@@ -13,13 +13,13 @@ interface ProductService {
     @GET("/products")
     fun requestProducts(
         @Header("accept") accept: String = "*/*",
-        @Query("page") page: Int = 0,
+        @Query("page") page: Int,
         @Query("size") size: Int = 20,
     ): Call<DataResponse<ProductResponse>>
 
     @GET("/products/{id}")
     fun requestProduct(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int = 0,
+        @Path("id") id: Int,
     ): Call<DataResponse<ProductContent>>
 }
