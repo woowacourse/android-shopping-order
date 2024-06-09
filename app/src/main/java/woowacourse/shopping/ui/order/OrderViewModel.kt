@@ -1,8 +1,13 @@
 package woowacourse.shopping.ui.order
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CategoryBasedProductRecommendationRepository
@@ -18,11 +23,9 @@ import woowacourse.shopping.ui.order.listener.OrderListener
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
-import kotlin.concurrent.thread
 
 class OrderViewModel(
     private val orderRepository: OrderRepository,
-    private val historyRepository: ProductHistoryRepository,
     private val productsRecommendationRepository: ProductsRecommendationRepository,
     private val cartRepository: ShoppingCartRepository,
 ) : ViewModel(), OrderListener {
@@ -39,43 +42,91 @@ class OrderViewModel(
     val event: SingleLiveData<OrderEvent> get() = _event
 
     override fun order() {
-        thread {
-            val filter = orderRepository.orderItems().map { (id, _) -> id }
-
-            orderRepository.order(filter)
-            _event.postValue(OrderEvent.CompleteOrder)
+        viewModelScope.launch(Dispatchers.IO) {
+            orderRepository.orderItems2()
+                .onSuccess {
+                    orderRepository.order2(it.map { (cartItemId, _) -> cartItemId })
+                        .onSuccess {
+                            _event.postValue(OrderEvent.CompleteOrder)
+                        }
+                        .onFailure {
+                            // TODO : handle error
+                            Log.e(TAG, "order: order2 $it")
+                            throw it
+                        }
+                }
+                .onFailure {
+                    // TODO: handle error
+                    Log.e(TAG, "order: orderItems2 $it")
+                    throw it
+                }
         }
     }
 
     fun loadAll() {
-        thread {
-            _recommendedProducts.postValue(
-                productsRecommendationRepository.recommendedProducts(
-                    productId = historyRepository.loadLatestProduct().id,
-                ),
-            )
-            _addedProductQuantity.postValue(orderRepository.allOrderItemsQuantity())
+        viewModelScope.launch(Dispatchers.IO) {
+            productsRecommendationRepository.recommendedProducts2()
+                .also { Log.d(TAG, "loadAll: recommendedProducts2: $it") }
+                .onSuccess { recommendedProducts ->
+                    orderRepository.allOrderItemsQuantity2()
+                        .onSuccess { totalQuantity ->
+                            orderRepository.orderItemsTotalPrice2()
+                                .onSuccess { totalPrice ->
+                                    withContext(Dispatchers.Main) {
+                                        _recommendedProducts.postValue(recommendedProducts)
+                                        _addedProductQuantity.postValue(totalQuantity)
+                                        _totalPrice.postValue(totalPrice)
+                                    }
+                                }
+                                .onFailure {
+                                    // TODO : handle error
+                                    Log.e(TAG, "loadAll: orderItemsTotalPrice2 $it")
+                                    throw it
+                                }
+                        }
+                        .onFailure {
+                            // TODO : handle error
+                            Log.e(TAG, "loadAll: allOrderItemsQuantity2 $it")
+                            throw it
+                        }
 
-            _totalPrice.postValue(orderRepository.orderItemsTotalPrice())
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.e(TAG, "loadAll: recommendedProducts2 $it")
+                    throw it
+                }
         }
+
+
     }
 
     override fun onIncrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            try {
-                cartRepository.updateProductQuantity(productId, quantity)
-                orderRepository.saveOrderItem(productId, quantity)
-            } catch (e: NoSuchElementException) {
-                cartRepository.addShoppingCartProduct(productId, quantity)
-                orderRepository.saveOrderItem(productId, quantity)
-            } finally {
-                updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
-                updateTotalQuantity(productId, INCREASE_AMOUNT)
-            }
-            _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
+        viewModelScope.launch(Dispatchers.IO) {
+            cartRepository.addShoppingCartProduct2(productId, INCREASE_AMOUNT)
+                .onSuccess {
+                    orderRepository.saveOrderItem2(productId, quantity)
+                        .onSuccess {
+                            withContext(Dispatchers.Main) {
+                                updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
+                                updateTotalQuantity(productId, INCREASE_AMOUNT)
+                                _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
+                            }
+                        }
+                        .onFailure {
+                            // TODO: handle error
+                            Log.d(TAG, "onIncrease: saveOrderItem2: $it")
+                            throw it
+                        }
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.d(TAG, "onIncrease: addShoppingCartProduct2: $it")
+                    throw it
+                }
         }
     }
 
@@ -83,18 +134,37 @@ class OrderViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            val item =
-                _recommendedProducts.getValue()?.find {
-                    it.id == productId
-                } ?: throw NoSuchElementException("There is no product with id: $productId")
+        viewModelScope.launch(Dispatchers.IO) {
+            cartRepository.findCartItemByProductId(productId)
+                .onSuccess { cartItem ->
+                    cartRepository.updateProductQuantity2(cartItemId = cartItem.id, quantity)
+                        .onSuccess {
+                            orderRepository.saveOrderItem2(productId, quantity)
+                                .onSuccess {
+                                    withContext(Dispatchers.Main) {
+                                        updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
+                                        updateTotalQuantity(productId, DECREASE_AMOUNT)
+                                        _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
+                                    }
+                                }
+                                .onFailure {
+                                    // TODO: handle error
+                                    Log.e(TAG, "onDecrease: saveOrderItem2: $it")
+                                    throw it
+                                }
+                        }
+                        .onFailure {
+                            // TODO: handle error
+                            Log.e(TAG, "onDecrease: updateProductQuantity2: $it")
+                            throw it
+                        }
 
-            cartRepository.updateProductQuantity(productId, item.quantity - 1)
-
-            updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
-            updateTotalQuantity(productId, DECREASE_AMOUNT)
-
-            _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
+                }
+                .onFailure {
+                    // TODO: handle error
+                    Log.e(TAG, "onDecrease: findCartItemByProductId: $it")
+                    throw it
+                }
         }
     }
 
@@ -105,7 +175,8 @@ class OrderViewModel(
         _totalPrice.postValue(_totalPrice.value?.plus(productQuantity(productId) * changeAmount) ?: 0)
     }
 
-    private fun productQuantity(productId: Long) = _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+    private fun productQuantity(productId: Long) =
+        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
 
     private fun updateRecommendProductsQuantity(
         productId: Long,
@@ -133,6 +204,7 @@ class OrderViewModel(
                 DefaultOrderRepository(
                     ShoppingApp.orderSource,
                     ShoppingApp.productSource,
+                    ShoppingApp.cartSource,
                 ),
             historyRepository: ProductHistoryRepository =
                 DefaultProductHistoryRepository(
@@ -143,6 +215,7 @@ class OrderViewModel(
                 CategoryBasedProductRecommendationRepository(
                     ShoppingApp.productSource,
                     ShoppingApp.cartSource,
+                    ShoppingApp.historySource
                 ),
             cartRepository: ShoppingCartRepository =
                 DefaultShoppingCartRepository(
@@ -152,7 +225,6 @@ class OrderViewModel(
             return UniversalViewModelFactory {
                 OrderViewModel(
                     orderRepository,
-                    historyRepository,
                     productRecommendationRepository,
                     cartRepository,
                 )
