@@ -1,13 +1,17 @@
 package woowacourse.shopping.view.order
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.RemoteOrderRepositoryImpl
 import woowacourse.shopping.databinding.FragmentOrderBinding
+import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.model.ShoppingCart
@@ -55,19 +59,54 @@ class OrderFragment : Fragment(), OnClickOrder {
     private fun initView() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = orderViewModel
+        binding.onClickOrder = this
         adapter = CouponAdapter(orderViewModel)
         binding.rvCoupon.adapter = adapter
         observeData()
+        loadCheckedShoppingCart()
     }
 
     private fun observeData() {
         orderViewModel.coupons.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
+        orderViewModel.couponUiState.observe(viewLifecycleOwner) {
+            if (it.isCouponApplied) {
+                requireContext().makeToast(
+                    getString(R.string.success_coupon_apply),
+                )
+            } else {
+                it.errorMessage?.let { errorMessage ->
+                    requireContext().makeToast(errorMessage)
+                }
+            }
+        }
+    }
+
+    private fun receiveCheckedShoppingCart(): ShoppingCart {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(CHECKED_SHOPPING_CART, ShoppingCart::class.java)
+                ?: throw NoSuchDataException()
+        } else {
+            arguments?.getSerializable(CHECKED_SHOPPING_CART) as? ShoppingCart
+                ?: throw NoSuchDataException()
+        }
+    }
+
+    private fun loadCheckedShoppingCart() {
+        try {
+            val shoppingCart = receiveCheckedShoppingCart()
+            orderViewModel.saveCheckedShoppingCarts(shoppingCart)
+        } catch (e: Exception) {
+            requireContext().makeToast(
+                getString(R.string.error_data_load),
+            )
+            clickBack()
+        }
     }
 
     override fun clickOrder() {
-        TODO("Not yet implemented")
+        orderViewModel.orderItems()
     }
 
     override fun clickBack() {

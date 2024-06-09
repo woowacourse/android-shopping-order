@@ -15,9 +15,9 @@
     </data>
 
     <ScrollView
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -84,8 +84,8 @@
                 android:id="@+id/rv_coupon"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="18dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="18dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -121,6 +121,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
+                android:text="@{@string/formatted_price(vm.totalPrice)}"
+                android:textColor="@color/black"
                 android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_total_price"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -145,6 +147,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
+                android:text="@{@string/formatted_price(vm.couponDiscount)}"
+                android:textColor="@color/black"
                 android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_coupon_discount"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -169,11 +173,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
+                android:text="@{@string/formatted_price(vm.deliveryFee)}"
+                android:textColor="@color/black"
                 android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_delivery_fee"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tv_delivery_fee"
-                tools:text="14,000원" />
+                tools:text="3,000원" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider1"
@@ -205,6 +211,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
+                android:text="@{@string/formatted_price(vm.totalPayment)}"
+                android:textColor="@color/black"
                 android:textSize="18dp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_total_payment"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -23,5 +23,6 @@
     <string name="delivery_fee">배송비</string>\
     <string name="total_payment">총 결제 금액</string>
     <string name="expiration_date">만료일: %1$s</string>
-    <string name="minimum_order_amount">최소 주문 금액: %1$,d원</string>
+    <string name="minimum_order_amount">최소 주문 금액: %1$,d원</string>=
+    <string name="success_coupon_apply">쿠폰이 적용되었습니다!</string>
 </resources>

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="onClickCoupon"
             type="woowacourse.shopping.view.order.adapter.OnClickCoupon" />
@@ -17,8 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="140dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/shape_border"
-        android:onClick="@{()->onClickCoupon}">
+        android:background="@drawable/shape_border">
 
 
         <CheckBox
@@ -26,6 +26,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
+            android:onClick="@{()->onClickCoupon.applyCoupon(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,11 +51,11 @@
             android:id="@+id/tv_expiration_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
-            android:textSize="15dp"
+            android:layout_marginEnd="12dp"
             android:text="@{@string/expiration_date(coupon.expirationDate)}"
             android:textColor="@color/gray_5"
+            android:textSize="15dp"
             app:layout_constraintStart_toStartOf="@+id/checkBox"
             app:layout_constraintTop_toBottomOf="@+id/checkBox"
             tools:text="10,000원" />
@@ -64,9 +65,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:textSize="15dp"
             android:text="@{@string/minimum_order_amount(1000)}"
             android:textColor="@color/gray_5"
+            android:textSize="15dp"
             app:layout_constraintStart_toStartOf="@+id/tv_expiration_date"
             app:layout_constraintTop_toBottomOf="@+id/tv_expiration_date"
             tools:text="10,000원" />

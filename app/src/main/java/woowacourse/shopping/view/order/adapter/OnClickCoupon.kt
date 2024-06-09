@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.order.adapter
 
+import woowacourse.shopping.domain.model.Coupon
+
 interface OnClickCoupon {
-    fun clickCoupon()
+    fun applyCoupon(coupon: Coupon)
 }
