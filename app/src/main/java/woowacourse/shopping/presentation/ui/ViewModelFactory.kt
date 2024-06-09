@@ -55,12 +55,14 @@ class ViewModelFactory() : ViewModelProvider.Factory {
             }
 
             modelClass.isAssignableFrom(PaymentViewModel::class.java) -> {
+                val cartRepositoryImpl =
+                    CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSource())
                 PaymentViewModel(
-                    cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSource()),
+                    cartRepository = cartRepositoryImpl,
                     orderRepository =
                         OrderRepositoryImpl(
                             RemoteOrderDataSource(),
-                            RemoteCartDataSource(),
+                            cartRepositoryImpl,
                         ),
                     couponRepository = CouponRepositoryImpl(remoteCouponDataSource = RemoteCouponDataSource()),
                 ) as T
