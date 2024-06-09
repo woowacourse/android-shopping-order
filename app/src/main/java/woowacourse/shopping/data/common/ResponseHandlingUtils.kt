@@ -20,11 +20,23 @@ object ResponseHandlingUtils {
         }
     }
 
-   fun <T : Any> handleResponse(response: ResponseResult<T>): T {
+    fun <T : Any> handleResponse(response: ResponseResult<T>): T {
         return when (response) {
             is ResponseResult.Success -> response.data
             is ResponseResult.ServerError -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
+        }
+    }
+
+    // TODO: 네이밍 변경
+    fun <T: Any, R: Any> handle(
+        responseResult: ResponseResult<T>,
+        onSuccess: (T) -> ResponseResult<R>
+    ): ResponseResult<R> {
+        return when(responseResult) {
+            is ResponseResult.Exception -> ResponseResult.Exception(responseResult.e, "예기치 않은 오류가 발생했습니다")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(responseResult.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.Success -> onSuccess(responseResult.data)
         }
     }
 

@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.cart
 
+import woowacourse.shopping.data.common.ResponseHandlingUtils.handle
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.domain.model.ProductIdsCount
@@ -11,13 +12,9 @@ class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartItemRepository {
     override suspend fun loadCartItems(): ResponseResult<List<CartItem>> =
-        when(val response = cartItemDataSource.fetchCartItems()) {
-            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e, "예기치 않은 오류가 발생했습니다")
-            is ResponseResult.Success -> {
-                val cartItems: List<CartItem> = response.data.content.map { cartItemDto -> cartItemDto.toDomain() }
-                ResponseResult.Success(cartItems)
-            }
+        handle(cartItemDataSource.fetchCartItems()) { response ->
+            val cartItems: List<CartItem> = response.content.map { cartItemDto -> cartItemDto.toDomain() }
+            ResponseResult.Success(cartItems)
         }
 
     override suspend fun updateProductQuantity(
@@ -32,29 +29,17 @@ class DefaultCartItemRepository(
     }
 
     override suspend fun delete(cartItemId: Long): ResponseResult<Unit> =
-        when(val response = cartItemDataSource.deleteCartItem(cartItemId)) {
-            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e, "예기치 않은 오류가 발생했습니다")
-            is ResponseResult.Success -> ResponseResult.Success(response.data)
-        }
+        handle(cartItemDataSource.deleteCartItem(cartItemId)) { ResponseResult.Success(Unit) }
 
     override suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
     ): ResponseResult<Unit> =
-        when(val response = cartItemDataSource.updateCartItemQuantity(cartItemId, quantity)) {
-            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e, "예기치 않은 오류가 발생했습니다")
-            is ResponseResult.Success -> ResponseResult.Success(response.data)
-        }
+        handle(cartItemDataSource.updateCartItemQuantity(cartItemId, quantity)) { ResponseResult.Success(Unit) }
 
     override suspend fun calculateCartItemsCount(): ResponseResult<Int> =
-        when(val response = cartItemDataSource.fetchCartItems()) {
-            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e, "예기치 않은 오류가 발생했습니다")
-            is ResponseResult.Success -> {
-                val cartItemsCount: Int = response.data.content.sumOf { it.quantity }
-                ResponseResult.Success(cartItemsCount)
-            }
+        handle(cartItemDataSource.fetchCartItems()) { response ->
+            val cartItemsCount: Int = response.content.sumOf { it.quantity }
+            ResponseResult.Success(cartItemsCount)
         }
 }
