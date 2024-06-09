@@ -18,9 +18,7 @@ import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.OnProductItemClickListener
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
+import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 
 class ProductDetailViewModel(
     private val productId: Long,
@@ -43,35 +41,8 @@ class ProductDetailViewModel(
     private var _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    fun loadAll() {
-        viewModelScope.launch {
-            shoppingProductsRepository.loadProduct(id = productId).onSuccess { product ->
-                _currentProduct.value = product
-                _productCount.value = product.quantity
-                _isLoading.value = false
-            }.onServerError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-
-            val latestProduct =
-                try {
-                    productHistoryRepository.loadLatestProduct()
-                } catch (e: NoSuchElementException) {
-                    Product.NULL
-                }
-            _latestProduct.value = latestProduct
-            productHistoryRepository.saveProductHistory(productId)
-        }
-    }
-
-    fun addProductToCart() {
-        val productCount = productCount.value ?: return
-        viewModelScope.launch {
-            cartItemRepository.updateProductQuantity(productId, productCount)
-        }
-    }
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> get() = _errorMessage
 
     override fun onIncrease(
         productId: Long,
@@ -90,6 +61,43 @@ class ProductDetailViewModel(
 
     override fun onClick(productId: Long) {
         _detailProductDestinationId.setValue(productId)
+    }
+
+    fun loadDetailPage() {
+        viewModelScope.launch {
+            loadProduct()
+            loadLatestProduct()
+            saveProductHistory()
+        }
+    }
+
+    fun addProductToCart() {
+        val productCount = productCount.value ?: return
+        viewModelScope.launch {
+            cartItemRepository.updateProductQuantity(productId, productCount)
+        }
+    }
+
+    private suspend fun loadProduct() {
+        handleResponseResult(shoppingProductsRepository.loadProduct(id = productId), _errorMessage) { product ->
+            _currentProduct.value = product
+            _productCount.value = product.quantity
+            _isLoading.value = false
+        }
+    }
+
+    private suspend fun loadLatestProduct() {
+        val latestProduct =
+            try {
+                productHistoryRepository.loadLatestProduct()
+            } catch (e: NoSuchElementException) {
+                Product.NULL
+            }
+        _latestProduct.value = latestProduct
+    }
+
+    private suspend fun saveProductHistory() {
+        productHistoryRepository.saveProductHistory(productId)
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,10 +11,8 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
+import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
@@ -52,35 +49,23 @@ class ShoppingCartViewModel(
     private var _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> get() = _errorMessage
+
     fun loadAll() {
         viewModelScope.launch {
-            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
                 _cartItems.value = cartItems
                 _isLoading.value = false
-            }.onServerError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
             }
         }
     }
 
     fun deleteItem(cartItemId: Long) {
         viewModelScope.launch  {
-            cartItemRepository.delete(cartItemId).onSuccess {
-                Log.d("hye", "Success: 장바구니 아이템 삭제 성공")
-            }.onServerError { code, message ->
-                Log.e("hye", "ServerError: $code - $message")
-            }.onException {
-                Log.e("hye", "Exception: ${it.message}")
-            }
-
-            cartItemRepository.loadCartItems().onSuccess { cartItems ->
+            handleResponseResult(cartItemRepository.delete(cartItemId), _errorMessage) { }
+            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
                 _cartItems.value = cartItems
-            }.onServerError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
             }
         }
         updateSelectedCartItemsCount()
@@ -115,13 +100,7 @@ class ShoppingCartViewModel(
     ) {
         viewModelScope.launch  {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
-            cartItemRepository.loadCartItems().onSuccess { cartItems ->
-                updateCartItems(cartItems)
-            }.onServerError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
+            updateCartItems()
             updateTotalPrice()
         }
     }
@@ -132,24 +111,20 @@ class ShoppingCartViewModel(
     ) {
         viewModelScope.launch  {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
-            cartItemRepository.loadCartItems().onSuccess { cartItems ->
-                updateCartItems(cartItems)
-            }.onServerError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
+            updateCartItems()
             updateTotalPrice()
             updateSelectedCartItemsCount()
         }
     }
 
-    private fun updateCartItems(currentItems: List<CartItem>) {
+    private suspend fun updateCartItems() {
         val cartItems = cartItems.value ?: return
-        _cartItems.value =
-            currentItems.map { cartItem ->
-                cartItem.copy(checked = cartItems.first { it.id == cartItem.id }.checked)
-            }
+        handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { currentItems ->
+            _cartItems.value =
+                currentItems.map { cartItem ->
+                    cartItem.copy(checked = cartItems.first { it.id == cartItem.id }.checked)
+                }
+        }
     }
 
     override fun selected(cartItemId: Long) {

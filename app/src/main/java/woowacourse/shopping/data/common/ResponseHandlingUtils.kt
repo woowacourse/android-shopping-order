@@ -16,7 +16,7 @@ object ResponseHandlingUtils {
         } catch (e: HttpException) {
             ResponseResult.ServerError(code = e.code(), message = e.message())
         } catch (e: Throwable) {
-            ResponseResult.Exception(e)
+            ResponseResult.Exception(e, message = e.message.toString())
         }
     }
 
@@ -37,7 +37,7 @@ object ResponseHandlingUtils {
     }
 
     suspend fun <T : Any> ResponseResult<T>.onServerError(
-        executable: suspend (code: Int, message: String?) -> Unit
+        executable: suspend (code: Int, message: String) -> Unit
     ): ResponseResult<T> = apply {
         if (this is ResponseResult.ServerError<T>) {
             executable(code, message)
@@ -45,10 +45,10 @@ object ResponseHandlingUtils {
     }
 
     suspend fun <T : Any> ResponseResult<T>.onException(
-        executable: suspend (e: Throwable) -> Unit
+        executable: suspend (e: Throwable, message: String) -> Unit
     ): ResponseResult<T> = apply {
         if (this is ResponseResult.Exception<T>) {
-            executable(e)
+            executable(e, message)
         }
     }
 }

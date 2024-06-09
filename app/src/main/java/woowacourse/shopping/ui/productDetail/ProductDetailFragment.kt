@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
@@ -80,7 +81,7 @@ class ProductDetailFragment : Fragment() {
     private fun loadProductDetail() {
         lifecycleScope.launch {
             delay(1000)
-            viewModel.loadAll()
+            viewModel.loadDetailPage()
         }
     }
 
@@ -92,6 +93,12 @@ class ProductDetailFragment : Fragment() {
 
     private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
 
+    private fun observeErrorMessage() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -100,12 +107,5 @@ class ProductDetailFragment : Fragment() {
     companion object {
         const val PRODUCT_ID = "productId"
         const val TAG = "ProductDetailFragment"
-
-        fun newInstance(productId: Long): ProductDetailFragment {
-            val fragment = ProductDetailFragment()
-            val bundle = Bundle().apply { putLong(PRODUCT_ID, productId) }
-            fragment.arguments = bundle
-            return fragment
-        }
     }
 }

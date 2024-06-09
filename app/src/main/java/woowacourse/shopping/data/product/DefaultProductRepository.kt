@@ -22,7 +22,7 @@ class DefaultProductRepository(
                 ResponseResult.Success(ProductsPage(products, isFinalPage))
             }
             is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e)
+            is ResponseResult.Exception -> ResponseResult.Exception(response.e, "예기치 않은 오류가 발생했습니다")
         }
     }
 
@@ -33,7 +33,7 @@ class DefaultProductRepository(
                 ResponseResult.Success(data)
             }
             is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e)
+            is ResponseResult.Exception -> ResponseResult.Exception(response.e, "예기치 않은 오류가 발생했습니다")
         }
     }
 

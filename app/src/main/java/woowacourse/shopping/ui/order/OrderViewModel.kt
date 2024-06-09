@@ -44,18 +44,22 @@ class OrderViewModel(
     private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
     val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
 
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> get() = _errorMessage
+
     override fun createOrder() {
         viewModelScope.launch {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
-            cartItemRepository.loadCartItems().onSuccess { cartItems ->
-                val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
-                orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
-            }.onServerError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
+            cartItemRepository.loadCartItems()
+                .onSuccess { cartItems ->
+                    val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
+                    orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
+                }.onServerError { code, message ->
+                    _errorMessage.value = "$code: $message"
+                }.onException { _, message ->
+                    _errorMessage.value = message
+                }
             _isOrderSuccess.setValue(true)
         }
     }
@@ -105,14 +109,15 @@ class OrderViewModel(
     }
 
     private suspend fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
-        productRepository.loadProduct(productId).onSuccess { product ->
-            val currentOrderAmount = orderAmount.value ?: 0
-            _orderAmount.value = currentOrderAmount + priceConvert(product.price)
-        }.onServerError { code, message ->
-            // TODO: Error Handling
-        }.onException {
-            // TODO: Exception Handling
-        }
+        productRepository.loadProduct(productId)
+            .onSuccess { product ->
+                val currentOrderAmount = orderAmount.value ?: 0
+                _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+            }.onServerError { code, message ->
+                _errorMessage.value = "$code: $message"
+            }.onException { _, message ->
+                _errorMessage.value = message
+            }
     }
 
     private fun updateOrdersCount(countVariation: Int) {

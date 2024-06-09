@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
@@ -49,6 +50,7 @@ class OrderFragment : Fragment() {
         initToolbar()
         initRecommendProductsAdapter()
         observeIsOrderSuccess()
+        observeErrorMessage()
     }
 
     override fun onResume() {
@@ -99,6 +101,12 @@ class OrderFragment : Fragment() {
 
     private fun makeToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun observeErrorMessage() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     private fun <T : Serializable> Bundle.bundleSerializable(

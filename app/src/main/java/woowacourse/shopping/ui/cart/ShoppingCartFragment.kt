@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.common.UniversalViewModelFactory
@@ -54,6 +55,7 @@ class ShoppingCartFragment : Fragment() {
         observeDeletedItem()
         observeItemsInCurrentPage()
         observeOrderNavigation()
+        observeErrorMessage()
     }
 
     override fun onResume() {
@@ -90,9 +92,13 @@ class ShoppingCartFragment : Fragment() {
 
     private fun observeOrderNavigation() {
         viewModel.navigationOrderEvent.observe(viewLifecycleOwner) { orderInformation ->
-            if (orderInformation != null) {
-                (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderInformation)
-            }
+            (requireActivity() as? FragmentNavigator)?.navigateToOrder(orderInformation)
+        }
+    }
+
+    private fun observeErrorMessage() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
         }
     }
 

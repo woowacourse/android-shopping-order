@@ -87,7 +87,7 @@ class ProductDetailViewModelTest {
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
 
         // when
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // then
         val actualProduct = viewModel.currentProduct.getOrAwaitValue()
@@ -101,7 +101,7 @@ class ProductDetailViewModelTest {
         cartSource = FakeShoppingCartProductIdDataSource(data = mutableListOf())
         shoppingProductRepository = DefaultProductRepository(productsSource, cartSource)
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // when
         viewModel.onIncrease(productId)
@@ -116,7 +116,7 @@ class ProductDetailViewModelTest {
     fun `현재 상품의 개수를 1 에서 더 줄여도 줄어들지 않는다 `() {
         // given
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // when
         viewModel.onDecrease(productId, 1)
@@ -136,7 +136,7 @@ class ProductDetailViewModelTest {
             )
         shoppingProductRepository = DefaultProductRepository(productsSource, cartSource)
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // when
         viewModel.onDecrease(productId, quantity = 1)
@@ -153,7 +153,7 @@ class ProductDetailViewModelTest {
         // given
         productId = 1
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // when
         viewModel.addProductToCart()
@@ -197,7 +197,7 @@ class ProductDetailViewModelTest {
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
 
         // when
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // then
         val actualLatestProduct = viewModel.latestProduct.getOrAwaitValue()
@@ -215,7 +215,7 @@ class ProductDetailViewModelTest {
         viewModel = ProductDetailViewModel(productId, shoppingProductRepository, historyRepository)
 
         // when
-        viewModel.loadAll()
+        viewModel.loadDetailPage()
 
         // then
         val actualLatestProduct = viewModel.latestProduct.getOrAwaitValue()
