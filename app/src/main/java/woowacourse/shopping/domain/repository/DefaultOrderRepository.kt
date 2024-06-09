@@ -2,10 +2,12 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.ProductDataSource
+import woowacourse.shopping.data.source.ShoppingCartDataSource
 
 class DefaultOrderRepository(
     private val orderSource: OrderDataSource,
     private val productSource: ProductDataSource,
+    private val cartSource: ShoppingCartDataSource,
 ) : OrderRepository {
     override fun order(cartItemIds: List<Long>) {
         orderSource.order(cartItemIds)
@@ -48,11 +50,11 @@ class DefaultOrderRepository(
     override suspend fun orderItemsTotalPrice2(): Result<Int> =
         runCatching {
             val orders = orderSource.load2().getOrThrow()
+            val allCartItems = cartSource.loadAllCartItems2().getOrThrow()
 
-            orders.map { (id, quantity) ->
-                productSource.findById2(id).map {
-                    it.price.times(quantity)
-                }.getOrThrow()
+            orders.map { (cartItemId, quantity) ->
+                val foundCartItem = allCartItems.find { it.id == cartItemId }?: throw NoSuchElementException("No such element found in cart items.")
+                foundCartItem.product.price.times(quantity)
             }.sum()
         }
 

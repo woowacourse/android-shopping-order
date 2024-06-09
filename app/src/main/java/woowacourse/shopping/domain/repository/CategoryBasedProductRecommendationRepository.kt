@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.repository
 
+import android.util.Log
+import woowacourse.shopping.data.model.HistoryProduct
 import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
@@ -34,7 +36,11 @@ class CategoryBasedProductRecommendationRepository(
     }
 
     override suspend fun recommendedProducts2(): Result<List<Product>> = runCatching {
-        val latestProductId = historySource.loadLatestProduct2().getOrThrow().id
+        val latestProductId = historySource.loadLatestProduct2()
+            .map { it.id }
+            .recover {
+                productsSource.findByPaged2(1).getOrThrow().random().id
+            }.getOrThrow()
 
         val latestProduct = productsSource.findById2(latestProductId).getOrThrow()
 

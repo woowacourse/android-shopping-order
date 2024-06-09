@@ -1,5 +1,6 @@
 package woowacourse.shopping.local.source
 
+import android.util.Log
 import woowacourse.shopping.data.model.HistoryProduct
 import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.local.history.HistoryProductDao
@@ -28,7 +29,10 @@ class LocalHistoryProductDataSource(private val dao: HistoryProductDao) : Produc
 
     override suspend fun loadLatestProduct2(): Result<HistoryProduct> =
         runCatching {
-            dao.findLatest2()
+            val result = dao.findLatest2() ?: return Result.failure(Exception("No latest product found"))
+            result
+        }.also {
+            Log.d(TAG, "loadLatestProduct2: $it")
         }
 
     override suspend fun loadRecentProducts(size: Int): Result<List<HistoryProduct>> =
@@ -37,6 +41,7 @@ class LocalHistoryProductDataSource(private val dao: HistoryProductDao) : Produc
         }
 
     companion object {
+        private const val TAG = "LocalHistoryProductDataSource"
         private const val EMPTY = -1L
     }
 }

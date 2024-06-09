@@ -34,5 +34,5 @@ interface HistoryProductDao {
     suspend fun findAll2(size: Int): List<HistoryProduct>
 
     @Query("SELECT * FROM history_products ORDER BY timestamp DESC LIMIT 1")
-    suspend fun findLatest2(): HistoryProduct
+    suspend fun findLatest2(): HistoryProduct?
 }
