@@ -37,6 +37,6 @@
     <string name="payment_total_amount">총 결제 금액</string>
 
     // item_coupon.xml
-    <string name="coupon_expiration_date">만료일:&#160;%s</string>
+    <string name="coupon_expiration_date">만료일:&#160;%s년 %s월 %s일</string>
     <string name="coupon_minimum_amount">최소 주문 금액:&#160;%,d원</string>
 </resources>

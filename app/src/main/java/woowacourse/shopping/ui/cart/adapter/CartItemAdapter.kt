@@ -8,13 +8,13 @@ import woowacourse.shopping.databinding.HolderCartBinding
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.model.CartItemUiModel
 
 class CartItemAdapter(
     private val onCartItemDeleteListener: OnCartItemDeleteListener,
     private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
     private val onCartItemSelectedListener: OnCartItemSelectedListener,
-) : ListAdapter<CartItem, CartItemViewHolder>(diffUtil) {
+) : ListAdapter<CartItemUiModel, CartItemViewHolder>(diffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -31,22 +31,22 @@ class CartItemAdapter(
         position: Int,
     ) = holder.bind(getItem(position))
 
-    fun updateCartItems(newData: List<CartItem>) {
+    fun updateCartItems(newData: List<CartItemUiModel>) {
         submitList(newData)
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<CartItem>() {
+        val diffUtil = object : DiffUtil.ItemCallback<CartItemUiModel>() {
             override fun areItemsTheSame(
-                oldItem: CartItem,
-                newItem: CartItem,
+                oldItem: CartItemUiModel,
+                newItem: CartItemUiModel,
             ): Boolean {
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
-                oldItem: CartItem,
-                newItem: CartItem,
+                oldItem: CartItemUiModel,
+                newItem: CartItemUiModel,
             ): Boolean {
                 return oldItem == newItem
             }

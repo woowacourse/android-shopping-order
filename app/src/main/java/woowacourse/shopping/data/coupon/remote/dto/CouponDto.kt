@@ -7,6 +7,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.model.coupon.PercentageDiscountCoupon
+import java.time.LocalDate
 
 data class CouponDto(
     val id: Long,
@@ -17,7 +18,7 @@ data class CouponDto(
     val minimumAmount: Int?,
     val buyQuantity: Int?,
     val getQuantity: Int?,
-    val availableTimeDto: AvailableTimeDto?,
+    val availableTime: AvailableTimeDto?,
     val discountType: String,
 ) {
     companion object {
@@ -28,7 +29,7 @@ data class CouponDto(
                 id = id,
                 code = code,
                 description = description,
-                expirationDate = expirationDate,
+                expirationDate = LocalDate.parse(expirationDate),
                 discountType = discountType,
                 buyQuantity = buyQuantity ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("buyQuantity")),
                 getQuantity = getQuantity ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("getQuantity")),
@@ -39,7 +40,7 @@ data class CouponDto(
                 id = id,
                 code = code,
                 description = description,
-                expirationDate = expirationDate,
+                expirationDate = LocalDate.parse(expirationDate),
                 discountType = discountType,
                 discount = discount ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("discount")),
                 minimumAmount = minimumAmount ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("minimumAmount")),
@@ -50,7 +51,7 @@ data class CouponDto(
                 id = id,
                 code = code,
                 description = description,
-                expirationDate = expirationDate,
+                expirationDate = LocalDate.parse(expirationDate),
                 discountType = discountType,
                 minimumAmount = minimumAmount ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("minimumAmount")),
             )
@@ -60,11 +61,10 @@ data class CouponDto(
                 id = id,
                 code = code,
                 description = description,
-                expirationDate = expirationDate,
+                expirationDate = LocalDate.parse(expirationDate),
                 discountType = discountType,
-                discount = discount ?: throw IllegalStateException(),
-                // TODO: availableTimeDto 가 null 인 버그 해결하기
-                availableTime = availableTimeDto?.toDomain() ?: AvailableTime("", ""),
+                discount = discount ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("discount")),
+                availableTime = availableTime?.toDomain() ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("availableTime")),
             )
     }
 }

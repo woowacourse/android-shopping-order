@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository.cart
 
 import woowacourse.shopping.data.common.ResponseResult
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.domain.model.CartItem
 
 interface CartItemRepository {
     suspend fun loadCartItems(): ResponseResult<List<CartItem>>

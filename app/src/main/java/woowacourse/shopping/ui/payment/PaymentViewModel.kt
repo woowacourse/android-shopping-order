@@ -9,9 +9,12 @@ import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
+import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.data.coupon.remote.CouponRemoteRepository
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
@@ -22,6 +25,7 @@ class PaymentViewModel(
     private val orderInformation: OrderInformation,
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
+    private val cartItemRepository: CartItemRepository,
 ): ViewModel() {
     private val _coupons = MutableLiveData<List<Coupon>>()
 
@@ -29,10 +33,9 @@ class PaymentViewModel(
     val couponsUiModel: LiveData<List<CouponUiModel>> get() = _couponsUiModel
 
     private val _isPaymentSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
-
     val isPaymentSuccess: SingleLiveData<Boolean> get() = _isPaymentSuccess
-    private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
 
+    private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
     val orderAmount: LiveData<Int> get() = _orderAmount
 
     private val _errorMessage = MutableLiveData<String>()
@@ -47,9 +50,13 @@ class PaymentViewModel(
 
     fun loadCoupons() {
         viewModelScope.launch {
+            var selectedCartItems = emptyList<CartItem>()
+            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
+                selectedCartItems = cartItems.filter { it.id in orderInformation.cartItemIds }
+            }
             handleResponseResult(couponRepository.loadCoupons(), _errorMessage) { coupons ->
-                _coupons.value = coupons
-                _couponsUiModel.value = coupons.map { CouponUiModel.toUiModel(it) }
+                val applicableCoupon = coupons.filter { it.isAvailability(selectedCartItems) }
+                _couponsUiModel.value = applicableCoupon.map { CouponUiModel.toUiModel(it) }
             }
         }
     }
@@ -69,7 +76,10 @@ class PaymentViewModel(
                    ),
                    couponRepository = CouponRemoteRepository(
                        ShoppingApp.couponSource,
-                   )
+                   ),
+                   cartItemRepository = DefaultCartItemRepository(
+                       ShoppingApp.cartSource
+                   ),
                )
            }
        }

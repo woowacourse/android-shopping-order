@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.coupon.remote
 
+import android.util.Log
 import woowacourse.shopping.data.common.ApiResponseHandler.handleResponseResult
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.coupon.remote.datasource.CouponDataSource

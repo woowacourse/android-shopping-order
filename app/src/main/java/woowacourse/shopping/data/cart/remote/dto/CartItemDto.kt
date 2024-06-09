@@ -1,7 +1,9 @@
 package woowacourse.shopping.data.cart.remote.dto
 
 import woowacourse.shopping.data.product.remote.dto.ProductDto
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.data.product.remote.dto.ProductDto.Companion.toDomain
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.ui.model.CartItemUiModel
 
 data class CartItemDto(
     val id: Long,
@@ -13,8 +15,7 @@ data class CartItemDto(
             CartItem(
                 id = id,
                 quantity = quantity,
-                product = product,
-                checked = false,
+                product = product.toDomain(),
             )
     }
 }

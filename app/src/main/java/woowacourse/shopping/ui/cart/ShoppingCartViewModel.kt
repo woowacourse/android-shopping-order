@@ -11,13 +11,14 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
+import woowacourse.shopping.domain.model.CartItem.Companion.toUiModel
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.OrderInformation
 
 class ShoppingCartViewModel(
@@ -28,8 +29,8 @@ class ShoppingCartViewModel(
     OnCartItemSelectedListener,
     OnAllCartItemSelectedListener,
     OnNavigationOrderListener {
-    private var _cartItems = MutableLiveData<List<CartItem>>()
-    val cartItems: LiveData<List<CartItem>> get() = _cartItems
+    private var _cartItems = MutableLiveData<List<CartItemUiModel>>()
+    val cartItems: LiveData<List<CartItemUiModel>> get() = _cartItems
 
     private var _deletedItemId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val deletedItemId: SingleLiveData<Long> get() = _deletedItemId
@@ -55,7 +56,7 @@ class ShoppingCartViewModel(
     fun loadAll() {
         viewModelScope.launch {
             handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
-                _cartItems.value = cartItems
+                _cartItems.value = cartItems.map { it.toUiModel() }
                 _isLoading.value = false
             }
         }
@@ -65,7 +66,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch  {
             handleResponseResult(cartItemRepository.delete(cartItemId), _errorMessage) { }
             handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
-                _cartItems.value = cartItems
+                _cartItems.value = cartItems.map { it.toUiModel() }
             }
         }
         updateSelectedCartItemsCount()
@@ -122,7 +123,7 @@ class ShoppingCartViewModel(
         handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { currentItems ->
             _cartItems.value =
                 currentItems.map { cartItem ->
-                    cartItem.copy(checked = cartItems.first { it.id == cartItem.id }.checked)
+                    cartItem.toUiModel().copy(checked = cartItems.first { it.id == cartItem.id }.checked)
                 }
         }
     }

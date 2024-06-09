@@ -7,7 +7,8 @@ import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.data.cart.remote.dto.CartItemDto.Companion.toDomain
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.ui.model.CartItemUiModel
 
 class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,

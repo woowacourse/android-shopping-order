@@ -9,11 +9,12 @@ import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon.Companion.toUiModel
 import woowacourse.shopping.domain.model.coupon.PercentageDiscountCoupon
 import woowacourse.shopping.domain.model.coupon.PercentageDiscountCoupon.Companion.toUiModel
+import java.time.LocalDate
 
 data class CouponUiModel(
     val id: Long,
     val description: String,
-    val expirationDate: String,
+    val expirationDate: LocalDate,
     val minimumAmount: Int?,
     val discountType: String,
     val checked: Boolean = false,

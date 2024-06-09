@@ -46,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:text="@{@string/coupon_expiration_date(coupon.expirationDate)}"
+            android:text="@{@string/coupon_expiration_date(coupon.expirationDate.year, coupon.expirationDate.month.getValue(), coupon.expirationDate.dayOfMonth)}"
             android:textColor="@color/gray_500"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
