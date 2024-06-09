@@ -80,7 +80,7 @@ class DefaultShoppingCartRepositoryTest {
             // given
             castSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(10, cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) })
+                    cartItemDtosTestFixture(10, cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) }),
                 )
             repository =
                 DefaultShoppingCartRepository(
@@ -123,8 +123,10 @@ class DefaultShoppingCartRepositoryTest {
             // given
             castSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(10,
-                        cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) }),
+                    cartItemDtosTestFixture(
+                        10,
+                        cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) },
+                    ),
                 )
             repository =
                 DefaultShoppingCartRepository(
