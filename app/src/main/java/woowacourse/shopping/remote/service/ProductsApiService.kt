@@ -19,4 +19,16 @@ interface ProductsApiService {
     fun requestProduct(
         @Path("id") id: Int,
     ): Call<ProductResponse>
+
+    @GET("/products")
+    fun requestProducts2(
+        @Query("category") category: String? = null,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+    ): ProductListResponse
+
+    @GET("/products/{id}")
+    fun requestProduct2(
+        @Path("id") id: Int,
+    ): ProductResponse
 }
