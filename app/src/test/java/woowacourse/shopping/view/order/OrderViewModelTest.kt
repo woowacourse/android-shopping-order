@@ -29,22 +29,24 @@ class OrderViewModelTest {
     fun setUp() {
         couponRepository = FakeCouponRepository()
         orderRepository = FakeOrderRepository()
-        orderViewModel = OrderViewModel(
-            couponRepository = couponRepository,
-            orderRepository = orderRepository,
-            cartItems = getFixtureCartItems(5, 50000)
-        )
+        orderViewModel =
+            OrderViewModel(
+                couponRepository = couponRepository,
+                orderRepository = orderRepository,
+                cartItems = getFixtureCartItems(5, 50000),
+            )
     }
 
     @Test
-    fun `쿠폰을 사용하지 않은 채로 주문을 진행할 수 있다`() = runTest {
-        // when
-        orderViewModel.makeOrder()
+    fun `쿠폰을 사용하지 않은 채로 주문을 진행할 수 있다`() =
+        runTest {
+            // when
+            orderViewModel.makeOrder()
 
-        // then
-        val actualEvent = orderViewModel.orderUiEvent.getOrAwaitValue().getContentIfNotHandled()
-        assertThat(actualEvent).isEqualTo(OrderUiEvent.NavigateBackToHome)
-    }
+            // then
+            val actualEvent = orderViewModel.orderUiEvent.getOrAwaitValue().getContentIfNotHandled()
+            assertThat(actualEvent).isEqualTo(OrderUiEvent.NavigateBackToHome)
+        }
 
     @Test
     fun `사용할 쿠폰을 선택할 수 있다`() {
@@ -62,7 +64,7 @@ class OrderViewModelTest {
                 discount = 5000,
                 minimumAmount = 100000,
                 discountType = "fixed",
-            )
+            ),
         )
     }
 

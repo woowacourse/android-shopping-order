@@ -59,51 +59,6 @@ class HomeViewModel(
         updateQuantity(updatedCartItem)
     }
 
-    private fun updateQuantity(targetCartItem: CartData) {
-        viewModelScope.launch {
-            val result =
-                cartRepository.updateCartItem(targetCartItem.cartItemId, targetCartItem.quantity)
-                    .getOrNull()
-
-            val uiState = homeProductUiState.value
-
-            if (result == null || uiState == null) {
-                notifyError()
-                return@launch
-            }
-
-            val cartItems =
-                uiState.cartItems.map {
-                    if (it.productId == targetCartItem.productId) {
-                        it.copy(quantity = targetCartItem.quantity)
-                    } else {
-                        it
-                    }
-                }
-
-            val productItems =
-                uiState.productItems.map {
-                    if (it.orderableProduct.productItemDomain.id == targetCartItem.productId) {
-                        it.copy(
-                            orderableProduct =
-                                it.orderableProduct.copy(
-                                    cartData = targetCartItem,
-                                ),
-                        )
-                    } else {
-                        it
-                    }
-                }
-
-            _homeProductUiState.value =
-                homeProductUiState.value?.copy(
-                    productItems = productItems,
-                    cartItems = cartItems,
-                    totalCartQuantity = cartItems.sumOf { it.quantity },
-                )
-        }
-    }
-
     override fun navigateToDetail(productId: Int) {
         _homeUiEvent.value = Event(HomeUiEvent.NavigateToDetail(productId))
     }
@@ -161,6 +116,66 @@ class HomeViewModel(
                     isLoading = false,
                     isEmpty = recentProductItems.isEmpty(),
                     productItems = recentProductItems,
+                )
+        }
+    }
+
+    fun updateProductQuantities(changedIds: IntArray) {
+        viewModelScope.launch {
+            if (changedIds.isEmpty()) return@launch
+            changedIds.forEach { id ->
+                val updatedProduct = productRepository.getProductById(id).getOrNull()
+                val target = getUpdatedProducts(id, updatedProduct?.cartData)
+                _homeProductUiState.value =
+                    homeProductUiState.value?.copy(
+                        productItems = target ?: return@forEach,
+                        totalCartQuantity = target.sumOf { it.orderableProduct.cartData?.quantity ?: 0 },
+                    )
+            }
+        }
+    }
+
+    private fun updateQuantity(targetCartItem: CartData) {
+        viewModelScope.launch {
+            val result =
+                cartRepository.updateCartItem(targetCartItem.cartItemId, targetCartItem.quantity)
+                    .getOrNull()
+
+            val uiState = homeProductUiState.value
+
+            if (result == null || uiState == null) {
+                notifyError()
+                return@launch
+            }
+
+            val cartItems =
+                uiState.cartItems.map {
+                    if (it.productId == targetCartItem.productId) {
+                        it.copy(quantity = targetCartItem.quantity)
+                    } else {
+                        it
+                    }
+                }
+
+            val productItems =
+                uiState.productItems.map {
+                    if (it.orderableProduct.productItemDomain.id == targetCartItem.productId) {
+                        it.copy(
+                            orderableProduct =
+                                it.orderableProduct.copy(
+                                    cartData = targetCartItem,
+                                ),
+                        )
+                    } else {
+                        it
+                    }
+                }
+
+            _homeProductUiState.value =
+                homeProductUiState.value?.copy(
+                    productItems = productItems,
+                    cartItems = cartItems,
+                    totalCartQuantity = cartItems.sumOf { it.quantity },
                 )
         }
     }
@@ -237,21 +252,6 @@ class HomeViewModel(
 
     private fun notifyError() {
         _homeUiEvent.value = Event(HomeUiEvent.Error)
-    }
-
-    fun updateProductQuantities(changedIds: IntArray) {
-        viewModelScope.launch {
-            if (changedIds.isEmpty()) return@launch
-            changedIds.forEach { id ->
-                val updatedProduct = productRepository.getProductById(id).getOrNull()
-                val target = getUpdatedProducts(id, updatedProduct?.cartData)
-                _homeProductUiState.value =
-                    homeProductUiState.value?.copy(
-                        productItems = target ?: return@forEach,
-                        totalCartQuantity = target.sumOf { it.orderableProduct.cartData?.quantity ?: 0 },
-                    )
-            }
-        }
     }
 
     private fun getUpdatedProducts(

@@ -1,9 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.local.database.RecentProductDatabase
-import woowacourse.shopping.data.local.database.toRecentProduct
 import woowacourse.shopping.data.model.product.Product
-import woowacourse.shopping.data.model.product.toRecentProductEntity
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.utils.getFixtureRecentProducts
@@ -17,13 +14,14 @@ class FakeRecentProductRepository : RecentProductRepository {
             update(product.id)
         } else {
             val id = recentProducts.last().productId + 1
-            recentProducts += RecentProduct(
-                productId = id,
-                productName = "apple$id",
-                imageUrl = "image",
-                dateTime = LocalDateTime.now(),
-                category = "fashion"
-            )
+            recentProducts +=
+                RecentProduct(
+                    productId = id,
+                    productName = "apple$id",
+                    imageUrl = "image",
+                    dateTime = LocalDateTime.now(),
+                    category = "fashion",
+                )
         }
     }
 
@@ -31,7 +29,7 @@ class FakeRecentProductRepository : RecentProductRepository {
         val targetProduct = recentProducts.first { it.productId == productId }
         recentProducts =
             recentProducts.filter { it.productId != productId } +
-                    targetProduct.copy(dateTime = LocalDateTime.now())
+            targetProduct.copy(dateTime = LocalDateTime.now())
     }
 
     override suspend fun findOrNullByProductId(productId: Int): RecentProduct? {

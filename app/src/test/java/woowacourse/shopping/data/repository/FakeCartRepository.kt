@@ -1,24 +1,15 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.RemoteCartDataSource
-import woowacourse.shopping.data.model.cart.CartItem
-import woowacourse.shopping.data.model.cart.CartItemRequestBody
-import woowacourse.shopping.data.model.cart.CartQuantity
-import woowacourse.shopping.data.model.cart.toCartData
-import woowacourse.shopping.data.model.cart.toCartDomain
-import woowacourse.shopping.data.model.cart.toCartItemDomain
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.CartDomain
 import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.utils.getFixtureCartItems
-import woowacourse.shopping.utils.getFixtureProduct
 import woowacourse.shopping.utils.getFixtureProducts
-import woowacourse.shopping.view.cart.toCartItemInfo
 import kotlin.math.min
 
-class FakeCartRepository : CartRepository {
-    private val products = getFixtureProducts(100)
+class FakeCartRepository(count: Int = 100) : CartRepository {
+    private val products = getFixtureProducts(count)
     private var cartItems: List<CartItemDomain> = getFixtureCartItems(10)
 
     override suspend fun getCartItems(
@@ -47,7 +38,7 @@ class FakeCartRepository : CartRepository {
                 CartData(
                     cartItemId = it.cartItemId,
                     productId = it.product.id,
-                    quantity = it.quantity
+                    quantity = it.quantity,
                 )
             }
         }
@@ -80,11 +71,12 @@ class FakeCartRepository : CartRepository {
         quantity: Int,
     ): Result<Unit> {
         return runCatching {
-            cartItems += CartItemDomain(
-                cartItemId = cartItems.last().cartItemId + 1,
-                quantity = quantity,
-                product = products.first { it.id == productId }
-            )
+            cartItems = cartItems +
+                CartItemDomain(
+                    cartItemId = cartItems.last().cartItemId + 1,
+                    quantity = quantity,
+                    product = products.first { it.id == productId },
+                )
         }
     }
 
@@ -99,13 +91,14 @@ class FakeCartRepository : CartRepository {
         quantity: Int,
     ): Result<Unit> {
         return runCatching {
-            cartItems = cartItems.map {
-                if (it.cartItemId == cartItemId) {
-                    it.copy(quantity = quantity)
-                } else {
-                    it
+            cartItems =
+                cartItems.map {
+                    if (it.cartItemId == cartItemId) {
+                        it.copy(quantity = quantity)
+                    } else {
+                        it
+                    }
                 }
-            }
         }
     }
 

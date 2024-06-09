@@ -1,24 +1,19 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.RemoteCartDataSource
-import woowacourse.shopping.data.datasource.RemoteProductDataSource
-import woowacourse.shopping.data.local.database.RecentProductDao
-import woowacourse.shopping.data.model.cart.CartItem
-import woowacourse.shopping.data.model.cart.toCartData
-import woowacourse.shopping.data.model.product.toOrderableProduct
-import woowacourse.shopping.data.model.product.toProductDomain
 import woowacourse.shopping.domain.model.CartData
-import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.utils.getFixtureOrderableProducts
 import kotlin.math.min
 
-class FakeProductRepository : ProductRepository {
+class FakeProductRepository(
+    count: Int = 130,
+    cartCount: Int = 10,
+) : ProductRepository {
     private val recentProductRepository = FakeRecentProductRepository()
-    private val cartRepository = FakeCartRepository()
-    private var orderableProducts = getFixtureOrderableProducts(130)
+    private val cartRepository = FakeCartRepository(cartCount)
+    private var orderableProducts = getFixtureOrderableProducts(count, cartCount)
 
     override suspend fun getProducts(
         category: String?,
@@ -32,9 +27,8 @@ class FakeProductRepository : ProductRepository {
             val last = orderableProducts.getOrNull(toIndex) == null
             ProductDomain(
                 orderableProducts = orderableProducts.subList(fromIndex, toIndex),
-                last = last
+                last = last,
             )
-
         }
     }
 

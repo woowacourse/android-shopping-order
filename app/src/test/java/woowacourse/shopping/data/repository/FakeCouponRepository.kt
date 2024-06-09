@@ -1,9 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.RemoteCouponDataSource
-import woowacourse.shopping.data.model.coupon.AvailableTime
-import woowacourse.shopping.data.model.coupon.CouponResponseItem
-import woowacourse.shopping.data.model.coupon.toCoupon
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import java.time.LocalDate
