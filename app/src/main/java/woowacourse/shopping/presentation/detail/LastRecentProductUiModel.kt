@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.detail
 
+import com.example.domain.model.Product
+
 class LastRecentProductUiModel(
-    val productId: Int,
+    val product: Product,
     val title: String,
 )

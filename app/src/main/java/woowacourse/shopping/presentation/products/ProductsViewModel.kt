@@ -43,7 +43,8 @@ class ProductsViewModel(
     private var page: Int = INIT_PAGE
 
     init {
-        loadPage()
+        // loadPage()
+        updateTotalCount()
     }
 
     fun loadPage() {
@@ -108,7 +109,7 @@ class ProductsViewModel(
         }
     }
 
-    private fun updateQuantity(productId: Int) {
+    fun updateQuantity(productId: Int) {
         thread {
             val result = cartRepository.find(productId).map { it.quantity }
             handler.post {

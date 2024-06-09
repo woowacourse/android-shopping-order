@@ -11,9 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.presentation.cart.CartActivity
-import woowacourse.shopping.presentation.products.ProductsActivity
 
 class ProductDetailActivity : AppCompatActivity() {
     private val binding by lazy { ActivityProductDetailBinding.inflate(layoutInflater) }
@@ -27,36 +27,31 @@ class ProductDetailActivity : AppCompatActivity() {
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.onClickLastRecentProductListener =
-            OnClickLastRecentProductListener { productId ->
-                startActivity(intent)
-                finish()
-            }
+        binding.actionHandler = viewModel
         initializeView()
     }
 
     private fun initializeView() {
         initializeToolbar()
-        initializeAddCartButton()
-        initializeProductLoadError()
-        setRequireActivityResult()
+        viewModel.putOnCartEvent.observeEvent(this) { isSuccess ->
+            when (isSuccess) {
+                true -> showAddCartSuccessDialog()
+                false -> showAddCartFailureToast()
+            }
+        }
     }
 
     private fun initializeToolbar() {
         binding.toolbarDetail.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.item_exit -> finish()
+                R.id.item_exit -> {
+                    val resultIntent = Intent()
+                    resultIntent.putExtra(PRODUCT_ID_KEY, viewModel.productUiModel.value?.product?.id)
+                    setResult(Activity.RESULT_OK, resultIntent)
+                    finish()
+                }
             }
             false
-        }
-    }
-
-    private fun initializeAddCartButton() {
-        binding.btnProductDetailAddCart.setOnClickListener {
-            // viewModel.addCartProduct()
-        }
-
-        viewModel.isSuccessAddCart.observe(this) { isSuccessEvent ->
         }
     }
 
@@ -83,12 +78,6 @@ class ProductDetailActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun initializeProductLoadError() {
-        viewModel.productLoadError.observe(this) { errorEvent ->
-            showErrorSnackBar()
-        }
-    }
-
     private fun showErrorSnackBar() {
         Snackbar
             .make(binding.root, getString(R.string.common_error), Snackbar.LENGTH_INDEFINITE)
@@ -96,25 +85,13 @@ class ProductDetailActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun productId(): Int = intent.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
-
-    private fun setRequireActivityResult() {
-        val resultIntent = Intent().putExtra(ProductsActivity.PRODUCT_ID_KEY, productId())
-        setResult(Activity.RESULT_OK, resultIntent)
-    }
-
     companion object {
-        private const val PRODUCT_ID_KEY = "product_id_key"
-        private const val PRODUCT_ID_DEFAULT_VALUE = -1
+        const val PRODUCT_ID_KEY = "product_id_key"
 
-        fun startActivity(
+        fun getIntent(
             context: Context,
             productId: Int,
-        ) {
-            val intent =
-                Intent(context, ProductDetailActivity::class.java)
-                    .putExtra(PRODUCT_ID_KEY, productId)
-            context.startActivity(intent)
-        }
+        ) = Intent(context, ProductDetailActivity::class.java)
+            .putExtra(PRODUCT_ID_KEY, productId)
     }
 }

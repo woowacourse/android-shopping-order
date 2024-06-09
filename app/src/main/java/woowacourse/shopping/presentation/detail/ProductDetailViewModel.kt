@@ -1,150 +1,101 @@
 package woowacourse.shopping.presentation.detail
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
+import com.example.domain.datasource.map
+import com.example.domain.datasource.onFailure
+import com.example.domain.datasource.onSuccess
+import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
-import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
-import woowacourse.shopping.presentation.utils.AddCartQuantityBundle
+import woowacourse.shopping.common.emit
+import woowacourse.shopping.presentation.detail.ProductDetailActivity.Companion.PRODUCT_ID_KEY
+import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel() {
-    private val _productUiModel = MutableLiveData<ProductUiModel>()
-    val productUiModel: LiveData<ProductUiModel> get() = _productUiModel
+) : ViewModel(), ProductDetailActionHandler {
+    private val _productUiModel = MutableLiveData<ProductDetailUiModel>()
+    val productUiModel: LiveData<ProductDetailUiModel> get() = _productUiModel
 
-    private val _productLoadError = MutableLiveData<Event<Unit>>()
-    val productLoadError: LiveData<Event<Unit>> get() = _productLoadError
-
-    private val _isSuccessAddCart = MutableLiveData<Event<Boolean>>()
-    val isSuccessAddCart: LiveData<Event<Boolean>> get() = _isSuccessAddCart
-
-    val addCartQuantityBundle: LiveData<AddCartQuantityBundle> =
-        _productUiModel.map {
-            AddCartQuantityBundle(
-                productId = it.product.id,
-                quantity = it.quantity,
-                onIncreaseProductQuantity = { increaseQuantity() },
-                onDecreaseProductQuantity = { decreaseQuantity() },
-            )
-        }
+    private val _price: MutableLiveData<Int> = MutableLiveData()
+    val price: LiveData<Int> get() = _price
 
     private val _lastRecentProduct = MutableLiveData<LastRecentProductUiModel>()
     val lastRecentProduct: LiveData<LastRecentProductUiModel> get() = _lastRecentProduct
 
-    /*
-    val isVisibleLastRecentProduct: LiveData<Boolean> =
-        _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
-     */
+    private val _putOnCartEvent = MutableLiveData<Event<Boolean>>()
+    val putOnCartEvent get() = _putOnCartEvent
 
-    private fun increaseQuantity() {
-        var quantity = _productUiModel.value?.quantity ?: return
-        _productUiModel.value = _productUiModel.value?.copy(quantity = ++quantity)
-    }
+    private val handler = Handler(Looper.getMainLooper())
 
-    private fun decreaseQuantity() {
-        var quantity = _productUiModel.value?.quantity ?: return
-        _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
-    }
-
-    /*
     init {
-        loadProduct()
-        loadLastRecentProduct()
-        saveRecentProduct()
+        savedStateHandle.get<Int>(PRODUCT_ID_KEY)?.let(::loadProduct)
     }
 
-    private fun loadProduct() {
-        productRepository.find(
-            productId,
-            dataCallback =
-                object : DataCallback<com.example.domain.model.Product> {
-                    override fun onSuccess(result: com.example.domain.model.Product) {
-                        _productUiModel.postValue(result.toProductUiModel())
-                    }
-
-                    override fun onFailure(t: Throwable) {
-                        setError()
-                    }
-                },
-        )
-    }
-
-    private fun Product.toProductUiModel(): ProductUiModel {
-        val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
-        val cartItem =
-            cartRepository.syncFindByProductId(id, totalQuantityCount)
-                ?: return ProductUiModel.from(this)
-        return ProductUiModel.from(this, cartItem.quantity)
-    }
-
-    private fun loadLastRecentProduct() {
-        val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
-        productRepository.find(
-            lastRecentProduct.product.id,
-            object : DataCallback<com.example.domain.model.Product> {
-                override fun onSuccess(result: com.example.domain.model.Product) {
-                    _lastRecentProduct.postValue(LastRecentProductUiModel(result.id, result.name))
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
-    }
-
-    private fun saveRecentProduct() {
-        val product = productRepository.syncFind(productId)
-        recentProductRepository.save(product)
-    }
-
-    private fun increaseQuantity() {
-        var quantity = _productUiModel.value?.quantity ?: return
-        _productUiModel.value = _productUiModel.value?.copy(quantity = ++quantity)
-    }
-
-    private fun decreaseQuantity() {
-        var quantity = _productUiModel.value?.quantity ?: return
-        _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
-    }
-
-    fun addCartProduct() {
-        val productUiModel = _productUiModel.value ?: return
-        val cartTotalCount = cartRepository.syncGetCartQuantityCount()
-        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId, cartTotalCount)
-
-        val addCartDataCallback =
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    _isSuccessAddCart.postValue(Event(true))
-                }
-
-                override fun onFailure(t: Throwable) {
-                    _isSuccessAddCart.postValue(Event(false))
+    private fun loadProduct(productId: Int) {
+        thread {
+            val result = productRepository.find(productId)
+            handler.post {
+                result.onSuccess { product ->
+                    _productUiModel.postValue(
+                        ProductDetailUiModel(
+                            product,
+                            Quantity(1),
+                            isSuccess = true,
+                        ),
+                    )
+                }.onFailure { _, _ ->
+                    _productUiModel.postValue(ProductDetailUiModel(isFailure = true))
                 }
             }
-
-        if (cartItem == null) {
-            cartRepository.addCartItem(
-                productId = productId,
-                quantity = productUiModel.quantity,
-                dataCallback = addCartDataCallback,
-            )
-            return
         }
-        cartRepository.setCartItemQuantity(cartItem.id, productUiModel.quantity, addCartDataCallback)
     }
 
-    private fun setError() {
-        _productLoadError.postValue(Event(Unit))
+    override fun onClickPlusButton() {
+        var quantity = _productUiModel.value?.quantity ?: return
+        _productUiModel.value = _productUiModel.value?.copy(quantity = ++quantity)
     }
 
-     */
+    override fun onClickMinusButton() {
+        var quantity = _productUiModel.value?.quantity ?: return
+        _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
+    }
+
+    override fun onClickRecentProduct() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onClickAddCartProduct() {
+        val product = productUiModel.value?.product ?: return
+        val quantity = productUiModel.value?.quantity ?: return
+        thread {
+            val result =
+                cartRepository.find(product.id).map {
+                    repeat(quantity.count) {
+                        cartRepository.increaseQuantity(product.id)
+                    }
+                /*
+                val newQuantity = Quantity(it.quantity.count + quantity.count)
+                cartRepository.changeQuantity(product.id, newQuantity)
+                 */
+                }
+            handler.post {
+                result.onSuccess {
+                    _putOnCartEvent.emit(true)
+                }.onFailure { _, _ ->
+                    _putOnCartEvent.emit(false)
+                }
+            }
+        }
+    }
 }

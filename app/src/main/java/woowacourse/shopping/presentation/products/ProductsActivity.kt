@@ -16,6 +16,7 @@ import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.detail.ProductDetailActivity
+import woowacourse.shopping.presentation.detail.ProductDetailActivity.Companion.PRODUCT_ID_KEY
 import woowacourse.shopping.presentation.products.adapter.ProductsAdapter
 import woowacourse.shopping.presentation.products.adapter.ProductsAdapterManager
 import woowacourse.shopping.presentation.products.adapter.ProductsViewType
@@ -34,16 +35,13 @@ class ProductsActivity : AppCompatActivity() {
         )
     }
 
-    private val productDetailActivityResultLauncher =
+    private val detailActivityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val changedProductId =
-                    result.data?.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)
-                        ?: return@registerForActivityResult
-                // viewModel.loadProduct(changedProductId)
-                viewModel.loadRecentProducts()
+                val productsId = result.data?.getIntExtra(PRODUCT_ID_KEY, -1) ?: -1
+                viewModel.updateQuantity(productsId)
             }
         }
 
@@ -55,6 +53,11 @@ class ProductsActivity : AppCompatActivity() {
                 // viewModel.loadProducts()
             }
         }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadPage()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,8 +89,10 @@ class ProductsActivity : AppCompatActivity() {
         }
         viewModel.navigateAction.observeEvent(this) { navigateAction ->
             when (navigateAction) {
-                is ProductsNavigateAction.ProductDetailNavigateAction ->
-                    ProductDetailActivity.startActivity(this, navigateAction.productId)
+                is ProductsNavigateAction.ProductDetailNavigateAction -> {
+                    val intent = ProductDetailActivity.getIntent(this, navigateAction.productId)
+                    detailActivityResultLauncher.launch(intent)
+                }
 
                 is ProductsNavigateAction.CartNavigateAction ->
                     CartActivity.startActivity(this)
@@ -137,10 +142,5 @@ class ProductsActivity : AppCompatActivity() {
                 }
             }
         binding.rvProducts.addOnScrollListener(onScrollListener)
-    }
-
-    companion object {
-        const val PRODUCT_ID_KEY = "changed_product_id_key"
-        private const val PRODUCT_ID_DEFAULT_VALUE = -1
     }
 }
