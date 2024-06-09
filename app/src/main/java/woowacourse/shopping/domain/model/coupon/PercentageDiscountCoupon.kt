@@ -32,7 +32,7 @@ data class PercentageDiscountCoupon(
 
     override fun discountAmount(order: Order): Int {
         val discountPercentage = discount * PERCENTAGE
-        return (order.getTotalQuantity() * discountPercentage).toInt()
+        return (order.getTotalPrice() * discountPercentage).toInt()
     }
 
     companion object {
