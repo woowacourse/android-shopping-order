@@ -11,6 +11,8 @@ import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.ItemSelector
 import woowacourse.shopping.domain.model.Product
+import java.time.LocalDate
+import java.time.LocalTime
 
 object DtoMapper {
     fun CartItemResponse.toCartItemList(): List<CartItem> {
@@ -45,47 +47,56 @@ object DtoMapper {
     }
 
     fun CouponDto.toDomainModel(): Coupon {
-        return when (this) {
-            is CouponDto.FixedDiscountCouponDto ->
+        return when (this.code) {
+            "FIXED5000" ->
                 Coupon.FixedDiscountCoupon(
                     id = this.id,
                     code = this.code,
                     description = this.description,
-                    expirationDate = this.expirationDate,
+                    expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    discount = this.discount,
-                    minimumAmount = this.minimumAmount,
+                    discount = this.discount ?: 0,
+                    minimumAmount = this.minimumAmount ?: 0,
                 )
-            is CouponDto.BogoCouponDto ->
+            "BOGO" ->
                 Coupon.BogoCoupon(
                     id = this.id,
                     code = this.code,
                     description = this.description,
-                    expirationDate = this.expirationDate,
+                    expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    buyQuantity = this.buyQuantity,
-                    getQuantity = this.getQuantity,
+                    buyQuantity = this.buyQuantity ?: 0,
+                    getQuantity = this.getQuantity ?: 0,
                 )
-            is CouponDto.FreeShippingCouponDto ->
+            "FREESHIPPING" ->
                 Coupon.FreeShippingCoupon(
                     id = this.id,
                     code = this.code,
                     description = this.description,
-                    expirationDate = this.expirationDate,
+                    expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    minimumAmount = this.minimumAmount,
+                    minimumAmount = this.minimumAmount ?: 0,
                 )
-            is CouponDto.TimeBasedDiscountCouponDto ->
+            "MIRACLESALE" ->
                 Coupon.TimeBasedDiscountCoupon(
                     id = this.id,
                     code = this.code,
                     description = this.description,
-                    expirationDate = this.expirationDate,
+                    expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    discount = this.discount,
-                    availableTimeStart = this.availableTime.start,
-                    availableTimeEnd = this.availableTime.end,
+                    discount = this.discount ?: 0,
+                    availableTimeStart = this.availableTime?.start?.toLocalTime() ?: LocalTime.MIN,
+                    availableTimeEnd = this.availableTime?.end?.toLocalTime() ?: LocalTime.MAX,
                 )
+            else -> throw IllegalArgumentException("Unknown discount type: ${this.discountType}")
         }
+    }
+
+    private fun String.toLocalDate(): LocalDate {
+        return LocalDate.parse(this)
+    }
+
+    private fun String.toLocalTime(): LocalTime {
+        return LocalTime.parse(this)
     }
 }
