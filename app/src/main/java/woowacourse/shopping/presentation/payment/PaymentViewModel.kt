@@ -60,7 +60,7 @@ class PaymentViewModel(
                 .onSuccess {
                     _cartItems.value = it.map { cartProduct -> cartProduct.toUiModel() }
                     _orderPrice.value = _cartItems.value?.sumOf { it.totalPrice }
-                    _finalPrice.value = _orderPrice.value
+                    _finalPrice.value = (_orderPrice.value ?: 0) + (_deliveryPrice.value ?: 0)
                 }.onFailure {
                     Log.d("alsong", "장바구니상품 불러오기 실패")
                 }
@@ -84,11 +84,53 @@ class PaymentViewModel(
         coupons.forEachIndexed { index, couponOfList ->
             if (couponOfList.name == coupon.name) {
                 coupons[index] = coupons[index].copy(isSelected = true)
+                val couponsData = _couponsData.value ?: return
+                updatePrices(couponsData[index])
             } else {
                 coupons[index] = coupons[index].copy(isSelected = false)
             }
         }
         _coupons.value = coupons
+    }
+
+    private fun updatePrices(selectedCoupon: CouponData) {
+        _deliveryPrice.value = 3000
+        _couponDiscountPrice.value = 0
+        when (selectedCoupon) {
+            is CouponData.Fixed5000 -> {
+                if ((orderPrice.value ?: 0) >= 100000) {
+                    _couponDiscountPrice.value = -5000
+                }
+            }
+
+            is CouponData.Bogo -> {
+                val cartItems = _cartItems.value ?: return
+                if (cartItems.any { it.count >= 3 }) {
+                    var mostExpensiveItemIndex = 0
+                    cartItems.forEachIndexed { index, item ->
+                        if (item.count >= 3) {
+                            if (cartItems[mostExpensiveItemIndex].product.price <= cartItems[index].product.price) {
+                                mostExpensiveItemIndex = index
+                            }
+                        }
+                    }
+                    _couponDiscountPrice.value = -cartItems[mostExpensiveItemIndex].product.price
+                }
+            }
+
+            is CouponData.Freeshipping -> {
+                if ((orderPrice.value ?: 0) >= 50000) {
+                    _deliveryPrice.value = 0
+                }
+            }
+
+            is CouponData.Miraclesale -> {
+                val orderPrice = _orderPrice.value ?: 0
+                _couponDiscountPrice.value = -(orderPrice * 0.3).toInt()
+            }
+        }
+        _finalPrice.value =
+            (_orderPrice.value ?: 0) + (_deliveryPrice.value ?: 0) + (_couponDiscountPrice.value ?: 0)
     }
 
     companion object {
