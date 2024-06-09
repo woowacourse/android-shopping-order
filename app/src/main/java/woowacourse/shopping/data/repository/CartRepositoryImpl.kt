@@ -38,7 +38,7 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
                 if (cartWithProduct != null) {
                     Response.Success(cartWithProduct)
                 } else {
-                    Response.Exception(NoSuchElementException())
+                    Fail.NotFound("$productId 에 해당하는 cartItem이 없습니다.")
                 }
             }
 
