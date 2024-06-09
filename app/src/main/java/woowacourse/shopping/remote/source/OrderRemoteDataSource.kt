@@ -5,26 +5,6 @@ import woowacourse.shopping.remote.model.request.OrderRequest
 import woowacourse.shopping.remote.service.OrderApiService
 
 class OrderRemoteDataSource(private val orderApiService: OrderApiService) : OrderDataSource {
-    override fun order(cartItemIds: List<Long>) {
-        val orderRequest = OrderRequest(cartItemIds)
-        orderApiService.createOrder(orderRequest).execute()
-    }
-
-    override fun save(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        _orderSaved[cartItemId] = quantity
-    }
-
-    override fun load(): Map<Long, Int> = orderSaved
-
-    override fun allQuantity(): Int = orderSaved.values.sum()
-
-    override fun claer() {
-        _orderSaved.clear()
-    }
-
     override suspend fun order2(cartItemIds: List<Long>): Result<Unit> =
         runCatching {
             orderApiService.createOrder2(OrderRequest(cartItemIds))

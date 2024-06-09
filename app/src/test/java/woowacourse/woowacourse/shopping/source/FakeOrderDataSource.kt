@@ -6,29 +6,6 @@ class FakeOrderDataSource(
     private val orderSaved: MutableMap<Long, Int> = mutableMapOf(),
     private val orderService: MutableList<Long> = mutableListOf(),
 ) : OrderDataSource {
-    override fun order(cartItemIds: List<Long>) {
-        // TODO: not implemented
-    }
-
-    override fun save(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun load(): Map<Long, Int> {
-        TODO("Not yet implemented")
-    }
-
-    override fun allQuantity(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun claer() {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun order2(cartItemIds: List<Long>): Result<Unit> =
         runCatching {
             orderService.addAll(cartItemIds)
