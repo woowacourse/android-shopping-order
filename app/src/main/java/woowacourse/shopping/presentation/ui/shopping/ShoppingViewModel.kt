@@ -69,6 +69,7 @@ class ShoppingViewModel(
                 async { asyncLoadCartItems() }.await()
             combineProductsWithCartItems(totalProducts, cartItems)
             updateTotalCartItemsQuantity()
+            loadRecentProducts()
         }
     }
 
@@ -138,6 +139,12 @@ class ShoppingViewModel(
         }
     }
 
+    private fun loadRecentProducts() {
+        viewModelScope.launch {
+            _recentProducts.value = recentProductRepository.loadLatestList()
+        }
+    }
+
     fun setLoadingStart() {
         _isLoading.value = Event(true)
     }
@@ -157,7 +164,7 @@ class ShoppingViewModel(
     private fun updateRecentProducts(product: Product) {
         viewModelScope.launch {
             recentProductRepository.save(product)
-            _recentProducts.value = recentProductRepository.loadLatestList()
+            loadRecentProducts()
         }
     }
 
