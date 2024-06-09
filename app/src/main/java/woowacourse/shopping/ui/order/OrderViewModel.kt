@@ -43,9 +43,9 @@ class OrderViewModel(
 
     override fun order() {
         viewModelScope.launch(Dispatchers.IO) {
-            orderRepository.orderItems2()
+            orderRepository.orderItems()
                 .onSuccess {
-                    orderRepository.order2(it.map { (cartItemId, _) -> cartItemId })
+                    orderRepository.order(it.map { (cartItemId, _) -> cartItemId })
                         .onSuccess {
                             _event.postValue(OrderEvent.CompleteOrder)
                         }
@@ -68,9 +68,9 @@ class OrderViewModel(
             productsRecommendationRepository.recommendedProducts2()
                 .also { Log.d(TAG, "loadAll: recommendedProducts2: $it") }
                 .onSuccess { recommendedProducts ->
-                    orderRepository.allOrderItemsQuantity2()
+                    orderRepository.allOrderItemsQuantity()
                         .onSuccess { totalQuantity ->
-                            orderRepository.orderItemsTotalPrice2()
+                            orderRepository.orderItemsTotalPrice()
                                 .onSuccess { totalPrice ->
                                     withContext(Dispatchers.Main) {
                                         _recommendedProducts.postValue(recommendedProducts)
@@ -108,7 +108,7 @@ class OrderViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartRepository.addShoppingCartProduct2(productId, INCREASE_AMOUNT)
                 .onSuccess {
-                    orderRepository.saveOrderItem2(productId, quantity)
+                    orderRepository.saveOrderItem(productId, quantity)
                         .onSuccess {
                             withContext(Dispatchers.Main) {
                                 updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
@@ -139,7 +139,7 @@ class OrderViewModel(
                 .onSuccess { cartItem ->
                     cartRepository.updateProductQuantity2(cartItemId = cartItem.id, quantity)
                         .onSuccess {
-                            orderRepository.saveOrderItem2(productId, quantity)
+                            orderRepository.saveOrderItem(productId, quantity)
                                 .onSuccess {
                                     withContext(Dispatchers.Main) {
                                         updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
@@ -203,7 +203,6 @@ class OrderViewModel(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
                     ShoppingApp.orderSource,
-                    ShoppingApp.productSource,
                     ShoppingApp.cartSource,
                 ),
             historyRepository: ProductHistoryRepository =

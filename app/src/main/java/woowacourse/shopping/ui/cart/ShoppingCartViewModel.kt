@@ -97,7 +97,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartItems.value?.forEach { cartItem ->
                 if (cartItem.checked) {
-                    orderRepository.saveOrderItem2(cartItem.id, cartItem.quantity)
+                    orderRepository.saveOrderItem(cartItem.id, cartItem.quantity)
                         .onSuccess {
                             _event.postValue(ShoppingCartEvent.NavigationOrder)
                         }
@@ -249,7 +249,6 @@ class ShoppingCartViewModel(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
                     orderSource = ShoppingApp.orderSource,
-                    productSource = ShoppingApp.productSource,
                     cartSource = ShoppingApp.cartSource,
                 ),
         ): UniversalViewModelFactory =

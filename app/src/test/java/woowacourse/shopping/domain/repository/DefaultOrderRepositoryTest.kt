@@ -5,14 +5,18 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.ProductDataSource
+import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
+import woowacourse.shopping.remote.model.response.CartItemResponse
+import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.source.FakeProductDataSource
+import woowacourse.shopping.source.FakeShoppingCartDataSource
 import woowacourse.woowacourse.shopping.source.FakeOrderDataSource
 
 class DefaultOrderRepositoryTest {
     private lateinit var orderSource: OrderDataSource
-    private lateinit var productSource: ProductDataSource
+    private lateinit var cartSource: ShoppingCartDataSource
     private lateinit var repo: OrderRepository
 
     @Test
@@ -20,14 +24,11 @@ class DefaultOrderRepositoryTest {
         runTest {
             // given
             orderSource = FakeOrderDataSource()
-            productSource =
-                FakeProductDataSource(
-                    allProducts = productsTestFixture(60).toMutableList(),
-                )
-            repo = DefaultOrderRepository(orderSource, productSource)
+            cartSource = FakeShoppingCartDataSource()
+            repo = DefaultOrderRepository(orderSource, cartSource)
             // when
 
-            val actual = repo.order2(listOf(1, 2, 3))
+            val actual = repo.order(listOf(1, 2, 3))
 
             // then
             assertThat(actual.isSuccess).isTrue
@@ -38,16 +39,14 @@ class DefaultOrderRepositoryTest {
         runTest {
             // given
             orderSource = FakeOrderDataSource()
-            productSource =
-                FakeProductDataSource(
-                    allProducts = productsTestFixture(60).toMutableList(),
-                )
-            repo = DefaultOrderRepository(orderSource, productSource)
+            cartSource = FakeShoppingCartDataSource()
+
+            repo = DefaultOrderRepository(orderSource, cartSource)
 
             // when
-            repo.order2(listOf(1, 2, 3))
+            repo.order(listOf(1, 2, 3))
 
-            val actual = repo.orderItems2().getOrThrow()
+            val actual = repo.orderItems().getOrThrow()
 
             // then
             assertThat(actual).isEmpty()
@@ -58,14 +57,12 @@ class DefaultOrderRepositoryTest {
         runTest {
             // given
             orderSource = FakeOrderDataSource()
-            productSource =
-                FakeProductDataSource(
-                    allProducts = productsTestFixture(60).toMutableList(),
-                )
-            repo = DefaultOrderRepository(orderSource, productSource)
+            cartSource = FakeShoppingCartDataSource()
+
+            repo = DefaultOrderRepository(orderSource, cartSource)
 
             // when
-            val actual = repo.saveOrderItem2(1, 3)
+            val actual = repo.saveOrderItem(1, 3)
 
             // then
             assertThat(actual.isSuccess).isTrue
@@ -76,15 +73,13 @@ class DefaultOrderRepositoryTest {
         runTest {
             // given
             orderSource = FakeOrderDataSource()
-            productSource =
-                FakeProductDataSource(
-                    allProducts = productsTestFixture(60).toMutableList(),
-                )
-            repo = DefaultOrderRepository(orderSource, productSource)
+            cartSource = FakeShoppingCartDataSource()
+
+            repo = DefaultOrderRepository(orderSource, cartSource)
 
             // when
-            repo.saveOrderItem2(1, 3)
-            val actual = repo.orderItems2().getOrThrow()
+            repo.saveOrderItem(1, 3)
+            val actual = repo.orderItems().getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(mapOf(1L to 3))
@@ -97,24 +92,54 @@ class DefaultOrderRepositoryTest {
             orderSource =
                 FakeOrderDataSource(
                     orderSaved =
-                        mutableMapOf(
-                            1L to 3,
-                            2L to 2,
-                            3L to 1,
+                    mutableMapOf(
+                        101L to 3,
+                        102L to 2,
+                        103L to 1,
+                    ),
+                )
+
+            cartSource = FakeShoppingCartDataSource(
+                cartItemResponses =
+                listOf(
+                    CartItemResponse(
+                        101, 3, ProductResponse(
+                            101,
+                            "name",
+                            100,
+                            "1",
+                            "image",
+                        )
+                    ),
+                    CartItemResponse(
+                        102,
+                        2,
+                        ProductResponse(
+                            102,
+                            "name",
+                            200,
+                            "1",
+                            "image",
                         ),
+                    ),
+                    CartItemResponse(
+                        103,
+                        1,
+                        ProductResponse(
+                            103,
+                            "name",
+                            300,
+                            "1",
+                            "image",
+                        ),
+                    ),
                 )
-            productSource =
-                FakeProductDataSource(
-                    allProducts =
-                        productsTestFixture(
-                            60,
-                            productFixture = { id -> productTestFixture(id.toLong(), price = id * 100) },
-                        ).toMutableList(),
-                )
-            repo = DefaultOrderRepository(orderSource, productSource)
+            )
+
+            repo = DefaultOrderRepository(orderSource, cartSource)
 
             // when
-            val actual = repo.orderItemsTotalPrice2().getOrThrow()
+            val actual = repo.orderItemsTotalPrice().getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(1000)
