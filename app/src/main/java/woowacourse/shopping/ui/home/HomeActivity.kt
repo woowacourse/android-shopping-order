@@ -107,7 +107,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(this, productId))
+        startActivity(DetailActivity.createIntent(this, productId, HOME_ORIGIN))
     }
 
     private fun navigateToCart() {
@@ -115,6 +115,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val HOME_ORIGIN = "home"
+
         fun createIntent(context: Context): Intent {
             return Intent(context, HomeActivity::class.java)
         }

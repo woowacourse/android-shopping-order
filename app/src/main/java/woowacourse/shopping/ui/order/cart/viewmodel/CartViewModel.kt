@@ -59,8 +59,8 @@ class CartViewModel(
         viewModelScope.launch {
             val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
             cartRepository.getCartItems(0, cartTotalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
-                .onSuccess {
-                    val cartViewItems = it.map(::CartViewItem)
+                .onSuccess { cartItems ->
+                    val cartViewItems = cartItems.map(::CartViewItem)
                     orderViewModel.updateCartViewItems(cartViewItems)
                     _cartUiState.value = UiState.Success(cartViewItems)
                 }.onFailure {
@@ -87,11 +87,9 @@ class CartViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
-        var cartItemId: Int
         viewModelScope.launch {
             cartRepository.addCartItem(product.productId, 1)
-                .onSuccess {
-                    cartItemId = it
+                .onSuccess { cartItemId ->
                     val updatedCartItem = CartViewItem(CartItem(cartItemId, 1, product))
                     val newCartViewItems =
                         orderViewModel.cartViewItems.value?.plus(updatedCartItem)

@@ -37,7 +37,7 @@ class DetailViewModel(
     val mostRecentProduct: LiveData<RecentProduct?>
         get() = _mostRecentProduct
 
-    private val _quantity = MutableLiveData(1)
+    private val _quantity = MutableLiveData<Int>()
     val quantity: LiveData<Int>
         get() = _quantity
 
@@ -83,9 +83,9 @@ class DetailViewModel(
     private fun loadProduct() {
         viewModelScope.launch {
             productRepository.getProductById(productId)
-                .onSuccess {
-                    val product = it
+                .onSuccess { product ->
                     _product.value = product
+                    _quantity.value = DEFAULT_QUANTITY
                     _detailUiState.value = UiState.Success(product)
                 }.onFailure {
                     _detailUiState.value = UiState.Error(it)
@@ -98,8 +98,7 @@ class DetailViewModel(
             viewModelScope.launch {
                 val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
                 cartRepository.getCartItems(0, totalQuantity, DESCENDING_SORT_ORDER)
-                    .onSuccess {
-                        val cartItems = it
+                    .onSuccess { cartItems ->
                         val cartItem =
                             cartItems.firstOrNull { cartItem ->
                                 cartItem.product.productId == productId
@@ -140,5 +139,9 @@ class DetailViewModel(
 
     override fun onFinishButtonClick() {
         _detailNavigationActions.value = Event(DetailNavigationActions.NavigateToBack)
+    }
+
+    companion object {
+        private const val DEFAULT_QUANTITY = 1
     }
 }

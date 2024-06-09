@@ -84,15 +84,15 @@ class HomeViewModel(
                 page = page,
                 size = PAGE_SIZE,
                 sort = ASCENDING_SORT_ORDER,
-            ).onSuccess {
+            ).onSuccess { homeInfo ->
                 page += 1
-                val products = it.products
+                val products = homeInfo.products
                 val productViewItems =
                     products.map { product ->
                         val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
                         ProductViewItem(product, quantity)
                     }
-                _canLoadMore.value = it.canLoadMore
+                _canLoadMore.value = homeInfo.canLoadMore
                 loadedProductViewItems.addAll(productViewItems)
                 _homeUiState.value = UiState.Success(loadedProductViewItems)
             }.onFailure {
@@ -171,11 +171,9 @@ class HomeViewModel(
     }
 
     override fun onPlusButtonClick(product: Product) {
-        var cartItemId: Int
         viewModelScope.launch {
             cartRepository.addCartItem(product.productId, 1)
-                .onSuccess {
-                    cartItemId = it
+                .onSuccess { cartItemId ->
                     updateProductViewItemQuantity(product, 1)
                     cartItems.add(CartItem(cartItemId, 1, product))
                     _cartTotalQuantity.value = cartTotalQuantity.value?.plus(1)
