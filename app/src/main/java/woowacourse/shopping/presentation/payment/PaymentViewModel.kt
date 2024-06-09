@@ -54,6 +54,16 @@ class PaymentViewModel(
         loadCartItems()
     }
 
+    fun pay() {
+        viewModelScope.launch {
+            cartRepository.orderCartProducts(_cartItems.value?.map { it.product.id } ?: emptyList())
+                .onSuccess {
+//                    _updateCartEvent.setValue(Unit)
+//                    _finishOrderEvent.setValue(Unit)
+                }
+        }
+    }
+
     private fun loadCartItems() {
         viewModelScope.launch {
             cartRepository.totalCartProducts()
@@ -130,7 +140,10 @@ class PaymentViewModel(
             }
         }
         _finalPrice.value =
-            (_orderPrice.value ?: 0) + (_deliveryPrice.value ?: 0) + (_couponDiscountPrice.value ?: 0)
+            (_orderPrice.value ?: 0) + (_deliveryPrice.value ?: 0) + (
+                _couponDiscountPrice.value
+                    ?: 0
+            )
     }
 
     companion object {
