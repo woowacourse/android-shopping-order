@@ -132,7 +132,7 @@
             app:layout_constraintBottom_toTopOf="@id/btn_put_cart"
             app:layout_constraintLeft_toLeftOf="@id/tv_detail_price"
             app:layout_constraintRight_toRightOf="@id/btn_quantity_control"
-            app:viewVisibility="@{viewModel.productDetailUiState.lastlyViewedProduct != null}">
+            app:viewVisibility="@{viewModel.isRecentProductVisible}">
 
             <TextView
                 android:id="@+id/tv_recent_viewed_product_title"

@@ -3,6 +3,7 @@ package woowacourse.shopping.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -47,45 +48,17 @@ class DetailActivity : AppCompatActivity() {
         observeViewModel()
     }
 
-//    override fun onRestart() {
-//        super.onRestart()
-//        viewModel.updateRecentProductVisible(isMostRecentProductClicked)
-//    }
-
     private fun setUpDataBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
     }
 
     private fun observeViewModel() {
-//        viewModel.detailUiState.observe(this) { state ->
-//            if (state is UIState.Error) {
-//                showError(
-//                    state.exception.message ?: getString(R.string.unknown_error),
-//                )
-//            }
-//        }
-//
-//        viewModel.navigateToCart.observe(this) {
-//            it.getContentIfNotHandled()?.let {
-//                putCartItem()
-//            }
-//        }
-//
-//        viewModel.navigateToRecentDetail.observe(this) {
-//            it.getContentIfNotHandled()?.let {
-//                navigateToDetail()
-//            }
-//        }
-//
-//        viewModel.isFinishButtonClicked.observe(this) {
-//            it.getContentIfNotHandled()?.let {
-//                finish()
-//            }
-//        }
-//        viewModel.productDetailUiState.observe(this) {
-//
-//        }
+        viewModel.productDetailUiState.observe(this) {
+            if (!it.isLoading && isMostRecentProductClicked) {
+                binding.clRecentViewedProducts.visibility = View.GONE
+            }
+        }
 
         viewModel.detailUiEvent.observe(this) {
             when (val event = it.getContentIfNotHandled() ?: return@observe) {
@@ -94,7 +67,7 @@ class DetailActivity : AppCompatActivity() {
                 is DetailUiEvent.NavigateBack -> finish()
                 is DetailUiEvent.Error -> showError(getString(R.string.unknown_error))
             }
-            viewModel.saveRecentProduct(isMostRecentProductClicked)
+            viewModel.saveRecentProduct()
         }
     }
 

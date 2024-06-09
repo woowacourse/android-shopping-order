@@ -3,6 +3,8 @@ package woowacourse.shopping.view.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.toProduct
@@ -28,6 +30,10 @@ class DetailViewModel(
     private val _detailUiEvent: MutableLiveData<Event<DetailUiEvent>> = MutableLiveData()
     val detailUiEvent: LiveData<Event<DetailUiEvent>>
         get() = _detailUiEvent
+
+    val isRecentProductVisible: LiveData<Boolean> = productDetailUiState.map {
+        it.lastlyViewedProduct?.productId != productId
+    }.distinctUntilChanged()
 
     init {
         loadProduct()
@@ -78,9 +84,8 @@ class DetailViewModel(
         _detailUiEvent.value = Event(DetailUiEvent.NavigateBack)
     }
 
-    fun saveRecentProduct(mostRecentProductClicked: Boolean) {
+    fun saveRecentProduct() {
         viewModelScope.launch {
-            if (mostRecentProductClicked) return@launch
             recentProductRepository.save(
                 productDetailUiState.value?.product?.toProduct() ?: return@launch
             )
