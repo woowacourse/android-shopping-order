@@ -11,6 +11,7 @@ import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.cart.recommend.RecommendCartProductFragment
 import woowacourse.shopping.presentation.cart.recommend.RecommendNavArgs
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
+import woowacourse.shopping.presentation.payment.PaymentFragment
 import woowacourse.shopping.presentation.shopping.detail.ProductDetailFragment
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 
@@ -66,6 +67,21 @@ class ShoppingActivity :
                 R.id.fragment_container_shopping,
                 RecommendCartProductFragment.TAG,
                 RecommendCartProductFragment.args(RecommendNavArgs(productOrders)),
+            )
+            if (addBackStack) addToBackStack(tag)
+        }
+    }
+
+    override fun navigateToPayment(
+        orderIds: List<CartProductUi>,
+        addBackStack: Boolean,
+        tag: String?,
+    ) {
+        supportFragmentManager.commit {
+            replace<PaymentFragment>(
+                R.id.fragment_container_shopping,
+                PaymentFragment.TAG,
+                PaymentFragment.args(RecommendNavArgs(orderIds)),
             )
             if (addBackStack) addToBackStack(tag)
         }

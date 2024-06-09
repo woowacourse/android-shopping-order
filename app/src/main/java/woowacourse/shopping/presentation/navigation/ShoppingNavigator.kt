@@ -20,6 +20,12 @@ interface ShoppingNavigator {
         tag: String?,
     )
 
+    fun navigateToPayment(
+        orderIds: List<CartProductUi>,
+        addBackStack: Boolean,
+        tag: String?,
+    )
+
     fun popBackStack(
         popUpTo: String,
         inclusive: Boolean = false,

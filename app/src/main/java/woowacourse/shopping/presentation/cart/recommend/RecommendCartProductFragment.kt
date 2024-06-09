@@ -21,6 +21,7 @@ import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
+import woowacourse.shopping.presentation.shopping.detail.ProductDetailFragment
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 
 class RecommendCartProductFragment :
@@ -121,8 +122,9 @@ class RecommendCartProductFragment :
             val destination = ProductListFragment.TAG ?: return@observe
             navigator.popBackStack(destination, inclusive = false)
         }
-        viewModel.showOrderDialogEvent.observe(viewLifecycleOwner) {
-            orderDialog.show()
+        viewModel.navigateToRecommendEvent.observe(viewLifecycleOwner) {
+//            orderDialog.show()
+            navigator.navigateToPayment(it, true, ProductDetailFragment.TAG)
         }
     }
 

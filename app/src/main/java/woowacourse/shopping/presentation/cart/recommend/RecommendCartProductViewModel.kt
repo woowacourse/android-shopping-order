@@ -29,6 +29,10 @@ class RecommendCartProductViewModel(
     private val _finishOrderEvent = MutableSingleLiveData<Unit>()
     val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
 
+    private val _navigateToRecommendEvent: MutableSingleLiveData<List<CartProductUi>> =
+        MutableSingleLiveData()
+    val navigateToRecommendEvent: SingleLiveData<List<CartProductUi>> get() = _navigateToRecommendEvent
+
     init {
         val uiState = _uiState.value
         viewModelScope.launch {
@@ -43,7 +47,7 @@ class RecommendCartProductViewModel(
     }
 
     fun startOrder() {
-        _showOrderDialogEvent.setValue(Unit)
+        navigateToPayment()
     }
 
     fun orderProducts() {
@@ -68,6 +72,12 @@ class RecommendCartProductViewModel(
                     _updateCartEvent.setValue(Unit)
                 }
         }
+    }
+
+    fun navigateToPayment() {
+        val orderedProductIds = _uiState.value?.orderedProducts ?: return
+        if (orderedProductIds.isEmpty()) return
+        _navigateToRecommendEvent.setValue(orderedProductIds)
     }
 
     override fun decreaseProductCount(id: Long) {

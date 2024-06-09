@@ -18,10 +18,25 @@ object RetrofitModule {
     private const val CONNECT_TIME_OUT = 60L
     private const val READ_TIME_OUT = 30L
     private const val WRITE_TIME_OUT = 15L
+
+//
+//    private val module = SerializersModule {
+//        polymorphic(CouponResponse::class) {
+//            subclass(CouponResponse.Fixed5000::class/*, CouponResponse.Fixed5000.serializer()*/)
+//            subclass(CouponResponse.Bogo::class/*, CouponResponse.Bogo.serializer()*/)
+//            subclass(CouponResponse.Freeshipping::class/*, CouponResponse.Freeshipping.serializer()*/)
+//            subclass(CouponResponse.Miraclesale::class/*, CouponResponse.Miraclesale.serializer()*/)
+//        }
+//    }
     private val json =
         Json {
+//            isLenient = true
             ignoreUnknownKeys = true
+//            serializersModule = module
+//            classDiscriminator = "discountType"
+//            useArrayPolymorphism = true
         }
+
     private val INSTANCE: Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
