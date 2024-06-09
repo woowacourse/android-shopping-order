@@ -1,9 +1,8 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
-import woowacourse.shopping.data.model.CartItemRequestBody
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.model.cart.CartItemRequestBody
+import woowacourse.shopping.data.model.cart.CartQuantity
+import woowacourse.shopping.data.model.cart.CartResponse
 
 interface RemoteCartDataSource {
     suspend fun getCartItems(

@@ -11,7 +11,6 @@ sealed class CouponViewItem(
         override val viewType: Int = VIEW_TYPE_COUPON,
     ) : CouponViewItem(viewType) {
         fun select(): CouponItem {
-            println("changed : ${!isSelected}")
             return this.copy(isSelected = !isSelected)
         }
     }

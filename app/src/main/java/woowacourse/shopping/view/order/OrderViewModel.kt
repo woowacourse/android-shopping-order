@@ -24,21 +24,22 @@ class OrderViewModel(
     val orderUiState: LiveData<OrderUiState>
         get() = _orderUiState
 
-    private val _couponUiEvent: MutableLiveData<Event<OrderUiEvent>> =
+    private val _orderUiEvent: MutableLiveData<Event<OrderUiEvent>> =
         MutableLiveData()
     val orderUiEvent: LiveData<Event<OrderUiEvent>>
-        get() = _couponUiEvent
+        get() = _orderUiEvent
 
-    val totalPrice: LiveData<Int> = orderUiState.map {
-        it.orderPrice - it.discount + it.shippingPrice
-    }.distinctUntilChanged()
+    val totalPrice: LiveData<Int> =
+        orderUiState.map {
+            it.orderPrice - it.discount + it.shippingPrice
+        }.distinctUntilChanged()
 
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, _ ->
-        showError()
-    }
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, _ ->
+            showError()
+        }
 
     init {
-        println(cartItems)
         loadPage()
     }
 
@@ -64,9 +65,9 @@ class OrderViewModel(
     fun makeOrder() {
         viewModelScope.launch(coroutineExceptionHandler) {
             orderRepository.postOrder(
-                cartItems.map(CartItemDomain::cartItemId)
+                cartItems.map(CartItemDomain::cartItemId),
             ).onSuccess {
-                _couponUiEvent.value = Event(OrderUiEvent.NavigateBackToHome)
+                _orderUiEvent.value = Event(OrderUiEvent.NavigateBackToHome)
             }.onFailure {
                 showError()
             }
@@ -74,19 +75,20 @@ class OrderViewModel(
     }
 
     private fun showError() {
-        _couponUiEvent.value = Event(OrderUiEvent.Error)
+        _orderUiEvent.value = Event(OrderUiEvent.Error)
     }
 
     private fun loadPage() {
         viewModelScope.launch(coroutineExceptionHandler) {
             val coupons = couponRepository.getCoupons().getOrThrow()
             val couponViewItems = coupons.map(::CouponItem)
-            _orderUiState.value = orderUiState.value?.copy(
-                isLoading = false,
-                cartItems = cartItems,
-                coupons = couponViewItems,
-                orderPrice = cartItems.sumOf { it.totalPrice() },
-            )?.filterAvailableCoupons()
+            _orderUiState.value =
+                orderUiState.value?.copy(
+                    isLoading = false,
+                    cartItems = cartItems,
+                    coupons = couponViewItems,
+                    orderPrice = cartItems.sumOf { it.totalPrice() },
+                )?.filterAvailableCoupons()
         }
     }
 }

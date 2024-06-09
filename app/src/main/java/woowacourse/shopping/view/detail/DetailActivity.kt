@@ -16,7 +16,6 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.home.HomeActivity
 
 class DetailActivity : AppCompatActivity() {
@@ -31,11 +30,12 @@ class DetailActivity : AppCompatActivity() {
     private val viewModel: DetailViewModel by viewModels {
         DetailViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            productRepository = ProductRepositoryImpl(
-                remoteProductDataSource,
-                remoteCartDataSource,
-                recentProductDatabase.recentProductDao()
-            ),
+            productRepository =
+                ProductRepositoryImpl(
+                    remoteProductDataSource,
+                    remoteCartDataSource,
+                    recentProductDatabase.recentProductDao(),
+                ),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
             productId = productId,
         )
@@ -97,7 +97,6 @@ class DetailActivity : AppCompatActivity() {
 
     private fun navigateBackToHome() {
         val itemIds = viewModel.alteredProductIds.toIntArray()
-        itemIds.forEach { println(it) }
         setResult(
             RESULT_OK,
             HomeActivity.createIntent(this, itemIds),

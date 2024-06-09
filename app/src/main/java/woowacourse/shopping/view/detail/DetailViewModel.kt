@@ -7,7 +7,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.model.toProduct
+import woowacourse.shopping.data.model.product.toProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -29,9 +29,10 @@ class DetailViewModel(
     val detailUiEvent: LiveData<Event<DetailUiEvent>>
         get() = _detailUiEvent
 
-    val isRecentProductVisible: LiveData<Boolean> = productDetailUiState.map {
-        it.lastlyViewedProduct?.productId != productId
-    }.distinctUntilChanged()
+    val isRecentProductVisible: LiveData<Boolean> =
+        productDetailUiState.map {
+            it.lastlyViewedProduct?.productId != productId
+        }.distinctUntilChanged()
 
     var alteredProductIds: Array<Int> = arrayOf()
         private set
@@ -62,8 +63,9 @@ class DetailViewModel(
             if (targetCartItem == null) {
                 cartRepository.addCartItem(productId, uiState.quantity)
             } else {
-                val result = cartRepository.updateCartItem(targetCartItem.cartItemId, uiState.quantity)
-                    .getOrNull()
+                val result =
+                    cartRepository.updateCartItem(targetCartItem.cartItemId, uiState.quantity)
+                        .getOrNull()
                 if (result == null) {
                     notifyError()
                     return@launch
@@ -89,7 +91,7 @@ class DetailViewModel(
     fun saveRecentProduct() {
         viewModelScope.launch {
             recentProductRepository.save(
-                productDetailUiState.value?.product?.toProduct() ?: return@launch
+                productDetailUiState.value?.product?.toProduct() ?: return@launch,
             )
         }
     }

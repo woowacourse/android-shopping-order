@@ -7,11 +7,13 @@ data class CartData(
 ) {
     fun increaseQuantity(step: Int = DEFAULT_STEP): CartData = copy(quantity = quantity + step)
 
-    fun decreaseQuantity(step: Int = DEFAULT_STEP): CartData = copy(
-        quantity = (quantity - step).coerceAtLeast(
-            DEFAULT_SHOPPING_QUANTITY
+    fun decreaseQuantity(step: Int = DEFAULT_STEP): CartData =
+        copy(
+            quantity =
+                (quantity - step).coerceAtLeast(
+                    DEFAULT_SHOPPING_QUANTITY,
+                ),
         )
-    )
 
     fun totalPrice(unitPrice: Int): Int = unitPrice * quantity
 

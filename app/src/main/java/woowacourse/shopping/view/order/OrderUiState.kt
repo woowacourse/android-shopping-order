@@ -14,10 +14,9 @@ data class OrderUiState(
     val discount: Int = DEFAULT_DISCOUNT_PRICE,
     val selectedCoupon: Coupon? = null,
 ) {
-
     fun filterAvailableCoupons(): OrderUiState {
         return copy(
-            coupons = coupons.filter { it.coupon.isAvailable() }
+            coupons = coupons.filter { it.coupon.isAvailable() },
         )
     }
 
@@ -25,18 +24,21 @@ data class OrderUiState(
         val targetCoupon = coupons.firstOrNull { it.coupon.id == couponId } ?: return this
         val updatedCoupon = targetCoupon.copy(isSelected = false)
         return copy(
-            coupons = coupons.map {
-                if (it.coupon.id == updatedCoupon.coupon.id) updatedCoupon else it
-            },
-            discount = when (selectedCoupon) {
-                is Coupon.Fixed -> selectedCoupon.discount
-                is Coupon.BuyXGetY -> cartItems.filter { it.quantity >= selectedCoupon.buyQuantity }
-                    .maxOf { it.product.price } * selectedCoupon.getQuantity
+            coupons =
+                coupons.map {
+                    if (it.coupon.id == updatedCoupon.coupon.id) updatedCoupon else it
+                },
+            discount =
+                when (selectedCoupon) {
+                    is Coupon.Fixed -> selectedCoupon.discount
+                    is Coupon.BuyXGetY ->
+                        cartItems.filter { it.quantity >= selectedCoupon.buyQuantity }
+                            .maxOf { it.product.price } * selectedCoupon.getQuantity
 
-                is Coupon.FreeShipping -> shippingPrice
-                is Coupon.MiracleSale -> orderPrice * (selectedCoupon.discount / 100)
-                null -> 0
-            },
+                    is Coupon.FreeShipping -> shippingPrice
+                    is Coupon.MiracleSale -> orderPrice * (selectedCoupon.discount / 100)
+                    null -> 0
+                },
             selectedCoupon = null,
         )
     }
@@ -45,18 +47,21 @@ data class OrderUiState(
         val targetCoupon = coupons.firstOrNull { it.coupon.id == couponId } ?: return this
         val updatedCoupon = targetCoupon.copy(isSelected = true)
         return copy(
-            coupons = coupons.map {
-                if (it.coupon.id == updatedCoupon.coupon.id) updatedCoupon else it.copy(isSelected = false)
-            },
-            discount = when (targetCoupon.coupon) {
-                is Coupon.Fixed -> targetCoupon.coupon.discount
-                is Coupon.BuyXGetY -> cartItems.filter { it.quantity >= targetCoupon.coupon.buyQuantity }
-                    .maxOf { it.product.price } * targetCoupon.coupon.getQuantity
+            coupons =
+                coupons.map {
+                    if (it.coupon.id == updatedCoupon.coupon.id) updatedCoupon else it.copy(isSelected = false)
+                },
+            discount =
+                when (targetCoupon.coupon) {
+                    is Coupon.Fixed -> targetCoupon.coupon.discount
+                    is Coupon.BuyXGetY ->
+                        cartItems.filter { it.quantity >= targetCoupon.coupon.buyQuantity }
+                            .maxOf { it.product.price } * targetCoupon.coupon.getQuantity
 
-                is Coupon.FreeShipping -> shippingPrice
-                is Coupon.MiracleSale -> orderPrice * (targetCoupon.coupon.discount / 100)
-            },
-            selectedCoupon = updatedCoupon.coupon
+                    is Coupon.FreeShipping -> shippingPrice
+                    is Coupon.MiracleSale -> orderPrice * (targetCoupon.coupon.discount / 100)
+                },
+            selectedCoupon = updatedCoupon.coupon,
         )
     }
 

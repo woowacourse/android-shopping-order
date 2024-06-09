@@ -72,25 +72,28 @@ class HomeViewModel(
                 return@launch
             }
 
-            val cartItems = uiState.cartItems.map {
-                if (it.productId == targetCartItem.productId) {
-                    it.copy(quantity = targetCartItem.quantity)
-                } else {
-                    it
+            val cartItems =
+                uiState.cartItems.map {
+                    if (it.productId == targetCartItem.productId) {
+                        it.copy(quantity = targetCartItem.quantity)
+                    } else {
+                        it
+                    }
                 }
-            }
 
-            val productItems = uiState.productItems.map {
-                if (it.orderableProduct.productItemDomain.id == targetCartItem.productId) {
-                    it.copy(
-                        orderableProduct = it.orderableProduct.copy(
-                            cartData = targetCartItem
+            val productItems =
+                uiState.productItems.map {
+                    if (it.orderableProduct.productItemDomain.id == targetCartItem.productId) {
+                        it.copy(
+                            orderableProduct =
+                                it.orderableProduct.copy(
+                                    cartData = targetCartItem,
+                                ),
                         )
-                    )
-                } else {
-                    it
+                    } else {
+                        it
+                    }
                 }
-            }
 
             _homeProductUiState.value =
                 homeProductUiState.value?.copy(
@@ -104,7 +107,6 @@ class HomeViewModel(
     override fun navigateToDetail(productId: Int) {
         _homeUiEvent.value = Event(HomeUiEvent.NavigateToDetail(productId))
     }
-
 
     override fun navigateToCart() {
         _homeUiEvent.value = Event(HomeUiEvent.NavigateToCart)
@@ -130,9 +132,10 @@ class HomeViewModel(
                 uiState.productItems.map {
                     if (it.orderableProduct.productItemDomain.id == changedItem.productId) {
                         it.copy(
-                            orderableProduct = it.orderableProduct.copy(
-                                cartData = changedItem
-                            )
+                            orderableProduct =
+                                it.orderableProduct.copy(
+                                    cartData = changedItem,
+                                ),
                         )
                     } else {
                         it
@@ -164,12 +167,13 @@ class HomeViewModel(
 
     private fun loadProducts() {
         viewModelScope.launch {
-            val productData = productRepository.getProducts(
-                page = homeProductUiState.value?.currentPageNumber ?: 0,
-                size = PAGE_SIZE,
-                category = CATEGORY_UNDEFINED,
-                sort = DEFAULT_SORT_ORDER
-            ).getOrNull()
+            val productData =
+                productRepository.getProducts(
+                    page = homeProductUiState.value?.currentPageNumber ?: 0,
+                    size = PAGE_SIZE,
+                    category = CATEGORY_UNDEFINED,
+                    sort = DEFAULT_SORT_ORDER,
+                ).getOrNull()
 
             val totalCartQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
             val uiState = homeProductUiState.value
@@ -179,9 +183,10 @@ class HomeViewModel(
                 return@launch
             }
 
-            val productItems = productData.orderableProducts.map {
-                HomeViewItem.ProductViewItem(it)
-            }
+            val productItems =
+                productData.orderableProducts.map {
+                    HomeViewItem.ProductViewItem(it)
+                }
             val cartData = productData.orderableProducts.mapNotNull(OrderableProduct::cartData)
 
             _homeProductUiState.value =
@@ -240,16 +245,18 @@ class HomeViewModel(
             changedIds.forEach { id ->
                 val updatedProduct = productRepository.getProductById(id).getOrNull()
                 val target = getUpdatedProducts(id, updatedProduct?.cartData)
-                _homeProductUiState.value = homeProductUiState.value?.copy(
-                    productItems = target ?: return@forEach
-                )
+                _homeProductUiState.value =
+                    homeProductUiState.value?.copy(
+                        productItems = target ?: return@forEach,
+                        totalCartQuantity = target.sumOf { it.orderableProduct.cartData?.quantity ?: 0 },
+                    )
             }
         }
     }
 
     private fun getUpdatedProducts(
         targetProductId: Int,
-        cartItemToUpdate: CartData?
+        cartItemToUpdate: CartData?,
     ): List<HomeViewItem.ProductViewItem>? {
         return homeProductUiState.value?.productItems?.map {
             if (it.orderableProduct.productItemDomain.id == targetProductId) {

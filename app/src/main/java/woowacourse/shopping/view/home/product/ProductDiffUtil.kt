@@ -10,7 +10,7 @@ object ProductDiffUtil : DiffUtil.ItemCallback<HomeViewItem>() {
         if (oldItem is HomeViewItem.ProductViewItem && newItem is HomeViewItem.ProductViewItem) {
             return oldItem.orderableProduct.productItemDomain.id == newItem.orderableProduct.productItemDomain.id
         }
-        return oldItem.hashCode() == newItem.hashCode()
+        return oldItem.viewType == newItem.viewType
     }
 
     override fun areContentsTheSame(

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote
 
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -8,9 +7,9 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.model.CartItemRequestBody
-import woowacourse.shopping.data.model.CartQuantity
-import woowacourse.shopping.data.model.CartResponse
+import woowacourse.shopping.data.model.cart.CartItemRequestBody
+import woowacourse.shopping.data.model.cart.CartQuantity
+import woowacourse.shopping.data.model.cart.CartResponse
 
 interface CartService {
     @GET("/cart-items")

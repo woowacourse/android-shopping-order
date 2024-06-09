@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.model.cart
 
 data class CartItemRequestBody(
     val productId: Int,

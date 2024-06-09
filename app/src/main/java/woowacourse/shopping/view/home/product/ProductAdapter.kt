@@ -17,9 +17,6 @@ class ProductAdapter(
     private val homeClickListener: HomeEventListener,
     private val quantityClickListener: QuantityEventListener,
 ) : ListAdapter<HomeViewItem, RecyclerView.ViewHolder>(ProductDiffUtil) {
-//    private val homeViewItems: MutableList<HomeViewItem> =
-//        MutableList(20) { HomeViewItem.ProductPlaceHolderViewItem() }
-
     init {
         submitList(List(6) { HomeViewItem.ProductPlaceHolderViewItem() })
     }
@@ -75,32 +72,9 @@ class ProductAdapter(
         return currentList.size + 1
     }
 
-    fun loadData(
-        productItems: List<ProductViewItem>,
-        canLoadMore: Boolean,
-    ) {
+    fun loadData(productItems: List<ProductViewItem>) {
         if (isFirstLoad()) submitList(null)
         submitList(productItems)
-    }
-
-    fun updateData(updatedItems: List<ProductViewItem>) {
-        updatedItems.forEach { updatedItem ->
-            updateProductQuantity(updatedItem)
-        }
-    }
-
-    fun updateProductQuantity(updatedProductItem: ProductViewItem) {
-        if (!isFirstLoad()) {
-            val position =
-                currentList.indexOfFirst { item ->
-                    item is ProductViewItem && item.orderableProduct.productItemDomain.id == updatedProductItem.orderableProduct.productItemDomain.id
-                }
-
-            if (position != -1) {
-                currentList[position] = updatedProductItem
-                notifyItemChanged(position)
-            }
-        }
     }
 
     private fun isFirstLoad() = currentList.all { it.viewType == PRODUCT_PLACEHOLDER_VIEW_TYPE }

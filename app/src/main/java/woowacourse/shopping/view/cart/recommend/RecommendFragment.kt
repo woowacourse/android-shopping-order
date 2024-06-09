@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.databinding.FragmentRecommendBinding
@@ -15,8 +14,10 @@ class RecommendFragment : Fragment() {
     private val binding: FragmentRecommendBinding
         get() = _binding!!
 
-    private lateinit var adapter: RecommendProductAdapter
     private val viewModel by activityViewModels<CartViewModel>()
+    private val adapter: RecommendProductAdapter by lazy {
+        RecommendProductAdapter(viewModel, viewModel)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,9 +33,16 @@ class RecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = RecommendProductAdapter(viewModel, viewModel)
-        binding.rvRecommend.adapter = adapter
-        viewModel.loadRecommendedItems()
+        initializeBindingVariables()
+        observeState()
+    }
+
+    private fun initializeBindingVariables() {
+        binding.lifecycleOwner = this
+        binding.adapter = adapter
+    }
+
+    private fun observeState() {
         viewModel.recommendedListUiState.observe(viewLifecycleOwner) { state ->
             adapter.loadData(state.recommendedProducts)
         }
@@ -43,9 +51,5 @@ class RecommendFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-    }
-
-    private fun showError(errorMessage: String) {
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
     }
 }

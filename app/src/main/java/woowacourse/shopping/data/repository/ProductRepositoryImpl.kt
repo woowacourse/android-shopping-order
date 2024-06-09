@@ -3,10 +3,10 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.datasource.RemoteCartDataSource
 import woowacourse.shopping.data.datasource.RemoteProductDataSource
 import woowacourse.shopping.data.local.database.RecentProductDao
-import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.toCartData
-import woowacourse.shopping.data.model.toOrderableProduct
-import woowacourse.shopping.data.model.toProductDomain2
+import woowacourse.shopping.data.model.cart.CartItem
+import woowacourse.shopping.data.model.cart.toCartData
+import woowacourse.shopping.data.model.product.toOrderableProduct
+import woowacourse.shopping.data.model.product.toProductDomain2
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
@@ -21,7 +21,7 @@ class ProductRepositoryImpl(
         category: String?,
         page: Int,
         size: Int,
-        sort: String
+        sort: String,
     ): Result<ProductDomain> {
         return runCatching {
             remoteProductDataSource.getProducts(category, page, size, sort)
@@ -43,18 +43,21 @@ class ProductRepositoryImpl(
             val orderableProducts = mutableListOf<OrderableProduct>()
             var page = 0
             do {
-                val products = remoteProductDataSource.getProducts(
-                    category = lastlyViewedProduct?.category,
-                    page = page++,
-                    size = RECOMMEND_PAGE_SIZE,
-                    sort = SORT_CART_ITEMS
-                ).toProductDomain2(cartData).orderableProducts.filter {
-                    it.cartData == null
-                }
+                val products =
+                    remoteProductDataSource.getProducts(
+                        category = lastlyViewedProduct?.category,
+                        page = page++,
+                        size = RECOMMEND_PAGE_SIZE,
+                        sort = SORT_CART_ITEMS,
+                    ).toProductDomain2(cartData).orderableProducts.filter {
+                        it.cartData == null
+                    }
                 products.forEach {
                     if (orderableProducts.size < 10) {
                         orderableProducts.add(it)
-                    } else return@forEach
+                    } else {
+                        return@forEach
+                    }
                 }
             } while (orderableProducts.size >= 10 || products.isEmpty())
             orderableProducts
@@ -66,7 +69,7 @@ class ProductRepositoryImpl(
         return remoteCartDataSource.getCartItems(
             PAGE_CART_ITEMS,
             totalCartQuantity,
-            SORT_CART_ITEMS
+            SORT_CART_ITEMS,
         ).cartItems.map(CartItem::toCartData)
     }
 
@@ -75,66 +78,4 @@ class ProductRepositoryImpl(
         private const val RECOMMEND_PAGE_SIZE = 10
         private const val SORT_CART_ITEMS = "asc"
     }
-    //    override fun getProducts(
-//        category: String?,
-//        page: Int,
-//        size: Int,
-//        sort: String,
-//        onSuccess: (ProductDomain) -> Unit,
-//        onFailure: (Throwable) -> Unit,
-//    ) {
-//        remoteProductDataSource.getProducts(category, page, size, sort).enqueue(
-//            object : Callback<ProductResponse> {
-//                override fun onResponse(
-//                    call: Call<ProductResponse>,
-//                    response: Response<ProductResponse>,
-//                ) {
-//                    onSuccess(response.body()?.toProductDomain() ?: throw HttpException(response))
-//                }
-//
-//                override fun onFailure(
-//                    call: Call<ProductResponse>,
-//                    t: Throwable,
-//                ) {
-//                    onFailure(t)
-//                }
-//            },
-//        )
-////        thread {
-////            runCatching {
-////                val response = remoteProductDataSource.getProducts(category, page, size, sort).execute()
-////                response.body()?.toProductDomain() ?: throw HttpException(response)
-////            }.onSuccess(onSuccess).onFailure(onFailure)
-////        }
-//    }
-//
-//    override fun getProductById(
-//        id: Int,
-//        onSuccess: (ProductItemDomain) -> Unit,
-//        onFailure: (Throwable) -> Unit,
-//    ) {
-//        remoteProductDataSource.getProductById(id).enqueue(
-//            object : Callback<Product> {
-//                override fun onResponse(
-//                    call: Call<Product>,
-//                    response: Response<Product>,
-//                ) {
-//                    onSuccess(response.body()?.toProductItemDomain() ?: throw HttpException(response))
-//                }
-//
-//                override fun onFailure(
-//                    call: Call<Product>,
-//                    t: Throwable,
-//                ) {
-//                    onFailure(t)
-//                }
-//            },
-//        )
-////        thread {
-////            runCatching {
-////                val response = remoteProductDataSource.getProductById(id).execute()
-////
-////            }.onSuccess(onSuccess).onFailure(onFailure)
-////        }
-//    }
 }

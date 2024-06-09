@@ -15,4 +15,3 @@ class CouponItemViewHolder(
         binding.couponItem = couponItem
     }
 }
-

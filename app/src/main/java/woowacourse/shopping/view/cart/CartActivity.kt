@@ -11,10 +11,8 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteOrderDataSource
 import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -32,11 +30,12 @@ class CartActivity : AppCompatActivity() {
         CartViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
-            productRepository = ProductRepositoryImpl(
-                remoteProductDataSource,
-                remoteCartDataSource,
-                recentProductDatabase.recentProductDao()
-            ),
+            productRepository =
+                ProductRepositoryImpl(
+                    remoteProductDataSource,
+                    remoteCartDataSource,
+                    recentProductDatabase.recentProductDao(),
+                ),
         )
     }
     private val cartFragment by lazy { CartFragment() }
@@ -121,7 +120,6 @@ class CartActivity : AppCompatActivity() {
 
     private fun navigateBackToHome() {
         val itemIds = viewModel.alteredProductIds.toIntArray()
-        itemIds.forEach { println(it) }
         setResult(
             RESULT_OK,
             HomeActivity.createIntent(this, itemIds),

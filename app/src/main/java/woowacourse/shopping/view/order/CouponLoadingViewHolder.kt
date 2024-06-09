@@ -4,6 +4,5 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartPlaceholderBinding
 
 class CouponLoadingViewHolder(
-    binding: ItemCartPlaceholderBinding
+    binding: ItemCartPlaceholderBinding,
 ) : RecyclerView.ViewHolder(binding.root)
-

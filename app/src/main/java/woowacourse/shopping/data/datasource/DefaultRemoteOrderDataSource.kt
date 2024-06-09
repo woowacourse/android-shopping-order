@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
-import woowacourse.shopping.data.model.CartItemIds
+import woowacourse.shopping.data.model.cart.CartItemIds
 import woowacourse.shopping.data.remote.OrderService
 
 class DefaultRemoteOrderDataSource(

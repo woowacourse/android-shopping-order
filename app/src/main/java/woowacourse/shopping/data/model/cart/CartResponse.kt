@@ -1,6 +1,9 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.data.model.cart
 
 import com.google.gson.annotations.SerializedName
+import woowacourse.shopping.data.model.Pageable
+import woowacourse.shopping.data.model.Sort
+import woowacourse.shopping.data.model.product.toProductItemDomain
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.CartDomain
 import woowacourse.shopping.domain.model.CartItemDomain

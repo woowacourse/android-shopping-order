@@ -10,4 +10,3 @@ sealed interface CartListUiEvent {
 
     data object NavigateBack : CartListUiEvent
 }
-

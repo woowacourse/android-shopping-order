@@ -107,10 +107,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.loadData(
-            data,
-            viewModel.homeProductUiState.value?.loadMoreAvailable ?: false
-        )
+        productAdapter.loadData(data)
     }
 
     private fun showError(errorMessage: String) {
@@ -134,7 +131,11 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_CHANGED_IDS = "extra_changed_ids"
-        fun createIntent(context: Context, changedIds: IntArray): Intent {
+
+        fun createIntent(
+            context: Context,
+            changedIds: IntArray,
+        ): Intent {
             return Intent(context, HomeActivity::class.java)
                 .putExtra(EXTRA_CHANGED_IDS, changedIds)
         }

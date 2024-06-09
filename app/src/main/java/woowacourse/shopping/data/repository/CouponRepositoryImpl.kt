@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepositoryImpl(
-    private val couponRemoteDataSource: RemoteCouponDataSource
+    private val couponRemoteDataSource: RemoteCouponDataSource,
 ) : CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> {
         return runCatching {

@@ -7,5 +7,5 @@ data class CartUiState(
     val isEntireCheckboxSelected: Boolean = false,
     val totalPrice: Int = 0,
     val isActivated: Boolean = false,
-    val selectedCartItems: List<CartItemDomain> = emptyList()
+    val selectedCartItems: List<CartItemDomain> = emptyList(),
 )

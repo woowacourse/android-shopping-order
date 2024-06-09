@@ -15,12 +15,15 @@ class CouponAdapter(
         recyclerView.itemAnimator = null
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             CouponViewItem.VIEW_TYPE_LOADING -> {
-               val binding = ItemCartPlaceholderBinding.inflate(layoutInflater, parent, false)
-               CouponLoadingViewHolder(binding)
+                val binding = ItemCartPlaceholderBinding.inflate(layoutInflater, parent, false)
+                CouponLoadingViewHolder(binding)
             }
             else -> {
                 val binding = ItemCouponBinding.inflate(layoutInflater, parent, false)
@@ -29,7 +32,10 @@ class CouponAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         if (holder is CouponItemViewHolder) {
             holder.bind(currentList[position] as CouponViewItem.CouponItem)
         }

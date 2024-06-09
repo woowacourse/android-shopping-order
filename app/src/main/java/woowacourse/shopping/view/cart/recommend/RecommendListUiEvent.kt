@@ -13,6 +13,6 @@ sealed interface RecommendListUiEvent {
     data object NavigateBackToHome : RecommendListUiEvent
 
     data class NavigateToOrder(
-        val cartItems: List<CartItemDomain>
+        val cartItems: List<CartItemDomain>,
     ) : RecommendListUiEvent
 }

@@ -24,18 +24,19 @@ fun CartItemDomain.toCartItemInfo(): CartItemInfo =
         category = product.category,
         imageUrl = product.imageUrl,
         name = product.name,
-        price = product.price
+        price = product.price,
     )
 
 fun CartItemInfo.toCartItemDomain(): CartItemDomain =
     CartItemDomain(
         cartItemId = cartItemId,
         quantity = quantity,
-        product = ProductItemDomain(
-            id = productId,
-            category = category,
-            imageUrl = imageUrl,
-            name = name,
-            price = price
-        )
+        product =
+            ProductItemDomain(
+                id = productId,
+                category = category,
+                imageUrl = imageUrl,
+                name = name,
+                price = price,
+            ),
     )

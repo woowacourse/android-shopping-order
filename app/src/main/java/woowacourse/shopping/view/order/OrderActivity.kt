@@ -31,7 +31,7 @@ class OrderActivity : AppCompatActivity() {
         OrderViewModelFactory(
             couponRepository,
             orderRepository,
-            orders?.map(CartItemInfo::toCartItemDomain) ?: emptyList()
+            orders?.map(CartItemInfo::toCartItemDomain) ?: emptyList(),
         )
     }
     private val adapter: CouponAdapter by lazy { CouponAdapter(viewModel) }
@@ -97,7 +97,10 @@ class OrderActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_CART_ITEMS = "cart_items"
 
-        fun createIntent(context: Context, cartItems: List<CartItemDomain>): Intent {
+        fun createIntent(
+            context: Context,
+            cartItems: List<CartItemDomain>,
+        ): Intent {
             return Intent(context, OrderActivity::class.java)
                 .putExtra(
                     EXTRA_CART_ITEMS,

@@ -67,7 +67,6 @@ class CartAdapter(
     fun loadData(cartItems: List<CartViewItem>) {
         if (isFirstLoad()) submitList(null)
         submitList(cartItems)
-        println(cartItems)
     }
 
     private fun isFirstLoad() = currentList.all { it.viewType == ShoppingCartViewItem.CART_PLACEHOLDER_VIEW_TYPE }

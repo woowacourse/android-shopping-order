@@ -64,20 +64,21 @@ fun setExpirationDate(
         textView.visibility = View.INVISIBLE
         return
     }
-    val minimumPrice = when (couponViewItem.coupon) {
-        is Coupon.Fixed -> context.getString(
-            R.string.price_format,
-            couponViewItem.coupon.minimumAmount
-        )
+    val minimumPrice =
+        when (couponViewItem.coupon) {
+            is Coupon.Fixed ->
+                context.getString(
+                    R.string.price_format,
+                    couponViewItem.coupon.minimumAmount,
+                )
 
-        is Coupon.FreeShipping -> context.getString(
-            R.string.price_format,
-            couponViewItem.coupon.minimumAmount
-        )
+            is Coupon.FreeShipping ->
+                context.getString(
+                    R.string.price_format,
+                    couponViewItem.coupon.minimumAmount,
+                )
 
-        else -> return
-    }
+            else -> return
+        }
     textView.text = context.getString(R.string.order_minimum_price, minimumPrice)
 }
-
-

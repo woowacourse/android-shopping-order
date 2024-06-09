@@ -1,7 +1,5 @@
 package woowacourse.shopping.domain.model
 
-import com.google.gson.annotations.SerializedName
-import woowacourse.shopping.data.model.coupon.AvailableTime
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -51,4 +49,11 @@ sealed class Coupon(
         val startTime: LocalTime,
         val endTime: LocalTime,
     ) : Coupon(id, code, description, expirationDate, discountType)
+
+    companion object {
+        const val DISCOUNT_TYPE_FIXED = "fixed"
+        const val DISCOUNT_TYPE_BUYX_GETY = "buyXgetY"
+        const val DISCOUNT_TYPE_FREE_SHIPPING = "freeShipping"
+        const val DISCOUNT_TYPE_PERCENTAGE = "percentage"
+    }
 }
