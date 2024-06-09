@@ -11,12 +11,18 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.response.onSuccess
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.toUiModel
+import woowacourse.shopping.ui.coupon.uimodel.CouponError
 import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
 import woowacourse.shopping.ui.coupon.uimodel.PaymentInfoUiModel
+import woowacourse.shopping.ui.coupon.uimodel.checkCouponError
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
+import woowacourse.shopping.ui.utils.viewModelAsync
+import woowacourse.shopping.ui.utils.viewModelLaunch
 
 class CouponViewModel(
     private val couponRepository: CouponRepository,
@@ -33,15 +39,16 @@ class CouponViewModel(
     private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
 
+    private val _error: MutableSingleLiveData<CouponError> = MutableSingleLiveData()
+    val error: SingleLiveData<CouponError> get() = _error
+
     fun loadAvailableCoupons(carts: List<CartUiModel>) {
-        viewModelScope.launch {
-            runCatching {
-                couponRepository.getCoupons()
-            }.onSuccess { coupons ->
+        viewModelLaunch(::couponExceptionHandler) {
+            couponRepository.allCouponsResponse().onSuccess { coupons ->
                 order.value = Order(coupons)
                 _coupons.value =
                     order?.value?.canUseCoupons(getCartWithProduct(carts))?.map { it.toUiModel() }
-            }
+            }.checkCouponError { _error.setValue(it) }
         }
     }
 
@@ -55,16 +62,16 @@ class CouponViewModel(
         }
 
     fun loadInitialPaymentInfo(carts: List<CartUiModel>) {
-        viewModelScope.launch {
-            val carts = getCartWithProduct(carts)
-            _payment.value =
-                PaymentInfoUiModel(
-                    carts.sumOf { it.product.price * it.quantity.value },
-                    Order.INIT_DISCOUNT_PRICE,
-                    Order.SHIPPING_PRICE,
-                    carts.sumOf { it.product.price * it.quantity.value },
-                )
-        }
+
+        val carts = getCartWithProduct(carts)
+        _payment.value =
+            PaymentInfoUiModel(
+                carts.sumOf { it.product.price * it.quantity.value },
+                Order.INIT_DISCOUNT_PRICE,
+                Order.SHIPPING_PRICE,
+                carts.sumOf { it.product.price * it.quantity.value },
+            )
+
     }
 
     fun updatePaymentInfo(
@@ -72,12 +79,14 @@ class CouponViewModel(
         selectedCouponId: Long,
     ) {
         viewModelScope.launch {
-            val carts = getCartWithProduct(cartsUiModel)
-            val order = order?.value ?: Order(emptyList())
+            val cartsJob = viewModelAsync { getCartWithProduct(cartsUiModel) }
+            val orderJob = viewModelAsync { order?.value ?: Order(emptyList()) }
 
             _coupons.value = _coupons.value?.reverseCheck(couponId = selectedCouponId)
 
             if (_coupons.value.isChecked(selectedCouponId)) {
+                val carts = cartsJob.await()
+                val order = orderJob.await()
                 _payment.value =
                     PaymentInfoUiModel(
                         carts.sumOf { it.product.price * it.quantity.value },
@@ -86,19 +95,20 @@ class CouponViewModel(
                         order.paymentPrice(carts, selectedCouponId),
                     )
             } else {
-                loadInitialPaymentInfo(cartsUiModel)
+                viewModelLaunch {
+                    loadInitialPaymentInfo(cartsUiModel)
+                }
             }
         }
     }
 
     fun order(carts: List<CartUiModel>) {
-        viewModelScope.launch {
-            runCatching {
-                orderRepository.order(carts.map { it.id })
-            }.onSuccess {
+        viewModelLaunch(::orderExceptionHandler) {
+            orderRepository.order(carts.map { it.id }).onSuccess {
                 _isOrderSuccess.setValue(true)
-            }.onFailure {
+            }.checkCouponError {
                 _isOrderSuccess.setValue(false)
+                _error.setValue(it)
             }
         }
     }
@@ -120,5 +130,15 @@ class CouponViewModel(
         }
     }
 
-    private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean = this?.firstOrNull { it.id == couponId }?.isChecked ?: false
+    private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean =
+        this?.firstOrNull { it.id == couponId }?.isChecked ?: false
+
+
+    private fun couponExceptionHandler(throwable: Throwable) {
+        _error.setValue(CouponError.LoadCoupon)
+    }
+
+    private fun orderExceptionHandler(throwable: Throwable) {
+        _error.setValue(CouponError.Order)
+    }
 }

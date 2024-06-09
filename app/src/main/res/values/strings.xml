@@ -27,4 +27,6 @@
     <string name="coupon_discount_price">-%,d원</string>
     <string name="product_list_error">현재는 상품을 불러올 수 없습니다. 나중에 다시 이용해주세요</string>
     <string name="cart_error">현재는 장바구니를 이용할 수 없습니다</string>
+    <string name="order_error">현재는 결제할 수 없습니다. 나중에 다시 이용해주세요</string>
+    <string name="coupon_error">현재는 쿠폰을 적용할 수 없습니다. 나중에 다시 이용해주세요</string>
 </resources>

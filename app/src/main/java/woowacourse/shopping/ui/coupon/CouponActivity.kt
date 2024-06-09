@@ -5,15 +5,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCouponBinding
+import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.uimodel.CouponClickListener
+import woowacourse.shopping.ui.coupon.uimodel.CouponError
 import woowacourse.shopping.ui.coupon.viewmodel.CouponViewModel
 import woowacourse.shopping.ui.coupon.viewmodel.CouponViewModelFactory
 import woowacourse.shopping.ui.products.ProductContentsActivity
 import woowacourse.shopping.ui.utils.parcelableList
+import woowacourse.shopping.ui.utils.showToastMessage
 
 class CouponActivity : AppCompatActivity(), CouponClickListener {
     private lateinit var binding: ActivityCouponBinding
@@ -45,6 +49,7 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
         clickOrder()
 
         viewModel.loadInitialPaymentInfo(carts)
+        observeErrorMessage()
     }
 
     private fun setAdapter() {
@@ -69,10 +74,27 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
         }
 
         viewModel.isOrderSuccess.observe(this) {
-            val intent = Intent(this, ProductContentsActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            startActivity(intent)
+            finishOrderPage()
         }
+    }
+
+    private fun observeErrorMessage() {
+        viewModel.error.observe(this) { error ->
+            when (error) {
+                CouponError.InvalidAuthorized -> showToastMessage(R.string.unauthorized_error)
+                CouponError.LoadCoupon -> showToastMessage(R.string.coupon_error)
+                CouponError.Network -> showToastMessage(R.string.server_error)
+                CouponError.Order -> showToastMessage(R.string.order_error)
+                CouponError.UnKnown -> showToastMessage(R.string.unknown_error)
+            }
+            finishOrderPage()
+        }
+    }
+
+    private fun finishOrderPage() {
+        val intent = Intent(this, ProductContentsActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
     }
 
     companion object {
