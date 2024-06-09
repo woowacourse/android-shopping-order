@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
@@ -205,9 +205,9 @@ class ProductContentsViewModel(
         _error.setValue(ProductListError.LoadProduct)
     }
 
-    private inline fun <reified T : Any?> Response<T>.checkError(excute: (ProductListError) -> Unit) = apply {
+    private inline fun <reified T : Any?> Result<T>.checkError(excute: (ProductListError) -> Unit) = apply {
         when (this) {
-            is Response.Success -> {}
+            is Result.Success -> {}
             is Fail.InvalidAuthorized -> excute(ProductListError.InvalidAuthorized)
             is Fail.Network -> excute(ProductListError.Network)
             is Fail.NotFound -> {
@@ -218,7 +218,7 @@ class ProductContentsViewModel(
                 }
             }
 
-            is Response.Exception -> {
+            is Result.Exception -> {
                 Log.d(this.javaClass.simpleName, "${this.e}")
                 excute(ProductListError.UnKnown)
             }

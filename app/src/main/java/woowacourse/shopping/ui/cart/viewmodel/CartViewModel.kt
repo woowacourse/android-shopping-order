@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onException
 import woowacourse.shopping.domain.result.onFail
 import woowacourse.shopping.domain.result.onSuccess
@@ -263,9 +263,9 @@ class CartViewModel(
             it.productId == productId
         }?.isChecked ?: false || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 
-    private inline fun <reified T : Any?> Response<T>.checkError(excute: (CartError) -> Unit) = apply {
+    private inline fun <reified T : Any?> Result<T>.checkError(excute: (CartError) -> Unit) = apply {
         when (this) {
-            is Response.Success -> {}
+            is Result.Success -> {}
             is Fail.InvalidAuthorized -> excute(CartError.InvalidAuthorized)
             is Fail.Network -> excute(CartError.Network)
             is Fail.NotFound -> {
@@ -276,7 +276,7 @@ class CartViewModel(
                 }
             }
 
-            is Response.Exception -> {
+            is Result.Exception -> {
                 Log.d(this.javaClass.simpleName, "${this.e}")
                 excute(CartError.UnKnown)
             }

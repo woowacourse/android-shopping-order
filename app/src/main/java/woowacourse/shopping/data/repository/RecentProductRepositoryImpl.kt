@@ -4,7 +4,7 @@ import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDao
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :
@@ -17,7 +17,7 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
             ),
         )
 
-    override suspend fun insertResponse(productId: Long): Response<Long> {
+    override suspend fun insertResponse(productId: Long): Result<Long> {
         return try {
             val productId = recentProductDao.insert(
                 RecentProduct(
@@ -25,9 +25,9 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
                     recentTime = LocalDateTime.now(),
                 ),
             )
-            Response.Success(productId)
+            Result.Success(productId)
         } catch (e: Exception) {
-            Response.Exception(e)
+            Result.Exception(e)
         }
     }
 
@@ -37,30 +37,30 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
     override suspend fun mostRecentProductOrNull(): RecentProduct? =
         recentProductDao.findMostRecentProduct()
 
-    override suspend fun mostRecentProductResponse(): Response<RecentProduct> {
+    override suspend fun mostRecentProductResponse(): Result<RecentProduct> {
         return try {
             val result =
                 recentProductDao.findMostRecentProduct() ?: return Fail.NotFound("최근 상품이 없습니다.")
-            Response.Success(result)
+            Result.Success(result)
         } catch (e: Exception) {
-            Response.Exception(e)
+            Result.Exception(e)
         }
     }
 
     override suspend fun allRecentProducts(): List<RecentProduct> = recentProductDao.findAll()
-    override suspend fun allRecentProductsResponse(): Response<List<RecentProduct>> {
+    override suspend fun allRecentProductsResponse(): Result<List<RecentProduct>> {
         return try {
-            Response.Success(recentProductDao.findAll())
+            Result.Success(recentProductDao.findAll())
         } catch (e: Exception) {
-            Response.Exception(e)
+            Result.Exception(e)
         }
     }
 
-    override suspend fun deleteAll(): Response<Unit> {
+    override suspend fun deleteAll(): Result<Unit> {
         return try {
-            Response.Success(recentProductDao.deleteAll())
+            Result.Success(recentProductDao.deleteAll())
         } catch (e: Exception) {
-            Response.Exception(e)
+            Result.Exception(e)
         }
     }
 

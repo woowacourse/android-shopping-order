@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onException
 import woowacourse.shopping.domain.result.onFail
 import woowacourse.shopping.domain.result.onSuccess
@@ -139,9 +139,9 @@ class ProductDetailViewModel(
         _mostRecentProductVisibility.value = false
     }
 
-    private inline fun <reified T : Any?> Response<T>.checkError(execute: (ProductDetailError) -> Unit) = apply {
+    private inline fun <reified T : Any?> Result<T>.checkError(execute: (ProductDetailError) -> Unit) = apply {
         when (this) {
-            is Response.Success -> {}
+            is Result.Success -> {}
             is Fail.InvalidAuthorized -> execute(ProductDetailError.InvalidAuthorized)
             is Fail.Network -> execute(ProductDetailError.Network)
             is Fail.NotFound -> {
@@ -152,7 +152,7 @@ class ProductDetailViewModel(
                 }
             }
 
-            is Response.Exception -> {
+            is Result.Exception -> {
                 Log.d(this.javaClass.simpleName, "${this.e}")
                 execute(ProductDetailError.UnKnown)
             }

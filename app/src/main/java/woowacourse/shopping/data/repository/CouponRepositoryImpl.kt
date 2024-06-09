@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.model.coupon.PercentageCoupon
 import woowacourse.shopping.domain.model.coupon.ShippingCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.result
 
@@ -28,7 +28,7 @@ class CouponRepositoryImpl(private val dataSource: ApiHandleCouponDataSource = A
         return if (response is Fail.NotFound) emptyList() else response.result()
     }
 
-    override suspend fun allCouponsResponse(): Response<List<Coupon>> = handleApiResult(
+    override suspend fun allCouponsResponse(): Result<List<Coupon>> = handleApiResult(
         result = dataSource.getCoupons(),
         transform = { it.map { it.toDomain() } }
     )

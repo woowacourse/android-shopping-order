@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.toUiModel
@@ -144,9 +144,9 @@ class CouponViewModel(
         _error.setValue(CouponError.Order)
     }
 
-    private inline fun <reified T : Any?> Response<T>.checkError(execute: (CouponError) -> Unit) = apply {
+    private inline fun <reified T : Any?> Result<T>.checkError(execute: (CouponError) -> Unit) = apply {
         when (this) {
-            is Response.Success -> {}
+            is Result.Success -> {}
             is Fail.InvalidAuthorized -> execute(CouponError.InvalidAuthorized)
             is Fail.Network -> execute(CouponError.Network)
             is Fail.NotFound -> {
@@ -157,7 +157,7 @@ class CouponViewModel(
                 }
             }
 
-            is Response.Exception -> {
+            is Result.Exception -> {
                 Log.d(this.javaClass.simpleName, "${this.e}")
                 execute(CouponError.UnKnown)
             }

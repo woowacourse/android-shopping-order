@@ -10,7 +10,7 @@ import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.result
 import woowacourse.shopping.domain.result.resultOrNull
@@ -25,18 +25,18 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
 
     override suspend fun cartItemOrNull(productId: Long): CartWithProduct? {
         return when (val carts = allCartItemsResponse()) {
-            is Response.Success -> carts.result.firstOrNull { it.product.id == productId }
+            is Result.Success -> carts.result.firstOrNull { it.product.id == productId }
             is Fail -> null
-            is Response.Exception -> null
+            is Result.Exception -> null
         }
     }
 
-    override suspend fun cartItemResponse(productId: Long): Response<CartWithProduct> {
+    override suspend fun cartItemResponse(productId: Long): Result<CartWithProduct> {
         return when (val carts = allCartItemsResponse()) {
-            is Response.Success -> {
+            is Result.Success -> {
                 val cartWithProduct = carts.result.firstOrNull { it.product.id == productId }
                 if (cartWithProduct != null) {
-                    Response.Success(cartWithProduct)
+                    Result.Success(cartWithProduct)
                 } else {
                     Fail.NotFound("$productId 에 해당하는 cartItem이 없습니다.")
                 }
@@ -45,7 +45,7 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
             is Fail.NotFound -> Fail.NotFound(carts.message)
             is Fail.InvalidAuthorized -> Fail.InvalidAuthorized(carts.message)
             is Fail.Network -> Fail.Network(carts.message)
-            is Response.Exception -> Response.Exception(carts.e)
+            is Result.Exception -> Result.Exception(carts.e)
         }
     }
 
@@ -58,7 +58,7 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
         return if (response is Fail.NotFound) emptyList() else response.result()
     }
 
-    override suspend fun allCartItemsResponse(): Response<List<CartWithProduct>> = coroutineScope {
+    override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> = coroutineScope {
         val count = dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
         return@coroutineScope handleApiResult(
             result = dataSource.getCartItems(START_CART_PAGE, count),
@@ -69,12 +69,12 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
     override suspend fun postCartItems(
         productId: Long,
         quantity: Int,
-    ): Response<Unit> = handleApiResult(
+    ): Result<Unit> = handleApiResult(
         result = dataSource.postCartItems(RequestCartItemPostDto(productId, quantity)),
     )
 
 
-    override suspend fun deleteCartItem(id: Long): Response<Unit> = handleApiResult(
+    override suspend fun deleteCartItem(id: Long): Result<Unit> = handleApiResult(
         result = dataSource.deleteCartItems(id)
     )
 
@@ -88,7 +88,7 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
         transform = { it.quantity }
     ).resultOrNull()
 
-    override suspend fun cartItemsCountResponse(): Response<Int> = handleApiResult(
+    override suspend fun cartItemsCountResponse(): Result<Int> = handleApiResult(
         result = dataSource.getCartItemCounts(),
         transform = { it.quantity }
     )
@@ -97,14 +97,14 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
     override suspend fun patchCartItem(
         id: Long,
         quantity: Int,
-    ): Response<Unit> = handleApiResult(
+    ): Result<Unit> = handleApiResult(
         result = dataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
     )
 
     override suspend fun addProductToCart(
         productId: Long,
         quantity: Int,
-    ): Response<Unit> = coroutineScope {
+    ): Result<Unit> = coroutineScope {
         val cart: CartWithProduct? = allCartItems().firstOrNull { it.product.id == productId }
         if (cart == null) {
             return@coroutineScope postCartItems(productId, quantity)

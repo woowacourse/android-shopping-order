@@ -1,12 +1,14 @@
 package woowacourse.shopping.domain.result
 
-sealed interface Response<out T : Any?> {
-    data class Success<T : Any?>(val result: T) : Response<T>
+sealed interface Result<out T : Any?> {
+    data class Success<T : Any?>(val result: T) :
+        Result<T>
 
-    data class Exception<T : Any?>(val e: Throwable) : Response<T>
+    data class Exception<T : Any?>(val e: Throwable) :
+        Result<T>
 }
 
-sealed interface Fail<T : Any?> : Response<T> {
+sealed interface Fail<T : Any?> : Result<T> {
     val message: String?
 
     data class NotFound<T : Any?>(override val message: String?) : Fail<T>

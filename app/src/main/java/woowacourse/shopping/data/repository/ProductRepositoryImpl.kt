@@ -14,7 +14,7 @@ import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.handleError
 import woowacourse.shopping.domain.result.result
@@ -35,7 +35,7 @@ class ProductRepositoryImpl(
         productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
     ).resultOrNull()
 
-    override suspend fun productByIdResponse(id: Long): Response<Product> = handleApiResult(
+    override suspend fun productByIdResponse(id: Long): Result<Product> = handleApiResult(
         productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
     )
 
@@ -47,7 +47,7 @@ class ProductRepositoryImpl(
         return if (result is Fail.NotFound) emptyList() else result.result()
     }
 
-    override suspend fun allProductsResponse(page: Int, size: Int): Response<List<Product>> =
+    override suspend fun allProductsResponse(page: Int, size: Int): Result<List<Product>> =
         handleApiResult(
             productDataSource.getProductsByOffset(page, size),
             transform = ResponseProductsGetDto::toProductList
@@ -75,7 +75,7 @@ class ProductRepositoryImpl(
         return@coroutineScope allProducts
     }
 
-    override suspend fun allProductsByCategoryResponse(category: String): Response<List<Product>> =
+    override suspend fun allProductsByCategoryResponse(category: String): Result<List<Product>> =
         coroutineScope {
             try {
                 val count: Int = cartDataSource.getCartItemCounts().resultOrNull()?.quantity
@@ -96,7 +96,7 @@ class ProductRepositoryImpl(
                             productResponse.data.toProductList()
 
                         is ApiResponse.Error -> return@coroutineScope handleError(productResponse)
-                        is ApiResponse.Exception -> return@coroutineScope Response.Exception(
+                        is ApiResponse.Exception -> return@coroutineScope Result.Exception(
                             productResponse.e,
                         )
                     }
@@ -106,11 +106,11 @@ class ProductRepositoryImpl(
                     page++
                 }
 
-                return@coroutineScope Response.Success(
+                return@coroutineScope Result.Success(
                     allProducts.subList(0, min(MAX_RECOMMEND_SIZE, allProducts.size)),
                 )
             } catch (e: Exception) {
-                return@coroutineScope Response.Exception(e)
+                return@coroutineScope Result.Exception(e)
             }
         }
 

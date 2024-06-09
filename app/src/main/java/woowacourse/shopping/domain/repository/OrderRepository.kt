@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.Result
 
 interface OrderRepository {
-    suspend fun order(cartIds: List<Long>):Response<Unit>
+    suspend fun order(cartIds: List<Long>): Result<Unit>
 }
