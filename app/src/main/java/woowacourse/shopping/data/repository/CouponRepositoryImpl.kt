@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.ApiHandleCouponDataSource
-import woowacourse.shopping.data.datasource.impl.ApiHandleCouponDataSourceImpl
+import woowacourse.shopping.data.datasource.CouponDataSource
+import woowacourse.shopping.data.datasource.impl.RemoteCouponDataSource
 import woowacourse.shopping.data.remote.dto.response.BuyXGetYCoupon
 import woowacourse.shopping.data.remote.dto.response.CouponDto
 import woowacourse.shopping.data.remote.dto.response.FixedDiscountCoupon
@@ -18,7 +18,7 @@ import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.result
 
-class CouponRepositoryImpl(private val dataSource: ApiHandleCouponDataSource = ApiHandleCouponDataSourceImpl()) :
+class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
     CouponRepository {
     override suspend fun allCoupons(): List<Coupon> {
         val response =

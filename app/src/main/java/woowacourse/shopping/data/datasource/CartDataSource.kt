@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.datasource
 
+import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.remote.dto.response.ResponseCartItemCountsGetDto
@@ -9,16 +10,16 @@ interface CartDataSource {
     suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): ResponseCartItemsGetDto
+    ): ApiResponse<ResponseCartItemsGetDto>
 
-    suspend fun postCartItems(request: RequestCartItemPostDto)
+    suspend fun postCartItems(request: RequestCartItemPostDto): ApiResponse<Unit>
 
-    suspend fun deleteCartItems(id: Long)
+    suspend fun deleteCartItems(id: Long): ApiResponse<Unit>
 
     suspend fun patchCartItems(
         id: Long,
         request: RequestCartItemsPatchDto,
-    )
+    ): ApiResponse<Unit>
 
-    suspend fun getCartItemCounts(): ResponseCartItemCountsGetDto
+    suspend fun getCartItemCounts(): ApiResponse<ResponseCartItemCountsGetDto>
 }

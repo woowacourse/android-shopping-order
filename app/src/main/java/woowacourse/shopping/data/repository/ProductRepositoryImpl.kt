@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.coroutineScope
-import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
-import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
-import woowacourse.shopping.data.datasource.impl.ApiHandleCartDataSourceImpl
-import woowacourse.shopping.data.datasource.impl.ApiHandleProductDataSourceImpl
+import woowacourse.shopping.data.datasource.CartDataSource
+import woowacourse.shopping.data.datasource.ProductDataSource
+import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
+import woowacourse.shopping.data.datasource.impl.RemoteProductDataSource
 import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.api.result
 import woowacourse.shopping.data.remote.api.resultOrNull
@@ -22,8 +22,8 @@ import woowacourse.shopping.domain.result.resultOrNull
 import kotlin.math.min
 
 class ProductRepositoryImpl(
-    private val productDataSource: ApiHandleProductDataSource = ApiHandleProductDataSourceImpl(),
-    private val cartDataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl(),
+    private val productDataSource: ProductDataSource = RemoteProductDataSource(),
+    private val cartDataSource: CartDataSource = RemoteCartDataSource(),
 ) :
     ProductRepository {
     override suspend fun productById(id: Long): Product =

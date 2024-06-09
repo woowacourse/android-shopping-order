@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.coroutineScope
-import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
-import woowacourse.shopping.data.datasource.impl.ApiHandleCartDataSourceImpl
+import woowacourse.shopping.data.datasource.CartDataSource
+import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
 import woowacourse.shopping.data.remote.api.resultOrNull
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.result
 import woowacourse.shopping.domain.result.resultOrNull
 
-class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl()) :
+class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartDataSource()) :
     CartRepository {
     override suspend fun cartItem(productId: Long): CartWithProduct {
         val carts = allCartItems()
