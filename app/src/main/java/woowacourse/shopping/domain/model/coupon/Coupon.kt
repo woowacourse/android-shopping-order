@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.coupon
 
 import java.time.LocalDate
 
@@ -12,7 +12,7 @@ data class Coupon(
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
     val availableTime: AvailableTime? = null,
-    val discountType: String,
+    val discountType: DiscountType,
     val isChecked: Boolean = false,
 ) {
     fun check(): Coupon = copy(isChecked = true)

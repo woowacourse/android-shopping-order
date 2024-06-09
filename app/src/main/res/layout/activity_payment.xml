@@ -75,20 +75,20 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupon"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="270dp"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             app:isCouponEmpty="@{viewModel.isCouponEmpty}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_information"
             app:paymentUiState="@{viewModel.paymentUiState}"
-            tools:itemCount="2"
+            tools:itemCount="4"
             tools:listitem="@layout/item_coupon" />
 
         <TextView
             android:id="@+id/rv_coupon_empty"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="270dp"
             android:layout_marginTop="12dp"
             android:gravity="center"
             android:text="텅!"

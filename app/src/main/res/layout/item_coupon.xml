@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="coupon"
-            type="woowacourse.shopping.domain.model.Coupon" />
+            name="couponState"
+            type="woowacourse.shopping.domain.model.coupon.CouponState" />
 
         <variable
             name="viewModel"
@@ -17,7 +17,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="110dp"
         android:layout_marginHorizontal="18dp"
         android:layout_marginVertical="12dp"
         android:background="@drawable/item_gridview">
@@ -28,8 +28,8 @@
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
-            android:checked="@{coupon.isChecked}"
-            android:onClick="@{() -> viewModel.onCouponClick(coupon.id)}"
+            android:checked="@{couponState.coupon.isChecked}"
+            android:onClick="@{() -> viewModel.onCouponClick(couponState.coupon.id)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:checked="true" />
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@{coupon.description}"
+            android:text="@{couponState.coupon.description}"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:visibility="visible"
-            app:expirationDate="@{coupon.expirationDate}"
+            app:expirationDate="@{couponState.coupon.expirationDate}"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/checkbox_coupon"
             tools:text="만료일: 2024년 11월 30일" />
@@ -64,9 +64,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:minOrderPrice="@{coupon.minOrderPrice}"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_expiration_date"
+            app:minOrderPrice="@{couponState.coupon.minOrderPrice}"
             tools:text="최소 주문 금액: 100,000원" />
 
 

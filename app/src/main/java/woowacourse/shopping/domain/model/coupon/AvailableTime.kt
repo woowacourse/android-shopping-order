@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.coupon
 
 data class AvailableTime(
     val start: String,

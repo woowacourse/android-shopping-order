@@ -14,7 +14,8 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.CouponState
 import woowacourse.shopping.ui.home.HomeActivity
 import woowacourse.shopping.ui.payment.action.PaymentNavigationActions.NavigateToBack
 import woowacourse.shopping.ui.payment.action.PaymentNavigationActions.NavigateToHome
@@ -99,7 +100,7 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-    private fun showData(data: List<Coupon>) {
+    private fun showData(data: List<CouponState>) {
         adapter.submitList(data.toList())
     }
 

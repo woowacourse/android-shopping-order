@@ -32,9 +32,13 @@ fun setExpirationDate(
 @BindingAdapter("app:minOrderPrice")
 fun setMinOrderPrice(
     view: TextView,
-    price: Int,
+    minOrderPrice: Int?,
 ) {
-    view.text = view.context.getString(R.string.min_order_price_format, price)
+    if (minOrderPrice == null) {
+        view.visibility = View.GONE
+    } else {
+        view.text = view.context.getString(R.string.min_order_price_format, minOrderPrice)
+    }
 }
 
 @BindingAdapter("app:isCouponEmpty", "app:paymentUiState", requireAll = true)

@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.mapper.toCoupons
 import woowacourse.shopping.data.remote.datasource.RemotePaymentDataSource
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepositoryImpl(private val remotePaymentDataSource: RemotePaymentDataSource) :

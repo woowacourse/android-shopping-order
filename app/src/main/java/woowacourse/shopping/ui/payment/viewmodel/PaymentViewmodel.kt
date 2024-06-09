@@ -8,7 +8,13 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.BuyXgetYCoupon
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.CouponState
+import woowacourse.shopping.domain.model.coupon.DiscountType
+import woowacourse.shopping.domain.model.coupon.FixedCoupon
+import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.model.coupon.PercentageCoupon
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -25,13 +31,13 @@ class PaymentViewmodel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel(), PaymentClickListener {
-    private val _paymentUiState = MutableLiveData<UiState<List<Coupon>>>(UiState.Loading)
-    val paymentUiState: LiveData<UiState<List<Coupon>>>
+    private val _paymentUiState = MutableLiveData<UiState<List<CouponState>>>(UiState.Loading)
+    val paymentUiState: LiveData<UiState<List<CouponState>>>
         get() = _paymentUiState
 
-    private val _coupons = MutableLiveData<List<Coupon>>(emptyList())
-    private val coupons: LiveData<List<Coupon>>
-        get() = _coupons
+    private val _validCoupons = MutableLiveData<List<CouponState>>(emptyList())
+    private val validCoupons: LiveData<List<CouponState>>
+        get() = _validCoupons
 
     private val _cartItems = MutableLiveData<List<CartItem>>(emptyList())
     private val cartItems: LiveData<List<CartItem>>
@@ -66,7 +72,7 @@ class PaymentViewmodel(
 
     val isCouponEmpty: LiveData<Boolean>
         get() =
-            coupons.map { couponsValue ->
+            validCoupons.map { couponsValue ->
                 if (paymentUiState.value is UiState.Success) {
                     couponsValue.isEmpty()
                 } else {
@@ -90,8 +96,9 @@ class PaymentViewmodel(
     private fun loadCoupons() {
         viewModelScope.launch {
             couponRepository.getCoupons().onSuccess { coupons ->
-                _paymentUiState.value = UiState.Success(coupons)
-                _coupons.value = coupons
+                val couponStates = coupons.map { coupon -> makeCouponState(coupon) }
+                _validCoupons.value = couponStates.filter { couponState -> couponState.isValid() }
+                _paymentUiState.value = UiState.Success((validCoupons.value ?: emptyList()))
             }.onFailure {
                 _paymentUiState.value = UiState.Error(it)
             }
@@ -111,25 +118,45 @@ class PaymentViewmodel(
         }
     }
 
+    private fun makeCouponState(coupon: Coupon): CouponState {
+        return when (coupon.discountType) {
+            DiscountType.FIXED -> FixedCoupon(coupon, (cartItems.value ?: emptyList()))
+            DiscountType.BUYXGETY -> BuyXgetYCoupon(coupon, (cartItems.value ?: emptyList()))
+            DiscountType.FREESHIPPING -> FreeShippingCoupon(
+                coupon,
+                (cartItems.value ?: emptyList())
+            )
+
+            DiscountType.PERCENTAGE -> PercentageCoupon(
+                coupon,
+                (cartItems.value ?: emptyList())
+            )
+        }
+    }
+
     override fun onBackButtonClick() {
         _paymentNavigationActions.value = Event(PaymentNavigationActions.NavigateToBack)
     }
 
     override fun onCouponClick(couponId: Int) {
-        var clickedCoupon = coupons.value?.first { coupon -> coupon.id == couponId } ?: return
-        clickedCoupon =
-            if (clickedCoupon.isChecked) clickedCoupon.unCheck() else clickedCoupon.check()
-        _coupons.value =
-            coupons.value?.map { coupon ->
-                if (coupon.id != couponId) {
-                    coupon.unCheck()
+        var clickedCouponState =
+            validCoupons.value?.first { couponState -> couponState.coupon.id == couponId } ?: return
+        clickedCouponState =
+            if (clickedCouponState.coupon.isChecked) makeCouponState(clickedCouponState.coupon.unCheck()) else makeCouponState(
+                clickedCouponState.coupon.check()
+            )
+        _validCoupons.value =
+            validCoupons.value?.map { couponState ->
+                if (couponState.coupon.id != couponId) {
+                    makeCouponState(couponState.coupon.unCheck())
                 } else {
-                    clickedCoupon
+                    clickedCouponState
                 }
             }
 
-        _paymentUiState.value = UiState.Success(coupons.value ?: emptyList())
-        _discountPrice.value = if (clickedCoupon.isChecked) clickedCoupon.discount ?: 0 else 0
+        _paymentUiState.value = UiState.Success(validCoupons.value ?: emptyList())
+        _discountPrice.value =
+            if (clickedCouponState.coupon.isChecked) clickedCouponState.discountPrice() else 0
     }
 
     override fun onPaymentButtonClick() {
@@ -143,6 +170,6 @@ class PaymentViewmodel(
     }
 
     companion object {
-        private const val DEFAULT_DELIVERY_PRICE = 3000
+        const val DEFAULT_DELIVERY_PRICE = 3000
     }
 }

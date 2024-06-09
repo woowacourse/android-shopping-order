@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCouponBinding
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.CouponState
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewmodel
 
 class CouponAdapter(val viewModel: PaymentViewmodel) :
-    ListAdapter<Coupon, CouponViewHolder>(diffUtil) {
+    ListAdapter<CouponState, CouponViewHolder>(diffUtil) {
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.itemAnimator = null
@@ -38,16 +38,16 @@ class CouponAdapter(val viewModel: PaymentViewmodel) :
 
     companion object {
         val diffUtil =
-            object : DiffUtil.ItemCallback<Coupon>() {
+            object : DiffUtil.ItemCallback<CouponState>() {
                 override fun areContentsTheSame(
-                    oldItem: Coupon,
-                    newItem: Coupon,
+                    oldItem: CouponState,
+                    newItem: CouponState,
                 ) = oldItem == newItem
 
                 override fun areItemsTheSame(
-                    oldItem: Coupon,
-                    newItem: Coupon,
-                ) = oldItem.id == newItem.id
+                    oldItem: CouponState,
+                    newItem: CouponState,
+                ) = oldItem.coupon.id == newItem.coupon.id
             }
     }
 }
