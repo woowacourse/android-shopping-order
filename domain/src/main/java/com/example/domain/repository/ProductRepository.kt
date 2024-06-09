@@ -5,14 +5,14 @@ import com.example.domain.model.PagingProduct
 import com.example.domain.model.Product
 
 interface ProductRepository {
-    fun find(id: Int): DataResponse<Product>
+    suspend fun find(id: Int): DataResponse<Product>
 
-    fun findRange(
+    suspend fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<Product>>
 
-    fun findPage(
+    suspend fun findPage(
         page: Int,
         size: Int,
     ): DataResponse<PagingProduct>

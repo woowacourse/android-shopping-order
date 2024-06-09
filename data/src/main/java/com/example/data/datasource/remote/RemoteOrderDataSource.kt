@@ -7,7 +7,7 @@ import com.example.domain.datasource.OrderDataSource
 class RemoteOrderDataSource(
     private val service: OrderService,
 ) : OrderDataSource {
-    override fun createOrder(cartItemIds: List<Int>) {
+    override suspend fun createOrder(cartItemIds: List<Int>) {
         val request = CreateOrderRequest(cartItemIds)
         service.requestCreateOrder(createOrderRequest = request)
     }

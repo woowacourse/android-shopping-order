@@ -5,6 +5,7 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.domain.datasource.DataResponse.Companion.NULL_BODY_ERROR_CODE
 import com.example.domain.datasource.map
 import com.example.domain.datasource.onFailure
@@ -14,12 +15,12 @@ import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.common.emit
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 import woowacourse.shopping.presentation.products.uimodel.toRecentProdutUiModels
-import kotlin.concurrent.thread
 
 class ProductsViewModel(
     private val productRepository: ProductRepository,
@@ -48,7 +49,7 @@ class ProductsViewModel(
     }
 
     fun loadPage() {
-        thread {
+        viewModelScope.launch {
             val pagingProduct = productRepository.findPage(page, PAGE_SIZE)
             val cartItems = cartRepository.findAll()
             val result =
@@ -61,25 +62,23 @@ class ProductsViewModel(
                         }
                     list to pagingProduct.isLast
                 }
-            handler.post {
-                result.onSuccess { (newProductUiModels, isLast) ->
-                    val oldProductsUiModel = productsUiState.value?.productUiModels ?: listOf()
-                    val productUiModels = oldProductsUiModel + newProductUiModels
-                    val newProductsUiState =
-                        productsUiState.value?.copy(
-                            productUiModels = productUiModels,
-                            isLast = isLast,
-                            isLoading = false,
-                            isError = false,
-                        )
-                    _productsUiState.postValue(newProductsUiState)
-                }.onFailure { _, _ ->
-                    val newProductsUiState =
-                        productsUiState.value?.copy(isLoading = false, isError = true)
-                    _productsUiState.postValue(newProductsUiState)
-                }
-                page++
+            result.onSuccess { (newProductUiModels, isLast) ->
+                val oldProductsUiModel = productsUiState.value?.productUiModels ?: listOf()
+                val productUiModels = oldProductsUiModel + newProductUiModels
+                val newProductsUiState =
+                    productsUiState.value?.copy(
+                        productUiModels = productUiModels,
+                        isLast = isLast,
+                        isLoading = false,
+                        isError = false,
+                    )
+                _productsUiState.value = newProductsUiState
+            }.onFailure { _, _ ->
+                val newProductsUiState =
+                    productsUiState.value?.copy(isLoading = false, isError = true)
+                _productsUiState.value = newProductsUiState
             }
+            page++
         }
     }
 
@@ -90,7 +89,7 @@ class ProductsViewModel(
     }
 
     private fun increaseQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             cartRepository.increaseQuantity(productId)
             updateQuantity(productId)
             updateTotalCount()
@@ -98,7 +97,7 @@ class ProductsViewModel(
     }
 
     private fun decreaseQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             cartRepository.decreaseQuantity(productId)
             updateQuantity(productId)
             updateTotalCount()
@@ -106,34 +105,31 @@ class ProductsViewModel(
     }
 
     fun updateQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             val result = cartRepository.find(productId).map { it.quantity }
-            handler.post {
-                val oldUiModels =
-                    productsUiState.value?.productUiModels?.toMutableList() ?: mutableListOf()
-                val idx = oldUiModels.indexOfFirst { it.product.id == productId }
-                result.onSuccess { quantity ->
-                    oldUiModels[idx] = oldUiModels[idx].copy(quantity = quantity)
+            val oldUiModels =
+                productsUiState.value?.productUiModels?.toMutableList() ?: mutableListOf()
+            val idx = oldUiModels.indexOfFirst { it.product.id == productId }
+
+            result.onSuccess { quantity ->
+                oldUiModels[idx] = oldUiModels[idx].copy(quantity = quantity)
+                val newUiState = productsUiState.value?.copy(productUiModels = oldUiModels)
+                _productsUiState.value = newUiState
+            }.onFailure { code, error ->
+                if (code == NULL_BODY_ERROR_CODE) {
+                    oldUiModels[idx] = oldUiModels[idx].copy(quantity = Quantity(0))
                     val newUiState = productsUiState.value?.copy(productUiModels = oldUiModels)
-                    _productsUiState.postValue(newUiState)
-                }.onFailure { code, error ->
-                    if (code == NULL_BODY_ERROR_CODE) {
-                        oldUiModels[idx] = oldUiModels[idx].copy(quantity = Quantity(0))
-                        val newUiState = productsUiState.value?.copy(productUiModels = oldUiModels)
-                        _productsUiState.postValue(newUiState)
-                    }
+                    _productsUiState.value = newUiState
                 }
             }
         }
     }
 
     private fun updateTotalCount() {
-        thread {
+        viewModelScope.launch {
             val result = cartRepository.totalCartItemCount()
-            handler.post {
-                result.onSuccess { totalCount ->
-                    _cartTotalCount.postValue(totalCount)
-                }
+            result.onSuccess { totalCount ->
+                _cartTotalCount.value = totalCount
             }
         }
     }

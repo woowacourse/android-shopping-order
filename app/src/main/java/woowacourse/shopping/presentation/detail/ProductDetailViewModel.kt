@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.domain.datasource.DataResponse.Companion.NULL_BODY_ERROR_CODE
 import com.example.domain.datasource.onFailure
 import com.example.domain.datasource.onSuccess
@@ -14,10 +15,10 @@ import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.common.emit
 import woowacourse.shopping.presentation.detail.ProductDetailActivity.Companion.PRODUCT_ID_KEY
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -44,28 +45,24 @@ class ProductDetailViewModel(
     }
 
     private fun loadProduct(productId: Int) {
-        thread {
+        viewModelScope.launch {
             val result = productRepository.find(productId)
-            handler.post {
-                result.onSuccess { product ->
-                    _productUiModel.postValue(
-                        ProductDetailUiModel(
-                            product,
-                            Quantity(1),
-                            isSuccess = true,
-                            isFailure = false,
-                        ),
+            result.onSuccess { product ->
+                _productUiModel.value =
+                    ProductDetailUiModel(
+                        product,
+                        Quantity(1),
+                        isSuccess = true,
+                        isFailure = false,
                     )
-                    loadRecentProduct()
-                    putRecentProduct(product)
-                }.onFailure { code, error ->
-                    _productUiModel.postValue(
-                        ProductDetailUiModel(
-                            isSuccess = false,
-                            isFailure = true,
-                        ),
+                loadRecentProduct()
+                putRecentProduct(product)
+            }.onFailure { code, error ->
+                _productUiModel.value =
+                    ProductDetailUiModel(
+                        isSuccess = false,
+                        isFailure = true,
                     )
-                }
             }
         }
     }
@@ -99,7 +96,7 @@ class ProductDetailViewModel(
     override fun onClickAddCartProduct() {
         val product = productUiModel.value?.product ?: return
         val quantity = productUiModel.value?.quantity ?: return
-        thread {
+        viewModelScope.launch {
             val result =
                 cartRepository.find(product.id)
                     .onSuccess {
@@ -110,15 +107,13 @@ class ProductDetailViewModel(
                             cartRepository.postCartItem(product.id, quantity)
                         }
                     }
-            handler.post {
-                result.onSuccess {
+            result.onSuccess {
+                _putOnCartEvent.emit(true)
+            }.onFailure { code, error ->
+                if (code == NULL_BODY_ERROR_CODE) {
                     _putOnCartEvent.emit(true)
-                }.onFailure { code, error ->
-                    if (code == NULL_BODY_ERROR_CODE) {
-                        _putOnCartEvent.emit(true)
-                    } else {
-                        _putOnCartEvent.emit(false)
-                    }
+                } else {
+                    _putOnCartEvent.emit(false)
                 }
             }
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.example.domain.datasource.DataResponse
 import com.example.domain.datasource.map
 import com.example.domain.datasource.onFailure
@@ -14,11 +15,11 @@ import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.RecentProductRepository
+import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.common.emit
 import woowacourse.shopping.presentation.products.ProductCountActionHandler
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
-import kotlin.concurrent.thread
 
 class CartViewModel(
     private val recommendRepository: RecentProductRepository,
@@ -71,29 +72,27 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems() {
-        thread {
+        viewModelScope.launch {
             val result = cartRepository.findAll()
-            handler.post {
-                result.onSuccess { cartItems ->
-                    val oldCartItems = cartUiState.value?.cartUiModels ?: cartItems.toCartUiModels()
-                    val newCartItems: MutableList<CartUiModel> = mutableListOf()
-                    cartItems.forEach { cartItem ->
-                        val oldItem = oldCartItems.find { it.toCartItem().id == cartItem.id }
-                        if (oldItem != null) {
-                            newCartItems.add(oldItem.copy(quantity = cartItem.quantity))
-                        } else {
-                            newCartItems.add(cartItem.toCartUiModel())
-                        }
+            result.onSuccess { cartItems ->
+                val oldCartItems = cartUiState.value?.cartUiModels ?: cartItems.toCartUiModels()
+                val newCartItems: MutableList<CartUiModel> = mutableListOf()
+                cartItems.forEach { cartItem ->
+                    val oldItem = oldCartItems.find { it.toCartItem().id == cartItem.id }
+                    if (oldItem != null) {
+                        newCartItems.add(oldItem.copy(quantity = cartItem.quantity))
+                    } else {
+                        newCartItems.add(cartItem.toCartUiModel())
                     }
-                    val newUiState =
-                        CartUiState(
-                            newCartItems,
-                            isLoading = false,
-                            isFailure = false,
-                            isSuccess = true,
-                        )
-                    _cartUiState.postValue(newUiState)
                 }
+                val newUiState =
+                    CartUiState(
+                        newCartItems,
+                        isLoading = false,
+                        isFailure = false,
+                        isSuccess = true,
+                    )
+                _cartUiState.value = newUiState
             }
         }
     }
@@ -101,7 +100,7 @@ class CartViewModel(
     override fun deleteCartItem(productId: Int) {
         _changedCartEvent.value = Event(Unit)
         val cartUiModel = findCartUiModelByProductId(productId) ?: return
-        thread {
+        viewModelScope.launch {
             cartRepository.deleteCartItem(cartUiModel.cartItemId)
             reloadCartUiState()
         }
@@ -112,14 +111,14 @@ class CartViewModel(
     }
 
     override fun increaseQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             cartRepository.increaseQuantity(productId)
             reloadCartUiState()
         }
     }
 
     override fun decreaseQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             cartRepository.decreaseQuantity(productId)
             reloadCartUiState()
         }
@@ -178,7 +177,7 @@ class CartViewModel(
     fun createOrder() {
         val cartUiModels = cartUiState.value?.cartUiModels ?: return
         val cartItemIds = cartUiModels.filter { it.isSelected }.map { it.cartItemId }
-        thread {
+        viewModelScope.launch {
             orderRepository.createOrder(cartItemIds)
         }
         /*
@@ -215,34 +214,32 @@ class CartViewModel(
     }
 
     private fun increaseRecommendQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             cartRepository.increaseQuantity(productId)
             updateRecommendQuantity(productId)
         }
     }
 
     private fun decreaseRecommendQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             cartRepository.decreaseQuantity(productId)
             updateRecommendQuantity(productId)
         }
     }
 
     private fun updateRecommendQuantity(productId: Int) {
-        thread {
+        viewModelScope.launch {
             val result = cartRepository.find(productId).map { it.quantity }
-            handler.post {
-                val oldUiModels =
-                    recommendProductUiModels.value?.toMutableList() ?: mutableListOf()
-                val idx = oldUiModels.indexOfFirst { it.product.id == productId }
-                result.onSuccess { quantity ->
-                    oldUiModels[idx] = oldUiModels[idx].copy(quantity = quantity)
-                    _recommendProductUiModels.postValue(oldUiModels)
-                }.onFailure { code, error ->
-                    if (code == DataResponse.NULL_BODY_ERROR_CODE) {
-                        oldUiModels[idx] = oldUiModels[idx].copy(quantity = Quantity(0))
-                        _recommendProductUiModels.postValue(oldUiModels)
-                    }
+            val oldUiModels =
+                recommendProductUiModels.value?.toMutableList() ?: mutableListOf()
+            val idx = oldUiModels.indexOfFirst { it.product.id == productId }
+            result.onSuccess { quantity ->
+                oldUiModels[idx] = oldUiModels[idx].copy(quantity = quantity)
+                _recommendProductUiModels.value = oldUiModels
+            }.onFailure { code, error ->
+                if (code == DataResponse.NULL_BODY_ERROR_CODE) {
+                    oldUiModels[idx] = oldUiModels[idx].copy(quantity = Quantity(0))
+                    _recommendProductUiModels.value = oldUiModels
                 }
             }
         }

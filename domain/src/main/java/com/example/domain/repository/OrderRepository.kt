@@ -1,5 +1,5 @@
 package com.example.domain.repository
 
 interface OrderRepository {
-    fun createOrder(cartItemIds: List<Int>)
+    suspend fun createOrder(cartItemIds: List<Int>)
 }

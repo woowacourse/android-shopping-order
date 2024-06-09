@@ -9,14 +9,14 @@ import com.example.domain.repository.ProductRepository
 class DefaultProductRepository(
     private val defaultProductDataSource: ProductDataSource,
 ) : ProductRepository {
-    override fun find(id: Int): DataResponse<Product> = defaultProductDataSource.find(id)
+    override suspend fun find(id: Int): DataResponse<Product> = defaultProductDataSource.find(id)
 
-    override fun findRange(
+    override suspend fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<Product>> = defaultProductDataSource.findRange(page, pageSize)
 
-    override fun findPage(
+    override suspend fun findPage(
         page: Int,
         size: Int,
     ): DataResponse<PagingProduct> = defaultProductDataSource.findPage(page, size)

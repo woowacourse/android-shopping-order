@@ -4,30 +4,30 @@ import com.example.domain.model.CartItem
 import com.example.domain.model.Quantity
 
 interface CartDataSource {
-    fun findAll(): DataResponse<List<CartItem>>
+    suspend fun findAll(): DataResponse<List<CartItem>>
 
-    fun postCartItem(
+    suspend fun postCartItem(
         productId: Int,
         quantity: Quantity,
     ): DataResponse<Unit>
 
-    fun increaseQuantity(productId: Int): DataResponse<Unit>
+    suspend fun increaseQuantity(productId: Int): DataResponse<Unit>
 
-    fun decreaseQuantity(productId: Int): DataResponse<Unit>
+    suspend fun decreaseQuantity(productId: Int): DataResponse<Unit>
 
-    fun changeQuantity(
+    suspend fun changeQuantity(
         cartItemId: Int,
         quantity: Quantity,
     ): DataResponse<Unit>
 
-    fun deleteCartItem(cartItemId: Int): DataResponse<Unit>
+    suspend fun deleteCartItem(cartItemId: Int): DataResponse<Unit>
 
-    fun findByProductId(productId: Int): DataResponse<CartItem>
+    suspend fun findByProductId(productId: Int): DataResponse<CartItem>
 
-    fun findRange(
+    suspend fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<CartItem>>
 
-    fun totalCartItemCount(): DataResponse<Int>
+    suspend fun totalCartItemCount(): DataResponse<Int>
 }

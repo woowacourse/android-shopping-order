@@ -13,20 +13,19 @@ import com.example.domain.model.Product
 class RemoteProductDataSource(
     private val productService: ProductService,
 ) : ProductDataSource {
-    override fun find(id: Int): DataResponse<Product> =
-        productService.requestProduct(id = id).executeForDataResponse().map { it.toProduct() }
+    override suspend fun find(id: Int): DataResponse<Product> = productService.requestProduct(id = id).map { it.toProduct() }
 
-    override fun findRange(
+    override suspend fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<Product>> =
-        productService.requestProducts(page = page, size = pageSize).executeForDataResponse()
+        productService.requestProducts(page = page, size = pageSize)
             .map { it.toProductList() }
 
-    override fun findPage(
+    override suspend fun findPage(
         page: Int,
         size: Int,
     ): DataResponse<PagingProduct> =
-        productService.requestProducts(page = page, size = size).executeForDataResponse()
+        productService.requestProducts(page = page, size = size)
             .map { it.toPagingProduct() }
 }
