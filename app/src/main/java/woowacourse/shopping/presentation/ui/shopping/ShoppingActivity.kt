@@ -23,7 +23,7 @@ class ShoppingActivity : AppCompatActivity() {
         ShoppingViewModelFactory(
             shoppingItemsRepository = RemoteShoppingRepositoryImpl(),
             cartItemsRepository = RemoteCartRepositoryImpl(),
-            recentProductRepository = RecentProductRepositoryImpl(context = this),
+            recentProductRepository = RecentProductRepositoryImpl(context = applicationContext),
         )
     }
 

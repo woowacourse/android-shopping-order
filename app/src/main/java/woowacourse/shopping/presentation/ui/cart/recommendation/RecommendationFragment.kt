@@ -25,7 +25,7 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
             RecommendViewModelFactory(
                 cartRepository = RemoteCartRepositoryImpl(),
                 shoppingRepository = RemoteShoppingRepositoryImpl(),
-                recentProductRepository = RecentProductRepositoryImpl(requireContext()),
+                recentProductRepository = RecentProductRepositoryImpl(requireContext().applicationContext),
             )
         viewModelFactory.create(RecommendViewModel::class.java)
     }

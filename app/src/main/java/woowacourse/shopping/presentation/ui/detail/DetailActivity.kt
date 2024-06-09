@@ -20,7 +20,7 @@ class DetailActivity : AppCompatActivity() {
         DetailViewModelFactory(
             cartRepository = RemoteCartRepositoryImpl(),
             shoppingRepository = RemoteShoppingRepositoryImpl(),
-            recentProductRepository = RecentProductRepositoryImpl(this),
+            recentProductRepository = RecentProductRepositoryImpl(applicationContext),
             productId = productId,
         )
     }
