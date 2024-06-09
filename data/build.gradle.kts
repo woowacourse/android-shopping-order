@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -9,14 +11,19 @@ plugins {
 android {
     namespace = "com.example.data"
     compileSdk = 34
-
+    val properties = Properties()
+    properties.load(project.rootProject.file("data/local.properties").inputStream())
     defaultConfig {
         minSdk = 26
-
+        buildConfigField("String", "USER_ID", "\"${properties["USER_ID"]}\"")
+        buildConfigField("String", "USER_PASSWORD", "\"${properties["USER_PASSWORD"]}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
         consumerProguardFiles("consumer-rules.pro")
+    }
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

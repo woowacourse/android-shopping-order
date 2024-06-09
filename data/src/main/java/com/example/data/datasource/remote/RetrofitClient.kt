@@ -1,5 +1,6 @@
 package com.example.data.datasource.remote
 
+import com.example.data.BuildConfig
 import com.example.data.datasource.remote.service.CartItemService
 import com.example.data.datasource.remote.service.OrderService
 import com.example.data.datasource.remote.service.ProductService
@@ -17,8 +18,8 @@ class RetrofitClient(
             .Builder()
             .addInterceptor(
                 AuthenticationInterceptor(
-                    "aprilgom",
-                    "password",
+                    BuildConfig.USER_ID,
+                    BuildConfig.USER_PASSWORD,
                 ),
             ).build()
 
