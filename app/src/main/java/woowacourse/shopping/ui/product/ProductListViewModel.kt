@@ -54,78 +54,6 @@ class ProductListViewModel(
     private var _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    fun loadAll() {
-        viewModelScope.launch {
-            val page = currentPage.value ?: currentPageIsNullException()
-            (FIRST_PAGE..page).forEach {
-                productsRepository.loadProducts(it).onSuccess { products ->
-                    _loadedProducts.value = products
-                    _isLoading.value = false
-                }.onError { code, message ->
-                    // TODO: Error Handling
-                }.onException {
-                    // TODO: Exception Handling
-                }
-            }
-
-            productsRepository.isFinalPage(page).onSuccess {
-                _isLastPage.postValue(it)
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-
-            cartItemRepository.calculateCartItemsCount().onSuccess { totalCartCount ->
-                _cartProductTotalCount.value = totalCartCount
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-
-            val productHistory = productHistoryRepository.loadProductsHistory()
-            _productsHistory.value = productHistory
-        }
-    }
-
-    fun loadNextPageProducts() {
-        viewModelScope.launch {
-            if (isLastPage.value == true) return@launch
-            val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
-
-            productsRepository.isFinalPage(nextPage).onSuccess {
-                _isLastPage.postValue(it)
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-
-            productsRepository.loadProducts(nextPage).onSuccess { products ->
-                _loadedProducts.value = _loadedProducts.value?.toMutableList()?.apply { addAll(products) }
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-
-            cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
-                _cartProductTotalCount.value = totalCount
-            }.onError { code, message ->
-                // TODO: Error Handling
-            }.onException {
-                // TODO: Exception Handling
-            }
-
-            _currentPage.postValue(nextPage)
-        }
-    }
-
-    fun navigateToShoppingCart() {
-        _shoppingCartDestination.setValue(true)
-    }
-
     override fun onClick(productId: Long) {
         _detailProductDestinationId.setValue(productId)
     }
@@ -142,6 +70,66 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         updateQuantity(ProductIdsCount(productId, quantity), DECREASE_VARIATION)
+    }
+
+    fun loadAll() {
+        viewModelScope.launch {
+            val page = currentPage.value ?: currentPageIsNullException()
+
+            (FIRST_PAGE..page).forEach {
+                productsRepository.loadProducts(it).onSuccess { productsInformation ->
+                    _loadedProducts.value = productsInformation.products
+                    _isLoading.value = false
+                    _isLastPage.postValue(productsInformation.isLastPage)
+                }.onError { code, message ->
+                    // TODO: Error Handling
+                }.onException {
+                    // TODO: Exception Handling
+                }
+            }
+
+            updateCartItemsCount()
+            loadProductsHistory()
+        }
+    }
+
+    fun loadNextPageProducts() {
+        viewModelScope.launch {
+            if (isLastPage.value == true) return@launch
+            val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
+
+            productsRepository.loadProducts(nextPage).onSuccess { productsInformation ->
+                val oldProducts = loadedProducts.value ?: emptyList()
+                _loadedProducts.value = oldProducts + productsInformation.products
+                _isLastPage.postValue(productsInformation.isLastPage)
+            }.onError { code, message ->
+                // TODO: Error Handling
+            }.onException {
+                // TODO: Exception Handling
+            }
+
+            updateCartItemsCount()
+            _currentPage.postValue(nextPage)
+        }
+    }
+
+    fun navigateToShoppingCart() {
+        _shoppingCartDestination.setValue(true)
+    }
+
+    private suspend fun loadProductsHistory() {
+        val productHistory = productHistoryRepository.loadProductsHistory()
+        _productsHistory.value = productHistory
+    }
+
+    private suspend fun updateCartItemsCount() {
+        cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
+            _cartProductTotalCount.value = totalCount
+        }.onError { code, message ->
+            // TODO: Error Handling
+        }.onException {
+            // TODO: Exception Handling
+        }
     }
 
     private fun updateQuantity(

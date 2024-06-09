@@ -4,21 +4,22 @@ import woowacourse.shopping.data.cart.CartItemDataSource
 import woowacourse.shopping.data.common.ResponseHandlingUtils.handleResponse
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductsPage
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.remote.product.ProductDto.Companion.toDomain
 
-// TODO: 에러 핸들링 중복 코드 제거 하기
 class DefaultProductRepository(
     private val productDataSource: ProductDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
-    override suspend fun loadProducts(page: Int): ResponseResult<List<Product>> {
+    override suspend fun loadProducts(page: Int): ResponseResult<ProductsPage> {
         return when (val response = productDataSource.loadByPaged(page)) {
             is ResponseResult.Success -> {
-                val data = response.data.content.map { productDto ->
+                val products = response.data.content.map { productDto ->
                     productDto.toDomain(findCartItemQuantity(productDto.id))
                 }
-                ResponseResult.Success(data)
+                val isFinalPage: Boolean = (page + 1) == response.data.totalPages
+                ResponseResult.Success(ProductsPage(products, isFinalPage))
             }
             is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
@@ -30,17 +31,6 @@ class DefaultProductRepository(
             is ResponseResult.Success -> {
                 val data = response.data.toDomain(findCartItemQuantity(id))
                 ResponseResult.Success(data)
-            }
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
-            is ResponseResult.Exception -> ResponseResult.Exception(response.e)
-        }
-    }
-
-    override suspend fun isFinalPage(page: Int): ResponseResult<Boolean> {
-        return when(val response = productDataSource.loadByPaged(page)) {
-            is ResponseResult.Success -> {
-                val totalPages = response.data.totalPages
-                ResponseResult.Success((page + 1) == totalPages)
             }
             is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
