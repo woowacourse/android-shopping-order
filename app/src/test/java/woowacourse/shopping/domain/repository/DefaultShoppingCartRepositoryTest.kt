@@ -80,7 +80,7 @@ class DefaultShoppingCartRepositoryTest {
             // given
             castSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(10),
+                    cartItemDtosTestFixture(10, cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) })
                 )
             repository =
                 DefaultShoppingCartRepository(
@@ -114,7 +114,7 @@ class DefaultShoppingCartRepositoryTest {
             val actual = repository.shoppingCartProductQuantity2().getOrThrow()
 
             // then
-            assertThat(actual).isEqualTo(19)
+            assertThat(actual).isEqualTo(9)
         }
 
     @Test
@@ -123,7 +123,8 @@ class DefaultShoppingCartRepositoryTest {
             // given
             castSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(10),
+                    cartItemDtosTestFixture(10,
+                        cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) }),
                 )
             repository =
                 DefaultShoppingCartRepository(
@@ -214,8 +215,8 @@ fun cartItemTestFixture(
     )
 
 fun cartItemsTestFixture(dataCount: Int): List<CartItem> =
-    List(dataCount) {
+    List(dataCount) { index ->
         cartItemTestFixture(
-            id = it + 1L,
+            id = index.toLong(),
         )
     }

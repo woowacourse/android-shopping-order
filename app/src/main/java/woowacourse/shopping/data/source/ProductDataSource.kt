@@ -15,13 +15,13 @@ interface ProductDataSource {
 
     fun shutDown(): Boolean
 
-    fun findByPaged2(page: Int): Result<List<ProductData>>
+    suspend fun findByPaged2(page: Int): Result<List<ProductData>>
 
-    fun findAllUntilPage2(page: Int): Result<List<ProductData>>
+    suspend fun findAllUntilPage2(page: Int): Result<List<ProductData>>
 
-    fun findById2(id: Long): Result<ProductData>
+    suspend fun findById2(id: Long): Result<ProductData>
 
-    fun findByCategory2(category: String): Result<List<ProductData>>
+    suspend fun findByCategory2(category: String): Result<List<ProductData>>
 
-    fun isFinalPage2(page: Int): Result<Boolean>
+    suspend fun isFinalPage2(page: Int): Result<Boolean>
 }
