@@ -9,7 +9,7 @@ import woowacourse.shopping.data.model.product.ProductResponse
 interface ProductService {
     @GET("/products")
     suspend fun getProducts(
-        @Query("category") category: String? = null,
+        @Query("category") category: String?,
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
