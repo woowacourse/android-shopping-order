@@ -13,7 +13,7 @@ sealed interface HomeUiEvent {
 sealed interface DetailUiEvent {
     data class NavigateToRecentProduct(val productId: Int) : DetailUiEvent
 
-    data object NavigateToCart : DetailUiEvent
+    data object ProductAddedToCart : DetailUiEvent
 
     data object NavigateBack : DetailUiEvent
 

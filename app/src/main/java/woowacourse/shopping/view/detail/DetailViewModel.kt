@@ -35,6 +35,9 @@ class DetailViewModel(
         it.lastlyViewedProduct?.productId != productId
     }.distinctUntilChanged()
 
+    var alteredProductIds: Array<Int> = arrayOf()
+        private set
+
     init {
         loadProduct()
     }
@@ -55,19 +58,20 @@ class DetailViewModel(
 
     override fun addToCart() {
         viewModelScope.launch {
+            alteredProductIds += productId
             val uiState = productDetailUiState.value ?: return@launch
             val targetCartItem = uiState.cartItems.firstOrNull { it.productId == productId }
             if (targetCartItem == null) {
                 cartRepository.addCartItem(productId, uiState.quantity)
-                return@launch
+            } else {
+                val result = cartRepository.updateCartItem(targetCartItem.cartItemId, uiState.quantity)
+                    .getOrNull()
+                if (result == null) {
+                    notifyError()
+                    return@launch
+                }
             }
-            val result = cartRepository.updateCartItem(targetCartItem.cartItemId, uiState.quantity)
-                .getOrNull()
-            if (result == null) {
-                notifyError()
-                return@launch
-            }
-            _detailUiEvent.value = Event(DetailUiEvent.NavigateToCart)
+            _detailUiEvent.value = Event(DetailUiEvent.ProductAddedToCart)
         }
     }
 
@@ -96,6 +100,8 @@ class DetailViewModel(
         viewModelScope.launch {
             val result = productRepository.getProductById(id = productId).getOrNull()
             val entireCartItems = cartRepository.getEntireCartData().getOrNull() ?: emptyList()
+            val targetCartItem =
+                entireCartItems.firstOrNull { it.productId == result?.productItemDomain?.id }
             if (result == null) {
                 notifyError()
                 return@launch
@@ -106,7 +112,7 @@ class DetailViewModel(
                     isLoading = false,
                     product = result.productItemDomain,
                     lastlyViewedProduct = recentProductRepository.findMostRecentProduct(),
-                    quantity = 1,
+                    quantity = targetCartItem?.quantity ?: 1,
                     cartItems = entireCartItems,
                 )
         }

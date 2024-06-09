@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
@@ -16,6 +17,7 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.cart.CartActivity
+import woowacourse.shopping.view.home.HomeActivity
 import woowacourse.shopping.view.state.DetailUiEvent
 
 class DetailActivity : AppCompatActivity() {
@@ -46,6 +48,7 @@ class DetailActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
+        initializeOnBackPressedCallback()
     }
 
     private fun setUpDataBinding() {
@@ -62,17 +65,25 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel.detailUiEvent.observe(this) {
             when (val event = it.getContentIfNotHandled() ?: return@observe) {
-                is DetailUiEvent.NavigateToCart -> navigateToCart()
+                is DetailUiEvent.ProductAddedToCart -> showToastMessage(getString(R.string.detail_message_add_to_cart))
                 is DetailUiEvent.NavigateToRecentProduct -> navigateToDetail(event.productId)
-                is DetailUiEvent.NavigateBack -> finish()
-                is DetailUiEvent.Error -> showError(getString(R.string.unknown_error))
+                is DetailUiEvent.NavigateBack -> navigateBackToHome()
+                is DetailUiEvent.Error -> showToastMessage(getString(R.string.unknown_error))
             }
             viewModel.saveRecentProduct()
         }
     }
 
-    private fun showError(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+    private fun showToastMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun initializeOnBackPressedCallback() {
+        val onBackPressedCallBack =
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = navigateBackToHome()
+            }
+        onBackPressedDispatcher.addCallback(onBackPressedCallBack)
     }
 
     private fun navigateToDetail(productId: Int) {
@@ -85,13 +96,17 @@ class DetailActivity : AppCompatActivity() {
         )
     }
 
-    private fun navigateToCart() {
-        Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
-        startActivity(CartActivity.createIntent(context = this))
+    private fun navigateBackToHome() {
+        val itemIds = viewModel.alteredProductIds.toIntArray()
+        itemIds.forEach { println(it) }
+        setResult(
+            RESULT_OK,
+            HomeActivity.createIntent(this, itemIds),
+        )
+        finish()
     }
 
     companion object {
-        private const val PUR_CART_MESSAGE = "장바구니에 상품이 추가되었습니다!"
         const val PRODUCT_ID = "product_id"
         const val INVALID_PRODUCT_ID = -1
         private const val IS_MOST_RECENT_PRODUCT_CLICKED = "is_most_recent_product_clicked"

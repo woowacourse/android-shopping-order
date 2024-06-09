@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
@@ -24,7 +23,6 @@ import woowacourse.shopping.view.state.RecommendListUiState
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel(),
@@ -61,6 +59,9 @@ class CartViewModel(
         MutableLiveData()
     val recommendListUiEvent: LiveData<Event<RecommendListUiEvent>>
         get() = _recommendListUiEvent
+
+    var alteredProductIds: Array<Int> = arrayOf()
+        private set
 
     init {
         loadCartItems()
@@ -100,10 +101,6 @@ class CartViewModel(
         }
     }
 
-    private fun showError() {
-
-    }
-
     fun navigateBackToHome() {
         _navigateBackToHome.value = Event(Unit)
     }
@@ -123,7 +120,6 @@ class CartViewModel(
 
     override fun onDeleteButtonClick(itemId: Int) {
         viewModelScope.launch {
-            println("delete cart item id : $itemId")
             val result = cartRepository.deleteCartItem(itemId).getOrNull()
             val uiState = cartUiState.value
             if (result == null || uiState == null) {
@@ -131,6 +127,7 @@ class CartViewModel(
             }
             _cartListUiState.value = cartListUiState.value?.copy(
                 cartViewItems = cartListUiState.value?.cartViewItems?.filter {
+                    alteredProductIds += it.cartItem.product.id
                     it.cartItem.cartItemId != itemId
                 } ?: return@launch
             )
@@ -149,7 +146,6 @@ class CartViewModel(
             if (it.cartItem.cartItemId == itemId)
                 it.copy(isSelected = isSelected) else it
         } ?: return
-        println(cartViewItems)
         _cartListUiState.value =
             cartListUiState.value?.copy(cartViewItems = cartViewItems)
         val cartItem =
@@ -190,6 +186,7 @@ class CartViewModel(
 
     override fun addToCart(product: ProductItemDomain) {
         viewModelScope.launch {
+            alteredProductIds += product.id
             val result = cartRepository.addCartItem(product.id, 1).getOrNull()
             val entireCartItems = cartRepository.getEntireCartItems().getOrNull()
             val uiState = recommendedListUiState.value
@@ -277,23 +274,12 @@ class CartViewModel(
         }
     }
 
-//    private fun makeOrder() {
-//        viewModelScope.launch {
-//            orderRepository.postOrder(
-//                cartUiState.value?.selectedCartItemIds ?: return@launch
-//            ).onSuccess {
-//                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
-//            }.onFailure {
-//
-//            }
-//        }
-//    }
-
     private fun updateCartQuantity(
         cartItemId: Int,
         changedItem: CartViewItem,
     ) {
         viewModelScope.launch {
+            alteredProductIds += changedItem.cartItem.product.id
             cartRepository.updateCartItem(
                 cartItemId = cartItemId,
                 quantity = changedItem.cartItem.quantity

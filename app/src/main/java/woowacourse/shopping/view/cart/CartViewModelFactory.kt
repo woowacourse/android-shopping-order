@@ -9,7 +9,6 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class CartViewModelFactory(
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModelProvider.Factory {
@@ -18,7 +17,6 @@ class CartViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return CartViewModel(
                 cartRepository = cartRepository,
-                orderRepository = orderRepository,
                 recentProductRepository = recentProductRepository,
                 productRepository = productRepository,
             ) as T

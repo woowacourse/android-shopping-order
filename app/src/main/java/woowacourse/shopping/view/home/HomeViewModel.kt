@@ -132,7 +132,6 @@ class HomeViewModel(
             val productItems =
                 uiState.productItems.map {
                     if (it.orderableProduct.productItemDomain.id == changedItem.productId) {
-//                        it.copy(_quantity = 1)
                         it.copy(
                             orderableProduct = it.orderableProduct.copy(
                                 cartData = changedItem
@@ -236,6 +235,32 @@ class HomeViewModel(
 
     private fun notifyError() {
         _homeUiEvent.value = Event(HomeUiEvent.Error)
+    }
+
+    fun onNavigatedBack(changedIds: IntArray) {
+        viewModelScope.launch {
+            if (changedIds.isEmpty()) return@launch
+            changedIds.forEach { id ->
+                val updatedProduct = productRepository.getProductById(id).getOrNull() ?: return@launch
+                val target = getUpdatedProducts(id, updatedProduct.cartData)
+                _homeProductUiState.value = homeProductUiState.value?.copy(
+                    productItems = target ?: return@forEach
+                )
+            }
+        }
+    }
+
+    private fun getUpdatedProducts(
+        targetProductId: Int,
+        cartItemToUpdate: CartData?
+    ): List<HomeViewItem.ProductViewItem>? {
+        return homeProductUiState.value?.productItems?.map {
+            if (it.orderableProduct.productItemDomain.id == targetProductId) {
+                it.copy(orderableProduct = it.orderableProduct.copy(cartData = cartItemToUpdate))
+            } else {
+                it
+            }
+        }
     }
 
     companion object {

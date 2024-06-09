@@ -1,7 +1,12 @@
 package woowacourse.shopping.view.home
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -36,6 +41,13 @@ class HomeActivity : AppCompatActivity() {
             RecentProductRepositoryImpl(recentProductDatabase),
         )
     }
+    private val activityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            val changedIds = getChangedIdsFromActivityResult(result)
+            viewModel.onNavigatedBack(changedIds = changedIds)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,10 +120,25 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(this, productId))
+        activityResultLauncher.launch(DetailActivity.createIntent(this, productId))
     }
 
     private fun navigateToCart() {
-        startActivity(CartActivity.createIntent(this))
+        activityResultLauncher.launch(CartActivity.createIntent(this))
+    }
+
+    private fun getChangedIdsFromActivityResult(result: ActivityResult): IntArray =
+        if (result.resultCode == RESULT_OK) {
+            result.data?.getIntArrayExtra(EXTRA_CHANGED_IDS)
+        } else {
+            intArrayOf()
+        } ?: intArrayOf()
+
+    companion object {
+        private const val EXTRA_CHANGED_IDS = "extra_changed_ids"
+        fun createIntent(context: Context, changedIds: IntArray): Intent {
+            return Intent(context, HomeActivity::class.java)
+                .putExtra(EXTRA_CHANGED_IDS, changedIds)
+        }
     }
 }
