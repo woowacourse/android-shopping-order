@@ -98,3 +98,88 @@ println(transformedResult) // Output: Failure(kotlin.IllegalArgumentException: E
 
 이 함수들은 Result 의 동작을 체이닝하는 강력한 도구.  
 에러를 이쁘게 처리할 수 있다.  
+
+
+## runCatching
+
+runCatching 은 예외를 던질 수 있는 동작을 처리하는 데 사용되는 유틸리티 함수.  
+동작의 결과를 캡처하고 성공적인 결과나 예외를 나타내는 Result 객체를 반환한다.
+
+- **목적**: 코드 블록을 실행하고 그 결과를 `Result` 객체에 캡슐화하여 예외를 이쁘게 처리한다.
+- **반환 타입**: `Result<T>` 여기서 `T` 는 성공적인 결과의 타입이다.
+- **예외 처리**: 코드 블록이 예외를 던지면 `runCatching` 이 예외를 잡아서 `Result.Failure` 로 캡슐화한다.
+- **사용 시나리오**: 예외를 던질 수 있는 동작을 안전하게 실행하고, 성공과 실패를 구분하여 처리할 때 사용한다.
+- **주요 기능**: 성공과 실패를 캡슐화하고, `Result` 의 `map`, `mapCatching`, `onSuccess`, `onFailure` 등의 메서드를 사용하여 결과를 처리한다.
+
+### `runCatching`의 시그니처
+
+```kotlin
+inline fun <R> runCatching(block: () -> R): Result<R>
+```
+
+### 동작 방식
+- **실행**: `runCatching` 내에서 코드 블록이 실행된다.
+- **성공**: 코드 블록이 예외를 던지지 않고 완료되면, 결과는 `Result.Success` 로 래핑된다.
+- **실패**: 코드 블록이 예외를 던지면, 예외가 잡히고 `Result.Failure` 로 래핑된다.
+
+### 사용 예시
+
+```kotlin
+val result = runCatching {
+    // Some operation that might throw an exception
+    "This might fail".toInt()
+}
+
+result.onSuccess { value ->
+    println("Success: $value")
+}.onFailure { exception ->
+    println("Failed with exception: ${exception.message}")
+}
+```
+
+- runCatching 의 주요 기능
+- **안전성**: 결과와 예외를 모두 캡슐화하여 예외가 애플리케이션을 중단시키지 않도록 한다.
+- **체이닝**: `Result` 의 `map`, `mapCatching`, `onSuccess`, `onFailure` 등의 메서드를 사용하여 추가 작업을 체이닝할 수 있다.
+- **간소화**: 명시적인 try-catch 블록이 필요 없어져 코드가 단순해진다.
+
+- 레포지토리에서 `runCatching` 사용
+
+DefaultShoppingProductRepository 에서 `runCatching` 을 사용하면 함수를 안전하게 실행하고 발생할 수 있는 예외를 처리할 수 있다.  
+
+```kotlin
+override suspend fun loadProduct(id: Long): Result<Product> {
+    return runCatching {
+        // Assuming this function could potentially throw an exception
+        val productData = productsSource.findById(id)
+        productData.toDomain(productQuantity(id).getOrThrow())
+    }
+}
+```
+여기에서 
+- `runCatching` 은 Product 을 로드하고 변환하는 작업을 래핑한다.
+- `findById` 또는 `toDomain` 이 예외를 던지면 `runCatching` 이 예외를 캡처.
+- 결과 `Result<Product>` 객체는 작업이 성공했는지 실패했는지를 나타낸다.
+
+### Advanced Usage with Functional Methods
+runCatching 이 리턴하는 Result 타입 은 `map`, `flatMap`, `recover` 등의 함수를 사용하여 추가 처리가 가능하다. 
+
+
+```kotlin
+val result = runCatching {
+    "123".toInt()  // This will succeed
+}.map { value ->
+    value * 2
+}.recover { exception ->
+    -1  // Provide a default value in case of failure
+}
+
+println(result.getOrDefault(-999))  // Outputs: 246
+```
+
+- **`map`**: 성공적인 결과를 변환한다.
+- **`recover`**: 실패 시 대체 값을 제공한다.
+
+### 요약
+- **`runCatching`**: 예외를 던질 수 있는 동작을 안전하게 실행하고, 성공과 실패를 구분하여 처리하는 데 사용된다.
+- **캡슐화**: 성공과 실패를 `Result` 객체로 캡슐화하여 예외를 처리한다.
+- **통합**: `map`, `flatMap`, `recover` 등의 함수를 사용하여 결과를 처리하는 함수형 프로그래밍 개념을 쉽게 적용할 수 있다.
