@@ -8,8 +8,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.DefaultShoppingApplication
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.view.cart.CartItemInfo
@@ -27,7 +27,7 @@ class OrderActivity : AppCompatActivity() {
         }
     }
     private val viewModel: OrderViewModel by viewModels<OrderViewModel> {
-        (application as DefaultShoppingApplication).orderViewModelFactory(
+        (application as ShoppingApplication).orderViewModelFactory(
             orders?.map(CartItemInfo::toCartItemDomain) ?: emptyList(),
         )
     }

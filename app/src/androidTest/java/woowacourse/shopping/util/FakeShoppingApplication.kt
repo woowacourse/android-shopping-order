@@ -23,22 +23,33 @@ class FakeShoppingApplication : ShoppingApplication() {
     override val couponRepository: CouponRepository = FakeCouponRepository()
     override val orderRepository: OrderRepository = FakeOrderRepository()
     override val recentProductRepository: RecentProductRepository = FakeRecentProductRepository()
-    override val homeViewModelFactory: HomeViewModelFactory = HomeViewModelFactory(
-        productRepository, cartRepository, recentProductRepository
-    )
-    override val cartViewModelFactory: CartViewModelFactory = CartViewModelFactory(
-        cartRepository, recentProductRepository, productRepository
-    )
+    override val homeViewModelFactory: HomeViewModelFactory =
+        HomeViewModelFactory(
+            productRepository,
+            cartRepository,
+            recentProductRepository,
+        )
+    override val cartViewModelFactory: CartViewModelFactory =
+        CartViewModelFactory(
+            cartRepository,
+            recentProductRepository,
+            productRepository,
+        )
 
     override fun detailViewModelFactory(productId: Int): DetailViewModelFactory {
         return DetailViewModelFactory(
-            cartRepository, productRepository, recentProductRepository, productId
+            cartRepository,
+            productRepository,
+            recentProductRepository,
+            productId,
         )
     }
 
     override fun orderViewModelFactory(cartItems: List<CartItemDomain>): OrderViewModelFactory {
         return OrderViewModelFactory(
-            couponRepository, orderRepository, cartItems
+            couponRepository,
+            orderRepository,
+            cartItems,
         )
     }
 }

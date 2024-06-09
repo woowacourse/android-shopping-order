@@ -8,8 +8,8 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.DefaultShoppingApplication
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.home.HomeActivity
 
@@ -23,7 +23,7 @@ class DetailActivity : AppCompatActivity() {
         )
     }
     private val viewModel: DetailViewModel by viewModels {
-        (application as DefaultShoppingApplication).detailViewModelFactory(productId)
+        (application as ShoppingApplication).detailViewModelFactory(productId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -13,7 +13,7 @@ class FakeRecentProductRepository : RecentProductRepository {
         if (findOrNullByProductId(product.id) != null) {
             update(product.id)
         } else {
-            val id = recentProducts.last().productId + 1
+            val id = (recentProducts.lastOrNull()?.productId ?: 0) + 1
             recentProducts +=
                 RecentProduct(
                     productId = id,
