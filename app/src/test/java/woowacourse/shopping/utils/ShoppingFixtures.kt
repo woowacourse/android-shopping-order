@@ -9,9 +9,9 @@ import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.model.RecentProduct
 import java.time.LocalDateTime
 
-fun getFixtureCartItems(count: Int): List<CartItemDomain> =
+fun getFixtureCartItems(count: Int, unitPrice: Int = 1000): List<CartItemDomain> =
     List(count) {
-        CartItemDomain(it + 1, it + 1, getFixtureProduct(it + 1, 1000 * (it + 1)))
+        CartItemDomain(it + 1, it + 1, getFixtureProduct(it + 1, unitPrice * (it + 1)))
     }
 
 fun getFixtureProducts(count: Int): List<ProductItemDomain> =

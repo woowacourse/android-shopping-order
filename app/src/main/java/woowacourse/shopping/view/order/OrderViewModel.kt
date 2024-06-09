@@ -43,6 +43,18 @@ class OrderViewModel(
         loadPage()
     }
 
+    fun makeOrder() {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            orderRepository.postOrder(
+                cartItems.map(CartItemDomain::cartItemId),
+            ).onSuccess {
+                _orderUiEvent.value = Event(OrderUiEvent.NavigateBackToHome)
+            }.onFailure {
+                showError()
+            }
+        }
+    }
+
     override fun changeCouponSelection(
         isSelected: Boolean,
         couponId: Int,
@@ -60,18 +72,6 @@ class OrderViewModel(
 
     private fun cancelCoupon(couponId: Int) {
         _orderUiState.value = orderUiState.value?.cancelCoupon(couponId)
-    }
-
-    fun makeOrder() {
-        viewModelScope.launch(coroutineExceptionHandler) {
-            orderRepository.postOrder(
-                cartItems.map(CartItemDomain::cartItemId),
-            ).onSuccess {
-                _orderUiEvent.value = Event(OrderUiEvent.NavigateBackToHome)
-            }.onFailure {
-                showError()
-            }
-        }
     }
 
     private fun showError() {
