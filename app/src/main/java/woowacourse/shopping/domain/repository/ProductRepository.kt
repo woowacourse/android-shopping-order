@@ -4,7 +4,7 @@ import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.domain.CartProduct
 
 interface ProductRepository {
-    suspend fun getAllByPaging(
+    suspend fun getAllByPagingAndCategory(
         category: String,
         page: Int = 0,
         size: Int = 20,

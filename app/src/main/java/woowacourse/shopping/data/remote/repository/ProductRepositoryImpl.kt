@@ -13,7 +13,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     private val productPagingSource = ProductPagingSource(productDataSource)
 
-    override suspend fun getAllByPaging(
+    override suspend fun getAllByPagingAndCategory(
         category: String,
         page: Int,
         size: Int,

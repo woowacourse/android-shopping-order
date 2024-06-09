@@ -13,7 +13,7 @@ class CurationUseCase(
     suspend operator fun invoke(count: Int): Result<List<CartProduct>> =
         runCatching {
             recentProductRepository.findOrNull().getOrNull()?.let {
-                val products = productRepository.getAllByPaging(it.category, 0, count).getOrThrow()
+                val products = productRepository.getAllByPagingAndCategory(it.category, 0, count).getOrThrow()
                 val cartItems = cartItemRepository.getAllByPaging(0, MAXIMUM_CART_SIZE).getOrThrow()
 
                 val cartProductIds = cartItems.map { it.productId }.toSet()
