@@ -86,24 +86,11 @@ class ProductDetailViewModel(
 
     fun addToRecentProduct(lastSeenProductState: Boolean) {
         viewModelLaunch(::recentExceptionHandler) {
-            loadMostRecentProduct(productId, lastSeenProductState)
-        }
-
-        viewModelLaunch {
-            recentProductRepository.insert(productId)
-        }
-    }
-
-    private fun loadMostRecentProduct(
-        productId: Long,
-        lastSeenProductState: Boolean,
-    ) {
-        viewModelLaunch(::recentExceptionHandler) {
             recentProductRepository.mostRecentProductResponse().onSuccess {
                 if (!lastSeenProductState) {
                     _mostRecentProductVisibility.value = false
                 } else {
-                    _mostRecentProduct.value = productRepository.productById(productId)
+                    _mostRecentProduct.value = productRepository.productById(it.productId)
                     setMostRecentVisibility(it.id, productId)
                 }
             }.onFail {
@@ -115,6 +102,7 @@ class ProductDetailViewModel(
             }.onException {
                 _error.setValue(ProductDetailError.UnKnown)
             }
+            recentProductRepository.insert(productId)
         }
     }
 
