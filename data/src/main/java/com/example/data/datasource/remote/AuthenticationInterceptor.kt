@@ -19,6 +19,7 @@ class AuthenticationInterceptor(user: String, password: String) : Interceptor {
         val request: Request = chain.request()
         val authenticatedRequest: Request =
             request.newBuilder()
+                .header("accept", "*/*")
                 .header("Authorization", credentials).build()
         return chain.proceed(authenticatedRequest)
     }
