@@ -124,20 +124,7 @@ class RecommendViewModel(
 
     fun completeOrder() {
         val currentOrder = _order.value ?: return
-        viewModelScope.launch {
-            val result = cartRepository.makeOrder(currentOrder)
-            result.onSuccess {
-                clearOrder()
-            }.onFailure {
-                Log.d(this::class.java.simpleName, "$it")
-            }
-        }
-    }
-
-    private fun clearOrder() {
-        val order = order.value ?: Order()
-        order.clearOrder()
-        _order.value = order
+        OrderDatabase.postOrder(currentOrder)
     }
 
     override fun increaseCount(

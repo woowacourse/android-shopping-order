@@ -8,6 +8,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.ui.cart.selection.SelectionFragment
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 
 class CartActivity : AppCompatActivity(), FragmentController {
     private lateinit var binding: ActivityCartBinding
@@ -67,7 +68,7 @@ class CartActivity : AppCompatActivity(), FragmentController {
             }
 
             is RecommendationFragment -> {
-                finish()
+                startActivity(PaymentActivity.createIntent(this))
             }
 
             else -> {
