@@ -10,4 +10,12 @@ interface ShoppingProductsRepository {
     fun loadProduct(id: Long): Product
 
     fun isFinalPage(page: Int): Boolean
+
+    suspend fun pagedProducts2(page: Int): Result<List<Product>>
+
+    suspend fun allProductsUntilPage2(page: Int): Result<List<Product>>
+
+    suspend fun loadProduct2(id: Long): Result<Product>
+
+    suspend fun isFinalPage2(page: Int): Result<Boolean>
 }
