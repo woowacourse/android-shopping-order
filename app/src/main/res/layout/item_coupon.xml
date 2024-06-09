@@ -5,16 +5,12 @@
 
     <data>
         <variable
-            name="onClickShoppingCart"
-            type="woowacourse.shopping.view.cart.OnClickShoppingCart" />
+            name="onClickCoupon"
+            type="woowacourse.shopping.view.order.adapter.OnClickCoupon" />
 
         <variable
-            name="onClickNavigateShoppingCart"
-            type="woowacourse.shopping.view.cart.OnClickNavigateShoppingCart" />
-
-        <variable
-            name="cartItem"
-            type="woowacourse.shopping.domain.model.CartItem" />
+            name="coupon"
+            type="woowacourse.shopping.domain.model.Coupon" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,14 +18,13 @@
         android:layout_height="140dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/shape_border"
-        android:onClick="@{()->onClickNavigateShoppingCart.clickCartItem(cartItem.product.id)}">
+        android:onClick="@{()->onClickCoupon}">
 
 
         <CheckBox
             android:id="@+id/checkBox"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -41,13 +36,14 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cartItem.product.name}"
+            android:text="@{coupon.description}"
             android:textColor="@color/gray_5"
             android:textSize="18dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox"
             app:layout_constraintStart_toEndOf="@+id/checkBox"
             app:layout_constraintTop_toTopOf="@+id/checkBox"
+            app:layout_constraintVertical_bias="0.4"
             tools:text="5,000원 할인 쿠폰" />
 
         <TextView
@@ -57,7 +53,7 @@
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
             android:textSize="15dp"
-            android:text="@{@string/expiration_date(1)}"
+            android:text="@{@string/expiration_date(coupon.expirationDate)}"
             android:textColor="@color/gray_5"
             app:layout_constraintStart_toStartOf="@+id/checkBox"
             app:layout_constraintTop_toBottomOf="@+id/checkBox"
