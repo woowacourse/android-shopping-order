@@ -49,15 +49,22 @@ class DetailViewModel(
     }
 
     override fun subtractQuantity(cartItemId: Int) {
+        val updatedQuantity = productDetailUiState.value?.quantity?.minus(1) ?: return
+        if (updatedQuantity < 1) {
+            _detailUiEvent.value = Event(DetailUiEvent.Error)
+            return
+        }
         _productDetailUiState.value =
             productDetailUiState.value?.copy(
-                quantity = productDetailUiState.value?.quantity?.minus(1) ?: return,
+                quantity = updatedQuantity,
             )
     }
 
     override fun addToCart() {
         viewModelScope.launch {
-            alteredProductIds += productId
+            if (productId !in alteredProductIds) {
+                alteredProductIds += productId
+            }
             val uiState = productDetailUiState.value ?: return@launch
             val targetCartItem = uiState.cartItems.firstOrNull { it.productId == productId }
             if (targetCartItem == null) {
