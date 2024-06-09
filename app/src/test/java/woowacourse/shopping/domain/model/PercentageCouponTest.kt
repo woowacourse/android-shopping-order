@@ -7,6 +7,7 @@ import woowacourse.shopping.cartItemsBySize
 import woowacourse.shopping.cartItemsByTotalPrice
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 class PercentageCouponTest {
     @Test
@@ -60,7 +61,8 @@ class PercentageCouponTest {
         id: Int = 0,
         expirationDate: LocalDate = LocalDate.of(3000, 10, 10),
         discount: Int = 100,
-        availableTime: AvailableTime = availableTime(0, 23),
+        availableTime: AvailableTime =
+            AvailableTime(LocalTime.of(0, 0, 0), LocalTime.of(23, 59, 59)),
     ): PercentageCoupon {
         return PercentageCoupon(id, "", "", expirationDate, discount, availableTime)
     }
