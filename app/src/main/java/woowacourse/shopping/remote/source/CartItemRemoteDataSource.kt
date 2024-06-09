@@ -68,18 +68,6 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         cartItemApiService.updateCartItemQuantity(cartItemId, newQuantity).execute()
     }
 
-    /*
-    class ProductDataSourceImpl(private val productService: ProductService) : ProductDataSource {
-    override fun findProductById(id: Long): Result<ProductDto> =
-    override suspend fun findProductById(id: Long): Result<ProductDto> =
-        runCatching {
-            productService.getProductsById(id = id.toInt()).execute().body()?.toData()
-                ?: throw IllegalArgumentException()
-            productService.getProductsById(id = id.toInt()).toData()
-        }
-
-     */
-
     override suspend fun findByProductId2(productId: Long): Result<ProductIdsCountData> =
         runCatching {
             val allCartItems = cartItemApiService.requestCartItems2().content

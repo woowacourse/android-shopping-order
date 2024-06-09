@@ -72,6 +72,62 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
         return false
     }
 
+    override fun findByPaged2(page: Int): Result<List<ProductData>> =
+        runCatching {
+            productsApiService.requestProducts2(page = page).content.map {
+                ProductData(
+                    id = it.id,
+                    imgUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                )
+            }
+        }
+
+    override fun findAllUntilPage2(page: Int): Result<List<ProductData>> =
+        runCatching {
+            productsApiService.requestProducts2(size = page * 20).content.map {
+                ProductData(
+                    id = it.id,
+                    imgUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                )
+            }
+        }
+
+    override fun findById2(id: Long): Result<ProductData> =
+        runCatching {
+            productsApiService.requestProduct2(id.toInt()).let {
+                ProductData(
+                    id = it.id,
+                    imgUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                    category = it.category,
+                )
+            }
+        }
+
+    override fun findByCategory2(category: String): Result<List<ProductData>> =
+        runCatching {
+            productsApiService.requestProducts2(category = category).content.map {
+                ProductData(
+                    id = it.id,
+                    imgUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                    category = it.category,
+                )
+            }
+        }
+
+    override fun isFinalPage2(page: Int): Result<Boolean> =
+        runCatching {
+            val totalPage = productsApiService.requestProducts2(page = page).totalPages
+            (page + 1) == totalPage
+        }
+
     companion object {
         private const val TAG = "ProductRemoteDataSource"
     }
