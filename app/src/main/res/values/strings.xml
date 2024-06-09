@@ -11,4 +11,7 @@
     <string name="recommendation_explanation">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="recommendation_title">이런 상품은 어떠세요?</string>
     <string name="shopping_load_more_products">상품을 더 불러올게요!</string>
+    <string name="expiration_date">만료일: %1$s</string>
+    <string name="minimum_amount">최소 주문 금액: %1$,d원</string>
+    <string name="available_time">사용 가능 시간: %1$s</string>
 </resources>

@@ -80,3 +80,15 @@ fun setViewVisibility(
         }
     }
 }
+
+@BindingAdapter("app:visibilityUponNullData")
+fun setViewVisibilityUponNull(
+    view: View,
+    data: Any?,
+) {
+    if (data == null) {
+        view.visibility = View.GONE
+    } else {
+        view.visibility = View.VISIBLE
+    }
+}

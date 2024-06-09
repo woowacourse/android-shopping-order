@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter
 
 private const val DATE_PARSE_PATTERN = "yyyy-MM-dd"
 private const val DATE_FORMAT_PATTERN = "yyyy년 MM월 dd일"
-private const val TIME_PARSE_PATTERN = "HH:mm:SS"
+private const val TIME_PARSE_PATTERN = "HH:mm:ss"
+private const val TIME_FORMAT_PATTERN = "HH:mm"
 
 fun convertStringToLocalDate(date: String): LocalDate {
     return LocalDate.parse(date, DateTimeFormatter.ofPattern(DATE_PARSE_PATTERN))
@@ -18,4 +19,8 @@ fun convertLocalDateToFormatString(localDate: LocalDate): String {
 
 fun convertStringToLocalTime(time: String): LocalTime {
     return LocalTime.parse(time, DateTimeFormatter.ofPattern(TIME_PARSE_PATTERN))
+}
+
+fun convertLocalTimeToFormatString(localTime: LocalTime): String {
+    return localTime.format(DateTimeFormatter.ofPattern(TIME_FORMAT_PATTERN))
 }
