@@ -177,18 +177,8 @@ class ProductListViewModel(
     }
 
     override fun onIncrease(productId: Long, quantity: Int) {
-        val find = findCartItemOrNull(productId)
-        if (find == null) {
-            addCartItem(productId)
-            return
-        }
-
-        updateCartItemQuantity(find, productId, INCREASE_AMOUNT)
-    }
-
-    private fun addCartItem(productId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.addShoppingCartProduct2(productId, FIRST_AMOUNT)
+            shoppingCartRepository.addShoppingCartProduct2(productId, quantity)
                 .onSuccess {
                     loadCartProducts()
                     updateLoadedProduct(productId, INCREASE_AMOUNT)
@@ -241,7 +231,19 @@ class ProductListViewModel(
         quantity: Int,
     ) {
         val find = findCartItemOrNull(productId) ?: return
-        updateCartItemQuantity(find, productId, DECREASE_AMOUNT)
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.updateProductQuantity2(find.id, quantity)
+                .onSuccess {
+                    loadCartProducts()
+                    updateLoadedProduct(productId, DECREASE_AMOUNT)
+                    updateProductsTotalCount()
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "onIncrease2: failure: $it")
+                    throw it
+                }
+        }
     }
 
     private fun updateProductsTotalCount() {
