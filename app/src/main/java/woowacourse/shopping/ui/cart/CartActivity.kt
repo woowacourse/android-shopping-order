@@ -30,7 +30,6 @@ class CartActivity : AppCompatActivity() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl(),
         )
     }
 

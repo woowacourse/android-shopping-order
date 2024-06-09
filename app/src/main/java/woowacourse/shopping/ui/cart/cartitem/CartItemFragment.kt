@@ -28,7 +28,6 @@ class CartItemFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl(),
         )
     }
 

@@ -33,7 +33,6 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val orderRepository: OrderRepository,
 ) : ViewModel(), CountButtonClickListener, AddCartClickListener {
     private val _recommendProducts: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
     val recommendProducts: LiveData<List<ProductWithQuantity>> = _recommendProducts
@@ -125,11 +124,6 @@ class CartViewModel(
                 loadCartItems()
             }.checkError { _error.setValue(it) }
         }
-    }
-
-    private fun findIsCheckedByProductId(productId: Long): Boolean {
-        val current = requireNotNull(_cart.value)
-        return current.cartItems.first { it.productId == productId }.isChecked
     }
 
     fun clickCheckBox(productId: Long) {

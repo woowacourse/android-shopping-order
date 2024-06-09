@@ -29,7 +29,6 @@ class RecommendFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl(),
         )
     }
 

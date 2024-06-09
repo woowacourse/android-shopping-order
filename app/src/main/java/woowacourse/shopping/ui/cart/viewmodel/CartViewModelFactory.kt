@@ -11,14 +11,12 @@ class CartViewModelFactory(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val orderRepository: OrderRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return CartViewModel(
             productRepository,
             cartRepository,
             recentProductRepository,
-            orderRepository,
         ) as T
     }
 }
