@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCouponBinding
-import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.ui.model.CouponUiModel
 
-class CouponAdapter: ListAdapter<Coupon, CouponViewHolder>(diffUtil) {
+class CouponAdapter: ListAdapter<CouponUiModel, CouponViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CouponViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCouponBinding.inflate(inflater, parent, false)
@@ -18,20 +18,20 @@ class CouponAdapter: ListAdapter<Coupon, CouponViewHolder>(diffUtil) {
         holder.bind(getItem(position))
     }
 
-    fun updateCoupons(newCoupons: List<Coupon>) {
+    fun updateCoupons(newCoupons: List<CouponUiModel>) {
         submitList(newCoupons)
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<Coupon>() {
+        val diffUtil = object : DiffUtil.ItemCallback<CouponUiModel>() {
             override fun areItemsTheSame(
-                oldItem: Coupon,
-                newItem: Coupon,
+                oldItem: CouponUiModel,
+                newItem: CouponUiModel,
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: Coupon,
-                newItem: Coupon,
+                oldItem: CouponUiModel,
+                newItem: CouponUiModel,
             ): Boolean = oldItem == newItem
         }
     }

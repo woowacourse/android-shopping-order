@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
+import woowacourse.shopping.ui.model.CouponUiModel
 import woowacourse.shopping.ui.model.OrderInformation
 
 class PaymentViewModel(
@@ -22,14 +23,17 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ): ViewModel() {
+    private val _coupons = MutableLiveData<List<Coupon>>()
+
+    private val _couponsUiModel = MutableLiveData<List<CouponUiModel>>(emptyList())
+    val couponsUiModel: LiveData<List<CouponUiModel>> get() = _couponsUiModel
+
     private val _isPaymentSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
+
     val isPaymentSuccess: SingleLiveData<Boolean> get() = _isPaymentSuccess
-
     private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
-    val orderAmount: LiveData<Int> get() = _orderAmount
 
-    private val _coupons = MutableLiveData<List<Coupon>>(emptyList())
-    val coupons: LiveData<List<Coupon>> get() = _coupons
+    val orderAmount: LiveData<Int> get() = _orderAmount
 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> get() = _errorMessage
@@ -45,6 +49,7 @@ class PaymentViewModel(
         viewModelScope.launch {
             handleResponseResult(couponRepository.loadCoupons(), _errorMessage) { coupons ->
                 _coupons.value = coupons
+                _couponsUiModel.value = coupons.map { CouponUiModel.toUiModel(it) }
             }
         }
     }

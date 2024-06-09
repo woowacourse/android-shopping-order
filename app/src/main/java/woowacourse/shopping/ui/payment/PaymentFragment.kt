@@ -49,7 +49,7 @@ class PaymentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeIsPaymentSuccess()
         binding.rvPaymentCoupon.adapter = adapter
-        viewModel.coupons.observe(viewLifecycleOwner) { coupons ->
+        viewModel.couponsUiModel.observe(viewLifecycleOwner) { coupons ->
             adapter.updateCoupons(coupons)
         }
     }

@@ -5,9 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="coupon"
-            type="woowacourse.shopping.domain.model.coupon.Coupon" />
+            type="woowacourse.shopping.ui.model.CouponUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,6 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
+            android:text="@{@string/coupon_expiration_date(coupon.expirationDate)}"
             android:textColor="@color/gray_500"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -55,6 +58,8 @@
             android:id="@+id/tv_coupon_minimum_amount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:visibility="@{coupon.minimumAmount == null ? View.INVISIBLE : View.VISIBLE}"
+            android:text="@{@string/coupon_minimum_amount(coupon.minimumAmount)}"
             android:textColor="@color/gray_500"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
