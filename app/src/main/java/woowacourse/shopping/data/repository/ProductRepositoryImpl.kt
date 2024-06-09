@@ -6,7 +6,7 @@ import woowacourse.shopping.data.local.database.RecentProductDao
 import woowacourse.shopping.data.model.cart.CartItem
 import woowacourse.shopping.data.model.cart.toCartData
 import woowacourse.shopping.data.model.product.toOrderableProduct
-import woowacourse.shopping.data.model.product.toProductDomain2
+import woowacourse.shopping.data.model.product.toProductDomain
 import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
@@ -25,7 +25,7 @@ class ProductRepositoryImpl(
     ): Result<ProductDomain> {
         return runCatching {
             remoteProductDataSource.getProducts(category, page, size, sort)
-                .toProductDomain2(getEntireCartItems())
+                .toProductDomain(getEntireCartItems())
         }
     }
 
@@ -49,7 +49,7 @@ class ProductRepositoryImpl(
                         page = page++,
                         size = RECOMMEND_PAGE_SIZE,
                         sort = SORT_CART_ITEMS,
-                    ).toProductDomain2(cartData).orderableProducts.filter {
+                    ).toProductDomain(cartData).orderableProducts.filter {
                         it.cartData == null
                     }
                 products.forEach {

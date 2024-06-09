@@ -32,7 +32,7 @@ fun Product.toProductItemDomain(): ProductItemDomain =
         price = price,
     )
 
-fun ProductResponse.toProductDomain2(cartData: List<CartData>): ProductDomain =
+fun ProductResponse.toProductDomain(cartData: List<CartData>): ProductDomain =
     ProductDomain(
         orderableProducts =
             products.map { product ->
