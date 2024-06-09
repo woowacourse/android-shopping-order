@@ -3,7 +3,7 @@ package woowacourse.shopping.domain
 import woowacourse.shopping.data.dto.response.AvailableTime
 import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 sealed class Coupon(
     val id: Int,
@@ -13,12 +13,15 @@ sealed class Coupon(
     val discountType: DiscountType,
     val isChecked: Boolean = false,
 ) {
-    protected fun isValidPeriod(nowDate: LocalDate): Boolean {
+    fun isValidPeriod(nowDate: LocalDate): Boolean {
         val duration = Duration.between(expirationDate.atStartOfDay(), nowDate.atStartOfDay())
         return (duration.isNegative)
     }
 
-    abstract fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long
+    abstract fun calculateDiscount(
+        products: List<ProductListItem.ShoppingProductItem>,
+        now: LocalDateTime,
+    ): Long
 
     abstract fun updateCheck(isChecked: Boolean): Coupon
 }
@@ -33,11 +36,17 @@ class FixedCoupon(
     val discount: Int,
     val minimumAmount: Int,
 ) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
-    private fun isValid(totalPrice: Long) = (minimumAmount <= totalPrice) && isValidPeriod(LocalDate.now())
+    private fun isValid(
+        totalPrice: Long,
+        now: LocalDateTime,
+    ) = (minimumAmount <= totalPrice) && isValidPeriod(now.toLocalDate())
 
-    override fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long {
+    override fun calculateDiscount(
+        products: List<ProductListItem.ShoppingProductItem>,
+        now: LocalDateTime,
+    ): Long {
         val totalPrice = products.sumOf { it.price * it.quantity }
-        return if (isValid(totalPrice)) {
+        return if (isValid(totalPrice, now)) {
             discount.toLong()
         } else {
             0
@@ -68,18 +77,25 @@ class BuyXGetYCoupon(
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
-    private fun isValid(products: List<ProductListItem.ShoppingProductItem>): Boolean =
-        (products.any { it.quantity == buyQuantity }) && isValidPeriod(LocalDate.now())
+    private fun isValid(
+        products: List<ProductListItem.ShoppingProductItem>,
+        now: LocalDateTime,
+    ): Boolean = (products.any { isDiscountableQuantity(it) }) && isValidPeriod(now.toLocalDate())
 
-    override fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long {
-        return if (isValid(products)) {
-            val discountableProducts = products.filter { it.quantity == buyQuantity }
+    override fun calculateDiscount(
+        products: List<ProductListItem.ShoppingProductItem>,
+        now: LocalDateTime,
+    ): Long {
+        return if (isValid(products, now)) {
+            val discountableProducts = products.filter { isDiscountableQuantity(it) }
             val highestPriceProduct = discountableProducts.maxBy { it.price }
             highestPriceProduct.price * getQuantity
         } else {
             0
         }
     }
+
+    private fun isDiscountableQuantity(it: ProductListItem.ShoppingProductItem) = it.quantity == (buyQuantity + getQuantity)
 
     override fun updateCheck(isChecked: Boolean): Coupon {
         return BuyXGetYCoupon(
@@ -103,10 +119,13 @@ class FreeShippingCoupon(
     discountType: DiscountType,
     isChecked: Boolean,
 ) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
-    private fun isValid() = isValidPeriod(LocalDate.now())
+    private fun isValid(now: LocalDateTime) = isValidPeriod(now.toLocalDate())
 
-    override fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long {
-        return if (isValid()) {
+    override fun calculateDiscount(
+        products: List<ProductListItem.ShoppingProductItem>,
+        now: LocalDateTime,
+    ): Long {
+        return if (isValid(now)) {
             3_000
         } else {
             0
@@ -134,15 +153,20 @@ class PercentageCoupon(
     val discount: Int,
     val availableTime: AvailableTime,
 ) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
-    private fun isValid(nowTime: LocalTime): Boolean =
-        nowTime.isAfter(availableTime.start) && nowTime.isBefore(availableTime.end) &&
-            isValidPeriod(
-                LocalDate.now(),
-            )
+    private fun isValid(now: LocalDateTime): Boolean {
+        val time = now.toLocalTime()
+        val date = now.toLocalDate()
+        return time.isAfter(availableTime.start) &&
+            time.isBefore(availableTime.end) &&
+            isValidPeriod(date)
+    }
 
-    override fun calculateDiscount(products: List<ProductListItem.ShoppingProductItem>): Long {
-        val totalPrice = products.sumOf { it.price }
-        return if (isValid(LocalTime.now())) {
+    override fun calculateDiscount(
+        products: List<ProductListItem.ShoppingProductItem>,
+        now: LocalDateTime,
+    ): Long {
+        val totalPrice = products.sumOf { it.price * it.quantity }
+        return if (isValid(now)) {
             (totalPrice * discount) / 100
         } else {
             0

@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.util.Event
+import java.time.LocalDateTime
 
 class PaymentViewModel(
     private val cartRepository: CartRepository,
@@ -91,7 +92,7 @@ class PaymentViewModel(
             if (selectedCoupon == null || selectedCoupon.discountType == DiscountType.FreeShipping) {
                 0L
             } else {
-                selectedCoupon.calculateDiscount(it)
+                selectedCoupon.calculateDiscount(it, LocalDateTime.now())
             }
         } ?: 0L
     }
