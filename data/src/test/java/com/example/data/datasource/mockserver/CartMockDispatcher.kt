@@ -1,11 +1,11 @@
 package com.example.data.datasource.mockserver
 
 import com.example.data.datasource.mockserver.MockWebServerPath.CART_ITEMS
-import com.example.data.datasource.remote.retrofit.model.response.Pageable
-import com.example.data.datasource.remote.retrofit.model.response.Sort
-import com.example.data.datasource.remote.retrofit.model.response.cart.CartResponse
-import com.example.data.datasource.remote.retrofit.model.response.cart.toCartContent
-import com.example.data.datasource.remote.retrofit.model.response.cart.toCartContents
+import com.example.data.datasource.remote.model.response.Pageable
+import com.example.data.datasource.remote.model.response.Sort
+import com.example.data.datasource.remote.model.response.cart.CartResponse
+import com.example.data.datasource.remote.model.response.cart.toCartContent
+import com.example.data.datasource.remote.model.response.cart.toCartContents
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.Dispatcher

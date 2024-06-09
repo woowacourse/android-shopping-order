@@ -3,11 +3,11 @@ package com.example.data
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.data.datasource.local.room.ShoppingDatabase
-import com.example.data.datasource.local.room.dao.RecentProductDao
-import com.example.data.datasource.local.room.entity.product.toProduct
-import com.example.data.datasource.local.room.entity.product.toProductEntity
-import com.example.data.datasource.local.room.entity.recentproduct.RecentProductEntity
+import com.example.data.datasource.local.ShoppingDatabase
+import com.example.data.datasource.local.dao.RecentProductDao
+import com.example.data.datasource.local.entity.product.toProduct
+import com.example.data.datasource.local.entity.product.toProductEntity
+import com.example.data.datasource.local.entity.recentproduct.RecentProductEntity
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before

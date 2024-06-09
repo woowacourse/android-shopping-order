@@ -1,9 +1,9 @@
 package com.example.data.datasource.remote
 
-import com.example.data.datasource.remote.retrofit.model.request.AddCartItemRequest
-import com.example.data.datasource.remote.retrofit.model.request.CartItemQuantityRequest
-import com.example.data.datasource.remote.retrofit.model.response.cart.toCartItems
-import com.example.data.datasource.remote.retrofit.service.CartItemService
+import com.example.data.datasource.remote.model.request.AddCartItemRequest
+import com.example.data.datasource.remote.model.request.CartItemQuantityRequest
+import com.example.data.datasource.remote.model.response.cart.toCartItems
+import com.example.data.datasource.remote.service.CartItemService
 import com.example.domain.datasource.CartDataSource
 import com.example.domain.datasource.DataResponse
 import com.example.domain.datasource.DataResponse.Companion.NULL_BODY_ERROR_CODE

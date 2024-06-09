@@ -5,7 +5,7 @@ import com.example.data.datasource.mockserver.MockWebServerPath
 import com.example.data.datasource.mockserver.ShoppingMockWebServer
 import com.example.data.datasource.mockserver.dummyCartItems
 import com.example.data.datasource.remote.RemoteCartDataSource
-import com.example.data.datasource.remote.retrofit.RetrofitClient
+import com.example.data.datasource.remote.RetrofitClient
 import com.example.domain.datasource.CartDataSource
 import com.example.domain.datasource.DataResponse
 import org.assertj.core.api.Assertions

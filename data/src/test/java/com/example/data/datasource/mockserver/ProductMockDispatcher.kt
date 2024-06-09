@@ -3,11 +3,11 @@ package com.example.data.datasource.mockserver
 import com.example.data.datasource.mockserver.MockWebServerPath.CONTENT_KEY
 import com.example.data.datasource.mockserver.MockWebServerPath.CONTENT_TYPE
 import com.example.data.datasource.mockserver.MockWebServerPath.PRODUCTS
-import com.example.data.datasource.remote.retrofit.model.response.Pageable
-import com.example.data.datasource.remote.retrofit.model.response.Sort
-import com.example.data.datasource.remote.retrofit.model.response.product.ProductResponse
-import com.example.data.datasource.remote.retrofit.model.response.product.toProductContent
-import com.example.data.datasource.remote.retrofit.model.response.product.toProductContents
+import com.example.data.datasource.remote.model.response.Pageable
+import com.example.data.datasource.remote.model.response.Sort
+import com.example.data.datasource.remote.model.response.product.ProductResponse
+import com.example.data.datasource.remote.model.response.product.toProductContent
+import com.example.data.datasource.remote.model.response.product.toProductContents
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.Dispatcher

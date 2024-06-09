@@ -1,9 +1,9 @@
 package com.example.data.datasource.remote
 
-import com.example.data.datasource.remote.retrofit.model.response.product.toPagingProduct
-import com.example.data.datasource.remote.retrofit.model.response.product.toProduct
-import com.example.data.datasource.remote.retrofit.model.response.product.toProductList
-import com.example.data.datasource.remote.retrofit.service.ProductService
+import com.example.data.datasource.remote.model.response.product.toPagingProduct
+import com.example.data.datasource.remote.model.response.product.toProduct
+import com.example.data.datasource.remote.model.response.product.toProductList
+import com.example.data.datasource.remote.service.ProductService
 import com.example.domain.datasource.DataResponse
 import com.example.domain.datasource.ProductDataSource
 import com.example.domain.datasource.map

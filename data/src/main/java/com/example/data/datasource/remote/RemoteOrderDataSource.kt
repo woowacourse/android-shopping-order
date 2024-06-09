@@ -1,7 +1,7 @@
 package com.example.data.datasource.remote
 
-import com.example.data.datasource.remote.retrofit.model.request.CreateOrderRequest
-import com.example.data.datasource.remote.retrofit.service.OrderService
+import com.example.data.datasource.remote.model.request.CreateOrderRequest
+import com.example.data.datasource.remote.service.OrderService
 import com.example.domain.datasource.OrderDataSource
 
 class RemoteOrderDataSource(

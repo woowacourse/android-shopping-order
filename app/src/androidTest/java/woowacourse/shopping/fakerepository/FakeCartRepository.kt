@@ -1,6 +1,7 @@
 package woowacourse.shopping.fakerepository
 
-import com.example.data.datasource.local.room.entity.cart.CartItemEntity
+import com.example.data.datasource.local.entity.cart.CartItemEntity
+import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import java.lang.IllegalArgumentException
 import kotlin.math.min
@@ -13,7 +14,7 @@ class FakeCartRepository(savedCartItemEntities: List<CartItemEntity> = emptyList
     override fun increaseQuantity(productId: Int) {
         val oldCartItem = cart.find { it.productId == productId }
         if (oldCartItem == null) {
-            cart.add(CartItemEntity(id++, productId, com.example.domain.model.Quantity(1)))
+            cart.add(CartItemEntity(id++, productId, Quantity(1)))
             return
         }
         cart.remove(oldCartItem)

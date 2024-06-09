@@ -1,10 +1,10 @@
 package com.example.data.repository
 
-import com.example.data.datasource.local.room.dao.RecentProductDao
-import com.example.data.datasource.local.room.entity.product.toProductEntity
-import com.example.data.datasource.local.room.entity.recentproduct.RecentProductEntity
-import com.example.data.datasource.local.room.entity.recentproduct.toRecentProduct
-import com.example.data.datasource.local.room.entity.recentproduct.toRecentProducts
+import com.example.data.datasource.local.dao.RecentProductDao
+import com.example.data.datasource.local.entity.product.toProductEntity
+import com.example.data.datasource.local.entity.recentproduct.RecentProductEntity
+import com.example.data.datasource.local.entity.recentproduct.toRecentProduct
+import com.example.data.datasource.local.entity.recentproduct.toRecentProducts
 import com.example.domain.model.CartItem
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct

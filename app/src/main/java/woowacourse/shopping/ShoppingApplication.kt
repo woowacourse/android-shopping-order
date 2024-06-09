@@ -1,11 +1,11 @@
 package woowacourse.shopping
 
 import android.app.Application
-import com.example.data.datasource.local.room.ShoppingDatabase
+import com.example.data.datasource.local.ShoppingDatabase
 import com.example.data.datasource.remote.RemoteCartDataSource
 import com.example.data.datasource.remote.RemoteOrderDataSource
 import com.example.data.datasource.remote.RemoteProductDataSource
-import com.example.data.datasource.remote.retrofit.RetrofitClient
+import com.example.data.datasource.remote.RetrofitClient
 import com.example.data.repository.DefaultCartRepository
 import com.example.data.repository.DefaultOrderRepository
 import com.example.data.repository.DefaultProductRepository

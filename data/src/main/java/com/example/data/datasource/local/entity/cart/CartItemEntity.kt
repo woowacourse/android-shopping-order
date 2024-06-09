@@ -1,0 +1,16 @@
+package com.example.data.datasource.local.entity.cart
+
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.data.datasource.local.entity.product.ProductEntity
+import com.example.domain.model.Quantity
+
+@Entity(tableName = "cart")
+data class CartItemEntity(
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @Embedded
+    val product: ProductEntity,
+    @ColumnInfo(name = "quantity") var quantity: Quantity,
+)

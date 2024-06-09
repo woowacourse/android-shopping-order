@@ -1,6 +1,6 @@
 package com.example.data.datasource.local
 
-import com.example.data.datasource.local.room.dao.RecentProductDao
+import com.example.data.datasource.local.dao.RecentProductDao
 import com.example.domain.datasource.RecentProductDataSource
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
