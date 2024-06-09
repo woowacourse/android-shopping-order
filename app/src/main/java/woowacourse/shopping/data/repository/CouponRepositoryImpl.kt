@@ -13,10 +13,10 @@ import woowacourse.shopping.domain.model.coupon.FixedCoupon
 import woowacourse.shopping.domain.model.coupon.PercentageCoupon
 import woowacourse.shopping.domain.model.coupon.ShippingCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.domain.response.Fail
-import woowacourse.shopping.domain.response.Response
-import woowacourse.shopping.domain.response.handleApiResult
-import woowacourse.shopping.domain.response.result
+import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.handleApiResult
+import woowacourse.shopping.domain.result.result
 
 class CouponRepositoryImpl(private val dataSource: ApiHandleCouponDataSource = ApiHandleCouponDataSourceImpl()) :
     CouponRepository {

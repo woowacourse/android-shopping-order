@@ -9,11 +9,11 @@ import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.response.Fail
-import woowacourse.shopping.domain.response.Response
-import woowacourse.shopping.domain.response.handleApiResult
-import woowacourse.shopping.domain.response.result
-import woowacourse.shopping.domain.response.resultOrNull
+import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.handleApiResult
+import woowacourse.shopping.domain.result.result
+import woowacourse.shopping.domain.result.resultOrNull
 
 class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl()) :
     CartRepository {

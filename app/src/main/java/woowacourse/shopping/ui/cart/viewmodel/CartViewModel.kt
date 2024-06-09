@@ -14,11 +14,11 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.response.Fail
-import woowacourse.shopping.domain.response.Response
-import woowacourse.shopping.domain.response.onException
-import woowacourse.shopping.domain.response.onFail
-import woowacourse.shopping.domain.response.onSuccess
+import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.onException
+import woowacourse.shopping.domain.result.onFail
+import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartItemsUiState

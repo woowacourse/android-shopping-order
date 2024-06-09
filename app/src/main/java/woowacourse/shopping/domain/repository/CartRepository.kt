@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartWithProduct
-import woowacourse.shopping.domain.response.Response
+import woowacourse.shopping.domain.result.Response
 
 interface CartRepository {
     suspend fun cartItem(productId: Long): CartWithProduct

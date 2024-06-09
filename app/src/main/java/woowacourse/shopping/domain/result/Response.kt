@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.response
+package woowacourse.shopping.domain.result
 
 sealed interface Response<out T : Any?> {
     data class Success<T : Any?>(val result: T) : Response<T>

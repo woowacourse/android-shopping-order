@@ -14,9 +14,9 @@ import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.response.Fail
-import woowacourse.shopping.domain.response.Response
-import woowacourse.shopping.domain.response.onSuccess
+import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductListError
