@@ -22,59 +22,6 @@ class DefaultShoppingCartRepositoryTest {
     }
 
     @Test
-    fun `모든 장바구니 상품을 불러온다`() {
-        // given
-        castSource =
-            FakeShoppingCartDataSource(
-                cartItemDtosTestFixture(10),
-            )
-        repository = DefaultShoppingCartRepository(castSource)
-
-        // when
-        val actual = repository.loadAllCartItems()
-
-        // then
-        assertThat(actual).hasSize(10)
-    }
-
-    @Test
-    fun `장바구니 상품의 총 개수를 계산한다`() {
-        // given
-        castSource =
-            FakeShoppingCartDataSource(
-                cartItemDtosTestFixture(10) + cartItemDtoTestFixture(id = 10, quantity = 9),
-            )
-        repository = DefaultShoppingCartRepository(castSource)
-
-        // when
-        val actual = repository.shoppingCartProductQuantity()
-
-        // then
-        assertThat(actual).isEqualTo(19)
-    }
-
-    @Test
-    fun `상품의 개수를 변경한다`() {
-        // given
-        castSource =
-            FakeShoppingCartDataSource(
-                cartItemDtosTestFixture(10),
-            )
-        repository = DefaultShoppingCartRepository(castSource)
-
-        // when
-        repository.updateProductQuantity(1, 10)
-
-        // then
-        val actual =
-            castSource.loadAllCartItems().find { it.id == 1L }?.quantity
-                ?: throw NoSuchElementException("there is no product")
-        assertThat(actual).isEqualTo(10)
-    }
-
-    // test suspend function
-
-    @Test
     fun `모든 장바구니 상품 불러오기 성공`() =
         runTest {
             // given

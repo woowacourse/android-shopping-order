@@ -62,8 +62,15 @@ class ShoppingCartViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.removeShoppingCartProduct2(cartItemId)
                 .onSuccess {
-                    val currentItems = shoppingCartRepository.loadAllCartItems()
-                    _cartItems.postValue(currentItems)
+                    shoppingCartRepository.loadAllCartItems2()
+                        .onSuccess {
+                            _cartItems.postValue(it)
+                        }
+                        .onFailure {
+                            // TODO : handle error
+                            Log.e(TAG, "deleteItem: loadAllCartItems2: failure: $it")
+                            throw it
+                        }
                 }
                 .onFailure {
                     // TODO : handle error
