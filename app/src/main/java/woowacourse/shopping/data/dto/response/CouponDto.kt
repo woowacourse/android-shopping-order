@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-data class CouponDTO(
+data class CouponDto(
     val id: Int,
     val code: String,
     val description: String,

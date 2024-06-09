@@ -115,7 +115,7 @@ class PaymentViewModel(
 
     private fun fetchCoupon() {
         viewModelScope.launch {
-            couponRepository.requestCoupons().onSuccess {
+            couponRepository.loadAll().onSuccess {
                 _coupons.value = it
             }.onFailure {
                 // TODO

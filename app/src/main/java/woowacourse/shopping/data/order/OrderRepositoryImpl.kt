@@ -14,7 +14,7 @@ class OrderRepositoryImpl(
             cartRepository.loadAll().onSuccess { carts ->
                 val checkedCartIds =
                     carts.filter { productIds.contains(it.product.id) }.map { it.cartId }
-                remoteOrderDataSource.requestOrder(checkedCartIds)
+                remoteOrderDataSource.order(checkedCartIds)
             }
         }
     }

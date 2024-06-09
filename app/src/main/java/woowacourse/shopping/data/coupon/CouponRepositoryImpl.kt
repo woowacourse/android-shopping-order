@@ -5,13 +5,13 @@ import woowacourse.shopping.domain.Coupon
 
 class CouponRepositoryImpl(private val remoteCouponDataSource: RemoteCouponDataSource) :
     CouponRepository {
-    override suspend fun requestCoupons(): Result<List<Coupon>> {
+    override suspend fun loadAll(): Result<List<Coupon>> {
         return runCatching {
-            remoteCouponDataSource.requestCoupon()
+            remoteCouponDataSource.loadAll()
         }
     }
 }
 
 interface CouponRepository {
-    suspend fun requestCoupons(): Result<List<Coupon>>
+    suspend fun loadAll(): Result<List<Coupon>>
 }

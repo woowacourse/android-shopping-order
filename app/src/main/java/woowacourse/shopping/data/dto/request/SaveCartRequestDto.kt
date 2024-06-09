@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.dto.request
 
-data class CartSaveRequest(
+data class SaveCartRequestDto(
     val productId: Long,
     val quantity: Int,
 )
 
-data class CartUpdateRequest(
+data class UpdateCartRequestDto(
     val quantity: Int,
 )

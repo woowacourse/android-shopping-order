@@ -14,6 +14,7 @@ val dummyProducts =
             imgUrl = "",
             name = "$id",
             price = 10000,
+            category = "",
         )
     }
 
@@ -26,10 +27,9 @@ val dummyRecentProducts =
             name = "0",
             imgUrl = "",
             dateTime = LocalDateTime.of(2023, 5, 23, 11, 42),
+            category = "",
         ),
     )
-
-val dummyRecentProduct = dummyRecentProducts[0]
 
 val dummyCartProducts: List<Cart> =
     List(3) {

@@ -7,7 +7,7 @@ class RemoteCouponDataSource {
     private val couponApiService: CouponApiService =
         ApiClient.getApiClient().create(CouponApiService::class.java)
 
-    suspend fun requestCoupon(): List<Coupon> {
+    suspend fun loadAll(): List<Coupon> {
         return couponApiService.requestCoupons().map { it.toDomain() }
     }
 }
