@@ -59,10 +59,9 @@ class SelectionAdapter(
     fun submitItems(newItems: List<CartItemUiModel>) {
         val hasInitialized = cartItems.isEmpty()
         cartItems = newItems
-        if (hasInitialized)
-            {
-                notifyItemRangeInserted(0, newItems.size)
-            }
+        if (hasInitialized) {
+            notifyItemRangeInserted(0, newItems.size)
+        }
     }
 
     fun updateQuantity(updatedProductIds: Set<Long>) {
