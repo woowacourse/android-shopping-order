@@ -11,10 +11,10 @@ object ResponseHandlingUtils {
             when {
                 response.isSuccessful && body != null -> ResponseResult.Success(body)
                 response.isSuccessful && response.code() == 204 -> ResponseResult.Success(Unit as T)
-                else -> ResponseResult.Error(code = response.code(), message = response.message())
+                else -> ResponseResult.ServerError(code = response.code(), message = response.message())
             }
         } catch (e: HttpException) {
-            ResponseResult.Error(code = e.code(), message = e.message())
+            ResponseResult.ServerError(code = e.code(), message = e.message())
         } catch (e: Throwable) {
             ResponseResult.Exception(e)
         }
@@ -23,7 +23,7 @@ object ResponseHandlingUtils {
    fun <T : Any> handleResponse(response: ResponseResult<T>): T {
         return when (response) {
             is ResponseResult.Success -> response.data
-            is ResponseResult.Error -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> throw IllegalStateException("${response.code}: 서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> throw IllegalStateException("${response.e}: 예기치 않은 오류가 발생했습니다.")
         }
     }
@@ -36,10 +36,10 @@ object ResponseHandlingUtils {
         }
     }
 
-    suspend fun <T : Any> ResponseResult<T>.onError(
+    suspend fun <T : Any> ResponseResult<T>.onServerError(
         executable: suspend (code: Int, message: String?) -> Unit
     ): ResponseResult<T> = apply {
-        if (this is ResponseResult.Error<T>) {
+        if (this is ResponseResult.ServerError<T>) {
             executable(code, message)
         }
     }

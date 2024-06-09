@@ -12,7 +12,7 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
@@ -57,7 +57,7 @@ class ShoppingCartViewModel(
             cartItemRepository.loadCartItems().onSuccess { cartItems ->
                 _cartItems.value = cartItems
                 _isLoading.value = false
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 // TODO: Error Handling
             }.onException {
                 // TODO: Exception Handling
@@ -69,7 +69,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch  {
             cartItemRepository.delete(cartItemId).onSuccess {
                 Log.d("hye", "Success: 장바구니 아이템 삭제 성공")
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 Log.e("hye", "ServerError: $code - $message")
             }.onException {
                 Log.e("hye", "Exception: ${it.message}")
@@ -77,7 +77,7 @@ class ShoppingCartViewModel(
 
             cartItemRepository.loadCartItems().onSuccess { cartItems ->
                 _cartItems.value = cartItems
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 // TODO: Error Handling
             }.onException {
                 // TODO: Exception Handling
@@ -117,7 +117,7 @@ class ShoppingCartViewModel(
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             cartItemRepository.loadCartItems().onSuccess { cartItems ->
                 updateCartItems(cartItems)
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 // TODO: Error Handling
             }.onException {
                 // TODO: Exception Handling
@@ -134,7 +134,7 @@ class ShoppingCartViewModel(
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             cartItemRepository.loadCartItems().onSuccess { cartItems ->
                 updateCartItems(cartItems)
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 // TODO: Error Handling
             }.onException {
                 // TODO: Exception Handling

@@ -21,7 +21,7 @@ class DefaultProductRepository(
                 val isFinalPage: Boolean = (page + 1) == response.data.totalPages
                 ResponseResult.Success(ProductsPage(products, isFinalPage))
             }
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
         }
     }
@@ -32,7 +32,7 @@ class DefaultProductRepository(
                 val data = response.data.toDomain(findCartItemQuantity(id))
                 ResponseResult.Success(data)
             }
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
         }
     }

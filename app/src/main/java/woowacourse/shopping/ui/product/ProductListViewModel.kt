@@ -14,7 +14,7 @@ import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.common.currentPageIsNullException
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.history.DefaultProductHistoryRepository
@@ -81,7 +81,7 @@ class ProductListViewModel(
                     _loadedProducts.value = productsInformation.products
                     _isLoading.value = false
                     _isLastPage.postValue(productsInformation.isLastPage)
-                }.onError { code, message ->
+                }.onServerError { code, message ->
                     // TODO: Error Handling
                 }.onException {
                     // TODO: Exception Handling
@@ -102,7 +102,7 @@ class ProductListViewModel(
                 val oldProducts = loadedProducts.value ?: emptyList()
                 _loadedProducts.value = oldProducts + productsInformation.products
                 _isLastPage.postValue(productsInformation.isLastPage)
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 // TODO: Error Handling
             }.onException {
                 // TODO: Exception Handling
@@ -125,7 +125,7 @@ class ProductListViewModel(
     private suspend fun updateCartItemsCount() {
         cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
             _cartProductTotalCount.value = totalCount
-        }.onError { code, message ->
+        }.onServerError { code, message ->
             // TODO: Error Handling
         }.onException {
             // TODO: Exception Handling
@@ -140,7 +140,7 @@ class ProductListViewModel(
             cartItemRepository.updateProductQuantity(productIdsCount.productId, productIdsCount.quantity)
             cartItemRepository.calculateCartItemsCount().onSuccess { totalCount ->
                 updateProductQuantity(productIdsCount.productId, variation, totalCount)
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 Log.d("hye", "ServerError: $code - $message")
             }.onException {
                 Log.d("hye", "Exception: $it")

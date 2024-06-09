@@ -12,7 +12,7 @@ class DefaultCartItemRepository(
 ) : CartItemRepository {
     override suspend fun loadCartItems(): ResponseResult<List<CartItem>> =
         when(val response = cartItemDataSource.fetchCartItems()) {
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
             is ResponseResult.Success -> {
                 val cartItems: List<CartItem> = response.data.content.map { cartItemDto -> cartItemDto.toDomain() }
@@ -33,7 +33,7 @@ class DefaultCartItemRepository(
 
     override suspend fun delete(cartItemId: Long): ResponseResult<Unit> =
         when(val response = cartItemDataSource.deleteCartItem(cartItemId)) {
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
             is ResponseResult.Success -> ResponseResult.Success(response.data)
         }
@@ -43,14 +43,14 @@ class DefaultCartItemRepository(
         quantity: Int,
     ): ResponseResult<Unit> =
         when(val response = cartItemDataSource.updateCartItemQuantity(cartItemId, quantity)) {
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
             is ResponseResult.Success -> ResponseResult.Success(response.data)
         }
 
     override suspend fun calculateCartItemsCount(): ResponseResult<Int> =
         when(val response = cartItemDataSource.fetchCartItems()) {
-            is ResponseResult.Error -> ResponseResult.Error(response.code, "서버와 통신 중에 오류가 발생했습니다.")
+            is ResponseResult.ServerError -> ResponseResult.ServerError(response.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Exception -> ResponseResult.Exception(response.e)
             is ResponseResult.Success -> {
                 val cartItemsCount: Int = response.data.content.sumOf { it.quantity }

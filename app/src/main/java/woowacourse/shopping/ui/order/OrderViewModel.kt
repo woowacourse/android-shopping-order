@@ -11,7 +11,7 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onError
+import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
 import woowacourse.shopping.data.order.OrderRemoteRepository
@@ -51,7 +51,7 @@ class OrderViewModel(
             cartItemRepository.loadCartItems().onSuccess { cartItems ->
                 val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
                 orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
-            }.onError { code, message ->
+            }.onServerError { code, message ->
                 // TODO: Error Handling
             }.onException {
                 // TODO: Exception Handling
@@ -108,7 +108,7 @@ class OrderViewModel(
         productRepository.loadProduct(productId).onSuccess { product ->
             val currentOrderAmount = orderAmount.value ?: 0
             _orderAmount.value = currentOrderAmount + priceConvert(product.price)
-        }.onError { code, message ->
+        }.onServerError { code, message ->
             // TODO: Error Handling
         }.onException {
             // TODO: Exception Handling
