@@ -33,7 +33,10 @@ class DefaultShoppingCartRepository(
         quantity: Int,
     ): Result<Unit> {
         return runCatching {
-            val cartItem = cartSource.loadAllCartItems().getOrThrow().find { it.product.id == productId }
+            val cartItem = findCartItemByProductId(productId)
+                .map { it }
+                .recover { null }
+                .getOrThrow()
 
             if (cartItem != null) {
                 cartSource.updateProductsCount(cartItem.id, cartItem.quantity + quantity)
@@ -47,14 +50,11 @@ class DefaultShoppingCartRepository(
         cartSource.removeCartItem(cartItemId)
 
 
-    override suspend fun findCartItemByProductId(productId: Long): Result<CartItem> {
-        return cartSource.loadAllCartItems().mapCatching { cartitems ->
-            cartitems.find { it.product.id == productId }?.let {
-                it.toDomain()
-            } ?: throw NoSuchElementException("There is no product with id: $productId")
-
+    override suspend fun findCartItemByProductId(productId: Long): Result<CartItem> =
+        cartSource.loadAllCartItems().mapCatching { cartItems ->
+            cartItems.find { it.product.id == productId }?.toDomain()
+                ?: throw NoSuchElementException("There is no product with id: $productId")
         }
-    }
 
     companion object {
         private const val TAG = "DefaultShoppingCartRepository"

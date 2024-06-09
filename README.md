@@ -76,6 +76,23 @@ API 문서: http://54.180.95.212:8080/swagger-ui/index.html
 - [x] local.properties 에 url, id, password 저장.
 - [x] gson 선택 이유, adapter 의 생성 시점과 방법.
 - [x] Retrofit 의 execute, enqueue 차이, 장/단점 고찰.
-- [ ] 여러 url 을 사용한다면?
+- [x] 여러 url 을 사용한다면?
 
-R
+# 3 단계
+
+Coroutines을 적용하여 비동기 요청을 리팩터링한다.
+단, Flow를 사용하진 않는다.
+
+- [x] 모든 데이터 소스에 suspend, Result 적용
+- [x] 모든 Repository 에 suspend, Result 적용
+- [x] Repository 테스트 추가
+- [x] 뷰모델에 코루틴 적용하기
+
+
+
+- [x] 상품 추천 관련
+  - [x] productsRecommendationRepository 의 함수에 파라미터를 제거.
+  - [x] CategoryBasedProductRecommendationRepository 의 생성자에 historySource 추가.
+
+
+

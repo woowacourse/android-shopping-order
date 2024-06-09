@@ -214,9 +214,10 @@ class ProductListViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val find = findCartItemOrNull(productId) ?: return
+        val foundCartItem = findCartItemOrNull(productId) ?: return
+
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.updateProductQuantity(find.id, quantity)
+            shoppingCartRepository.updateProductQuantity(foundCartItem.id, quantity)
                 .onSuccess {
                     loadCartProducts()
                     updateLoadedProduct(productId, DECREASE_AMOUNT)

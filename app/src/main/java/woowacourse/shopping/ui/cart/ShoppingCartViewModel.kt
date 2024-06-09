@@ -96,10 +96,9 @@ class ShoppingCartViewModel(
 
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) {
-            // TOOD: show toast message: "선택된 상품이 없습니다."
+            // TODO: show toast message: "선택된 상품이 없습니다."
             return
         }
-
 
         viewModelScope.launch(Dispatchers.IO) {
             cartItems.value?.forEach { cartItem ->
@@ -122,37 +121,21 @@ class ShoppingCartViewModel(
         _deletedItemId.setValue(productId)
     }
 
-    // 여기서의 파라미터 productId 는 실제로는 cartItemId.
     override fun onIncrease(
         productId: Long,
         quantity: Int,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val item = cartItems.value?.find { it.id == productId }
-                ?: throw NoSuchElementException("There is no product with id: $productId")
-            // TODO: 위에서 못 찰을 수가 없음. 만약 못 찾는 다면, viewmodel 이 가진 error 객체에게 보내서 예기치 못한 오류 설정하기
-
-            updateProductQuantity(productId, item, INCREASE_AMOUNT)
+            shoppingCartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
+                .onSuccess {
+                    updateCartItems()
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.d(TAG, "onIncrease: addShoppingCartProduct2: $it")
+                    throw it
+                }
         }
-    }
-
-    private suspend fun updateProductQuantity(
-        productId: Long,
-        item: CartItem,
-        changeAmount: Int
-    ) {
-        shoppingCartRepository.updateProductQuantity(
-            cartItemId = productId,
-            quantity = item.quantity + changeAmount
-        )
-            .onSuccess {
-                updateCartItems()
-            }
-            .onFailure {
-                // TODO : handle error
-                Log.d(TAG, "onIncrease: updateProductQuantity2: $it")
-                throw it
-            }
     }
 
     private suspend fun updateCartItems() {
@@ -171,17 +154,24 @@ class ShoppingCartViewModel(
             }
     }
 
-    // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val item = cartItems.value?.find { it.id == productId }
-                ?: throw NoSuchElementException("There is no product with id: $productId")
-            // TODO: 위에서 못 찰을 수가 없음. 만약 못 찾는 다면, viewmodel 이 가진 error 객체에게 보내서 예기치 못한 오류 설정하기
+        val cart = cartItems.value?.find { cartItem ->
+            cartItem.product.id == productId
+        } ?: return
 
-            updateProductQuantity(productId, item, DECREASE_AMOUNT)
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.updateProductQuantity(cart.id, quantity)
+                .onSuccess {
+                    updateCartItems()
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.d(TAG, "onIncrease: updateProductQuantity2: $it")
+                    throw it
+                }
         }
     }
 
