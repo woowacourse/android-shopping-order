@@ -1,15 +1,20 @@
 package woowacourse.shopping.data.remote.dto.mapper
 
 import woowacourse.shopping.data.remote.dto.response.CouponResponse
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.coupon.Bogo
+import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.Fixed
+import woowacourse.shopping.domain.coupon.FreeShipping
+import woowacourse.shopping.domain.coupon.MiracleSale
+import woowacourse.shopping.domain.coupon.Unknown
 
 fun CouponResponse.toDomain(): Coupon {
     return when (CouponType.fromCode(code)) {
-        CouponType.FIXED5000 -> Coupon.Fixed5000(id, code, description, discountType, expirationDate, discount!!, minimumAmount!!)
-        CouponType.BOGO -> Coupon.Bogo(id, code, description, expirationDate, buyQuantity!!, getQuantity!!, discountType)
-        CouponType.FREESHIPPING -> Coupon.FreeShipping(id, code, description, expirationDate, minimumAmount!!, discountType)
+        CouponType.FIXED5000 -> Fixed(id, code, description, discountType, expirationDate, discount!!, minimumAmount!!)
+        CouponType.BOGO -> Bogo(id, code, description, expirationDate, buyQuantity!!, getQuantity!!, discountType)
+        CouponType.FREESHIPPING -> FreeShipping(id, code, description, expirationDate, minimumAmount!!, discountType)
         CouponType.MIRACLESALE ->
-            Coupon.MiracleSale(
+            MiracleSale(
                 id,
                 code,
                 description,
@@ -20,7 +25,7 @@ fun CouponResponse.toDomain(): Coupon {
                 discountType,
             )
         CouponType.UNKNOWN -> {
-            Coupon.Unknown(id, code, description, expirationDate, discountType)
+            Unknown(id, code, description, expirationDate, discountType)
         }
     }
 }

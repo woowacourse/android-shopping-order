@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.ui.UiState
+import woowacourse.shopping.presentation.base.UiState
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
 @BindingAdapter("cartImgUrl")

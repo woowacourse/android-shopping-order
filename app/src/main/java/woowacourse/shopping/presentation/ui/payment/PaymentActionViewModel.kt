@@ -11,9 +11,9 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
-import woowacourse.shopping.presentation.ErrorType
+import woowacourse.shopping.presentation.base.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
-import woowacourse.shopping.presentation.ui.UpdateUiModel
+import woowacourse.shopping.presentation.base.UpdateUiModel
 import woowacourse.shopping.presentation.ui.payment.model.CouponUiModel
 import woowacourse.shopping.presentation.ui.payment.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel

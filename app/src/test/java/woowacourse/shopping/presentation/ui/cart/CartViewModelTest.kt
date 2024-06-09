@@ -15,8 +15,8 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
-import woowacourse.shopping.presentation.ErrorType
-import woowacourse.shopping.presentation.ui.UiState
+import woowacourse.shopping.presentation.base.ErrorType
+import woowacourse.shopping.presentation.base.UiState
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
 @ExtendWith(InstantTaskExecutorExtension::class, CoroutinesTestExtension::class, MockKExtension::class)
@@ -70,6 +70,7 @@ class CartViewModelTest {
             ),
         )
         Thread.sleep(1000)
-        assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(ErrorType.ERROR_CART_DELETE)
+        assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(
+            ErrorType.ERROR_CART_DELETE)
     }
 }

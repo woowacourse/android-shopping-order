@@ -1,6 +1,6 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class FakeCouponRepository :

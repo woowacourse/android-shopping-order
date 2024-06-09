@@ -2,7 +2,7 @@ package woowacourse.shopping.data.remote.repository
 
 import woowacourse.shopping.data.remote.datasource.coupon.CouponDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepositoryImpl(

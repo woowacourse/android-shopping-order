@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.ui.payment.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.coupon.Coupon
 
 @Parcelize
 data class CouponUiModel(

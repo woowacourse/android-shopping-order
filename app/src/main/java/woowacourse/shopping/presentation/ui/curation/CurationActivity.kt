@@ -6,7 +6,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCurationBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
-import woowacourse.shopping.presentation.ui.UiState
+import woowacourse.shopping.presentation.base.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.curation.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.PaymentActivity

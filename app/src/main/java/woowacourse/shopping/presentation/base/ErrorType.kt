@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation
+package woowacourse.shopping.presentation.base
 
 enum class ErrorType(val message: String, val code: Int) {
     ERROR_RECENT_INSERT("최근 아이템 추가 에러", 1),
