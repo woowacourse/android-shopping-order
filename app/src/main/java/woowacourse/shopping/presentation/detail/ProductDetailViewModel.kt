@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.domain.datasource.map
+import com.example.domain.datasource.DataResponse.Companion.NULL_BODY_ERROR_CODE
 import com.example.domain.datasource.onFailure
 import com.example.domain.datasource.onSuccess
 import com.example.domain.model.Quantity
@@ -52,10 +52,16 @@ class ProductDetailViewModel(
                             product,
                             Quantity(1),
                             isSuccess = true,
+                            isFailure = false,
                         ),
                     )
-                }.onFailure { _, _ ->
-                    _productUiModel.postValue(ProductDetailUiModel(isFailure = true))
+                }.onFailure { code, error ->
+                    _productUiModel.postValue(
+                        ProductDetailUiModel(
+                            isSuccess = false,
+                            isFailure = true,
+                        ),
+                    )
                 }
             }
         }
@@ -80,20 +86,24 @@ class ProductDetailViewModel(
         val quantity = productUiModel.value?.quantity ?: return
         thread {
             val result =
-                cartRepository.find(product.id).map {
-                    repeat(quantity.count) {
-                        cartRepository.increaseQuantity(product.id)
+                cartRepository.find(product.id)
+                    .onSuccess {
+                        val newQuantity = Quantity(it.quantity.count + quantity.count)
+                        cartRepository.changeQuantity(it.id, newQuantity)
+                    }.onFailure { code, _ ->
+                        if (code == NULL_BODY_ERROR_CODE || code == 400) {
+                            cartRepository.postCartItem(product.id, quantity)
+                        }
                     }
-                /*
-                val newQuantity = Quantity(it.quantity.count + quantity.count)
-                cartRepository.changeQuantity(product.id, newQuantity)
-                 */
-                }
             handler.post {
                 result.onSuccess {
                     _putOnCartEvent.emit(true)
-                }.onFailure { _, _ ->
-                    _putOnCartEvent.emit(false)
+                }.onFailure { code, error ->
+                    if (code == NULL_BODY_ERROR_CODE) {
+                        _putOnCartEvent.emit(true)
+                    } else {
+                        _putOnCartEvent.emit(false)
+                    }
                 }
             }
         }

@@ -11,6 +11,11 @@ class DefaultCartRepository(
 ) : CartRepository {
     override fun findAll(): DataResponse<List<CartItem>> = dataSource.findAll()
 
+    override fun postCartItem(
+        productId: Int,
+        quantity: Quantity,
+    ): DataResponse<Unit> = dataSource.postCartItem(productId, quantity)
+
     override fun increaseQuantity(productId: Int) = dataSource.increaseQuantity(productId)
 
     override fun decreaseQuantity(productId: Int) = dataSource.decreaseQuantity(productId)

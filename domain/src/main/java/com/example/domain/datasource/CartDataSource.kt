@@ -6,6 +6,11 @@ import com.example.domain.model.Quantity
 interface CartDataSource {
     fun findAll(): DataResponse<List<CartItem>>
 
+    fun postCartItem(
+        productId: Int,
+        quantity: Quantity,
+    ): DataResponse<Unit>
+
     fun increaseQuantity(productId: Int): DataResponse<Unit>
 
     fun decreaseQuantity(productId: Int): DataResponse<Unit>

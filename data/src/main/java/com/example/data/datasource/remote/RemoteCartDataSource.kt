@@ -23,6 +23,14 @@ class RemoteCartDataSource(
             it.toCartItems()
         }
 
+    override fun postCartItem(
+        productId: Int,
+        quantity: Quantity,
+    ): DataResponse<Unit> {
+        val request = AddCartItemRequest(productId, quantity.count)
+        return cartItemService.postCartItem(addCartItemRequest = request).executeForDataResponse()
+    }
+
     override fun increaseQuantity(productId: Int) =
         findByProductId(productId).map { cartItem ->
             changeQuantity(cartItem.id, cartItem.quantity.inc())
