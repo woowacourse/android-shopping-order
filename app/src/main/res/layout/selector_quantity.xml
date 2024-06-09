@@ -11,7 +11,7 @@
 
         <variable
             name="cartCountHandler"
-            type="woowacourse.shopping.presentation.base.CartCountHandler" />
+            type="woowacourse.shopping.presentation.common.ProductCountHandler" />
 
     </data>
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui
+package woowacourse.shopping.presentation.common
 
 import androidx.lifecycle.Observer
 

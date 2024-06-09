@@ -11,9 +11,9 @@ import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
-import woowacourse.shopping.presentation.ui.EventObserver
-import woowacourse.shopping.presentation.base.UiState
-import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.common.EventObserver
+import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.base.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
@@ -21,9 +21,7 @@ import woowacourse.shopping.presentation.ui.curation.CurationActivity
 import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 
-class CartActivity : BindingActivity<ActivityCartBinding>() {
-    override val layoutResourceId: Int
-        get() = R.layout.activity_cart
+class CartActivity : BindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
 
     private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
     private val cartAdapter: CartAdapter by lazy { CartAdapter(viewModel) }

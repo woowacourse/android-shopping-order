@@ -1,10 +1,10 @@
 package woowacourse.shopping.presentation.ui.cart
 
 import kotlinx.coroutines.Job
-import woowacourse.shopping.presentation.base.CartCountHandler
+import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
-interface CartActionHandler : CartCountHandler {
+interface CartActionHandler : ProductCountHandler {
     fun onDelete(cartProductUiModel: CartProductUiModel): Job
 
     fun onCheck(

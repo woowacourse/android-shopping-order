@@ -13,10 +13,10 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
-import woowacourse.shopping.presentation.base.ErrorType
-import woowacourse.shopping.presentation.ui.EventState
-import woowacourse.shopping.presentation.base.UiState
-import woowacourse.shopping.presentation.base.UpdateUiModel
+import woowacourse.shopping.presentation.common.ErrorType
+import woowacourse.shopping.presentation.common.EventState
+import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
 
 class ProductDetailViewModel(

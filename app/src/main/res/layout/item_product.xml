@@ -11,7 +11,7 @@
 
         <variable
             name="productActionHandler"
-            type="woowacourse.shopping.presentation.base.ProductActionHandler" />
+            type="woowacourse.shopping.presentation.common.ProductClickHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -8,10 +8,10 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.presentation.base.ErrorType
-import woowacourse.shopping.presentation.ui.EventState
-import woowacourse.shopping.presentation.base.UiState
-import woowacourse.shopping.presentation.base.UpdateUiModel
+import woowacourse.shopping.presentation.common.ErrorType
+import woowacourse.shopping.presentation.common.EventState
+import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState

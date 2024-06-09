@@ -17,10 +17,11 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
-import woowacourse.shopping.presentation.base.ErrorType
-import woowacourse.shopping.presentation.ui.EventState
-import woowacourse.shopping.presentation.base.UiState
-import woowacourse.shopping.presentation.base.UpdateUiModel
+import woowacourse.shopping.presentation.base.BaseViewModel
+import woowacourse.shopping.presentation.common.ErrorType
+import woowacourse.shopping.presentation.common.EventState
+import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 
 class ShoppingViewModel(
@@ -28,15 +29,12 @@ class ShoppingViewModel(
     private val cartItemRepository: CartItemRepository,
     private val recentProductRepository: RecentProductRepository,
 ) :
-    ViewModel(), ShoppingActionHandler {
+    BaseViewModel(), ShoppingActionHandler {
     private val _cartCount = MutableLiveData<Int>(0)
     val cartCount: LiveData<Int> get() = _cartCount
 
     private val _recentProducts = MutableLiveData<UiState<List<RecentProduct>>>(UiState.Loading)
     val recentProducts: LiveData<UiState<List<RecentProduct>>> get() = _recentProducts
-
-    private val _errorHandler = MutableLiveData<EventState<ErrorType>>()
-    val errorHandler: LiveData<EventState<ErrorType>> get() = _errorHandler
 
     private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
     val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
@@ -90,7 +88,7 @@ class ShoppingViewModel(
                     )
                 }
             }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
+                showError(ErrorType.ERROR_PRODUCT_LOAD)
             }
         }
 
@@ -99,7 +97,7 @@ class ShoppingViewModel(
             cartItemRepository.getAllByPaging(0, 5000).onSuccess {
                 _carts.postValue(UiState.Success(it))
             }.onFailure {
-                _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
+                showError(ErrorType.ERROR_CART_LOAD)
             }
         }
 
@@ -108,7 +106,7 @@ class ShoppingViewModel(
             cartItemRepository.getCount().onSuccess { maxCount ->
                 _cartCount.postValue(maxCount)
             }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_CART_COUNT_LOAD))
+                showError(ErrorType.ERROR_CART_COUNT_LOAD)
             }
         }
 
@@ -149,7 +147,7 @@ class ShoppingViewModel(
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
+                        showError(ErrorType.ERROR_PRODUCT_PLUS)
                     }
             } else {
                 cartItemRepository.patch(
@@ -162,7 +160,7 @@ class ShoppingViewModel(
                         _cartCount.postValue(_cartCount.value?.plus(1))
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
+                        showError(ErrorType.ERROR_PRODUCT_PLUS)
                     }
             }
         }
@@ -184,7 +182,7 @@ class ShoppingViewModel(
                         _cartCount.postValue(_cartCount.value?.minus(1))
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_MINUS))
+                        showError(ErrorType.ERROR_PRODUCT_MINUS)
                     }
             } else {
                 cartItemRepository.delete(cartProduct.cartId.toInt()).onSuccess {
@@ -192,7 +190,7 @@ class ShoppingViewModel(
                     saveRecentProduct(cartProducts[index])
                     _cartCount.postValue(_cartCount.value?.minus(1))
                 }.onFailure {
-                    _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_MINUS))
+                    showError(ErrorType.ERROR_PRODUCT_MINUS)
                 }
             }
         }
@@ -212,14 +210,14 @@ class ShoppingViewModel(
             recentProductRepository.findAllByLimit(10).onSuccess {
                 _recentProducts.postValue(UiState.Success(it))
             }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_LOAD))
+                showError(ErrorType.ERROR_RECENT_LOAD)
             }
         }
 
     override fun saveRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
             recentProductRepository.save(cartProduct.toRecentProduct()).onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
+                showError(ErrorType.ERROR_RECENT_INSERT)
             }
         }
 

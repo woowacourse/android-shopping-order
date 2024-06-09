@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.base
+package woowacourse.shopping.presentation.common
 
 sealed interface UiState<out T : Any> {
     data object Loading : UiState<Nothing>

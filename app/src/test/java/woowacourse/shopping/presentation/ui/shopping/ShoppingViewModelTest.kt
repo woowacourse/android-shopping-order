@@ -15,8 +15,8 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
-import woowacourse.shopping.presentation.base.ErrorType
-import woowacourse.shopping.presentation.base.UiState
+import woowacourse.shopping.presentation.common.ErrorType
+import woowacourse.shopping.presentation.common.UiState
 
 @ExtendWith(InstantTaskExecutorExtension::class, CoroutinesTestExtension::class, MockKExtension::class)
 class ShoppingViewModelTest {

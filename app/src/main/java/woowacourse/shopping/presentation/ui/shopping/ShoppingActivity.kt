@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
-import woowacourse.shopping.presentation.ui.EventObserver
-import woowacourse.shopping.presentation.base.UiState
-import woowacourse.shopping.presentation.base.UpdateUiModel
-import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.common.EventObserver
+import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.common.UpdateUiModel
+import woowacourse.shopping.presentation.base.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shopping.adapter.RecentAdapter
@@ -23,9 +23,7 @@ import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 import woowacourse.shopping.utils.getParcelableExtraCompat
 
-class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
-    override val layoutResourceId: Int
-        get() = R.layout.activity_shopping
+class ShoppingActivity : BindingActivity<ActivityShoppingBinding>(R.layout.activity_shopping) {
 
     private val viewModel: ShoppingViewModel by viewModels { ViewModelFactory() }
 
