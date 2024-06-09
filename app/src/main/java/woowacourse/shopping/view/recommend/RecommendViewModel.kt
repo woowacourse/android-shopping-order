@@ -27,7 +27,8 @@ class RecommendViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
 ) : ViewModel(), OnClickCartItemCounter {
-    private var checkedShoppingCart = ShoppingCart()
+    private var _checkedShoppingCart = ShoppingCart()
+    val checkedShoppingCart: ShoppingCart get() = _checkedShoppingCart
 
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
@@ -82,7 +83,7 @@ class RecommendViewModel(
     }
 
     fun orderItems() {
-        val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
+        val ids = _checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
         if (ids != null) {
             viewModelScope.launch {
                 orderRepository.orderShoppingCart(ids)
@@ -101,7 +102,7 @@ class RecommendViewModel(
         viewModelScope.launch {
             runCatching {
                 product.updateItemSelector(false)
-                checkedShoppingCart.deleteProductFromProductId(product.id)
+                _checkedShoppingCart.deleteProductFromProductId(product.id)
             }.onSuccess {
                 _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
                 updateCheckItemData()
@@ -121,15 +122,15 @@ class RecommendViewModel(
     }
 
     fun saveCheckedShoppingCarts(shoppingCart: ShoppingCart) {
-        checkedShoppingCart = shoppingCart
+        _checkedShoppingCart = shoppingCart
         updateCheckItemData()
     }
 
     private fun updateCheckItemData() {
-        _totalPrice.value = checkedShoppingCart.cartItems.value?.sumOf {
+        _totalPrice.value = _checkedShoppingCart.cartItems.value?.sumOf {
             it.product.cartItemCounter.itemCount * it.product.price
         } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
-        _totalCount.value = checkedShoppingCart.cartItems.value?.count {
+        _totalCount.value = _checkedShoppingCart.cartItems.value?.count {
             it.cartItemSelector.isSelected
         } ?: ShoppingCartRepositoryImpl.DEFAULT_ITEM_SIZE
     }
@@ -144,7 +145,7 @@ class RecommendViewModel(
                             product,
                         ),
                     )
-                    checkedShoppingCart.addProduct(CartItem(product = product))
+                    _checkedShoppingCart.addProduct(CartItem(product = product))
                     updateCheckItemData()
                 }.onFailure {
                     // Todo: handle exception

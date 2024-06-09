@@ -21,6 +21,7 @@ import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
+import woowacourse.shopping.view.order.OrderFragment
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
@@ -126,7 +127,13 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     }
 
     override fun clickOrder() {
-        recommendViewModel.orderItems()
+        val checkedShoppingCart = recommendViewModel.checkedShoppingCart
+        val orderFragment =
+            OrderFragment().apply {
+                arguments =
+                    OrderFragment.createBundle(checkedShoppingCart)
+            }
+        mainActivityListener?.changeFragment(orderFragment)
     }
 
     override fun clickBack() {
