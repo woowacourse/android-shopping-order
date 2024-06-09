@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.MutableSingleLiveData
@@ -14,6 +16,7 @@ import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
+import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
 import woowacourse.shopping.data.product.remote.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
@@ -23,6 +26,8 @@ import woowacourse.shopping.domain.model.ProductIdsCount.Companion.INCREASE_VARI
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
+import woowacourse.shopping.ui.ResponseHandler
+import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.listener.OnOrderListener
 
@@ -51,15 +56,12 @@ class OrderViewModel(
         viewModelScope.launch {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
-            cartItemRepository.loadCartItems()
-                .onSuccess { cartItems ->
-                    val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
+            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
+                val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
+                viewModelScope.launch {
                     orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
-                }.onServerError { code, message ->
-                    _errorMessage.value = "$code: $message"
-                }.onException { _, message ->
-                    _errorMessage.value = message
                 }
+            }
             _isOrderSuccess.setValue(true)
         }
     }
@@ -80,7 +82,9 @@ class OrderViewModel(
 
     fun loadRecommendedProducts() {
         viewModelScope.launch {
-            _recommendProducts.postValue(orderRepository.loadRecommendedProducts())
+            handleResponseResult(orderRepository.loadRecommendedProducts(), _errorMessage) { products ->
+                _recommendProducts.value = products
+            }
         }
     }
 
@@ -109,15 +113,10 @@ class OrderViewModel(
     }
 
     private suspend fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
-        productRepository.loadProduct(productId)
-            .onSuccess { product ->
-                val currentOrderAmount = orderAmount.value ?: 0
-                _orderAmount.value = currentOrderAmount + priceConvert(product.price)
-            }.onServerError { code, message ->
-                _errorMessage.value = "$code: $message"
-            }.onException { _, message ->
-                _errorMessage.value = message
-            }
+        handleResponseResult(productRepository.loadProduct(productId), _errorMessage) { product ->
+            val currentOrderAmount = orderAmount.value ?: 0
+            _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+        }
     }
 
     private fun updateOrdersCount(countVariation: Int) {
