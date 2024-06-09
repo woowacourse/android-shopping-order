@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
+import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.api.resultOrNull
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
@@ -76,10 +77,10 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
             result = dataSource.postCartItems(RequestCartItemPostDto(productId, quantity)),
         )
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit> =
-        handleApiResult(
-            result = dataSource.deleteCartItems(id),
-        )
+    override suspend fun deleteCartItem(id: Long): Result<Unit> {
+        val result = dataSource.deleteCartItems(id)
+        return if (result is ApiResponse.Error && result.code == 204) Result.Success(Unit) else handleApiResult(result)
+    }
 
     override suspend fun cartItemsCount(): Int =
         handleApiResult(
