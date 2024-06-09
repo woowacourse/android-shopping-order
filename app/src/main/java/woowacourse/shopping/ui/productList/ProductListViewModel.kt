@@ -1,8 +1,13 @@
 package woowacourse.shopping.ui.productList
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.currentPageIsNullException
 import woowacourse.shopping.domain.model.Product
@@ -18,7 +23,6 @@ import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
-import kotlin.concurrent.thread
 
 class ProductListViewModel(
     private val productsRepository: ShoppingProductsRepository,
@@ -46,38 +50,122 @@ class ProductListViewModel(
     private val _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
     val shoppingCartDestination: SingleLiveData<Boolean> get() = _shoppingCartDestination
 
-//    private val _cartProducts: MutableLiveData<List<CartItem>> = MutableLiveData()
-//    private val cartProducts: LiveData<List<CartItem>> get() = _cartProducts
-
     private val _cartProducts: MutableLiveData<List<CartItem>> = MutableLiveData()
     private val cartProducts: LiveData<List<CartItem>> get() = _cartProducts
 
     fun loadAll() {
         val page = currentPage.value ?: currentPageIsNullException()
 
-        thread {
-            _loadedProducts.postValue(productsRepository.allProductsUntilPage(page))
-            _cartProductTotalCount.postValue(shoppingCartRepository.shoppingCartProductQuantity())
-            _isLastPage.postValue(productsRepository.isFinalPage(page))
-            _productsHistory.postValue(productHistoryRepository.loadAllProductHistory())
-//            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
-            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
-        }.join()
+        loadAllProducts(page)
+        calculateCartProductTotalCount()
+        calculateFinalPage(page)
+        loadProductHistory()
+        loadCartProducts()
+    }
+
+    private fun loadAllProducts(page: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            productsRepository.allProductsUntilPage2(page)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _loadedProducts.postValue(it)
+                    }
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "loadAllProducts: failure: $it")
+                    throw it
+                }
+        }
+    }
+
+    private fun calculateCartProductTotalCount() {
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.shoppingCartProductQuantity2()
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _cartProductTotalCount.postValue(it)
+                    }
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "calculateCartProductTotalCount: failure: $it")
+                    throw it
+                }
+        }
+    }
+
+    private fun calculateFinalPage(page: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            productsRepository.isFinalPage2(page)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _isLastPage.postValue(it)
+                    }
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "calculateFinalPage: failure: $it")
+                    throw it
+                }
+        }
+    }
+
+    private fun loadProductHistory() {
+        viewModelScope.launch(Dispatchers.IO) {
+            productHistoryRepository.loadRecentProducts(10)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _productsHistory.postValue(it)
+                    }
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "loadProductHistory: failure: $it")
+                    throw it
+                }
+        }
+    }
+
+    private fun loadCartProducts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.loadAllCartItems2()
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _cartProducts.postValue(it)
+                    }
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "loadCarProducts: failure: $it")
+                    throw it
+                }
+        }
+    }
+
+    private fun loadPagedProducts(page: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            productsRepository.pagedProducts2(page)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _loadedProducts.postValue(_loadedProducts.value?.toMutableList()?.apply { addAll(it) } ?: it)
+                    }
+                }
+                .onFailure {
+                    // TODO 에러 처리
+                    Log.e(TAG, "loadPagedProducts: failure: $it")
+                    throw it
+                }
+        }
     }
 
     fun loadNextPageProducts() {
         if (isLastPage.value == true) return
-
         val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
 
-        thread {
-            val isLastPage = productsRepository.isFinalPage(nextPage)
-            val result = productsRepository.pagedProducts(nextPage)
-
-            _currentPage.postValue(nextPage)
-            _isLastPage.postValue(isLastPage)
-            _loadedProducts.postValue(_loadedProducts.value?.toMutableList()?.apply { addAll(result) })
-        }
+        calculateFinalPage(nextPage)
+        loadPagedProducts(nextPage)
+        _currentPage.postValue(nextPage)
     }
 
     fun navigateToShoppingCart() {
@@ -88,39 +176,50 @@ class ProductListViewModel(
         _detailProductDestinationId.setValue(productId)
     }
 
-    override fun onIncrease(
-        productId: Long,
-        quantity: Int,
-    ) {
-        try {
-            val foundCartItem = foundCartItem(productId)
-//            updateProductQuantity(foundCartItem, INCREASE_AMOUNT)
-            updateProductQuantity2(foundCartItem, INCREASE_AMOUNT)
-        } catch (e: NoSuchElementException) {
-            addNewProduct(productId)
-        } finally {
-            thread {
-//                _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
-                _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
-            }.join()
+    override fun onIncrease(productId: Long, quantity: Int) {
+        val find = findCartItemOrNull(productId)
+        if (find == null) {
+            addCartItem(productId)
+            return
+        }
 
-            updateProductsTotalCount()
+        updateCartItemQuantity(find, productId, INCREASE_AMOUNT)
+    }
 
-            updateLoadedProduct(productId, INCREASE_AMOUNT)
+    private fun addCartItem(productId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.addShoppingCartProduct2(productId, FIRST_AMOUNT)
+                .onSuccess {
+                    loadCartProducts()
+                    updateLoadedProduct(productId, INCREASE_AMOUNT)
+                    updateProductsTotalCount()
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "onIncrease2: failure: $it")
+                    throw it
+                }
         }
     }
 
-    private fun addNewProduct(productId: Long) {
-        thread {
-            shoppingCartRepository.addShoppingCartProduct(productId, FIRST_AMOUNT)
-        }.join()
+    private fun updateCartItemQuantity(find: CartItem, productId: Long, changeAmount: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.updateProductQuantity2(find.id, find.quantity + changeAmount)
+                .onSuccess {
+                    loadCartProducts()
+                    updateLoadedProduct(productId, changeAmount)
+                    updateProductsTotalCount()
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "onIncrease2: failure: $it")
+                    throw it
+                }
+        }
     }
 
-    private fun foundCartItem(productId: Long) =
-        (
-            cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
-                ?: throw NoSuchElementException()
-        )
+    private fun findCartItemOrNull(productId: Long): CartItem? =
+        cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
 
     private fun updateLoadedProduct(
         productId: Long,
@@ -141,32 +240,22 @@ class ProductListViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val find = foundCartItem(productId)
-//        updateProductQuantity(find, DECREASE_AMOUNT)
-        updateProductQuantity2(find, DECREASE_AMOUNT)
-
-        thread {
-//            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
-            _cartProducts.postValue(shoppingCartRepository.loadAllCartItems())
-        }.join()
-
-        updateLoadedProduct(productId, DECREASE_AMOUNT)
-        updateProductsTotalCount()
-    }
-
-    private fun updateProductQuantity2(
-        find: CartItem,
-        changeAmount: Int,
-    ) {
-        thread {
-            shoppingCartRepository.updateProductQuantity(find.id, find.quantity + changeAmount)
-        }.join()
+        val find = findCartItemOrNull(productId) ?: return
+        updateCartItemQuantity(find, productId, DECREASE_AMOUNT)
     }
 
     private fun updateProductsTotalCount() {
-        thread {
-            _cartProductTotalCount.postValue(shoppingCartRepository.shoppingCartProductQuantity())
-        }.join()
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.shoppingCartProductQuantity2()
+                .onSuccess {
+                    _cartProductTotalCount.postValue(it)
+                }
+                .onFailure {
+                    // TODO: 에러 처리
+                    Log.e(TAG, "updateProductsTotalCount: failure: $it")
+                    throw it
+                }
+        }
     }
 
     companion object {
