@@ -10,9 +10,12 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
+import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.viewmodel.HomeViewModel
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions
 import woowacourse.shopping.ui.order.recommend.listener.RecommendClickListener
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
@@ -25,9 +28,58 @@ class RecommendViewModel(
     private val orderViewModel: OrderViewModel,
 ) : ViewModel(), RecommendClickListener {
     private val _recommendUiState =
-        MutableLiveData<UiState<List<HomeViewItem.ProductViewItem>>>(UiState.Loading)
-    val recommendUiState: LiveData<UiState<List<HomeViewItem.ProductViewItem>>>
+        MutableLiveData<UiState<List<ProductViewItem>>>(UiState.Loading)
+    val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
         get() = _recommendUiState
+
+    private val _recommendProductViewItems = MutableLiveData<List<ProductViewItem>>(emptyList())
+    val recommendProductViewItems: LiveData<List<ProductViewItem>>
+        get() = _recommendProductViewItems
+
+    private val _recommendNavigationActions = MutableLiveData<Event<RecommendNavigationActions>>()
+    val recommendNavigationActions: LiveData<Event<RecommendNavigationActions>>
+        get() = _recommendNavigationActions
+
+    fun updateRecommendProductViewItems() {
+        if (recommendUiState.value is UiState.Success) {
+            viewModelScope.launch {
+                val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
+                cartRepository.getCartItems(0, totalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
+                    .onSuccess { cartItems ->
+                        val recommendProductIds =
+                            _recommendProductViewItems.value?.map { recommendProductViewItem -> recommendProductViewItem.product.productId }
+                                ?: return@onSuccess
+
+                        val updatedRecommendProductViewItems = cartItems.filter { cartItem ->
+                            recommendProductIds.contains(cartItem.product.productId)
+                        }.map { updatedCartItem ->
+                            ProductViewItem(updatedCartItem.product, updatedCartItem.quantity)
+                        }
+
+                        val newRecommendProductViewItems =
+                            recommendProductViewItems.value?.toMutableList() ?: return@onSuccess
+
+                        updatedRecommendProductViewItems.forEach { updatedRecommendProductViewItem ->
+                            val updatePosition =
+                                newRecommendProductViewItems.indexOfFirst { it.product.productId == updatedRecommendProductViewItem.product.productId }
+                            if (updatePosition != -1) {
+                                newRecommendProductViewItems[updatePosition] =
+                                    updatedRecommendProductViewItem
+                            }
+                        }
+
+                        val newCartViewItems = cartItems.map { cartItem ->
+                            CartViewItem(cartItem).check()
+                        }
+                        orderViewModel.updateSelectedCartViewItems(newCartViewItems)
+
+                        _recommendProductViewItems.value = newRecommendProductViewItems
+                        _recommendUiState.value =
+                            UiState.Success(recommendProductViewItems.value ?: emptyList())
+                    }
+            }
+        }
+    }
 
     fun generateRecommendProductViewItems() {
         viewModelScope.launch {
@@ -49,22 +101,26 @@ class RecommendViewModel(
 
                 val numberOfRecommend =
                     min(OrderViewModel.DEFAULT_NUMBER_OF_RECOMMEND, sameCategoryProducts.size)
-                val recommendProductViewItems =
+                _recommendProductViewItems.value =
                     sameCategoryProducts.subList(0, numberOfRecommend)
                         .map(HomeViewItem::ProductViewItem)
-                _recommendUiState.value = UiState.Success(recommendProductViewItems)
+                _recommendUiState.value =
+                    UiState.Success(recommendProductViewItems.value ?: emptyList())
             }
         }
+    }
+
+    override fun onProductClick(productId: Int) {
+        _recommendNavigationActions.value =
+            Event(RecommendNavigationActions.NavigateToDetail(productId))
     }
 
     override fun onPlusButtonClick(product: Product) {
         val recommendState = recommendUiState.value
         if (recommendState is UiState.Success) {
-            var cartItemId: Int
             viewModelScope.launch {
                 cartRepository.addCartItem(product.productId, 1)
-                    .onSuccess {
-                        cartItemId = it
+                    .onSuccess { cartItemId ->
                         var updatedCartViewItem = CartViewItem(CartItem(cartItemId, 1, product))
                         updatedCartViewItem = updatedCartViewItem.check()
 
@@ -86,7 +142,7 @@ class RecommendViewModel(
                             }
                         val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
                         newRecommendProductViewItems[recommendPosition] =
-                            HomeViewItem.ProductViewItem(product, 1)
+                            ProductViewItem(product, 1)
                         _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
                     }
             }
@@ -107,7 +163,7 @@ class RecommendViewModel(
                 }
             val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
             newRecommendProductViewItems[recommendPosition] =
-                HomeViewItem.ProductViewItem(
+                ProductViewItem(
                     updatedCartViewItem.cartItem.product,
                     updatedCartViewItem.cartItem.quantity,
                 )
@@ -129,7 +185,7 @@ class RecommendViewModel(
                 }
             val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
             newRecommendProductViewItems[recommendPosition] =
-                HomeViewItem.ProductViewItem(
+                ProductViewItem(
                     updatedCartItem.cartItem.product,
                     updatedCartItem.cartItem.quantity - 1,
                 )

@@ -19,6 +19,7 @@ import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
+import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.NavigateToDetail
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -59,6 +60,11 @@ class RecommendFragment : Fragment() {
         observeViewModel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        recommendViewModel.updateRecommendProductViewItems()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -85,6 +91,14 @@ class RecommendFragment : Fragment() {
                     )
             }
         }
+
+        recommendViewModel.recommendNavigationActions.observe(viewLifecycleOwner) { recommendNavigationActions ->
+            recommendNavigationActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is NavigateToDetail -> navigateToDetail(action.productId)
+                }
+            }
+        }
     }
 
     private fun showData(productViewItems: List<HomeViewItem.ProductViewItem>) {
@@ -96,10 +110,12 @@ class RecommendFragment : Fragment() {
     }
 
     private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(requireContext(), productId))
+        startActivity(DetailActivity.createIntent(requireContext(), productId, RECOMMEND_ORIGIN))
     }
 
     companion object {
+        const val RECOMMEND_ORIGIN = "recommend"
+
         fun newInstance(): Fragment {
             return RecommendFragment()
         }
