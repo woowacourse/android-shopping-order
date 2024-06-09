@@ -16,26 +16,7 @@ class CategoryBasedProductRecommendationRepository(
     private val cartSource: ShoppingCartDataSource,
     private val historySource: ProductHistoryDataSource,
 ) : ProductsRecommendationRepository {
-    override fun recommendedProducts(productId: Long): List<Product> {
-        val latest = productsSource.findById(productId)
-
-        val allCartItemProductIds: List<Long> = cartSource.loadAllCartItems().map { it.product.id }
-
-        val productsWithCategory: List<ProductData> = productsSource.findByCategory(latest.category)
-
-        val filteredProducts =
-            productsWithCategory.filterNot { productData ->
-                allCartItemProductIds.contains(productData.id)
-            }
-
-        val minimumCount = min(filteredProducts.size, 10)
-
-        return filteredProducts.map { productData ->
-            productData.toDomain()
-        }.subList(0, minimumCount)
-    }
-
-    override suspend fun recommendedProducts2(): Result<List<Product>> = runCatching {
+    override suspend fun recommendedProducts(): Result<List<Product>> = runCatching {
         val latestProductId = historySource.loadLatestProduct2()
             .map { it.id }
             .recover {

@@ -65,7 +65,7 @@ class OrderViewModel(
 
     fun loadAll() {
         viewModelScope.launch(Dispatchers.IO) {
-            productsRecommendationRepository.recommendedProducts2()
+            productsRecommendationRepository.recommendedProducts()
                 .also { Log.d(TAG, "loadAll: recommendedProducts2: $it") }
                 .onSuccess { recommendedProducts ->
                     orderRepository.allOrderItemsQuantity()

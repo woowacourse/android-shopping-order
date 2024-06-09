@@ -9,8 +9,6 @@ import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.productTestFixture
-import woowacourse.shopping.productsTestFixture
 import woowacourse.shopping.remote.model.response.CartItemResponse
 import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.source.FakeProductDataSource
@@ -54,7 +52,7 @@ class CategoryBasedProductRecommendationRepositoryTest {
         repository = CategoryBasedProductRecommendationRepository(productSource, cartSource, historySource)
 
         // when
-        val actual = repository.recommendedProducts2().getOrThrow()
+        val actual = repository.recommendedProducts().getOrThrow()
 
         // then
         assertThat(actual).isEqualTo(
@@ -99,7 +97,7 @@ class CategoryBasedProductRecommendationRepositoryTest {
         repository = CategoryBasedProductRecommendationRepository(productSource, cartSource, historySource)
 
         // when
-        val actual = repository.recommendedProducts2().getOrThrow()
+        val actual = repository.recommendedProducts().getOrThrow()
 
         // then
         assertThat(actual).isEqualTo(
@@ -144,7 +142,7 @@ class CategoryBasedProductRecommendationRepositoryTest {
         repository = CategoryBasedProductRecommendationRepository(productSource, cartSource, historySource)
 
         // when
-        val actual = repository.recommendedProducts2().getOrThrow()
+        val actual = repository.recommendedProducts().getOrThrow()
 
         // then
         assertThat(actual).isEqualTo(
