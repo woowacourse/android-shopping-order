@@ -4,12 +4,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import retrofit2.HttpException
 import retrofit2.Response
-import woowacourse.shopping.ui.utils.exceptionHandler
 
 suspend inline fun <T : Any?> handleApi(crossinline execute: suspend () -> Response<T>): ApiResponse<T> =
     coroutineScope {
         val deferredResult =
-            async<ApiResponse<T>>(exceptionHandler()) {
+            async<ApiResponse<T>> {
                 try {
                     val response = execute()
                     val body = response.body()
