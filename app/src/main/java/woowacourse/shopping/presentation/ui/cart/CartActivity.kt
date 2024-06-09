@@ -44,8 +44,11 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             this,
             EventObserver {
                 when (it) {
-                    OrderEvent.MoveToPayment -> {
-                        PaymentActivity.start(this)
+                    is OrderEvent.MoveToPayment -> {
+                        PaymentActivity.startWithSelectedProducts(
+                            this,
+                            it.selectedCartItems,
+                        )
                     }
 
                     OrderEvent.MoveToRecommend -> {

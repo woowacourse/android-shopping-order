@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
+import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.payment.adapter.CouponAdapter
@@ -21,7 +22,8 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     override fun initStartView(savedInstanceState: Bundle?) {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        viewModel.fetchInitialData()
+        val productIds = intent.getLongArrayExtra(EXTRA_SELECTED_PRODUCT_IDS) ?: return
+        viewModel.fetchInitialData(productIds)
         initActionBarTitle()
         initRecyclerViewAdapter()
         observeCoupon()
@@ -60,8 +62,15 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     }
 
     companion object {
-        fun start(context: Context) {
+        private const val EXTRA_SELECTED_PRODUCT_IDS = "selectedProductIds"
+
+        fun startWithSelectedProducts(
+            context: Context,
+            selectedProducts: List<ProductListItem.ShoppingProductItem>,
+        ) {
+            val selectedProductIds = selectedProducts.map { it.id }.toLongArray()
             Intent(context, PaymentActivity::class.java).apply {
+                putExtra(EXTRA_SELECTED_PRODUCT_IDS, selectedProductIds)
                 context.startActivity(this)
             }
         }

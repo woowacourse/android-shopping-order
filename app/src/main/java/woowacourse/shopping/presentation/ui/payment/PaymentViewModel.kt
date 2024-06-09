@@ -109,9 +109,9 @@ class PaymentViewModel(
         }
     }
 
-    fun fetchInitialData() {
+    fun fetchInitialData(productIds: LongArray) {
         fetchCoupon()
-        fetchCarts()
+        fetchCarts(productIds)
     }
 
     private fun fetchCoupon() {
@@ -124,10 +124,12 @@ class PaymentViewModel(
         }
     }
 
-    private fun fetchCarts() {
+    private fun fetchCarts(productIds: LongArray) {
         viewModelScope.launch {
-            cartRepository.loadAll().onSuccess {
-                carts.value = it.map { cart -> cart.toShoppingProduct() }
+            cartRepository.loadAll().onSuccess { fetchedCarts ->
+                carts.value =
+                    fetchedCarts.filter { productIds.contains(it.product.id) }
+                        .map { it.toShoppingProduct() }
             }.onFailure {
                 // TODO
             }

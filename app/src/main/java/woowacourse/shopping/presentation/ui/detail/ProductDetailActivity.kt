@@ -99,7 +99,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     companion object {
-        //        const val EXTRA_QUANTITY = "quantity"
         const val EXTRA_PRODUCT_ID = "productId"
         const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
         private const val EXTRA_IS_LAST_VIEWED_PRODUCT = "isLastViewedProduct"

@@ -146,7 +146,8 @@ class CartViewModel(
             }
 
             is OrderState.Recommend -> {
-                _orderEvent.value = Event(OrderEvent.MoveToPayment)
+                val selectedCartItems = selectedCartItems.value ?: return
+                _orderEvent.value = Event(OrderEvent.MoveToPayment(selectedCartItems))
             }
 
             null -> throw IllegalAccessError()
