@@ -23,5 +23,10 @@ fun View.setVisible(isVisible: Boolean) {
 
 @BindingAdapter("minimumAmount")
 fun TextView.setText(minimumAmount: Int?) {
-    text = minimumAmount?.toString() ?: ""
+    text =
+        if (minimumAmount == null) {
+            ""
+        } else {
+            "최소 주문 금액: %,d원".format(minimumAmount)
+        }
 }

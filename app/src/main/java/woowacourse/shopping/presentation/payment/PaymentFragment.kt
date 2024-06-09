@@ -38,6 +38,9 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
         viewModel.coupons.observe(viewLifecycleOwner) {
             adapter.setData(it)
         }
+//        viewModel.orderPrice.observe(viewLifecycleOwner) {
+//            viewModel.updateFinalPrice()
+//        }
         initViews()
         initAppBar()
     }

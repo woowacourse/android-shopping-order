@@ -15,14 +15,12 @@ class CouponAdapter(
     private val data: MutableList<Coupon> = mutableListOf()
 
 //    private val data: List<Coupon> get() {
-//        Log.d("alsong", "data : ${viewModel.coupons.value}")
 //        return viewModel.coupons.value?.map { Coupon.of(it) } ?: emptyList()
 //    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): CouponViewHolder {
-        Log.d("alsong", "onCreateViewHolder: $data")
         val binding =
             ItemCouponBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CouponViewHolder(binding, lifecycleOwner)

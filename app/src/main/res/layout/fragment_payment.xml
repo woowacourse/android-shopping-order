@@ -75,7 +75,8 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_price"
-            tools:text="200,000원" />
+            tools:text="200,000원"
+            android:text="@{String.valueOf(vm.orderPrice)}"/>
 
         <TextView
             android:id="@+id/tv_discount_price"
@@ -97,7 +98,8 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_discount_price"
-            tools:text="-5,000원" />
+            tools:text="-5,000원"
+            android:text="@{String.valueOf(vm.couponDiscountPrice)}"/>
 
         <TextView
             android:id="@+id/tv_delivery_price"
@@ -119,7 +121,8 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_delivery_price"
-            tools:text="3,000원" />
+            tools:text="3,000원"
+            android:text="@{String.valueOf(vm.deliveryPrice)}"/>
 
         <ImageView
             android:id="@+id/divider2"
@@ -150,7 +153,8 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_total_price"
-            tools:text="200,000원" />
+            tools:text="200,000원"
+            android:text="@{String.valueOf(vm.finalPrice)}"/>
 
         <Button
             android:layout_width="match_parent"
