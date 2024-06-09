@@ -237,12 +237,12 @@ class HomeViewModel(
         _homeUiEvent.value = Event(HomeUiEvent.Error)
     }
 
-    fun onNavigatedBack(changedIds: IntArray) {
+    fun updateProductQuantities(changedIds: IntArray) {
         viewModelScope.launch {
             if (changedIds.isEmpty()) return@launch
             changedIds.forEach { id ->
-                val updatedProduct = productRepository.getProductById(id).getOrNull() ?: return@launch
-                val target = getUpdatedProducts(id, updatedProduct.cartData)
+                val updatedProduct = productRepository.getProductById(id).getOrNull()
+                val target = getUpdatedProducts(id, updatedProduct?.cartData)
                 _homeProductUiState.value = homeProductUiState.value?.copy(
                     productItems = target ?: return@forEach
                 )

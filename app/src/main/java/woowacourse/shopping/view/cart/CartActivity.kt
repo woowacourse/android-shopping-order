@@ -121,6 +121,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun navigateBackToHome() {
         val itemIds = viewModel.alteredProductIds.toIntArray()
+        itemIds.forEach { println(it) }
         setResult(
             RESULT_OK,
             HomeActivity.createIntent(this, itemIds),

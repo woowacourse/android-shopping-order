@@ -2,7 +2,6 @@ package woowacourse.shopping.view.home
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -46,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             val changedIds = getChangedIdsFromActivityResult(result)
-            viewModel.onNavigatedBack(changedIds = changedIds)
+            viewModel.updateProductQuantities(changedIds = changedIds)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
