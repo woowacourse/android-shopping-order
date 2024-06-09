@@ -19,17 +19,17 @@ import woowacourse.shopping.data.remote.injector.CartItemRepositoryInjector
 import woowacourse.shopping.data.remote.injector.CouponRepositoryInjector
 import woowacourse.shopping.data.remote.injector.OrderRepositoryInjector
 import woowacourse.shopping.data.remote.injector.ProductRepositoryInjector
-import woowacourse.shopping.presentation.ui.FakeCartItemRepository
-import woowacourse.shopping.presentation.ui.FakeCouponRepository
-import woowacourse.shopping.presentation.ui.FakeOrderRepository
-import woowacourse.shopping.presentation.ui.FakeProductRepository
+import woowacourse.shopping.repository.FakeCartItemRepository
+import woowacourse.shopping.repository.FakeCouponRepository
+import woowacourse.shopping.repository.FakeOrderRepository
+import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.presentation.ui.cart.CartActivity
-import woowacourse.shopping.presentation.ui.cartProduct
+import woowacourse.shopping.cartProduct
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity.Companion.EXTRA_CART_PRODUCT
 import java.lang.IllegalStateException
 
 @RunWith(AndroidJUnit4::class)
-class ProductEntityDetailActivityTest {
+class ProductDetailActivityTest {
     private val intent =
         Intent(
             ApplicationProvider.getApplicationContext(),

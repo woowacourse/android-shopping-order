@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui
+package woowacourse.shopping.repository
 
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.domain.CartProduct

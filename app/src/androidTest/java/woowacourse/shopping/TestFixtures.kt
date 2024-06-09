@@ -1,5 +1,6 @@
-package woowacourse.shopping.presentation.ui
+package woowacourse.shopping
 
+import woowacourse.shopping.data.local.mapper.toEntity
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 
@@ -30,4 +31,9 @@ val recentProducts =
         )
     }
 
+
 val recentProduct: RecentProduct = recentProducts.first()
+
+val recentProductEntities = recentProducts.map { it.toEntity() }
+val recentProductEntity = recentProduct.toEntity()
+

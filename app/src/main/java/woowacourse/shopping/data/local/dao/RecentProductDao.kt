@@ -9,7 +9,7 @@ import woowacourse.shopping.data.local.entity.RecentProductEntity
 @Dao
 interface RecentProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun save(recentProductEntity: RecentProductEntity)
+    suspend fun save(recentProductEntity: RecentProductEntity): Long
 
     @Query(
         "SELECT productId, name, imgUrl, quantity, price, createdAt, category, cartId " +

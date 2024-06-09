@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui
+package woowacourse.shopping.repository
 
 import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.CouponRepository
