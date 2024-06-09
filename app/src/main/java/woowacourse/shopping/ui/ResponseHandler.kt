@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui
 
 import androidx.lifecycle.MutableLiveData
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
+import woowacourse.shopping.data.common.ApiResponseHandler.onException
+import woowacourse.shopping.data.common.ApiResponseHandler.onServerError
+import woowacourse.shopping.data.common.ApiResponseHandler.onSuccess
 import woowacourse.shopping.data.common.ResponseResult
 
 object ResponseHandler {

@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.cart.remote
 
 import woowacourse.shopping.data.cart.remote.datasource.CartItemDataSource
-import woowacourse.shopping.data.common.ResponseHandlingUtils.handle
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
+import woowacourse.shopping.data.common.ApiResponseHandler.handleResponseResult
+import woowacourse.shopping.data.common.ApiResponseHandler.onSuccess
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
@@ -13,7 +13,7 @@ class DefaultCartItemRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartItemRepository {
     override suspend fun loadCartItems(): ResponseResult<List<CartItem>> =
-        handle(cartItemDataSource.fetchCartItems()) { response ->
+        handleResponseResult(cartItemDataSource.fetchCartItems()) { response ->
             val cartItems: List<CartItem> = response.content.map { cartItemDto -> cartItemDto.toDomain() }
             ResponseResult.Success(cartItems)
         }
@@ -30,16 +30,16 @@ class DefaultCartItemRepository(
     }
 
     override suspend fun delete(cartItemId: Long): ResponseResult<Unit> =
-        handle(cartItemDataSource.deleteCartItem(cartItemId)) { ResponseResult.Success(Unit) }
+        handleResponseResult(cartItemDataSource.deleteCartItem(cartItemId)) { ResponseResult.Success(Unit) }
 
     override suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
     ): ResponseResult<Unit> =
-        handle(cartItemDataSource.updateCartItemQuantity(cartItemId, quantity)) { ResponseResult.Success(Unit) }
+        handleResponseResult(cartItemDataSource.updateCartItemQuantity(cartItemId, quantity)) { ResponseResult.Success(Unit) }
 
     override suspend fun calculateCartItemsCount(): ResponseResult<Int> =
-        handle(cartItemDataSource.fetchCartItems()) { response ->
+        handleResponseResult(cartItemDataSource.fetchCartItems()) { response ->
             val cartItemsCount: Int = response.content.sumOf { it.quantity }
             ResponseResult.Success(cartItemsCount)
         }

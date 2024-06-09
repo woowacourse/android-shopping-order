@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.history.local
 
-import woowacourse.shopping.data.common.ResponseHandlingUtils.handleResponse
+import woowacourse.shopping.data.common.ApiResponseHandler.handleResponse
 import woowacourse.shopping.data.history.local.datasource.ProductHistoryDataSource
 import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 import woowacourse.shopping.data.product.remote.dto.ProductDto.Companion.toDomain

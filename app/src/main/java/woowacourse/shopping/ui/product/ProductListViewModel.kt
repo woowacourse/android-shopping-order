@@ -13,9 +13,9 @@ import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.common.currentPageIsNullException
 import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
+import woowacourse.shopping.data.common.ApiResponseHandler.onServerError
+import woowacourse.shopping.data.common.ApiResponseHandler.onException
+import woowacourse.shopping.data.common.ApiResponseHandler.onSuccess
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.history.local.DefaultProductHistoryRepository
 import woowacourse.shopping.data.product.remote.DefaultProductRepository

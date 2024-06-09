@@ -10,6 +10,4 @@ interface ProductDataSource {
     suspend fun loadById(id: Long): ResponseResult<ProductDto>
 
     suspend fun loadByCategory(category: String): ResponseResult<ProductResponse>
-
-    fun shutDown(): Boolean
 }

@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.product.remote
 
 import woowacourse.shopping.data.cart.remote.datasource.CartItemDataSource
-import woowacourse.shopping.data.common.ResponseHandlingUtils.handleResponse
+import woowacourse.shopping.data.common.ApiResponseHandler.handleResponse
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 import woowacourse.shopping.data.product.remote.dto.ProductDto.Companion.toDomain

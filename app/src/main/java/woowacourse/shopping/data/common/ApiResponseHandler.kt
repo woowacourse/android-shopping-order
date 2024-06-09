@@ -3,8 +3,8 @@ package woowacourse.shopping.data.common
 import retrofit2.HttpException
 import retrofit2.Response
 
-object ResponseHandlingUtils {
-    suspend fun <T : Any> handleExecute(execute: suspend () -> Response<T>): ResponseResult<T> {
+object ApiResponseHandler {
+    suspend fun <T : Any> handleApiResponse(execute: suspend () -> Response<T>): ResponseResult<T> {
         return try {
             val response = execute()
             val body = response.body()
@@ -28,8 +28,8 @@ object ResponseHandlingUtils {
         }
     }
 
-    // TODO: 네이밍 변경
-    fun <T: Any, R: Any> handle(
+    // TODO: handleResponse를 제거하고 handleResponseResult 만 사용할 방법 생각해보기
+    fun <T: Any, R: Any> handleResponseResult(
         responseResult: ResponseResult<T>,
         onSuccess: (T) -> ResponseResult<R>
     ): ResponseResult<R> {

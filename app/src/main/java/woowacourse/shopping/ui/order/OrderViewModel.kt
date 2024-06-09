@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.MutableSingleLiveData
@@ -13,10 +11,6 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
-import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
-import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
 import woowacourse.shopping.data.product.remote.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
@@ -26,7 +20,6 @@ import woowacourse.shopping.domain.model.ProductIdsCount.Companion.INCREASE_VARI
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.ui.ResponseHandler
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.listener.OnOrderListener

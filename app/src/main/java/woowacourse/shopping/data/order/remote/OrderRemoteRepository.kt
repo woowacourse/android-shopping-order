@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.order.remote
 
 import woowacourse.shopping.data.cart.remote.datasource.CartItemDataSource
-import woowacourse.shopping.data.common.ResponseHandlingUtils.handle
-import woowacourse.shopping.data.common.ResponseHandlingUtils.handleResponse
+import woowacourse.shopping.data.common.ApiResponseHandler.handleResponseResult
+import woowacourse.shopping.data.common.ApiResponseHandler.handleResponse
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.history.local.datasource.ProductHistoryDataSource
 import woowacourse.shopping.data.order.remote.datasource.OrderRemoteDataSource
@@ -19,7 +19,7 @@ class OrderRemoteRepository(
     private val cartItemDataSource: CartItemDataSource,
 ) : OrderRepository {
     override suspend fun orderCartItems(cartItemIds: List<Long>): ResponseResult<Unit> =
-        handle(orderDataSource.orderCartItems(cartItemIds)) { ResponseResult.Success(Unit) }
+        handleResponseResult(orderDataSource.orderCartItems(cartItemIds)) { ResponseResult.Success(Unit) }
 
     override suspend fun loadRecommendedProducts(): ResponseResult<List<Product>> {
         val productId: Long = productHistoryDataSource.fetchLatestProduct()
@@ -27,7 +27,7 @@ class OrderRemoteRepository(
         val cartItemsProductDto: List<ProductDto> =
             handleResponse(cartItemDataSource.fetchCartItems()).content.map { it.product }
 
-        return handle(productDataSource.loadByCategory(category)) { response ->
+        return handleResponseResult(productDataSource.loadByCategory(category)) { response ->
             val recommendedProducts =
                 response.content.filterNot { cartItemsProductDto.contains(it) }
                     .map { productDto -> productDto.toDomain() }.take(10)
