@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.payment.model.Coupon
+import woowacourse.shopping.data.payment.model.CouponData
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
@@ -24,6 +25,9 @@ class PaymentViewModel(
     private val _coupons: MutableLiveData<List<Coupon>> = MutableLiveData()
     val coupons: LiveData<List<Coupon>> get() = _coupons
 
+    private val _couponsData: MutableLiveData<List<CouponData>> = MutableLiveData()
+    val couponsData: LiveData<List<CouponData>> get() = _couponsData
+
     private val _cartItems: MutableLiveData<List<CartProductUi>> = MutableLiveData()
     val cartItems: LiveData<List<CartProductUi>> get() = _cartItems
 
@@ -38,6 +42,12 @@ class PaymentViewModel(
 
     private val _finalPrice: MutableLiveData<Int> = MutableLiveData()
     val finalPrice: LiveData<Int> get() = _finalPrice
+
+    private val _checkedCoupon: MutableLiveData<CouponData> = MutableLiveData()
+    val checkedCoupon: LiveData<CouponData> get() = _checkedCoupon
+
+    private val _checkedState: MutableLiveData<CheckBoxState> = MutableLiveData()
+    val checkedState: LiveData<CheckBoxState> get() = _checkedState
 
     init {
         loadCoupons()
@@ -62,10 +72,23 @@ class PaymentViewModel(
             couponRepository.loadCoupons()
                 .onSuccess {
                     _coupons.value = it.map { couponData -> Coupon.of(couponData) }
+                    _couponsData.value = it
                 }.onFailure {
                     Log.d("alsong", "쿠폰 불러오기 실패")
                 }
         }
+    }
+
+    fun toggleCouponCheckBox(coupon: Coupon) {
+        val coupons: MutableList<Coupon> = _coupons.value?.toMutableList() ?: return
+        coupons.forEachIndexed { index, couponOfList ->
+            if (couponOfList.name == coupon.name) {
+                coupons[index] = coupons[index].copy(isSelected = true)
+            } else {
+                coupons[index] = coupons[index].copy(isSelected = false)
+            }
+        }
+        _coupons.value = coupons
     }
 
     companion object {

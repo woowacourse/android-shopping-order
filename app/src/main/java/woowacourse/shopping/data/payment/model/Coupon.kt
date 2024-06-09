@@ -4,6 +4,7 @@ data class Coupon(
     val name: String,
     val expirationDate: String,
     val minimumAmount: Int?,
+    val isSelected: Boolean = false,
 ) {
     companion object {
         fun of(couponData: CouponData): Coupon {
