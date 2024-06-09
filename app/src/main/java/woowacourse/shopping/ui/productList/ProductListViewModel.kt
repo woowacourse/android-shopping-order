@@ -65,7 +65,7 @@ class ProductListViewModel(
 
     private fun loadAllProducts(page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            productsRepository.allProductsUntilPage2(page)
+            productsRepository.allProductsUntilPage(page)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _loadedProducts.postValue(it)
@@ -97,7 +97,7 @@ class ProductListViewModel(
 
     private fun calculateFinalPage(page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            productsRepository.isFinalPage2(page)
+            productsRepository.isFinalPage(page)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _isLastPage.postValue(it)
@@ -145,7 +145,7 @@ class ProductListViewModel(
 
     private fun loadPagedProducts(page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            productsRepository.pagedProducts2(page)
+            productsRepository.pagedProducts(page)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _loadedProducts.postValue(_loadedProducts.value?.toMutableList()?.apply { addAll(it) } ?: it)

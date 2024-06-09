@@ -46,7 +46,7 @@ class ProductDetailViewModel(
 
     private fun loadProduct() {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingProductsRepository.loadProduct2(id = productId)
+            shoppingProductsRepository.loadProduct(id = productId)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _currentProduct.postValue(it)

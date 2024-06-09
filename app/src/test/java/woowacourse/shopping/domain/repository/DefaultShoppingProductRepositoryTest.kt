@@ -45,7 +45,7 @@ class DefaultShoppingProductRepositoryTest {
             repo = DefaultShoppingProductRepository(productsSource, cartSource)
 
             // when
-            val actual = repo.pagedProducts2(page).getOrThrow()
+            val actual = repo.pagedProducts(page).getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(
@@ -69,7 +69,7 @@ class DefaultShoppingProductRepositoryTest {
             repo = DefaultShoppingProductRepository(productsSource, cartSource)
 
             // when
-            val actual = repo.pagedProducts2(page).getOrThrow()
+            val actual = repo.pagedProducts(page).getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(
@@ -103,7 +103,7 @@ class DefaultShoppingProductRepositoryTest {
             repo = DefaultShoppingProductRepository(productsSource, cartSource)
 
             // when
-            val actual = repo.allProductsUntilPage2(page).getOrThrow()
+            val actual = repo.allProductsUntilPage(page).getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(
@@ -137,7 +137,7 @@ class DefaultShoppingProductRepositoryTest {
 
             // when
             val repo = DefaultShoppingProductRepository(productsSource, cartSource)
-            val actual = repo.loadProduct2(productId).getOrThrow()
+            val actual = repo.loadProduct(productId).getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(
@@ -161,7 +161,7 @@ class DefaultShoppingProductRepositoryTest {
             val repo = DefaultShoppingProductRepository(productsSource, cartSource)
 
             // when
-            val actual = repo.isFinalPage2(page).getOrThrow()
+            val actual = repo.isFinalPage(page).getOrThrow()
 
             // then
             assertThat(actual).isTrue()
@@ -183,7 +183,7 @@ class DefaultShoppingProductRepositoryTest {
             val repo = DefaultShoppingProductRepository(productsSource, cartSource)
 
             // when
-            val actual = repo.isFinalPage2(page).getOrThrow()
+            val actual = repo.isFinalPage(page).getOrThrow()
 
             // then
             assertThat(actual).isFalse()
