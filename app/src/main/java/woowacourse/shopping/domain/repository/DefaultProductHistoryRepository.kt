@@ -9,11 +9,11 @@ class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
     private val productDataSource: ProductDataSource,
 ) : ProductHistoryRepository {
-    override suspend fun saveProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.saveProductHistory2(productId)
+    override suspend fun saveProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.saveProductHistory(productId)
 
     override suspend fun loadLatestProduct(): Result<Product> {
         val latestProductId =
-            productHistoryDataSource.loadLatestProduct2().getOrNull()?.id
+            productHistoryDataSource.loadLatestProduct().getOrNull()?.id
                 ?: return Result.failure(Exception("No latest product found"))
         val productData =
             productDataSource.findById(latestProductId).getOrNull() ?: return Result.failure(Exception("No product found"))
@@ -22,7 +22,7 @@ class DefaultProductHistoryRepository(
 
     override suspend fun loadRecentProducts(size: Int): Result<List<Product>> {
         val productIds =
-            productHistoryDataSource.loadRecentProducts(size).getOrNull()
+            productHistoryDataSource.loadRecentProduct(size).getOrNull()
                 ?: return Result.failure(Exception("No recent products found"))
         val products =
             productIds.map {

@@ -13,7 +13,7 @@ class CategoryBasedProductRecommendationRepository(
     private val historySource: ProductHistoryDataSource,
 ) : ProductsRecommendationRepository {
     override suspend fun recommendedProducts(): Result<List<Product>> = runCatching {
-        val latestProductId = historySource.loadLatestProduct2()
+        val latestProductId = historySource.loadLatestProduct()
             .map { it.id }
             .recover {
                 productsSource.findByPaged(1).getOrThrow().random().id

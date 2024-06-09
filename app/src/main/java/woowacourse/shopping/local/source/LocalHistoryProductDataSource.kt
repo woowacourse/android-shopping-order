@@ -6,12 +6,12 @@ import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.local.history.HistoryProductDao
 
 class LocalHistoryProductDataSource(private val dao: HistoryProductDao) : ProductHistoryDataSource {
-    override suspend fun saveProductHistory2(productId: Long): Result<Unit> =
+    override suspend fun saveProductHistory(productId: Long): Result<Unit> =
         runCatching {
             dao.insert2(HistoryProduct(productId))
         }
 
-    override suspend fun loadLatestProduct2(): Result<HistoryProduct> =
+    override suspend fun loadLatestProduct(): Result<HistoryProduct> =
         runCatching {
             val result = dao.findLatest2() ?: return Result.failure(Exception("No latest product found"))
             result
@@ -19,7 +19,7 @@ class LocalHistoryProductDataSource(private val dao: HistoryProductDao) : Produc
             Log.d(TAG, "loadLatestProduct2: $it")
         }
 
-    override suspend fun loadRecentProducts(size: Int): Result<List<HistoryProduct>> =
+    override suspend fun loadRecentProduct(size: Int): Result<List<HistoryProduct>> =
         runCatching {
             dao.findAll2(size)
         }
