@@ -9,12 +9,11 @@ import woowacourse.shopping.databinding.ItemRecentProductsBinding
 import woowacourse.shopping.presentation.products.ProductsActionHandler
 import woowacourse.shopping.presentation.products.ProductsUiState
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
-import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 
 class ProductsAdapter(
     private var productsUiState: ProductsUiState =
         ProductsUiState(),
-    private var recentProductUiModels: List<RecentProductUiModel> = listOf(),
+    private val recentProductsAdapter: RecentProductsAdapter,
     private val actionHandler: ProductsActionHandler,
 ) : RecyclerView.Adapter<ProductsViewHolder>() {
     override fun onCreateViewHolder(
@@ -25,7 +24,7 @@ class ProductsAdapter(
         return when (ProductsViewType.entries[viewType]) {
             ProductsViewType.RecentProducts -> {
                 val binding = ItemRecentProductsBinding.inflate(inflater, parent, false)
-                ProductsViewHolder.RecentProductsViewHolder(binding, actionHandler)
+                ProductsViewHolder.RecentProductsViewHolder(binding)
             }
 
             ProductsViewType.Product -> {
@@ -46,7 +45,7 @@ class ProductsAdapter(
     ) {
         when (holder) {
             is ProductsViewHolder.RecentProductsViewHolder -> {
-                holder.bind(recentProductUiModels)
+                holder.bind(recentProductsAdapter)
             }
 
             is ProductsViewHolder.ProductViewHolder -> {
@@ -89,12 +88,5 @@ class ProductsAdapter(
         val position =
             productsUiState.productUiModels.indexOfFirst { it.product.id == newProduct.product.id }
         notifyItemChanged(position + 1)
-    }
-
-    private fun isExistedRecentProducts(): Boolean = recentProductUiModels.isEmpty()
-
-    fun findProductsLastPosition(lastPosition: Int): Int {
-        if (isExistedRecentProducts()) return lastPosition - 1
-        return lastPosition
     }
 }

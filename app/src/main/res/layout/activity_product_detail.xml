@@ -122,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="@{viewModel.lastRecentProduct.title}"
+                android:text="@{viewModel.lastRecentProduct.product.name\}"
                 android:textColor="@color/gray_500"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"

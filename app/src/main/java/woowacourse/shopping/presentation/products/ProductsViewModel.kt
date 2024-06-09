@@ -84,13 +84,9 @@ class ProductsViewModel(
     }
 
     fun loadRecentProducts() {
-        thread {
-            val result =
-                recentProductRepository.findRecentProducts()
-            handler.post {
-                _recentProductUiModels.postValue(result.toRecentProdutUiModels())
-            }
-        }
+        val result =
+            recentProductRepository.findRecentProducts()
+        _recentProductUiModels.postValue(result.toRecentProdutUiModels())
     }
 
     private fun increaseQuantity(productId: Int) {

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import com.example.domain.datasource.DataResponse.Companion.NULL_BODY_ERROR_CODE
 import com.example.domain.datasource.onFailure
 import com.example.domain.datasource.onSuccess
+import com.example.domain.model.Product
 import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.ProductRepository
@@ -55,6 +56,8 @@ class ProductDetailViewModel(
                             isFailure = false,
                         ),
                     )
+                    loadRecentProduct()
+                    putRecentProduct(product)
                 }.onFailure { code, error ->
                     _productUiModel.postValue(
                         ProductDetailUiModel(
@@ -65,6 +68,17 @@ class ProductDetailViewModel(
                 }
             }
         }
+    }
+
+    private fun putRecentProduct(product: Product) {
+        recentProductRepository.save(product)
+    }
+
+    private fun loadRecentProduct() {
+        val recentProducts = recentProductRepository.findRecentProducts()
+        if (recentProducts.isEmpty()) return
+        val lastRecentProduct = recentProducts[0].toLastRecentProductUiModel()
+        _lastRecentProduct.value = lastRecentProduct
     }
 
     override fun onClickPlusButton() {
@@ -78,7 +92,8 @@ class ProductDetailViewModel(
     }
 
     override fun onClickRecentProduct() {
-        TODO("Not yet implemented")
+        val lastProduct = lastRecentProduct.value?.product ?: return
+        loadProduct(lastProduct.id)
     }
 
     override fun onClickAddCartProduct() {

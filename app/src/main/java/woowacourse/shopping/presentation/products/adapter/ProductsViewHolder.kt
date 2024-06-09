@@ -7,7 +7,6 @@ import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemRecentProductsBinding
 import woowacourse.shopping.presentation.products.ProductsActionHandler
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
-import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 
 sealed class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     class ProductViewHolder(
@@ -22,20 +21,10 @@ sealed class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     class RecentProductsViewHolder(
-        binding: ItemRecentProductsBinding,
-        private val actionHandler: ProductsActionHandler,
+        private val binding: ItemRecentProductsBinding,
     ) : ProductsViewHolder(binding.root) {
-        private val adapter by lazy {
-            RecentProductsAdapter(actionHandler)
-        }
-
-        init {
-            binding.rvRecentProduct.itemAnimator = null
-            binding.rvRecentProduct.adapter = adapter
-        }
-
-        fun bind(recentProducts: List<RecentProductUiModel>) {
-            adapter.submitList(recentProducts)
+        fun bind(recentProductsAdapter: RecentProductsAdapter) {
+            binding.rvRecentProduct.adapter = recentProductsAdapter
         }
     }
 

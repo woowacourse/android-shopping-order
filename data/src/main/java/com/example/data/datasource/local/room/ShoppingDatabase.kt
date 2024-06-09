@@ -7,7 +7,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.data.datasource.local.room.converter.CartItemConverter
-import com.example.data.datasource.local.room.converter.RecentProductConverter
 import com.example.data.datasource.local.room.dao.CartDao
 import com.example.data.datasource.local.room.dao.ProductDao
 import com.example.data.datasource.local.room.dao.RecentProductDao
@@ -21,9 +20,9 @@ import com.example.data.datasource.local.room.entity.recentproduct.RecentProduct
         ProductEntity::class,
         RecentProductEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
-@TypeConverters(CartItemConverter::class, RecentProductConverter::class)
+@TypeConverters(CartItemConverter::class)
 abstract class ShoppingDatabase : RoomDatabase() {
     abstract fun cartDao(): CartDao
 

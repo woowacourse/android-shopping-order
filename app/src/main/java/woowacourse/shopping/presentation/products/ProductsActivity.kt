@@ -8,8 +8,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.common.observeEvent
@@ -20,6 +18,7 @@ import woowacourse.shopping.presentation.detail.ProductDetailActivity.Companion.
 import woowacourse.shopping.presentation.products.adapter.ProductsAdapter
 import woowacourse.shopping.presentation.products.adapter.ProductsAdapterManager
 import woowacourse.shopping.presentation.products.adapter.ProductsViewType
+import woowacourse.shopping.presentation.products.adapter.RecentProductsAdapter
 
 class ProductsActivity : AppCompatActivity() {
     private lateinit var shoppingApplication: ShoppingApplication
@@ -29,9 +28,15 @@ class ProductsActivity : AppCompatActivity() {
     private val viewModel by viewModels<ProductsViewModel> {
         shoppingApplication.getProductsViewModelFactory()
     }
-    private val adapter by lazy {
+    private val recentProductsAdapter by lazy {
+        RecentProductsAdapter(
+            actionHandler = viewModel,
+        )
+    }
+    private val productsAdapter by lazy {
         ProductsAdapter(
             actionHandler = viewModel,
+            recentProductsAdapter = recentProductsAdapter,
         )
     }
 
@@ -57,6 +62,7 @@ class ProductsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.loadPage()
+        viewModel.loadRecentProducts()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +78,6 @@ class ProductsActivity : AppCompatActivity() {
     private fun initializeView() {
         initializeProductAdapter()
         initializeToolbar()
-        initializePage()
         viewModel.productsUiState.observe(this) { productsUiState ->
             if (productsUiState.isLoading) {
                 binding.layoutProductsSkeleton.visibility = View.VISIBLE
@@ -85,7 +90,7 @@ class ProductsActivity : AppCompatActivity() {
             }
             binding.layoutProductsSkeleton.visibility = View.GONE
             binding.rvProducts.visibility = View.VISIBLE
-            adapter.updateProducts(productsUiState)
+            productsAdapter.updateProducts(productsUiState)
         }
         viewModel.navigateAction.observeEvent(this) { navigateAction ->
             when (navigateAction) {
@@ -98,15 +103,18 @@ class ProductsActivity : AppCompatActivity() {
                     CartActivity.startActivity(this)
             }
         }
+        viewModel.recentProductUiModels.observe(this) { recentProductUiModels ->
+            recentProductsAdapter.submitList(recentProductUiModels)
+        }
     }
 
     private fun initializeProductAdapter() {
         binding.rvProducts.itemAnimator = null
-        binding.rvProducts.adapter = adapter
+        binding.rvProducts.adapter = productsAdapter
         binding.rvProducts.layoutManager =
             ProductsAdapterManager(
                 context = this,
-                adapter = adapter,
+                adapter = productsAdapter,
                 spanCount = 2,
                 productViewType = ProductsViewType.Product.ordinal,
             )
@@ -125,22 +133,5 @@ class ProductsActivity : AppCompatActivity() {
     private fun navigateToCartView() {
         val intent = Intent(this, CartActivity::class.java)
         cartActivityResultLauncher.launch(intent)
-    }
-
-    private fun initializePage() {
-        val onScrollListener =
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(
-                    recyclerView: RecyclerView,
-                    dx: Int,
-                    dy: Int,
-                ) {
-                    val lastPosition =
-                        (recyclerView.layoutManager as GridLayoutManager).findLastCompletelyVisibleItemPosition()
-                    val productsLastPosition = adapter.findProductsLastPosition(lastPosition)
-                    // viewModel.changeSeeMoreVisibility(productsLastPosition)
-                }
-            }
-        binding.rvProducts.addOnScrollListener(onScrollListener)
     }
 }
