@@ -8,9 +8,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.DefaultShoppingApplication
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.couponRepository
-import woowacourse.shopping.ShoppingApplication.Companion.orderRepository
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.view.cart.CartItemInfo
@@ -28,9 +27,7 @@ class OrderActivity : AppCompatActivity() {
         }
     }
     private val viewModel: OrderViewModel by viewModels<OrderViewModel> {
-        OrderViewModelFactory(
-            couponRepository,
-            orderRepository,
+        (application as DefaultShoppingApplication).orderViewModelFactory(
             orders?.map(CartItemInfo::toCartItemDomain) ?: emptyList(),
         )
     }

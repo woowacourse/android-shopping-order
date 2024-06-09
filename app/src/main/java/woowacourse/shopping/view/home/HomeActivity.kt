@@ -9,13 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import woowacourse.shopping.DefaultShoppingApplication
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
@@ -29,15 +24,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
     private val viewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory(
-            ProductRepositoryImpl(
-                remoteProductDataSource,
-                remoteCartDataSource,
-                recentProductDatabase.recentProductDao(),
-            ),
-            CartRepositoryImpl(remoteCartDataSource),
-            RecentProductRepositoryImpl(recentProductDatabase),
-        )
+        (application as DefaultShoppingApplication).homeViewModelFactory
     }
     private val activityResultLauncher =
         registerForActivityResult(

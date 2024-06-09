@@ -12,9 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
 import woowacourse.shopping.data.model.product.Product
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
 @RunWith(AndroidJUnit4::class)
@@ -24,7 +22,7 @@ class HomeActivityTest {
     @Before
     fun setUp() {
         runTest {
-            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase)
+//            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase)
             recentProductRepository.deleteAll()
         }
     }

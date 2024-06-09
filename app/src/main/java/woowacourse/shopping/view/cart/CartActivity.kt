@@ -8,13 +8,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import woowacourse.shopping.DefaultShoppingApplication
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.view.cart.list.CartFragment
 import woowacourse.shopping.view.cart.list.CartListUiEvent
@@ -27,16 +22,7 @@ import woowacourse.shopping.view.order.OrderActivity
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
-        CartViewModelFactory(
-            cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
-            productRepository =
-                ProductRepositoryImpl(
-                    remoteProductDataSource,
-                    remoteCartDataSource,
-                    recentProductDatabase.recentProductDao(),
-                ),
-        )
+        (application as DefaultShoppingApplication).cartViewModelFactory
     }
     private val cartFragment by lazy { CartFragment() }
     private val recommendFragment by lazy { RecommendFragment() }

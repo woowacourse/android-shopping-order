@@ -8,13 +8,8 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.DefaultShoppingApplication
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.home.HomeActivity
 
@@ -28,17 +23,7 @@ class DetailActivity : AppCompatActivity() {
         )
     }
     private val viewModel: DetailViewModel by viewModels {
-        DetailViewModelFactory(
-            cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            productRepository =
-                ProductRepositoryImpl(
-                    remoteProductDataSource,
-                    remoteCartDataSource,
-                    recentProductDatabase.recentProductDao(),
-                ),
-            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
-            productId = productId,
-        )
+        (application as DefaultShoppingApplication).detailViewModelFactory(productId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
