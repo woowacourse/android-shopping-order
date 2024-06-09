@@ -66,5 +66,5 @@ interface RetrofitService {
     ): Response<Unit>
 
     @GET("/coupons")
-    suspend fun requestCoupons(): Response<CouponDto>
+    suspend fun requestCoupons(): Response<List<CouponDto>>
 }
