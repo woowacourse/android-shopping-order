@@ -11,7 +11,15 @@ fun Coupon.toUiModel() =
     when (this) {
         is BuyXFreeYCoupon -> CouponUiModel(id, description, expirationDate, null, null, null)
         is FixedCoupon -> CouponUiModel(id, description, expirationDate, minimumAmount, null, null)
-        is ShippingCoupon -> CouponUiModel(id, description, expirationDate, minimumAmount, null, null)
+        is ShippingCoupon -> CouponUiModel(
+            id,
+            description,
+            expirationDate,
+            minimumAmount,
+            null,
+            null
+        )
+
         is PercentageCoupon ->
             CouponUiModel(
                 id,

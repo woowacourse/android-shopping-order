@@ -19,8 +19,8 @@ import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
-import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
+import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
@@ -98,7 +98,6 @@ class ProductContentsViewModel(
             }.checkError {
                 _error.setValue(it)
             }
-
         }
     }
 
@@ -113,7 +112,6 @@ class ProductContentsViewModel(
                     .checkError { _error.setValue(it) }.onSuccess { loadCartItems() }
             }
         }
-
     }
 
     override fun itemClickListener(productId: Long) {
@@ -151,11 +149,11 @@ class ProductContentsViewModel(
     }
 
     private fun updateProductWithQuantity(): ProductWithQuantityUiState {
-
         val currentProducts = products.value ?: emptyList()
-        val updatedList = currentProducts.map { product ->
-            ProductWithQuantity(product = product, quantity = getQuantity(product.id))
-        }
+        val updatedList =
+            currentProducts.map { product ->
+                ProductWithQuantity(product = product, quantity = getQuantity(product.id))
+            }
 
         return currentProduct().copy(
             productWithQuantities = updatedList.map { it.toUiModel() },
@@ -205,25 +203,26 @@ class ProductContentsViewModel(
         _error.setValue(ProductListError.LoadProduct)
     }
 
-    private inline fun <reified T : Any?> Result<T>.checkError(excute: (ProductListError) -> Unit) = apply {
-        when (this) {
-            is Result.Success -> {}
-            is Fail.InvalidAuthorized -> excute(ProductListError.InvalidAuthorized)
-            is Fail.Network -> excute(ProductListError.Network)
-            is Fail.NotFound -> {
-                when (T::class) {
-                    Product::class -> excute(ProductListError.LoadProduct)
-                    RecentProduct::class -> excute(ProductListError.LoadRecentProduct)
-                    else -> excute(ProductListError.UnKnown)
+    private inline fun <reified T : Any?> Result<T>.checkError(excute: (ProductListError) -> Unit) =
+        apply {
+            when (this) {
+                is Result.Success -> {}
+                is Fail.InvalidAuthorized -> excute(ProductListError.InvalidAuthorized)
+                is Fail.Network -> excute(ProductListError.Network)
+                is Fail.NotFound -> {
+                    when (T::class) {
+                        Product::class -> excute(ProductListError.LoadProduct)
+                        RecentProduct::class -> excute(ProductListError.LoadRecentProduct)
+                        else -> excute(ProductListError.UnKnown)
+                    }
+                }
+
+                is Result.Exception -> {
+                    Log.d(this.javaClass.simpleName, "${this.e}")
+                    excute(ProductListError.UnKnown)
                 }
             }
-
-            is Result.Exception -> {
-                Log.d(this.javaClass.simpleName, "${this.e}")
-                excute(ProductListError.UnKnown)
-            }
         }
-    }
 
     companion object {
         private const val DEFAULT_CART_ITEMS_COUNT = 0

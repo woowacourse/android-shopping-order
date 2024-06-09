@@ -26,60 +26,75 @@ class ProductRepositoryImpl(
     private val cartDataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl(),
 ) :
     ProductRepository {
+    override suspend fun productById(id: Long): Product =
+        handleApiResult(
+            productDataSource.getProductsById(id),
+            ResponseProductIdGetDto::toProduct,
+        ).result()
 
-    override suspend fun productById(id: Long): Product = handleApiResult(
-        productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
-    ).result()
+    override suspend fun productByIdOrNull(id: Long): Product? =
+        handleApiResult(
+            productDataSource.getProductsById(id),
+            ResponseProductIdGetDto::toProduct,
+        ).resultOrNull()
 
-    override suspend fun productByIdOrNull(id: Long): Product? = handleApiResult(
-        productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
-    ).resultOrNull()
-
-    override suspend fun productByIdResponse(id: Long): Result<Product> = handleApiResult(
-        productDataSource.getProductsById(id), ResponseProductIdGetDto::toProduct
-    )
-
-    override suspend fun allProducts(page: Int, size: Int): List<Product> {
-        val result = handleApiResult(
-            productDataSource.getProductsByOffset(page, size),
-            transform = ResponseProductsGetDto::toProductList
+    override suspend fun productByIdResponse(id: Long): Result<Product> =
+        handleApiResult(
+            productDataSource.getProductsById(id),
+            ResponseProductIdGetDto::toProduct,
         )
+
+    override suspend fun allProducts(
+        page: Int,
+        size: Int,
+    ): List<Product> {
+        val result =
+            handleApiResult(
+                productDataSource.getProductsByOffset(page, size),
+                transform = ResponseProductsGetDto::toProductList,
+            )
         return if (result is Fail.NotFound) emptyList() else result.result()
     }
 
-    override suspend fun allProductsResponse(page: Int, size: Int): Result<List<Product>> =
+    override suspend fun allProductsResponse(
+        page: Int,
+        size: Int,
+    ): Result<List<Product>> =
         handleApiResult(
             productDataSource.getProductsByOffset(page, size),
-            transform = ResponseProductsGetDto::toProductList
+            transform = ResponseProductsGetDto::toProductList,
         )
 
-    override suspend fun allProductsByCategory(category: String): List<Product> = coroutineScope {
-        val count: Int = cartDataSource.getCartItemCounts().resultOrNull()?.quantity
-            ?: DEFAULT_CART_COUNT
-        val cartResponse =
-            cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
-                ?: emptyList()
-        val carts: List<CartWithProduct> = cartResponse.map { it.toCartWithProduct() }
-        var page = START_PRODUCT_PAGE
-        var allProducts = mutableListOf<Product>()
-        var loadedProducts = emptyList<Product>()
-        while (true) {
-            loadedProducts =
-                productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL).result()
-                    .toProductList()
+    override suspend fun allProductsByCategory(category: String): List<Product> =
+        coroutineScope {
+            val count: Int =
+                cartDataSource.getCartItemCounts().resultOrNull()?.quantity
+                    ?: DEFAULT_CART_COUNT
+            val cartResponse =
+                cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
+                    ?: emptyList()
+            val carts: List<CartWithProduct> = cartResponse.map { it.toCartWithProduct() }
+            var page = START_PRODUCT_PAGE
+            var allProducts = mutableListOf<Product>()
+            var loadedProducts = emptyList<Product>()
+            while (true) {
+                loadedProducts =
+                    productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL).result()
+                        .toProductList()
 
-            if (noMoreProductOrMaxProduct(loadedProducts, allProducts)) break
-            allProducts.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
-            page++
+                if (noMoreProductOrMaxProduct(loadedProducts, allProducts)) break
+                allProducts.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
+                page++
+            }
+            return@coroutineScope allProducts
         }
-        return@coroutineScope allProducts
-    }
 
     override suspend fun allProductsByCategoryResponse(category: String): Result<List<Product>> =
         coroutineScope {
             try {
-                val count: Int = cartDataSource.getCartItemCounts().resultOrNull()?.quantity
-                    ?: DEFAULT_CART_COUNT
+                val count: Int =
+                    cartDataSource.getCartItemCounts().resultOrNull()?.quantity
+                        ?: DEFAULT_CART_COUNT
                 val cartResponse =
                     cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
                         ?: emptyList()
@@ -92,8 +107,9 @@ class ProductRepositoryImpl(
                     val productResponse =
                         productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL)
                     when (productResponse) {
-                        is ApiResponse.Success -> loadedProducts =
-                            productResponse.data.toProductList()
+                        is ApiResponse.Success ->
+                            loadedProducts =
+                                productResponse.data.toProductList()
 
                         is ApiResponse.Error -> return@coroutineScope handleError(productResponse)
                         is ApiResponse.Exception -> return@coroutineScope Result.Exception(
@@ -116,16 +132,14 @@ class ProductRepositoryImpl(
 
     private fun noMoreProductOrMaxProduct(
         loadedProducts: List<Product>,
-        allProducts: MutableList<Product>
+        allProducts: MutableList<Product>,
     ) = loadedProducts.isEmpty() || allProducts.size >= MAX_RECOMMEND_SIZE
-
 
     private fun List<Product>.filterCategoryAndNotInCart(
         category: String,
         carts: List<CartWithProduct>,
     ) = this.filter { it.category == category }
         .filterNot { carts.map { it.product.id }.contains(it.id) }
-
 
     companion object {
         private const val DEFAULT_CART_COUNT = 300

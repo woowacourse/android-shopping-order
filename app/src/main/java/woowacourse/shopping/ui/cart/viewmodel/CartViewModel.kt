@@ -93,10 +93,12 @@ class CartViewModel(
 
     fun loadRecommendProducts() {
         viewModelLaunch(::recommendExceptionHandler) {
-            val recentProductId: Long = recentProductRepository.mostRecentProductOrNull()?.productId
-                ?: DEFAULT_RECENT_PRODUCT_ID
-            val category = productRepository.productByIdOrNull(recentProductId)?.category
-                ?: DEFAULT_RECOMMEND_CATEGORY
+            val recentProductId: Long =
+                recentProductRepository.mostRecentProductOrNull()?.productId
+                    ?: DEFAULT_RECENT_PRODUCT_ID
+            val category =
+                productRepository.productByIdOrNull(recentProductId)?.category
+                    ?: DEFAULT_RECOMMEND_CATEGORY
             productRepository.allProductsByCategoryResponse(category).onSuccess {
                 _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
                 noRecommendProductState.value = false
@@ -105,12 +107,12 @@ class CartViewModel(
                 noRecommendProductState.value = true
             }
         }
-
     }
 
     private fun totalPrice(): Int {
-        val carts = _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice }
-            ?: DEFAULT_TOTAL_PRICE
+        val carts =
+            _cart.value?.cartItems?.filter { it.isChecked }?.sumOf { it.totalPrice }
+                ?: DEFAULT_TOTAL_PRICE
         val recommends =
             _recommendProducts.value?.filter { it.quantity.value >= 1 }?.sumOf { it.totalPrice }
                 ?: DEFAULT_TOTAL_PRICE
@@ -193,7 +195,6 @@ class CartViewModel(
                 _error.setValue(it)
             }
         }
-
     }
 
     private fun changeRecommendProductCount(productId: Long) {
@@ -214,7 +215,6 @@ class CartViewModel(
             }.onException {
                 _error.setValue(CartError.UnKnown)
             }
-
         }
     }
 
@@ -263,25 +263,26 @@ class CartViewModel(
             it.productId == productId
         }?.isChecked ?: false || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 
-    private inline fun <reified T : Any?> Result<T>.checkError(excute: (CartError) -> Unit) = apply {
-        when (this) {
-            is Result.Success -> {}
-            is Fail.InvalidAuthorized -> excute(CartError.InvalidAuthorized)
-            is Fail.Network -> excute(CartError.Network)
-            is Fail.NotFound -> {
-                when (T::class) {
-                    Product::class -> excute(CartError.LoadRecommend)
-                    CartWithProduct::class -> excute(CartError.LoadCart)
-                    else -> excute(CartError.UnKnown)
+    private inline fun <reified T : Any?> Result<T>.checkError(excute: (CartError) -> Unit) =
+        apply {
+            when (this) {
+                is Result.Success -> {}
+                is Fail.InvalidAuthorized -> excute(CartError.InvalidAuthorized)
+                is Fail.Network -> excute(CartError.Network)
+                is Fail.NotFound -> {
+                    when (T::class) {
+                        Product::class -> excute(CartError.LoadRecommend)
+                        CartWithProduct::class -> excute(CartError.LoadCart)
+                        else -> excute(CartError.UnKnown)
+                    }
+                }
+
+                is Result.Exception -> {
+                    Log.d(this.javaClass.simpleName, "${this.e}")
+                    excute(CartError.UnKnown)
                 }
             }
-
-            is Result.Exception -> {
-                Log.d(this.javaClass.simpleName, "${this.e}")
-                excute(CartError.UnKnown)
-            }
         }
-    }
 
     private inline fun <reified T : Any?> Fail<T>.toUiError() =
         when (this) {
@@ -295,8 +296,6 @@ class CartViewModel(
                 }
             }
         }
-
-
 
     companion object {
         private const val DEFAULT_RECENT_PRODUCT_ID = 0L

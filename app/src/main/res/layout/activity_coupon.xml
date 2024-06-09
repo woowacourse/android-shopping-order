@@ -121,11 +121,11 @@
 
                 <TextView
                     android:id="@+id/tv_coupon_total_discount_price"
+                    discountPrice="@{vm.payment.discountPrice}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
-                    discountPrice="@{vm.payment.discountPrice}"
                     android:textColor="#333333"
                     android:textSize="18sp"
                     android:textStyle="bold"

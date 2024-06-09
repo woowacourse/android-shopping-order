@@ -19,12 +19,13 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
 
     override suspend fun insertResponse(productId: Long): Result<Long> {
         return try {
-            val productId = recentProductDao.insert(
-                RecentProduct(
-                    productId = productId,
-                    recentTime = LocalDateTime.now(),
-                ),
-            )
+            val productId =
+                recentProductDao.insert(
+                    RecentProduct(
+                        productId = productId,
+                        recentTime = LocalDateTime.now(),
+                    ),
+                )
             Result.Success(productId)
         } catch (e: Exception) {
             Result.Exception(e)
@@ -48,6 +49,7 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
     }
 
     override suspend fun allRecentProducts(): List<RecentProduct> = recentProductDao.findAll()
+
     override suspend fun allRecentProductsResponse(): Result<List<RecentProduct>> {
         return try {
             Result.Success(recentProductDao.findAll())

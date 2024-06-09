@@ -5,5 +5,4 @@ import woowacourse.shopping.data.remote.dto.response.CouponDto
 
 interface ApiHandleCouponDataSource {
     suspend fun getCoupons(): ApiResponse<List<CouponDto>>
-
 }

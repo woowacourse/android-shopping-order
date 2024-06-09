@@ -9,7 +9,8 @@ import woowacourse.shopping.domain.result.handleApiResult
 
 class OrderRepositoryImpl(private val dataSource: ApiHandleOrderDataSource = ApiHandleOrderDataSourceImpl()) :
     OrderRepository {
-    override suspend fun order(cartIds: List<Long>): Result<Unit> = handleApiResult(
-        dataSource.postOrder(RequestOrderPostDto(cartIds))
-    )
+    override suspend fun order(cartIds: List<Long>): Result<Unit> =
+        handleApiResult(
+            dataSource.postOrder(RequestOrderPostDto(cartIds)),
+        )
 }

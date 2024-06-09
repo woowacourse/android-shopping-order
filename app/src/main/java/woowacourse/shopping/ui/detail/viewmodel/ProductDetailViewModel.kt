@@ -75,7 +75,7 @@ class ProductDetailViewModel(
         viewModelLaunch(::addCartExceptionHandler) {
             cartRepository.addProductToCart(
                 currentCount().product.id,
-                currentCount().quantity.value
+                currentCount().quantity.value,
             ).onSuccess {
                 loadProduct()
                 _addCartComplete.setValue(Unit)
@@ -93,7 +93,6 @@ class ProductDetailViewModel(
         viewModelLaunch {
             recentProductRepository.insert(productId)
         }
-
     }
 
     private fun loadMostRecentProduct(
@@ -139,25 +138,26 @@ class ProductDetailViewModel(
         _mostRecentProductVisibility.value = false
     }
 
-    private inline fun <reified T : Any?> Result<T>.checkError(execute: (ProductDetailError) -> Unit) = apply {
-        when (this) {
-            is Result.Success -> {}
-            is Fail.InvalidAuthorized -> execute(ProductDetailError.InvalidAuthorized)
-            is Fail.Network -> execute(ProductDetailError.Network)
-            is Fail.NotFound -> {
-                when (T::class) {
-                    Product::class -> execute(ProductDetailError.LoadProduct)
-                    CartWithProduct::class -> execute(ProductDetailError.AddCart)
-                    else -> execute(ProductDetailError.UnKnown)
+    private inline fun <reified T : Any?> Result<T>.checkError(execute: (ProductDetailError) -> Unit) =
+        apply {
+            when (this) {
+                is Result.Success -> {}
+                is Fail.InvalidAuthorized -> execute(ProductDetailError.InvalidAuthorized)
+                is Fail.Network -> execute(ProductDetailError.Network)
+                is Fail.NotFound -> {
+                    when (T::class) {
+                        Product::class -> execute(ProductDetailError.LoadProduct)
+                        CartWithProduct::class -> execute(ProductDetailError.AddCart)
+                        else -> execute(ProductDetailError.UnKnown)
+                    }
+                }
+
+                is Result.Exception -> {
+                    Log.d(this.javaClass.simpleName, "${this.e}")
+                    execute(ProductDetailError.UnKnown)
                 }
             }
-
-            is Result.Exception -> {
-                Log.d(this.javaClass.simpleName, "${this.e}")
-                execute(ProductDetailError.UnKnown)
-            }
         }
-    }
 
     private inline fun <reified T : Any?> Fail<T>.toUiError() =
         when (this) {
@@ -170,5 +170,4 @@ class ProductDetailViewModel(
                 }
             }
         }
-
 }

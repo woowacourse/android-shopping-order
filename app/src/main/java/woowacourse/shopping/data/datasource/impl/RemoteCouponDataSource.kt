@@ -5,5 +5,6 @@ import woowacourse.shopping.data.remote.api.ShoppingRetrofit
 import woowacourse.shopping.data.remote.dto.response.CouponDto
 
 class RemoteCouponDataSource : CouponDataSource {
-    override suspend fun getCoupons(): List<CouponDto> = ShoppingRetrofit.couponService.getCoupons().body() ?: emptyList()
+    override suspend fun getCoupons(): List<CouponDto> =
+        ShoppingRetrofit.couponService.getCoupons().body() ?: emptyList()
 }

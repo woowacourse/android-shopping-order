@@ -20,7 +20,6 @@ inline fun <T : Any?, S : Any?> handleError(error: ApiResponse.Error<S>): Result
         else -> Result.Exception(IllegalArgumentException())
     }
 
-
 inline fun <T : Any?> Result<T>.onSuccess(executable: (T) -> Unit): Result<T> =
     apply {
         if (this is Result.Success) {
@@ -34,7 +33,6 @@ inline fun <T : Any?> Result<T>.onFail(executable: (Fail<T>) -> Unit): Result<T>
             executable(this)
         }
     }
-
 
 inline fun <T : Any?> Result<T>.onException(executable: (Result.Exception<Throwable>) -> Unit): Result<T> =
     apply {

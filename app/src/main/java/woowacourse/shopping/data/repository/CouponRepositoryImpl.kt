@@ -21,18 +21,19 @@ import woowacourse.shopping.domain.result.result
 class CouponRepositoryImpl(private val dataSource: ApiHandleCouponDataSource = ApiHandleCouponDataSourceImpl()) :
     CouponRepository {
     override suspend fun allCoupons(): List<Coupon> {
-        val response = handleApiResult(
-            result = dataSource.getCoupons(),
-            transform = { it.map { it.toDomain() } }
-        )
+        val response =
+            handleApiResult(
+                result = dataSource.getCoupons(),
+                transform = { it.map { it.toDomain() } },
+            )
         return if (response is Fail.NotFound) emptyList() else response.result()
     }
 
-    override suspend fun allCouponsResponse(): Result<List<Coupon>> = handleApiResult(
-        result = dataSource.getCoupons(),
-        transform = { it.map { it.toDomain() } }
-    )
-
+    override suspend fun allCouponsResponse(): Result<List<Coupon>> =
+        handleApiResult(
+            result = dataSource.getCoupons(),
+            transform = { it.map { it.toDomain() } },
+        )
 
     private fun CouponDto.toDomain(): Coupon =
         when (this) {

@@ -92,7 +92,6 @@ class ProductDetailActivity :
                 ProductDetailError.Network -> showToastMessage(R.string.server_error)
                 ProductDetailError.UnKnown -> showToastMessage(R.string.unknown_error)
             }
-
         }
     }
 

@@ -17,7 +17,6 @@ import woowacourse.shopping.domain.result.resultOrNull
 
 class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHandleCartDataSourceImpl()) :
     CartRepository {
-
     override suspend fun cartItem(productId: Long): CartWithProduct {
         val carts = allCartItems()
         return carts.first { it.product.id == productId }
@@ -51,67 +50,78 @@ class CartRepositoryImpl(private val dataSource: ApiHandleCartDataSource = ApiHa
 
     override suspend fun allCartItems(): List<CartWithProduct> {
         val count = dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
-        val response = handleApiResult(
-            result = dataSource.getCartItems(0, count),
-            transform = ResponseCartItemsGetDto::toCartWithProduct
-        )
+        val response =
+            handleApiResult(
+                result = dataSource.getCartItems(0, count),
+                transform = ResponseCartItemsGetDto::toCartWithProduct,
+            )
         return if (response is Fail.NotFound) emptyList() else response.result()
     }
 
-    override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> = coroutineScope {
-        val count = dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
-        return@coroutineScope handleApiResult(
-            result = dataSource.getCartItems(START_CART_PAGE, count),
-            transform = ResponseCartItemsGetDto::toCartWithProduct
-        )
-    }
+    override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> =
+        coroutineScope {
+            val count =
+                dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
+            return@coroutineScope handleApiResult(
+                result = dataSource.getCartItems(START_CART_PAGE, count),
+                transform = ResponseCartItemsGetDto::toCartWithProduct,
+            )
+        }
 
     override suspend fun postCartItems(
         productId: Long,
         quantity: Int,
-    ): Result<Unit> = handleApiResult(
-        result = dataSource.postCartItems(RequestCartItemPostDto(productId, quantity)),
-    )
+    ): Result<Unit> =
+        handleApiResult(
+            result = dataSource.postCartItems(RequestCartItemPostDto(productId, quantity)),
+        )
 
+    override suspend fun deleteCartItem(id: Long): Result<Unit> =
+        handleApiResult(
+            result = dataSource.deleteCartItems(id),
+        )
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit> = handleApiResult(
-        result = dataSource.deleteCartItems(id)
-    )
+    override suspend fun cartItemsCount(): Int =
+        handleApiResult(
+            result = dataSource.getCartItemCounts(),
+            transform = { it.quantity },
+        ).result()
 
-    override suspend fun cartItemsCount(): Int = handleApiResult(
-        result = dataSource.getCartItemCounts(),
-        transform = { it.quantity }
-    ).result()
+    override suspend fun cartItemsCountOrNull(): Int? =
+        handleApiResult(
+            result = dataSource.getCartItemCounts(),
+            transform = { it.quantity },
+        ).resultOrNull()
 
-    override suspend fun cartItemsCountOrNull(): Int? = handleApiResult(
-        result = dataSource.getCartItemCounts(),
-        transform = { it.quantity }
-    ).resultOrNull()
-
-    override suspend fun cartItemsCountResponse(): Result<Int> = handleApiResult(
-        result = dataSource.getCartItemCounts(),
-        transform = { it.quantity }
-    )
-
+    override suspend fun cartItemsCountResponse(): Result<Int> =
+        handleApiResult(
+            result = dataSource.getCartItemCounts(),
+            transform = { it.quantity },
+        )
 
     override suspend fun patchCartItem(
         id: Long,
         quantity: Int,
-    ): Result<Unit> = handleApiResult(
-        result = dataSource.patchCartItems(id = id, request = RequestCartItemsPatchDto(quantity))
-    )
+    ): Result<Unit> =
+        handleApiResult(
+            result = dataSource.patchCartItems(
+                id = id,
+                request = RequestCartItemsPatchDto(quantity)
+            ),
+        )
 
     override suspend fun addProductToCart(
         productId: Long,
         quantity: Int,
-    ): Result<Unit> = coroutineScope {
-        val cart: CartWithProduct? = allCartItems().firstOrNull { it.product.id == productId }
-        if (cart == null) {
-            return@coroutineScope postCartItems(productId, quantity)
-        } else {
-            return@coroutineScope patchCartItem(cart.id, cart.quantity.value + quantity)
+    ): Result<Unit> =
+        coroutineScope {
+            val cart: CartWithProduct? = allCartItems().firstOrNull { it.product.id == productId }
+            if (cart == null) {
+                return@coroutineScope postCartItems(productId, quantity)
+            } else {
+                return@coroutineScope patchCartItem(cart.id, cart.quantity.value + quantity)
+            }
         }
-    }
 
     companion object {
         private const val DEFAULT_CART_COUNT = 300

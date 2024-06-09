@@ -7,16 +7,22 @@ import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 
+fun ResponseCartItemsGetDto.Content.toCartWithProduct() =
+    CartWithProduct(
+        id = id,
+        product = this.product.toProduct(),
+        quantity = Quantity(this.quantity),
+    )
 
-fun ResponseCartItemsGetDto.Content.toCartWithProduct() = CartWithProduct(
-    id = id, product = this.product.toProduct(), quantity = Quantity(this.quantity)
-)
+fun ResponseCartItemsGetDto.toCartWithProduct(): List<CartWithProduct> =
+    this.content.map {
+        CartWithProduct(
+            id = it.id,
+            product = it.product.toProduct(),
+            quantity = Quantity(it.quantity),
+        )
+    }
 
-
-fun ResponseCartItemsGetDto.toCartWithProduct():List<CartWithProduct> = this.content.map { CartWithProduct(
-    id = it.id, product = it.product.toProduct(), quantity = Quantity(it.quantity)
-)
-}
 fun ResponseCartItemsGetDto.Product.toProduct() =
     Product(
         id = this.id,

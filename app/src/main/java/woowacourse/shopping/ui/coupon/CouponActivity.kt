@@ -9,7 +9,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCouponBinding
-import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.uimodel.CouponClickListener
 import woowacourse.shopping.ui.coupon.uimodel.CouponError

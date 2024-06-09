@@ -14,13 +14,13 @@ interface ProductRepository {
         size: Int,
     ): Result<List<Product>>
 
-    suspend fun productById(id:Long):Product
+    suspend fun productById(id: Long): Product
 
     suspend fun productByIdOrNull(id: Long): Product?
 
-    suspend fun productByIdResponse(id:Long): Result<Product>
+    suspend fun productByIdResponse(id: Long): Result<Product>
 
-    suspend fun allProductsByCategory(category: String):List<Product>
+    suspend fun allProductsByCategory(category: String): List<Product>
 
     suspend fun allProductsByCategoryResponse(category: String): Result<List<Product>>
 }

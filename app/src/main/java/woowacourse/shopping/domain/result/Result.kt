@@ -17,5 +17,3 @@ sealed interface Fail<T : Any?> : Result<T> {
 
     data class InvalidAuthorized<T : Any?>(override val message: String?) : Fail<T>
 }
-
-

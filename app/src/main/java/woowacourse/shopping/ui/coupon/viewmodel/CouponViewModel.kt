@@ -64,7 +64,6 @@ class CouponViewModel(
         }
 
     fun loadInitialPaymentInfo(carts: List<CartUiModel>) {
-
         val carts = getCartWithProduct(carts)
         _payment.value =
             PaymentInfoUiModel(
@@ -73,7 +72,6 @@ class CouponViewModel(
                 Order.SHIPPING_PRICE,
                 carts.sumOf { it.product.price * it.quantity.value },
             )
-
     }
 
     fun updatePaymentInfo(
@@ -135,7 +133,6 @@ class CouponViewModel(
     private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean =
         this?.firstOrNull { it.id == couponId }?.isChecked ?: false
 
-
     private fun couponExceptionHandler(throwable: Throwable) {
         _error.setValue(CouponError.LoadCoupon)
     }
@@ -144,24 +141,24 @@ class CouponViewModel(
         _error.setValue(CouponError.Order)
     }
 
-    private inline fun <reified T : Any?> Result<T>.checkError(execute: (CouponError) -> Unit) = apply {
-        when (this) {
-            is Result.Success -> {}
-            is Fail.InvalidAuthorized -> execute(CouponError.InvalidAuthorized)
-            is Fail.Network -> execute(CouponError.Network)
-            is Fail.NotFound -> {
-                when (T::class) {
-                    Coupon::class -> execute(CouponError.LoadCoupon)
-                    Order::class -> execute(CouponError.Order)
-                    else -> execute(CouponError.UnKnown)
+    private inline fun <reified T : Any?> Result<T>.checkError(execute: (CouponError) -> Unit) =
+        apply {
+            when (this) {
+                is Result.Success -> {}
+                is Fail.InvalidAuthorized -> execute(CouponError.InvalidAuthorized)
+                is Fail.Network -> execute(CouponError.Network)
+                is Fail.NotFound -> {
+                    when (T::class) {
+                        Coupon::class -> execute(CouponError.LoadCoupon)
+                        Order::class -> execute(CouponError.Order)
+                        else -> execute(CouponError.UnKnown)
+                    }
+                }
+
+                is Result.Exception -> {
+                    Log.d(this.javaClass.simpleName, "${this.e}")
+                    execute(CouponError.UnKnown)
                 }
             }
-
-            is Result.Exception -> {
-                Log.d(this.javaClass.simpleName, "${this.e}")
-                execute(CouponError.UnKnown)
-            }
         }
-    }
-
 }

@@ -15,8 +15,8 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductAdapter
 import woowacourse.shopping.ui.products.adapter.RecentProductAdapter
-import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.LoadingUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.ProductUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModelFactory
@@ -115,7 +115,7 @@ class ProductContentsActivity : AppCompatActivity() {
         }
     }
 
-    private fun recentProductVisibility(isVisible:Boolean) {
+    private fun recentProductVisibility(isVisible: Boolean) {
         with(binding) {
             tvRecentProductComment.isVisible = isVisible
             horizonLine.isVisible = isVisible
