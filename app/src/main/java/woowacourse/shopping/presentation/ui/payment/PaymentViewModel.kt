@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.payment
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,10 +30,32 @@ class PaymentViewModel(
     private val _eventHandler = MutableLiveData<EventState<CouponEvent>>()
     val eventHandler: LiveData<EventState<CouponEvent>> get() = _eventHandler
 
+    private val _couponPrice = MutableLiveData<Int>(0)
+    val couponPrice: LiveData<Int> get() = _couponPrice
+
+    private val _deliveryPrice = MutableLiveData<Int>(3000)
+    val deliveryPrice: LiveData<Int> get() = _deliveryPrice
+
+    private val _totalPrice = MediatorLiveData<Int>()
+    val totalPrice: LiveData<Int> get() = _totalPrice
+
     init {
         viewModelScope.launch {
             orderProducts()
         }
+
+        _totalPrice.addSource(_orderProducts) { calculateTotalPrice() }
+        _totalPrice.addSource(_couponPrice) { calculateTotalPrice() }
+        _totalPrice.addSource(_deliveryPrice) { calculateTotalPrice() }
+    }
+
+    fun getCoupons() = viewModelScope.launch {
+        repository.getCoupons()
+            .onSuccess {
+                _coupons.value = UiState.Success(it)
+            }.onFailure {
+                _errorHandler.value = EventState(COUPON_LOAD_ERROR)
+            }
     }
 
     private suspend fun orderProducts() {
@@ -51,14 +74,13 @@ class PaymentViewModel(
             }
     }
 
-
-    fun getCoupons() = viewModelScope.launch {
-        repository.getCoupons()
-            .onSuccess {
-                _coupons.value = UiState.Success(it)
-            }.onFailure {
-                _errorHandler.value = EventState(COUPON_LOAD_ERROR)
+    private fun calculateTotalPrice() {
+        if (_orderProducts.value is UiState.Success) {
+            val orderTotal = (_orderProducts.value as UiState.Success).data.sumOf {
+                it.quantity * it.price.toInt()
             }
+            _totalPrice.value = orderTotal - _couponPrice.value!! + _deliveryPrice.value!!
+        }
     }
 
     override fun order() {
@@ -75,6 +97,27 @@ class PaymentViewModel(
                 // Handle the case when _cartProducts.value is not UiState.Success
             }
         }
+    }
+
+    override fun onCouponClick(selectedCoupon: Coupon) {
+        val coupons = (_coupons.value as UiState.Success).data
+
+        selectedCoupon.discountPrice(
+            totalPrice.value as Int,
+            (_orderProducts.value as UiState.Success).data
+        ).also {
+            _couponPrice.value = it
+        }
+
+        coupons.forEach {
+            if (it.id == selectedCoupon.id) {
+                it.isSelected = !selectedCoupon.isSelected
+            } else {
+                it.isSelected = false
+            }
+        }
+
+        _coupons.value = UiState.Success(coupons)
     }
 
     companion object {

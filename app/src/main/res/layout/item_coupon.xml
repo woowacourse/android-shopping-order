@@ -18,8 +18,11 @@
             android:layout_height="wrap_content">
 
             <CheckBox
+                android:id="@+id/cb_coupon_item"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:checked="@{coupon.isSelected}"
+                android:onClick="@{() -> couponActionHandler.onCouponClick(coupon)}" />
 
             <TextView
                 android:id="@+id/tv_coupon_name"
@@ -49,9 +52,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="18dp"
-            app:minimumAmountIsVisible="@{coupon.minimumAmount}"
             android:textAppearance="@style/B2"
             android:textColor="#555555"
+            app:minimumAmountIsVisible="@{coupon.minimumAmount}"
             tools:text="최소 주문 금액: 100,000원" />
     </LinearLayout>
 

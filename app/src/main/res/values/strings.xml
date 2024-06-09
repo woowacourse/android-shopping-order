@@ -16,5 +16,5 @@
     <string name="payment_coupon_discount_title">쿠폰 할인 금액</string>
     <string name="payment_delivery_title">배송비</string>
     <string name="payment_total_title">총 결제 금액</string>
-    <string name="payment_price">%,d원</string>
+    <string name="discount_won">-%,d원</string>
 </resources>

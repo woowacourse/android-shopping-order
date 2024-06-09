@@ -45,6 +45,7 @@ class PaymentActivity :
 
                 is UiState.Success -> {
                     couponAdapter.submitList(it.data)
+                    couponAdapter.notifyDataSetChanged()
                 }
 
             }
@@ -61,10 +62,17 @@ class PaymentActivity :
                                 it.quantity * it.price
                             },
                         )
-
-                    binding.tvPaymentDeliveryPrice.text = getString(R.string.won, 3000)
                 }
             }
+        }
+        viewModel.couponPrice.observe(this) {
+            binding.tvPaymentCouponPrice.text = getString(R.string.discount_won, it)
+        }
+        viewModel.deliveryPrice.observe(this) {
+            binding.tvPaymentDeliveryPrice.text = getString(R.string.won, it)
+        }
+        viewModel.totalPrice.observe(this) {
+            binding.tvPaymentTotalPrice.text = getString(R.string.won, it)
         }
 
         viewModel.eventHandler.observe(
