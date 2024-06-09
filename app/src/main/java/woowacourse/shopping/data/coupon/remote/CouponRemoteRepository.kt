@@ -1,13 +1,13 @@
-package woowacourse.shopping.data.payment.remote
+package woowacourse.shopping.data.coupon.remote
 
 import woowacourse.shopping.data.common.ApiResponseHandler.handleResponseResult
 import woowacourse.shopping.data.common.ResponseResult
-import woowacourse.shopping.data.payment.remote.datasource.CouponDataSource
-import woowacourse.shopping.data.payment.remote.dto.CouponDto
-import woowacourse.shopping.data.payment.remote.dto.CouponDto.Companion.toBuyXGetYCoupon
-import woowacourse.shopping.data.payment.remote.dto.CouponDto.Companion.toFixedDiscountCoupon
-import woowacourse.shopping.data.payment.remote.dto.CouponDto.Companion.toFreeShippingCoupon
-import woowacourse.shopping.data.payment.remote.dto.CouponDto.Companion.toPercentageDiscountCoupon
+import woowacourse.shopping.data.coupon.remote.datasource.CouponDataSource
+import woowacourse.shopping.data.coupon.remote.dto.CouponDto
+import woowacourse.shopping.data.coupon.remote.dto.CouponDto.Companion.toBuyXGetYCoupon
+import woowacourse.shopping.data.coupon.remote.dto.CouponDto.Companion.toFixedDiscountCoupon
+import woowacourse.shopping.data.coupon.remote.dto.CouponDto.Companion.toFreeShippingCoupon
+import woowacourse.shopping.data.coupon.remote.dto.CouponDto.Companion.toPercentageDiscountCoupon
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponType
 import woowacourse.shopping.domain.repository.coupon.CouponRepository

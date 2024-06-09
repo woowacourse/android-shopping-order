@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.cart.remote.CartItemApiService
-import woowacourse.shopping.data.payment.remote.CouponApiService
+import woowacourse.shopping.data.coupon.remote.CouponApiService
 import woowacourse.shopping.data.order.remote.OrderApiService
 import woowacourse.shopping.data.product.remote.ProductsApiService
 import java.lang.reflect.Type

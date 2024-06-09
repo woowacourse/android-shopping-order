@@ -7,7 +7,7 @@ import woowacourse.shopping.data.common.RetrofitClient.cartItemApi
 import woowacourse.shopping.data.common.RetrofitClient.couponApi
 import woowacourse.shopping.data.common.RetrofitClient.orderApi
 import woowacourse.shopping.data.common.RetrofitClient.productsApi
-import woowacourse.shopping.data.payment.remote.datasource.CouponRemoteDataSource
+import woowacourse.shopping.data.coupon.remote.datasource.CouponRemoteDataSource
 import woowacourse.shopping.data.history.local.datasource.ProductHistoryDataSource
 import woowacourse.shopping.data.history.local.datasource.ProductHistoryLocalDataSource
 import woowacourse.shopping.data.order.remote.datasource.OrderRemoteDataSource

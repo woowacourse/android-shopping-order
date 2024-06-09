@@ -1,6 +1,6 @@
-package woowacourse.shopping.data.payment.remote.dto
+package woowacourse.shopping.data.coupon.remote.dto
 
-import woowacourse.shopping.data.payment.remote.dto.AvailableTimeDto.Companion.toDomain
+import woowacourse.shopping.data.coupon.remote.dto.AvailableTimeDto.Companion.toDomain
 import woowacourse.shopping.domain.model.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedDiscountCoupon

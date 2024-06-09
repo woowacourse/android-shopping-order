@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.payment.remote.dto
+package woowacourse.shopping.data.coupon.remote.dto
 
 import woowacourse.shopping.domain.model.coupon.AvailableTime
 
