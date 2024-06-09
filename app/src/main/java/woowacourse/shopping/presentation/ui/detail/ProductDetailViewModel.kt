@@ -9,9 +9,10 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.domain.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -20,7 +21,8 @@ import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
 
 class ProductDetailViewModel(
-    private val repository: Repository,
+    private val cartItemRepository: CartItemRepository,
+    private val recentProductRepository: RecentProductRepository
 ) : ViewModel(), DetailActionHandler {
     private val _cartProduct = MutableLiveData<UiState<DetailCartProduct>>(UiState.Loading)
     val cartProduct: LiveData<UiState<DetailCartProduct>> get() = _cartProduct
@@ -47,7 +49,7 @@ class ProductDetailViewModel(
 
     fun findOneRecentProduct() =
         viewModelScope.launch {
-            repository.findOneRecent().onSuccess {
+            recentProductRepository.findOrNull().onSuccess {
                 if (it != null) {
                     _recentProduct.postValue(UiState.Success(it))
                 }
@@ -60,7 +62,7 @@ class ProductDetailViewModel(
         viewModelScope.launch {
             when (detailCartProduct.isNew) {
                 true -> {
-                    repository.postCartItem(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
+                    cartItemRepository.postCartItem(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
                         .onSuccess {
                             _cartProduct.postValue(UiState.Success(detailCartProduct))
                             Log.d("FIRST LOG", "${it.toLong()}")
@@ -75,7 +77,7 @@ class ProductDetailViewModel(
                 }
 
                 false -> {
-                    repository.patchCartItem(
+                    cartItemRepository.patchCartItem(
                         id = detailCartProduct.cartProduct.cartId.toInt(),
                         quantityRequestDto =
                             QuantityRequest(
@@ -122,7 +124,7 @@ class ProductDetailViewModel(
 
     override fun saveRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
-            repository.saveRecentProduct(cartProduct.toRecentProduct()).onFailure {
+            recentProductRepository.save(cartProduct.toRecentProduct()).onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }

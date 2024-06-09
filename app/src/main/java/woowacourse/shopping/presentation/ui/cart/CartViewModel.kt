@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.domain.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
@@ -17,7 +17,9 @@ import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
-class CartViewModel(private val repository: Repository) : ViewModel(), CartActionHandler {
+class CartViewModel(
+    private val cartItemRepository: CartItemRepository
+) : ViewModel(), CartActionHandler {
     private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
 
     val carts: LiveData<UiState<List<CartProductUiModel>>> get() = _carts
@@ -38,7 +40,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
     fun findCartByOffset() =
         viewModelScope.launch {
-            repository.getCartItems(0, 1000).onSuccess {
+            cartItemRepository.getCartItems(0, 1000).onSuccess {
                 _carts.postValue(
                     UiState.Success(
                         it.map { cartProduct ->
@@ -59,7 +61,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 cartProductUiModel.cartProduct.productId,
                 cartProductUiModel.cartProduct.copy(quantity = 0),
             )
-            repository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
+            cartItemRepository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
                 val updatedData = (_carts.value as UiState.Success).data.toMutableList()
                 updatedData.remove(cartProductUiModel)
                 _carts.postValue(
@@ -133,7 +135,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            repository.patchCartItem(
+            cartItemRepository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
                 quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
@@ -156,7 +158,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
             cartProducts[index].cartProduct.minusQuantity()
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            repository.patchCartItem(
+            cartItemRepository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
                 quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )

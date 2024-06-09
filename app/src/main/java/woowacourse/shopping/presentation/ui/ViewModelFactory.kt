@@ -2,7 +2,12 @@ package woowacourse.shopping.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.data.RepositoryInjector
+import woowacourse.shopping.data.remote.injector.CartItemRepositoryInjector
+import woowacourse.shopping.data.remote.injector.CouponRepositoryInjector
+import woowacourse.shopping.data.remote.injector.OrderRepositoryInjector
+import woowacourse.shopping.data.remote.injector.ProductRepositoryInjector
+import woowacourse.shopping.data.remote.injector.RecentProductRepositoryInjector
+import woowacourse.shopping.domain.usecase.CurationUseCase
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.curation.CurationViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
@@ -14,31 +19,41 @@ class ViewModelFactory : ViewModelProvider.Factory {
         return when {
             modelClass.isAssignableFrom(ProductDetailViewModel::class.java) -> {
                 ProductDetailViewModel(
-                    RepositoryInjector.repository,
+                    CartItemRepositoryInjector.instance,
+                    RecentProductRepositoryInjector.instance
                 ) as T
             }
 
             modelClass.isAssignableFrom(ShoppingViewModel::class.java) -> {
                 ShoppingViewModel(
-                    RepositoryInjector.repository,
+                    ProductRepositoryInjector.instance,
+                    CartItemRepositoryInjector.instance,
+                    RecentProductRepositoryInjector.instance
                 ) as T
             }
 
             modelClass.isAssignableFrom(CartViewModel::class.java) -> {
                 CartViewModel(
-                    RepositoryInjector.repository,
+                    CartItemRepositoryInjector.instance,
                 ) as T
             }
 
             modelClass.isAssignableFrom(CurationViewModel::class.java) -> {
                 CurationViewModel(
-                    RepositoryInjector.repository,
+                    CartItemRepositoryInjector.instance,
+                    CurationUseCase(
+                        RecentProductRepositoryInjector.instance,
+                        ProductRepositoryInjector.instance,
+                        CartItemRepositoryInjector.instance,
+                    )
                 ) as T
             }
 
             modelClass.isAssignableFrom(PaymentActionViewModel::class.java) -> {
                 PaymentActionViewModel(
-                    RepositoryInjector.repository,
+                    OrderRepositoryInjector.instance,
+                    CouponRepositoryInjector.instance,
+                    RecentProductRepositoryInjector.instance
                 ) as T
             }
 

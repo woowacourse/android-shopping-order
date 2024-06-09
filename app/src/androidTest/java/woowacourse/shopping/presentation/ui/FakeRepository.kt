@@ -7,7 +7,6 @@ import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.Repository
 
 class FakeRepository : Repository {
     val carts = cartProducts.toMutableList()

@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.CouponRepository
+import woowacourse.shopping.domain.OrderRepository
+import woowacourse.shopping.domain.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -18,7 +20,9 @@ import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 import woowacourse.shopping.presentation.ui.payment.model.toUiModel
 
 class PaymentActionViewModel(
-    private val repository: Repository
+    private val orderRepository: OrderRepository,
+    private val couponRepository: CouponRepository,
+    private val recentProductRepository: RecentProductRepository
 ) : ViewModel(), PaymentActionHandler {
 
     private val _coupons = MutableLiveData<PaymentUiModel>()
@@ -46,7 +50,7 @@ class PaymentActionViewModel(
             updateUiModel.add(it.productId, it.copy(quantity = 0))
         }
 
-        repository.postOrders(
+        orderRepository.postOrders(
             OrderRequest(
                 _coupons.value!!.cartProductIds,
             ),
@@ -59,7 +63,7 @@ class PaymentActionViewModel(
 
     fun updateRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
-            repository.saveRecentProduct(cartProduct.toRecentProduct().copy(quantity = 0)).onFailure {
+            recentProductRepository.save(cartProduct.toRecentProduct().copy(quantity = 0)).onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }
@@ -80,7 +84,7 @@ class PaymentActionViewModel(
 
     fun loadCoupons() = viewModelScope.launch {
         if (_coupons.value == null) return@launch
-        repository.getCoupons()
+        couponRepository.getCoupons()
             .onSuccess {
                 _coupons.postValue(_coupons.value?.copy(couponUiModels = it.filter { it.isValid(cartProducts = _coupons.value!!.cartProducts) }.map { it.toUiModel() }))
             }

@@ -11,9 +11,11 @@ import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.mergeWith
+import woowacourse.shopping.domain.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
+import woowacourse.shopping.domain.ProductRepository
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -21,7 +23,11 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.UpdateUiModel
 import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 
-class ShoppingViewModel(private val repository: Repository) :
+class ShoppingViewModel(
+    private val productRepository: ProductRepository,
+    private val cartItemRepository: CartItemRepository,
+    private val recentProductRepository: RecentProductRepository
+) :
     ViewModel(), ShoppingActionHandler {
     private val _cartCount = MutableLiveData<Int>(0)
     val cartCount: LiveData<Int> get() = _cartCount
@@ -75,7 +81,7 @@ class ShoppingViewModel(private val repository: Repository) :
     fun loadProductsByOffset() =
         viewModelScope.launch {
             val offset = if (_products.value is UiState.Success) (_products.value as UiState.Success).data.offset + 1 else 0
-            repository.getProductsByPaging(offset, DEFAULT_PAGE_SIZE).onSuccess {
+            productRepository.getProductsByPaging(offset, DEFAULT_PAGE_SIZE).onSuccess {
                 if (_products.value is UiState.Loading) {
                     _products.postValue(UiState.Success(it))
                 } else {
@@ -90,7 +96,7 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun loadAllCart() =
         viewModelScope.launch {
-            repository.getCartItems(0, 5000).onSuccess {
+            cartItemRepository.getCartItems(0, 5000).onSuccess {
                 _carts.postValue(UiState.Success(it))
             }.onFailure {
                 _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
@@ -99,7 +105,7 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun getCartItemCounts() =
         viewModelScope.launch {
-            repository.getCartItemsCounts().onSuccess { maxCount ->
+            cartItemRepository.getCartItemsCounts().onSuccess { maxCount ->
                 _cartCount.postValue(maxCount)
             }.onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_CART_COUNT_LOAD))
@@ -135,7 +141,7 @@ class ShoppingViewModel(private val repository: Repository) :
             cartProducts[index].plusQuantity()
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
-                repository.postCartItem(CartItemRequest.fromCartProduct(cartProducts[index]))
+                cartItemRepository.postCartItem(CartItemRequest.fromCartProduct(cartProducts[index]))
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         saveRecentProduct(cartProducts[index])
@@ -146,7 +152,7 @@ class ShoppingViewModel(private val repository: Repository) :
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
-                repository.patchCartItem(
+                cartItemRepository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -168,7 +174,7 @@ class ShoppingViewModel(private val repository: Repository) :
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                repository.patchCartItem(
+                cartItemRepository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -181,7 +187,7 @@ class ShoppingViewModel(private val repository: Repository) :
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_MINUS))
                     }
             } else {
-                repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+                cartItemRepository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
                     this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                     saveRecentProduct(cartProducts[index])
                     _cartCount.postValue(_cartCount.value?.minus(1))
@@ -203,7 +209,7 @@ class ShoppingViewModel(private val repository: Repository) :
 
     fun findAllRecent() =
         viewModelScope.launch {
-            repository.findByLimit(10).onSuccess {
+            recentProductRepository.findAllByLimit(10).onSuccess {
                 _recentProducts.postValue(UiState.Success(it))
             }.onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_LOAD))
@@ -212,7 +218,7 @@ class ShoppingViewModel(private val repository: Repository) :
 
     override fun saveRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
-            repository.saveRecentProduct(cartProduct.toRecentProduct()).onFailure {
+            recentProductRepository.save(cartProduct.toRecentProduct()).onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
             }
         }

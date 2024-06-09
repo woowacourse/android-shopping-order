@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartProduct
 import woowacourse.shopping.cartProducts
-import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.ErrorType

@@ -7,8 +7,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.domain.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.usecase.CurationUseCase
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
@@ -16,7 +17,8 @@ import woowacourse.shopping.presentation.ui.curation.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 class CurationViewModel(
-    private val repository: Repository,
+    private val cartItemRepository: CartItemRepository,
+    private val curationUseCase: CurationUseCase
 ) : ViewModel(), CurationActionHandler {
     private val _cartProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val cartProducts: LiveData<UiState<List<CartProduct>>> get() = _cartProducts
@@ -32,7 +34,7 @@ class CurationViewModel(
 
     init {
         viewModelScope.launch {
-            repository.getCuration().onSuccess {
+            curationUseCase(10).onSuccess {
                 _cartProducts.postValue(UiState.Success(it))
             }.onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_CURATION_LOAD))
@@ -61,7 +63,7 @@ class CurationViewModel(
             cartProducts[index].plusQuantity()
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
-                repository.postCartItem(
+                cartItemRepository.postCartItem(
                     CartItemRequest(
                         productId = cartProducts[index].productId.toInt(),
                         quantity = cartProducts[index].quantity,
@@ -75,7 +77,7 @@ class CurationViewModel(
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
-                repository.patchCartItem(
+                cartItemRepository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -95,7 +97,7 @@ class CurationViewModel(
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                repository.patchCartItem(
+                cartItemRepository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -106,7 +108,7 @@ class CurationViewModel(
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
-                repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+                cartItemRepository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
                     _cartProducts.postValue(UiState.Success(cartProducts))
                 }.onFailure {
                     _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
