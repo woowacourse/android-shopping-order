@@ -2,7 +2,7 @@ package woowacourse.shopping.data.local
 
 import woowacourse.shopping.data.local.entity.RecentProductEntity
 
-interface LocalDataSource {
+interface RecentProductDataSource {
     suspend fun findByLimit(limit: Int): List<RecentProductEntity>
 
     suspend fun findOne(): RecentProductEntity?

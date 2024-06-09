@@ -1,7 +1,7 @@
 package woowacourse.shopping.data
 
 import android.util.Log
-import woowacourse.shopping.data.local.LocalDataSource
+import woowacourse.shopping.data.local.RecentProductDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
 import woowacourse.shopping.data.remote.RemoteDataSource
@@ -18,7 +18,7 @@ import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.utils.toIdOrNull
 
 class RepositoryImpl(
-    private val localDataSource: LocalDataSource,
+    private val recentProductDataSource: RecentProductDataSource,
     private val remoteDataSource: RemoteDataSource,
 ) : Repository {
     private val productPagingSource = ProductPagingSource(remoteDataSource)
@@ -116,17 +116,17 @@ class RepositoryImpl(
 
     override suspend fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
-            localDataSource.findByLimit(limit).map { it.toDomain() }
+            recentProductDataSource.findByLimit(limit).map { it.toDomain() }
         }
 
     override suspend fun findOneRecent(): Result<RecentProduct?> =
         runCatching {
-            localDataSource.findOne()?.toDomain()
+            recentProductDataSource.findOne()?.toDomain()
         }
 
     override suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
         runCatching {
-            localDataSource.saveRecentProduct(recentProduct.toEntity())
+            recentProductDataSource.saveRecentProduct(recentProduct.toEntity())
         }
 
     override suspend fun getCartItemsCounts(): Result<Int> =
@@ -139,7 +139,7 @@ class RepositoryImpl(
         }
 
     override suspend fun getCuration(): Result<List<CartProduct>> {
-        localDataSource.findOne()?.toDomain()?.let {
+        recentProductDataSource.findOne()?.toDomain()?.let {
             val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
             val cartResponse = remoteDataSource.getCartItems(0, 1000)
 
