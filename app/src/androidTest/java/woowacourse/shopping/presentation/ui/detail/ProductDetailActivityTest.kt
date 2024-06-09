@@ -72,13 +72,13 @@ class ProductDetailActivityTest {
     fun `장바구니에_담으면_상품이_데이터에_추가된다`() =
         runTest {
             ActivityScenario.launch<CartActivity>(intent)
-            CartItemRepositoryInjector.instance.getCartItems(0, 100).onSuccess {
+            CartItemRepositoryInjector.instance.getAllByPaging(0, 100).onSuccess {
                 it.size shouldBe 51 // 디폴트 갯수
             }.onFailure {
                 throw IllegalStateException()
             }
             onView(withId(R.id.tv_add_cart)).perform(click())
-            CartItemRepositoryInjector.instance.getCartItems(0, 100).onSuccess {
+            CartItemRepositoryInjector.instance.getAllByPaging(0, 100).onSuccess {
                 it.size shouldBe 52 // 하나 증가한 갯수
             }.onFailure {
                 throw IllegalStateException()

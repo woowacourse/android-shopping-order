@@ -4,7 +4,7 @@ import woowacourse.shopping.data.local.RecentProductDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class RecentProductRepositoryImpl(
     private val recentProductDataSource: RecentProductDataSource,

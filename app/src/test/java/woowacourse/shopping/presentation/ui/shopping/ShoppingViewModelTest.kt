@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartProducts
 import woowacourse.shopping.data.remote.paging.LoadResult
-import woowacourse.shopping.domain.CartItemRepository
-import woowacourse.shopping.domain.ProductRepository
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.ErrorType
@@ -33,7 +33,7 @@ class ShoppingViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        coEvery { cartItemRepository.getCartItemsCounts() } returns Result.success(10)
+        coEvery { cartItemRepository.getCount() } returns Result.success(10)
         viewModel =
             ShoppingViewModel(
                 productRepository, cartItemRepository, recentProductRepository,
@@ -42,7 +42,7 @@ class ShoppingViewModelTest {
 
     @Test
     fun `viewModel이 초기화되면 데이터가 20개 불러와진다`() {
-        coEvery { productRepository.getProductsByPaging(any(), any()) } returns Result.success(LoadResult.Page(0, false, cartProducts))
+        coEvery { productRepository.getAllByPaging(any(), any()) } returns Result.success(LoadResult.Page(0, false, cartProducts))
         viewModel.loadProductsByOffset()
         Thread.sleep(1000)
         assertEquals(viewModel.products.getOrAwaitValue(), UiState.Success(LoadResult.Page(0, false, cartProducts)))
@@ -50,7 +50,7 @@ class ShoppingViewModelTest {
 
     @Test
     fun `viewModel에서 데이터 로드가 실패하면 Error로 상태가 변화한다`() {
-        coEvery { productRepository.getProductsByPaging(any(), any()) } returns Result.failure(Throwable())
+        coEvery { productRepository.getAllByPaging(any(), any()) } returns Result.failure(Throwable())
         viewModel.loadProductsByOffset()
         Thread.sleep(1000)
         assertEquals(viewModel.errorHandler.getOrAwaitValue(1).getContentIfNotHandled(), ErrorType.ERROR_PRODUCT_LOAD)

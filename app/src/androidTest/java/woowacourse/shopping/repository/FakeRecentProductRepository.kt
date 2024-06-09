@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class FakeRecentProductRepository :
     RecentProductRepository {

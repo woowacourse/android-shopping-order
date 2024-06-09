@@ -6,14 +6,14 @@ import woowacourse.shopping.data.remote.datasource.cartItem.DefaultCartItemDataS
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.utils.toIdOrNull
 
 class CartItemRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = DefaultCartItemDataSource(),
 ) : CartItemRepository {
-    override suspend fun getCartItems(
+    override suspend fun getAllByPaging(
         page: Int,
         size: Int,
     ): Result<List<CartProduct>> =
@@ -25,7 +25,7 @@ class CartItemRepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
+    override suspend fun post(cartItemRequest: CartItemRequest): Result<Int> =
         runCatching {
             val response = cartItemDataSource.post(cartItemRequest)
             if (response.isSuccessful) {
@@ -36,21 +36,19 @@ class CartItemRepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun patchCartItem(
+    override suspend fun patch(
         id: Int,
         quantityRequestDto: QuantityRequest,
     ): Result<Unit> =
         runCatching {
-            Log.d("SDFEFS", "$id")
             val response = cartItemDataSource.patch(id, quantityRequestDto)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }
-            Log.d("SDFEFS", response.toString())
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun deleteCartItem(id: Int): Result<Unit> =
+    override suspend fun delete(id: Int): Result<Unit> =
         runCatching {
             val response = cartItemDataSource.delete(id)
             if (response.isSuccessful) {
@@ -59,7 +57,7 @@ class CartItemRepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun getCartItemsCounts(): Result<Int> =
+    override suspend fun getCount(): Result<Int> =
         runCatching {
             val response = cartItemDataSource.getCount()
             if (response.isSuccessful) {

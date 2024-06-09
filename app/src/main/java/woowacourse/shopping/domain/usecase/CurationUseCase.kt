@@ -1,9 +1,9 @@
 package woowacourse.shopping.domain.usecase
 
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.ProductRepository
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class CurationUseCase(
     private val recentProductRepository: RecentProductRepository,
@@ -13,8 +13,8 @@ class CurationUseCase(
     suspend operator fun invoke(count: Int): Result<List<CartProduct>> =
         runCatching {
             recentProductRepository.findOrNull().getOrNull()?.let {
-                val products = productRepository.getProducts(it.category, 0, count).getOrThrow()
-                val cartItems = cartItemRepository.getCartItems(0, MAXIMUM_CART_SIZE).getOrThrow()
+                val products = productRepository.getAllByPaging(it.category, 0, count).getOrThrow()
+                val cartItems = cartItemRepository.getAllByPaging(0, MAXIMUM_CART_SIZE).getOrThrow()
 
                 val cartProductIds = cartItems.map { it.productId }.toSet()
 

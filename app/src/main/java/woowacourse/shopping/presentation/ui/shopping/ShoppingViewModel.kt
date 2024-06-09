@@ -11,11 +11,11 @@ import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.mergeWith
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -81,7 +81,7 @@ class ShoppingViewModel(
     fun loadProductsByOffset() =
         viewModelScope.launch {
             val offset = if (_products.value is UiState.Success) (_products.value as UiState.Success).data.offset + 1 else 0
-            productRepository.getProductsByPaging(offset, DEFAULT_PAGE_SIZE).onSuccess {
+            productRepository.getAllByPaging(offset, DEFAULT_PAGE_SIZE).onSuccess {
                 if (_products.value is UiState.Loading) {
                     _products.postValue(UiState.Success(it))
                 } else {
@@ -96,7 +96,7 @@ class ShoppingViewModel(
 
     fun loadAllCart() =
         viewModelScope.launch {
-            cartItemRepository.getCartItems(0, 5000).onSuccess {
+            cartItemRepository.getAllByPaging(0, 5000).onSuccess {
                 _carts.postValue(UiState.Success(it))
             }.onFailure {
                 _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
@@ -105,7 +105,7 @@ class ShoppingViewModel(
 
     fun getCartItemCounts() =
         viewModelScope.launch {
-            cartItemRepository.getCartItemsCounts().onSuccess { maxCount ->
+            cartItemRepository.getCount().onSuccess { maxCount ->
                 _cartCount.postValue(maxCount)
             }.onFailure {
                 _errorHandler.postValue(EventState(ErrorType.ERROR_CART_COUNT_LOAD))
@@ -141,7 +141,7 @@ class ShoppingViewModel(
             cartProducts[index].plusQuantity()
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
-                cartItemRepository.postCartItem(CartItemRequest.fromCartProduct(cartProducts[index]))
+                cartItemRepository.post(CartItemRequest.fromCartProduct(cartProducts[index]))
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         saveRecentProduct(cartProducts[index])
@@ -152,7 +152,7 @@ class ShoppingViewModel(
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
-                cartItemRepository.patchCartItem(
+                cartItemRepository.patch(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -174,7 +174,7 @@ class ShoppingViewModel(
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                cartItemRepository.patchCartItem(
+                cartItemRepository.patch(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -187,7 +187,7 @@ class ShoppingViewModel(
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_MINUS))
                     }
             } else {
-                cartItemRepository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+                cartItemRepository.delete(cartProduct.cartId.toInt()).onSuccess {
                     this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
                     saveRecentProduct(cartProducts[index])
                     _cartCount.postValue(_cartCount.value?.minus(1))

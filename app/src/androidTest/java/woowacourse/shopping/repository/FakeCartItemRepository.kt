@@ -3,20 +3,20 @@ package woowacourse.shopping.repository
 import woowacourse.shopping.cartProducts
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 
 class FakeCartItemRepository : CartItemRepository {
     val carts = cartProducts.toMutableList()
 
-    override suspend fun getCartItems(
+    override suspend fun getAllByPaging(
         page: Int,
         size: Int,
     ): Result<List<CartProduct>> {
         return Result.success(carts)
     }
 
-    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> {
+    override suspend fun post(cartItemRequest: CartItemRequest): Result<Int> {
         carts.add(
             CartProduct(
                 productId = cartItemRequest.productId.toLong(),
@@ -31,7 +31,7 @@ class FakeCartItemRepository : CartItemRepository {
         return Result.success(cartItemRequest.productId)
     }
 
-    override suspend fun patchCartItem(
+    override suspend fun patch(
         id: Int,
         quantityRequestDto: QuantityRequest,
     ): Result<Unit> {
@@ -49,11 +49,11 @@ class FakeCartItemRepository : CartItemRepository {
         return Result.success(Unit)
     }
 
-    override suspend fun deleteCartItem(id: Int): Result<Unit> {
+    override suspend fun delete(id: Int): Result<Unit> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCartItemsCounts(): Result<Int> {
+    override suspend fun getCount(): Result<Int> {
         TODO("Not yet implemented")
     }
 }

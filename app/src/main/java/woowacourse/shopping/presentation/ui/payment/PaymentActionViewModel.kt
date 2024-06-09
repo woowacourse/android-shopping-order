@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.CouponRepository
-import woowacourse.shopping.domain.OrderRepository
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -50,7 +50,7 @@ class PaymentActionViewModel(
                 updateUiModel.add(it.productId, it.copy(quantity = 0))
             }
 
-            orderRepository.postOrders(
+            orderRepository.post(
                 OrderRequest(
                     _coupons.value!!.cartProductIds,
                 ),
@@ -85,7 +85,7 @@ class PaymentActionViewModel(
     fun loadCoupons() =
         viewModelScope.launch {
             if (_coupons.value == null) return@launch
-            couponRepository.getCoupons()
+            couponRepository.getAll()
                 .onSuccess {
                     _coupons.postValue(
                         _coupons.value?.copy(

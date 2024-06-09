@@ -6,14 +6,14 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.ProductPagingSource
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource = DefaultProductDataSource(),
 ) : ProductRepository {
     private val productPagingSource = ProductPagingSource(productDataSource)
 
-    override suspend fun getProducts(
+    override suspend fun getAllByPaging(
         category: String,
         page: Int,
         size: Int,
@@ -26,7 +26,7 @@ class ProductRepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun getProductsByPaging(
+    override suspend fun getAllByPaging(
         offset: Int,
         pageSize: Int,
     ): Result<LoadResult.Page<CartProduct>> {
@@ -40,7 +40,7 @@ class ProductRepositoryImpl(
         }
     }
 
-    override suspend fun getProductById(id: Int): Result<CartProduct?> =
+    override suspend fun getById(id: Int): Result<CartProduct?> =
         runCatching {
             val response = productDataSource.getById(id = id)
             if (response.isSuccessful) {

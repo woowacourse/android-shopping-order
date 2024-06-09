@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.usecase.CurationUseCase
 import woowacourse.shopping.presentation.ErrorType
@@ -62,7 +62,7 @@ class CurationViewModel(
             cartProducts[index].plusQuantity()
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
-                cartItemRepository.postCartItem(
+                cartItemRepository.post(
                     CartItemRequest(
                         productId = cartProducts[index].productId.toInt(),
                         quantity = cartProducts[index].quantity,
@@ -76,7 +76,7 @@ class CurationViewModel(
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
-                cartItemRepository.patchCartItem(
+                cartItemRepository.patch(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -96,7 +96,7 @@ class CurationViewModel(
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                cartItemRepository.patchCartItem(
+                cartItemRepository.patch(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
@@ -107,7 +107,7 @@ class CurationViewModel(
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                     }
             } else {
-                cartItemRepository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
+                cartItemRepository.delete(cartProduct.cartId.toInt()).onSuccess {
                     _cartProducts.postValue(UiState.Success(cartProducts))
                 }.onFailure {
                     _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))

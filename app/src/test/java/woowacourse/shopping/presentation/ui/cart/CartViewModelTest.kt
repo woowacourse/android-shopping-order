@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartProduct
 import woowacourse.shopping.cartProducts
-import woowacourse.shopping.domain.CartItemRepository
-import woowacourse.shopping.domain.ProductRepository
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.ErrorType
@@ -35,7 +35,7 @@ class CartViewModelTest {
 
     @Test
     fun `카트 아이템을 pageCount개씩 불러온다`() {
-        coEvery { cartItemRepository.getCartItems(any(), any()) } returns
+        coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns
             Result.success(
                 cartProducts,
             )
@@ -53,7 +53,7 @@ class CartViewModelTest {
 
     @Test
     fun `카트 아이템을 불러오기 실패하면 Error 상태로 변화한다`() {
-        coEvery { cartItemRepository.getCartItems(any(), any()) } returns Result.failure(Throwable())
+        coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns Result.failure(Throwable())
         viewModel.findCartByOffset()
         Thread.sleep(1000)
         assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(
@@ -63,7 +63,7 @@ class CartViewModelTest {
 
     @Test
     fun `데이터 삭제에 실패하면 Error 상태로 변화한다`() {
-        coEvery { cartItemRepository.deleteCartItem(any()) } returns Result.failure(Throwable())
+        coEvery { cartItemRepository.delete(any()) } returns Result.failure(Throwable())
         viewModel.onDelete(
             CartProductUiModel(
                 cartProduct = cartProduct,

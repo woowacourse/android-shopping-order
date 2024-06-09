@@ -8,10 +8,10 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -61,7 +61,7 @@ class ProductDetailViewModel(
         viewModelScope.launch {
             when (detailCartProduct.isNew) {
                 true -> {
-                    cartItemRepository.postCartItem(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
+                    cartItemRepository.post(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
                         .onSuccess {
                             saveRecentProduct(detailCartProduct.cartProduct.copy(cartId = it.toLong()))
                             updateUiModel.add(
@@ -75,7 +75,7 @@ class ProductDetailViewModel(
                 }
 
                 false -> {
-                    cartItemRepository.patchCartItem(
+                    cartItemRepository.patch(
                         id = detailCartProduct.cartProduct.cartId.toInt(),
                         quantityRequestDto =
                             QuantityRequest(

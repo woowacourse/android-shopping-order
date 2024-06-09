@@ -1,4 +1,6 @@
-package woowacourse.shopping.domain
+package woowacourse.shopping.domain.repository
+
+import woowacourse.shopping.domain.RecentProduct
 
 interface RecentProductRepository {
     suspend fun findAllByLimit(limit: Int): Result<List<RecentProduct>>

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.presentation.ErrorType
 import woowacourse.shopping.presentation.ui.EventState
@@ -40,7 +40,7 @@ class CartViewModel(
 
     fun findCartByOffset() =
         viewModelScope.launch {
-            cartItemRepository.getCartItems(0, 1000).onSuccess {
+            cartItemRepository.getAllByPaging(0, 1000).onSuccess {
                 _carts.postValue(
                     UiState.Success(
                         it.map { cartProduct ->
@@ -61,7 +61,7 @@ class CartViewModel(
                 cartProductUiModel.cartProduct.productId,
                 cartProductUiModel.cartProduct.copy(quantity = 0),
             )
-            cartItemRepository.deleteCartItem(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
+            cartItemRepository.delete(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
                 val updatedData = (_carts.value as UiState.Success).data.toMutableList()
                 updatedData.remove(cartProductUiModel)
                 _carts.postValue(
@@ -134,7 +134,7 @@ class CartViewModel(
 
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            cartItemRepository.patchCartItem(
+            cartItemRepository.patch(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
                 quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
@@ -157,7 +157,7 @@ class CartViewModel(
             cartProducts[index].cartProduct.minusQuantity()
             updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
 
-            cartItemRepository.patchCartItem(
+            cartItemRepository.patch(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
                 quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )

@@ -2,10 +2,10 @@ package woowacourse.shopping.repository
 
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 
 class FakeProductRepository : ProductRepository {
-    override suspend fun getProducts(
+    override suspend fun getAllByPaging(
         category: String,
         page: Int,
         size: Int,
@@ -13,14 +13,14 @@ class FakeProductRepository : ProductRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getProductsByPaging(
+    override suspend fun getAllByPaging(
         offset: Int,
         pageSize: Int,
     ): Result<LoadResult.Page<CartProduct>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getProductById(id: Int): Result<CartProduct?> {
+    override suspend fun getById(id: Int): Result<CartProduct?> {
         TODO("Not yet implemented")
     }
 }

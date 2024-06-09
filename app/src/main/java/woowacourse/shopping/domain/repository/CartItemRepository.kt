@@ -1,22 +1,23 @@
-package woowacourse.shopping.domain
+package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.domain.CartProduct
 
 interface CartItemRepository {
-    suspend fun getCartItems(
+    suspend fun getAllByPaging(
         page: Int,
         size: Int,
     ): Result<List<CartProduct>>
 
-    suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int>
+    suspend fun post(cartItemRequest: CartItemRequest): Result<Int>
 
-    suspend fun patchCartItem(
+    suspend fun patch(
         id: Int,
         quantityRequestDto: QuantityRequest,
     ): Result<Unit>
 
-    suspend fun deleteCartItem(id: Int): Result<Unit>
+    suspend fun delete(id: Int): Result<Unit>
 
-    suspend fun getCartItemsCounts(): Result<Int>
+    suspend fun getCount(): Result<Int>
 }

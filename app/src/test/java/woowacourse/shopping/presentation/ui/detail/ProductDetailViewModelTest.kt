@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartProduct
-import woowacourse.shopping.domain.CartItemRepository
-import woowacourse.shopping.domain.RecentProductRepository
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
 
@@ -27,7 +27,7 @@ class ProductDetailViewModelTest {
 
     @Test
     fun `상품을 장바구니에 저장한다`() {
-        coEvery { cartItemRepository.postCartItem(any()) } returns Result.success(1)
+        coEvery { cartItemRepository.post(any()) } returns Result.success(1)
         viewModel.onAddToCart(
             DetailCartProduct(
                 isNew = true,
@@ -35,7 +35,7 @@ class ProductDetailViewModelTest {
             ),
         )
         Thread.sleep(1000)
-        coVerify(exactly = 1) { cartItemRepository.postCartItem(any()) }
+        coVerify(exactly = 1) { cartItemRepository.post(any()) }
         coVerify(exactly = 1) { recentProductRepository.save(any()) }
     }
 }
