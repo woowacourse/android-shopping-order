@@ -70,7 +70,7 @@ class CouponViewModel(
                 carts.sumOf { it.product.price * it.quantity.value },
                 Order.INIT_DISCOUNT_PRICE,
                 Order.SHIPPING_PRICE,
-                carts.sumOf { it.product.price * it.quantity.value },
+                carts.sumOf { it.product.price * it.quantity.value } + Order.SHIPPING_PRICE,
             )
     }
 
