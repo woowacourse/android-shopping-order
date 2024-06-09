@@ -28,6 +28,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
         initRecyclerViewAdapter()
         observeCoupon()
         observePaymentEvent()
+        observeError()
     }
 
     private fun initActionBarTitle() {
@@ -57,6 +58,15 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
                         ShoppingActivity.start(this)
                     }
                 }
+            },
+        )
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(
+            this,
+            EventObserver {
+                showToast(it.message)
             },
         )
     }

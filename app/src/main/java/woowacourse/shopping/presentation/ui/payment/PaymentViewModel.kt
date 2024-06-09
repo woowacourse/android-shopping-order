@@ -21,6 +21,9 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel(), PaymentHandler {
+    private val _error = MutableLiveData<Event<PaymentError>>()
+    val error: LiveData<Event<PaymentError>> get() = _error
+
     private val _coupons = MutableLiveData<List<Coupon>>()
     val coupons: LiveData<List<Coupon>> get() = _coupons
 
@@ -119,7 +122,7 @@ class PaymentViewModel(
             couponRepository.loadAll().onSuccess {
                 _coupons.value = it
             }.onFailure {
-                // TODO
+                _error.value = Event(PaymentError.CouponNotFound)
             }
         }
     }
@@ -131,7 +134,7 @@ class PaymentViewModel(
                     fetchedCarts.filter { productIds.contains(it.product.id) }
                         .map { it.toShoppingProduct() }
             }.onFailure {
-                // TODO
+                _error.value = Event(PaymentError.CartItemsNotFound)
             }
         }
     }
