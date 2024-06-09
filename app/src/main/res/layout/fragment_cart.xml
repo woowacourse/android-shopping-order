@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UIState" />
-
         <import type="java.util.List" />
 
         <import type="android.view.View" />

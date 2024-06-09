@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UIState"/>
-
         <variable
             name="viewModel"
             type="woowacourse.shopping.view.cart.CartViewModel" />

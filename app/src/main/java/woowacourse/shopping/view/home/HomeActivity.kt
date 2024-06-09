@@ -23,7 +23,6 @@ import woowacourse.shopping.view.home.product.HomeViewItem.Companion.LOAD_MORE_B
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.product.ProductAdapter
 import woowacourse.shopping.view.home.recent.RecentProductAdapter
-import woowacourse.shopping.view.state.HomeUiEvent
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding

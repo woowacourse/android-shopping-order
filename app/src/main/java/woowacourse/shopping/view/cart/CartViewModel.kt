@@ -12,14 +12,13 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.list.CartItemClickListener
+import woowacourse.shopping.view.cart.list.CartListUiEvent
+import woowacourse.shopping.view.cart.list.CartListUiState
 import woowacourse.shopping.view.cart.list.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.cart.recommend.RecommendListUiEvent
+import woowacourse.shopping.view.cart.recommend.RecommendListUiState
 import woowacourse.shopping.view.cart.recommend.RecommendProductEventListener
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.view.state.CartListUiEvent
-import woowacourse.shopping.view.state.CartListUiState
-import woowacourse.shopping.view.state.CartUiState
-import woowacourse.shopping.view.state.RecommendListUiEvent
-import woowacourse.shopping.view.state.RecommendListUiState
 
 class CartViewModel(
     private val cartRepository: CartRepository,

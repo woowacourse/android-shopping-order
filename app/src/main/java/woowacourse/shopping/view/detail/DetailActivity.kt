@@ -18,7 +18,6 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.home.HomeActivity
-import woowacourse.shopping.view.state.DetailUiEvent
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding

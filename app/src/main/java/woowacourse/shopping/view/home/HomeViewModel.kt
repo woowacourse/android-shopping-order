@@ -14,9 +14,6 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityEventListener
 import woowacourse.shopping.view.home.product.HomeViewItem
-import woowacourse.shopping.view.state.HomeProductUiState
-import woowacourse.shopping.view.state.HomeUiEvent
-import woowacourse.shopping.view.state.RecentProductUiState
 
 class HomeViewModel(
     private val productRepository: ProductRepository,

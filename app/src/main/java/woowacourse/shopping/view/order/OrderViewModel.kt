@@ -13,7 +13,6 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.order.CouponViewItem.CouponItem
-import woowacourse.shopping.view.state.OrderUiEvent
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,

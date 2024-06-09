@@ -17,7 +17,6 @@ import woowacourse.shopping.view.cart.CartItemInfo
 import woowacourse.shopping.view.cart.toCartItemDomain
 import woowacourse.shopping.view.cart.toCartItemInfo
 import woowacourse.shopping.view.home.HomeActivity
-import woowacourse.shopping.view.state.OrderUiEvent
 
 class OrderActivity : AppCompatActivity() {
     private val binding: ActivityOrderBinding by lazy { ActivityOrderBinding.inflate(layoutInflater) }

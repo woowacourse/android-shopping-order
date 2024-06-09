@@ -19,12 +19,12 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.view.cart.list.CartFragment
+import woowacourse.shopping.view.cart.list.CartListUiEvent
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
+import woowacourse.shopping.view.cart.recommend.RecommendListUiEvent
 import woowacourse.shopping.view.detail.DetailActivity
 import woowacourse.shopping.view.home.HomeActivity
 import woowacourse.shopping.view.order.OrderActivity
-import woowacourse.shopping.view.state.CartListUiEvent
-import woowacourse.shopping.view.state.RecommendListUiEvent
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
