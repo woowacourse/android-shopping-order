@@ -67,24 +67,6 @@ class CartViewModel(
         loadRecommendedItems()
     }
 
-    fun loadRecommendedItems() {
-        viewModelScope.launch {
-            val recommendedProducts = productRepository.getRecommendedProducts().getOrNull()
-            val uiState = recommendedListUiState.value
-            if (recommendedProducts == null || uiState == null) {
-                return@launch
-            }
-            _recommendedListUiState.value =
-                uiState.copy(
-                    isLoading = false,
-                    recommendedProducts =
-                        recommendedProducts.map {
-                            ProductViewItem(it)
-                        },
-                )
-        }
-    }
-
     fun navigate() {
         when (currentScreen.value ?: return) {
             CurrentScreen.CART -> {
@@ -212,6 +194,24 @@ class CartViewModel(
 
     override fun navigateToCart() {
         _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToCartList)
+    }
+
+    private fun loadRecommendedItems() {
+        viewModelScope.launch {
+            val recommendedProducts = productRepository.getRecommendedProducts().getOrNull()
+            val uiState = recommendedListUiState.value
+            if (recommendedProducts == null || uiState == null) {
+                return@launch
+            }
+            _recommendedListUiState.value =
+                uiState.copy(
+                    isLoading = false,
+                    recommendedProducts =
+                        recommendedProducts.map {
+                            ProductViewItem(it)
+                        },
+                )
+        }
     }
 
     private fun loadCartItems() {

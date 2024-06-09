@@ -6,7 +6,6 @@ import woowacourse.shopping.domain.model.CartItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.utils.getFixtureCartItems
 import woowacourse.shopping.utils.getFixtureProducts
-import kotlin.math.min
 
 class FakeCartRepository(count: Int = 100) : CartRepository {
     private val products = getFixtureProducts(count)
@@ -19,7 +18,7 @@ class FakeCartRepository(count: Int = 100) : CartRepository {
     ): Result<CartDomain> {
         return runCatching {
             val fromIndex = page * size
-            val toIndex = min(fromIndex + 5, cartItems.size)
+            val toIndex = cartItems.size
             val items = cartItems.subList(fromIndex, toIndex)
             val last = cartItems.getOrNull(toIndex) == null
             CartDomain(

@@ -10,9 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.repository.FakeCartRepository
 import woowacourse.shopping.data.repository.FakeProductRepository
 import woowacourse.shopping.data.repository.FakeRecentProductRepository
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.utils.CoroutinesTestExtension
 import woowacourse.shopping.utils.InstantTaskExecutorExtension
 import woowacourse.shopping.utils.getOrAwaitValue
@@ -22,15 +19,12 @@ import woowacourse.shopping.utils.getOrAwaitValue
 @ExtendWith(InstantTaskExecutorExtension::class)
 class HomeViewModelTest {
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var productRepository: ProductRepository
-    private lateinit var cartRepository: CartRepository
-    private lateinit var recentProductRepository: RecentProductRepository
 
     @BeforeEach
     fun setUp() {
-        productRepository = FakeProductRepository(count = 100)
-        cartRepository = FakeCartRepository(count = 5)
-        recentProductRepository = FakeRecentProductRepository()
+        val productRepository = FakeProductRepository(count = 100)
+        val cartRepository = FakeCartRepository(count = 5)
+        val recentProductRepository = FakeRecentProductRepository()
         homeViewModel =
             HomeViewModel(
                 productRepository = productRepository,

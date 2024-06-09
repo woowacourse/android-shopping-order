@@ -9,8 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.repository.FakeCouponRepository
 import woowacourse.shopping.data.repository.FakeOrderRepository
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.utils.CoroutinesTestExtension
 import woowacourse.shopping.utils.InstantTaskExecutorExtension
 import woowacourse.shopping.utils.getFixtureCartItems
@@ -22,13 +20,11 @@ import java.time.LocalDate
 @ExtendWith(InstantTaskExecutorExtension::class)
 class OrderViewModelTest {
     private lateinit var orderViewModel: OrderViewModel
-    private lateinit var couponRepository: CouponRepository
-    private lateinit var orderRepository: OrderRepository
 
     @BeforeEach
     fun setUp() {
-        couponRepository = FakeCouponRepository()
-        orderRepository = FakeOrderRepository()
+        val couponRepository = FakeCouponRepository()
+        val orderRepository = FakeOrderRepository()
         orderViewModel =
             OrderViewModel(
                 couponRepository = couponRepository,
