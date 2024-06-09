@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.fixture
 
 import androidx.arch.core.executor.ArchTaskExecutor
 import androidx.arch.core.executor.TaskExecutor

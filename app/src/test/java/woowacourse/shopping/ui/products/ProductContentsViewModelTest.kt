@@ -1,21 +1,30 @@
 package woowacourse.shopping.ui.products
 
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.local.room.cart.Cart
+import woowacourse.shopping.fixture.InstantTaskExecutorExtension
+import woowacourse.shopping.domain.model.CartWithProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.result.Result
+import woowacourse.shopping.fixture.getOrAwaitValue
+import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductContentsViewModelTest {
     private lateinit var viewModel: ProductContentsViewModel
@@ -26,20 +35,37 @@ class ProductContentsViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         productRepository = mockk<ProductRepository>()
         recentProductRepository = mockk<RecentProductRepository>()
         cartRepository = mockk<CartRepository>()
-        every { productRepository.getProducts(0, 20) } returns PRODUCT_STUB.subList(0, 20)
+        coEvery {
+            productRepository.allProductsResponse(
+                0,
+                20
+            )
+        } returns Result.Success(PRODUCT_STUB.subList(0, 20))
         viewModel =
             ProductContentsViewModel(productRepository, recentProductRepository, cartRepository)
     }
 
+    @AfterEach
+    fun tearDown() {
+        Dispatchers.resetMain()
+
+    }
+
     @Test
     fun `상품을 가져올 때, 20개씩 가져온다`() {
-        // given
-        every { productRepository.getProducts(1, 20) } returns PRODUCT_STUB.subList(20, 40)
-
         // when
+        coEvery {
+            productRepository.allProductsResponse(
+                1,
+                20
+            )
+        } returns Result.Success(PRODUCT_STUB.subList(20, 40))
+
+        // given
         viewModel.loadProducts()
         val actual = viewModel.productWithQuantity.getOrAwaitValue()
 
@@ -49,15 +75,19 @@ class ProductContentsViewModelTest {
 
     @Test
     fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
-        // given
-        every { cartRepository.addProductToCart(0, 1) }
-        every { cartRepository.getAllCartItems() } returns listOf(Cart(0L, 0L, Quantity(1)))
-
         // when
+        coEvery { cartRepository.postCartItems(0, 1) } returns Result.Success(Unit)
+        coEvery { cartRepository.allCartItemsResponse() } returns Result.Success(
+            listOf(
+                CartWithProduct(0L, PRODUCT_STUB.first(), Quantity(1))
+            )
+        )
+
+        // given
         viewModel.addCart(0)
         val actual = viewModel.productWithQuantity.getOrAwaitValue()
 
-        val actualProduct = (actual as List<ProductWithQuantityUiModel>)
+        val actualProduct = (actual.productWithQuantities as List<ProductWithQuantityUiModel>)
 
         // then
         assertThat(actualProduct.first { it.product.id == 0L }.quantity).isEqualTo(1)
