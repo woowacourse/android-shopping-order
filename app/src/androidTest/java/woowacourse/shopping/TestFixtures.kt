@@ -31,9 +31,7 @@ val recentProducts =
         )
     }
 
-
 val recentProduct: RecentProduct = recentProducts.first()
 
 val recentProductEntities = recentProducts.map { it.toEntity() }
 val recentProductEntity = recentProduct.toEntity()
-

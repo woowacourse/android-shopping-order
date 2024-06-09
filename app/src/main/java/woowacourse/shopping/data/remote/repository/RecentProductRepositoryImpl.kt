@@ -11,16 +11,16 @@ class RecentProductRepositoryImpl(
 ) : RecentProductRepository {
     override suspend fun findAllByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
-            recentProductDataSource.findByLimit(limit).map { it.toDomain() }
+            recentProductDataSource.findAllByLimit(limit).map { it.toDomain() }
         }
 
     override suspend fun findOrNull(): Result<RecentProduct?> =
         runCatching {
-            recentProductDataSource.findOne()?.toDomain()
+            recentProductDataSource.findOrNull()?.toDomain()
         }
 
     override suspend fun save(recentProduct: RecentProduct): Result<Long> =
         runCatching {
-            recentProductDataSource.saveRecentProduct(recentProduct.toEntity())
+            recentProductDataSource.save(recentProduct.toEntity())
         }
 }

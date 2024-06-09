@@ -1,10 +1,10 @@
 package woowacourse.shopping.repository
 
+import woowacourse.shopping.cartProducts
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.cartProducts
 
 class FakeCartItemRepository : CartItemRepository {
     val carts = cartProducts.toMutableList()
