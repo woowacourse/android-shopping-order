@@ -1,13 +1,12 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.payment
 
-import android.os.Build
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentPaymentBinding
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.observeEvent
+import woowacourse.shopping.presentation.ui.shoppingcart.payment.adapter.CouponsAdapter
 
 class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
     private val viewModel: PaymentViewModel by viewModels {
@@ -17,20 +16,16 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         )
     }
 
+    private val adapter: CouponsAdapter by lazy { CouponsAdapter() }
+
     override fun initViewCreated() {
         initDataBinding()
         initObserve()
-
-        val orderCarts =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                arguments?.getParcelableArray(PUT_EXTRA_CART_IDS_KEY, Cart::class.java)
-            } else {
-                arguments?.getParcelableArray(PUT_EXTRA_CART_IDS_KEY)
-            }
     }
 
     private fun initDataBinding() {
         binding.vm = viewModel
+        binding.rvCoupons.adapter = adapter
     }
 
     private fun initObserve() {
@@ -39,11 +34,14 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
                 is PaymentNavigateAction.NavigateToProductList -> activity?.finish()
             }
         }
+
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            adapter.submitList(uiState.coupons)
+        }
     }
 
     companion object {
         const val TAG = "PaymentFragment"
-
         const val PUT_EXTRA_CART_IDS_KEY = "PUT_EXTRA_CART_IDS_KEY"
     }
 }

@@ -81,6 +81,7 @@ class ShoppingApplication : Application() {
     val couponRepository: CouponRepository by lazy {
         CouponRepositoryImpl(
             couponRemoteDataSource,
+            shoppingRemoteCartDataSource,
         )
     }
 

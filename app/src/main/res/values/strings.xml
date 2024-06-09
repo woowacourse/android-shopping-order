@@ -21,6 +21,10 @@
     <string name="tv_next_page_title"><![CDATA[>]]></string>
     <string name="tv_order">주문하기(%d)</string>
 
+    <!--    쿠폰-->
+    <string name="expired_date">만료일: %s</string>
+    <string name="minimum_amount">최소 주문 금액: %,d원</string>
+
     <!--    에러-->
     <string name="retry_title">재시도</string>
     <string name="network_error_title">인터넷 연결이 불안정해요.</string>
@@ -37,5 +41,4 @@
     <string name="add_to_cart_success_message">상품을 성공적으로 장바구니에 담았습니다.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
 </resources>
