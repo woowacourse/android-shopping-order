@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.ui.payment.PaymentViewModel" />
@@ -71,6 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="@id/tv_payment_coupon_description"
                     app:layout_constraintStart_toStartOf="@id/tv_payment_coupon_description"
                     app:layout_constraintTop_toBottomOf="@id/tv_payment_coupon_description"
@@ -220,8 +222,8 @@
             android:background="@drawable/shape_order_button"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:paddingVertical="12dp"
             android:onClick="@{() -> viewModel.createOrder()}"
+            android:paddingVertical="12dp"
             android:text="@string/payment"
             android:textColor="@color/white"
             android:textSize="20sp"
