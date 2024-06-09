@@ -4,5 +4,5 @@ import retrofit2.Response
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 
 interface OrderDataSource {
-    suspend fun postOrders(orderRequest: OrderRequest): Response<Unit>
+    suspend fun post(orderRequest: OrderRequest): Response<Unit>
 }

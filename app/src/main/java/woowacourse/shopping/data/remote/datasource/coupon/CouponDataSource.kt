@@ -4,5 +4,5 @@ import retrofit2.Response
 import woowacourse.shopping.data.remote.dto.response.CouponResponse
 
 interface CouponDataSource {
-    suspend fun getCoupons(): Response<List<CouponResponse>>
+    suspend fun getAll(): Response<List<CouponResponse>>
 }

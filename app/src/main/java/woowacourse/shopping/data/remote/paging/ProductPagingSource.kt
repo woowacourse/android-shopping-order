@@ -11,7 +11,7 @@ class ProductPagingSource(
         defaultOffset: Int = 0,
         defaultPageSize: Int = 20,
     ): LoadResult<CartProduct> {
-        val response = productDataSource.getProducts(page = defaultOffset, size = defaultPageSize)
+        val response = productDataSource.getAllByPaging(page = defaultOffset, size = defaultPageSize)
 
         if (!response.isSuccessful) {
             return LoadResult.Error(LoadErrorType.UNKNOWN)

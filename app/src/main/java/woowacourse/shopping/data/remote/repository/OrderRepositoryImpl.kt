@@ -9,7 +9,7 @@ class OrderRepositoryImpl(
 ) : OrderRepository {
     override suspend fun postOrders(orderRequest: OrderRequest): Result<Unit> =
         runCatching {
-            val response = orderDataSource.postOrders(orderRequest)
+            val response = orderDataSource.post(orderRequest)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }

@@ -10,7 +10,7 @@ class CouponRepositoryImpl(
 ) : CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> =
         runCatching {
-            val response = couponDataSource.getCoupons()
+            val response = couponDataSource.getAll()
             if (response.isSuccessful) {
                 return Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
             }

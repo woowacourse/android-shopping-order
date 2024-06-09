@@ -10,29 +10,29 @@ import woowacourse.shopping.data.remote.service.CartItemApi
 class DefaultCartItemDataSource(
     private val cartItemApi: CartItemApi = CartItemApi.service(),
 ) : CartItemDataSource {
-    override suspend fun getCartItems(
+    override suspend fun getAllByPaging(
         page: Int,
         size: Int,
     ): Response<CartsResponse> {
         return cartItemApi.getCartItems(page = page, size = size)
     }
 
-    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit> {
+    override suspend fun post(cartItemRequest: CartItemRequest): Response<Unit> {
         return cartItemApi.postCartItem(cartItemRequest = cartItemRequest)
     }
 
-    override suspend fun deleteCartItem(id: Int): Response<Unit> {
+    override suspend fun delete(id: Int): Response<Unit> {
         return cartItemApi.deleteCartItem(id = id)
     }
 
-    override suspend fun patchCartItem(
+    override suspend fun patch(
         id: Int,
         quantityRequestDto: QuantityRequest,
     ): Response<Unit> {
         return cartItemApi.patchCartItem(id = id, quantityRequestDto = quantityRequestDto)
     }
 
-    override suspend fun getCartItemsCounts(): Response<QuantityResponse> {
+    override suspend fun getCount(): Response<QuantityResponse> {
         return cartItemApi.getCartItemsCounts()
     }
 }

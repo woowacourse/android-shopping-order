@@ -18,7 +18,7 @@ class CartItemRepositoryImpl(
         size: Int,
     ): Result<List<CartProduct>> =
         runCatching {
-            val response = cartItemDataSource.getCartItems(page, size)
+            val response = cartItemDataSource.getAllByPaging(page, size)
             if (response.isSuccessful) {
                 return Result.success(response.body()?.content?.map { it.toDomain() } ?: emptyList())
             }
@@ -27,7 +27,7 @@ class CartItemRepositoryImpl(
 
     override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
         runCatching {
-            val response = cartItemDataSource.postCartItem(cartItemRequest)
+            val response = cartItemDataSource.post(cartItemRequest)
             if (response.isSuccessful) {
                 return Result.success(
                     response.toIdOrNull() ?: 0,
@@ -42,7 +42,7 @@ class CartItemRepositoryImpl(
     ): Result<Unit> =
         runCatching {
             Log.d("SDFEFS", "$id")
-            val response = cartItemDataSource.patchCartItem(id, quantityRequestDto)
+            val response = cartItemDataSource.patch(id, quantityRequestDto)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }
@@ -52,7 +52,7 @@ class CartItemRepositoryImpl(
 
     override suspend fun deleteCartItem(id: Int): Result<Unit> =
         runCatching {
-            val response = cartItemDataSource.deleteCartItem(id)
+            val response = cartItemDataSource.delete(id)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }
@@ -61,7 +61,7 @@ class CartItemRepositoryImpl(
 
     override suspend fun getCartItemsCounts(): Result<Int> =
         runCatching {
-            val response = cartItemDataSource.getCartItemsCounts()
+            val response = cartItemDataSource.getCount()
             if (response.isSuccessful) {
                 return Result.success(response.body()?.quantity ?: 0)
             }

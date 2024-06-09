@@ -7,7 +7,7 @@ import woowacourse.shopping.data.remote.service.OrderApi
 class DefaultOrderDataSource(
     private val orderApi: OrderApi = OrderApi.service(),
 ) : OrderDataSource {
-    override suspend fun postOrders(orderRequest: OrderRequest): Response<Unit> {
+    override suspend fun post(orderRequest: OrderRequest): Response<Unit> {
         return orderApi.postOrders(orderRequest = orderRequest)
     }
 }

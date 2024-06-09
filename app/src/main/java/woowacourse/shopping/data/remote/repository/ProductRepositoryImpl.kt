@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.repository
 
-import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.remote.datasource.product.DefaultProductDataSource
 import woowacourse.shopping.data.remote.datasource.product.ProductDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
@@ -20,7 +19,7 @@ class ProductRepositoryImpl(
         size: Int,
     ): Result<List<CartProduct>> =
         runCatching {
-            val response = productDataSource.getProducts(category, page, size)
+            val response = productDataSource.getAllByPaging(category, page, size)
             if (response.isSuccessful) {
                 return Result.success(response.body()?.content?.map { it.toDomain() } ?: emptyList())
             }
@@ -43,7 +42,7 @@ class ProductRepositoryImpl(
 
     override suspend fun getProductById(id: Int): Result<CartProduct?> =
         runCatching {
-            val response = productDataSource.getProductById(id = id)
+            val response = productDataSource.getById(id = id)
             if (response.isSuccessful) {
                 return Result.success(response.body()?.toDomain())
             }

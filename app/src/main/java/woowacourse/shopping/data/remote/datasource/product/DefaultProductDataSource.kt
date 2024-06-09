@@ -9,7 +9,7 @@ import woowacourse.shopping.data.remote.service.ProductApi
 class DefaultProductDataSource(
     private val productApi: ProductApi = ProductApi.service(),
 ) : ProductDataSource {
-    override suspend fun getProducts(
+    override suspend fun getAllByPaging(
         category: String?,
         page: Int,
         size: Int,
@@ -17,15 +17,15 @@ class DefaultProductDataSource(
         return productApi.getProducts(category = category, page = page, size = size)
     }
 
-    override suspend fun postProduct(productRequest: ProductRequest): Response<Unit> {
+    override suspend fun post(productRequest: ProductRequest): Response<Unit> {
         return productApi.postProduct(productRequest = productRequest)
     }
 
-    override suspend fun getProductById(id: Int): Response<ProductResponse> {
+    override suspend fun getById(id: Int): Response<ProductResponse> {
         return productApi.getProductById(id = id)
     }
 
-    override suspend fun deleteProductById(id: Int): Response<Unit> {
+    override suspend fun deleteById(id: Int): Response<Unit> {
         return productApi.deleteProductById(id = id)
     }
 }

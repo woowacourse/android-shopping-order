@@ -7,19 +7,19 @@ import woowacourse.shopping.data.remote.dto.response.CartsResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface CartItemDataSource {
-    suspend fun getCartItems(
+    suspend fun getAllByPaging(
         page: Int = 0,
         size: Int = 20,
     ): Response<CartsResponse>
 
-    suspend fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit>
+    suspend fun post(cartItemRequest: CartItemRequest): Response<Unit>
 
-    suspend fun deleteCartItem(id: Int): Response<Unit>
+    suspend fun delete(id: Int): Response<Unit>
 
-    suspend fun patchCartItem(
+    suspend fun patch(
         id: Int,
         quantityRequestDto: QuantityRequest,
     ): Response<Unit>
 
-    suspend fun getCartItemsCounts(): Response<QuantityResponse>
+    suspend fun getCount(): Response<QuantityResponse>
 }
