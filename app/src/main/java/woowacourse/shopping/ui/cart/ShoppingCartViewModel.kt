@@ -10,7 +10,7 @@ import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
@@ -146,8 +146,9 @@ class ShoppingCartViewModel(
     }
 
     private fun updateTotalPrice() {
+        val cartItems = cartItems.value ?: return
         _selectedCartItemsTotalPrice.value =
-            cartItems.value?.filter { it.checked }?.sumOf {
+            cartItems.filter { it.checked }.sumOf {
                 it.product.price * it.quantity
             }
     }

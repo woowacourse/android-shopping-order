@@ -3,7 +3,7 @@ package woowacourse.shopping.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 
 class DummyProductsDataSourceTest {
     private lateinit var productDataSource: ProductDataSource

@@ -12,6 +12,8 @@ import org.junit.Test
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertThrows
 import org.junit.runner.RunWith
+import woowacourse.shopping.data.history.local.HistoryProductDao
+import woowacourse.shopping.data.history.local.HistoryProductDatabase
 import woowacourse.shopping.data.model.HistoryProduct
 
 @RunWith(AndroidJUnit4::class)

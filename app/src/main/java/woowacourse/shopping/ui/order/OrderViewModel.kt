@@ -10,12 +10,12 @@ import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onServerError
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onException
 import woowacourse.shopping.data.common.ResponseHandlingUtils.onSuccess
-import woowacourse.shopping.data.order.OrderRemoteRepository
-import woowacourse.shopping.data.product.DefaultProductRepository
+import woowacourse.shopping.data.order.remote.OrderRemoteRepository
+import woowacourse.shopping.data.product.remote.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.model.ProductIdsCount.Companion.DECREASE_VARIATION

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.model
 
-import woowacourse.shopping.remote.product.ProductDto
+import woowacourse.shopping.data.product.remote.dto.ProductDto
 
 data class CartItem(
     val id: Long,

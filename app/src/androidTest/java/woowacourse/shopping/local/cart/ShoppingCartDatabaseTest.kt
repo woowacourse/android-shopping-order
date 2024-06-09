@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.model.ProductIdsCountData
 
 @RunWith(AndroidJUnit4::class)
 class ShoppingCartDatabaseTest {

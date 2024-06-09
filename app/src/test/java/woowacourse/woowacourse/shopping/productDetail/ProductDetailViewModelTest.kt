@@ -1,4 +1,4 @@
-package woowacourse.shopping.productDetail
+package woowacourse.woowacourse.shopping.productDetail
 
 import android.os.Handler
 import android.os.Looper
@@ -13,22 +13,22 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.cart.CartItemDataSource
-import woowacourse.shopping.data.history.DefaultProductHistoryRepository
-import woowacourse.shopping.data.history.ProductHistoryDataSource
+import woowacourse.shopping.data.cart.remote.datasource.CartItemDataSource
+import woowacourse.shopping.data.history.local.DefaultProductHistoryRepository
+import woowacourse.shopping.data.history.local.datasource.ProductHistoryDataSource
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.product.DefaultProductRepository
-import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.product.remote.DefaultProductRepository
+import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
-import woowacourse.shopping.source.FakeProductDataSource
-import woowacourse.shopping.source.FakeProductHistorySource
-import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
-import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
+import woowacourse.woowacourse.shopping.source.FakeProductDataSource
+import woowacourse.woowacourse.shopping.source.FakeProductHistorySource
+import woowacourse.woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
+import woowacourse.woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)

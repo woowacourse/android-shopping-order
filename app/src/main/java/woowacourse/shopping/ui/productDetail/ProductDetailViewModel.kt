@@ -9,9 +9,9 @@ import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.history.DefaultProductHistoryRepository
-import woowacourse.shopping.data.product.DefaultProductRepository
+import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
+import woowacourse.shopping.data.history.local.DefaultProductHistoryRepository
+import woowacourse.shopping.data.product.remote.DefaultProductRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository

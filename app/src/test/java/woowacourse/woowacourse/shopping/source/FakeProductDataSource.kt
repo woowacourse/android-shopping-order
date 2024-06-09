@@ -1,7 +1,7 @@
-package woowacourse.shopping.source
+package woowacourse.woowacourse.shopping.source
 
 import woowacourse.shopping.data.model.ProductData
-import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 
 class FakeProductDataSource(
     private val pagingStrategy: NumberPagingStrategy<ProductData> = NumberPagingStrategy(20),

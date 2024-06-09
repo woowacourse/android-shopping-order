@@ -1,17 +1,17 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.woowacourse.shopping.domain.repository
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.cart.CartItemDataSource
+import woowacourse.shopping.data.cart.remote.datasource.CartItemDataSource
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.product.DefaultProductRepository
-import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.product.remote.DefaultProductRepository
+import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
-import woowacourse.shopping.source.FakeProductDataSource
-import woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
-import woowacourse.shopping.testfixture.productsIdCountDataTestFixture
+import woowacourse.woowacourse.shopping.source.FakeProductDataSource
+import woowacourse.woowacourse.shopping.source.FakeShoppingCartProductIdDataSource
+import woowacourse.woowacourse.shopping.testfixture.productsIdCountDataTestFixture
 
 class DefaultShoppingProductRepositoryTest {
     lateinit var productDataSource: ProductDataSource

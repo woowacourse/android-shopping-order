@@ -1,17 +1,16 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.woowacourse.shopping.domain.repository
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.history.DefaultProductHistoryRepository
-import woowacourse.shopping.data.history.ProductHistoryDataSource
-import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.product.ProductDataSource
+import woowacourse.shopping.data.history.local.DefaultProductHistoryRepository
+import woowacourse.shopping.data.history.local.datasource.ProductHistoryDataSource
+import woowacourse.shopping.data.product.remote.datasource.ProductDataSource
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.productTestFixture
 import woowacourse.shopping.productsTestFixture
-import woowacourse.shopping.source.FakeProductDataSource
-import woowacourse.shopping.source.FakeProductHistorySource
+import woowacourse.woowacourse.shopping.source.FakeProductDataSource
+import woowacourse.woowacourse.shopping.source.FakeProductHistorySource
 
 class DefaultProductHistoryRepositoryTest {
     private lateinit var historySource: ProductHistoryDataSource
