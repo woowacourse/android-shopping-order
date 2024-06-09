@@ -74,6 +74,7 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
 
         viewModel.isOrderSuccess.observe(this) {
             finishOrderPage()
+            showToastMessage(R.string.order_finish)
         }
     }
 
