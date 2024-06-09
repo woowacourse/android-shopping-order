@@ -2,6 +2,7 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.payment.PaymentViewModel" />
@@ -36,7 +37,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupon_list"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="280dp"
             android:layout_marginTop="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

@@ -15,23 +15,18 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/coupon_box"
-            android:layout_width="324dp"
-            android:layout_height="104dp"
-            android:src="@drawable/shape_retangular_5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:background="@drawable/shape_retangular_5"
+        android:layout_width="324dp"
+        android:layout_height="104dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp">
 
         <CheckBox
             android:id="@+id/cb_coupon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/coupon_box"
-            app:layout_constraintTop_toTopOf="@id/coupon_box" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_coupon_name"
