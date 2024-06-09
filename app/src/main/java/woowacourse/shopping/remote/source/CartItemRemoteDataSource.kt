@@ -9,7 +9,7 @@ import woowacourse.shopping.remote.service.CartItemApiService
 
 class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
     ShoppingCartDataSource {
-    override suspend fun findByProductId2(productId: Long): Result<ProductIdsCountData> =
+    override suspend fun findByProductId(productId: Long): Result<ProductIdsCountData> =
         runCatching {
             val allCartItems = cartItemApiService.requestCartItems2().content
             val find =
@@ -18,7 +18,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
             ProductIdsCountData(find.product.id, find.quantity)
         }
 
-    override suspend fun loadAllCartItems2(): Result<List<CartItemData>> =
+    override suspend fun loadAllCartItems(): Result<List<CartItemData>> =
         runCatching {
             val response = cartItemApiService.requestCartItems2().content
             response.map {
@@ -30,7 +30,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
             }
         }
 
-    override suspend fun addNewProduct2(productIdsCountData: ProductIdsCountData): Result<Unit> =
+    override suspend fun addNewProduct(productIdsCountData: ProductIdsCountData): Result<Unit> =
         runCatching {
             cartItemApiService.addCartItem2(
                 CartItemRequest(
@@ -40,28 +40,12 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
             )
         }
 
-    override suspend fun removeCartItem2(cartItemId: Long): Result<Unit> =
+    override suspend fun removeCartItem(cartItemId: Long): Result<Unit> =
         runCatching {
             cartItemApiService.removeCartItem2(cartItemId)
         }
 
-    override suspend fun plusProductsIdCount2(
-        cartItemId: Long,
-        quantity: Int,
-    ): Result<Unit> =
-        runCatching {
-            cartItemApiService.updateCartItemQuantity2(cartItemId, quantity)
-        }
-
-    override suspend fun minusProductsIdCount2(
-        cartItemId: Long,
-        quantity: Int,
-    ): Result<Unit> =
-        runCatching {
-            cartItemApiService.updateCartItemQuantity2(cartItemId, quantity)
-        }
-
-    override suspend fun updateProductsCount2(
+    override suspend fun updateProductsCount(
         cartItemId: Long,
         newQuantity: Int,
     ): Result<Unit> =

@@ -16,7 +16,7 @@ class DefaultShoppingProductRepository(
             }
         }
 
-    private suspend fun productQuantity2(productId: Long): Int = cartSource.findByProductId2(productId).getOrNull()?.quantity ?: 0
+    private suspend fun productQuantity2(productId: Long): Int = cartSource.findByProductId(productId).getOrNull()?.quantity ?: 0
 
     override suspend fun allProductsUntilPage(page: Int): Result<List<Product>> =
         productsSource.findAllUntilPage(page).map { productsData ->

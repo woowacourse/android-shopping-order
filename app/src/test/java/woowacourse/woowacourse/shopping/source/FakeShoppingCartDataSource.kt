@@ -12,7 +12,7 @@ class FakeShoppingCartDataSource(
 ) : ShoppingCartDataSource {
     constructor(vararg cartItemResponses: CartItemResponse) : this(cartItemResponses.toList())
 
-    override suspend fun findByProductId2(productId: Long): Result<ProductIdsCountData> =
+    override suspend fun findByProductId(productId: Long): Result<ProductIdsCountData> =
         runCatching {
             val foundItem =
                 cartItemResponses.find { cartItemResponse -> cartItemResponse.product.id == productId }
@@ -21,7 +21,7 @@ class FakeShoppingCartDataSource(
             ProductIdsCountData(foundItem.id, foundItem.quantity)
         }
 
-    override suspend fun loadAllCartItems2(): Result<List<CartItemData>> =
+    override suspend fun loadAllCartItems(): Result<List<CartItemData>> =
         runCatching {
             cartItemResponses.map { cartItemResponse ->
                 CartItemData(
@@ -38,7 +38,7 @@ class FakeShoppingCartDataSource(
             }
         }
 
-    override suspend fun addNewProduct2(productIdsCountData: ProductIdsCountData): Result<Unit> =
+    override suspend fun addNewProduct(productIdsCountData: ProductIdsCountData): Result<Unit> =
         runCatching {
             val newCartItemResponse =
                 CartItemResponse(
@@ -56,7 +56,7 @@ class FakeShoppingCartDataSource(
             cartItemResponses = cartItemResponses + newCartItemResponse
         }
 
-    override suspend fun removeCartItem2(cartItemId: Long): Result<Unit> =
+    override suspend fun removeCartItem(cartItemId: Long): Result<Unit> =
         runCatching {
             val foundItem =
                 cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
@@ -64,39 +64,7 @@ class FakeShoppingCartDataSource(
             cartItemResponses = cartItemResponses - foundItem
         }
 
-    override suspend fun plusProductsIdCount2(
-        cartItemId: Long,
-        quantity: Int,
-    ): Result<Unit> =
-        runCatching {
-            val foundItem =
-                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
-                    ?: throw NoSuchElementException()
-            val updatedItem = foundItem.copy(quantity = foundItem.quantity + quantity)
-            val newCartItems =
-                cartItemResponses.map { cartItemResponse ->
-                    if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
-                }
-            cartItemResponses = newCartItems
-        }
-
-    override suspend fun minusProductsIdCount2(
-        cartItemId: Long,
-        quantity: Int,
-    ): Result<Unit> =
-        runCatching {
-            val foundItem =
-                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
-                    ?: throw NoSuchElementException()
-            val updatedItem = foundItem.copy(quantity = foundItem.quantity - quantity)
-            val newCartItems =
-                cartItemResponses.map { cartItemResponse ->
-                    if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
-                }
-            cartItemResponses = newCartItems
-        }
-
-    override suspend fun updateProductsCount2(
+    override suspend fun updateProductsCount(
         cartItemId: Long,
         newQuantity: Int,
     ): Result<Unit> =

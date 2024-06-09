@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import android.util.Log
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -10,7 +9,7 @@ class DefaultShoppingCartRepository(
     private val cartSource: ShoppingCartDataSource,
 ) : ShoppingCartRepository {
     override suspend fun loadAllCartItems(): Result<List<CartItem>> =
-        cartSource.loadAllCartItems2().mapCatching { cartItemDatas ->
+        cartSource.loadAllCartItems().mapCatching { cartItemDatas ->
             cartItemDatas.map { cartItemData ->
                 CartItem(
                     id = cartItemData.id,
@@ -22,34 +21,34 @@ class DefaultShoppingCartRepository(
         }
 
     override suspend fun shoppingCartProductQuantity(): Result<Int> =
-        cartSource.loadAllCartItems2().mapCatching { cartItemDatas -> cartItemDatas.sumOf { it.quantity } }
+        cartSource.loadAllCartItems().mapCatching { cartItemDatas -> cartItemDatas.sumOf { it.quantity } }
 
     override suspend fun updateProductQuantity(
         cartItemId: Long,
         quantity: Int,
-    ): Result<Unit> = cartSource.updateProductsCount2(cartItemId, quantity)
+    ): Result<Unit> = cartSource.updateProductsCount(cartItemId, quantity)
 
     override suspend fun addShoppingCartProduct(
         productId: Long,
         quantity: Int,
     ): Result<Unit> {
         return runCatching {
-            val cartItem = cartSource.loadAllCartItems2().getOrThrow().find { it.product.id == productId }
+            val cartItem = cartSource.loadAllCartItems().getOrThrow().find { it.product.id == productId }
 
             if (cartItem != null) {
-                cartSource.updateProductsCount2(cartItem.id, cartItem.quantity + quantity)
+                cartSource.updateProductsCount(cartItem.id, cartItem.quantity + quantity)
             } else {
-                cartSource.addNewProduct2(ProductIdsCountData(productId, quantity))
+                cartSource.addNewProduct(ProductIdsCountData(productId, quantity))
             }
         }
     }
 
     override suspend fun removeShoppingCartProduct(cartItemId: Long): Result<Unit> =
-        cartSource.removeCartItem2(cartItemId)
+        cartSource.removeCartItem(cartItemId)
 
 
     override suspend fun findCartItemByProductId(productId: Long): Result<CartItem> {
-        return cartSource.loadAllCartItems2().mapCatching { cartitems ->
+        return cartSource.loadAllCartItems().mapCatching { cartitems ->
             cartitems.find { it.product.id == productId }?.let {
                 it.toDomain()
             } ?: throw NoSuchElementException("There is no product with id: $productId")

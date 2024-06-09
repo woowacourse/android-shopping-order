@@ -24,7 +24,7 @@ class DefaultOrderRepository(
     override suspend fun orderItemsTotalPrice(): Result<Int> =
         runCatching {
             val orders = orderSource.load().getOrThrow()
-            val allCartItems = cartSource.loadAllCartItems2().getOrThrow()
+            val allCartItems = cartSource.loadAllCartItems().getOrThrow()
 
             orders.map { (cartItemId, quantity) ->
                 val foundCartItem = allCartItems.find { it.id == cartItemId }

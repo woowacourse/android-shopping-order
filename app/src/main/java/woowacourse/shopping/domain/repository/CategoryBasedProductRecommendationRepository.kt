@@ -21,7 +21,7 @@ class CategoryBasedProductRecommendationRepository(
 
         val latestProduct = productsSource.findById(latestProductId).getOrThrow()
 
-        val allCartItemsProductsIds = cartSource.loadAllCartItems2().getOrThrow().map { it.product.id }
+        val allCartItemsProductsIds = cartSource.loadAllCartItems().getOrThrow().map { it.product.id }
 
         val productsWithCategory = productsSource.findByCategory(latestProduct.category).getOrThrow()
 

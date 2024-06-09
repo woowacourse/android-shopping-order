@@ -83,7 +83,7 @@ class DefaultShoppingCartRepositoryTest {
             // when
             repository.updateProductQuantity(1, 10).getOrThrow()
             val actual =
-                castSource.loadAllCartItems2().getOrThrow().find { it.id == 1L }?.quantity
+                castSource.loadAllCartItems().getOrThrow().find { it.id == 1L }?.quantity
                     ?: throw NoSuchElementException("there is no product")
 
             // then
@@ -102,7 +102,7 @@ class DefaultShoppingCartRepositoryTest {
 
             // then
             val actual =
-                castSource.loadAllCartItems2().getOrThrow().find { it.id == 1L }?.quantity
+                castSource.loadAllCartItems().getOrThrow().find { it.id == 1L }?.quantity
                     ?: throw NoSuchElementException("there is no product")
 
             assertThat(actual).isEqualTo(5)
@@ -119,7 +119,7 @@ class DefaultShoppingCartRepositoryTest {
             repository.removeShoppingCartProduct(1).getOrThrow()
 
             // then
-            val actual = castSource.loadAllCartItems2().getOrThrow()
+            val actual = castSource.loadAllCartItems().getOrThrow()
             assertThat(actual).hasSize(9)
         }
 }
