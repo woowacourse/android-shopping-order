@@ -28,9 +28,10 @@
 
         <CheckBox
             android:id="@+id/checkBox"
-            android:onClick="@{() -> action.selectCoupon(coupon)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="@{coupon.checked}"
+            android:onClick="@{() -> action.selectCoupon(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,11 +52,11 @@
 
         <TextView
             android:id="@+id/tv_expiration_date"
+            expiredDate="@{coupon.expirationDate}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            expiredDate="@{coupon.expirationDate}"
             android:layout_marginBottom="17dp"
             android:ellipsize="end"
             android:maxLines="1"
@@ -67,11 +68,11 @@
 
         <TextView
             android:id="@+id/tv_coupon_description"
+            minimumPayment="@{coupon}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ellipsize="end"
-            minimumPayment="@{coupon}"
             android:maxLines="1"
             android:textColor="@color/gray5"
             android:textSize="16dp"

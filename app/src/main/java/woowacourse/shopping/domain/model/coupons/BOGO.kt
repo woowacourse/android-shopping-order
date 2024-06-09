@@ -9,6 +9,7 @@ data class BOGO(
     override val description: String,
     override val expirationDate: LocalDate,
     override val discountType: String,
+    override var isChecked: Boolean = false,
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : Coupon() {
@@ -16,5 +17,18 @@ data class BOGO(
         val discountTargetCart = carts.maxBy { it.totalPrice }
 
         return discountTargetCart.product.price * getQuantity
+    }
+
+    override fun copy(checked: Boolean): Coupon {
+        return BOGO(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = expirationDate,
+            discountType = discountType,
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity,
+            isChecked = checked,
+        )
     }
 }

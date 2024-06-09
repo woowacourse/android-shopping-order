@@ -88,8 +88,18 @@ class PaymentViewModel(
     override fun selectCoupon(coupon: Coupon) {
         val carts = uiState.value?.orderCarts?.toList() ?: throw IllegalArgumentException()
 
+        val state = uiState.value ?: return
+
         _uiState.value =
             _uiState.value?.copy(
+                coupons =
+                    state.coupons.map {
+                        if (it.code == coupon.code) {
+                            it.copy(!it.isChecked)
+                        } else {
+                            it.copy(false)
+                        }
+                    },
                 discountPrice =
                     -when (coupon) {
                         is FIXED5000 -> coupon.calculateDiscountRate(carts)
