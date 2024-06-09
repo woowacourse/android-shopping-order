@@ -89,4 +89,7 @@ dependencies {
 
     // gson
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // mockk
+    testImplementation("io.mockk:mockk:1.13.10")
 }

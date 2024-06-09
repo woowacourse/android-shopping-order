@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 
 class FixedCouponTest {
     @Test
-    fun `쿠폰 만료일이 2024년 3월 1일이고 쿠폰을 2024년 6월 1일에 사용한다면 적용할 수 있다`() {
+    fun `쿠폰 만료일이 2024년 3월 1일이고 쿠폰을 2024년 6월 1일에 사용한다면 적용할 수 없다`() {
         // given
         val fixedCoupon = fixedCoupon(id = 0, discount = 5_000, expirationDate = LocalDate.of(2024, 3, 1))
         val cartItems = cartItemsBySize(1)
@@ -21,11 +21,11 @@ class FixedCouponTest {
         val actual = fixedCoupon.available(cartItems, LocalDateTime.of(2024, 6, 1, 0, 0))
 
         // given
-        assertThat(actual).isTrue
+        assertThat(actual).isFalse
     }
 
     @Test
-    fun `쿠폰 만료일이 2024년 3월 1일이고 쿠폰을 2024년 2월 1일에 사용한다면 적용할 수 없다`() {
+    fun `쿠폰 만료일이 2024년 3월 1일이고 쿠폰을 2024년 2월 1일에 사용한다면 적용할 수 있다`() {
         // given
         val fixedCoupon = fixedCoupon(id = 0, discount = 5_000, expirationDate = LocalDate.of(2024, 3, 1))
         val cartItems = cartItemsBySize(1)
@@ -34,7 +34,7 @@ class FixedCouponTest {
         val actual = fixedCoupon.available(cartItems, LocalDateTime.of(2024, 2, 1, 0, 0))
 
         // given
-        assertThat(actual).isFalse
+        assertThat(actual).isTrue
     }
 
     @Test

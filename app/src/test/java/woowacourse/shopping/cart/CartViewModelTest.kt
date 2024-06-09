@@ -1,6 +1,9 @@
 package woowacourse.shopping.cart
 
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -35,6 +38,24 @@ class CartViewModelTest {
     private lateinit var productRepository: ProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var cartRepository: CartRepository
+
+    @Test
+    fun `장바구니 상품을 불러오기 전에는 로딩 상태다`(): Unit =
+        runBlocking {
+            // given
+            setUpViewModelWithMock()
+            coEvery { cartRepository.findAll() } coAnswers {
+                delay(1000)
+                Result.success(emptyList())
+            }
+
+            // when
+            viewModel.loadAllCartItems()
+
+            // then
+            val actual = viewModel.isLoadingCart.getOrAwaitValue()
+            assertThat(actual).isTrue
+        }
 
     @Test
     fun `장바구니에 20개의 상품이 있으면 20개 상품을 모두 로드한다`(): Unit =
@@ -343,5 +364,12 @@ class CartViewModelTest {
                 recentProductRepository,
                 cartRepository,
             )
+    }
+
+    private fun setUpViewModelWithMock() {
+        productRepository = mockk<ProductRepository>()
+        recentProductRepository = mockk<RecentProductRepository>()
+        cartRepository = mockk<CartRepository>()
+        viewModel = CartViewModel(productRepository, recentProductRepository, cartRepository)
     }
 }
