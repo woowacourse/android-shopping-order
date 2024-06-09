@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Product
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 fun Product.toRecentProductEntity(): RecentProductEntity {
@@ -49,7 +50,7 @@ fun CouponDto.toCouPon(): Coupon {
         id,
         code,
         description,
-        expirationDate,
+        LocalDate.parse(expirationDate),
         discount,
         minimumAmount,
         buyQuantity,

@@ -2,6 +2,8 @@
     <string name="app_name">Shopping</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="discount_price_format">-%1$,d원</string>
+    <string name="min_order_price_format">최소 주문 금액: %1$,d원</string>
+    <string name="expiration_date_format">만료일: %d년 %d월 %d일</string>
     <string name="price_format">%1$,d원</string>
     <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
     <string name="order_format">주문하기(%d)</string>

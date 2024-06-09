@@ -1,12 +1,14 @@
 package woowacourse.shopping.domain.model
 
+import java.time.LocalDate
+
 data class Coupon(
     val id: Int,
     val code: String,
     val description: String,
-    val expirationDate: String,
+    val expirationDate: LocalDate,
     val discount: Int? = null,
-    val minimumAmount: Int? = null,
+    val minOrderPrice: Int? = null,
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
     val availableTime: AvailableTime? = null,

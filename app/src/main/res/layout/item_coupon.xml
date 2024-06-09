@@ -54,6 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:visibility="visible"
+            app:expirationDate="@{coupon.expirationDate}"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/checkbox_coupon"
             tools:text="만료일: 2024년 11월 30일" />
@@ -63,6 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
+            app:minOrderPrice="@{coupon.minOrderPrice}"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_expiration_date"
             tools:text="최소 주문 금액: 100,000원" />
