@@ -28,7 +28,7 @@ android {
         buildConfigField("String", "PASSWORD", properties.getProperty("password"))
         buildConfigField("String", "BASE_URL", properties.getProperty("baseUrl"))
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "woowacourse.shopping.util.TestRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
 
         buildFeatures {
