@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.presentation.cart.CartListener
+import woowacourse.shopping.presentation.cart.CartActionHandler
 import woowacourse.shopping.presentation.cart.CartUiModel
 
-class CartAdapter(private val cartListener: CartListener) : ListAdapter<CartUiModel, CartViewHolder>(diffCallback) {
+class CartAdapter(private val cartActionHandler: CartActionHandler) : ListAdapter<CartUiModel, CartViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -24,7 +24,7 @@ class CartAdapter(private val cartListener: CartListener) : ListAdapter<CartUiMo
     ) {
         holder.bind(
             getItem(position),
-            cartListener,
+            cartActionHandler,
         )
     }
 

@@ -21,25 +21,22 @@ class CartSelectionFragment(val viewModel: CartViewModel) : Fragment() {
         binding.rvCart.itemAnimator = null
         binding.rvCart.adapter = adapter
 
-        viewModel.cartUiState.observe(viewLifecycleOwner) {
-            /*
-            val cartUiState = it.getContentIfNotHandled() ?: return@observe
-            when (cartUiState) {
-                CartUiState.Failure -> {
+        viewModel.cartUiState.observe(viewLifecycleOwner) { cartUiState ->
+            when {
+                cartUiState.isFailure -> {
                 }
 
-                CartUiState.Loading -> {
+                cartUiState.isLoading -> {
                     binding.layoutCartSkeleton.visibility = View.VISIBLE
                     binding.rvCart.visibility = View.GONE
                 }
 
-                is CartUiState.Success -> {
+                cartUiState.isSuccess -> {
                     binding.layoutCartSkeleton.visibility = View.GONE
                     binding.rvCart.visibility = View.VISIBLE
                     adapter.submitList(cartUiState.cartUiModels)
                 }
             }
-             */
         }
         return binding.root
     }

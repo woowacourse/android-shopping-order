@@ -20,7 +20,7 @@ class DefaultCartRepository(
         quantity: Quantity,
     ) = dataSource.changeQuantity(productId, quantity)
 
-    override fun deleteCartItem(productId: Int) = dataSource.deleteByProductIdCartItem(productId)
+    override fun deleteCartItem(cartItemId: Int) = dataSource.deleteCartItem(cartItemId)
 
     override fun find(productId: Int): DataResponse<CartItem> = dataSource.findByProductId(productId)
 

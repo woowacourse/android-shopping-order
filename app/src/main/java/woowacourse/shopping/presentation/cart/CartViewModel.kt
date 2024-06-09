@@ -1,37 +1,46 @@
 package woowacourse.shopping.presentation.cart
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import com.example.domain.datasource.onSuccess
+import com.example.domain.model.CartItem
+import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.OrderRepository
-import com.example.domain.repository.ProductRepository
 import com.example.domain.repository.RecentProductRepository
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
+import kotlin.concurrent.thread
 
 class CartViewModel(
-    private val productRepository: ProductRepository,
     private val recommendRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
-) : ViewModel(), CartListener {
-    private val _cartUiState = MutableLiveData<Event<CartUiState>>()
-    val cartUiState: LiveData<Event<CartUiState>> get() = _cartUiState
-
-    private val _totalPrice = MutableLiveData<Int>()
-    val totalPrice: LiveData<Int> get() = _totalPrice
+) : ViewModel(), CartActionHandler {
+    private val _cartUiState = MutableLiveData<CartUiState>()
+    val cartUiState: LiveData<CartUiState> get() = _cartUiState
 
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
-    private val _cartItemSelectedCount = MutableLiveData<Int>(0)
-    val cartItemSelectedCount: LiveData<Int> get() = _cartItemSelectedCount
-/*
-    val cartItemAllSelected: LiveData<Boolean> =
-        _cartItemSelectedCount.map { it == cartUiModels()?.size }
+    val cartItemSelectedCount: LiveData<Int>
+        get() = cartUiState.map { it.cartUiModels.count { cartUiModel -> cartUiModel.isSelected } }
 
- */
+    val cartItemAllSelected: LiveData<Boolean>
+        get() =
+            cartUiState.map { it.cartUiModels.all { cartUiModel -> cartUiModel.isSelected } }
+
+    val totalPrice: LiveData<Int>
+        get() =
+            cartUiState.map { cartUiState ->
+                cartUiState.cartUiModels.filter {
+                    it.isSelected
+                }.sumOf { it.product.price * it.quantity.count }
+            }
 
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
@@ -48,101 +57,93 @@ class CartViewModel(
     private val _orderButtonEnabled = MutableLiveData(false)
     val orderButtonEnabled: LiveData<Boolean> get() = _orderButtonEnabled
 
+    private val handler = Handler(Looper.getMainLooper())
+
+    init {
+        loadAllCartItems()
+    }
+
+    private fun loadAllCartItems() {
+        thread {
+            val result = cartRepository.findAll()
+            handler.post {
+                result.onSuccess { cartItems ->
+                    val oldCartItems = cartUiState.value?.cartUiModels ?: cartItems.toCartUiModels()
+                    val newCartItems: MutableList<CartUiModel> = mutableListOf()
+                    cartItems.forEach { cartItem ->
+                        val oldItem = oldCartItems.find { it.toCartItem().id == cartItem.id }
+                        if (oldItem != null) {
+                            newCartItems.add(oldItem.copy(quantity = cartItem.quantity))
+                        } else {
+                            newCartItems.add(cartItem.toCartUiModel())
+                        }
+                    }
+                    val newUiState =
+                        CartUiState(
+                            newCartItems,
+                            isLoading = false,
+                            isFailure = false,
+                            isSuccess = true,
+                        )
+                    _cartUiState.postValue(newUiState)
+                }
+            }
+        }
+    }
+
+    @Synchronized
+    private fun updateCartUiState(cartItem: CartItem) {
+        val oldCartUiModels = cartUiState.value?.cartUiModels ?: emptyList()
+        val oldCartUiModel =
+            findCartUiModelByProductId(cartItem.product.id) ?: cartItem.toCartUiModel()
+        val newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
+        val newCartUiModels = oldCartUiModels.upsert(newCartUiModel).sortedBy { it.cartItemId }
+        val newCartUiState = CartUiState(newCartUiModels, isSuccess = true)
+        _cartUiState.postValue(newCartUiState)
+    }
+
     override fun deleteCartItem(productId: Int) {
-        TODO("Not yet implemented")
+        _changedCartEvent.value = Event(Unit)
+        val cartUiModel = findCartUiModelByProductId(productId) ?: return
+        thread {
+            cartRepository.deleteCartItem(cartUiModel.cartItemId)
+            reloadCartUiState()
+        }
+    }
+
+    private fun reloadCartUiState() {
+        loadAllCartItems()
     }
 
     override fun increaseQuantity(productId: Int) {
-        TODO("Not yet implemented")
+        thread {
+            cartRepository.increaseQuantity(productId)
+            reloadCartUiState()
+        }
     }
 
     override fun decreaseQuantity(productId: Int) {
-        TODO("Not yet implemented")
+        thread {
+            cartRepository.decreaseQuantity(productId)
+            reloadCartUiState()
+        }
     }
 
     override fun selectCartItem(
         productId: Int,
         isSelected: Boolean,
     ) {
-        TODO("Not yet implemented")
-    }
+        val oldCartUiModels = cartUiState.value?.cartUiModels ?: emptyList()
+        val oldCartUiModel = findCartUiModelByProductId(productId) ?: return
+        if (oldCartUiModel.isSelected == isSelected) return
 
-    override fun selectAllCartItem(isChecked: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun navigateCartRecommend() {
-        TODO("Not yet implemented")
-    }
-
-    /*
-    init {
-        loadAllCartItems()
-    }
-
-    private fun loadAllCartItems() {
-        /*
-        val totalQuantityCount = cartRepository.syncGetCartQuantityCount()
-        cartRepository.getAllCartItem(
-            totalQuantityCount,
-            object : DataCallback<List<CartItem>> {
-                override fun onSuccess(result: List<CartItem>) {
-                    result.forEach {
-                        loadProduct(it)
-                    }
-                }
-
-                override fun onFailure(t: Throwable) {
-                }
-            },
-        )
-     */
-        updateTotalPrice()
-    }
-
-    private fun updateTotalPrice() {
-        val uiModels = cartUiModels() ?: emptyList()
-        val totalPrice =
-            uiModels
-                .filter { it.isSelected }
-                .sumOf { it.totalPrice() }
-        _totalPrice.value = totalPrice
-        _orderButtonEnabled.value = totalPrice != 0
-    }
-
-    private fun loadProduct(cartItem: com.example.domain.model.CartItem) {
-        /*
-        productRepository.find(
-            cartItem.productId,
-            object : DataCallback<Product> {
-                override fun onSuccess(result: Product) {
-                    updateCartUiState(result, cartItem)
-                    updateTotalPrice()
-                }
-
-                override fun onFailure(t: Throwable) {
-                }
-            },
-        )
-
-     */
-    }
-
-    @Synchronized
-    private fun updateCartUiState(
-        product: com.example.domain.model.Product,
-        cartItem: com.example.domain.model.CartItem,
-    ) {
-        val oldCartUiModels = cartUiModels() ?: emptyList()
-        val oldCartUiModel = cartUiModel(product.id) ?: CartUiModel.from(product, cartItem)
-        val newCartUiModel = oldCartUiModel.copy(quantity = cartItem.quantity)
-        val newCartUiModels = oldCartUiModels.upsert(newCartUiModel).sortedBy { it.cartItemId }
-        val newCartUiState = Event(CartUiState.Success(newCartUiModels))
+        val newCartUiModels = oldCartUiModels.upsert(oldCartUiModel.copy(isSelected = isSelected))
+        val newCartUiState = CartUiState(newCartUiModels, isLoading = false, isFailure = false, isSuccess = true)
         _cartUiState.value = newCartUiState
     }
 
     private fun List<CartUiModel>.upsert(cartUiModel: CartUiModel): List<CartUiModel> {
-        val list = toMutableList()
+        val list = this.toMutableList()
         if (this.none { it.cartItemId == cartUiModel.cartItemId }) {
             list += cartUiModel
         } else {
@@ -155,101 +156,10 @@ class CartViewModel(
         return list.toList()
     }
 
-    override fun deleteCartItem(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
-        val cartUiModel = cartUiModel(productId) ?: return
-        /*
-        cartRepository.deleteCartItem(
-            cartUiModel.cartItemId,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    updateDeletedCart()
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
-     */
-    }
-
-    private fun updateDeletedCart() {
-        _cartUiState.value = Event(CartUiState.Success(listOf()))
-        loadAllCartItems()
-    }
-
-    override fun increaseQuantity(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
-
-        val cartUiModel = cartUiModel(productId)
-        if (cartUiModel == null) {
-            addCartItem(productId)
-            return
-        }
-
-        var newQuantity = cartUiModel.quantity
-        setQuantity(cartUiModel.cartItemId, ++newQuantity)
-    }
-
-    override fun decreaseQuantity(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
-
-        val cartUiModel = cartUiModel(productId) ?: return
-        if (cartUiModel.quantity.count == 1) {
-            deleteCartItem(productId)
-            return
-        }
-
-        var newQuantity = cartUiModel.quantity
-        setQuantity(cartUiModel.cartItemId, --newQuantity)
-    }
-
-    override fun selectCartItem(
-        productId: Int,
-        isSelected: Boolean,
-    ) {
-        val oldCartUiModels = cartUiModels() ?: emptyList()
-        val oldCartUiModel = cartUiModel(productId) ?: return
-        if (oldCartUiModel.isSelected == isSelected) return
-
-        val newCartUiModels = oldCartUiModels.upsert(oldCartUiModel.copy(isSelected = isSelected))
-        val newCartUiState = Event(CartUiState.Success(newCartUiModels))
-        _cartUiState.value = newCartUiState
-        updateTotalPrice()
-        updateCartSelectedCount(isSelected)
-    }
-
-    private fun updateCartSelectedCount(isSelected: Boolean) {
-        val cartItemSelectedCount = _cartItemSelectedCount.value ?: 0
-        val newCartItemSelectedCount =
-            if (isSelected) cartItemSelectedCount + 1 else cartItemSelectedCount - 1
-        this._cartItemSelectedCount.value = newCartItemSelectedCount
-    }
-
-    private fun setQuantity(
-        cartItemId: Int,
-        quantity: com.example.domain.model.Quantity,
-    ) {
-        cartRepository.setCartItemQuantity(
-            cartItemId,
-            quantity,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    loadAllCartItems()
-                }
-
-                override fun onFailure(t: Throwable) {
-                    setError()
-                }
-            },
-        )
-    }
-
     override fun selectAllCartItem(isChecked: Boolean) {
         if (cartItemAllSelected.value == true && isChecked) return
-        cartUiModels()?.forEach {
-            selectCartItem(it.productId, isSelected = isChecked)
+        cartUiState.value?.cartUiModels?.forEach {
+            selectCartItem(it.product.id, isSelected = isChecked)
         }
     }
 
@@ -259,30 +169,22 @@ class CartViewModel(
     }
 
     fun loadRecommendProductUiModels() {
-        val cartItems = cartUiModels()?.map { it.toCartItem() } ?: return
+        val cartItems = cartUiState.value?.cartUiModels?.map { it.toCartItem() } ?: return
         val recommendProducts = recommendRepository.getRecommendProducts(cartItems = cartItems)
-        _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
-    }
-
-    private fun addCartItem(productId: Int) {
-        cartRepository.addCartItem(
-            productId = productId,
-            dataCallback =
-                object : DataCallback<Unit> {
-                    override fun onSuccess(result: Unit) {
-                        loadAllCartItems()
-                    }
-
-                    override fun onFailure(t: Throwable) {
-                        setError()
-                    }
-                },
-        )
+        _recommendProductUiModels.value =
+            recommendProducts.map { product ->
+                val quantity = cartItems.find { it.product == product }?.quantity ?: Quantity(0)
+                ProductUiModel(product, quantity)
+            }
     }
 
     fun createOrder() {
-        val cartUiModels = cartUiModels() ?: return
+        val cartUiModels = cartUiState.value?.cartUiModels ?: return
         val cartItemIds = cartUiModels.filter { it.isSelected }.map { it.cartItemId }
+        thread {
+            orderRepository.createOrder(cartItemIds)
+        }
+        /*
         orderRepository.createOrder(
             cartItemIds,
             object : DataCallback<Unit> {
@@ -296,10 +198,17 @@ class CartViewModel(
                 }
             },
         )
+         */
     }
 
     private fun deleteCartItemIds(cartItemIds: List<Int>) {
         _changedCartEvent.value = Event(Unit)
+        thread {
+            cartItemIds.forEach {
+                cartRepository.deleteCartItem(it)
+            }
+        }
+        /*
         cartItemIds.forEach {
             cartRepository.deleteCartItem(
                 it,
@@ -312,24 +221,10 @@ class CartViewModel(
                 },
             )
         }
+         */
     }
 
-    private fun CartUiModel.toCartItem() = com.example.domain.model.CartItem(cartItemId, productId, quantity)
-
-    private fun setError() {
-        _cartUiState.value = Event(CartUiState.Failure)
+    private fun findCartUiModelByProductId(productId: Int): CartUiModel? {
+        return cartUiState.value?.cartUiModels?.find { it.product.id == productId }
     }
-
-    private fun cartUiModel(productId: Int): CartUiModel? {
-        return cartUiModels()?.find { it.productId == productId }
-    }
-
-    private fun cartUiModels(): List<CartUiModel>? {
-        val cartUiState = cartUiState.value?.peekContent()
-        if (cartUiState is CartUiState.Success) {
-            return cartUiState.cartUiModels
-        }
-        return null
-    }
-     */
 }

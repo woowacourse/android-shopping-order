@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.cart
 
-interface CartListener {
+interface CartActionHandler {
     fun deleteCartItem(productId: Int)
 
     fun increaseQuantity(productId: Int)

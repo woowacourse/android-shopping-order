@@ -5,10 +5,10 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.CheckBox
 import androidx.databinding.BindingAdapter
-import woowacourse.shopping.presentation.cart.CartListener
+import woowacourse.shopping.presentation.cart.CartActionHandler
 
 @BindingAdapter("onChecked")
-fun CheckBox.onChecked(listener: CartListener) {
+fun CheckBox.onChecked(listener: CartActionHandler) {
     setOnClickListener {
         listener.selectAllCartItem(isChecked)
     }
@@ -16,9 +16,10 @@ fun CheckBox.onChecked(listener: CartListener) {
 
 @BindingAdapter("setVisibility")
 fun View.setVisibility(isVisible: Boolean) {
-    if (isVisible) {
-        visibility = VISIBLE
-    } else {
-        visibility = GONE
-    }
+    visibility =
+        if (isVisible) {
+            VISIBLE
+        } else {
+            GONE
+        }
 }

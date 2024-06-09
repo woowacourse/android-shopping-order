@@ -23,7 +23,7 @@ class RemoteCartDataSource(
             it.toCartItems()
         }
 
-    override fun increaseQuantity(productId: Int) {
+    override fun increaseQuantity(productId: Int) =
         findByProductId(productId).map { cartItem ->
             changeQuantity(cartItem.id, cartItem.quantity.inc())
         }.onFailure { code, error ->
@@ -31,28 +31,22 @@ class RemoteCartDataSource(
                 val request = AddCartItemRequest(productId, 1)
                 cartItemService.postCartItem(addCartItemRequest = request).execute()
             }
-        }
-    }
+        }.chain { it }
 
-    override fun decreaseQuantity(productId: Int) {
+    override fun decreaseQuantity(productId: Int) =
         findByProductId(productId).map { cartItem ->
             changeQuantity(cartItem.id, cartItem.quantity.dec())
-        }
-    }
+        }.chain { it }
 
     override fun changeQuantity(
         cartItemId: Int,
         quantity: Quantity,
-    ) {
-        cartItemService.patchCartItemQuantity(
-            id = cartItemId,
-            quantity = CartItemQuantityRequest(quantity.count),
-        ).executeForDataResponse()
-    }
+    ) = cartItemService.patchCartItemQuantity(
+        id = cartItemId,
+        quantity = CartItemQuantityRequest(quantity.count),
+    ).executeForDataResponse()
 
-    override fun deleteByProductIdCartItem(productId: Int) {
-        cartItemService.deleteCartItem(id = productId)
-    }
+    override fun deleteCartItem(cartItemId: Int) = cartItemService.deleteCartItem(id = cartItemId).executeForDataResponse()
 
     override fun findByProductId(productId: Int): DataResponse<CartItem> =
         findAll().map { wholeList ->

@@ -6,16 +6,16 @@ import com.example.domain.model.Quantity
 interface CartDataSource {
     fun findAll(): DataResponse<List<CartItem>>
 
-    fun increaseQuantity(productId: Int)
+    fun increaseQuantity(productId: Int): DataResponse<Unit>
 
-    fun decreaseQuantity(productId: Int)
+    fun decreaseQuantity(productId: Int): DataResponse<Unit>
 
     fun changeQuantity(
         cartItemId: Int,
         quantity: Quantity,
-    )
+    ): DataResponse<Unit>
 
-    fun deleteByProductIdCartItem(productId: Int)
+    fun deleteCartItem(cartItemId: Int): DataResponse<Unit>
 
     fun findByProductId(productId: Int): DataResponse<CartItem>
 

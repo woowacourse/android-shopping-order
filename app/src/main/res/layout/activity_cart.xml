@@ -10,8 +10,8 @@
             type="woowacourse.shopping.presentation.cart.CartViewModel" />
 
         <variable
-            name="listener"
-            type="woowacourse.shopping.presentation.cart.CartListener" />
+            name="actionHandler"
+            type="woowacourse.shopping.presentation.cart.CartActionHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,10 +58,10 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="20dp"
                     android:buttonTint="@color/teal_200"
-                    android:checked="@{true}"
+                    android:checked="@{viewModel.cartItemAllSelected}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:onChecked="@{listener}" />
+                    app:onChecked="@{actionHandler}" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:onClick="@{() ->listener.navigateCartRecommend()}"
+                android:onClick="@{() ->actionHandler.navigateCartRecommend()}"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="주문하기(4)" />
 

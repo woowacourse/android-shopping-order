@@ -51,7 +51,6 @@ class ShoppingApplication : Application() {
 
     fun getCartViewModelFactory(): CartViewModelFactory =
         CartViewModelFactory(
-            defaultProductRepository,
             defaultRecentProductRepository,
             defaultCartRepository,
             defaultOrderRepository,

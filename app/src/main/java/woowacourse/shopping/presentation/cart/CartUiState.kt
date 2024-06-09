@@ -1,9 +1,8 @@
 package woowacourse.shopping.presentation.cart
 
-sealed class CartUiState {
-    class Success(val cartUiModels: List<CartUiModel>) : CartUiState()
-
-    data object Loading : CartUiState()
-
-    data object Failure : CartUiState()
-}
+data class CartUiState(
+    val cartUiModels: List<CartUiModel>,
+    val isSuccess: Boolean = false,
+    val isLoading: Boolean = true,
+    val isFailure: Boolean = false,
+)

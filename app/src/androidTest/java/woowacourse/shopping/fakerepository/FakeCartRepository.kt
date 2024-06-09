@@ -46,9 +46,9 @@ class FakeCartRepository(savedCartItemEntities: List<CartItemEntity> = emptyList
         cart.add(oldCartItem.copy(quantity = quantity))
     }
 
-    override fun deleteCartItem(productId: Int) {
+    override fun deleteCartItem(cartItemId: Int) {
         val deleteCartItem =
-            cart.find { it.productId == productId } ?: throw IllegalArgumentException()
+            cart.find { it.productId == cartItemId } ?: throw IllegalArgumentException()
         cart.remove(deleteCartItem)
     }
 

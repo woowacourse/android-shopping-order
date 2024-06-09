@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="actionHandler"
+            type="woowacourse.shopping.presentation.cart.CartActionHandler" />
         <variable
             name="cartUiModel"
             type="woowacourse.shopping.presentation.cart.CartUiModel" />
@@ -22,6 +24,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
             android:checked="@{cartUiModel.isSelected}"
+            android:onCheckedChanged="@{(_, isChecked) -> actionHandler.selectCartItem(cartUiModel.product.id,isChecked)}"
             android:buttonTint="@color/teal_500"
             app:layout_constraintEnd_toStartOf="@id/tv_cart_product_title"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +37,7 @@
             android:layout_marginTop="18dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cartUiModel.title}"
+            android:text="@{cartUiModel.product.name}"
             android:textColor="@color/gray_500"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -51,6 +54,7 @@
             android:layout_marginEnd="8dp"
             android:padding="20dp"
             android:src="@drawable/ic_exit"
+            android:onClick="@{() -> actionHandler.deleteCartItem(cartUiModel.product.id)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/gray_200" />
@@ -62,6 +66,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="6dp"
+            app:onPlusClickListener = "@{() -> actionHandler.increaseQuantity(cartUiModel.product.id)}"
+            app:onMinusClickListener = "@{() -> actionHandler.decreaseQuantity(cartUiModel.product.id)}"
+            app:countNum = "@{cartUiModel.quantity.count}"
             app:layout_constraintBottom_toTopOf="@id/tv_cart_product_price"
             app:layout_constraintEnd_toEndOf="@id/iv_cart_exit"
             app:layout_constraintTop_toBottomOf="@id/iv_cart_exit" />
@@ -73,7 +80,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="18dp"
-            app:imageUrl="@{cartUiModel.imageUrl}"
+            app:imageUrl="@{cartUiModel.product.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="2:1"
             app:layout_constraintStart_toStartOf="parent"
@@ -84,7 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="17dp"
-            android:text="@{@string/product_price(cartUiModel.totalPrice())}"
+            android:text="@{@string/product_price(cartUiModel.product.price * cartUiModel.quantity.count)}"
             android:textColor="@color/gray_500"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
