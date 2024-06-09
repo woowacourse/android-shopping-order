@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.coupon
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
@@ -32,15 +31,15 @@ class CouponViewModel(
     private val _couponErrorEvent = MutableLiveData<Event<Unit>>()
     val couponErrorEvent: LiveData<Event<Unit>> get() = _couponErrorEvent
 
-    private val selectedCartItems = MutableLiveData<List<CartItem>>()
+    private val selectedCartItems = MutableLiveData<List<CartItem>>(emptyList())
 
-    val orderPrice: LiveData<Int> =
-        selectedCartItems.map { it.sumOf { cartItem -> cartItem.totalPrice() } }
+    val orderPrice: LiveData<Int> = selectedCartItems.map { it.sumOf { cartItem -> cartItem.totalPrice() } }
 
     private val _discountPrice = MutableLiveData<Int>(0)
     val discountPrice: LiveData<Int> get() = _discountPrice
 
-    val totalOrderPrice = MediatorLiveData<Int>(0)
+    private val _totalOrderPrice = MutableLiveData<Int>(0)
+    val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
 
     private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
     val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
@@ -48,12 +47,7 @@ class CouponViewModel(
     init {
         if (selectedCartItemIds.isEmpty()) setError()
         loadCoupons()
-        totalOrderPrice.addSource(_discountPrice) {
-            totalOrderPrice.value = (orderPrice.value ?: 0) + it + Coupon.DELIVERY_FEE
-        }
-        totalOrderPrice.addSource(orderPrice) {
-            totalOrderPrice.value = it + (_discountPrice.value ?: 0) + Coupon.DELIVERY_FEE
-        }
+        observePrice()
     }
 
     private fun loadCoupons() =
@@ -83,6 +77,17 @@ class CouponViewModel(
     private fun List<Coupon>.toCouponUiModels(): CouponUiModels {
         val uiModels = map { CouponUiModel.from(it) }
         return CouponUiModels(uiModels)
+    }
+
+    private fun observePrice() {
+        orderPrice.observeForever { updateTotalOrderPrice() }
+        _discountPrice.observeForever { updateTotalOrderPrice() }
+    }
+
+    private fun updateTotalOrderPrice() {
+        val orderPrice = orderPrice.value ?: return
+        val discountPrice = _discountPrice.value ?: return
+        _totalOrderPrice.value = orderPrice + discountPrice + Coupon.DELIVERY_FEE
     }
 
     fun createOrder() =
