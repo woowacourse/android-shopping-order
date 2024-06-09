@@ -67,14 +67,14 @@ class PaymentViewModel(
     fun loadOrderCarats(orderCarts: Array<Cart>) {
         _uiState.value?.let { state ->
             _uiState.value =
-                state.copy(orderCarts = orderCarts.associateBy { cart -> cart.id }.toMutableMap())
+                state.copy(orderCarts = orderCarts.toList())
         }
     }
 
     fun makeAPayment() {
         viewModelScope.launch {
             uiState.value?.let { state ->
-                orderRepository.insertOrderByIds(state.orderCarts.keys.toList())
+                orderRepository.insertOrderByIds(state.orderCarts.map { it.id })
                     .onSuccess {
                         hideError()
                         _navigateAction.emit(PaymentNavigateAction.NavigateToProductList)
@@ -83,6 +83,21 @@ class PaymentViewModel(
                     }
             }
         }
+    }
+
+    override fun selectCoupon(coupon: Coupon) {
+        val carts = uiState.value?.orderCarts?.toList() ?: throw IllegalArgumentException()
+
+        _uiState.value =
+            _uiState.value?.copy(
+                discountPrice =
+                    -when (coupon) {
+                        is FIXED5000 -> coupon.calculateDiscountRate(carts)
+                        is BOGO -> coupon.calculateDiscountRate(carts)
+                        is FREESHIPPING -> coupon.calculateDiscountRate(carts)
+                        is MIRACLESALE -> coupon.calculateDiscountRate(carts)
+                    },
+            )
     }
 
     companion object {
@@ -98,20 +113,5 @@ class PaymentViewModel(
                 )
             }
         }
-    }
-
-    override fun selectCoupon(coupon: Coupon) {
-        val carts = uiState.value?.orderCarts?.values?.toList() ?: throw IllegalArgumentException()
-
-        _uiState.value =
-            _uiState.value?.copy(
-                discountPrice =
-                    -when (coupon) {
-                        is FIXED5000 -> coupon.calculateDiscountRate(carts)
-                        is BOGO -> coupon.calculateDiscountRate(carts)
-                        is FREESHIPPING -> coupon.calculateDiscountRate(carts)
-                        is MIRACLESALE -> coupon.calculateDiscountRate(carts)
-                    },
-            )
     }
 }
