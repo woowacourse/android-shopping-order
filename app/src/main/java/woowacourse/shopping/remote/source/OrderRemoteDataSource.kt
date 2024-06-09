@@ -25,6 +25,34 @@ class OrderRemoteDataSource(private val orderApiService: OrderApiService) : Orde
         _orderSaved.clear()
     }
 
+    override suspend fun order2(cartItemIds: List<Long>): Result<Unit> =
+        runCatching {
+            orderApiService.createOrder2(OrderRequest(cartItemIds))
+        }
+
+    override suspend fun save2(
+        cartItemId: Long,
+        quantity: Int,
+    ): Result<Unit> =
+        runCatching {
+            _orderSaved[cartItemId] = quantity
+        }
+
+    override suspend fun load2(): Result<Map<Long, Int>> =
+        runCatching {
+            orderSaved
+        }
+
+    override suspend fun allQuantity2(): Result<Int> =
+        runCatching {
+            orderSaved.values.sum()
+        }
+
+    override suspend fun clear2(): Result<Unit> =
+        runCatching {
+            _orderSaved.clear()
+        }
+
     companion object {
         private const val TAG = "OrderRemoteDataSource"
 
