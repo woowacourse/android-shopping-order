@@ -15,9 +15,26 @@ class LocalHistoryProductDataSource(private val dao: HistoryProductDao) : Produc
         dao.insert(HistoryProduct(productId))
     }
 
-    override fun loadLatestProduct(): Long = dao.findLatest()?.id ?: EMPTY
+    override fun loadLatestProduct(): HistoryProduct =
+        dao.findLatest()
+            ?: throw NoSuchElementException("No such element found in history product table for latest product.")
 
-    override fun loadAllProductHistory(): List<Long> = dao.findAll().map { it.id }
+    override fun loadAllProductHistory(): List<HistoryProduct> = dao.findAll()
+
+    override suspend fun saveProductHistory2(productId: Long): Result<Unit> =
+        runCatching {
+            dao.insert2(HistoryProduct(productId))
+        }
+
+    override suspend fun loadLatestProduct2(): Result<HistoryProduct> =
+        runCatching {
+            dao.findLatest2()
+        }
+
+    override suspend fun loadRecentProducts(size: Int): Result<List<HistoryProduct>> =
+        runCatching {
+            dao.findAll2(size)
+        }
 
     companion object {
         private const val EMPTY = -1L
