@@ -14,6 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.presentation.detail.ProductDetailActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var cartSelectionFragment: Fragment
@@ -102,13 +103,24 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun initializeCartAdapter() {
-        viewModel.navigateEvent.observeEvent(this) {
-            val fragment =
-                supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
-            if (fragment is CartSelectionFragment) {
-                changeFragment(cartRecommendFragment)
-            } else {
-                // viewModel.createOrder()
+        viewModel.navigateAction.observeEvent(this) { cartNavigationAction ->
+            when (cartNavigationAction) {
+                is CartNavigateAction.RecommendNavigateAction -> {
+                    val fragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container_view_cart)
+                    if (fragment is CartSelectionFragment) {
+                        changeFragment(cartRecommendFragment)
+                    }
+                }
+
+                is CartNavigateAction.ProductDetailNavigateAction -> {
+                    val intent =
+                        ProductDetailActivity.getIntent(
+                            this,
+                            productId = cartNavigationAction.productId,
+                        )
+                    startActivity(intent)
+                }
             }
         }
     }

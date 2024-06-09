@@ -35,7 +35,8 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val productsAdapter by lazy {
         ProductsAdapter(
-            actionHandler = viewModel,
+            productCountActionHandler = viewModel,
+            productsActionHandler = viewModel,
             recentProductsAdapter = recentProductsAdapter,
         )
     }
@@ -118,11 +119,6 @@ class ProductsActivity : AppCompatActivity() {
                 spanCount = 2,
                 productViewType = ProductsViewType.Product.ordinal,
             )
-        /*
-        viewModel.recentProductUiModels.observe(this) {
-            adapter.updateRecentProducts(it ?: return@observe)
-        }
-         */
     }
 
     private fun initializeToolbar() {

@@ -25,7 +25,7 @@ import woowacourse.shopping.presentation.products.adapter.ProductsViewHolder
 class ProductsActivityTest {
     @Before
     fun setUp() {
-        com.example.domain.repository.RecentProductRepository.setInstance(
+        RecentProductRepository.setInstance(
             FakeRecentProductRepository(),
         )
     }

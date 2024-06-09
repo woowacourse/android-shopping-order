@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemRecentProductBinding
-import woowacourse.shopping.presentation.products.ProductsActionHandler
+import woowacourse.shopping.presentation.products.ProductCountActionHandler
 import woowacourse.shopping.presentation.products.uimodel.RecentProductUiModel
 
 class RecentProductsAdapter(
-    private val actionHandler: ProductsActionHandler,
+    private val actionHandler: ProductCountActionHandler,
 ) :
     ListAdapter<RecentProductUiModel, RecentProductViewHolder>(diffCallback) {
     override fun onCreateViewHolder(

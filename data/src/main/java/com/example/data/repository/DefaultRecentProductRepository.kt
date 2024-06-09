@@ -5,6 +5,7 @@ import com.example.data.datasource.local.room.entity.product.toProductEntity
 import com.example.data.datasource.local.room.entity.recentproduct.RecentProductEntity
 import com.example.data.datasource.local.room.entity.recentproduct.toRecentProduct
 import com.example.data.datasource.local.room.entity.recentproduct.toRecentProducts
+import com.example.domain.model.CartItem
 import com.example.domain.model.Product
 import com.example.domain.model.RecentProduct
 import com.example.domain.repository.RecentProductRepository
@@ -44,7 +45,7 @@ class DefaultRecentProductRepository(
         }.join()
     }
 
-    override fun getRecommendProducts(cartItems: List<com.example.domain.model.CartItem>): List<Product> {
+    override fun getRecommendProducts(cartItems: List<CartItem>): List<Product> {
         var recommendProducts: List<Product> = emptyList()
         thread {
             val category = findLastOrNull()?.product?.category ?: return@thread

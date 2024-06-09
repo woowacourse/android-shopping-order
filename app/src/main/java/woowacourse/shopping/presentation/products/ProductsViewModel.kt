@@ -25,7 +25,7 @@ class ProductsViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel(), ProductsActionHandler {
+) : ViewModel(), ProductsActionHandler, ProductCountActionHandler {
     private val _productsUiState = MutableLiveData(ProductsUiState())
     val productsUiState: LiveData<ProductsUiState> = _productsUiState
 
@@ -138,12 +138,12 @@ class ProductsViewModel(
         }
     }
 
-    override fun onClickProduct(productId: Int) {
-        _navigateAction.emit(ProductsNavigateAction.ProductDetailNavigateAction(productId))
-    }
-
     override fun onClickLoadMoreButton() {
         loadPage()
+    }
+
+    override fun onClickProduct(productId: Int) {
+        _navigateAction.emit(ProductsNavigateAction.ProductDetailNavigateAction(productId))
     }
 
     override fun onClickPlusQuantityButton(productId: Int) {

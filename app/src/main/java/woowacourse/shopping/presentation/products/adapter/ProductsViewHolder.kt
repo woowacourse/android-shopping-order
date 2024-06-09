@@ -5,13 +5,14 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemLoadMoreBinding
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemRecentProductsBinding
+import woowacourse.shopping.presentation.products.ProductCountActionHandler
 import woowacourse.shopping.presentation.products.ProductsActionHandler
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 
 sealed class ProductsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     class ProductViewHolder(
         private val binding: ItemProductBinding,
-        private val actionHandler: ProductsActionHandler,
+        private val actionHandler: ProductCountActionHandler,
     ) :
         ProductsViewHolder(binding.root) {
         fun bind(productUiModel: ProductUiModel) {

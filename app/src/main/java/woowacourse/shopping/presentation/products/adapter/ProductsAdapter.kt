@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemLoadMoreBinding
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemRecentProductsBinding
+import woowacourse.shopping.presentation.products.ProductCountActionHandler
 import woowacourse.shopping.presentation.products.ProductsActionHandler
 import woowacourse.shopping.presentation.products.ProductsUiState
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
@@ -14,7 +15,8 @@ class ProductsAdapter(
     private var productsUiState: ProductsUiState =
         ProductsUiState(),
     private val recentProductsAdapter: RecentProductsAdapter,
-    private val actionHandler: ProductsActionHandler,
+    private val productsActionHandler: ProductsActionHandler,
+    private val productCountActionHandler: ProductCountActionHandler,
 ) : RecyclerView.Adapter<ProductsViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -29,12 +31,12 @@ class ProductsAdapter(
 
             ProductsViewType.Product -> {
                 val binding = ItemProductBinding.inflate(inflater, parent, false)
-                ProductsViewHolder.ProductViewHolder(binding, actionHandler)
+                ProductsViewHolder.ProductViewHolder(binding, productCountActionHandler)
             }
 
             ProductsViewType.LoadMore -> {
                 val binding = ItemLoadMoreBinding.inflate(inflater, parent, false)
-                ProductsViewHolder.LoadMoreViewHolder(binding, actionHandler)
+                ProductsViewHolder.LoadMoreViewHolder(binding, productsActionHandler)
             }
         }
     }
