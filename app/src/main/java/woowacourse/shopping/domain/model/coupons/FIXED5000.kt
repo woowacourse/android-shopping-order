@@ -13,8 +13,6 @@ data class FIXED5000(
     val minimumAmount: Int,
 ) : Coupon() {
     override fun calculateDiscountRate(carts: List<Cart>): Int {
-        val totalPrice = carts.sumOf { it.totalPrice }
-
-        return totalPrice - discount
+        return discount
     }
 }

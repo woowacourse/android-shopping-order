@@ -81,6 +81,7 @@
 
                 <TextView
                     android:id="@+id/tv_order_amount_value"
+                    priceToCurrency="@{vm.uiState.orderTotalPrice}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="18dp"
@@ -106,9 +107,9 @@
 
                 <TextView
                     android:id="@+id/tv_coupon_discount_amount_value"
+                    priceToCurrency="@{vm.uiState.discountPrice}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:textColor="@color/gray4"
                     android:textSize="18dp"
                     app:layout_constraintBottom_toBottomOf="@id/tv_coupon_discount_amount"
@@ -134,6 +135,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray4"
                     android:textSize="18dp"
+                    priceToCurrency="@{3000}"
                     app:layout_constraintBottom_toBottomOf="@id/tv_delivery_fee"
                     app:layout_constraintEnd_toEndOf="@id/tv_coupon_discount_amount_value"
                     app:layout_constraintTop_toTopOf="@id/tv_delivery_fee"
@@ -167,6 +169,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray4"
                     android:textSize="18dp"
+                    priceToCurrency="@{vm.uiState.totalPaymentPrice}"
                     app:layout_constraintEnd_toEndOf="@id/tv_coupon_discount_amount_value"
                     app:layout_constraintTop_toTopOf="@id/tv_total_payment_amount"
                     tools:text="202,200원" />

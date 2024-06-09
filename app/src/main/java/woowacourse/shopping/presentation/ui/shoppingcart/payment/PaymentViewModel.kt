@@ -8,6 +8,11 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.coupons.BOGO
+import woowacourse.shopping.domain.model.coupons.Coupon
+import woowacourse.shopping.domain.model.coupons.FIXED5000
+import woowacourse.shopping.domain.model.coupons.FREESHIPPING
+import woowacourse.shopping.domain.model.coupons.MIRACLESALE
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -21,7 +26,7 @@ class PaymentViewModel(
     savedStateHandle: SavedStateHandle,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-) : BaseViewModel() {
+) : BaseViewModel(), CouponListActionHandler {
     private val _uiState: MutableLiveData<CouponUiState> = MutableLiveData(CouponUiState())
     val uiState: LiveData<CouponUiState> get() = _uiState
 
@@ -93,5 +98,20 @@ class PaymentViewModel(
                 )
             }
         }
+    }
+
+    override fun selectCoupon(coupon: Coupon) {
+        val carts = uiState.value?.orderCarts?.values?.toList() ?: throw IllegalArgumentException()
+
+        _uiState.value =
+            _uiState.value?.copy(
+                discountPrice =
+                    -when (coupon) {
+                        is FIXED5000 -> coupon.calculateDiscountRate(carts)
+                        is BOGO -> coupon.calculateDiscountRate(carts)
+                        is FREESHIPPING -> coupon.calculateDiscountRate(carts)
+                        is MIRACLESALE -> coupon.calculateDiscountRate(carts)
+                    },
+            )
     }
 }

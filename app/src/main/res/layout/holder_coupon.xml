@@ -9,6 +9,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="action"
+            type="woowacourse.shopping.presentation.ui.shoppingcart.payment.CouponListActionHandler" />
+
+        <variable
             name="coupon"
             type="woowacourse.shopping.domain.model.coupons.Coupon" />
     </data>
@@ -24,11 +28,11 @@
 
         <CheckBox
             android:id="@+id/checkBox"
+            android:onClick="@{() -> action.selectCoupon(coupon)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <TextView
             android:id="@+id/tv_coupon_name"

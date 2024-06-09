@@ -7,8 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderCouponBinding
 import woowacourse.shopping.domain.model.coupons.Coupon
+import woowacourse.shopping.presentation.ui.shoppingcart.payment.CouponListActionHandler
 
-class CouponsAdapter : ListAdapter<Coupon, CouponsAdapter.CouponViewHolder>(CouponDiffCallback) {
+class CouponsAdapter(
+    private val couponListActionHandler: CouponListActionHandler,
+) : ListAdapter<Coupon, CouponsAdapter.CouponViewHolder>(CouponDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -22,14 +25,18 @@ class CouponsAdapter : ListAdapter<Coupon, CouponsAdapter.CouponViewHolder>(Coup
         holder: CouponViewHolder,
         postion: Int,
     ) {
-        holder.bind(getItem(postion))
+        holder.bind(getItem(postion), couponListActionHandler)
     }
 
     class CouponViewHolder(
         private val binding: HolderCouponBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(coupon: Coupon) {
+        fun bind(
+            coupon: Coupon,
+            couponListActionHandler: CouponListActionHandler,
+        ) {
             binding.coupon = coupon
+            binding.action = couponListActionHandler
         }
     }
 

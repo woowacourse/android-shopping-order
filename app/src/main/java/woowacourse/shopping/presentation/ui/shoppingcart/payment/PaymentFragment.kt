@@ -16,7 +16,7 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         )
     }
 
-    private val adapter: CouponsAdapter by lazy { CouponsAdapter() }
+    private val adapter: CouponsAdapter by lazy { CouponsAdapter(viewModel) }
 
     override fun initViewCreated() {
         initDataBinding()

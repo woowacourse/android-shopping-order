@@ -13,9 +13,8 @@ data class BOGO(
     val getQuantity: Int,
 ) : Coupon() {
     override fun calculateDiscountRate(carts: List<Cart>): Int {
-        val totalPrice = carts.sumOf { it.totalPrice }
         val discountTargetCart = carts.maxBy { it.totalPrice }
 
-        return totalPrice - (discountTargetCart.product.price * getQuantity)
+        return discountTargetCart.product.price * getQuantity
     }
 }

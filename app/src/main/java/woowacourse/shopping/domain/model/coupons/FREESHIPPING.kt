@@ -12,8 +12,6 @@ data class FREESHIPPING(
     val minimumAmount: Int,
 ) : Coupon() {
     override fun calculateDiscountRate(carts: List<Cart>): Int {
-        val totalPrice = carts.sumOf { it.totalPrice }
-
-        return totalPrice - 3000
+        return 3000
     }
 }
