@@ -19,37 +19,3 @@ sealed interface CartError {
 
     data object UnKnown : CartError
 }
-
-inline fun <reified T : Any?> Response<T>.checkCartError(excute: (CartError) -> Unit) = apply {
-    when (this) {
-        is Response.Success -> {}
-        is Fail.InvalidAuthorized -> excute(CartError.InvalidAuthorized)
-        is Fail.Network -> excute(CartError.Network)
-        is Fail.NotFound -> {
-            when (T::class) {
-                Product::class -> excute(CartError.LoadRecommend)
-                CartWithProduct::class -> excute(CartError.LoadCart)
-                else -> excute(CartError.UnKnown)
-            }
-        }
-
-        is Response.Exception -> {
-            Log.d(this.javaClass.simpleName, "${this.e}")
-            excute(CartError.UnKnown)
-        }
-    }
-}
-
-inline fun <reified T : Any?> Fail<T>.toUiError() =
-    when (this) {
-        is Fail.InvalidAuthorized -> CartError.InvalidAuthorized
-        is Fail.Network -> CartError.Network
-        is Fail.NotFound -> {
-            when (T::class) {
-                Product::class -> CartError.LoadRecommend
-                CartWithProduct::class -> CartError.LoadCart
-                else -> CartError.UnKnown
-            }
-        }
-    }
-

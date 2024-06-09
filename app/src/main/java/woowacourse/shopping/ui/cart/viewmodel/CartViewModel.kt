@@ -6,9 +6,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartWithProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
@@ -16,6 +15,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.response.Fail
+import woowacourse.shopping.domain.response.Response
 import woowacourse.shopping.domain.response.onException
 import woowacourse.shopping.domain.response.onFail
 import woowacourse.shopping.domain.response.onSuccess
@@ -23,8 +23,6 @@ import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartItemsUiState
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
-import woowacourse.shopping.ui.cart.cartitem.uimodel.checkCartError
-import woowacourse.shopping.ui.cart.cartitem.uimodel.toUiError
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
@@ -89,7 +87,7 @@ class CartViewModel(
                         cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
                         isLoading = false,
                     )
-            }.checkCartError { _error.setValue(it) }
+            }.checkError { _error.setValue(it) }
         }
     }
 
@@ -102,7 +100,7 @@ class CartViewModel(
             productRepository.allProductsByCategoryResponse(category).onSuccess {
                 _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
                 noRecommendProductState.value = false
-            }.checkCartError {
+            }.checkError {
                 _error.setValue(it)
                 noRecommendProductState.value = true
             }
@@ -123,7 +121,7 @@ class CartViewModel(
         viewModelLaunch(::updateCartExceptionHandler) {
             cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
                 loadCartItems()
-            }.checkCartError { _error.setValue(it) }
+            }.checkError { _error.setValue(it) }
         }
     }
 
@@ -158,7 +156,7 @@ class CartViewModel(
             cartRepository.postCartItems(productId, INITIAL_CART_COUNT).onSuccess {
                 changeRecommendProductCount(productId)
                 loadCartItems()
-            }.checkCartError { _error.setValue(it) }
+            }.checkError { _error.setValue(it) }
         }
     }
 
@@ -173,7 +171,7 @@ class CartViewModel(
                     changeRecommendProductCount(productId)
                 }
                 loadCartItems()
-            }.checkCartError {
+            }.checkError {
                 _error.setValue(it)
             }
         }
@@ -191,7 +189,7 @@ class CartViewModel(
                     changeRecommendProductCount(productId)
                 }
                 loadCartItems()
-            }.checkCartError {
+            }.checkError {
                 _error.setValue(it)
             }
         }
@@ -264,6 +262,41 @@ class CartViewModel(
         _cart.value?.cartItems?.firstOrNull {
             it.productId == productId
         }?.isChecked ?: false || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
+
+    private inline fun <reified T : Any?> Response<T>.checkError(excute: (CartError) -> Unit) = apply {
+        when (this) {
+            is Response.Success -> {}
+            is Fail.InvalidAuthorized -> excute(CartError.InvalidAuthorized)
+            is Fail.Network -> excute(CartError.Network)
+            is Fail.NotFound -> {
+                when (T::class) {
+                    Product::class -> excute(CartError.LoadRecommend)
+                    CartWithProduct::class -> excute(CartError.LoadCart)
+                    else -> excute(CartError.UnKnown)
+                }
+            }
+
+            is Response.Exception -> {
+                Log.d(this.javaClass.simpleName, "${this.e}")
+                excute(CartError.UnKnown)
+            }
+        }
+    }
+
+    private inline fun <reified T : Any?> Fail<T>.toUiError() =
+        when (this) {
+            is Fail.InvalidAuthorized -> CartError.InvalidAuthorized
+            is Fail.Network -> CartError.Network
+            is Fail.NotFound -> {
+                when (T::class) {
+                    Product::class -> CartError.LoadRecommend
+                    CartWithProduct::class -> CartError.LoadCart
+                    else -> CartError.UnKnown
+                }
+            }
+        }
+
+
 
     companion object {
         private const val DEFAULT_RECENT_PRODUCT_ID = 0L

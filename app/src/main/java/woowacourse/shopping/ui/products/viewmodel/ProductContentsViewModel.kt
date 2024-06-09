@@ -1,10 +1,12 @@
 package woowacourse.shopping.ui.products.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
@@ -12,13 +14,14 @@ import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.response.Fail
+import woowacourse.shopping.domain.response.Response
 import woowacourse.shopping.domain.response.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductListError
 import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
-import woowacourse.shopping.ui.products.uimodel.checkError
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
@@ -200,6 +203,26 @@ class ProductContentsViewModel(
 
     private fun cartExceptionHandler(throwable: Throwable) {
         _error.setValue(ProductListError.LoadProduct)
+    }
+
+    private inline fun <reified T : Any?> Response<T>.checkError(excute: (ProductListError) -> Unit) = apply {
+        when (this) {
+            is Response.Success -> {}
+            is Fail.InvalidAuthorized -> excute(ProductListError.InvalidAuthorized)
+            is Fail.Network -> excute(ProductListError.Network)
+            is Fail.NotFound -> {
+                when (T::class) {
+                    Product::class -> excute(ProductListError.LoadProduct)
+                    RecentProduct::class -> excute(ProductListError.LoadRecentProduct)
+                    else -> excute(ProductListError.UnKnown)
+                }
+            }
+
+            is Response.Exception -> {
+                Log.d(this.javaClass.simpleName, "${this.e}")
+                excute(ProductListError.UnKnown)
+            }
+        }
     }
 
     companion object {

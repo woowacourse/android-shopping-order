@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.coupon.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,16 +10,17 @@ import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.response.Fail
+import woowacourse.shopping.domain.response.Response
 import woowacourse.shopping.domain.response.onSuccess
-import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.toUiModel
 import woowacourse.shopping.ui.coupon.uimodel.CouponError
 import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
 import woowacourse.shopping.ui.coupon.uimodel.PaymentInfoUiModel
-import woowacourse.shopping.ui.coupon.uimodel.checkCouponError
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 import woowacourse.shopping.ui.utils.viewModelAsync
@@ -48,7 +50,7 @@ class CouponViewModel(
                 order.value = Order(coupons)
                 _coupons.value =
                     order?.value?.canUseCoupons(getCartWithProduct(carts))?.map { it.toUiModel() }
-            }.checkCouponError { _error.setValue(it) }
+            }.checkError { _error.setValue(it) }
         }
     }
 
@@ -106,7 +108,7 @@ class CouponViewModel(
         viewModelLaunch(::orderExceptionHandler) {
             orderRepository.order(carts.map { it.id }).onSuccess {
                 _isOrderSuccess.setValue(true)
-            }.checkCouponError {
+            }.checkError {
                 _isOrderSuccess.setValue(false)
                 _error.setValue(it)
             }
@@ -141,4 +143,25 @@ class CouponViewModel(
     private fun orderExceptionHandler(throwable: Throwable) {
         _error.setValue(CouponError.Order)
     }
+
+    private inline fun <reified T : Any?> Response<T>.checkError(execute: (CouponError) -> Unit) = apply {
+        when (this) {
+            is Response.Success -> {}
+            is Fail.InvalidAuthorized -> execute(CouponError.InvalidAuthorized)
+            is Fail.Network -> execute(CouponError.Network)
+            is Fail.NotFound -> {
+                when (T::class) {
+                    Coupon::class -> execute(CouponError.LoadCoupon)
+                    Order::class -> execute(CouponError.Order)
+                    else -> execute(CouponError.UnKnown)
+                }
+            }
+
+            is Response.Exception -> {
+                Log.d(this.javaClass.simpleName, "${this.e}")
+                execute(CouponError.UnKnown)
+            }
+        }
+    }
+
 }

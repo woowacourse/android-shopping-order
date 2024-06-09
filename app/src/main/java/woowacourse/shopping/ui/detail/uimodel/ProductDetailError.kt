@@ -22,35 +22,3 @@ sealed interface ProductDetailError {
 
     data object UnKnown : ProductDetailError
 }
-
-inline fun <reified T : Any?> Response<T>.checkProductDetailError(execute: (ProductDetailError) -> Unit) = apply {
-    when (this) {
-        is Response.Success -> {}
-        is Fail.InvalidAuthorized -> execute(ProductDetailError.InvalidAuthorized)
-        is Fail.Network -> execute(ProductDetailError.Network)
-        is Fail.NotFound -> {
-            when (T::class) {
-                Product::class -> execute(ProductDetailError.LoadProduct)
-                CartWithProduct::class -> execute(ProductDetailError.AddCart)
-                else -> execute(ProductDetailError.UnKnown)
-            }
-        }
-
-        is Response.Exception -> {
-            Log.d(this.javaClass.simpleName, "${this.e}")
-            execute(ProductDetailError.UnKnown)
-        }
-    }
-}
-
-inline fun <reified T : Any?> Fail<T>.toProductDetailUiError() =
-    when (this) {
-        is Fail.InvalidAuthorized -> ProductDetailError.InvalidAuthorized
-        is Fail.Network -> ProductDetailError.Network
-        is Fail.NotFound -> {
-            when (T::class) {
-                Product::class -> ProductDetailError.LoadProduct
-                else -> ProductDetailError.UnKnown
-            }
-        }
-    }

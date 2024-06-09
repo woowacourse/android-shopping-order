@@ -20,23 +20,3 @@ sealed interface CouponError {
 
     data object UnKnown : CouponError
 }
-
-inline fun <reified T : Any?> Response<T>.checkCouponError(execute: (CouponError) -> Unit) = apply {
-    when (this) {
-        is Response.Success -> {}
-        is Fail.InvalidAuthorized -> execute(CouponError.InvalidAuthorized)
-        is Fail.Network -> execute(CouponError.Network)
-        is Fail.NotFound -> {
-            when (T::class) {
-                Coupon::class -> execute(CouponError.LoadCoupon)
-                Order::class -> execute(CouponError.Order)
-                else -> execute(CouponError.UnKnown)
-            }
-        }
-
-        is Response.Exception -> {
-            Log.d(this.javaClass.simpleName, "${this.e}")
-            execute(CouponError.UnKnown)
-        }
-    }
-}
