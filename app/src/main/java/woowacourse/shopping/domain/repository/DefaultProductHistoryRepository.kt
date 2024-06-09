@@ -9,30 +9,6 @@ class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
     private val productDataSource: ProductDataSource,
 ) : ProductHistoryRepository {
-    override fun saveProductHistory(productId: Long) {
-        productHistoryDataSource.saveProductHistory(productId)
-    }
-
-    override fun loadAllProductHistory(): List<Product> {
-        val productIds = productHistoryDataSource.loadAllProductHistory()
-        return productIds.map {
-            productDataSource.findById(it.id).toDomain(quantity = 0)
-        }
-    }
-
-    override fun loadLatestProduct(): Product {
-        val productId: Long = productHistoryDataSource.loadLatestProduct().id
-        val productData = productDataSource.findById(productId)
-        return Product(
-            productData.id,
-            productData.imgUrl,
-            productData.name,
-            productData.price,
-            quantity = 0,
-            category = productData.category,
-        )
-    }
-
     override suspend fun saveProductHistory2(productId: Long): Result<Unit> = productHistoryDataSource.saveProductHistory2(productId)
 
     override suspend fun loadLatestProduct2(): Result<Product> {
