@@ -16,6 +16,8 @@ import woowacourse.shopping.databinding.FragmentPaymentBinding
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.recommend.RecommendNavArgs
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
+import woowacourse.shopping.presentation.shopping.product.ProductListFragment
+import woowacourse.shopping.presentation.util.showToast
 
 class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
     private lateinit var adapter: CouponAdapter
@@ -37,6 +39,11 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
         }
         viewModel.coupons.observe(viewLifecycleOwner) {
             adapter.setData(it)
+        }
+        viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
+            val destination = ProductListFragment.TAG ?: return@observe
+            navigator.popBackStack(destination, inclusive = false)
+            showToast(R.string.payment_success)
         }
         initViews()
         initAppBar()

@@ -50,17 +50,6 @@ class RecommendCartProductViewModel(
         navigateToPayment()
     }
 
-    fun orderProducts() {
-        viewModelScope.launch {
-            val uiState = _uiState.value ?: return@launch
-            cartRepository.orderCartProducts(uiState.totalOrderIds)
-                .onSuccess {
-                    _updateCartEvent.setValue(Unit)
-                    _finishOrderEvent.setValue(Unit)
-                }
-        }
-    }
-
     override fun increaseProductCount(id: Long) {
         viewModelScope.launch {
             var uiState = _uiState.value ?: return@launch

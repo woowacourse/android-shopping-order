@@ -14,6 +14,8 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.cart.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 
 class PaymentViewModel(
     private val cartRepository: CartRepository,
@@ -49,6 +51,9 @@ class PaymentViewModel(
     private val _checkedState: MutableLiveData<CheckBoxState> = MutableLiveData()
     val checkedState: LiveData<CheckBoxState> get() = _checkedState
 
+    private val _finishOrderEvent = MutableSingleLiveData<Unit>()
+    val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
+
     init {
         loadCoupons()
         loadCartItems()
@@ -58,8 +63,7 @@ class PaymentViewModel(
         viewModelScope.launch {
             cartRepository.orderCartProducts(_cartItems.value?.map { it.product.id } ?: emptyList())
                 .onSuccess {
-//                    _updateCartEvent.setValue(Unit)
-//                    _finishOrderEvent.setValue(Unit)
+                    _finishOrderEvent.setValue(Unit)
                 }
         }
     }
