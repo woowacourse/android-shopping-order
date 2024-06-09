@@ -17,7 +17,7 @@ class CouponRemoteRepository(
 ): CouponRepository {
     override suspend fun loadCoupons(): ResponseResult<List<Coupon>> =
         handleResponseResult(couponDataSource.loadCoupons()) { response ->
-            val coupons = response.coupons.map { it.toDomain() }
+            val coupons = response.map { it.toDomain() }
             ResponseResult.Success(coupons)
         }
 

@@ -9,13 +9,18 @@ import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
+import woowacourse.shopping.data.coupon.remote.CouponRemoteRepository
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
+import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.model.OrderInformation
 
 class PaymentViewModel(
     private val orderInformation: OrderInformation,
     private val orderRepository: OrderRepository,
+    private val couponRepository: CouponRepository,
 ): ViewModel() {
     private val _isPaymentSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
     val isPaymentSuccess: SingleLiveData<Boolean> get() = _isPaymentSuccess
@@ -23,11 +28,25 @@ class PaymentViewModel(
     private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
     val orderAmount: LiveData<Int> get() = _orderAmount
 
+    private val _coupons = MutableLiveData<List<Coupon>>(emptyList())
+    val coupons: LiveData<List<Coupon>> get() = _coupons
+
+    private val _errorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> get() = _errorMessage
+
     fun createOrder() {
         viewModelScope.launch {
             orderRepository.orderCartItems(orderInformation.cartItemIds)
         }
         _isPaymentSuccess.setValue(true)
+    }
+
+    fun loadCoupons() {
+        viewModelScope.launch {
+            handleResponseResult(couponRepository.loadCoupons(), _errorMessage) { coupons ->
+                _coupons.value = coupons
+            }
+        }
     }
 
     companion object {
@@ -42,6 +61,9 @@ class PaymentViewModel(
                        ShoppingApp.productSource,
                        ShoppingApp.historySource,
                        ShoppingApp.cartSource,
+                   ),
+                   couponRepository = CouponRemoteRepository(
+                       ShoppingApp.couponSource,
                    )
                )
            }

@@ -34,4 +34,5 @@
     <string name="payment_coupon_discount_amount">쿠폰 할인 금액</string>
     <string name="delivery_fee">배송비</string>
     <string name="payment_total_amount">총 결제 금액</string>
+    <string name="coupon_minimum_amount">최소 주문 금액: %d</string>
 </resources>
