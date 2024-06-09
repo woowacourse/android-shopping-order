@@ -1,20 +1,15 @@
 package woowacourse.shopping.domain.repository
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.model.CartItemData
-import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.remote.model.response.CartItemResponse
 import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.source.FakeShoppingCartDataSource
 import woowacourse.shopping.ui.model.CartItem
-import woowacourse.woowacourse.shopping.testfixture.CoroutinesTestExtension
 
 class DefaultShoppingCartRepositoryTest {
     private lateinit var castSource: ShoppingCartDataSource
@@ -182,7 +177,7 @@ class DefaultShoppingCartRepositoryTest {
 // test fixture for CartItemDto
 fun cartItemDtoTestFixture(
     id: Int,
-    quantity: Int = 1,
+    quantity: Int = 0,
     product: ProductResponse = ProductResponse.DEFAULT,
 ): CartItemResponse =
     CartItemResponse(
@@ -191,11 +186,12 @@ fun cartItemDtoTestFixture(
         product = product,
     )
 
-fun cartItemDtosTestFixture(dataCount: Int): List<CartItemResponse> =
-    List(dataCount) {
-        cartItemDtoTestFixture(
-            id = it + 1,
-        )
+fun cartItemDtosTestFixture(
+    dataCount: Int,
+    cartItemFixture: (Int) -> CartItemResponse = { cartItemDtoTestFixture(it) },
+): List<CartItemResponse> =
+    List(dataCount) { idx ->
+        cartItemFixture(idx)
     }
 
 /**
@@ -220,24 +216,6 @@ fun cartItemTestFixture(
 fun cartItemsTestFixture(dataCount: Int): List<CartItem> =
     List(dataCount) {
         cartItemTestFixture(
-            id = it + 1L,
-        )
-    }
-
-fun cartItemDataTestFixture(
-    id: Long = 1,
-    quantity: Int = 1,
-    product: ProductData = ProductData.NULL,
-): CartItemData =
-    CartItemData(
-        id = id,
-        quantity = quantity,
-        product = product,
-    )
-
-fun cartItemsDataTestFixture(dataCount: Int): List<CartItemData> =
-    List(dataCount) {
-        cartItemDataTestFixture(
             id = it + 1L,
         )
     }
