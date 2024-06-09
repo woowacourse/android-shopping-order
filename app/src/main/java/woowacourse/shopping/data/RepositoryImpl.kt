@@ -6,10 +6,9 @@ import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
 import woowacourse.shopping.data.remote.RemoteDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
-import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
-import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
-import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
-import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.OrderRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.ProductPagingSource
 import woowacourse.shopping.domain.CartProduct
@@ -72,9 +71,9 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun postCartItem(cartItemRequestDto: CartItemRequestDto): Result<Int> =
+    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
         runCatching {
-            val response = remoteDataSource.postCartItem(cartItemRequestDto)
+            val response = remoteDataSource.postCartItem(cartItemRequest)
             if (response.isSuccessful) {
                 return Result.success(
                     response.toIdOrNull() ?: 0,
@@ -85,7 +84,7 @@ class RepositoryImpl(
 
     override suspend fun patchCartItem(
         id: Int,
-        quantityRequestDto: QuantityRequestDto,
+        quantityRequestDto: QuantityRequest,
     ): Result<Unit> =
         runCatching {
             Log.d("SDFEFS", "${id}")
@@ -106,9 +105,9 @@ class RepositoryImpl(
             return Result.failure(Throwable(response.errorBody().toString()))
         }
 
-    override suspend fun postOrders(orderRequestDto: OrderRequestDto): Result<Unit> =
+    override suspend fun postOrders(orderRequest: OrderRequest): Result<Unit> =
         runCatching {
-            val response = remoteDataSource.postOrders(orderRequestDto)
+            val response = remoteDataSource.postOrders(orderRequest)
             if (response.isSuccessful) {
                 return Result.success(Unit)
             }

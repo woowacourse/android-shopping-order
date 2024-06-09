@@ -3,13 +3,13 @@ package woowacourse.shopping.data.remote.dto.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartResponseDto(
-    val content: List<Cart>,
-    val pageable: Pageable,
+data class ProductsResponse(
+    val content: List<ProductResponse>,
+    val pageable: PageableResponse,
     val last: Boolean,
     val totalPages: Int,
     val totalElements: Int,
-    val sort: Sort,
+    val sort: SortResponse,
     val first: Boolean,
     val number: Int,
     val numberOfElements: Int,

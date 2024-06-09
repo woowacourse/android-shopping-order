@@ -8,9 +8,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.dto.request.ProductRequestDto
-import woowacourse.shopping.data.remote.dto.response.Product
-import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
+import woowacourse.shopping.data.remote.dto.request.ProductRequest
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.ProductsResponse
 
 interface ProductApi {
     @GET("/products")
@@ -19,19 +19,19 @@ interface ProductApi {
         @Query("category") category: String? = null,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 1,
-    ): Response<ProductResponseDto>
+    ): Response<ProductsResponse>
 
     @POST("/products")
     suspend fun postProduct(
         @Header("accept") accept: String = "*/*",
-        @Body productRequestDto: ProductRequestDto,
+        @Body productRequest: ProductRequest,
     ): Response<Unit>
 
     @GET("/products/{id}")
     suspend fun getProductById(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
-    ): Response<Product>
+    ): Response<ProductResponse>
 
     @DELETE("/products/{id}")
     suspend fun deleteProductById(

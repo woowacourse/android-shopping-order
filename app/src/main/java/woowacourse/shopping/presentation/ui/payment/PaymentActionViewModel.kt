@@ -1,12 +1,11 @@
 package woowacourse.shopping.presentation.ui.payment
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.domain.toRecentProduct
@@ -48,7 +47,7 @@ class PaymentActionViewModel(
         }
 
         repository.postOrders(
-            OrderRequestDto(
+            OrderRequest(
                 _coupons.value!!.cartProductIds,
             ),
         ).onSuccess {

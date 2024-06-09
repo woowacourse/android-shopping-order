@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.remote
 
 import retrofit2.Response
-import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
-import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
-import woowacourse.shopping.data.remote.dto.request.ProductRequestDto
-import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
-import woowacourse.shopping.data.remote.dto.response.CartResponseDto
-import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
-import woowacourse.shopping.data.remote.dto.response.Product
-import woowacourse.shopping.data.remote.dto.response.ProductResponseDto
-import woowacourse.shopping.data.remote.dto.response.QuantityResponseDto
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.OrderRequest
+import woowacourse.shopping.data.remote.dto.request.ProductRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
+import woowacourse.shopping.data.remote.dto.response.CartsResponse
+import woowacourse.shopping.data.remote.dto.response.CouponResponse
+import woowacourse.shopping.data.remote.dto.response.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.ProductsResponse
+import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.data.remote.service.CartItemApi
 import woowacourse.shopping.data.remote.service.CouponApi
 import woowacourse.shopping.data.remote.service.OrderApi
@@ -25,15 +25,15 @@ class RetrofitDataSource(
         category: String?,
         page: Int,
         size: Int,
-    ): Response<ProductResponseDto> {
+    ): Response<ProductsResponse> {
         return productApi.getProducts(category = category, page = page, size = size)
     }
 
-    override suspend fun postProduct(productRequestDto: ProductRequestDto): Response<Unit> {
-        return productApi.postProduct(productRequestDto = productRequestDto)
+    override suspend fun postProduct(productRequest: ProductRequest): Response<Unit> {
+        return productApi.postProduct(productRequest = productRequest)
     }
 
-    override suspend fun getProductById(id: Int): Response<Product> {
+    override suspend fun getProductById(id: Int): Response<ProductResponse> {
         return productApi.getProductById(id = id)
     }
 
@@ -44,12 +44,12 @@ class RetrofitDataSource(
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): Response<CartResponseDto> {
+    ): Response<CartsResponse> {
         return cartItemApi.getCartItems(page = page, size = size)
     }
 
-    override suspend fun postCartItem(cartItemRequestDto: CartItemRequestDto): Response<Unit> {
-        return cartItemApi.postCartItem(cartItemRequestDto = cartItemRequestDto)
+    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Response<Unit> {
+        return cartItemApi.postCartItem(cartItemRequest = cartItemRequest)
     }
 
     override suspend fun deleteCartItem(id: Int): Response<Unit> {
@@ -58,20 +58,20 @@ class RetrofitDataSource(
 
     override suspend fun patchCartItem(
         id: Int,
-        quantityRequestDto: QuantityRequestDto,
+        quantityRequestDto: QuantityRequest,
     ): Response<Unit> {
         return cartItemApi.patchCartItem(id = id, quantityRequestDto = quantityRequestDto)
     }
 
-    override suspend fun getCartItemsCounts(): Response<QuantityResponseDto> {
+    override suspend fun getCartItemsCounts(): Response<QuantityResponse> {
         return cartItemApi.getCartItemsCounts()
     }
 
-    override suspend fun postOrders(orderRequestDto: OrderRequestDto): Response<Unit> {
-        return orderApi.postOrders(orderRequestDto = orderRequestDto)
+    override suspend fun postOrders(orderRequest: OrderRequest): Response<Unit> {
+        return orderApi.postOrders(orderRequest = orderRequest)
     }
 
-    override suspend fun getCoupons(): Response<List<CouponResponseDto>> {
+    override suspend fun getCoupons(): Response<List<CouponResponse>> {
         return couponApi.getCoupons()
     }
 }

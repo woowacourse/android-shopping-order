@@ -18,7 +18,7 @@ import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
 @ExtendWith(InstantTaskExecutorExtension::class, CoroutinesTestExtension::class, MockKExtension::class)
-class CartEntityViewModelTest {
+class CartItemResponseEntityViewModelTest {
     @MockK
     private lateinit var productCartRepository: Repository
 

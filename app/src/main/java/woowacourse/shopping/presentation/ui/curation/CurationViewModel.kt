@@ -5,9 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
-import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
-import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
@@ -63,7 +62,7 @@ class CurationViewModel(
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
                 repository.postCartItem(
-                    CartItemRequestDto(
+                    CartItemRequest(
                         productId = cartProducts[index].productId.toInt(),
                         quantity = cartProducts[index].quantity,
                     ),
@@ -78,7 +77,7 @@ class CurationViewModel(
             } else {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].quantity),
+                    quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         _cartProducts.postValue(UiState.Success(cartProducts))
@@ -98,7 +97,7 @@ class CurationViewModel(
             if (cartProducts[index].quantity > 0) {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].quantity),
+                    quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         _cartProducts.postValue(UiState.Success(cartProducts))

@@ -4,13 +4,13 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
+import woowacourse.shopping.data.remote.dto.response.CouponResponse
 
 interface CouponApi {
     @GET("/coupons")
     suspend fun getCoupons(
         @Header("accept") accept: String = "*/*",
-    ): Response<List<CouponResponseDto>>
+    ): Response<List<CouponResponse>>
 
     companion object {
         private var service: CouponApi? = null

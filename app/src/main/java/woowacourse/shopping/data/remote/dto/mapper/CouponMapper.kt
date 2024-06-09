@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.remote.dto.mapper
 
-import woowacourse.shopping.data.remote.dto.response.CouponResponseDto
+import woowacourse.shopping.data.remote.dto.response.CouponResponse
 import woowacourse.shopping.domain.Coupon
 
-fun CouponResponseDto.toDomain(): Coupon {
+fun CouponResponse.toDomain(): Coupon {
     return when(CouponType.fromCode(code)) {
         CouponType.FIXED5000 -> Coupon.Fixed5000(id, code, description, discountType, expirationDate, discount!!, minimumAmount!!)
         CouponType.BOGO -> Coupon.Bogo(id, code, description, expirationDate, buyQuantity!!, getQuantity!!, discountType)

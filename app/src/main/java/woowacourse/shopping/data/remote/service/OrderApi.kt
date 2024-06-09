@@ -5,13 +5,13 @@ import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
 import woowacourse.shopping.data.remote.RetrofitModule
-import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
+import woowacourse.shopping.data.remote.dto.request.OrderRequest
 
 interface OrderApi {
     @POST("/orders")
     suspend fun postOrders(
         @Header("accept") accept: String = "*/*",
-        @Body orderRequestDto: OrderRequestDto,
+        @Body orderRequest: OrderRequest,
     ): Response<Unit>
 
     companion object {

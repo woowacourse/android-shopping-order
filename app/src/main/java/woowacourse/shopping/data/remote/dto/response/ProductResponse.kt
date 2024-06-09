@@ -3,8 +3,10 @@ package woowacourse.shopping.data.remote.dto.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Cart(
+data class ProductResponse(
     val id: Int,
-    val quantity: Int,
-    val product: Product,
+    val name: String,
+    val price: Int,
+    val imageUrl: String,
+    val category: String,
 )

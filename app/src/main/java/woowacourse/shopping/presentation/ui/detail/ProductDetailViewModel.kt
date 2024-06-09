@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
-import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
-import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
@@ -60,7 +60,7 @@ class ProductDetailViewModel(
         viewModelScope.launch {
             when (detailCartProduct.isNew) {
                 true -> {
-                    repository.postCartItem(CartItemRequestDto.fromCartProduct(detailCartProduct.cartProduct))
+                    repository.postCartItem(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
                         .onSuccess {
                             _cartProduct.postValue(UiState.Success(detailCartProduct))
                             Log.d("FIRST LOG", "${it.toLong()}")
@@ -78,7 +78,7 @@ class ProductDetailViewModel(
                     repository.patchCartItem(
                         id = detailCartProduct.cartProduct.cartId.toInt(),
                         quantityRequestDto =
-                            QuantityRequestDto(
+                            QuantityRequest(
                                 detailCartProduct.cartProduct.quantity,
                             ),
                     ).onSuccess {

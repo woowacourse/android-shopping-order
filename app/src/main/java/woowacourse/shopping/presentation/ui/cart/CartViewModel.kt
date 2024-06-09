@@ -5,8 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.dto.request.OrderRequestDto
-import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ErrorType
@@ -136,7 +135,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             repository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].cartProduct.quantity),
+                quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))
@@ -159,7 +158,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
 
             repository.patchCartItem(
                 id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].cartProduct.quantity),
+                quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
                     _carts.postValue(UiState.Success(cartProducts))

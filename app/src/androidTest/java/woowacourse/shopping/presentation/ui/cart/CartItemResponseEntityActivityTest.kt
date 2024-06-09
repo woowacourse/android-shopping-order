@@ -16,7 +16,7 @@ import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.presentation.ui.FakeRepository
 
 @RunWith(AndroidJUnit4::class)
-class CartEntityActivityTest {
+class CartItemResponseEntityActivityTest {
     @Before
     fun setUp() {
         RepositoryInjector.setInstance(FakeRepository())

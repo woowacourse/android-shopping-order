@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
-import woowacourse.shopping.data.remote.dto.request.CartItemRequestDto
-import woowacourse.shopping.data.remote.dto.request.QuantityRequestDto
+import woowacourse.shopping.data.remote.dto.request.CartItemRequest
+import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.mergeWith
 import woowacourse.shopping.domain.CartProduct
@@ -135,7 +135,7 @@ class ShoppingViewModel(private val repository: Repository) :
             cartProducts[index].plusQuantity()
 
             if (cartProducts[index].quantity == FIRST_UPDATE) {
-                repository.postCartItem(CartItemRequestDto.fromCartProduct(cartProducts[index]))
+                repository.postCartItem(CartItemRequest.fromCartProduct(cartProducts[index]))
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
                         saveRecentProduct(cartProducts[index])
@@ -148,7 +148,7 @@ class ShoppingViewModel(private val repository: Repository) :
             } else {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].quantity),
+                    quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         saveRecentProduct(cartProducts[index])
@@ -170,7 +170,7 @@ class ShoppingViewModel(private val repository: Repository) :
             if (cartProducts[index].quantity > 0) {
                 repository.patchCartItem(
                     id = cartProducts[index].cartId.toInt(),
-                    quantityRequestDto = QuantityRequestDto(quantity = cartProducts[index].quantity),
+                    quantityRequestDto = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
                         this@ShoppingViewModel.cartProducts.postValue(UiState.Success(cartProducts))
