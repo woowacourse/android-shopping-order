@@ -5,21 +5,28 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.RepositoryInjector
-import woowacourse.shopping.presentation.ui.FakeRepository
+import woowacourse.shopping.data.remote.injector.CartItemRepositoryInjector
+import woowacourse.shopping.data.remote.injector.CouponRepositoryInjector
+import woowacourse.shopping.data.remote.injector.OrderRepositoryInjector
+import woowacourse.shopping.data.remote.injector.ProductRepositoryInjector
+import woowacourse.shopping.presentation.ui.FakeCartItemRepository
+import woowacourse.shopping.presentation.ui.FakeCouponRepository
+import woowacourse.shopping.presentation.ui.FakeOrderRepository
+import woowacourse.shopping.presentation.ui.FakeProductRepository
 
 @RunWith(AndroidJUnit4::class)
 class CartItemResponseEntityActivityTest {
     @Before
     fun setUp() {
-        RepositoryInjector.setInstance(FakeRepository())
+        ProductRepositoryInjector.setInstance(FakeProductRepository())
+        CartItemRepositoryInjector.setInstance(FakeCartItemRepository())
+        CouponRepositoryInjector.setInstance(FakeCouponRepository())
+        OrderRepositoryInjector.setInstance(FakeOrderRepository())
     }
 
     @Test

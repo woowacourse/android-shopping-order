@@ -1,18 +1,14 @@
 package woowacourse.shopping.data.remote.injector
 
 import woowacourse.shopping.data.local.DefaultRecentProductDataSource
-import woowacourse.shopping.data.local.RecentProductDataSource
 import woowacourse.shopping.data.local.db.AppDatabase
-import woowacourse.shopping.data.remote.datasource.order.DefaultOrderDataSource
-import woowacourse.shopping.data.remote.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.remote.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.domain.OrderRepository
 import woowacourse.shopping.domain.RecentProductRepository
 
 object RecentProductRepositoryInjector {
     var instance: RecentProductRepository =
         RecentProductRepositoryImpl(
-            (DefaultRecentProductDataSource(AppDatabase.instance.recentProductDao()))
+            (DefaultRecentProductDataSource(AppDatabase.instance.recentProductDao())),
         )
         private set
 

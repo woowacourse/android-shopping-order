@@ -20,7 +20,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(ProductDetailViewModel::class.java) -> {
                 ProductDetailViewModel(
                     CartItemRepositoryInjector.instance,
-                    RecentProductRepositoryInjector.instance
+                    RecentProductRepositoryInjector.instance,
                 ) as T
             }
 
@@ -28,7 +28,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 ShoppingViewModel(
                     ProductRepositoryInjector.instance,
                     CartItemRepositoryInjector.instance,
-                    RecentProductRepositoryInjector.instance
+                    RecentProductRepositoryInjector.instance,
                 ) as T
             }
 
@@ -45,7 +45,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
                         RecentProductRepositoryInjector.instance,
                         ProductRepositoryInjector.instance,
                         CartItemRepositoryInjector.instance,
-                    )
+                    ),
                 ) as T
             }
 
@@ -53,7 +53,7 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 PaymentActionViewModel(
                     OrderRepositoryInjector.instance,
                     CouponRepositoryInjector.instance,
-                    RecentProductRepositoryInjector.instance
+                    RecentProductRepositoryInjector.instance,
                 ) as T
             }
 

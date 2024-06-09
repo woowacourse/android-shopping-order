@@ -18,7 +18,7 @@ import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 class CartViewModel(
-    private val cartItemRepository: CartItemRepository
+    private val cartItemRepository: CartItemRepository,
 ) : ViewModel(), CartActionHandler {
     private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
 
@@ -78,10 +78,9 @@ class CartViewModel(
 
     private fun getPaymentUiModel(): PaymentUiModel {
         return PaymentUiModel(
-            cartProducts = (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct }
+            cartProducts = (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct },
         )
     }
-
 
     private fun getCheckedIds(): List<Int> {
         return (_carts.value as UiState.Success).data.filter { it.isChecked }

@@ -8,8 +8,8 @@ import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.data.remote.service.CartItemApi
 
 class DefaultCartItemDataSource(
-    private val cartItemApi: CartItemApi = CartItemApi.service()
-): CartItemDataSource {
+    private val cartItemApi: CartItemApi = CartItemApi.service(),
+) : CartItemDataSource {
     override suspend fun getCartItems(
         page: Int,
         size: Int,
@@ -31,6 +31,7 @@ class DefaultCartItemDataSource(
     ): Response<Unit> {
         return cartItemApi.patchCartItem(id = id, quantityRequestDto = quantityRequestDto)
     }
+
     override suspend fun getCartItemsCounts(): Response<QuantityResponse> {
         return cartItemApi.getCartItemsCounts()
     }

@@ -5,13 +5,13 @@ import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.Coupon
 
 @Parcelize
-data class CouponUiModel (
+data class CouponUiModel(
     val coupon: Coupon,
-    val isChecked: Boolean = false
-): Parcelable
+    val isChecked: Boolean = false,
+) : Parcelable
 
 fun Coupon.toUiModel(): CouponUiModel {
     return CouponUiModel(
-        coupon = this
+        coupon = this,
     )
 }

@@ -6,14 +6,15 @@ import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.CouponRepository
 
 class CouponRepositoryImpl(
-    private val couponDataSource: CouponDataSource
-): CouponRepository {
-    override suspend fun getCoupons(): Result<List<Coupon>> = runCatching {
-        val response = couponDataSource.getCoupons()
-        if (response.isSuccessful) {
-            return Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
+    private val couponDataSource: CouponDataSource,
+) : CouponRepository {
+    override suspend fun getCoupons(): Result<List<Coupon>> =
+        runCatching {
+            val response = couponDataSource.getCoupons()
+            if (response.isSuccessful) {
+                return Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
+            }
+            return Result.failure(Throwable(response.errorBody().toString()))
+        }.onFailure {
         }
-        return Result.failure(Throwable(response.errorBody().toString()))
-    }.onFailure {
-    }
 }

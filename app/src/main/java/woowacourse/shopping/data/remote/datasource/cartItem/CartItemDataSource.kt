@@ -7,7 +7,6 @@ import woowacourse.shopping.data.remote.dto.response.CartsResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface CartItemDataSource {
-
     suspend fun getCartItems(
         page: Int = 0,
         size: Int = 20,

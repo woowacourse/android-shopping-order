@@ -7,8 +7,8 @@ import woowacourse.shopping.data.remote.dto.response.ProductsResponse
 import woowacourse.shopping.data.remote.service.ProductApi
 
 class DefaultProductDataSource(
-    private val productApi: ProductApi = ProductApi.service()
-): ProductDataSource {
+    private val productApi: ProductApi = ProductApi.service(),
+) : ProductDataSource {
     override suspend fun getProducts(
         category: String?,
         page: Int,

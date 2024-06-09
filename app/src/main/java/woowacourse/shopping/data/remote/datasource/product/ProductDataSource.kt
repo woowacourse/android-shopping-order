@@ -6,7 +6,6 @@ import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.ProductsResponse
 
 interface ProductDataSource {
-
     suspend fun getProducts(
         category: String? = null,
         page: Int = 0,

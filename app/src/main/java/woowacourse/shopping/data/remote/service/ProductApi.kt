@@ -41,6 +41,7 @@ interface ProductApi {
 
     companion object {
         private var service: ProductApi? = null
+
         fun service(): ProductApi {
             return service ?: RetrofitModule.defaultBuild.create(ProductApi::class.java)
         }

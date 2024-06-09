@@ -10,13 +10,19 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.RepositoryInjector
-import woowacourse.shopping.presentation.ui.FakeRepository
+import woowacourse.shopping.data.remote.injector.CartItemRepositoryInjector
+import woowacourse.shopping.data.remote.injector.CouponRepositoryInjector
+import woowacourse.shopping.data.remote.injector.OrderRepositoryInjector
+import woowacourse.shopping.data.remote.injector.ProductRepositoryInjector
+import woowacourse.shopping.presentation.ui.FakeCartItemRepository
+import woowacourse.shopping.presentation.ui.FakeCouponRepository
+import woowacourse.shopping.presentation.ui.FakeOrderRepository
+import woowacourse.shopping.presentation.ui.FakeProductRepository
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.cartProduct
 import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity.Companion.EXTRA_CART_PRODUCT
@@ -32,7 +38,10 @@ class ProductEntityDetailActivityTest {
 
     @Before
     fun setUp() {
-        RepositoryInjector.setInstance(FakeRepository())
+        ProductRepositoryInjector.setInstance(FakeProductRepository())
+        CartItemRepositoryInjector.setInstance(FakeCartItemRepository())
+        CouponRepositoryInjector.setInstance(FakeCouponRepository())
+        OrderRepositoryInjector.setInstance(FakeOrderRepository())
     }
 
     @Test
@@ -60,18 +69,19 @@ class ProductEntityDetailActivityTest {
     }
 
     @Test
-    fun `장바구니에_담으면_상품이_데이터에_추가된다`() {
-        ActivityScenario.launch<CartActivity>(intent)
-        RepositoryInjector.repository.getCartItems(0, 100).onSuccess {
-            it.size shouldBe 51 // 디폴트 갯수
-        }.onFailure {
-            throw IllegalStateException()
+    fun `장바구니에_담으면_상품이_데이터에_추가된다`() =
+        runTest {
+            ActivityScenario.launch<CartActivity>(intent)
+            CartItemRepositoryInjector.instance.getCartItems(0, 100).onSuccess {
+                it.size shouldBe 51 // 디폴트 갯수
+            }.onFailure {
+                throw IllegalStateException()
+            }
+            onView(withId(R.id.tv_add_cart)).perform(click())
+            CartItemRepositoryInjector.instance.getCartItems(0, 100).onSuccess {
+                it.size shouldBe 52 // 하나 증가한 갯수
+            }.onFailure {
+                throw IllegalStateException()
+            }
         }
-        onView(withId(R.id.tv_add_cart)).perform(click())
-        RepositoryInjector.repository.getCartItems(0, 100).onSuccess {
-            it.size shouldBe 52 // 하나 증가한 갯수
-        }.onFailure {
-            throw IllegalStateException()
-        }
-    }
 }

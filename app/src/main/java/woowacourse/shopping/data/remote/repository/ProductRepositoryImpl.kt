@@ -10,8 +10,8 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.ProductRepository
 
 class ProductRepositoryImpl(
-    private val productDataSource: ProductDataSource = DefaultProductDataSource()
-): ProductRepository {
+    private val productDataSource: ProductDataSource = DefaultProductDataSource(),
+) : ProductRepository {
     private val productPagingSource = ProductPagingSource(productDataSource)
 
     override suspend fun getProducts(

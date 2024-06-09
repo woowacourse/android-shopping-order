@@ -13,5 +13,5 @@ data class CouponResponse(
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
     val availableTime: AvailableTimeResponse? = null,
-    val discountType: String
+    val discountType: String,
 )

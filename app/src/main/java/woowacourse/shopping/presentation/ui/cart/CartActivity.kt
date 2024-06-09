@@ -91,12 +91,12 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         viewModel.navigateHandler.observe(
             this,
             EventObserver {
-                when(it) {
+                when (it) {
                     is NavigateUiState.ToPayment -> {
                         PaymentActivity.createIntent(this, it.paymentUiModel).apply { startActivity(this) }
                     }
                 }
-            }
+            },
         )
     }
 

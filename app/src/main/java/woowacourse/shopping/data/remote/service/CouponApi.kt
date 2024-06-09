@@ -14,6 +14,7 @@ interface CouponApi {
 
     companion object {
         private var service: CouponApi? = null
+
         fun service(): CouponApi {
             return service ?: RetrofitModule.defaultBuild.create(CouponApi::class.java)
         }

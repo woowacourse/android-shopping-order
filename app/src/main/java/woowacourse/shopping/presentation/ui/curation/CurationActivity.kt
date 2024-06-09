@@ -55,12 +55,12 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
         viewModel.navigateUiState.observe(
             this,
             EventObserver {
-                when(it) {
+                when (it) {
                     is NavigateUiState.ToPayment -> {
                         startActivity(PaymentActivity.createIntent(this, it.paymentUiModel))
                     }
                 }
-            }
+            },
         )
     }
 }

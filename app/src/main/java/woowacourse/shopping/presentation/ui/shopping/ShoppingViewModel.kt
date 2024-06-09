@@ -26,7 +26,7 @@ import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
 class ShoppingViewModel(
     private val productRepository: ProductRepository,
     private val cartItemRepository: CartItemRepository,
-    private val recentProductRepository: RecentProductRepository
+    private val recentProductRepository: RecentProductRepository,
 ) :
     ViewModel(), ShoppingActionHandler {
     private val _cartCount = MutableLiveData<Int>(0)

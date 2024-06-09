@@ -11,9 +11,8 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.utils.toIdOrNull
 
 class CartItemRepositoryImpl(
-    private val cartItemDataSource: CartItemDataSource = DefaultCartItemDataSource()
-): CartItemRepository {
-
+    private val cartItemDataSource: CartItemDataSource = DefaultCartItemDataSource(),
+) : CartItemRepository {
     override suspend fun getCartItems(
         page: Int,
         size: Int,
@@ -42,7 +41,7 @@ class CartItemRepositoryImpl(
         quantityRequestDto: QuantityRequest,
     ): Result<Unit> =
         runCatching {
-            Log.d("SDFEFS", "${id}")
+            Log.d("SDFEFS", "$id")
             val response = cartItemDataSource.patchCartItem(id, quantityRequestDto)
             if (response.isSuccessful) {
                 return Result.success(Unit)

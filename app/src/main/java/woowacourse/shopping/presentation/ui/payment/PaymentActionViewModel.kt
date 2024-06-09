@@ -22,9 +22,8 @@ import woowacourse.shopping.presentation.ui.payment.model.toUiModel
 class PaymentActionViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
-    private val recentProductRepository: RecentProductRepository
+    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), PaymentActionHandler {
-
     private val _coupons = MutableLiveData<PaymentUiModel>()
     val coupons: LiveData<PaymentUiModel> get() = _coupons
 
@@ -36,30 +35,31 @@ class PaymentActionViewModel(
 
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-
     fun setPaymentUiModel(paymentUiModel: PaymentUiModel) {
         _coupons.value = paymentUiModel
     }
 
-    override fun pay() = viewModelScope.launch {
-        if (_coupons.value == null)
-            return@launch
+    override fun pay() =
+        viewModelScope.launch {
+            if (_coupons.value == null) {
+                return@launch
+            }
 
-        _coupons.value!!.cartProducts.forEach {
-            updateRecentProduct(it)
-            updateUiModel.add(it.productId, it.copy(quantity = 0))
-        }
+            _coupons.value!!.cartProducts.forEach {
+                updateRecentProduct(it)
+                updateUiModel.add(it.productId, it.copy(quantity = 0))
+            }
 
-        orderRepository.postOrders(
-            OrderRequest(
-                _coupons.value!!.cartProductIds,
-            ),
-        ).onSuccess {
-            _navigateHandler.postValue(EventState(NavigateUiState.ToShopping(updateUiModel)))
-        }.onFailure {
-            _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
+            orderRepository.postOrders(
+                OrderRequest(
+                    _coupons.value!!.cartProductIds,
+                ),
+            ).onSuccess {
+                _navigateHandler.postValue(EventState(NavigateUiState.ToShopping(updateUiModel)))
+            }.onFailure {
+                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
+            }
         }
-    }
 
     fun updateRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
@@ -82,14 +82,22 @@ class PaymentActionViewModel(
         }
     }
 
-    fun loadCoupons() = viewModelScope.launch {
-        if (_coupons.value == null) return@launch
-        couponRepository.getCoupons()
-            .onSuccess {
-                _coupons.postValue(_coupons.value?.copy(couponUiModels = it.filter { it.isValid(cartProducts = _coupons.value!!.cartProducts) }.map { it.toUiModel() }))
-            }
-            .onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_COUPON_LOAD))
-            }
-    }
+    fun loadCoupons() =
+        viewModelScope.launch {
+            if (_coupons.value == null) return@launch
+            couponRepository.getCoupons()
+                .onSuccess {
+                    _coupons.postValue(
+                        _coupons.value?.copy(
+                            couponUiModels =
+                                it.filter {
+                                    it.isValid(cartProducts = _coupons.value!!.cartProducts)
+                                }.map { it.toUiModel() },
+                        ),
+                    )
+                }
+                .onFailure {
+                    _errorHandler.postValue(EventState(ErrorType.ERROR_COUPON_LOAD))
+                }
+        }
 }

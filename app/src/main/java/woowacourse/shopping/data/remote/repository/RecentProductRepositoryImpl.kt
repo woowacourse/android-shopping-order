@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.repository
 
-import woowacourse.shopping.data.local.DefaultRecentProductDataSource
 import woowacourse.shopping.data.local.RecentProductDataSource
 import woowacourse.shopping.data.local.mapper.toDomain
 import woowacourse.shopping.data.local.mapper.toEntity
@@ -8,9 +7,8 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.RecentProductRepository
 
 class RecentProductRepositoryImpl(
-    private val recentProductDataSource: RecentProductDataSource
-): RecentProductRepository {
-
+    private val recentProductDataSource: RecentProductDataSource,
+) : RecentProductRepository {
     override suspend fun findAllByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
             recentProductDataSource.findByLimit(limit).map { it.toDomain() }

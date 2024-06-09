@@ -7,9 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
@@ -157,7 +155,10 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         const val GRIDLAYOUT_COL = 2
         const val EXTRA_UPDATED_PRODUCT = "updatedProduct"
 
-        fun createIntent(context: Context, updateUiModel: UpdateUiModel): Intent {
+        fun createIntent(
+            context: Context,
+            updateUiModel: UpdateUiModel,
+        ): Intent {
             return Intent(context, ShoppingActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)

@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.CartItemRepository
 object CartItemRepositoryInjector {
     var instance: CartItemRepository =
         CartItemRepositoryImpl(
-            DefaultCartItemDataSource()
+            DefaultCartItemDataSource(),
         )
         private set
 

@@ -16,6 +16,7 @@ interface OrderApi {
 
     companion object {
         private var service: OrderApi? = null
+
         fun service(): OrderApi {
             return service ?: RetrofitModule.defaultBuild.create(OrderApi::class.java)
         }

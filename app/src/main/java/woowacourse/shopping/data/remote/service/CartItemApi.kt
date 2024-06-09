@@ -49,6 +49,7 @@ interface CartItemApi {
 
     companion object {
         private var service: CartItemApi? = null
+
         fun service(): CartItemApi {
             return service ?: RetrofitModule.defaultBuild.create(CartItemApi::class.java)
         }

@@ -30,9 +30,10 @@ object RetrofitModule {
             .addInterceptor(defaultAuthInterceptor)
             .build()
 
-    val defaultBuild: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(Json.asConverterFactory(contentType))
-        .client(defaultOkHttpClient)
-        .build()
+    val defaultBuild: Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .client(defaultOkHttpClient)
+            .build()
 }

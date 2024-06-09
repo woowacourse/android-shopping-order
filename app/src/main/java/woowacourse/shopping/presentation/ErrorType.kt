@@ -12,5 +12,5 @@ enum class ErrorType(val message: String, val code: Int) {
     ERROR_CART_COUNT_LOAD("카트 카운트 로드 에러", 9),
     ERROR_CURATION_LOAD("큐레이션 로드 에러", 10),
     ERROR_ORDER("주문 에러", 11),
-    ERROR_COUPON_LOAD("쿠폰 로드 에러", 12)
+    ERROR_COUPON_LOAD("쿠폰 로드 에러", 12),
 }

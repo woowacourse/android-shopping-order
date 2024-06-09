@@ -18,7 +18,7 @@ import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 class CurationViewModel(
     private val cartItemRepository: CartItemRepository,
-    private val curationUseCase: CurationUseCase
+    private val curationUseCase: CurationUseCase,
 ) : ViewModel(), CurationActionHandler {
     private val _cartProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val cartProducts: LiveData<UiState<List<CartProduct>>> get() = _cartProducts
@@ -46,16 +46,15 @@ class CurationViewModel(
         _navigateHandler.value = EventState(NavigateUiState.ToPayment(getPaymentUiModel()))
     }
 
-
     override fun onProductClick(cartProduct: CartProduct) {
     }
 
-
     private fun getPaymentUiModel(): PaymentUiModel {
         return PaymentUiModel(
-            cartProducts = (_cartProducts.value as UiState.Success).data.filter { it.quantity > 0 }
+            cartProducts = (_cartProducts.value as UiState.Success).data.filter { it.quantity > 0 },
         )
     }
+
     override fun onPlus(cartProduct: CartProduct) =
         viewModelScope.launch {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }

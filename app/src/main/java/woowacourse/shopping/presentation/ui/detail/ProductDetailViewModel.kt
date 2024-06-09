@@ -22,7 +22,7 @@ import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
 
 class ProductDetailViewModel(
     private val cartItemRepository: CartItemRepository,
-    private val recentProductRepository: RecentProductRepository
+    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(), DetailActionHandler {
     private val _cartProduct = MutableLiveData<UiState<DetailCartProduct>>(UiState.Loading)
     val cartProduct: LiveData<UiState<DetailCartProduct>> get() = _cartProduct
@@ -64,13 +64,12 @@ class ProductDetailViewModel(
                 true -> {
                     cartItemRepository.postCartItem(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
                         .onSuccess {
-                            _cartProduct.postValue(UiState.Success(detailCartProduct))
-                            Log.d("FIRST LOG", "${it.toLong()}")
                             saveRecentProduct(detailCartProduct.cartProduct.copy(cartId = it.toLong()))
                             updateUiModel.add(
                                 detailCartProduct.cartProduct.productId,
                                 detailCartProduct.cartProduct.copy(cartId = it.toLong()),
                             )
+                            _cartProduct.postValue(UiState.Success(detailCartProduct))
                         }.onFailure {
                             _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
                         }
@@ -84,12 +83,12 @@ class ProductDetailViewModel(
                                 detailCartProduct.cartProduct.quantity,
                             ),
                     ).onSuccess {
-                        _cartProduct.postValue(UiState.Success(detailCartProduct))
                         saveRecentProduct(detailCartProduct.cartProduct)
                         updateUiModel.add(
                             detailCartProduct.cartProduct.productId,
                             detailCartProduct.cartProduct,
                         )
+                        _cartProduct.postValue(UiState.Success(detailCartProduct))
                     }.onFailure {
                         _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS_MINUS))
                     }

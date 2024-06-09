@@ -6,5 +6,4 @@ interface RecentProductRepository {
     suspend fun findOrNull(): Result<RecentProduct?>
 
     suspend fun save(recentProduct: RecentProduct): Result<Long>
-
 }

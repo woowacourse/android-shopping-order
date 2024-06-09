@@ -5,7 +5,7 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.domain.CartProduct
 
 class ProductPagingSource(
-    private val productDataSource: ProductDataSource
+    private val productDataSource: ProductDataSource,
 ) {
     suspend fun load(
         defaultOffset: Int = 0,

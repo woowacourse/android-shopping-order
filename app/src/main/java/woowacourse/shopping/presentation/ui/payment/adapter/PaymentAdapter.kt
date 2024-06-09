@@ -10,7 +10,7 @@ import woowacourse.shopping.presentation.ui.payment.PaymentActionHandler
 import woowacourse.shopping.presentation.ui.payment.model.CouponUiModel
 
 class PaymentAdapter(
-    private val paymentActionHandler: PaymentActionHandler
+    private val paymentActionHandler: PaymentActionHandler,
 ) : ListAdapter<CouponUiModel, PaymentViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
