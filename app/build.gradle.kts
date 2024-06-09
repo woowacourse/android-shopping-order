@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -19,6 +21,34 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField(
+            "String",
+            "USER_NAME",
+            Properties().apply {
+                load(project.rootProject.file("local.properties").inputStream())
+            }["user.name"].toString(),
+        )
+
+        buildConfigField(
+            "String",
+            "PASSWORD",
+            Properties().apply {
+                load(project.rootProject.file("local.properties").inputStream())
+            }["password"].toString(),
+        )
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            Properties().apply {
+                load(project.rootProject.file("local.properties").inputStream())
+            }["base.url"].toString(),
+        )
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
