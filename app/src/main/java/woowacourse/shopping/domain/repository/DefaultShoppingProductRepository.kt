@@ -10,7 +10,7 @@ class DefaultShoppingProductRepository(
     private val cartSource: ShoppingCartDataSource,
 ) : ShoppingProductsRepository {
     override suspend fun pagedProducts(page: Int): Result<List<Product>> =
-        productsSource.findByPaged2(page).map { productsData ->
+        productsSource.findByPaged(page).map { productsData ->
             productsData.map { productData ->
                 productData.toDomain(productQuantity2(productData.id))
             }
@@ -19,18 +19,18 @@ class DefaultShoppingProductRepository(
     private suspend fun productQuantity2(productId: Long): Int = cartSource.findByProductId2(productId).getOrNull()?.quantity ?: 0
 
     override suspend fun allProductsUntilPage(page: Int): Result<List<Product>> =
-        productsSource.findAllUntilPage2(page).map { productsData ->
+        productsSource.findAllUntilPage(page).map { productsData ->
             productsData.map { productData ->
                 productData.toDomain(productQuantity2(productData.id))
             }
         }
 
     override suspend fun loadProduct(id: Long): Result<Product> =
-        productsSource.findById2(id).map { productData ->
+        productsSource.findById(id).map { productData ->
             productData.toDomain(productQuantity2(productData.id))
         }
 
-    override suspend fun isFinalPage(page: Int): Result<Boolean> = productsSource.isFinalPage2(page)
+    override suspend fun isFinalPage(page: Int): Result<Boolean> = productsSource.isFinalPage(page)
 
     companion object {
         private const val TAG = "DefaultShoppingProductRepository"
