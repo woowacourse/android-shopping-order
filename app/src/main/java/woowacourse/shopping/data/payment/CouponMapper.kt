@@ -2,13 +2,11 @@ package woowacourse.shopping.data.payment
 
 import woowacourse.shopping.data.payment.model.AvailableTime
 import woowacourse.shopping.data.payment.model.CouponData
-import woowacourse.shopping.data.payment.model.CouponsData
 import woowacourse.shopping.remote.dto.response.CouponResponse
-import woowacourse.shopping.remote.dto.response.CouponsResponse
 
 fun CouponResponse.toData(): CouponData {
-    when (this) {
-        is CouponResponse.Fixed5000 -> return CouponData.Fixed5000(
+    when (this.code) {
+        "FIXED5000" -> return CouponData.Fixed5000(
             id,
             code,
             description,
@@ -18,7 +16,7 @@ fun CouponResponse.toData(): CouponData {
             discountType,
         )
 
-        is CouponResponse.Bogo -> return CouponData.Bogo(
+        "BOGO" -> return CouponData.Bogo(
             id,
             code,
             description,
@@ -28,7 +26,7 @@ fun CouponResponse.toData(): CouponData {
             discountType,
         )
 
-        is CouponResponse.Freeshipping -> return CouponData.Freeshipping(
+        "FREESHIPPING" -> return CouponData.Freeshipping(
             id,
             code,
             description,
@@ -37,7 +35,7 @@ fun CouponResponse.toData(): CouponData {
             discountType,
         )
 
-        is CouponResponse.Miraclesale -> return CouponData.Miraclesale(
+        "MIRACLESALE" -> return CouponData.Miraclesale(
             id,
             code,
             description,
@@ -46,9 +44,7 @@ fun CouponResponse.toData(): CouponData {
             AvailableTime(availableTime.start, availableTime.end),
             discountType,
         )
-    }
-}
 
-fun CouponsResponse.toData(): CouponsData {
-    return CouponsData(coupons = coupons.map { it.toData() })
+        else -> throw Exception()
+    }
 }
