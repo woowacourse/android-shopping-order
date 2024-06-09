@@ -35,7 +35,7 @@ class DefaultShoppingCartRepositoryTest {
                 )
 
             // when
-            val actual = repository.loadAllCartItems2().getOrThrow()
+            val actual = repository.loadAllCartItems().getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(
@@ -58,7 +58,7 @@ class DefaultShoppingCartRepositoryTest {
                 )
 
             // when
-            val actual = repository.shoppingCartProductQuantity2().getOrThrow()
+            val actual = repository.shoppingCartProductQuantity().getOrThrow()
 
             // then
             assertThat(actual).isEqualTo(9)
@@ -81,7 +81,7 @@ class DefaultShoppingCartRepositoryTest {
                 )
 
             // when
-            repository.updateProductQuantity2(1, 10).getOrThrow()
+            repository.updateProductQuantity(1, 10).getOrThrow()
             val actual =
                 castSource.loadAllCartItems2().getOrThrow().find { it.id == 1L }?.quantity
                     ?: throw NoSuchElementException("there is no product")
@@ -98,7 +98,7 @@ class DefaultShoppingCartRepositoryTest {
             repository = DefaultShoppingCartRepository(castSource)
 
             // when
-            repository.addShoppingCartProduct2(1, 5).getOrThrow()
+            repository.addShoppingCartProduct(1, 5).getOrThrow()
 
             // then
             val actual =
@@ -116,7 +116,7 @@ class DefaultShoppingCartRepositoryTest {
             repository = DefaultShoppingCartRepository(castSource)
 
             // when
-            repository.removeShoppingCartProduct2(1).getOrThrow()
+            repository.removeShoppingCartProduct(1).getOrThrow()
 
             // then
             val actual = castSource.loadAllCartItems2().getOrThrow()

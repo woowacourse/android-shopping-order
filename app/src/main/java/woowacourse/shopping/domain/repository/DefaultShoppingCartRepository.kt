@@ -9,7 +9,7 @@ import woowacourse.shopping.ui.model.CartItem
 class DefaultShoppingCartRepository(
     private val cartSource: ShoppingCartDataSource,
 ) : ShoppingCartRepository {
-    override suspend fun loadAllCartItems2(): Result<List<CartItem>> =
+    override suspend fun loadAllCartItems(): Result<List<CartItem>> =
         cartSource.loadAllCartItems2().mapCatching { cartItemDatas ->
             cartItemDatas.map { cartItemData ->
                 CartItem(
@@ -21,15 +21,15 @@ class DefaultShoppingCartRepository(
             }
         }
 
-    override suspend fun shoppingCartProductQuantity2(): Result<Int> =
+    override suspend fun shoppingCartProductQuantity(): Result<Int> =
         cartSource.loadAllCartItems2().mapCatching { cartItemDatas -> cartItemDatas.sumOf { it.quantity } }
 
-    override suspend fun updateProductQuantity2(
+    override suspend fun updateProductQuantity(
         cartItemId: Long,
         quantity: Int,
     ): Result<Unit> = cartSource.updateProductsCount2(cartItemId, quantity)
 
-    override suspend fun addShoppingCartProduct2(
+    override suspend fun addShoppingCartProduct(
         productId: Long,
         quantity: Int,
     ): Result<Unit> {
@@ -44,7 +44,7 @@ class DefaultShoppingCartRepository(
         }
     }
 
-    override suspend fun removeShoppingCartProduct2(cartItemId: Long): Result<Unit> =
+    override suspend fun removeShoppingCartProduct(cartItemId: Long): Result<Unit> =
         cartSource.removeCartItem2(cartItemId)
 
 

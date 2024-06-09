@@ -90,7 +90,7 @@ class ProductDetailViewModel(
     fun addProductToCart() {
         val productCount = productCount.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            cartRepository.addShoppingCartProduct2(productId, productCount)
+            cartRepository.addShoppingCartProduct(productId, productCount)
                 .onSuccess {
                     // TODO : handle success
                     Log.d(TAG, "addProductToCart: success")

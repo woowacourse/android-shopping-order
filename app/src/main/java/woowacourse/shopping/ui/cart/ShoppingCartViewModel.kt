@@ -46,7 +46,7 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.loadAllCartItems2()
+            shoppingCartRepository.loadAllCartItems()
                 .onSuccess {
                     _cartItems.postValue(it)
                 }
@@ -60,9 +60,9 @@ class ShoppingCartViewModel(
 
     fun deleteItem(cartItemId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.removeShoppingCartProduct2(cartItemId)
+            shoppingCartRepository.removeShoppingCartProduct(cartItemId)
                 .onSuccess {
-                    shoppingCartRepository.loadAllCartItems2()
+                    shoppingCartRepository.loadAllCartItems()
                         .onSuccess {
                             _cartItems.postValue(it)
                         }
@@ -141,7 +141,7 @@ class ShoppingCartViewModel(
         item: CartItem,
         changeAmount: Int
     ) {
-        shoppingCartRepository.updateProductQuantity2(
+        shoppingCartRepository.updateProductQuantity(
             cartItemId = productId,
             quantity = item.quantity + changeAmount
         )
@@ -156,7 +156,7 @@ class ShoppingCartViewModel(
     }
 
     private suspend fun updateCartItems() {
-        shoppingCartRepository.loadAllCartItems2()
+        shoppingCartRepository.loadAllCartItems()
             .onSuccess { cartItems ->
                 withContext(Dispatchers.Main) {
                     updateCartItems(cartItems)

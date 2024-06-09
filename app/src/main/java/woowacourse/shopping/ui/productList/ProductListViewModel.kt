@@ -81,7 +81,7 @@ class ProductListViewModel(
 
     private fun calculateCartProductTotalCount() {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.shoppingCartProductQuantity2()
+            shoppingCartRepository.shoppingCartProductQuantity()
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _cartProductTotalCount.postValue(it)
@@ -129,7 +129,7 @@ class ProductListViewModel(
 
     private fun loadCartProducts() {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.loadAllCartItems2()
+            shoppingCartRepository.loadAllCartItems()
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _cartProducts.postValue(it)
@@ -178,7 +178,7 @@ class ProductListViewModel(
 
     override fun onIncrease(productId: Long, quantity: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.addShoppingCartProduct2(productId, INCREASE_AMOUNT)
+            shoppingCartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
                 .onSuccess {
                     loadCartProducts()
                     updateLoadedProduct(productId, INCREASE_AMOUNT)
@@ -216,7 +216,7 @@ class ProductListViewModel(
     ) {
         val find = findCartItemOrNull(productId) ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.updateProductQuantity2(find.id, quantity)
+            shoppingCartRepository.updateProductQuantity(find.id, quantity)
                 .onSuccess {
                     loadCartProducts()
                     updateLoadedProduct(productId, DECREASE_AMOUNT)
@@ -232,7 +232,7 @@ class ProductListViewModel(
 
     private fun updateProductsTotalCount() {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.shoppingCartProductQuantity2()
+            shoppingCartRepository.shoppingCartProductQuantity()
                 .onSuccess {
                     _cartProductTotalCount.postValue(it)
                 }

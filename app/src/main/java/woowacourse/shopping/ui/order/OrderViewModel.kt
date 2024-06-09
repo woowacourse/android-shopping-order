@@ -106,7 +106,7 @@ class OrderViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            cartRepository.addShoppingCartProduct2(productId, INCREASE_AMOUNT)
+            cartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
                 .onSuccess {
                     orderRepository.saveOrderItem(productId, quantity)
                         .onSuccess {
@@ -137,7 +137,7 @@ class OrderViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartRepository.findCartItemByProductId(productId)
                 .onSuccess { cartItem ->
-                    cartRepository.updateProductQuantity2(cartItemId = cartItem.id, quantity)
+                    cartRepository.updateProductQuantity(cartItemId = cartItem.id, quantity)
                         .onSuccess {
                             orderRepository.saveOrderItem(productId, quantity)
                                 .onSuccess {
