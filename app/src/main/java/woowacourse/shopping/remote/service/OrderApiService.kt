@@ -10,4 +10,9 @@ interface OrderApiService {
     fun createOrder(
         @Body cartItemIds: OrderRequest,
     ): Call<Unit>
+
+    @POST("/orders")
+    suspend fun createOrder2(
+        @Body cartItemIds: OrderRequest,
+    )
 }
