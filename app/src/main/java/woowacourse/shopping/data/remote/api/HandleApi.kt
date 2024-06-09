@@ -6,21 +6,21 @@ import retrofit2.HttpException
 import retrofit2.Response
 import woowacourse.shopping.ui.utils.exceptionHandler
 
-suspend inline fun <T : Any?> handleApi(crossinline execute: suspend () -> Response<T>): ApiResult<T> =
+suspend inline fun <T : Any?> handleApi(crossinline execute: suspend () -> Response<T>): ApiResponse<T> =
     coroutineScope {
-        val deferredResult = async<ApiResult<T>>(exceptionHandler()) {
+        val deferredResult = async<ApiResponse<T>>(exceptionHandler()) {
             try {
                 val response = execute()
                 val body = response.body()
                 if (response.isSuccessful && body != null) {
-                    ApiResult.Success(body)
+                    ApiResponse.Success(body)
                 } else {
-                    ApiResult.Error(code = response.code(), message = response.message())
+                    ApiResponse.Error(code = response.code(), message = response.message())
                 }
             } catch (e: HttpException) {
-                ApiResult.Error(code = e.code(), message = e.message())
+                ApiResponse.Error(code = e.code(), message = e.message())
             } catch (e: Throwable) {
-                ApiResult.Exception(e)
+                ApiResponse.Exception(e)
             }
         }
         return@coroutineScope deferredResult.await()

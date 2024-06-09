@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.response.Response
+import woowacourse.shopping.domain.result.Response
 
 interface ProductRepository {
     suspend fun allProducts(

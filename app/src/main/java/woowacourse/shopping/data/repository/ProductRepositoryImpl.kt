@@ -5,7 +5,7 @@ import woowacourse.shopping.data.datasource.ApiHandleCartDataSource
 import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
 import woowacourse.shopping.data.datasource.impl.ApiHandleCartDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ApiHandleProductDataSourceImpl
-import woowacourse.shopping.data.remote.api.ApiResult
+import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.api.result
 import woowacourse.shopping.data.remote.api.resultOrNull
 import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
@@ -13,12 +13,12 @@ import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.response.Fail
-import woowacourse.shopping.domain.response.Response
-import woowacourse.shopping.domain.response.handleApiResult
-import woowacourse.shopping.domain.response.handleError
-import woowacourse.shopping.domain.response.result
-import woowacourse.shopping.domain.response.resultOrNull
+import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.handleApiResult
+import woowacourse.shopping.domain.result.handleError
+import woowacourse.shopping.domain.result.result
+import woowacourse.shopping.domain.result.resultOrNull
 import kotlin.math.min
 
 class ProductRepositoryImpl(
@@ -92,11 +92,11 @@ class ProductRepositoryImpl(
                     val productResponse =
                         productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL)
                     when (productResponse) {
-                        is ApiResult.Success -> loadedProducts =
+                        is ApiResponse.Success -> loadedProducts =
                             productResponse.data.toProductList()
 
-                        is ApiResult.Error -> return@coroutineScope handleError(productResponse)
-                        is ApiResult.Exception -> return@coroutineScope Response.Exception(
+                        is ApiResponse.Error -> return@coroutineScope handleError(productResponse)
+                        is ApiResponse.Exception -> return@coroutineScope Response.Exception(
                             productResponse.e,
                         )
                     }

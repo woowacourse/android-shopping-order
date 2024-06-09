@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.response
+package woowacourse.shopping.domain.result
 
 import java.io.IOException
 

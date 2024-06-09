@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
-import woowacourse.shopping.domain.response.Response
+import woowacourse.shopping.domain.result.Response
 
 interface RecentProductRepository {
 

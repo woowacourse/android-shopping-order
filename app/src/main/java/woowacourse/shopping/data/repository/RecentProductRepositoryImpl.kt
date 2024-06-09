@@ -3,8 +3,8 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDao
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.response.Fail
-import woowacourse.shopping.domain.response.Response
+import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.Response
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :

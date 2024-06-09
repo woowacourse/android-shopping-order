@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource.impl
 
 import woowacourse.shopping.data.datasource.ApiHandleProductDataSource
-import woowacourse.shopping.data.remote.api.ApiResult
+import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.api.ShoppingRetrofit
 import woowacourse.shopping.data.remote.api.handleApi
 import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
@@ -11,8 +11,8 @@ class ApiHandleProductDataSourceImpl : ApiHandleProductDataSource {
     override suspend fun getProductsByOffset(
         page: Int,
         size: Int,
-    ): ApiResult<ResponseProductsGetDto> = handleApi { ShoppingRetrofit.productService.getProductsByOffset(page = page, size = size) }
+    ): ApiResponse<ResponseProductsGetDto> = handleApi { ShoppingRetrofit.productService.getProductsByOffset(page = page, size = size) }
 
-    override suspend fun getProductsById(id: Long): ApiResult<ResponseProductIdGetDto> =
+    override suspend fun getProductsById(id: Long): ApiResponse<ResponseProductIdGetDto> =
         handleApi { ShoppingRetrofit.productService.getProductsById(id = id) }
 }

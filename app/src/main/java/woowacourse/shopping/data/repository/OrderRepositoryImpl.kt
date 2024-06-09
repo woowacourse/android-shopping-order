@@ -4,8 +4,8 @@ import woowacourse.shopping.data.datasource.ApiHandleOrderDataSource
 import woowacourse.shopping.data.datasource.impl.ApiHandleOrderDataSourceImpl
 import woowacourse.shopping.data.remote.dto.request.RequestOrderPostDto
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.response.Response
-import woowacourse.shopping.domain.response.handleApiResult
+import woowacourse.shopping.domain.result.Response
+import woowacourse.shopping.domain.result.handleApiResult
 
 class OrderRepositoryImpl(private val dataSource: ApiHandleOrderDataSource = ApiHandleOrderDataSourceImpl()) :
     OrderRepository {
