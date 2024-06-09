@@ -12,58 +12,6 @@ class FakeShoppingCartDataSource(
 ) : ShoppingCartDataSource {
     constructor(vararg cartItemResponses: CartItemResponse) : this(cartItemResponses.toList())
 
-    override fun findByProductId(productId: Long): ProductIdsCountData {
-        val foundItem =
-            cartItemResponses.find { cartItemResponse -> cartItemResponse.product.id == productId }
-                ?: throw NoSuchElementException("there is no product $productId")
-
-        return ProductIdsCountData(foundItem.id, foundItem.quantity)
-    }
-
-    override fun loadAllCartItems(): List<CartItemData> {
-        TODO("Not yet implemented")
-    }
-
-    override fun addNewProduct(productIdsCountData: ProductIdsCountData) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeCartItem(cartItemId: Long) {
-        val foundItem =
-            cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
-                ?: throw NoSuchElementException()
-        cartItemResponses = cartItemResponses - foundItem
-    }
-
-    override fun plusProductsIdCount(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun minusProductsIdCount(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateProductsCount(
-        cartItemId: Long,
-        newQuantity: Int,
-    ) {
-        val foundItem =
-            cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
-                ?: throw NoSuchElementException()
-        val updatedItem = foundItem.copy(quantity = newQuantity)
-        val newCartItems =
-            cartItemResponses.map { cartItemResponse ->
-                if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
-            }
-        cartItemResponses = newCartItems
-    }
-
     override suspend fun findByProductId2(productId: Long): Result<ProductIdsCountData> =
         runCatching {
             val foundItem =
