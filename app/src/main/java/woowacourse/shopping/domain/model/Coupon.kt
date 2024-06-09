@@ -9,6 +9,7 @@ sealed class Coupon(
     open val description: String,
     open val expirationDate: LocalDate,
     open val discountType: String,
+    open val minimumAmount: Int = 0,
 ) {
     data class FixedDiscountCoupon(
         override val id: Long,
@@ -16,8 +17,8 @@ sealed class Coupon(
         override val description: String,
         override val expirationDate: LocalDate,
         override val discountType: String,
+        override val minimumAmount: Int,
         val discount: Int,
-        val minimumAmount: Int,
     ) : Coupon(id, code, description, expirationDate, discountType)
 
     data class BogoCoupon(
@@ -36,7 +37,7 @@ sealed class Coupon(
         override val description: String,
         override val expirationDate: LocalDate,
         override val discountType: String,
-        val minimumAmount: Int,
+        override val minimumAmount: Int,
     ) : Coupon(id, code, description, expirationDate, discountType)
 
     data class TimeBasedDiscountCoupon(
