@@ -8,22 +8,22 @@ class DefaultOrderRepository(
     private val cartSource: ShoppingCartDataSource,
 ) : OrderRepository {
     override suspend fun order(cartItemIds: List<Long>): Result<Unit> =
-        orderSource.order2(cartItemIds).map {
-            orderSource.clear2()
+        orderSource.order(cartItemIds).map {
+            orderSource.clear()
         }
 
     override suspend fun saveOrderItem(
         cartItemId: Long,
         quantity: Int,
-    ): Result<Unit> = orderSource.save2(cartItemId, quantity)
+    ): Result<Unit> = orderSource.save(cartItemId, quantity)
 
-    override suspend fun orderItems(): Result<Map<Long, Int>> = orderSource.load2()
+    override suspend fun orderItems(): Result<Map<Long, Int>> = orderSource.load()
 
-    override suspend fun allOrderItemsQuantity(): Result<Int> = orderSource.allQuantity2()
+    override suspend fun allOrderItemsQuantity(): Result<Int> = orderSource.allQuantity()
 
     override suspend fun orderItemsTotalPrice(): Result<Int> =
         runCatching {
-            val orders = orderSource.load2().getOrThrow()
+            val orders = orderSource.load().getOrThrow()
             val allCartItems = cartSource.loadAllCartItems2().getOrThrow()
 
             orders.map { (cartItemId, quantity) ->

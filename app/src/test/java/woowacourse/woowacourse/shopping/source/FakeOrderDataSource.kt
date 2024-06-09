@@ -6,12 +6,12 @@ class FakeOrderDataSource(
     private val orderSaved: MutableMap<Long, Int> = mutableMapOf(),
     private val orderService: MutableList<Long> = mutableListOf(),
 ) : OrderDataSource {
-    override suspend fun order2(cartItemIds: List<Long>): Result<Unit> =
+    override suspend fun order(cartItemIds: List<Long>): Result<Unit> =
         runCatching {
             orderService.addAll(cartItemIds)
         }
 
-    override suspend fun save2(
+    override suspend fun save(
         cartItemId: Long,
         quantity: Int,
     ): Result<Unit> =
@@ -19,17 +19,17 @@ class FakeOrderDataSource(
             orderSaved[cartItemId] = quantity
         }
 
-    override suspend fun load2(): Result<Map<Long, Int>> =
+    override suspend fun load(): Result<Map<Long, Int>> =
         runCatching {
             orderSaved
         }
 
-    override suspend fun allQuantity2(): Result<Int> =
+    override suspend fun allQuantity(): Result<Int> =
         runCatching {
             orderSaved.values.sum()
         }
 
-    override suspend fun clear2(): Result<Unit> =
+    override suspend fun clear(): Result<Unit> =
         runCatching {
             orderSaved.clear()
         }

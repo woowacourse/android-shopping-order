@@ -1,16 +1,16 @@
 package woowacourse.shopping.data.source
 
 interface OrderDataSource {
-    suspend fun order2(cartItemIds: List<Long>): Result<Unit>
+    suspend fun order(cartItemIds: List<Long>): Result<Unit>
 
-    suspend fun save2(
+    suspend fun save(
         cartItemId: Long,
         quantity: Int,
     ): Result<Unit>
 
-    suspend fun load2(): Result<Map<Long, Int>>
+    suspend fun load(): Result<Map<Long, Int>>
 
-    suspend fun allQuantity2(): Result<Int>
+    suspend fun allQuantity(): Result<Int>
 
-    suspend fun clear2(): Result<Unit>
+    suspend fun clear(): Result<Unit>
 }
