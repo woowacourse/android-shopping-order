@@ -32,7 +32,6 @@ class CartViewModelTest {
     private val recentProductRepository = RecentProductRepositoryImpl.get(FakeRecentProductDao)
     private lateinit var cartRepository: CartRepositoryImpl
 
-
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -58,19 +57,20 @@ class CartViewModelTest {
         // given
         viewModel.removeCartItem(DELETED_CART_ID)
 
-
         // then
         val actual = viewModel.cart.getOrAwaitValue()
         assertThat(actual.cartItems.size).isEqualTo(3)
     }
 
     companion object {
-        val CART_STUB = (0..3).toList().map {
-            CartWithProduct(
-                it.toLong(), Product(it.toLong(), "", "", (1_00 * it), ""),
-                Quantity(1)
-            )
-        }
+        val CART_STUB =
+            (0..3).toList().map {
+                CartWithProduct(
+                    it.toLong(),
+                    Product(it.toLong(), "", "", (1_00 * it), ""),
+                    Quantity(1),
+                )
+            }
         const val DELETED_CART_ID = 0L
     }
 }

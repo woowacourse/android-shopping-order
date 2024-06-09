@@ -12,12 +12,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.fixture.InstantTaskExecutorExtension
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.result.Result
+import woowacourse.shopping.fixture.InstantTaskExecutorExtension
 import woowacourse.shopping.fixture.getOrAwaitValue
 import woowacourse.shopping.ui.FakeRecentProductDao
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
@@ -43,7 +43,6 @@ class ProductDetailViewModelTest {
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
-
     }
 
     @Test

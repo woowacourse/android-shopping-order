@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Fail
@@ -70,8 +69,7 @@ class CartViewModel(
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private fun currentCartState(): CartItemsUiState =
-        _cart.value ?: CartItemsUiState(emptyList(), true)
+    private fun currentCartState(): CartItemsUiState = _cart.value ?: CartItemsUiState(emptyList(), true)
 
     init {
         loadCartItems()

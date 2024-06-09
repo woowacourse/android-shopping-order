@@ -12,7 +12,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.fixture.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
@@ -20,6 +19,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Result
+import woowacourse.shopping.fixture.InstantTaskExecutorExtension
 import woowacourse.shopping.fixture.getOrAwaitValue
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
@@ -42,7 +42,7 @@ class ProductContentsViewModelTest {
         coEvery {
             productRepository.allProductsResponse(
                 0,
-                20
+                20,
             )
         } returns Result.Success(PRODUCT_STUB.subList(0, 20))
         viewModel =
@@ -52,7 +52,6 @@ class ProductContentsViewModelTest {
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
-
     }
 
     @Test
@@ -61,7 +60,7 @@ class ProductContentsViewModelTest {
         coEvery {
             productRepository.allProductsResponse(
                 1,
-                20
+                20,
             )
         } returns Result.Success(PRODUCT_STUB.subList(20, 40))
 
@@ -77,11 +76,12 @@ class ProductContentsViewModelTest {
     fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
         // when
         coEvery { cartRepository.postCartItems(0, 1) } returns Result.Success(Unit)
-        coEvery { cartRepository.allCartItemsResponse() } returns Result.Success(
-            listOf(
-                CartWithProduct(0L, PRODUCT_STUB.first(), Quantity(1))
+        coEvery { cartRepository.allCartItemsResponse() } returns
+            Result.Success(
+                listOf(
+                    CartWithProduct(0L, PRODUCT_STUB.first(), Quantity(1)),
+                ),
             )
-        )
 
         // given
         viewModel.addCart(0)

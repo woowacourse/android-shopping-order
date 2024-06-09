@@ -104,10 +104,11 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         quantity: Int,
     ): Result<Unit> =
         handleApiResult(
-            result = dataSource.patchCartItems(
-                id = id,
-                request = RequestCartItemsPatchDto(quantity)
-            ),
+            result =
+                dataSource.patchCartItems(
+                    id = id,
+                    request = RequestCartItemsPatchDto(quantity),
+                ),
         )
 
     override suspend fun addProductToCart(

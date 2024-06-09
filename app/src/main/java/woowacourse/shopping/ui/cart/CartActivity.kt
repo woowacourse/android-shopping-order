@@ -11,7 +11,6 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding

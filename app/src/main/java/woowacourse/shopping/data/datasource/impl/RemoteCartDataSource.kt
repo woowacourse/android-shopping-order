@@ -13,8 +13,7 @@ class RemoteCartDataSource : CartDataSource {
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): ApiResponse<ResponseCartItemsGetDto> =
-        handleApi { ShoppingRetrofit.cartItemService.getCartItems(page = page, size = size) }
+    ): ApiResponse<ResponseCartItemsGetDto> = handleApi { ShoppingRetrofit.cartItemService.getCartItems(page = page, size = size) }
 
     override suspend fun postCartItems(request: RequestCartItemPostDto): ApiResponse<Unit> =
         handleApi { ShoppingRetrofit.cartItemService.postCartItem(request = request) }
@@ -27,8 +26,7 @@ class RemoteCartDataSource : CartDataSource {
     override suspend fun patchCartItems(
         id: Long,
         request: RequestCartItemsPatchDto,
-    ): ApiResponse<Unit> =
-        handleApi { ShoppingRetrofit.cartItemService.patchCartItem(id = id, request = request) }
+    ): ApiResponse<Unit> = handleApi { ShoppingRetrofit.cartItemService.patchCartItem(id = id, request = request) }
 
     override suspend fun getCartItemCounts(): ApiResponse<ResponseCartItemCountsGetDto> =
         handleApi { ShoppingRetrofit.cartItemService.getCartItemCounts() }
