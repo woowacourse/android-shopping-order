@@ -62,7 +62,7 @@ class ProductDetailViewModel(
 
     private fun loadLatestProduct() {
         viewModelScope.launch(Dispatchers.IO) {
-            productHistoryRepository.loadLatestProduct2()
+            productHistoryRepository.loadLatestProduct()
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _latestProduct.postValue(it)
@@ -78,7 +78,7 @@ class ProductDetailViewModel(
 
     private fun saveProductHistory() {
         viewModelScope.launch(Dispatchers.IO) {
-            productHistoryRepository.saveProductHistory2(productId)
+            productHistoryRepository.saveProductHistory(productId)
                 .onFailure {
                     // TODO : handle error
                     Log.e(TAG, "saveProductHistory: failure: it")

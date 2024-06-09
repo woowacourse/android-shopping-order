@@ -44,7 +44,7 @@ class DefaultProductHistoryRepositoryTest {
             productHistoryRepository = DefaultProductHistoryRepository(historySource, productSource)
 
             // when
-            val actual = productHistoryRepository.saveProductHistory2(productId)
+            val actual = productHistoryRepository.saveProductHistory(productId)
 
             // then
             assertThat(actual.isSuccess).isTrue()
@@ -66,8 +66,8 @@ class DefaultProductHistoryRepositoryTest {
             productHistoryRepository = DefaultProductHistoryRepository(historySource, productSource)
 
             // when
-            productHistoryRepository.saveProductHistory2(productId)
-            val actual = productHistoryRepository.loadLatestProduct2().getOrThrow()
+            productHistoryRepository.saveProductHistory(productId)
+            val actual = productHistoryRepository.loadLatestProduct().getOrThrow()
 
             // then
             assertThat(actual.id).isEqualTo(4L)

@@ -9,9 +9,9 @@ class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
     private val productDataSource: ProductDataSource,
 ) : ProductHistoryRepository {
-    override suspend fun saveProductHistory2(productId: Long): Result<Unit> = productHistoryDataSource.saveProductHistory2(productId)
+    override suspend fun saveProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.saveProductHistory2(productId)
 
-    override suspend fun loadLatestProduct2(): Result<Product> {
+    override suspend fun loadLatestProduct(): Result<Product> {
         val latestProductId =
             productHistoryDataSource.loadLatestProduct2().getOrNull()?.id
                 ?: return Result.failure(Exception("No latest product found"))
