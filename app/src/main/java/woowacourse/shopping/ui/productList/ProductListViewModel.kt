@@ -178,26 +178,10 @@ class ProductListViewModel(
 
     override fun onIncrease(productId: Long, quantity: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.addShoppingCartProduct2(productId, quantity)
+            shoppingCartRepository.addShoppingCartProduct2(productId, INCREASE_AMOUNT)
                 .onSuccess {
                     loadCartProducts()
                     updateLoadedProduct(productId, INCREASE_AMOUNT)
-                    updateProductsTotalCount()
-                }
-                .onFailure {
-                    // TODO: 에러 처리
-                    Log.e(TAG, "onIncrease2: failure: $it")
-                    throw it
-                }
-        }
-    }
-
-    private fun updateCartItemQuantity(find: CartItem, productId: Long, changeAmount: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.updateProductQuantity2(find.id, find.quantity + changeAmount)
-                .onSuccess {
-                    loadCartProducts()
-                    updateLoadedProduct(productId, changeAmount)
                     updateProductsTotalCount()
                 }
                 .onFailure {
@@ -266,7 +250,6 @@ class ProductListViewModel(
         private const val PAGE_MOVE_COUNT = 1
         private const val INCREASE_AMOUNT = 1
         private const val DECREASE_AMOUNT = -1
-        private const val FIRST_AMOUNT = 1
 
         fun factory(
             productRepository: ShoppingProductsRepository =
