@@ -22,14 +22,14 @@ import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.model.OrderInformation
-import woowacourse.shopping.ui.order.listener.OnOrderListener
+import woowacourse.shopping.ui.order.listener.OnNavigationPaymentListener
 
 class OrderViewModel(
     private val orderInformation: OrderInformation,
     private val orderRepository: OrderRepository,
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
-) : ViewModel(), OnOrderListener, OnItemQuantityChangeListener {
+) : ViewModel(), OnNavigationPaymentListener, OnItemQuantityChangeListener {
     private val _recommendProducts = MutableLiveData<List<Product>>(emptyList())
     val recommendProducts: LiveData<List<Product>> get() = _recommendProducts
 
@@ -39,23 +39,26 @@ class OrderViewModel(
     private val _ordersCount = MutableLiveData(orderInformation.ordersCount)
     val ordersCount: LiveData<Int> get() = _ordersCount
 
-    private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
-    val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
-
     private val _errorMessage: MutableLiveData<String> = MutableLiveData()
     val errorMessage: LiveData<String> get() = _errorMessage
 
-    override fun createOrder() {
+    private var _navigationPaymentEvent = MutableSingleLiveData<OrderInformation>()
+    val navigationPaymentEvent: SingleLiveData<OrderInformation> get() = _navigationPaymentEvent
+
+    override fun onOrderClick() {
         viewModelScope.launch {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
             handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
                 val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
-                viewModelScope.launch {
-                    orderRepository.orderCartItems(orderInformation.cartItemIds + cartItemIds)
-                }
+                _navigationPaymentEvent.setValue(
+                    OrderInformation(
+                        cartItemIds = orderInformation.cartItemIds + cartItemIds,
+                        orderAmount = orderAmount.value ?: 0,
+                        ordersCount = ordersCount.value ?: 0,
+                    )
+                )
             }
-            _isOrderSuccess.setValue(true)
         }
     }
 

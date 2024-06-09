@@ -15,7 +15,7 @@
 
         <variable
             name="onOrderListener"
-            type="woowacourse.shopping.ui.order.listener.OnOrderListener" />
+            type="woowacourse.shopping.ui.order.listener.OnNavigationPaymentListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +50,7 @@
             android:text="@{@string/order_items_count(ordersCount)}"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:onClick="@{() -> onOrderListener.createOrder()}"
+            android:onClick="@{() -> onOrderListener.onOrderClick()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_recommended_order_price"

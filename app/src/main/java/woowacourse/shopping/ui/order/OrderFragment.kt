@@ -49,13 +49,18 @@ class OrderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initToolbar()
         initRecommendProductsAdapter()
-        observeIsOrderSuccess()
+        observeNavigationPaymentEvent()
         observeErrorMessage()
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.loadRecommendedProducts()
+    }
+
+    private fun initViewModel() {
+        fetchOrderInformation()
+        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
     private fun fetchOrderInformation() {
@@ -65,11 +70,6 @@ class OrderFragment : Fragment() {
                     ?: throw NoSuchElementException()
             factory = OrderViewModel.factory(orderInformation)
         }
-    }
-
-    private fun initViewModel() {
-        fetchOrderInformation()
-        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
     private fun initBinding() {
@@ -90,17 +90,10 @@ class OrderFragment : Fragment() {
         }
     }
 
-    private fun observeIsOrderSuccess() {
-        viewModel.isOrderSuccess.observe(viewLifecycleOwner) { isOrderSuccess ->
-            if (isOrderSuccess) {
-                makeToast(getString(R.string.order_success))
-                parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            }
+    private fun observeNavigationPaymentEvent() {
+        viewModel.navigationPaymentEvent.observe(viewLifecycleOwner) { orderInformation ->
+            (requireActivity() as FragmentNavigator).navigateToPayment(orderInformation)
         }
-    }
-
-    private fun makeToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun observeErrorMessage() {
