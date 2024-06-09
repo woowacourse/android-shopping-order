@@ -1,28 +1,26 @@
 package woowacourse.shopping.ui.detail.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.ApiResponse
-import woowacourse.shopping.data.repository.Error
-import woowacourse.shopping.data.repository.onError
-import woowacourse.shopping.data.repository.onException
-import woowacourse.shopping.data.repository.onSuccess
-import woowacourse.shopping.data.repository.toErrorNothing
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.response.Fail
+import woowacourse.shopping.domain.response.onException
+import woowacourse.shopping.domain.response.onFail
+import woowacourse.shopping.domain.response.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.detail.uimodel.ProductDetailError
+import woowacourse.shopping.ui.detail.uimodel.checkProductDetailError
+import woowacourse.shopping.ui.detail.uimodel.toProductDetailUiError
 import woowacourse.shopping.ui.utils.Event
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
+import woowacourse.shopping.ui.utils.viewModelLaunch
 
 class ProductDetailViewModel(
     private val productId: Long,
@@ -30,11 +28,8 @@ class ProductDetailViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel(), CountButtonClickListener {
-    private val _error: MutableSingleLiveData<Error<Nothing>> = MutableSingleLiveData()
-    val error: SingleLiveData<Error<Nothing>> get() = _error
-
-    private val _errorMsg: MutableLiveData<Event<String>> = MutableLiveData(Event(""))
-    val errorMsg: LiveData<Event<String>> get() = _errorMsg
+    private val _error: MutableSingleLiveData<ProductDetailError> = MutableSingleLiveData()
+    val error: SingleLiveData<ProductDetailError> get() = _error
 
     private val _productWithQuantity: MutableLiveData<ProductWithQuantity> = MutableLiveData()
     val productWithQuantity: LiveData<ProductWithQuantity> get() = _productWithQuantity
@@ -53,85 +48,74 @@ class ProductDetailViewModel(
     private val _addCartComplete = MutableSingleLiveData<Unit>()
     val addCartComplete: SingleLiveData<Unit> get() = _addCartComplete
 
+    private fun currentCount(): ProductWithQuantity =
+        _productWithQuantity.value ?: error("상품 데이터를 초기화 해주세요")
+
     init {
         loadProduct()
     }
 
     fun loadProduct() {
-        viewModelScope.launch {
-            productRepository.find(productId).onSuccess {
+        viewModelLaunch(::productExceptionHandler) {
+            productRepository.productByIdResponse(productId).onSuccess {
                 _productWithQuantity.value = ProductWithQuantity(product = it)
-            }.onError {
-                _error.setValue(it)
-            }.onException {
-                Log.d(this.javaClass.simpleName, "${it.e}")
-            }
+            }.checkProductDetailError { _error.setValue(it) }
         }
     }
 
     override fun plusCount(productId: Long) {
-        _productWithQuantity.value?.let {
-            _productWithQuantity.value = it.inc()
-        }
+        _productWithQuantity.value = currentCount().inc()
     }
 
     override fun minusCount(productId: Long) {
-        _productWithQuantity.value?.let {
-            _productWithQuantity.value = it.dec()
-        }
+        _productWithQuantity.value = currentCount().dec()
     }
 
     fun addProductToCart() {
-        viewModelScope.launch {
-            _productWithQuantity.value?.let { productWithQuantity ->
-                with(productWithQuantity) {
-                    cartRepository.addProductToCart(this.product.id, this.quantity.value)
-                }
+        viewModelLaunch(::addCartExceptionHandler) {
+            cartRepository.addProductToCart(
+                currentCount().product.id,
+                currentCount().quantity.value
+            ).onSuccess {
                 loadProduct()
+                _addCartComplete.setValue(Unit)
+            }.checkProductDetailError {
+                _error.setValue(it)
             }
-            _addCartComplete.setValue(Unit)
         }
     }
 
     fun addToRecentProduct(lastSeenProductState: Boolean) {
-        viewModelScope.launch {
+        viewModelLaunch(::recentExceptionHandler) {
             loadMostRecentProduct(productId, lastSeenProductState)
+        }
+
+        viewModelLaunch {
             recentProductRepository.insert(productId)
         }
+
     }
 
     private fun loadMostRecentProduct(
         productId: Long,
         lastSeenProductState: Boolean,
     ) {
-        viewModelScope.launch {
-            recentProductRepository.findMostRecentProduct()?.let {
-                runCatching {
-                    productByIdOrNull(it.productId)
-                }.onSuccess {
-                    if (!lastSeenProductState || it == null) return@launch
-                    _mostRecentProduct.value = it
-                    setMostRecentVisibility(it.id, productId)
-                }.onFailure {
+        viewModelLaunch(::recentExceptionHandler) {
+            recentProductRepository.mostRecentProductResponse().onSuccess {
+                if (!lastSeenProductState) {
                     _mostRecentProductVisibility.value = false
-                    _error.setValue(Error.Unknown(it.message))
+                } else {
+                    _mostRecentProduct.value = productRepository.productById(productId)
+                    setMostRecentVisibility(it.id, productId)
                 }
-            }
-        }
-    }
-
-    private suspend fun productByIdOrNull(productId: Long): Product? {
-        val response = viewModelScope.async { productRepository.find(productId) }.await()
-        return when (response) {
-            is ApiResponse.Success -> response.data
-            is Error -> {
-                _error.setValue(response.toErrorNothing())
-                null
-            }
-
-            is ApiResponse.Exception -> {
-                Log.d(this.javaClass.simpleName, "${response.e}")
-                null
+            }.onFail {
+                if (it is Fail.NotFound) {
+                    _mostRecentProductVisibility.value = false
+                } else {
+                    _error.setValue(it.toProductDetailUiError())
+                }
+            }.onException {
+                _error.setValue(ProductDetailError.UnKnown)
             }
         }
     }
@@ -141,5 +125,17 @@ class ProductDetailViewModel(
         currentProductId: Long,
     ) {
         _mostRecentProductVisibility.value = (mostRecentProductId != currentProductId)
+    }
+
+    private fun productExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductDetailError.LoadProduct)
+    }
+
+    private fun addCartExceptionHandler(throwable: Throwable) {
+        _error.setValue(ProductDetailError.AddCart)
+    }
+
+    private fun recentExceptionHandler(throwable: Throwable) {
+        _mostRecentProductVisibility.value = false
     }
 }

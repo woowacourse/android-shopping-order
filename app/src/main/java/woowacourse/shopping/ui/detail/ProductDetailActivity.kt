@@ -10,11 +10,11 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.Error
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.detail.uimodel.MostRecentProductClickListener
+import woowacourse.shopping.ui.detail.uimodel.ProductDetailError
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModelFactory
 import woowacourse.shopping.ui.utils.showToastMessage
@@ -85,11 +85,14 @@ class ProductDetailActivity :
     private fun observeErrorMessage() {
         viewModel.error.observe(this) { error ->
             when (error) {
-                is Error.Network -> showToastMessage(R.string.server_error)
-                is Error.NotFound -> showToastMessage(R.string.not_fount_error)
-                is Error.Unauthorized -> showToastMessage(R.string.unauthorized_error)
-                is Error.Unknown -> showToastMessage(R.string.unknown_error)
+                ProductDetailError.AddCart -> showToastMessage(R.string.cart_error)
+                ProductDetailError.ChangeCount -> showToastMessage(R.string.server_error)
+                ProductDetailError.InvalidAuthorized -> showToastMessage(R.string.unauthorized_error)
+                ProductDetailError.LoadProduct -> showToastMessage(R.string.server_error)
+                ProductDetailError.Network -> showToastMessage(R.string.server_error)
+                ProductDetailError.UnKnown -> showToastMessage(R.string.unknown_error)
             }
+
         }
     }
 
