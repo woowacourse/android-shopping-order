@@ -1,7 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -9,7 +7,6 @@ import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingCartRepository(
     private val cartSource: ShoppingCartDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ShoppingCartRepository {
     override fun loadAllCartItems(): List<CartItem> {
         return cartSource.loadAllCartItems().map {
@@ -65,7 +62,17 @@ class DefaultShoppingCartRepository(
     override suspend fun addShoppingCartProduct2(
         productId: Long,
         quantity: Int,
-    ): Result<Unit> = cartSource.addNewProduct2(ProductIdsCountData(productId, quantity))
+    ): Result<Unit> {
+        return runCatching {
+            val cartItem = cartSource.loadAllCartItems2().getOrThrow().find { it.product.id == productId }
+
+            if (cartItem != null) {
+                cartSource.updateProductsCount2(cartItem.id, cartItem.quantity + quantity)
+            } else {
+                cartSource.addNewProduct2(ProductIdsCountData(productId, quantity))
+            }
+        }
+    }
 
     override suspend fun removeShoppingCartProduct2(cartItemId: Long): Result<Unit> = cartSource.removeCartItem2(cartItemId)
 }
