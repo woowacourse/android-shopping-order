@@ -1,10 +1,13 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
@@ -16,14 +19,12 @@ import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
-import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
     ShoppingCartListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
 
     private var _cartItems = MutableLiveData<List<CartItem>>()
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
@@ -44,21 +45,32 @@ class ShoppingCartViewModel(
     val event: SingleLiveData<ShoppingCartEvent> get() = _event
 
     fun loadAll() {
-        thread {
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-            _cartItems.postValue(currentItems)
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.loadAllCartItems2()
+                .onSuccess {
+                    _cartItems.postValue(it)
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.d(TAG, "loadAll: failure: $it")
+                    throw it
+                }
         }
     }
 
     fun deleteItem(cartItemId: Long) {
-        thread {
-            shoppingCartRepository.removeShoppingCartProduct(cartItemId)
-        }.join()
-
-        thread {
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-            _cartItems.postValue(currentItems)
-        }.join()
+        viewModelScope.launch(Dispatchers.IO) {
+            shoppingCartRepository.removeShoppingCartProduct2(cartItemId)
+                .onSuccess {
+                    val currentItems = shoppingCartRepository.loadAllCartItems()
+                    _cartItems.postValue(currentItems)
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.d(TAG, "deleteItem: failure: $it")
+                    throw it
+                }
+        }
 
         updateTotalPrice()
         updateSelectedCartItemsCount()
@@ -76,14 +88,24 @@ class ShoppingCartViewModel(
     }
 
     override fun navigateToOrder() {
-        if (selectedCartItemsCount.value == 0) return
+        if (selectedCartItemsCount.value == 0) {
+            // TOOD: show toast message: "선택된 상품이 없습니다."
+            return
+        }
 
-        thread {
-            _event.postValue(ShoppingCartEvent.NavigationOrder)
 
+        viewModelScope.launch(Dispatchers.IO) {
             cartItems.value?.forEach { cartItem ->
                 if (cartItem.checked) {
-                    orderRepository.saveOrderItem(cartItem.product.id, cartItem.quantity)
+                    orderRepository.saveOrderItem2(cartItem.product.id, cartItem.quantity)
+                        .onSuccess {
+                            _event.postValue(ShoppingCartEvent.NavigationOrder)
+                        }
+                        .onFailure {
+                            // TODO : handle error
+                            Log.d(TAG, "navigateToOrder: failure: $it")
+                            throw it
+                        }
                 }
             }
         }
@@ -93,25 +115,53 @@ class ShoppingCartViewModel(
         _deletedItemId.setValue(productId)
     }
 
-    // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
+    // 여기서의 파라미터 productId 는 실제로는 cartItemId.
     override fun onIncrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            val item =
-                cartItems.value?.find { it.id == productId }
-                    ?: throw NoSuchElementException("There is no product with id: $productId")
-            shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity + 1)
-            val currentItems = shoppingCartRepository.loadAllCartItems()
+        viewModelScope.launch(Dispatchers.IO) {
+            val item = cartItems.value?.find { it.id == productId }
+                ?: throw NoSuchElementException("There is no product with id: $productId")
+            // TODO: 위에서 못 찰을 수가 없음. 만약 못 찾는 다면, viewmodel 이 가진 error 객체에게 보내서 예기치 못한 오류 설정하기
 
-            uiHandler.post {
-                updateCartItems(currentItems)
-
-                updateTotalPrice()
-                updateSelectedCartItemsCount()
-            }
+            updateProductQuantity(productId, item, INCREASE_AMOUNT)
         }
+    }
+
+    private suspend fun updateProductQuantity(
+        productId: Long,
+        item: CartItem,
+        changeAmount: Int
+    ) {
+        shoppingCartRepository.updateProductQuantity2(
+            cartItemId = productId,
+            quantity = item.quantity + changeAmount
+        )
+            .onSuccess {
+                updateCartItems()
+            }
+            .onFailure {
+                // TODO : handle error
+                Log.d(TAG, "onIncrease: updateProductQuantity2: $it")
+                throw it
+            }
+    }
+
+    private suspend fun updateCartItems() {
+        shoppingCartRepository.loadAllCartItems2()
+            .onSuccess { cartItems ->
+                withContext(Dispatchers.Main) {
+                    updateCartItems(cartItems)
+                    updateTotalPrice()
+                    updateSelectedCartItemsCount()
+                }
+            }
+            .onFailure {
+                // TODO: handle error
+                Log.d(TAG, "onIncrease - loadAllCartItems2 : failure: $it")
+                throw it
+            }
     }
 
     // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
@@ -119,19 +169,12 @@ class ShoppingCartViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            val item =
-                cartItems.value?.find { it.id == productId }
-                    ?: throw NoSuchElementException("There is no product with id: $productId")
-            shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity - 1)
+        viewModelScope.launch(Dispatchers.IO) {
+            val item = cartItems.value?.find { it.id == productId }
+                ?: throw NoSuchElementException("There is no product with id: $productId")
+            // TODO: 위에서 못 찰을 수가 없음. 만약 못 찾는 다면, viewmodel 이 가진 error 객체에게 보내서 예기치 못한 오류 설정하기
 
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-                updateSelectedCartItemsCount()
-            }
+            updateProductQuantity(productId, item, DECREASE_AMOUNT)
         }
     }
 
@@ -194,6 +237,9 @@ class ShoppingCartViewModel(
 
     companion object {
         private const val TAG = "ShoppingCartViewModel"
+
+        private const val INCREASE_AMOUNT = 1
+        private const val DECREASE_AMOUNT = -1
 
         fun factory(
             shoppingCartRepository: ShoppingCartRepository =
