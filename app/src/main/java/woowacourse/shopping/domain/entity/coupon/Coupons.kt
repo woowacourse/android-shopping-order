@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.entity.coupon
 import woowacourse.shopping.domain.entity.Cart
 
 @JvmInline
-value class Coupons(val coupons: List<Coupon>) {
+value class Coupons(val coupons: List<Coupon> = emptyList()) {
     fun availableCoupons(cart: Cart): Coupons {
         return coupons
             .filter { it.available(cart) }
