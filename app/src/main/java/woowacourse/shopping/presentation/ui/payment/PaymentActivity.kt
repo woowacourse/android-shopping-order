@@ -16,7 +16,7 @@ import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.utils.getParcelableExtraCompat
 
 class PaymentActivity : BindingActivity<ActivityPaymentBinding>(R.layout.activity_payment) {
-    private val viewModel: PaymentActionViewModel by viewModels { ViewModelFactory() }
+    private val viewModel: PaymentViewModel by viewModels { ViewModelFactory() }
     private val paymentAdapter: PaymentAdapter by lazy { PaymentAdapter(viewModel) }
 
     override fun initStartView() {

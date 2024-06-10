@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.payment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
@@ -20,7 +19,7 @@ import woowacourse.shopping.presentation.ui.payment.model.PaymentNavigation
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
 import woowacourse.shopping.presentation.ui.payment.model.toUiModel
 
-class PaymentActionViewModel(
+class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
     private val recentProductRepository: RecentProductRepository,

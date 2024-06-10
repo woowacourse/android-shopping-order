@@ -11,7 +11,7 @@ import woowacourse.shopping.domain.usecase.CurationUseCase
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.curation.CurationViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
-import woowacourse.shopping.presentation.ui.payment.PaymentActionViewModel
+import woowacourse.shopping.presentation.ui.payment.PaymentViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
 class ViewModelFactory : ViewModelProvider.Factory {
@@ -49,8 +49,8 @@ class ViewModelFactory : ViewModelProvider.Factory {
                 ) as T
             }
 
-            modelClass.isAssignableFrom(PaymentActionViewModel::class.java) -> {
-                PaymentActionViewModel(
+            modelClass.isAssignableFrom(PaymentViewModel::class.java) -> {
+                PaymentViewModel(
                     OrderRepositoryInjector.instance,
                     CouponRepositoryInjector.instance,
                     RecentProductRepositoryInjector.instance,

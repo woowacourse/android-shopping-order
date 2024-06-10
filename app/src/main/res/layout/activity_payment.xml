@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="woowacourse.shopping.presentation.ui.payment.PaymentActionViewModel" />
+            type="woowacourse.shopping.presentation.ui.payment.PaymentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
