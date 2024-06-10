@@ -57,11 +57,9 @@ class PaymentViewModel(
         val uiState = _uiState.value ?: return
         val selectedCoupon = uiState.selectedCoupon
         if (selectedCoupon?.id == couponId) {
-            unSelectAllCoupons()
-        } else {
-            unSelectAllCoupons()
-            selectCoupon(couponId)
+            return unSelectCoupon()
         }
+        selectCoupon(couponId)
     }
 
     fun orderProducts() {
@@ -106,7 +104,7 @@ class PaymentViewModel(
             )
     }
 
-    private fun unSelectAllCoupons() {
+    private fun unSelectCoupon() {
         val uiState = _uiState.value ?: return
         _uiState.value =
             uiState.copy(
