@@ -2,6 +2,8 @@ package woowacourse.shopping.data.repository
 
 import android.content.Context
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
+import woowacourse.shopping.domain.mapper.CartItemEntityMapper.toCartItem
+import woowacourse.shopping.domain.mapper.CartItemEntityMapper.toCartItemEntity
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.cart.CartItemCounter
@@ -11,8 +13,6 @@ import woowacourse.shopping.domain.model.cart.UpdateCartItemType
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.ErrorEvent
-import woowacourse.shopping.utils.mapper.CartItemMapper.toCartItem
-import woowacourse.shopping.utils.mapper.CartItemMapper.toCartItemEntity
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 
 class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
