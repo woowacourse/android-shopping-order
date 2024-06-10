@@ -5,6 +5,7 @@
     tools:context=".ui.payment.PaymentFragment">
 
     <data>
+
         <variable
             name="vm"
             type="woowacourse.shopping.ui.payment.PaymentViewModel" />
