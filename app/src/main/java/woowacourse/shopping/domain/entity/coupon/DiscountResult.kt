@@ -6,5 +6,9 @@ data class DiscountResult(
     val shippingFee: Long,
 ) {
     val paymentPrice: Long
-        get() = orderPrice - discountPrice + shippingFee
+        get() {
+            val price = orderPrice - discountPrice + shippingFee
+            require(price >= 0) { "결제 금액은 0원 이상이어야 합니다." }
+            return price
+        }
 }
