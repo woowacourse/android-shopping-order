@@ -14,7 +14,7 @@ class CouponsTest {
         val coupons =
             fakeCoupons(
                 fakePercentageCoupon(currentTime = 5, availableStartTime = 4, availableEndTime = 6),
-                fakeBuyXGetYCoupon(buyCount = 0, freeCount = 1),
+                fakeBOGOCoupon(buyCount = 0, freeCount = 1),
                 fakeFixedCoupon(discountableMinPrice = 50_001),
                 fakeFreeShippingCoupon(discountableMinPrice = 50_001),
             )
@@ -28,7 +28,7 @@ class CouponsTest {
                     availableStartTime = 4,
                     availableEndTime = 6,
                 ),
-                fakeBuyXGetYCoupon(buyCount = 0, freeCount = 1),
+                fakeBOGOCoupon(buyCount = 0, freeCount = 1),
             )
         actual shouldBe expect
     }

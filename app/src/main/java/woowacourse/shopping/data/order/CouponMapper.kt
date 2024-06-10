@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.order
 
 import woowacourse.shopping.data.order.model.DiscountType
-import woowacourse.shopping.domain.entity.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.entity.coupon.BOGOCoupon
 import woowacourse.shopping.domain.entity.coupon.Coupon
 import woowacourse.shopping.domain.entity.coupon.Coupons
 import woowacourse.shopping.domain.entity.coupon.FixedCoupon
@@ -24,7 +24,7 @@ fun CouponResponse.toDomain(): Coupon? {
     val discountType = DiscountType.from(discountType) ?: return null
     return when (discountType) {
         DiscountType.FIXED -> toFixedCoupon()
-        DiscountType.BUY_X_GET_Y -> toBuyXGetYCoupon()
+        DiscountType.BUY_X_GET_Y -> toBOGOCoupon()
         DiscountType.FREE_SHIPPING -> toFreeShippingCoupon()
         DiscountType.PERCENTAGE -> toPercentageCoupon()
     }
@@ -42,8 +42,8 @@ private fun CouponResponse.toFixedCoupon(): FixedCoupon {
     )
 }
 
-private fun CouponResponse.toBuyXGetYCoupon(): BuyXGetYCoupon {
-    return BuyXGetYCoupon(
+private fun CouponResponse.toBOGOCoupon(): BOGOCoupon {
+    return BOGOCoupon(
         id = id,
         code = code,
         description = description,

@@ -86,4 +86,8 @@ class FakeCartRepository(
         val startIndex = currentPage * pageSize
         return Result.success(startIndex < products.size)
     }
+
+    override fun clearCart() {
+        TODO("Not yet implemented")
+    }
 }

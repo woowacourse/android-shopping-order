@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.fakeCartProduct
 
-class BuyXGetYCouponTest {
+class BOGOCouponTest {
     @Test
     fun `2 + 1 할인일 때, 3개 이상 주문해야 할인이 가능하다`() {
         // given
         val cart = Cart(fakeCartProduct(price = 1000, count = 3))
         val buyXGetYCoupon =
-            fakeBuyXGetYCoupon(
+            fakeBOGOCoupon(
                 buyCount = 2,
                 freeCount = 1,
             )
@@ -31,7 +31,7 @@ class BuyXGetYCouponTest {
         // given
         val cart = Cart(fakeCartProduct(price = 1000, count = 2))
         val buyXGetYCoupon =
-            fakeBuyXGetYCoupon(
+            fakeBOGOCoupon(
                 buyCount = 2,
                 freeCount = 1,
             )
@@ -53,7 +53,7 @@ class BuyXGetYCouponTest {
                 fakeCartProduct(price = 3000, count = 3),
             )
         val buyXGetYCoupon =
-            fakeBuyXGetYCoupon(
+            fakeBOGOCoupon(
                 buyCount = 2,
                 freeCount = 1,
             )
@@ -73,7 +73,7 @@ class BuyXGetYCouponTest {
         // given
         val cart = Cart(fakeCartProduct(price = 1000, count = 7))
         val buyXGetYCoupon =
-            fakeBuyXGetYCoupon(
+            fakeBOGOCoupon(
                 buyCount = 2,
                 freeCount = 1,
             )

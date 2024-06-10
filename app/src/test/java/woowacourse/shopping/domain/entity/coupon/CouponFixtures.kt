@@ -60,11 +60,11 @@ fun fakeFreeShippingCoupon(
     )
 }
 
-fun fakeBuyXGetYCoupon(
+fun fakeBOGOCoupon(
     isExpired: Boolean = false,
     buyCount: Int = 2,
     freeCount: Int = 1,
-): BuyXGetYCoupon {
+): BOGOCoupon {
     val targetDateTime = targetDateTime
     val expirationDate =
         if (isExpired) {
@@ -72,7 +72,7 @@ fun fakeBuyXGetYCoupon(
         } else {
             targetDateTime.plusDays(1)
         }
-    return BuyXGetYCoupon(
+    return BOGOCoupon(
         id = 1,
         code = "BUY_X_GET_Y",
         description = "BOGO 쿠폰",
