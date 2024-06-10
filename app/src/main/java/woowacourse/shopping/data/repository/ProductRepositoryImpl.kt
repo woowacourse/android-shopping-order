@@ -81,26 +81,9 @@ class ProductRepositoryImpl(
         return allProducts
     }
 
-    private suspend fun cartWithProducts(): List<CartWithProduct> {
-        val count: Int =
-            cartDataSource.getCartItemCounts().resultOrNull()?.quantity
-                ?: DEFAULT_CART_COUNT
-        val cartResponse =
-            cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
-                ?: emptyList()
-        val carts: List<CartWithProduct> = cartResponse.map { it.toCartWithProduct() }
-        return carts
-    }
-
     override suspend fun allProductsByCategoryResponse(category: String): Result<List<Product>> {
         try {
-            val count: Int =
-                cartDataSource.getCartItemCounts().resultOrNull()?.quantity
-                    ?: DEFAULT_CART_COUNT
-            val cartResponse =
-                cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
-                    ?: emptyList()
-            val carts: List<CartWithProduct> = cartResponse.map { it.toCartWithProduct() }
+            val carts: List<CartWithProduct> = cartWithProducts()
 
             var page = START_PRODUCT_PAGE
             var allProducts = mutableListOf<Product>()
@@ -131,6 +114,16 @@ class ProductRepositoryImpl(
             return Result.Exception(e)
         }
 
+    }
+
+    private suspend fun cartWithProducts(): List<CartWithProduct> {
+        val count: Int =
+            cartDataSource.getCartItemCounts().resultOrNull()?.quantity
+                ?: DEFAULT_CART_COUNT
+        val cartResponse =
+            cartDataSource.getCartItems(START_CART_PAGE, count).resultOrNull()?.content
+                ?: emptyList()
+        return cartResponse.map { it.toCartWithProduct() }
     }
 
     private fun noMoreProductOrMaxProduct(
