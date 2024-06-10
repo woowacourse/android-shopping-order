@@ -1,9 +1,11 @@
-package woowacourse.shopping.data.local.recent
+package woowacourse.shopping.data.local.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import woowacourse.shopping.data.local.dao.RecentProductDao
+import woowacourse.shopping.data.local.entity.RecentProductEntity
 
 @Database(
     entities = [

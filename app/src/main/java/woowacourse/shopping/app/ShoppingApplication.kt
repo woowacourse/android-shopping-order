@@ -1,7 +1,8 @@
 package woowacourse.shopping.app
 
 import android.app.Application
-import woowacourse.shopping.data.local.recent.RecentProductDatabase
+import woowacourse.shopping.data.local.datasource.LocalRecentDataSource
+import woowacourse.shopping.data.local.db.RecentProductDatabase
 import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.data.remote.datasource.RemoteCartDataSource
 import woowacourse.shopping.data.remote.datasource.RemoteOrderDataSource
@@ -25,7 +26,8 @@ class ShoppingApplication : Application() {
         remoteProductDataSource = RemoteProductDataSource(productService)
         remoteOrderDataSource = RemoteOrderDataSource(orderService)
         remotePaymentDataSource = RemotePaymentDataSource(paymentService)
-        recentProductDatabase = RecentProductDatabase.getInstance(this)
+        localRecentDataSource =
+            LocalRecentDataSource(RecentProductDatabase.getInstance(this).recentProductDao())
     }
 
     companion object {
@@ -33,6 +35,6 @@ class ShoppingApplication : Application() {
         lateinit var remoteProductDataSource: RemoteProductDataSource
         lateinit var remoteOrderDataSource: RemoteOrderDataSource
         lateinit var remotePaymentDataSource: RemotePaymentDataSource
-        lateinit var recentProductDatabase: RecentProductDatabase
+        lateinit var localRecentDataSource: LocalRecentDataSource
     }
 }

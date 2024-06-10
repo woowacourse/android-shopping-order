@@ -87,9 +87,11 @@ class RecommendViewModel(
 
     fun generateRecommendProductViewItems() {
         viewModelScope.launch {
-            val mostRecentProduct = recentProductRepository.findMostRecentProduct()
+            val mostRecentProductCategory =
+                recentProductRepository.findMostRecentProduct().getOrNull()?.category
+                    ?: return@launch
             productRepository.getProducts(
-                mostRecentProduct?.category,
+                mostRecentProductCategory,
                 0,
                 Int.MAX_VALUE,
                 HomeViewModel.ASCENDING_SORT_ORDER,

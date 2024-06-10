@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.app.ShoppingApplication.Companion.localRecentDataSource
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteProductDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -34,7 +34,7 @@ class RecommendFragment : Fragment() {
     private val orderViewModel by activityViewModels<OrderViewModel>()
     private val recommendViewModel by viewModels<RecommendViewModel> {
         RecommendViewModelFactory(
-            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
+            recentProductRepository = RecentProductRepositoryImpl(localRecentDataSource),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             orderViewModel = orderViewModel,

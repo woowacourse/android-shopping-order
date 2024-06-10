@@ -64,10 +64,13 @@ class DetailViewModel(
 
     fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
         viewModelScope.launch {
-            _mostRecentProduct.value = recentProductRepository.findMostRecentProduct()
-            val currentProduct = product.value ?: return@launch
-            recentProductRepository.save(currentProduct)
-            updateRecentProductVisible(isMostRecentProductClicked)
+            recentProductRepository.findMostRecentProduct()
+                .onSuccess { mostRecentProduct ->
+                    _mostRecentProduct.value = mostRecentProduct
+                    val currentProduct = product.value ?: return@onSuccess
+                    recentProductRepository.save(currentProduct)
+                    updateRecentProductVisible(isMostRecentProductClicked)
+                }
         }
     }
 

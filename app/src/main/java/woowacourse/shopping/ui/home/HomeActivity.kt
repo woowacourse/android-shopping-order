@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.app.ShoppingApplication.Companion.localRecentDataSource
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteProductDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -34,7 +34,7 @@ class HomeActivity : AppCompatActivity() {
         HomeViewModelFactory(
             ProductRepositoryImpl(remoteProductDataSource),
             CartRepositoryImpl(remoteCartDataSource),
-            RecentProductRepositoryImpl(recentProductDatabase),
+            RecentProductRepositoryImpl(localRecentDataSource),
         )
     }
 

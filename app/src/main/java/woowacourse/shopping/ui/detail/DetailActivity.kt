@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.app.ShoppingApplication.Companion.recentProductDatabase
+import woowacourse.shopping.app.ShoppingApplication.Companion.localRecentDataSource
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteProductDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -34,7 +34,7 @@ class DetailActivity : AppCompatActivity() {
         DetailViewModelFactory(
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
-            recentProductRepository = RecentProductRepositoryImpl(recentProductDatabase),
+            recentProductRepository = RecentProductRepositoryImpl(localRecentDataSource),
             productId = productId,
         )
     }

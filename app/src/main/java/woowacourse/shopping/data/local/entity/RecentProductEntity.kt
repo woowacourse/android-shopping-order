@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.local.recent
+package woowacourse.shopping.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -14,6 +14,10 @@ data class RecentProductEntity(
     val dateTime: String,
     val category: String,
 )
+
+fun List<RecentProductEntity>.toRecentProducts(): List<RecentProduct> {
+    return this.map { recentProductEntity -> recentProductEntity.toRecentProduct() }
+}
 
 fun RecentProductEntity.toRecentProduct(): RecentProduct {
     return RecentProduct(

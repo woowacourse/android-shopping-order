@@ -73,7 +73,10 @@ class HomeViewModel(
 
     private fun loadRecentProducts() {
         viewModelScope.launch {
-            _recentProducts.value = recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+            recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+                .onSuccess { recentProducts ->
+                    _recentProducts.value = recentProducts
+                }
         }
     }
 

@@ -5,7 +5,7 @@ import woowacourse.shopping.data.dto.CartItemDto
 import woowacourse.shopping.data.dto.CartResponse
 import woowacourse.shopping.data.dto.CouponDto
 import woowacourse.shopping.data.dto.ProductDto
-import woowacourse.shopping.data.local.recent.RecentProductEntity
+import woowacourse.shopping.data.local.entity.RecentProductEntity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.coupon.AvailableTime
