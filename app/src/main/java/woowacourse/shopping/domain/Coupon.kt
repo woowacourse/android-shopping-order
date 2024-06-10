@@ -4,37 +4,37 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-sealed class Coupon(
-    val id: Int,
-    val code: String,
-    val description: String,
-    val expirationDate: LocalDate,
-    val discountType: DiscountType,
-    val isChecked: Boolean = false,
-) {
+sealed interface Coupon {
+    val id: Int
+    val code: String
+    val description: String
+    val expirationDate: LocalDate
+    val discountType: DiscountType
+    val isChecked: Boolean
+
     fun isValidPeriod(nowDate: LocalDate): Boolean {
         val duration = Duration.between(expirationDate.atStartOfDay(), nowDate.atStartOfDay())
         return (duration.isNegative)
     }
 
-    abstract fun calculateDiscount(
+    fun calculateDiscount(
         products: List<ProductListItem.ShoppingProductItem>,
         now: LocalDateTime,
     ): Long
 
-    abstract fun updateCheck(isChecked: Boolean): Coupon
+    fun updateCheck(isChecked: Boolean): Coupon
 }
 
-class FixedCoupon(
-    id: Int,
-    code: String,
-    description: String,
-    expirationDate: LocalDate,
-    discountType: DiscountType,
-    isChecked: Boolean,
+data class FixedCoupon(
+    override val id: Int,
+    override val code: String,
+    override val description: String,
+    override val expirationDate: LocalDate,
+    override val discountType: DiscountType,
+    override val isChecked: Boolean,
     val discount: Int,
     val minimumAmount: Int,
-) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
+) : Coupon {
     private fun isValid(
         totalPrice: Long,
         now: LocalDateTime,
@@ -66,16 +66,16 @@ class FixedCoupon(
     }
 }
 
-class BuyXGetYCoupon(
-    id: Int,
-    code: String,
-    description: String,
-    expirationDate: LocalDate,
-    discountType: DiscountType,
-    isChecked: Boolean,
+data class BuyXGetYCoupon(
+    override val id: Int,
+    override val code: String,
+    override val description: String,
+    override val expirationDate: LocalDate,
+    override val discountType: DiscountType,
+    override val isChecked: Boolean,
     val buyQuantity: Int,
     val getQuantity: Int,
-) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
+) : Coupon {
     private fun isValid(
         products: List<ProductListItem.ShoppingProductItem>,
         now: LocalDateTime,
@@ -110,14 +110,14 @@ class BuyXGetYCoupon(
     }
 }
 
-class FreeShippingCoupon(
-    id: Int,
-    code: String,
-    description: String,
-    expirationDate: LocalDate,
-    discountType: DiscountType,
-    isChecked: Boolean,
-) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
+data class FreeShippingCoupon(
+    override val id: Int,
+    override val code: String,
+    override val description: String,
+    override val expirationDate: LocalDate,
+    override val discountType: DiscountType,
+    override val isChecked: Boolean,
+) : Coupon {
     private fun isValid(now: LocalDateTime) = isValidPeriod(now.toLocalDate())
 
     override fun calculateDiscount(
@@ -142,16 +142,16 @@ class FreeShippingCoupon(
         )
 }
 
-class PercentageCoupon(
-    id: Int,
-    code: String,
-    description: String,
-    expirationDate: LocalDate,
-    discountType: DiscountType,
-    isChecked: Boolean,
+data class PercentageCoupon(
+    override val id: Int,
+    override val code: String,
+    override val description: String,
+    override val expirationDate: LocalDate,
+    override val discountType: DiscountType,
+    override val isChecked: Boolean,
     val discount: Int,
     val availableTime: AvailableTime,
-) : Coupon(id, code, description, expirationDate, discountType, isChecked) {
+) : Coupon {
     private fun isValid(now: LocalDateTime): Boolean {
         val time = now.toLocalTime()
         val date = now.toLocalDate()
