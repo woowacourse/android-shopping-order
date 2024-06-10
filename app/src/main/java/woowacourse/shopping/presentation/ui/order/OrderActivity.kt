@@ -55,10 +55,17 @@ class OrderActivity : BindingActivity<ActivityOrderBinding>() {
             this,
             EventObserver {
                 if (it) {
-                    showToast(getString(R.string.order_complete_success_message))
+                    showToast(R.string.order_complete_success_message)
                     finish()
                     startActivity(ShoppingActivity.createIntent(this))
                 }
+            },
+        )
+
+        viewModel.error.observe(
+            this,
+            EventObserver {
+                showToast(it.messageResId)
             },
         )
     }

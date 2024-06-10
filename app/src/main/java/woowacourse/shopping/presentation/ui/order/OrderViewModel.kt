@@ -44,6 +44,9 @@ class OrderViewModel(
     private val _completeOrder: MutableLiveData<Event<Boolean>> = MutableLiveData()
     val completeOrder: LiveData<Event<Boolean>> = _completeOrder
 
+    private val _error = MutableLiveData<Event<OrderError>>()
+    val error: LiveData<Event<OrderError>> get() = _error
+
     init {
         viewModelScope.launch {
             couponRepository.findCoupons(selectedCartIds)
@@ -51,8 +54,7 @@ class OrderViewModel(
                     val couponModels = result.map { it.toUiModel() }
                     _coupons.value = UiState.Success(couponModels)
                 }
-                .onFailure {
-                }
+                .onFailure { _error.value = Event(OrderError.CouponsNotFound) }
         }
     }
 
@@ -74,7 +76,7 @@ class OrderViewModel(
         viewModelScope.launch {
             orderRepository.completeOrder(selectedCartIds)
                 .onSuccess { _completeOrder.value = Event(true) }
-                .onFailure { }
+                .onFailure { _error.value = Event(OrderError.FailToOrder) }
         }
     }
 

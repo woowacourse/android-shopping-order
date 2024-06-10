@@ -39,7 +39,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     private fun observeErrorEventUpdates() {
         viewModel.error.observe(
             this,
-            EventObserver { showToast(it.message) },
+            EventObserver { showToast(it.messageResId) },
         )
     }
 
@@ -55,7 +55,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
                     }
 
                     is FromDetailToScreen.ShoppingWithUpdated -> {
-                        showToast("장바구니에 성공적으로 저장되었습니다!")
+                        showToast(R.string.cart_complete_success_message)
                         ShoppingActivity.startWithNewProductQuantity(this, it.productId, it.quantity)
                         finish()
                     }

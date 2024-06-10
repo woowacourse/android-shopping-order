@@ -83,7 +83,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         viewModel.error.observe(
             this,
             EventObserver {
-                showToast(it.message)
+                showToast(it.messageResId)
             },
         )
     }

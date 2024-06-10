@@ -8,11 +8,9 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.local.database.AppDatabase
@@ -23,14 +21,12 @@ import woowacourse.shopping.presentation.ui.model.ProductModel
 import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
 import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
-import woowacourse.shopping.remote.datasource.RemoteOrderDataSourceImpl
 import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class CartViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
-    private val orderRepository: OrderRepository,
     initialTotalCartItemCount: Int,
 ) : ViewModel(), CartHandler {
     private val _error = MutableLiveData<Event<CartError>>()
@@ -264,7 +260,6 @@ class CartViewModel(
                     cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl()),
                     productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl()),
                     recentRepository = RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(recentDao)),
-                    orderRepository = OrderRepositoryImpl(RemoteOrderDataSourceImpl()),
                     initialTotalCartItemCount,
                 ) as T
             }

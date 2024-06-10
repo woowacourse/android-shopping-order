@@ -124,7 +124,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.error.observe(
             this,
             EventObserver {
-                showToast(it.message)
+                showToast(it.messageResId)
             },
         )
     }
