@@ -16,6 +16,8 @@ import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.order.adapter.CouponAdapter
+import woowacourse.shopping.view.order.state.CouponUiState
+import woowacourse.shopping.view.order.state.OrderUiState
 
 class OrderFragment : Fragment(), OnClickOrder {
     private var mainActivityListener: MainActivityListener? = null
@@ -71,14 +73,25 @@ class OrderFragment : Fragment(), OnClickOrder {
             adapter.submitList(it)
         }
         orderViewModel.couponUiState.observe(viewLifecycleOwner) {
-            if (it.isCouponApplied) {
-                requireContext().makeToast(
-                    getString(R.string.success_coupon_apply),
-                )
-            } else {
-                it.errorMessage?.let { errorMessage ->
-                    requireContext().makeToast(errorMessage)
+            when (it) {
+                is CouponUiState.Applied -> {
+                    requireContext().makeToast(getString(R.string.success_coupon_apply))
                 }
+                is CouponUiState.Error -> {
+                    requireContext().makeToast(it.errorMessage)
+                }
+                is CouponUiState.Idle -> {}
+            }
+        }
+        orderViewModel.orderUiState.observe(viewLifecycleOwner) {
+            when (it) {
+                is OrderUiState.Success -> {
+                    requireContext().makeToast(getString(R.string.success_order))
+                }
+                is OrderUiState.Failure -> {
+                    it.errorMessage?.let { error -> requireContext().makeToast(error) }
+                }
+                is OrderUiState.Idle -> {}
             }
         }
     }
@@ -98,15 +111,14 @@ class OrderFragment : Fragment(), OnClickOrder {
             val shoppingCart = receiveCheckedShoppingCart()
             orderViewModel.saveCheckedShoppingCarts(shoppingCart)
         } catch (e: Exception) {
-            requireContext().makeToast(
-                getString(R.string.error_data_load),
-            )
+            requireContext().makeToast(getString(R.string.error_data_load))
             clickBack()
         }
     }
 
     override fun clickOrder() {
         orderViewModel.orderItems()
+        mainActivityListener?.resetFragment()
     }
 
     override fun clickBack() {

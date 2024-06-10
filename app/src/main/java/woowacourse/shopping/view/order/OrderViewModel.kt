@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -12,6 +13,8 @@ import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.order.adapter.OnClickCoupon
 import woowacourse.shopping.view.order.model.CouponUiModel
 import woowacourse.shopping.view.order.model.CouponUiModelMapper.toUiModel
+import woowacourse.shopping.view.order.state.CouponUiState
+import woowacourse.shopping.view.order.state.OrderUiState
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -33,10 +36,18 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     private val _totalPayment: MutableLiveData<Int> = MutableLiveData(0)
     val totalPayment: LiveData<Int> get() = _totalPayment
 
-    private val _couponUiState: MutableLiveData<CouponUiState> = MutableLiveData(CouponUiState())
+    private val _couponUiState: MutableLiveData<CouponUiState> = MutableLiveData(CouponUiState.Idle)
     val couponUiState: LiveData<CouponUiState> get() = _couponUiState
 
+    private val _orderUiState: MutableLiveData<OrderUiState> = MutableLiveData(OrderUiState.Idle)
+    val orderUiState: LiveData<OrderUiState> get() = _orderUiState
+
     private var selectedCoupon: CouponUiModel? = null
+
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            _orderUiState.value = OrderUiState.Failure(throwable.message)
+        }
 
     init {
         loadCoupons()
@@ -44,7 +55,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     }
 
     private fun loadCoupons() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             runCatching {
                 orderRepository.getCoupons().getOrThrow()
             }.onSuccess { couponList ->
@@ -127,7 +138,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 .isBefore(coupon.expirationDate)
         ) {
             _couponDiscount.value = coupon.discount
-            _couponUiState.value = CouponUiState(isCouponApplied = true)
+            _couponUiState.value = CouponUiState.Applied
             true
         } else {
             val errorMessage =
@@ -137,7 +148,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
             _couponUiState.value =
-                CouponUiState(isCouponApplied = false, errorMessage = errorMessage)
+                CouponUiState.Error(errorMessage)
             false
         }
     }
@@ -151,7 +162,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
         return if (mostExpensiveItem != null && LocalDate.now().isBefore(coupon.expirationDate)) {
             val discountAmount = mostExpensiveItem.product.price
             _couponDiscount.value = discountAmount
-            _couponUiState.value = CouponUiState(isCouponApplied = true)
+            _couponUiState.value = CouponUiState.Applied
             true
         } else {
             val errorMessage =
@@ -161,7 +172,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
             _couponUiState.value =
-                CouponUiState(isCouponApplied = false, errorMessage = errorMessage)
+                CouponUiState.Error(errorMessage)
             false
         }
     }
@@ -172,7 +183,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 .isBefore(coupon.expirationDate)
         ) {
             _deliveryFee.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = true)
+            _couponUiState.value = CouponUiState.Applied
             true
         } else {
             val errorMessage =
@@ -182,9 +193,8 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
             _couponUiState.value =
-                CouponUiState(
-                    isCouponApplied = false,
-                    errorMessage = errorMessage,
+                CouponUiState.Error(
+                    errorMessage,
                 )
             false
         }
@@ -197,7 +207,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 .isBefore(coupon.expirationDate)
         ) {
             _couponDiscount.value = (_totalPrice.value!! * coupon.discount / 100)
-            _couponUiState.value = CouponUiState(isCouponApplied = true)
+            _couponUiState.value = CouponUiState.Applied
             true
         } else {
             val errorMessage =
@@ -207,7 +217,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
             _couponUiState.value =
-                CouponUiState(isCouponApplied = false, errorMessage = errorMessage)
+                CouponUiState.Error(errorMessage)
             false
         }
     }
@@ -216,7 +226,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
         selectedCoupon = null
         _couponDiscount.value = 0
         _deliveryFee.value = SHIPPING_COST
-        _couponUiState.value = CouponUiState(isCouponApplied = false)
+        _couponUiState.value = CouponUiState.Idle
         calculateTotalPayment()
     }
 
@@ -242,5 +252,6 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
         private const val ERROR_MESSAGE_MINIMUM_AMOUNT = "최소 주문 금액을 만족하지 못했습니다."
         private const val ERROR_MESSAGE_NOT_BOGO_ITEM = "적용할 수 없는 쿠폰입니다.(BoGo 조건 미충족)"
         private const val ERROR_MESSAGE_NOT_AVAILABLE_TIME = "쿠폰이 적용 가능한 시간이 아닙니다."
+        private const val ERROR_MESSAGE_NO_ITEMS = "주문할 아이템이 없습니다."
     }
 }
