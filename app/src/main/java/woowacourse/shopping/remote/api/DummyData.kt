@@ -6,6 +6,12 @@ import woowacourse.shopping.domain.model.Pageable
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Sort
+import woowacourse.shopping.domain.model.coupons.BOGO
+import woowacourse.shopping.domain.model.coupons.FIXED5000
+import woowacourse.shopping.domain.model.coupons.FREESHIPPING
+import woowacourse.shopping.domain.model.coupons.MIRACLESALE
+import java.time.LocalDate
+import java.time.LocalTime
 
 object DummyData {
     const val STUB_IMAGE_URL_A =
@@ -31,6 +37,42 @@ object DummyData {
     val STUB_PRODUCT_C =
         Product(id = 3, name = "신라면", price = 15000, category = "", imageUrl = STUB_IMAGE_URL_C)
     val STUB_CART_C = Cart(id = 3, quantity = 0, product = STUB_PRODUCT_C)
+
+    val STUB_COUPON_A =
+        FIXED5000(
+            id = 1L,
+            description = "",
+            expirationDate = LocalDate.now(),
+            discountType = "",
+            discount = 0,
+            minimumAmount = 0,
+        )
+    val STUB_COUPON_B =
+        BOGO(
+            id = 2L,
+            description = "",
+            expirationDate = LocalDate.now(),
+            discountType = "",
+            buyQuantity = 0,
+            getQuantity = 0,
+        )
+    val STUB_COUPON_C =
+        FREESHIPPING(
+            id = 3L,
+            description = "",
+            expirationDate = LocalDate.now(),
+            discountType = "",
+            minimumAmount = 0,
+        )
+    val STUB_COUPON_D =
+        MIRACLESALE(
+            id = 4L,
+            description = "",
+            expirationDate = LocalDate.now(),
+            discountType = "",
+            discount = 0,
+            availableTime = MIRACLESALE.AvailableLocalTime(LocalTime.now(), LocalTime.now()),
+        )
 
     val PRODUCT_LIST =
         mutableListOf(
@@ -117,4 +159,25 @@ object DummyData {
                     Cart(id = index, product = product)
                 },
         )
+
+    val CART_ARRAY =
+        arrayOf(
+            Cart(
+                id = 1,
+                quantity = 3,
+                product = STUB_PRODUCT_A.copy(id = 1L),
+            ),
+            Cart(
+                id = 2,
+                quantity = 3,
+                product = STUB_PRODUCT_B.copy(id = 2L),
+            ),
+            Cart(
+                id = 3,
+                quantity = 3,
+                product = STUB_PRODUCT_C.copy(id = 3L),
+            ),
+        )
+
+    val COPOUNS = listOf(STUB_COUPON_A, STUB_COUPON_B, STUB_COUPON_C, STUB_COUPON_D)
 }
