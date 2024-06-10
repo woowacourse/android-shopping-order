@@ -19,7 +19,6 @@ import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
-import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
@@ -30,7 +29,12 @@ class CartViewModel(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : BaseViewModel(), CountButtonClickListener, AddCartClickListener, CartItemClickListener {
-    private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
+    private val _cart: MutableLiveData<CartItemsUiState> =
+        MutableLiveData(
+            CartItemsUiState(
+                emptyList(),
+            ),
+        )
     val cart: LiveData<CartItemsUiState> = _cart
 
     private val _products: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
@@ -245,6 +249,7 @@ class CartViewModel(
     }
 
     private fun loadCartItems() {
+        _cart.value = _cart.value?.copy(isLoading = true)
         viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getAllCartItemsWithProduct().onSuccess {
                 _cart.value =
@@ -252,9 +257,8 @@ class CartViewModel(
                         it.map { cartWithProduct ->
                             cartWithProduct.toUiModel(findIsCheckedByProductId(cartWithProduct.product.id))
                         },
-                        isLoading = true,
+                        isLoading = false,
                     )
-                _cart.value = cart.value?.copy(isLoading = false)
             }
         }
     }

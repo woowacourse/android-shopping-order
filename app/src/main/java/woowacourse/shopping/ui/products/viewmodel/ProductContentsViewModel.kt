@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
@@ -100,7 +101,8 @@ class ProductContentsViewModel(
             productRepository.getProducts(currentOffset++, 20).onSuccess {
                 items.addAll(it)
                 products.value = items
-                productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
+                delay(1000)
+                productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
             }
         }
     }
@@ -109,7 +111,8 @@ class ProductContentsViewModel(
         viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getAllCartItems().onSuccess {
                 cart.value = it
-                productWithQuantity.postValue(productWithQuantity.value?.copy(isLoading = false))
+                delay(1000)
+                productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
             }
         }
     }
@@ -129,8 +132,7 @@ class ProductContentsViewModel(
             currentProducts.map { product ->
                 ProductWithQuantity(product = product, quantity = getQuantity(product.id))
             }
-        productWithQuantity.value =
-            ProductWithQuantityUiState(updatedList.map { it.toUiModel() })
+        productWithQuantity.value = ProductWithQuantityUiState(updatedList.map { it.toUiModel() })
     }
 
     private fun getQuantity(productId: Long): Quantity {
