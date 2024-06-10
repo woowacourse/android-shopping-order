@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onException
 import woowacourse.shopping.domain.result.onFail
 import woowacourse.shopping.domain.result.onSuccess
+import woowacourse.shopping.domain.result.resultOrThrow
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.detail.uimodel.ProductDetailError
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
@@ -90,7 +91,7 @@ class ProductDetailViewModel(
                 if (!lastSeenProductState) {
                     _mostRecentProductVisibility.value = false
                 } else {
-                    _mostRecentProduct.value = productRepository.productById(it.productId)
+                    _mostRecentProduct.value = productRepository.productByIdResponse(it.productId).resultOrThrow()
                     setMostRecentVisibility(it.id, productId)
                 }
             }.onFail {
@@ -102,7 +103,7 @@ class ProductDetailViewModel(
             }.onException {
                 _error.setValue(ProductDetailError.UnKnown)
             }
-            recentProductRepository.insert(productId)
+            recentProductRepository.insertResponse(productId)
         }
     }
 

@@ -24,31 +24,11 @@ class ProductRepositoryImpl(
     private val cartDataSource: CartDataSource = RemoteCartDataSource(),
 ) :
     ProductRepository {
-    override suspend fun productById(id: Long): Product =
-        handleApiResult(
-            productDataSource.getProductsById(id),
-            ResponseProductIdGetDto::toProduct,
-        ).resultOrThrow()
-
-    override suspend fun productByIdOrNull(id: Long): Product? =
-        handleApiResult(
-            productDataSource.getProductsById(id),
-            ResponseProductIdGetDto::toProduct,
-        ).resultOrNull()
-
     override suspend fun productByIdResponse(id: Long): Result<Product> =
         handleApiResult(
             productDataSource.getProductsById(id),
             ResponseProductIdGetDto::toProduct,
         )
-
-    override suspend fun allProducts(
-        page: Int,
-        size: Int,
-    ): List<Product> = handleApiResult(
-                productDataSource.getProductsByOffset(page, size),
-                transform = ResponseProductsGetDto::toProductList,
-            ).resultOrThrow()
 
 
 
@@ -61,22 +41,6 @@ class ProductRepositoryImpl(
             transform = ResponseProductsGetDto::toProductList,
         )
 
-    override suspend fun allRecommendProducts(category: String): List<Product> {
-        val carts: List<CartWithProduct> = cartWithProducts()
-        var page = START_PRODUCT_PAGE
-        var allProducts = mutableListOf<Product>()
-        var loadedProducts = emptyList<Product>()
-        while (true) {
-            loadedProducts =
-                productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL).result()
-                    .toProductList()
-
-            if (noMoreProductOrMaxProduct(loadedProducts, allProducts)) break
-            allProducts.addAll(loadedProducts.filterCategoryAndNotInCart(category, carts))
-            page++
-        }
-        return allProducts
-    }
 
     override suspend fun allRecommendProductsResponse(category: String): Result<List<Product>> {
         try {

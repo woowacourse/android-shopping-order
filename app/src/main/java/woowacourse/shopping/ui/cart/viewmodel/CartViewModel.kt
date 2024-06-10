@@ -18,6 +18,8 @@ import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onException
 import woowacourse.shopping.domain.result.onFail
 import woowacourse.shopping.domain.result.onSuccess
+import woowacourse.shopping.domain.result.resultOrNull
+import woowacourse.shopping.domain.result.resultOrThrow
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartItemsUiState
@@ -91,10 +93,10 @@ class CartViewModel(
     fun loadRecommendProducts() {
         viewModelLaunch(::recommendExceptionHandler) {
             val recentProductId: Long =
-                recentProductRepository.mostRecentProductOrNull()?.productId
+                recentProductRepository.mostRecentProductResponse().resultOrNull()?.productId
                     ?: DEFAULT_RECENT_PRODUCT_ID
             val category =
-                productRepository.productByIdOrNull(recentProductId)?.category
+                productRepository.productByIdResponse(recentProductId).resultOrNull()?.category
                     ?: DEFAULT_RECOMMEND_CATEGORY
             productRepository.allRecommendProductsResponse(category).onSuccess {
                 _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
@@ -156,7 +158,7 @@ class CartViewModel(
 
     override fun plusCount(productId: Long) {
         viewModelLaunch(::updateCartExceptionHandler) {
-            val cartItem = cartRepository.cartItem(productId)
+            val cartItem = cartRepository.cartItemResponse(productId).resultOrThrow()
             cartRepository.patchCartItem(
                 cartItem.id,
                 cartItem.quantity.value.inc(),
@@ -173,7 +175,7 @@ class CartViewModel(
 
     override fun minusCount(productId: Long) {
         viewModelLaunch(::updateCartExceptionHandler) {
-            val cartItem = cartRepository.cartItem(productId)
+            val cartItem = cartRepository.cartItemResponse(productId).resultOrThrow()
             if (cartItem.quantity.value <= 0) return@viewModelLaunch
             cartRepository.patchCartItem(
                 cartItem.id,

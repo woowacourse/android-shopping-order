@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.result.Fail
 import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.onSuccess
+import woowacourse.shopping.domain.result.resultOrNull
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
@@ -140,7 +141,7 @@ class ProductContentsViewModel(
         viewModelLaunch(::recentExceptionHandler) {
             recentProductRepository.allRecentProductsResponse().onSuccess { recentProducts ->
                 _recentProducts.value =
-                    recentProducts.mapNotNull { productRepository.productByIdOrNull(it.productId) }
+                    recentProducts.mapNotNull { productRepository.productByIdResponse(it.productId).resultOrNull() }
             }.checkError {
                 _error.setValue(it)
             }

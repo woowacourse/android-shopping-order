@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
 import woowacourse.shopping.data.remote.api.resultOrNull
@@ -13,23 +12,9 @@ import woowacourse.shopping.domain.result.Fail
 import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.resultOrThrow
-import woowacourse.shopping.domain.result.resultOrNull
 
 class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartDataSource()) :
     CartRepository {
-    override suspend fun cartItem(productId: Long): CartWithProduct {
-        val carts = allCartItems()
-        return carts.first { it.product.id == productId }
-    }
-
-    override suspend fun cartItemOrNull(productId: Long): CartWithProduct? {
-        return when (val carts = allCartItemsResponse()) {
-            is Result.Success -> carts.result.firstOrNull { it.product.id == productId }
-            is Fail -> null
-            is Result.Exception -> null
-        }
-    }
-
     override suspend fun cartItemResponse(productId: Long): Result<CartWithProduct> {
         return when (val carts = allCartItemsResponse()) {
             is Result.Success -> {
@@ -48,25 +33,15 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         }
     }
 
-    override suspend fun allCartItems(): List<CartWithProduct> {
-        val count = dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
-        val response =
-            handleApiResult(
-                result = dataSource.getCartItems(0, count),
-                transform = ResponseCartItemsGetDto::toCartWithProduct,
-            )
-        return if (response is Fail.NotFound) emptyList() else response.resultOrThrow()
-    }
 
-    override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> =
-        coroutineScope {
-            val count =
-                dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
-            return@coroutineScope handleApiResult(
-                result = dataSource.getCartItems(START_CART_PAGE, count),
-                transform = ResponseCartItemsGetDto::toCartWithProduct,
-            )
-        }
+    override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> {
+        val count =
+            dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
+        return handleApiResult(
+            result = dataSource.getCartItems(START_CART_PAGE, count),
+            transform = ResponseCartItemsGetDto::toCartWithProduct,
+        )
+    }
 
     override suspend fun postCartItems(
         productId: Long,
@@ -80,18 +55,6 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         result = dataSource.deleteCartItems(id)
     )
 
-    override suspend fun cartItemsCount(): Int =
-        handleApiResult(
-            result = dataSource.getCartItemCounts(),
-            transform = { it.quantity },
-        ).resultOrThrow()
-
-    override suspend fun cartItemsCountOrNull(): Int? =
-        handleApiResult(
-            result = dataSource.getCartItemCounts(),
-            transform = { it.quantity },
-        ).resultOrNull()
-
     override suspend fun cartItemsCountResponse(): Result<Int> =
         handleApiResult(
             result = dataSource.getCartItemCounts(),
@@ -104,24 +67,24 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
     ): Result<Unit> =
         handleApiResult(
             result =
-                dataSource.patchCartItems(
-                    id = id,
-                    request = RequestCartItemsPatchDto(quantity),
-                ),
+            dataSource.patchCartItems(
+                id = id,
+                request = RequestCartItemsPatchDto(quantity),
+            ),
         )
 
     override suspend fun addProductToCart(
         productId: Long,
         quantity: Int,
-    ): Result<Unit> =
-        coroutineScope {
-            val cart: CartWithProduct? = allCartItems().firstOrNull { it.product.id == productId }
-            if (cart == null) {
-                return@coroutineScope postCartItems(productId, quantity)
-            } else {
-                return@coroutineScope patchCartItem(cart.id, cart.quantity.value + quantity)
-            }
+    ): Result<Unit> {
+        val cart: CartWithProduct? =
+            allCartItemsResponse().resultOrThrow().firstOrNull { it.product.id == productId }
+        if (cart == null) {
+            return postCartItems(productId, quantity)
+        } else {
+            return patchCartItem(cart.id, cart.quantity.value + quantity)
         }
+    }
 
     companion object {
         private const val DEFAULT_CART_COUNT = 300

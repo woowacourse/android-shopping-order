@@ -9,13 +9,6 @@ import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :
     RecentProductRepository {
-        override suspend fun insert(productId: Long): Long =
-            recentProductDao.insert(
-                RecentProduct(
-                    productId = productId,
-                    recentTime = LocalDateTime.now(),
-                ),
-            )
 
         override suspend fun insertResponse(productId: Long): Result<Long> {
             return try {
@@ -32,9 +25,6 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
             }
         }
 
-        override suspend fun mostRecentProduct(): RecentProduct = recentProductDao.findMostRecentProduct() ?: throw NoSuchElementException()
-
-        override suspend fun mostRecentProductOrNull(): RecentProduct? = recentProductDao.findMostRecentProduct()
 
         override suspend fun mostRecentProductResponse(): Result<RecentProduct> {
             return try {
@@ -45,8 +35,6 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
                 Result.Exception(e)
             }
         }
-
-        override suspend fun allRecentProducts(): List<RecentProduct> = recentProductDao.findAll()
 
         override suspend fun allRecentProductsResponse(): Result<List<RecentProduct>> {
             return try {
