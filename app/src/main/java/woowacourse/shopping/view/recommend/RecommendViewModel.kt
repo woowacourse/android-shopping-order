@@ -15,7 +15,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -25,12 +24,11 @@ import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.cart.model.ShoppingCart
 
 class RecommendViewModel(
-    private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
 ) : ViewModel() {
-    private var checkedShoppingCart = ShoppingCart()
+    var checkedShoppingCart = ShoppingCart()
 
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
@@ -84,16 +82,6 @@ class RecommendViewModel(
 
     fun decreaseShoppingCart(product: Product) {
         updateCarItem(product, UpdateCartItemType.DECREASE)
-    }
-
-    fun orderItems() {
-        val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        try {
-            orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
-            _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-        } catch (e: Exception) {
-            _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
-        }
     }
 
     private fun updateCarItem(
