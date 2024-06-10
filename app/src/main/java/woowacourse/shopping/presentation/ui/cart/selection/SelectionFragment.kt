@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.ui.cart.selection
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
 import woowacourse.shopping.presentation.ui.cart.FragmentController
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
@@ -56,6 +58,7 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         binding.clickListener = this
 
         observeViewModel()
+        loadCartItems(savedInstanceState)
     }
 
     private fun setUpRecyclerView() {
@@ -95,6 +98,12 @@ class SelectionFragment : Fragment(), SelectionClickListener {
             }
         }
 
+        viewModel.addedItemsCount.observe(viewLifecycleOwner) {
+            if (it > 0) {
+                selectionAdapter.notifyItemsAdded(it)
+            }
+        }
+
         viewModel.navigateToDetail.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let { productId ->
                 navigateToDetail(productId)
@@ -129,10 +138,11 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.setLoadingState(true)
-        viewModel.setUpCartItems()
+    private fun loadCartItems(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            viewModel.setLoadingState(true)
+            viewModel.setUpCartItems()
+        }
     }
 
     override fun onMakeOrderClick() {
@@ -145,6 +155,9 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     }
 
     fun onShow() {
-        viewModel.setUpCartItems()
+        if (SharedChangedIdsDB.existAddedRecommendProducts()) {
+            viewModel.acceptAddedItems(SharedChangedIdsDB.getAddedRecommendProductsIds())
+            SharedChangedIdsDB.clearAddedRecommendProductsIds()
+        }
     }
 }

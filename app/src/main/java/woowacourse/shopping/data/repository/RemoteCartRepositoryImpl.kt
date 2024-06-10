@@ -58,6 +58,17 @@ class RemoteCartRepositoryImpl : CartRepository {
         return cartItems.find { it.productId == productId }
     }
 
+    override suspend fun findCartItemsWithProductIds(productIds: Set<Long>): List<CartItem> {
+        var cartItems: List<CartItem> = emptyList()
+        val result = fetchCartItemsInfo()
+        result.onSuccess { items ->
+            cartItems = items
+        }.onFailure {
+            return emptyList()
+        }
+        return cartItems.filter { productIds.contains(it.productId) }
+    }
+
     override suspend fun fetchItemQuantityWithProductId(productId: Long): Int {
         return findCartItemWithProductId(productId)?.quantity ?: 0
     }

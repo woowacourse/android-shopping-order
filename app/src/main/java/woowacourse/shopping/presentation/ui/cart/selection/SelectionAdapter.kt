@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.cart.selection
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -81,5 +82,10 @@ class SelectionAdapter(
     fun deleteItem(deletedItemId: Long) {
         val deletedPosition = cartItems.indexOfFirst { it.id == deletedItemId }
         notifyItemRemoved(deletedPosition)
+    }
+
+    fun notifyItemsAdded(addedCount: Int) {
+        val startPosition = cartItems.size - addedCount
+        notifyItemRangeInserted(startPosition, addedCount)
     }
 }

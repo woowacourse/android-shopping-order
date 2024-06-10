@@ -134,6 +134,7 @@ class RecommendViewModel(
     ) {
         addOrder(productId, quantity)
         SharedChangedIdsDB.addChangedProductsId(setOf(productId))
+        SharedChangedIdsDB.addRecommendProductsIds(setOf(productId))
     }
 
     private fun addOrder(
@@ -169,6 +170,7 @@ class RecommendViewModel(
             decreaseOrderQuantity(productId, quantity)
         }
         SharedChangedIdsDB.addChangedProductsId(setOf(productId))
+        SharedChangedIdsDB.addRecommendProductsIds(setOf(productId))
     }
 
     private fun removeOrder(productId: Long) {

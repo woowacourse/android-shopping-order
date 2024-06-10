@@ -75,6 +75,10 @@ class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel
     val changedProductIds: LiveData<Set<Long>>
         get() = _changedProductIds
 
+    private val _addedItemsCount = SingleLiveEvent<Int>()
+    val addedItemsCount: LiveData<Int>
+        get() = _addedItemsCount
+
     init {
         with(_isAllSelected) {
             addSource(order) { checkAllSelected(uiCartItemsState, order) }
@@ -323,6 +327,15 @@ class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel
         _uiCartItemsState.value = UIState.Success(uiCartItems)
         _quantityChangedIds.value = setOf(productId)
         SharedChangedIdsDB.addChangedProductsId(setOf(productId))
+    }
+
+    fun acceptAddedItems(addedProductsIds: Set<Long>) {
+        viewModelScope.launch {
+            val addedItems = cartRepository.findCartItemsWithProductIds(addedProductsIds)
+            cartItems += addedItems
+            setUpUIState()
+            _addedItemsCount.value = addedItems.size
+        }
     }
 
     private fun CartItem.toUiModel(isChecked: Boolean): CartItemUiModel {

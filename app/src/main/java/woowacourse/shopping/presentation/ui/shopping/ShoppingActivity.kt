@@ -123,5 +123,8 @@ class ShoppingActivity : AppCompatActivity() {
             viewModel.acceptChangedItems(SharedChangedIdsDB.getChangedProductsIds())
             SharedChangedIdsDB.clearChangedProductsId()
         }
+        if (SharedChangedIdsDB.existAddedRecommendProducts()) {
+            SharedChangedIdsDB.clearAddedRecommendProductsIds()
+        }
     }
 }

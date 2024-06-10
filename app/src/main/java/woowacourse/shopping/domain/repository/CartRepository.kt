@@ -16,6 +16,8 @@ interface CartRepository {
 
     suspend fun findCartItemWithProductId(productId: Long): CartItem?
 
+    suspend fun findCartItemsWithProductIds(productIds: Set<Long>): List<CartItem>
+
     suspend fun fetchItemQuantityWithProductId(productId: Long): Int
 
     suspend fun fetchCartItem(cartItemId: Long): CartItem?
