@@ -18,7 +18,6 @@ import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentPaymentBinding
 import woowacourse.shopping.domain.usecase.order.DefaultLoadAvailableDiscountCouponsUseCase
 import woowacourse.shopping.domain.usecase.order.DefaultOrderCartProductsUseCase
-import woowacourse.shopping.domain.usecase.order.LoadShippingFeeUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
@@ -39,7 +38,6 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
         val orderRepository = OrderRepositoryInjector.orderRepository()
         PaymentViewModel.factory(
             orders,
-            LoadShippingFeeUseCase.instance(),
             DefaultOrderCartProductsUseCase.instance(
                 productRepository,
                 cartRepository,

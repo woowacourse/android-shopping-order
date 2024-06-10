@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import woowacourse.shopping.domain.entity.coupon.DiscountResult
 import woowacourse.shopping.domain.usecase.order.LoadAvailableDiscountCouponsUseCase
-import woowacourse.shopping.domain.usecase.order.LoadShippingFeeUseCase
 import woowacourse.shopping.domain.usecase.order.OrderCartProductsUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.CartProductUi
@@ -19,7 +18,6 @@ import woowacourse.shopping.presentation.util.SingleLiveData
 
 class PaymentViewModel(
     orders: List<CartProductUi>,
-    private val loadShippingFeeUseCase: LoadShippingFeeUseCase,
     private val orderCartProductsUseCase: OrderCartProductsUseCase,
     private val loadAvailableDiscountCouponsUseCase: LoadAvailableDiscountCouponsUseCase,
 ) : ViewModel(), CouponClickListener {
@@ -40,11 +38,11 @@ class PaymentViewModel(
             _uiState.value?.copy(
                 cart = cart,
                 discountResult =
-                    DiscountResult(
-                        cart.totalPrice(),
-                        0,
-                        loadShippingFeeUseCase(),
-                    ),
+                DiscountResult(
+                    cart.totalPrice(),
+                    0,
+                    SHIPPING_FEE,
+                ),
             )
         loadCoupons(orders.map { it.product.id })
     }
@@ -92,14 +90,14 @@ class PaymentViewModel(
         val uiState = _uiState.value ?: return
         val discountResult =
             uiState.coupons.findCouponById(couponId)
-                ?.discount(uiState.cart, loadShippingFeeUseCase())
+                ?.discount(uiState.cart, SHIPPING_FEE)
                 ?: return
         _uiState.value =
             uiState.copy(
                 couponUis =
-                    uiState.couponUis.map {
-                        it.copy(isSelected = it.id == couponId)
-                    },
+                uiState.couponUis.map {
+                    it.copy(isSelected = it.id == couponId)
+                },
                 discountResult = discountResult,
             )
     }
@@ -114,16 +112,15 @@ class PaymentViewModel(
     }
 
     companion object {
+        private const val SHIPPING_FEE = 3000L
         fun factory(
             orders: List<CartProductUi>,
-            loadShippingFeeUseCase: LoadShippingFeeUseCase,
             orderCartProductsUseCase: OrderCartProductsUseCase,
             loadAvailableDiscountCouponsUseCase: LoadAvailableDiscountCouponsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 PaymentViewModel(
                     orders,
-                    loadShippingFeeUseCase,
                     orderCartProductsUseCase,
                     loadAvailableDiscountCouponsUseCase,
                 )
