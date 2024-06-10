@@ -1,13 +1,7 @@
 package woowacourse.shopping.presentation.common
 
 interface ProductCountHandler {
-    fun plusProductQuantity(
-        productId: Long,
-        position: Int,
-    )
+    fun plusProductQuantity(productId: Long)
 
-    fun minusProductQuantity(
-        productId: Long,
-        position: Int,
-    )
+    fun minusProductQuantity(productId: Long)
 }

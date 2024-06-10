@@ -111,7 +111,7 @@ class ProductListViewModelTest {
             } returns Result.success(cartItemId)
 
             // when
-            viewModel.plusProductQuantity(productList.first().id, 0)
+            viewModel.plusProductQuantity(productList.first().id)
 
             // then
             val actual = viewModel.uiState.getOrAwaitValue()

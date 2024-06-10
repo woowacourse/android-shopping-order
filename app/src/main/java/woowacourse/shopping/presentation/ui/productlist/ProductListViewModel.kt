@@ -151,17 +151,11 @@ class ProductListViewModel(
         }
     }
 
-    override fun plusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun plusProductQuantity(productId: Long) {
         updateProductQuantity(productId, increment = true)
     }
 
-    override fun minusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun minusProductQuantity(productId: Long) {
         updateProductQuantity(productId, increment = false)
     }
 

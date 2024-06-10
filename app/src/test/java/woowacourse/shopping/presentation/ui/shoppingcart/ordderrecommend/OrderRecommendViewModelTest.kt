@@ -61,7 +61,7 @@ class OrderRecommendViewModelTest {
             } returns Result.success(cartItemId)
 
             // when
-            viewModel.plusProductQuantity(recommendCarts.first().id, 0)
+            viewModel.plusProductQuantity(recommendCarts.first().id)
 
             // then
             val actual = viewModel.uiState.getOrAwaitValue()

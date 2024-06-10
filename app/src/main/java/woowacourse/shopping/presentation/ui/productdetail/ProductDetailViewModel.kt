@@ -154,19 +154,13 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun plusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun plusProductQuantity(productId: Long) {
         val state = uiState.value ?: return
         val cart = state.cart ?: return
         _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity + 1))
     }
 
-    override fun minusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun minusProductQuantity(productId: Long) {
         val state = uiState.value ?: return
         val cart = state.cart ?: return
         _uiState.value = state.copy(cart = cart.copy(quantity = cart.quantity - 1))

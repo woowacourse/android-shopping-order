@@ -58,7 +58,8 @@ class CartSelectViewModel(
     private fun loadedCartProducts(pagingCartProduct: PagingCartProduct) {
         launch {
             val state = uiState.value ?: return@launch
-            val cartProducts = updateCartProductCheckStatus(state.orderCarts, pagingCartProduct.cartProducts)
+            val cartProducts =
+                updateCartProductCheckStatus(state.orderCarts, pagingCartProduct.cartProducts)
             val newPagingCartProduct = pagingCartProduct.copy(cartProducts = cartProducts)
 
             _uiState.postValue(state.copy(pagingCartProduct = newPagingCartProduct))
@@ -98,17 +99,11 @@ class CartSelectViewModel(
         }
     }
 
-    override fun plusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun plusProductQuantity(productId: Long) {
         updateProductQuantity(productId = productId, increment = true)
     }
 
-    override fun minusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun minusProductQuantity(productId: Long) {
         updateProductQuantity(productId = productId, increment = false)
     }
 
