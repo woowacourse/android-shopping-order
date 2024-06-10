@@ -22,7 +22,7 @@ class ProductsViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _productUiModels = MutableLiveData<List<ProductUiModel>>()
+    private val _productUiModels = MutableLiveData<List<ProductUiModel>>(emptyList())
     val productUiModels: LiveData<List<ProductUiModel>> get() = _productUiModels
 
     private val _isLoadingProducts = MutableLiveData<Boolean>()
@@ -67,7 +67,7 @@ class ProductsViewModel(
     private fun updateProductUiModels(products: List<Product>) =
         viewModelScope.launch {
             val additionalProductUiModels = products.toProductUiModels(this)
-            val newProductUiModels = (productUiModels() ?: emptyList()) + additionalProductUiModels
+            val newProductUiModels = productUiModels() + additionalProductUiModels
             _productUiModels.value = newProductUiModels
             updateTotalCount()
         }
@@ -103,10 +103,10 @@ class ProductsViewModel(
     fun loadProducts() =
         viewModelScope.launch {
             _isLoadingProducts.value = true
-            val productUiModels = productUiModels()?.toMutableList() ?: return@launch
-
+            val productUiModels = productUiModels().toMutableList()
             productUiModels.forEachIndexed { index, productUiModel ->
-                val product = productRepository.find(productUiModel.productId).getOrNull() ?: return@launch
+                val product =
+                    productRepository.find(productUiModel.productId).getOrNull() ?: return@launch
                 productUiModels[index] = product.toProductUiModel(this)
             }
             _isLoadingProducts.value = false
@@ -120,7 +120,8 @@ class ProductsViewModel(
 
     fun loadRecentProducts() =
         viewModelScope.launch {
-            val recentProducts = recentProductRepository.findRecentProducts().getOrNull() ?: return@launch
+            val recentProducts =
+                recentProductRepository.findRecentProducts().getOrNull() ?: return@launch
             _recentProductUiModels.value = recentProducts.toRecentProductUiModels(this)
         }
 
@@ -128,7 +129,8 @@ class ProductsViewModel(
         val recentProductUiModelsDeferred =
             scope.async {
                 map {
-                    val product = productRepository.find(it.product.id).getOrNull() ?: return@async null
+                    val product =
+                        productRepository.find(it.product.id).getOrNull() ?: return@async null
                     RecentProductUiModel(product.id, product.imageUrl, product.name)
                 }
             }
@@ -137,17 +139,17 @@ class ProductsViewModel(
 
     fun changeSeeMoreVisibility(lastPosition: Int) {
         _showLoadMore.value =
-            (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == productUiModels()?.size && isLastPage.value == false
+            (lastPosition + 1) % PAGE_SIZE == 0 && lastPosition + 1 == productUiModels().size && isLastPage.value == false
     }
 
     fun increaseQuantity(productId: Int) {
-        val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
+        val productUiModel = productUiModels().find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.inc())
         updateCartQuantity(newProductUiModel)
     }
 
     fun decreaseQuantity(productId: Int) {
-        val productUiModel = productUiModels()?.find { it.productId == productId } ?: return
+        val productUiModel = productUiModels().find { it.productId == productId } ?: return
         val newProductUiModel = productUiModel.copy(quantity = productUiModel.quantity.dec())
         updateCartQuantity(newProductUiModel)
     }
@@ -169,12 +171,13 @@ class ProductsViewModel(
 
     private fun updateProductUiModel(productId: Int) =
         viewModelScope.launch {
-            val productUiModels = productUiModels()?.toMutableList() ?: return@launch
+            val productUiModels = productUiModels().toMutableList()
             productRepository.find(productId)
                 .onSuccess { product ->
                     viewModelScope.launch {
                         val newProductUiModel = product.toProductUiModel(this)
-                        val position = productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
+                        val position =
+                            productUiModels.indexOfFirst { productUiModel -> productUiModel.productId == productId }
                         productUiModels[position] = newProductUiModel
                         _productUiModels.value = productUiModels
                         updateTotalCount()
@@ -207,7 +210,7 @@ class ProductsViewModel(
         _productsErrorEvent.value = Event(Unit)
     }
 
-    private fun productUiModels(): List<ProductUiModel>? = _productUiModels.value
+    private fun productUiModels(): List<ProductUiModel> = _productUiModels.value ?: emptyList()
 
     companion object {
         private const val INITIALIZE_PAGE = 0
