@@ -77,10 +77,9 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
             result = dataSource.postCartItems(RequestCartItemPostDto(productId, quantity)),
         )
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit> {
-        val result = dataSource.deleteCartItems(id)
-        return if (result is ApiResponse.Error && result.code == 204) Result.Success(Unit) else handleApiResult(result)
-    }
+    override suspend fun deleteCartItem(id: Long): Result<Unit> = handleApiResult(
+        result = dataSource.deleteCartItems(id)
+    )
 
     override suspend fun cartItemsCount(): Int =
         handleApiResult(
