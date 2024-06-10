@@ -5,13 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CouponResponse(
     val id: Int,
-    val availableTime: AvailableTime,
-    val buyQuantity: Int,
     val code: String,
     val description: String,
-    val discount: Int,
-    val discountType: String,
     val expirationDate: String,
-    val getQuantity: Int,
-    val minimumAmount: Int,
+    val discountType: String,
+    val buyQuantity: Int = 0,
+    val discount: Int = 0,
+    val availableTime: AvailableTime = AvailableTime(),
+    val getQuantity: Int = 0,
+    val minimumAmount: Int = 0,
 )

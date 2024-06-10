@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AvailableTime(
-    val end: String,
-    val start: String,
+    val end: String = "",
+    val start: String = "",
 )

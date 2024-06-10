@@ -2,9 +2,9 @@ package com.example.data.datasource.remote.service
 
 import com.example.data.datasource.remote.model.response.coupon.CouponResponse
 import com.example.domain.datasource.DataResponse
-import retrofit2.http.POST
+import retrofit2.http.GET
 
 interface CouponService {
-    @POST("/coupons")
+    @GET("/coupons")
     suspend fun requestCoupons(): DataResponse<List<CouponResponse>>
 }

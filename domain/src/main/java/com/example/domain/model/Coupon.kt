@@ -2,53 +2,53 @@ package com.example.domain.model
 
 import java.time.LocalDate
 
-sealed class Coupon(
-    val id: Int,
-    val code: String,
-    val description: String,
-    val expirationDate: LocalDate,
-) {
-    class FixedCoupon(
-        id: Int,
-        code: String,
-        description: String,
-        expirationDate: LocalDate,
+sealed interface Coupon {
+    val id: Int
+    val code: String
+    val description: String
+    val expirationDate: LocalDate
+
+    data class FixedCoupon(
+        override val id: Int,
+        override val code: String,
+        override val description: String,
+        override val expirationDate: LocalDate,
         val discount: Int,
         val minimumAmount: Int,
-    ) : Coupon(id, code, description, expirationDate)
+    ) : Coupon
 
-    class BuyXGetYCoupon(
-        id: Int,
-        code: String,
-        description: String,
-        expirationDate: LocalDate,
+    data class BuyXGetYCoupon(
+        override val id: Int,
+        override val code: String,
+        override val description: String,
+        override val expirationDate: LocalDate,
         val buyQuantity: Int,
         val getQuantity: Int,
-    ) : Coupon(id, code, description, expirationDate)
+    ) : Coupon
 
-    class FreeShippingCoupon(
-        id: Int,
-        code: String,
-        description: String,
-        expirationDate: LocalDate,
+    data class FreeShippingCoupon(
+        override val id: Int,
+        override val code: String,
+        override val description: String,
+        override val expirationDate: LocalDate,
         val minimumAmount: Int,
-    ) : Coupon(id, code, description, expirationDate)
+    ) : Coupon
 
-    class PercentageCoupon(
-        id: Int,
-        code: String,
-        description: String,
-        expirationDate: LocalDate,
+    data class PercentageCoupon(
+        override val id: Int,
+        override val code: String,
+        override val description: String,
+        override val expirationDate: LocalDate,
         val discount: Int,
         val availableTime: LocalTimeRange,
-    ) : Coupon(id, code, description, expirationDate)
+    ) : Coupon
 
-    class DefaultCoupon(
-        id: Int,
-        code: String,
-        description: String,
-        expirationDate: LocalDate,
-    ) : Coupon(id, code, description, expirationDate)
+    data class DefaultCoupon(
+        override val id: Int,
+        override val code: String,
+        override val description: String,
+        override val expirationDate: LocalDate,
+    ) : Coupon
 
     companion object {
         const val FIXED_COUPON_TYPE_STRING = "fixed"

@@ -4,45 +4,76 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.domain.datasource.map
 import com.example.domain.datasource.onSuccess
+import com.example.domain.model.CartItem
+import com.example.domain.model.Coupon
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.CouponRepository
 import com.example.domain.repository.OrderRepository
 import kotlinx.coroutines.launch
-import woowacourse.shopping.presentation.cart.model.CouponUiModels
+import java.time.LocalDate
+import java.time.LocalTime
 
 class PurchaseViewModel(
     savedStateHandle: SavedStateHandle,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
-) : ViewModel() {
-    private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
-    val totalPrice: LiveData<Int> get() = _totalPrice
+) : ViewModel(), PurchaseActionHandler {
+    private val cartItems: MutableLiveData<List<CartItem>> = MutableLiveData()
+    val totalPrice: LiveData<Int> get() = cartItems.map { it.sumOf { it.quantity.count * it.product.price } }
 
     private val _couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
-    val couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
+    val couponUiModels: LiveData<CouponUiModels> get() = _couponUiModels
 
     init {
         savedStateHandle.get<IntArray>(PurchaseActivity.CART_ITEMS_ID)?.toList()
-            ?.let(::getTotalPrice)
+            ?.let(::getCartItems)
     }
 
-    fun getTotalPrice(cartItemIds: List<Int>) {
+    private fun getCartItems(cartItemIds: List<Int>) {
         viewModelScope.launch {
             val result =
                 cartRepository.findAll().map { allCartItems ->
                     allCartItems.filter { cartItem ->
                         cartItemIds.contains(cartItem.id)
-                    }.sumOf { it.quantity.count * it.product.price }
+                    }
                 }
             result.onSuccess {
-                _totalPrice.value = it
+                cartItems.value = it
             }
         }
     }
+
+    fun loadCoupons() {
+        viewModelScope.launch {
+            couponRepository.getCoupons().onSuccess { coupons ->
+                _couponUiModels.value = coupons.toCouponUiModels()
+            }
+        }
+    }
+
+    fun List<Coupon>.toCouponUiModels(): CouponUiModels = CouponUiModels(this.map { it.toCouponUiModel() })
+
+    fun Coupon.toCouponUiModel(): CouponUiModel {
+        val available = this.isAvailable()
+        return CouponUiModel(this, false, available)
+    }
+
+    private fun Coupon.isAvailable() =
+        if (this.expirationDate < LocalDate.now()) {
+            false
+        } else {
+            when (this) {
+                is Coupon.FixedCoupon -> (totalPrice.value ?: 0) > this.minimumAmount
+                is Coupon.FreeShippingCoupon -> (totalPrice.value ?: 0) > this.minimumAmount
+                is Coupon.PercentageCoupon -> LocalTime.now() in this.availableTime
+                else -> true
+            }
+        }
 
     fun createOrder() {
         /*

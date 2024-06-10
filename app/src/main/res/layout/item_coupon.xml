@@ -4,7 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="couponUiModel"
+            type="woowacourse.shopping.presentation.purchase.CouponUiModel" />
+        <variable
+            name="actionHandler"
+            type="woowacourse.shopping.presentation.purchase.PurchaseActionHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +26,7 @@
             android:id="@+id/cb_select_coupon"
             android:layout_marginTop="6dp"
             android:backgroundTint="@color/teal_500"
+            android:checked="@{couponUiModel.checked}"
             tools:checked="true"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -31,6 +37,7 @@
             app:layout_constraintStart_toEndOf="@id/cb_select_coupon"
             app:layout_constraintTop_toTopOf="@id/cb_select_coupon"
             app:layout_constraintBottom_toBottomOf="@id/cb_select_coupon"
+            android:text="@{couponUiModel.coupon.description}"
             android:textSize="18dp"
             android:textStyle="bold"
             tools:text="5000원 할인 쿠폰" />
@@ -39,6 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="만료일"
+            expirationDate="@{couponUiModel.coupon.expirationDate}"
             app:layout_constraintTop_toBottomOf="@id/cb_select_coupon"
             app:layout_constraintStart_toStartOf="@id/cb_select_coupon"
             android:id="@+id/tv_coupon_expiration_date"
@@ -47,6 +55,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            minimumPrice="@{couponUiModel.coupon}"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_expiration_date"
             app:layout_constraintStart_toStartOf="@id/tv_coupon_expiration_date"
             tools:text="최소주문금액" />

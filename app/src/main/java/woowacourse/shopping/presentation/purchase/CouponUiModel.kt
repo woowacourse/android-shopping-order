@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.model
+package woowacourse.shopping.presentation.purchase
 
 import com.example.domain.model.Coupon
 
