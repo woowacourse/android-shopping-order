@@ -11,11 +11,9 @@ import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CategoryBasedProductRecommendationRepository
-import woowacourse.shopping.domain.repository.DefaultOrderRepository
-import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
+import woowacourse.shopping.domain.repository.DefaultOrderRepository2
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductHistoryRepository
+import woowacourse.shopping.domain.repository.OrderRepository2
 import woowacourse.shopping.domain.repository.ProductsRecommendationRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.ui.order.event.OrderEvent
@@ -25,7 +23,7 @@ import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class OrderViewModel(
-    private val orderRepository: OrderRepository,
+    private val orderRepository2: OrderRepository2,
     private val productsRecommendationRepository: ProductsRecommendationRepository,
     private val cartRepository: ShoppingCartRepository,
 ) : ViewModel(), OrderListener {
@@ -41,63 +39,62 @@ class OrderViewModel(
     private val _event: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
     val event: SingleLiveData<OrderEvent> get() = _event
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            orderRepository2.loadAllOrders().getOrThrow().also {
+                Log.d(TAG, "all orders: $it")
+            }
+        }
+
+    }
+
     override fun order() {
         viewModelScope.launch(Dispatchers.IO) {
-            orderRepository.orderItems()
-                .onSuccess {
-                    orderRepository.order(it.map { (cartItemId, _) -> cartItemId })
-                        .onSuccess {
-                            _event.postValue(OrderEvent.CompleteOrder)
-                        }
-                        .onFailure {
-                            // TODO : handle error
-                            Log.e(TAG, "order: order2 $it")
-                            throw it
-                        }
-                }
-                .onFailure {
-                    // TODO: handle error
-                    Log.e(TAG, "order: orderItems2 $it")
-                    throw it
-                }
+            _event.postValue(OrderEvent.CompleteOrder)
+
         }
     }
 
     fun loadAll() {
         viewModelScope.launch(Dispatchers.IO) {
             productsRecommendationRepository.recommendedProducts()
-                .also { Log.d(TAG, "loadAll: recommendedProducts2: $it") }
                 .onSuccess { recommendedProducts ->
-                    orderRepository.allOrderItemsQuantity()
-                        .onSuccess { totalQuantity ->
-                            orderRepository.orderItemsTotalPrice()
-                                .onSuccess { totalPrice ->
-                                    withContext(Dispatchers.Main) {
-                                        _recommendedProducts.postValue(recommendedProducts)
-                                        _addedProductQuantity.postValue(totalQuantity)
-                                        _totalPrice.postValue(totalPrice)
-                                    }
-                                }
-                                .onFailure {
-                                    // TODO : handle error
-                                    Log.e(TAG, "loadAll: orderItemsTotalPrice2 $it")
-                                    throw it
-                                }
-                        }
-                        .onFailure {
-                            // TODO : handle error
-                            Log.e(TAG, "loadAll: allOrderItemsQuantity2 $it")
-                            throw it
-                        }
-
+                    withContext(Dispatchers.Main) {
+                        _recommendedProducts.postValue(recommendedProducts)
+                    }
                 }
                 .onFailure {
                     // TODO : handle error
                     Log.e(TAG, "loadAll: recommendedProducts2 $it")
                     throw it
                 }
-        }
 
+            orderRepository2.allOrderItemsQuantity()
+                .onSuccess { allQuantity ->
+                    withContext(Dispatchers.Main) {
+                        _addedProductQuantity.postValue(allQuantity)
+                    }
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.e(TAG, "loadAll: allOrderItemsQuantity2 $it")
+                    throw it
+                }
+
+            orderRepository2.orderItemsTotalPrice()
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _totalPrice.postValue(it)
+                    }
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.e(TAG, "loadAll: orderItemsTotalPrice2 $it")
+                    throw it
+                }
+
+
+        }
 
     }
 
@@ -108,26 +105,35 @@ class OrderViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
                 .onSuccess {
-                    orderRepository.saveOrderItem(productId, quantity)
-                        .onSuccess {
-                            withContext(Dispatchers.Main) {
-                                updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
-                                updateTotalQuantity(productId, INCREASE_AMOUNT)
-                                _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
-                            }
-                        }
-                        .onFailure {
-                            // TODO: handle error
-                            Log.d(TAG, "onIncrease: saveOrderItem2: $it")
-                            throw it
-                        }
+                    Log.d(TAG, "onIncrease: save in cart success")
                 }
                 .onFailure {
                     // TODO : handle error
                     Log.d(TAG, "onIncrease: addShoppingCartProduct2: $it")
                     throw it
                 }
+
+            orderRepository2.updateOrderItem(productId, quantity)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
+                        updateTotalQuantity(productId, INCREASE_AMOUNT)
+                        _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
+                    }
+                }
+                .onFailure {
+                    // TODO : handle error
+                    Log.d(TAG, "onIncrease: saveOrderItem2: $it")
+                    throw it
+                }
+
+
+            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository2.loadAllOrders().getOrThrow()}")
+
+
         }
+
+
     }
 
     override fun onDecrease(
@@ -135,36 +141,21 @@ class OrderViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            cartRepository.findCartItemByProductId(productId)
-                .onSuccess { cartItem ->
-                    cartRepository.updateProductQuantity(cartItemId = cartItem.id, quantity)
-                        .onSuccess {
-                            orderRepository.saveOrderItem(productId, quantity)
-                                .onSuccess {
-                                    withContext(Dispatchers.Main) {
-                                        updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
-                                        updateTotalQuantity(productId, DECREASE_AMOUNT)
-                                        _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
-                                    }
-                                }
-                                .onFailure {
-                                    // TODO: handle error
-                                    Log.e(TAG, "onDecrease: saveOrderItem2: $it")
-                                    throw it
-                                }
-                        }
-                        .onFailure {
-                            // TODO: handle error
-                            Log.e(TAG, "onDecrease: updateProductQuantity2: $it")
-                            throw it
-                        }
-
+            orderRepository2.updateOrderItem(productId, quantity)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
+                        updateTotalQuantity(productId, DECREASE_AMOUNT)
+                        _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
+                    }
                 }
                 .onFailure {
                     // TODO: handle error
-                    Log.e(TAG, "onDecrease: findCartItemByProductId: $it")
+                    Log.e(TAG, "onDecrease: saveOrderItem2: $it")
                     throw it
                 }
+            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository2.loadAllOrders().getOrThrow()}")
+
         }
     }
 
@@ -200,16 +191,12 @@ class OrderViewModel(
         private const val DECREASE_AMOUNT = -1
 
         fun factory(
-            orderRepository: OrderRepository =
-                DefaultOrderRepository(
-                    ShoppingApp.orderSource,
+            orderRepository2: OrderRepository2 =
+                DefaultOrderRepository2(
+                    ShoppingApp.orderSource2,
                     ShoppingApp.cartSource,
-                ),
-            historyRepository: ProductHistoryRepository =
-                DefaultProductHistoryRepository(
-                    ShoppingApp.historySource,
-                    ShoppingApp.productSource,
-                ),
+
+                    ),
             productRecommendationRepository: ProductsRecommendationRepository =
                 CategoryBasedProductRecommendationRepository(
                     ShoppingApp.productSource,
@@ -223,7 +210,7 @@ class OrderViewModel(
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
-                    orderRepository,
+                    orderRepository2,
                     productRecommendationRepository,
                     cartRepository,
                 )
