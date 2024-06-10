@@ -23,17 +23,13 @@ class DefaultIncreaseCartProductUseCase(
         productId: Long,
         amount: Int,
     ): Result<Cart> {
-        // 1. product id 가 유효한지 확인한다.
         val product =
             productRepository.findProductById(productId)
                 .onFailure { return Result.failure(it) }
                 .getOrThrow()
-        // 2. cart 에서 product id 를 가진 상품을 찾는다.
         val cartProduct =
             cartRepository.findCartProduct(product.id).getOrNull()
-                // 3. cartProduct 가 없으면 새로 생성한다.
                 ?: return cartRepository.createCartProduct(product, amount)
-        // 4. cartProduct 수량을 증가시킨다.
         val newCartProduct = cartProduct.increaseCount(amount)
         return cartRepository.updateCartProduct(cartProduct.product, newCartProduct.count)
     }

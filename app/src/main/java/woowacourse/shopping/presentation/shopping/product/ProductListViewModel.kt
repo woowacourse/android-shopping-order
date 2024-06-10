@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import timber.log.Timber
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.Product
@@ -62,13 +63,11 @@ class ProductListViewModel(
                         _uiState.value = uiState.copy(isLoading = false)
                         _errorEvent.postValue(ProductListErrorEvent.LoadProducts)
                     }
-                Timber.e("finish productLoadJob")
             }
     }
 
     fun loadCartProducts() {
         viewModelScope.launch {
-            // 아직 Product 가 최초 로드되지 않았으면 대기
             if (productLoadJob?.isActive == true) productLoadJob?.join()
             val ids = uiState.value?.products?.map { it.id } ?: return@launch
             loadCartUseCase(ids).onSuccess { newCart ->
