@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentPaymentBinding
+import woowacourse.shopping.ui.FragmentNavigator
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.OrderFragment
 import woowacourse.shopping.ui.payment.adapter.CouponAdapter
@@ -47,11 +48,9 @@ class PaymentFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initToolbar()
         observeIsPaymentSuccess()
-        binding.rvPaymentCoupon.adapter = adapter
-        viewModel.couponsUiModel.observe(viewLifecycleOwner) { coupons ->
-            adapter.updateCoupons(coupons)
-        }
+        observeCoupons()
     }
 
     private fun initViewModel() {
@@ -75,12 +74,25 @@ class PaymentFragment : Fragment() {
         }
     }
 
+    private fun initToolbar() {
+        binding.toolbarPayment.setNavigationOnClickListener {
+            (requireContext() as FragmentNavigator).popBackStack()
+        }
+    }
+
     private fun observeIsPaymentSuccess() {
         viewModel.isPaymentSuccess.observe(viewLifecycleOwner) { isPaymentSuccess ->
             if (isPaymentSuccess) {
                 makeToast(getString(R.string.payment_success))
                 parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             }
+        }
+    }
+
+    private fun observeCoupons() {
+        binding.rvPaymentCoupon.adapter = adapter
+        viewModel.couponsUiModel.observe(viewLifecycleOwner) { coupons ->
+            adapter.updateCoupons(coupons)
         }
     }
 
