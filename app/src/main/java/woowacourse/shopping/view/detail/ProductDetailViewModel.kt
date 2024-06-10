@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
+import woowacourse.shopping.domain.model.CartItemResult
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Product.Companion.DEFAULT_PRODUCT_ID
 import woowacourse.shopping.domain.model.RecentlyProduct
@@ -45,10 +46,12 @@ class ProductDetailViewModel(
                 if (cartItemId == DEFAULT_CART_ITEM_ID) {
                     shoppingCartRepository.insertCartItem(product).getOrThrow()
                 } else {
-//                    shoppingCartRepository.updateCartItem(
-//                        product = product,
-//                        updateCartItemType = UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
-//                    ).getOrThrow()
+                    shoppingCartRepository.updateCartCount(
+                        CartItemResult(
+                            cartItemId = cartItemId,
+                            counter = product.cartItemCounter,
+                        ),
+                    ).getOrThrow()
                 }
             }.onSuccess {
                 _productDetailEvent.setValue(

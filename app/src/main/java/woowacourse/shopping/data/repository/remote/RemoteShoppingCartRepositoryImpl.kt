@@ -59,6 +59,7 @@ class RemoteShoppingCartRepositoryImpl(
             val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
 
             if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
+                product.cartItemCounter.increase()
                 insertCartItem(product).getOrThrow()
             } else {
                 cartItemResult.increaseCount()
@@ -73,7 +74,6 @@ class RemoteShoppingCartRepositoryImpl(
 
     override suspend fun insertCartItem(product: Product): Result<Unit> {
         return try {
-            product.cartItemCounter.increase()
             val response =
                 cartItemDataSource.addCartItem(
                     productId = product.id,
