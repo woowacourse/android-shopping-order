@@ -15,7 +15,6 @@ import java.io.IOException
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
 
 abstract class BaseViewModel : ViewModel() {
     private val _message: MutableLiveData<Event<MessageProvider>> = MutableLiveData()
@@ -44,7 +43,7 @@ abstract class BaseViewModel : ViewModel() {
     }
 
     private fun handleException(throwable: Throwable) {
-        if (throwable is CancellationException) return
+        showError(throwable)
     }
 
     abstract fun retry()
@@ -79,7 +78,7 @@ abstract class BaseViewModel : ViewModel() {
         handleError(e)
     }
 
-    fun showError(
+    private fun showError(
         title: String,
         description: String,
     ) {

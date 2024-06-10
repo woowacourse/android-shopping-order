@@ -52,16 +52,15 @@ class PaymentViewModel(
         launch {
             showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
             delay(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
-            couponRepository.getCoupons().onSuccess { coupons ->
-                hideError()
-                val state = uiState.value ?: return@launch
-                val couponUiModel = coupons.map { it.toPresentation() }
-                val validCoupons =
-                    couponUiModel.filter { it.couponCondition.isValid(state.orderCarts.map { cartUiModel -> cartUiModel.toDomain() }) }
-                _uiState.postValue(state.copy(coupons = validCoupons))
-            }.onFailure { e ->
-                showError(e)
-            }
+            val coupons = couponRepository.getCoupons().getOrThrow()
+            throw IllegalArgumentException()
+
+            hideError()
+            val state = uiState.value ?: return@launch
+            val couponUiModel = coupons.map { it.toPresentation() }
+            val validCoupons =
+                couponUiModel.filter { it.couponCondition.isValid(state.orderCarts.map { cartUiModel -> cartUiModel.toDomain() }) }
+            _uiState.postValue(state.copy(coupons = validCoupons))
             delay(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             hideLoading()
         }
@@ -84,13 +83,10 @@ class PaymentViewModel(
     fun payment() {
         launch {
             val state = uiState.value ?: return@launch
-            orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
-                hideError()
-                showMessage(PaymentMessage.PaymentSuccessMessage)
-                _navigateAction.emit(PaymentNavigateAction.NavigateToProductList)
-            }.onFailure { e ->
-                showError(e)
-            }
+            orderRepository.insertOrder(state.orderCarts.map { it.id }).getOrThrow()
+            hideError()
+            showMessage(PaymentMessage.PaymentSuccessMessage)
+            _navigateAction.emit(PaymentNavigateAction.NavigateToProductList)
         }
     }
 
