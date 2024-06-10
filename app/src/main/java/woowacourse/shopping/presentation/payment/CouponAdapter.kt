@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.payment
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -14,9 +13,6 @@ class CouponAdapter(
 ) : RecyclerView.Adapter<CouponViewHolder>() {
     private val data: MutableList<Coupon> = mutableListOf()
 
-//    private val data: List<Coupon> get() {
-//        return viewModel.coupons.value?.map { Coupon.of(it) } ?: emptyList()
-//    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -32,7 +28,6 @@ class CouponAdapter(
         holder: CouponViewHolder,
         position: Int,
     ) {
-        Log.d("alsong", "onBindViewHolder: $data")
         holder.bind(data[position], viewModel)
     }
 
