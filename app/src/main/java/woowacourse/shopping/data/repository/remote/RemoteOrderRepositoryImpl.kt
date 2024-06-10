@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class RemoteOrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
 ) : OrderRepository {
-    override suspend fun orderShoppingCart(ids: List<Int>): Result<Unit> {
+    override suspend fun orderShoppingCart(ids: List<Long>): Result<Unit> {
         return try {
             val response = orderDataSource.orderItems(ids = ids)
             if (response.isSuccessful) {

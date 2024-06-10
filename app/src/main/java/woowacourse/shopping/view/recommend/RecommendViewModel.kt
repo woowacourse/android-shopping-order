@@ -82,22 +82,6 @@ class RecommendViewModel(
         }
     }
 
-    fun orderItems() {
-        val ids = _checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        if (ids != null) {
-            viewModelScope.launch {
-                orderRepository.orderShoppingCart(ids)
-                    .onSuccess {
-                        _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-                    }.onFailure {
-                        _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
-                    }
-            }
-        } else {
-            _errorEvent.setValue(RecommendEvent.OrderRecommends.Fail)
-        }
-    }
-
     private fun deleteCartItem(product: Product) {
         viewModelScope.launch {
             runCatching {

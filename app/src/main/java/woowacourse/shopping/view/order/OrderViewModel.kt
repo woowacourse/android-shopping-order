@@ -243,7 +243,20 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     }
 
     fun orderItems() {
-        // 주문 로직 구현
+        val ids = checkedShoppingCart.cartItems.value?.map { it.id }
+        if (ids != null) {
+            viewModelScope.launch(coroutineExceptionHandler) {
+                runCatching {
+                    orderRepository.orderShoppingCart(ids).getOrThrow()
+                }.onSuccess {
+                    _orderUiState.value = OrderUiState.Success
+                }.onFailure { throwable ->
+                    _orderUiState.value = OrderUiState.Failure(throwable.message)
+                }
+            }
+        } else {
+            _orderUiState.value = OrderUiState.Failure(ERROR_MESSAGE_NO_ITEMS)
+        }
     }
 
     companion object {

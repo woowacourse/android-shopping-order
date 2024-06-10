@@ -11,7 +11,7 @@ import woowacourse.shopping.utils.DtoMapper.toDomainModel
 class OrderDataSourceImpl(
     private val orderApiService: OrderApiService = NetworkManager.orderService(),
 ) : OrderDataSource {
-    override suspend fun orderItems(ids: List<Int>): Response<Unit> {
+    override suspend fun orderItems(ids: List<Long>): Response<Unit> {
         return orderApiService.orderItems(cartItemIds = CartOrderRequest(ids))
     }
 
