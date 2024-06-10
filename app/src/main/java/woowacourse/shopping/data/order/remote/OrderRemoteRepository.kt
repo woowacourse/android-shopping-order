@@ -22,8 +22,7 @@ class OrderRemoteRepository(
         handleResponseResult(orderDataSource.orderCartItems(cartItemIds)) { ResponseResult.Success(Unit) }
 
     override suspend fun loadRecommendedProducts(): ResponseResult<List<Product>> {
-        val productId: Long = productHistoryDataSource.fetchLatestProduct()
-        val category: String = handleResponse(productDataSource.loadById(productId)).category
+        val category: String = handleResponse(productDataSource.loadById(getProductId())).category
         val cartItemsProductDto: List<ProductDto> =
             handleResponse(cartItemDataSource.fetchCartItems()).content.map { it.product }
 
@@ -33,5 +32,16 @@ class OrderRemoteRepository(
                     .map { productDto -> productDto.toDomain() }.take(10)
             ResponseResult.Success(recommendedProducts)
         }
+    }
+
+    private suspend fun getProductId(): Long {
+        var productId: Long = 0
+        productHistoryDataSource.fetchLatestProduct()
+            .onSuccess {
+                productId = it
+            }.onFailure {
+                Product.NULL
+            }
+        return productId
     }
 }

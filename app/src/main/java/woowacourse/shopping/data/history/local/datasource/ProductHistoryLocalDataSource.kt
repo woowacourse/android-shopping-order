@@ -4,21 +4,45 @@ import woowacourse.shopping.data.history.local.HistoryProductDao
 import woowacourse.shopping.data.model.HistoryProduct
 
 class ProductHistoryLocalDataSource(private val dao: HistoryProductDao) : ProductHistoryDataSource {
-    override suspend fun saveProductHistory(productId: Long) {
+    override suspend fun saveProductHistory(productId: Long): Result<Long> {
         val id = dao.findById(productId)
+        if (id != null) { dao.delete(id) }
 
-        if (id != null) {
-            dao.delete(id)
+        return runCatching {
+            dao.insert(HistoryProduct(productId))
+        }.onSuccess {
+            Result.success(it)
+        }.onFailure {
+            Result.failure<Long>(it)
         }
-
-        dao.insert(HistoryProduct(productId))
     }
 
-    override suspend fun fetchProductHistory(productId: Long): Long? = dao.findById(productId)?.id
+    override suspend fun fetchProductHistory(productId: Long): Result<Long?> =
+        runCatching {
+            dao.findById(productId)?.id
+        }.onSuccess { id ->
+            Result.success(id)
+        }.onFailure {
+            Result.failure<Long>(it)
+        }
 
-    override suspend fun fetchLatestProduct(): Long = dao.findLatest()?.id ?: EMPTY
+    override suspend fun fetchLatestProduct(): Result<Long> =
+        runCatching {
+            dao.findLatest()?.id ?: EMPTY
+        }.onSuccess { id ->
+            Result.success(id)
+        }.onFailure {
+            Result.failure<Long>(it)
+        }
 
-    override suspend fun fetchProductsHistory(): List<Long> = dao.findAll().map { it.id }
+    override suspend fun fetchProductsHistory(): Result<List<Long>> =
+        runCatching {
+            dao.findAll().map { it.id }
+        }.onSuccess { productIds ->
+            Result.success(productIds)
+        }.onFailure {
+            Result.failure<List<Long>>(it)
+        }
 
     override suspend fun deleteProductsHistory() {
         dao.deleteAll()

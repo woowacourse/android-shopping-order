@@ -87,17 +87,19 @@ class ProductDetailViewModel(
     }
 
     private suspend fun loadLatestProduct() {
-        val latestProduct =
-            try {
-                productHistoryRepository.loadLatestProduct()
-            } catch (e: NoSuchElementException) {
-                Product.NULL
+        productHistoryRepository.loadLatestProduct()
+            .onSuccess { latestProduct ->
+                _latestProduct.value = latestProduct
+            }.onFailure {
+                _latestProduct.value = Product.NULL
             }
-        _latestProduct.value = latestProduct
     }
 
     private suspend fun saveProductHistory() {
         productHistoryRepository.saveProductHistory(productId)
+            .onFailure {
+                _errorMessage.value = it.message
+            }
     }
 
     companion object {
