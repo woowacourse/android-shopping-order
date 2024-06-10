@@ -10,21 +10,8 @@ data class FREESHIPPING(
     override val expirationDate: LocalDate,
     override val discountType: String,
     val minimumAmount: Int,
-    override var isChecked: Boolean = false,
 ) : Coupon() {
     override fun calculateDiscountRate(carts: List<Cart>): Int {
         return 3000
-    }
-
-    override fun copy(checked: Boolean): Coupon {
-        return FREESHIPPING(
-            id = id,
-            code = code,
-            description = description,
-            expirationDate = expirationDate,
-            discountType = discountType,
-            minimumAmount = minimumAmount,
-            isChecked = checked,
-        )
     }
 }

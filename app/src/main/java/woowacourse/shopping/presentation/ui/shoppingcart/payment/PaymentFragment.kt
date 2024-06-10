@@ -39,7 +39,7 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         }
 
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            adapter.submitList(uiState.coupons)
+            adapter.submitList(uiState.couponUiStates)
         }
     }
 

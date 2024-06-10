@@ -12,7 +12,6 @@ data class MIRACLESALE(
     override val discountType: String,
     val discount: Int,
     val availableTime: AvailableLocalTime,
-    override var isChecked: Boolean = false,
 ) : Coupon() {
     data class AvailableLocalTime(
         val start: LocalTime,
@@ -24,18 +23,5 @@ data class MIRACLESALE(
         val discountRate = discount / 100.0
 
         return (totalPrice * discountRate).toInt()
-    }
-
-    override fun copy(checked: Boolean): Coupon {
-        return MIRACLESALE(
-            id = id,
-            code = code,
-            description = description,
-            expirationDate = expirationDate,
-            discountType = discountType,
-            discount = discount,
-            availableTime = availableTime,
-            isChecked = checked,
-        )
     }
 }

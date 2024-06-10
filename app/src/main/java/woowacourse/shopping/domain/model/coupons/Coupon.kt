@@ -9,9 +9,6 @@ sealed class Coupon {
     abstract val description: String
     abstract val expirationDate: LocalDate
     abstract val discountType: String
-    abstract var isChecked: Boolean
 
     abstract fun calculateDiscountRate(carts: List<Cart>): Int
-
-    abstract fun copy(checked: Boolean): Coupon
 }

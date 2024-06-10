@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.shoppingcart.payment
+package woowacourse.shopping.presentation.ui.shoppingcart.payment.adapter
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter

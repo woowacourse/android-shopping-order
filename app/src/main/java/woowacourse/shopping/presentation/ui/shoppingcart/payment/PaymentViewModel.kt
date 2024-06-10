@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.payment
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -21,14 +22,15 @@ import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.ui.shoppingcart.payment.PaymentFragment.Companion.PUT_EXTRA_CART_IDS_KEY
+import woowacourse.shopping.presentation.ui.shoppingcart.payment.adapter.CouponListActionHandler
 
 class PaymentViewModel(
     savedStateHandle: SavedStateHandle,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : BaseViewModel(), CouponListActionHandler {
-    private val _uiState: MutableLiveData<CouponUiState> = MutableLiveData(CouponUiState())
-    val uiState: LiveData<CouponUiState> get() = _uiState
+    private val _uiState: MutableLiveData<PaymentUiState> = MutableLiveData(PaymentUiState())
+    val uiState: LiveData<PaymentUiState> get() = _uiState
 
     private val _navigateAction: MutableLiveData<Event<PaymentNavigateAction>> =
         MutableLiveData(null)
@@ -49,10 +51,12 @@ class PaymentViewModel(
                 .onSuccess {
                     hideError()
 
+                    val couponUiState = it.map { coupon -> CouponUiState(coupon, false) }
+
                     _uiState.value?.let { state ->
                         _uiState.value =
                             state.copy(
-                                coupons = it,
+                                couponUiStates = couponUiState,
                             )
                     }
                 }.onFailure { e ->
@@ -86,18 +90,23 @@ class PaymentViewModel(
     }
 
     override fun selectCoupon(coupon: Coupon) {
-        val carts = uiState.value?.orderCarts?.toList() ?: throw IllegalArgumentException()
-
         val state = uiState.value ?: return
+
+        val carts = state.orderCarts.toList()
 
         _uiState.value =
             _uiState.value?.copy(
-                coupons =
-                    state.coupons.map {
-                        if (it.code == coupon.code) {
-                            it.copy(!it.isChecked)
+                couponUiStates =
+                    state.couponUiStates.map {
+                        if (it.coupon.code == coupon.code) {
+                            Log.d("HELLO", "selectCoupon: ${it.coupon.code} ${coupon.code}")
+                            it.copy(
+                                isChecked = !it.isChecked,
+                            )
                         } else {
-                            it.copy(false)
+                            it.copy(
+                                isChecked = false,
+                            )
                         }
                     },
                 discountPrice =

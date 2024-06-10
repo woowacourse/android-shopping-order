@@ -10,11 +10,11 @@
 
         <variable
             name="action"
-            type="woowacourse.shopping.presentation.ui.shoppingcart.payment.CouponListActionHandler" />
+            type="woowacourse.shopping.presentation.ui.shoppingcart.payment.adapter.CouponListActionHandler" />
 
         <variable
-            name="coupon"
-            type="woowacourse.shopping.domain.model.coupons.Coupon" />
+            name="couponUiState"
+            type="woowacourse.shopping.presentation.ui.shoppingcart.payment.CouponUiState" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,8 +30,8 @@
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="@{coupon.checked}"
-            android:onClick="@{() -> action.selectCoupon(coupon)}"
+            android:checked="@{couponUiState.isChecked}"
+            android:onClick="@{() -> action.selectCoupon(couponUiState.coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{coupon.description}"
+            android:text="@{couponUiState.coupon.description}"
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -52,7 +52,7 @@
 
         <TextView
             android:id="@+id/tv_expiration_date"
-            expiredDate="@{coupon.expirationDate}"
+            expiredDate="@{couponUiState.coupon.expirationDate}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -68,7 +68,7 @@
 
         <TextView
             android:id="@+id/tv_coupon_description"
-            minimumPayment="@{coupon}"
+            minimumPayment="@{couponUiState.coupon}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

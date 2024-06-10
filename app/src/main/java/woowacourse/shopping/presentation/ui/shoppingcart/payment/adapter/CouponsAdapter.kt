@@ -6,12 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderCouponBinding
-import woowacourse.shopping.domain.model.coupons.Coupon
-import woowacourse.shopping.presentation.ui.shoppingcart.payment.CouponListActionHandler
+import woowacourse.shopping.presentation.ui.shoppingcart.payment.CouponUiState
 
 class CouponsAdapter(
     private val couponListActionHandler: CouponListActionHandler,
-) : ListAdapter<Coupon, CouponsAdapter.CouponViewHolder>(CouponDiffCallback) {
+) : ListAdapter<CouponUiState, CouponsAdapter.CouponViewHolder>(CouponDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -32,25 +31,25 @@ class CouponsAdapter(
         private val binding: HolderCouponBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
-            coupon: Coupon,
+            couponUiState: CouponUiState,
             couponListActionHandler: CouponListActionHandler,
         ) {
-            binding.coupon = coupon
+            binding.couponUiState = couponUiState
             binding.action = couponListActionHandler
         }
     }
 
-    object CouponDiffCallback : DiffUtil.ItemCallback<Coupon>() {
+    object CouponDiffCallback : DiffUtil.ItemCallback<CouponUiState>() {
         override fun areItemsTheSame(
-            oldItem: Coupon,
-            newItem: Coupon,
+            oldItem: CouponUiState,
+            newItem: CouponUiState,
         ): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.coupon == newItem.coupon
         }
 
         override fun areContentsTheSame(
-            oldItem: Coupon,
-            newItem: Coupon,
+            oldItem: CouponUiState,
+            newItem: CouponUiState,
         ): Boolean {
             return oldItem == newItem
         }
