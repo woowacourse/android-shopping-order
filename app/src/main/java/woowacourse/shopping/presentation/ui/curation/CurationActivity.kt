@@ -7,13 +7,11 @@ import woowacourse.shopping.databinding.ActivityCurationBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.base.ViewModelFactory
 import woowacourse.shopping.presentation.common.EventObserver
-import woowacourse.shopping.presentation.common.UiState
-import woowacourse.shopping.presentation.ui.curation.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.curation.model.CurationNavigation
 import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 
 class CurationActivity : BindingActivity<ActivityCurationBinding>(R.layout.activity_curation) {
     private val viewModel: CurationViewModel by viewModels { ViewModelFactory() }
-
     private val curationAdapter: CurationAdapter by lazy { CurationAdapter(viewModel) }
 
     override fun initStartView() {
@@ -28,32 +26,18 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>(R.layout.activ
     private fun initObserver() {
         binding.rvCurations.adapter = curationAdapter
         binding.curationActionHandler = viewModel
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        viewModel.cartProducts.observe(this) {
-            when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    curationAdapter.submitList(it.data)
-                }
-            }
+        viewModel.uiState.observe(this) {
+            curationAdapter.submitList(it.cartProducts)
         }
 
-        viewModel.eventHandler.observe(
+        viewModel.navigateHandler.observe(
             this,
             EventObserver {
                 when (it) {
-                    is CurationEvent.SuccessOrder -> {
-                        Toast.makeText(this, "주문이 성공적으로 진행되었습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-        )
-        viewModel.navigateUiState.observe(
-            this,
-            EventObserver {
-                when (it) {
-                    is NavigateUiState.ToPayment -> {
+                    is CurationNavigation.ToPayment -> {
                         startActivity(PaymentActivity.createIntent(this, it.paymentUiModel))
                     }
                 }

@@ -5,26 +5,25 @@ import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.ui.curation.model.CurationUiState
 
 @BindingAdapter("curationPrice")
-fun TextView.setPrice(uiState: UiState<List<CartProduct>>?) {
-    if (uiState is UiState.Success) {
-        this.text =
-            this.context.getString(
-                R.string.won,
-                uiState.data.sumOf {
-                    it.quantity * it.price
-                },
-            )
-    }
+fun TextView.setPrice(curationUiState: CurationUiState?) {
+    if(curationUiState == null) return
+    this.text =
+        this.context.getString(
+            R.string.won,
+            curationUiState.cartProducts.sumOf {
+                it.quantity * it.price
+            },
+        )
 }
 
 @BindingAdapter("curationOrderCount")
-fun TextView.setOrderCount(uiState: UiState<List<CartProduct>>?) {
-    if (uiState is UiState.Success) {
-        this.text =
-            uiState.data.sumOf {
-                it.quantity
-            }.toString()
-    }
+fun TextView.setOrderCount(curationUiState: CurationUiState?) {
+    if(curationUiState == null) return
+    this.text =
+        curationUiState.cartProducts.sumOf {
+            it.quantity
+        }.toString()
 }
