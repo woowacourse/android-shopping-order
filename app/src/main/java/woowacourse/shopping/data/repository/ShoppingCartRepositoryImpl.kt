@@ -101,10 +101,8 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
     }
 
     private suspend fun addCartItemResult(product: Product): UpdateCartItemResult {
-        return run {
-            addCartItem(product).getOrNull() ?: throw ErrorEvent.AddCartEvent()
-            UpdateCartItemResult.ADD
-        }
+        addCartItem(product).getOrNull() ?: throw ErrorEvent.AddCartEvent()
+        return UpdateCartItemResult.ADD
     }
 
     private suspend fun updateCartItemCount(cartItemResult: CartItemResult): UpdateCartItemResult {
@@ -120,10 +118,9 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
     }
 
     private suspend fun deleteCartItemResult(cartItemResult: CartItemResult): UpdateCartItemResult {
-        return run {
-            deleteCartItem(cartItemResult.cartItemId).getOrNull() ?: throw ErrorEvent.DeleteCartEvent()
-            UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
-        }
+        deleteCartItem(cartItemResult.cartItemId).getOrNull()
+            ?: throw ErrorEvent.DeleteCartEvent()
+        return UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
     }
 
     override suspend fun getTotalCartItemCount(): Result<Int> {
