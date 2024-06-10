@@ -10,9 +10,7 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Recent
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.domain.coupon.Coupon

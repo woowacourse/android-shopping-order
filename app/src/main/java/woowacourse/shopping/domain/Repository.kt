@@ -6,7 +6,6 @@ import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.coupon.Coupon
 
 interface Repository {
-
     suspend fun getProductsByPaging(): Result<List<CartProduct>?>
 
     suspend fun getCartItems(

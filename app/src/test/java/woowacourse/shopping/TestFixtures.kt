@@ -20,7 +20,6 @@ val cartProduct: CartProduct = cartProducts.first()
 
 val coupons = List(4) { createCoupon(id = it) }
 
-
 fun createCoupon(
     id: Int = 1,
     code: String = CouponType.FIXED5000.name,
@@ -31,7 +30,7 @@ fun createCoupon(
     minimumAmount: Int = 100000,
     buyQuantity: Int = 0,
     getQuantity: Int = 0,
-    availableTime: AvailableTime? = null
+    availableTime: AvailableTime? = null,
 ): Coupon {
     return Coupon(
         id = id,
