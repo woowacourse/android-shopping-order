@@ -96,7 +96,7 @@ class CartViewModel(
             val category =
                 productRepository.productByIdOrNull(recentProductId)?.category
                     ?: DEFAULT_RECOMMEND_CATEGORY
-            productRepository.allProductsByCategoryResponse(category).onSuccess {
+            productRepository.allRecommendProductsResponse(category).onSuccess {
                 _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
                 noRecommendProductState.value = false
             }.checkError {

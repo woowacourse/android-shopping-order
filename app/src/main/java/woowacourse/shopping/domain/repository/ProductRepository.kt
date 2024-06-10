@@ -20,7 +20,7 @@ interface ProductRepository {
 
     suspend fun productByIdResponse(id: Long): Result<Product>
 
-    suspend fun allProductsByCategory(category: String): List<Product>
+    suspend fun allRecommendProducts(category: String): List<Product>
 
-    suspend fun allProductsByCategoryResponse(category: String): Result<List<Product>>
+    suspend fun allRecommendProductsResponse(category: String): Result<List<Product>>
 }

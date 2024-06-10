@@ -64,7 +64,7 @@ class ProductRepositoryImpl(
             transform = ResponseProductsGetDto::toProductList,
         )
 
-    override suspend fun allProductsByCategory(category: String): List<Product> {
+    override suspend fun allRecommendProducts(category: String): List<Product> {
         val carts: List<CartWithProduct> = cartWithProducts()
         var page = START_PRODUCT_PAGE
         var allProducts = mutableListOf<Product>()
@@ -81,7 +81,7 @@ class ProductRepositoryImpl(
         return allProducts
     }
 
-    override suspend fun allProductsByCategoryResponse(category: String): Result<List<Product>> {
+    override suspend fun allRecommendProductsResponse(category: String): Result<List<Product>> {
         try {
             val carts: List<CartWithProduct> = cartWithProducts()
 
