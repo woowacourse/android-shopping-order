@@ -89,10 +89,30 @@ Coroutines을 적용하여 비동기 요청을 리팩터링한다.
 - [x] 뷰모델에 코루틴 적용하기
 
 
-
 - [x] 상품 추천 관련
-  - [x] productsRecommendationRepository 의 함수에 파라미터를 제거.
-  - [x] CategoryBasedProductRecommendationRepository 의 생성자에 historySource 추가.
+    - [x] productsRecommendationRepository 의 함수에 파라미터를 제거.
+    - [x] CategoryBasedProductRecommendationRepository 의 생성자에 historySource 추가.
+
+### 아직 해야 하는 것
+- [ ] 뷰모델 테스트
+- [ ] 뒤로 가기 버튼 적용 안되어 있는 것 있음.
+
+
+# 4 단계
+
+### 기능 요구 사항
+- 장바구니에 담긴 상품을 최종 주문할 수 있다.
+- 배송비는 기본 3,000원이다. 
+- 결제 화면에서 적용 가능한 쿠폰을 조회하고 적용할 수 있다. 
+- 쿠폰은 1개만 적용 가능하다. 
+- 결제 수단은 구현하지 않는다. 
+- 결제하기 버튼을 누르면 바로 최종 주문이 완료된다. 
+- 최종 주문이 완료되면 상품 목록으로 이동과 함께 주문 완료 토스트 메시지를 노출한다.
+
+### API 구현 상세
+- 최종 주문이 완료되면 장바구니에서 주문된 상품이 초기화되는 것이 정상이다.
+- 쿠폰을 사용해도 사라지지 않는 것이 정상이다.
+
 
 
 
