@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCouponBinding
 import woowacourse.shopping.presentation.base.BindingActivity
@@ -40,9 +41,11 @@ class PaymentActivity :
         viewModel.coupons.observe(this) {
             when (it) {
                 is UiState.Loading -> {
+                    binding.layoutShimmer.root.isVisible = true
                 }
 
                 is UiState.Success -> {
+                    binding.layoutShimmer.root.isVisible = false
                     couponAdapter.submitList(it.data)
                     couponAdapter.notifyDataSetChanged()
                 }

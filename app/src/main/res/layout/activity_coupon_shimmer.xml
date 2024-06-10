@@ -28,28 +28,25 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="4dp"
+                android:background="@color/shimmer_color"
                 android:paddingHorizontal="18dp"
                 android:text="@string/payment_coupon_title"
-                android:textAppearance="@style/H1" />
+                android:textAppearance="@style/H1"
+                android:textColor="@color/shimmer_color" />
 
             <TextView
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
+                android:background="@color/shimmer_color"
                 android:paddingHorizontal="18dp"
                 android:text="@string/payment_coupon_description"
                 android:textAppearance="@style/B2"
-                android:textColor="@color/grey_300" />
+                android:textColor="@color/shimmer_color"
+                android:layout_marginBottom="60dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_coupon"
-                android:layout_width="match_parent"
-                android:layout_height="210dp"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginVertical="40dp"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_coupon" />
+            <include layout="@layout/item_coupon_shimmer" />
+
+            <include layout="@layout/item_coupon_shimmer" />
 
             <View
                 android:layout_width="match_parent"
@@ -63,10 +60,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:background="@color/shimmer_color">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
+
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="18dp">
 
@@ -76,6 +75,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/payment_price_title"
                         android:textAppearance="@style/H1"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -86,7 +86,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/won"
                         android:textAppearance="@style/H2"
-                        android:textColor="@color/grey_300"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -99,7 +99,8 @@
                 android:id="@+id/ll_payment_coupon_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:background="@color/shimmer_color">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -112,7 +113,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/payment_coupon_discount_title"
+
                         android:textAppearance="@style/H1"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -121,8 +124,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/discount_won"
+
                         android:textAppearance="@style/H2"
-                        android:textColor="@color/grey_300"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -140,6 +144,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/shimmer_color"
                     android:paddingHorizontal="18dp">
 
                     <TextView
@@ -147,7 +152,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/payment_delivery_title"
+
                         android:textAppearance="@style/H1"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -156,8 +163,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/won"
+
                         android:textAppearance="@style/H2"
-                        android:textColor="@color/grey_300"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -178,7 +186,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:background="@color/shimmer_color">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -190,7 +199,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/payment_total_title"
+
                         android:textAppearance="@style/H1"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -200,7 +211,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/won"
                         android:textAppearance="@style/H2"
-                        android:textColor="@color/grey_300"
+                        android:textColor="@color/shimmer_color"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -212,21 +223,17 @@
 
         <TextView
             android:id="@+id/tv_add_cart"
+            android:textColor="@color/shimmer_color"
+            android:background="@color/shimmer_color"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="#04C09E"
             android:gravity="center"
             android:onClick="@{() -> couponActionHandler.order()}"
             android:text="@string/payment"
             android:textAppearance="@style/H1"
-            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <include
-            android:id="@+id/layout_shimmer"
-            layout="@layout/activity_coupon_shimmer" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
