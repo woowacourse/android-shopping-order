@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource.impl
 import woowacourse.shopping.data.datasource.ProductRemoteDataSource
 import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
-import woowacourse.shopping.data.service.ProductService
+import woowacourse.shopping.data.remote.service.ProductService
 import woowacourse.shopping.exception.ShoppingError
 import woowacourse.shopping.exception.ShoppingException
 

@@ -1,6 +1,6 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.data.db.cart.CartDao
+import woowacourse.shopping.data.local.db.cart.CartDao
 import woowacourse.shopping.domain.model.cart.Cart
 import kotlin.math.min
 

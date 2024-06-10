@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.remote.service
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

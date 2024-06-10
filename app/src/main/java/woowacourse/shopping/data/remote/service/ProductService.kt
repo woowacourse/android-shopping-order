@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.remote.service
 
 import androidx.room.Delete
 import retrofit2.Response

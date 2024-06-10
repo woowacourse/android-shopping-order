@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.api
+package woowacourse.shopping.data.remote.api
 
 import woowacourse.shopping.domain.model.product.Product
 

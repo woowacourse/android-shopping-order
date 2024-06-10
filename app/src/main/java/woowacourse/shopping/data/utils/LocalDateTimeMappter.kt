@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.utils.mapper
+package woowacourse.shopping.data.utils
 
 import java.time.LocalDate
 import java.time.LocalTime

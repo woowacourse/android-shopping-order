@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.service
+package woowacourse.shopping.data.remote.service
 
 import okhttp3.Credentials
 import okhttp3.Interceptor

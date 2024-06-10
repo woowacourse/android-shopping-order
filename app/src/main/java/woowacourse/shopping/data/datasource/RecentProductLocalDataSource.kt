@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.data.model.RecentProduct
 
 interface RecentProductLocalDataSource {
     suspend fun insert(recentProduct: RecentProduct): Result<Long>

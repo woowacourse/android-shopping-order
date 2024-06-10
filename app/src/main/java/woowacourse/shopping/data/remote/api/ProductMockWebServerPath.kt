@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.api
+package woowacourse.shopping.data.remote.api
 
 object ProductMockWebServerPath {
     const val BASE_PORT = 12345

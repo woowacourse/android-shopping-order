@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
-import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.data.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import java.time.LocalDateTime
 

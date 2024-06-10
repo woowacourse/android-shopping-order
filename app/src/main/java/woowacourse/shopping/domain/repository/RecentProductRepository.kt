@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.data.model.RecentProduct
 
 interface RecentProductRepository {
     suspend fun insert(productId: Long): Result<Long>

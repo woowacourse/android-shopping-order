@@ -1,11 +1,11 @@
-package woowacourse.shopping.data.db.recentproduct
+package woowacourse.shopping.data.local.db.recentproduct
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.data.model.RecentProduct
 
 @Database(entities = [RecentProduct::class], version = 1)
 @TypeConverters(RecentProductTypeConverters::class)

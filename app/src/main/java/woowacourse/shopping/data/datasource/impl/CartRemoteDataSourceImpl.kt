@@ -5,7 +5,7 @@ import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
-import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.remote.service.CartItemService
 import woowacourse.shopping.exception.ShoppingError
 import woowacourse.shopping.exception.ShoppingException
 

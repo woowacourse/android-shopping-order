@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.utils.mapper
+package woowacourse.shopping.data.utils
 
 import woowacourse.shopping.data.dto.response.ResponseCouponDto
 import woowacourse.shopping.domain.model.coupon.AvailableTime

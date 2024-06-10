@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model.local
+package woowacourse.shopping.data.model
 
 import androidx.room.Entity
 import androidx.room.Index

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.data.model.RecentProduct
 import woowacourse.shopping.domain.model.cart.CartWithProduct
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.product.ProductWithQuantity

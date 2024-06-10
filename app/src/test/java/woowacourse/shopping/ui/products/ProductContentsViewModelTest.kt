@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.data.model.RecentProduct
 import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.product.Quantity

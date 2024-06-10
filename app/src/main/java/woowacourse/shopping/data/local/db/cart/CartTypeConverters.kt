@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.db.cart
+package woowacourse.shopping.data.local.db.cart
 
 import androidx.room.TypeConverter
 import woowacourse.shopping.domain.model.product.Quantity

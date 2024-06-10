@@ -11,9 +11,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.CouponRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.remote.service.NetworkModule
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
-import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.payment.adapter.CouponAdapter
