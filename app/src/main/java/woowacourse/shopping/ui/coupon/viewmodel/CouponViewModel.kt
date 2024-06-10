@@ -49,22 +49,13 @@ class CouponViewModel(
             couponRepository.allCouponsResponse().onSuccess { coupons ->
                 order.value = Order(coupons)
                 _coupons.value =
-                    order?.value?.canUseCoupons(getCartWithProduct(carts))?.map { it.toUiModel() }
+                    order?.value?.canUseCoupons(carts.map { it.toCartWithProduct() })?.map { it.toUiModel() }
             }.checkError { _error.setValue(it) }
         }
     }
 
-    private fun getCartWithProduct(carts: List<CartUiModel>): List<CartWithProduct> =
-        carts.map {
-            CartWithProduct(
-                it.id,
-                Product(it.productId, it.imageUrl, it.name, it.price, ""),
-                Quantity(it.quantity),
-            )
-        }
-
     fun loadInitialPaymentInfo(carts: List<CartUiModel>) {
-        val carts = getCartWithProduct(carts)
+        val carts = carts.map { it.toCartWithProduct() }
         _payment.value =
             PaymentInfoUiModel(
                 carts.sumOf { it.product.price * it.quantity.value },
@@ -79,7 +70,7 @@ class CouponViewModel(
         selectedCouponId: Long,
     ) {
         viewModelScope.launch {
-            val cartsJob = viewModelAsync { getCartWithProduct(cartsUiModel) }
+            val cartsJob = viewModelAsync { cartsUiModel.map { it.toCartWithProduct() } }
             val orderJob = viewModelAsync { order?.value ?: Order(emptyList()) }
 
             _coupons.value = _coupons.value?.reverseCheck(couponId = selectedCouponId)
