@@ -4,19 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.base.ViewModelFactory
 import woowacourse.shopping.presentation.common.EventObserver
-import woowacourse.shopping.presentation.common.UiState
 import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
-import woowacourse.shopping.presentation.ui.cart.model.CartEvent
-import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.cart.model.CartNavigation
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
 import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
@@ -54,7 +50,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>(R.layout.activity_cart
                     }
                 }
             }
-        // 뒤로 가기 콜백을 추가
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
@@ -66,30 +61,15 @@ class CartActivity : BindingActivity<ActivityCartBinding>(R.layout.activity_cart
         binding.cartActionHandler = viewModel
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-        viewModel.carts.observe(this) {
-            when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    binding.layoutShimmer.isVisible = false
-                    cartAdapter.submitList(it.data)
-                }
-            }
+
+        viewModel.uiState.observe(this) {
+            cartAdapter.submitList(it.cartProductUiModels)
         }
-        viewModel.eventHandler.observe(
-            this,
-            EventObserver {
-                when (it) {
-                    is CartEvent.Update -> {
-                        Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-        )
         viewModel.navigateHandler.observe(
             this,
             EventObserver {
                 when (it) {
-                    is NavigateUiState.ToPayment -> {
+                    is CartNavigation.ToPayment -> {
                         PaymentActivity.createIntent(this, it.paymentUiModel).apply { startActivity(this) }
                     }
                 }

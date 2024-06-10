@@ -2,36 +2,30 @@ package woowacourse.shopping.presentation.ui.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.EventState
-import woowacourse.shopping.presentation.common.UiState
 import woowacourse.shopping.presentation.common.UpdateUiModel
-import woowacourse.shopping.presentation.ui.cart.model.CartEvent
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
-import woowacourse.shopping.presentation.ui.cart.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.cart.model.CartNavigation
+import woowacourse.shopping.presentation.ui.cart.model.CartUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
 
 class CartViewModel(
     private val cartItemRepository: CartItemRepository,
-) : ViewModel(), CartActionHandler {
-    private val _carts = MutableLiveData<UiState<List<CartProductUiModel>>>(UiState.Loading)
+) : BaseViewModel(), CartActionHandler {
 
-    val carts: LiveData<UiState<List<CartProductUiModel>>> get() = _carts
+    private var _uiState = MutableLiveData<CartUiState>(CartUiState())
+    val uiState: LiveData<CartUiState> get() = _uiState
 
-    private val _errorHandler = MutableLiveData<EventState<ErrorType>>()
-    val errorHandler: LiveData<EventState<ErrorType>> get() = _errorHandler
-
-    private val _eventHandler = MutableLiveData<EventState<CartEvent>>()
-    val eventHandler: LiveData<EventState<CartEvent>> get() = _eventHandler
-
-    private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
-    val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
+    private val _navigateHandler = MutableLiveData<EventState<CartNavigation>>()
+    val navigateHandler: LiveData<EventState<CartNavigation>> get() = _navigateHandler
 
     val updateUiModel: UpdateUiModel = UpdateUiModel()
 
@@ -40,18 +34,18 @@ class CartViewModel(
 
     fun findCartByOffset() =
         viewModelScope.launch {
-            cartItemRepository.getAllByPaging(0, 1000).onSuccess {
-                _carts.postValue(
-                    UiState.Success(
-                        it.map { cartProduct ->
-                            CartProductUiModel(
-                                cartProduct,
-                            )
-                        },
-                    ),
+            delay(500L) // skeleton
+            cartItemRepository.getAllByPaging(0, MAXIMUM_CART_SIZE).onSuccess {
+                val currentState = _uiState.value ?: return@launch
+
+                _uiState.postValue(
+                    currentState.copy(
+                        cartProductUiModels = it.map { cartProduct -> CartProductUiModel(cartProduct) },
+                        isLoading = false
+                    )
                 )
             }.onFailure {
-                _errorHandler.value = EventState(ErrorType.ERROR_CART_LOAD)
+                showError(ErrorType.ERROR_CART_LOAD)
             }
         }
 
@@ -62,110 +56,118 @@ class CartViewModel(
                 cartProductUiModel.cartProduct.copy(quantity = 0),
             )
             cartItemRepository.delete(cartProductUiModel.cartProduct.cartId.toInt()).onSuccess {
-                val updatedData = (_carts.value as UiState.Success).data.toMutableList()
-                updatedData.remove(cartProductUiModel)
-                _carts.postValue(
-                    UiState.Success(updatedData.toList()),
+                val currentCartProductUiModels = _uiState.value?.cartProductUiModels?.toMutableList() ?: return@launch
+                currentCartProductUiModels.remove(cartProductUiModel)
+
+                val currentState = _uiState.value ?: return@launch
+
+                _uiState.postValue(
+                    currentState.copy(
+                        cartProductUiModels = currentCartProductUiModels.toList()
+                    )
                 )
             }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_CART_DELETE))
+                showError(ErrorType.ERROR_CART_DELETE)
             }
         }
 
     fun postCheckedItems() {
-        _navigateHandler.value = EventState(NavigateUiState.ToPayment(getPaymentUiModel()))
+        _navigateHandler.value = EventState(CartNavigation.ToPayment(getPaymentUiModel()))
     }
 
     private fun getPaymentUiModel(): PaymentUiModel {
         return PaymentUiModel(
-            cartProducts = (_carts.value as UiState.Success).data.filter { it.isChecked }.map { it.cartProduct },
+            cartProducts = _uiState.value?.cartProductUiModels?.filter { it.isChecked }?.map { it.cartProduct } ?: emptyList(),
         )
-    }
-
-    private fun getCheckedIds(): List<Int> {
-        return (_carts.value as UiState.Success).data.filter { it.isChecked }
-            .map { it.cartProduct.cartId.toInt() }
-    }
-
-    private fun updateCarts(productId: Int) {
-        val currentCartItems = (_carts.value as? UiState.Success)?.data
-        val updatedCartItems =
-            currentCartItems?.filterNot { it.cartProduct.productId.toInt() == productId }
-        _carts.postValue(UiState.Success(updatedCartItems ?: emptyList()))
     }
 
     override fun onCheck(
         cartProduct: CartProductUiModel,
         isChecked: Boolean,
     ) {
-        _carts.value =
-            UiState.Success(
-                (_carts.value as UiState.Success).data.map {
-                    if (it.cartProduct.productId == cartProduct.cartProduct.productId) {
-                        cartProduct.copy(isChecked = isChecked)
-                    } else {
-                        it
-                    }
-                },
-            )
+        var currentState = _uiState.value ?: return
+        val updatedUiModel = currentState.cartProductUiModels.map {
+            if (it.cartProduct.productId == cartProduct.cartProduct.productId) {
+                cartProduct.copy(isChecked = isChecked)
+            } else {
+                it
+            }
+        }
+        _uiState.value = currentState.copy(
+            cartProductUiModels = updatedUiModel
+        )
+        currentState = _uiState.value ?: return
 
         if (!isChecked) _isAllChecked.value = false
-        if ((_carts.value as UiState.Success).data.all { it.isChecked }) _isAllChecked.value = true
+        if (currentState.cartProductUiModels.all { it.isChecked }) _isAllChecked.value = true
     }
 
     override fun onCheckAll() {
         val selectAll = isAllChecked.value ?: false
-        _carts.value =
-            UiState.Success(
-                (_carts.value as UiState.Success).data.map {
-                    it.copy(isChecked = !selectAll)
-                },
-            )
+
+        val currentState = _uiState.value ?: return
+
+        _uiState.value = currentState.copy(
+            cartProductUiModels = currentState.cartProductUiModels.map {
+                it.copy(isChecked = !selectAll)
+            }
+        )
         _isAllChecked.value = !selectAll
     }
 
     override fun onPlus(cartProduct: CartProduct) =
         viewModelScope.launch {
-            val cartProducts =
-                (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
+            val currentCartProducts = _uiState.value?.cartProductUiModels?.map { it.copy(cartProduct = it.cartProduct.copy()) } ?: return@launch
             val index =
-                cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
-            cartProducts[index].cartProduct.plusQuantity()
+                currentCartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
+            currentCartProducts[index].cartProduct.plusQuantity()
 
-            updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
+            updateUiModel.add(cartProduct.productId, currentCartProducts[index].cartProduct)
 
             cartItemRepository.patch(
-                id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
+                id = currentCartProducts[index].cartProduct.cartId.toInt(),
+                quantityRequestDto = QuantityRequest(quantity = currentCartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
-                    _carts.postValue(UiState.Success(cartProducts))
+                    val currentState = _uiState.value ?: return@launch
+                    _uiState.postValue(
+                        currentState.copy(
+                            cartProductUiModels = currentCartProducts
+                        )
+                    )
                 }
                 .onFailure {
-                    _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
+                    showError(ErrorType.ERROR_PRODUCT_PLUS)
                 }
         }
 
     override fun onMinus(cartProduct: CartProduct) =
         viewModelScope.launch {
             if (cartProduct.quantity == 1) return@launch
-
-            val cartProducts =
-                (_carts.value as UiState.Success).data.map { it.copy(cartProduct = it.cartProduct.copy()) }
+            val currentCartProducts = _uiState.value?.cartProductUiModels?.map { it.copy(cartProduct = it.cartProduct.copy()) } ?: return@launch
             val index =
-                cartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
-            cartProducts[index].cartProduct.minusQuantity()
-            updateUiModel.add(cartProduct.productId, cartProducts[index].cartProduct)
+                currentCartProducts.indexOfFirst { it.cartProduct.productId == cartProduct.productId }
+            currentCartProducts[index].cartProduct.minusQuantity()
+            updateUiModel.add(cartProduct.productId, currentCartProducts[index].cartProduct)
 
             cartItemRepository.patch(
-                id = cartProducts[index].cartProduct.cartId.toInt(),
-                quantityRequestDto = QuantityRequest(quantity = cartProducts[index].cartProduct.quantity),
+                id = currentCartProducts[index].cartProduct.cartId.toInt(),
+                quantityRequestDto = QuantityRequest(quantity = currentCartProducts[index].cartProduct.quantity),
             )
                 .onSuccess {
-                    _carts.postValue(UiState.Success(cartProducts))
+                    val currentState = _uiState.value ?: return@launch
+                    _uiState.postValue(
+                        currentState.copy(
+                            cartProductUiModels = currentCartProducts
+                        )
+                    )
                 }
                 .onFailure {
-                    _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
+                    showError(ErrorType.ERROR_PRODUCT_PLUS)
                 }
         }
+
+    companion object {
+        const val MAXIMUM_CART_SIZE = 1000
+    }
 }
