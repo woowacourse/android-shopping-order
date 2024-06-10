@@ -1,21 +1,8 @@
 package woowacourse.shopping.domain.repository
 
-import kotlinx.coroutines.test.runTest
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.source.OrderDataSource
-import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.productTestFixture
-import woowacourse.shopping.productsTestFixture
-import woowacourse.shopping.remote.model.response.CartItemResponse
-import woowacourse.shopping.remote.model.response.ProductResponse
-import woowacourse.shopping.source.FakeProductDataSource
-import woowacourse.shopping.source.FakeShoppingCartDataSource
-import woowacourse.woowacourse.shopping.source.FakeOrderDataSource
 
 class DefaultOrderRepositoryTest {
-    private lateinit var orderSource: OrderDataSource
     private lateinit var cartSource: ShoppingCartDataSource
 
 //

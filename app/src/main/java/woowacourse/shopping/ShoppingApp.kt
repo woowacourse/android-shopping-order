@@ -2,7 +2,6 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.source.CouponDataSource
-import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.OrderDataSource2
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
@@ -18,7 +17,6 @@ import woowacourse.shopping.remote.service.ProductsApiService
 import woowacourse.shopping.remote.source.CartItemRemoteDataSource
 import woowacourse.shopping.remote.source.CouponRemoteDataSource
 import woowacourse.shopping.remote.source.DefaultOrderDataSource
-import woowacourse.shopping.remote.source.OrderRemoteDataSource
 import woowacourse.shopping.remote.source.ProductRemoteDataSource
 
 class ShoppingApp : Application() {
@@ -44,7 +42,6 @@ class ShoppingApp : Application() {
         productSource = ProductRemoteDataSource(productsApi)
         cartSource = CartItemRemoteDataSource(cartItemApi)
         historySource = LocalHistoryProductDataSource(historyProductDao)
-        orderSource = OrderRemoteDataSource(orderApi)
         orderSource2 = DefaultOrderDataSource(orderApi)
         couponSource = CouponRemoteDataSource(couponApiService)
     }
@@ -63,9 +60,6 @@ class ShoppingApp : Application() {
             private set
 
         lateinit var historySource: ProductHistoryDataSource
-            private set
-
-        lateinit var orderSource: OrderDataSource
             private set
 
         lateinit var orderSource2: OrderDataSource2
