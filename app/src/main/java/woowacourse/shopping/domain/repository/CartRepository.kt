@@ -8,6 +8,8 @@ interface CartRepository {
         pageSize: Int,
     ): Result<List<Cart>>
 
+    suspend fun loadAll(): Result<List<Cart>>
+
     suspend fun saveNewCartItem(
         productId: Long,
         incrementAmount: Int,

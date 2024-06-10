@@ -25,6 +25,25 @@ class CartRepositoryImpl(
         }
     }
 
+    override suspend fun loadAll(): Result<List<Cart>> {
+        return runCatching {
+            val totalCount =
+                when (val result = remoteCartDataSource.getTotalCount()) {
+                    is NetworkResult.Success -> result.data.quantity
+                    is NetworkResult.Error -> throw result.exception
+                }
+
+            when (val result = remoteCartDataSource.getCartItems(0, totalCount)) {
+                is NetworkResult.Success -> {
+                    result.data.cartDto.map { it.toCart() }
+                }
+                is NetworkResult.Error -> {
+                    throw result.exception
+                }
+            }
+        }
+    }
+
     override suspend fun saveNewCartItem(
         productId: Long,
         incrementAmount: Int,

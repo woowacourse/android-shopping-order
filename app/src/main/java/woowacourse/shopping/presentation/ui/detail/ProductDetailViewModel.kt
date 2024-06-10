@@ -83,19 +83,7 @@ class ProductDetailViewModel(
 
     override fun onAddCartClick() {
         viewModelScope.launch {
-            cartRepository.getCount()
-                .onSuccess { cartCount ->
-                    findCartItem(cartCount)
-                }
-                .onFailure {
-                    _error.value = Event(DetailError.CartItemNotFound)
-                }
-        }
-    }
-
-    private fun findCartItem(pageSize: Int) {
-        viewModelScope.launch {
-            cartRepository.load(0, pageSize)
+            cartRepository.loadAll()
                 .onSuccess { carts ->
                     val cartItem = carts.find { it.product.id == productId }
                     addCartItem(cartItem)

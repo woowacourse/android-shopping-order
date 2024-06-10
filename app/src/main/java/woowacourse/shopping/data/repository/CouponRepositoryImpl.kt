@@ -35,8 +35,14 @@ class CouponRepositoryImpl(
 
     private suspend fun findCarts(selectedCartIds: Set<Long>): Result<List<Cart>> {
         return runCatching {
+            val totalCount =
+                when (val result = remoteCartDataSource.getTotalCount()) {
+                    is NetworkResult.Success -> result.data.quantity
+                    is NetworkResult.Error -> throw result.exception
+                }
+
             val carts =
-                when (val cartResult = remoteCartDataSource.getCartItems(0, 100)) {
+                when (val cartResult = remoteCartDataSource.getCartItems(0, totalCount)) {
                     is NetworkResult.Success -> {
                         cartResult.data.cartDto.map { it.toCart() }
                     }

@@ -57,7 +57,6 @@ class ShoppingViewModel(
     val showSkeleton: LiveData<Boolean> = shoppingProducts.map { it is UiState.Loading }
 
     init {
-        fetchCartCount()
         fetchInitialCartProducts()
         fetchRecentProducts()
     }
@@ -74,9 +73,10 @@ class ShoppingViewModel(
 
     private fun fetchInitialCartProducts() {
         viewModelScope.launch {
-            cartRepository.load(0, cartItemQuantity.value ?: 0)
+            cartRepository.loadAll()
                 .onSuccess { carts ->
                     cartItems = carts
+                    _cartItemQuantity.value = carts.sumOf { it.quantity }
                     fetchInitialProducts(carts)
                 }
                 .onFailure {
