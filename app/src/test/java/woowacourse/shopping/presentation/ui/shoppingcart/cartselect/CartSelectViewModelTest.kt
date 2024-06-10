@@ -129,7 +129,7 @@ class CartSelectViewModelTest {
     @Test
     fun `첫 번째 상품을 체크하면 주문 상품에 추가된다`() {
         // given & when
-        viewModel.updateCheckState(CARTS_PULL.content.first().toCartProduct())
+        viewModel.toggleCartProduct(CARTS_PULL.content.first().toCartProduct())
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
