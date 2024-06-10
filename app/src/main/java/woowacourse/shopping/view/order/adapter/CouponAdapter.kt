@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCouponBinding
-import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.view.order.adapter.viewholder.CouponViewHolder
+import woowacourse.shopping.view.order.model.CouponUiModel
 
 class CouponAdapter(
     private val onClickCoupon: OnClickCoupon,
-) : ListAdapter<Coupon, CouponViewHolder>(DIFF_CALLBACK) {
+) : ListAdapter<CouponUiModel, CouponViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -29,17 +29,17 @@ class CouponAdapter(
 
     companion object {
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<Coupon>() {
+            object : DiffUtil.ItemCallback<CouponUiModel>() {
                 override fun areItemsTheSame(
-                    oldItem: Coupon,
-                    newItem: Coupon,
+                    oldItem: CouponUiModel,
+                    newItem: CouponUiModel,
                 ): Boolean {
                     return oldItem.id == newItem.id
                 }
 
                 override fun areContentsTheSame(
-                    oldItem: Coupon,
-                    newItem: Coupon,
+                    oldItem: CouponUiModel,
+                    newItem: CouponUiModel,
                 ): Boolean {
                     return oldItem == newItem
                 }

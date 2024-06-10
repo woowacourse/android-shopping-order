@@ -10,14 +10,16 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.order.adapter.OnClickCoupon
+import woowacourse.shopping.view.order.model.CouponUiModel
+import woowacourse.shopping.view.order.model.CouponUiModelMapper.toUiModel
 import java.time.LocalDate
 import java.time.LocalTime
 
 class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel(), OnClickCoupon {
     private var checkedShoppingCart = ShoppingCart()
 
-    private val _coupons: MutableLiveData<List<Coupon>> = MutableLiveData()
-    val coupons: LiveData<List<Coupon>> get() = _coupons
+    private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
+    val coupons: LiveData<List<CouponUiModel>> get() = _coupons
 
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
@@ -34,7 +36,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     private val _couponUiState: MutableLiveData<CouponUiState> = MutableLiveData(CouponUiState())
     val couponUiState: LiveData<CouponUiState> get() = _couponUiState
 
-    private var selectedCoupon: Coupon? = null
+    private var selectedCoupon: CouponUiModel? = null
 
     init {
         loadCoupons()
@@ -46,7 +48,15 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
             runCatching {
                 orderRepository.getCoupons().getOrThrow()
             }.onSuccess { couponList ->
-                _coupons.value = couponList
+                _coupons.value =
+                    couponList.map { coupon ->
+                        when (coupon) {
+                            is Coupon.FixedDiscountCoupon -> coupon.toUiModel()
+                            is Coupon.BogoCoupon -> coupon.toUiModel()
+                            is Coupon.FreeShippingCoupon -> coupon.toUiModel()
+                            is Coupon.TimeBasedDiscountCoupon -> coupon.toUiModel()
+                        }
+                    }
             }.onFailure {
                 Log.e("OrderViewModel", "loadCoupons: error $it")
             }
@@ -58,84 +68,147 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
         calculateTotalPrice()
     }
 
-    override fun applyCoupon(coupon: Coupon) {
-        if (selectedCoupon == coupon) {
+    override fun applyCoupon(coupon: CouponUiModel) {
+        if (selectedCoupon != null) {
             resetCoupon()
+            resetCouponSelection()
         } else {
-            selectedCoupon = coupon
-            when (coupon) {
-                is Coupon.FixedDiscountCoupon -> applyFixedDiscountCoupon(coupon)
-                is Coupon.BogoCoupon -> applyBogoCoupon(coupon)
-                is Coupon.FreeShippingCoupon -> applyFreeShippingCoupon(coupon)
-                is Coupon.TimeBasedDiscountCoupon -> applyTimeBasedDiscountCoupon(coupon)
+            val isValidCoupon =
+                when (coupon) {
+                    is CouponUiModel.FixedDiscountCouponUiModel -> applyFixedDiscountCoupon(coupon)
+                    is CouponUiModel.BogoCouponUiModel -> applyBogoCoupon(coupon)
+                    is CouponUiModel.FreeShippingCouponUiModel -> applyFreeShippingCoupon(coupon)
+                    is CouponUiModel.TimeBasedDiscountCouponUiModel ->
+                        applyTimeBasedDiscountCoupon(
+                            coupon,
+                        )
+                }
+
+            if (isValidCoupon) {
+                resetCouponSelection()
+                selectedCoupon = coupon
+                updateCouponSelection(coupon)
+            } else {
+                selectedCoupon = null
+                resetCouponSelection()
             }
+
             calculateTotalPayment()
         }
     }
 
-    private fun applyFixedDiscountCoupon(coupon: Coupon.FixedDiscountCoupon) {
-        if (totalPrice.value!! >= coupon.minimumAmount &&
-            LocalDate.now().isBefore(coupon.expirationDate)
+    private fun updateCouponSelection(coupon: CouponUiModel) {
+        _coupons.value =
+            _coupons.value?.map {
+                when (it) {
+                    is CouponUiModel.FixedDiscountCouponUiModel -> it.copy(isSelected = it.id == coupon.id)
+                    is CouponUiModel.BogoCouponUiModel -> it.copy(isSelected = it.id == coupon.id)
+                    is CouponUiModel.FreeShippingCouponUiModel -> it.copy(isSelected = it.id == coupon.id)
+                    is CouponUiModel.TimeBasedDiscountCouponUiModel -> it.copy(isSelected = it.id == coupon.id)
+                }
+            }
+    }
+
+    private fun resetCouponSelection() {
+        _coupons.value =
+            _coupons.value?.map {
+                when (it) {
+                    is CouponUiModel.FixedDiscountCouponUiModel -> it.copy(isSelected = false)
+                    is CouponUiModel.BogoCouponUiModel -> it.copy(isSelected = false)
+                    is CouponUiModel.FreeShippingCouponUiModel -> it.copy(isSelected = false)
+                    is CouponUiModel.TimeBasedDiscountCouponUiModel -> it.copy(isSelected = false)
+                }
+            }
+    }
+
+    private fun applyFixedDiscountCoupon(coupon: CouponUiModel.FixedDiscountCouponUiModel): Boolean {
+        return if (totalPrice.value!! >= coupon.minimumAmount &&
+            LocalDate.now()
+                .isBefore(coupon.expirationDate)
         ) {
             _couponDiscount.value = coupon.discount
             _couponUiState.value = CouponUiState(isCouponApplied = true)
-        } else if (totalPrice.value!! >= coupon.minimumAmount) {
-            _couponDiscount.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "쿠폰이 만료되었습니다.")
+            true
         } else {
-            _couponDiscount.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "최소 주문 금액을 만족하지 못했습니다.")
+            val errorMessage =
+                if (totalPrice.value!! < coupon.minimumAmount) {
+                    ERROR_MESSAGE_MINIMUM_AMOUNT
+                } else {
+                    ERROR_MESSAGE_EXPIRED_COUPON
+                }
+            _couponUiState.value =
+                CouponUiState(isCouponApplied = false, errorMessage = errorMessage)
+            false
         }
     }
 
-    private fun applyBogoCoupon(coupon: Coupon.BogoCoupon) {
+    private fun applyBogoCoupon(coupon: CouponUiModel.BogoCouponUiModel): Boolean {
         val cartItems = checkedShoppingCart.cartItems.value.orEmpty()
         val bogoItems =
             cartItems.filter { it.product.cartItemCounter.itemCount >= coupon.buyQuantity }
         val mostExpensiveItem = bogoItems.maxByOrNull { it.product.price }
 
-        if (mostExpensiveItem != null && LocalDate.now().isBefore(coupon.expirationDate)) {
+        return if (mostExpensiveItem != null && LocalDate.now().isBefore(coupon.expirationDate)) {
             val discountAmount = mostExpensiveItem.product.price
             _couponDiscount.value = discountAmount
             _couponUiState.value = CouponUiState(isCouponApplied = true)
-        } else if (mostExpensiveItem == null) {
-            _couponDiscount.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "적용할 수 없는 쿠폰입니다.(BoGo 조건 미충족)")
+            true
         } else {
-            _couponDiscount.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "쿠폰이 만료되었습니다.")
+            val errorMessage =
+                if (mostExpensiveItem == null) {
+                    ERROR_MESSAGE_NOT_BOGO_ITEM
+                } else {
+                    ERROR_MESSAGE_EXPIRED_COUPON
+                }
+            _couponUiState.value =
+                CouponUiState(isCouponApplied = false, errorMessage = errorMessage)
+            false
         }
     }
 
-    private fun applyFreeShippingCoupon(coupon: Coupon.FreeShippingCoupon) {
-        if (totalPrice.value!! >= coupon.minimumAmount &&
-            LocalDate.now().isBefore(coupon.expirationDate)
+    private fun applyFreeShippingCoupon(coupon: CouponUiModel.FreeShippingCouponUiModel): Boolean {
+        return if (totalPrice.value!! >= coupon.minimumAmount &&
+            LocalDate.now()
+                .isBefore(coupon.expirationDate)
         ) {
             _deliveryFee.value = 0
             _couponUiState.value = CouponUiState(isCouponApplied = true)
-        } else if (totalPrice.value!! >= coupon.minimumAmount) {
-            _deliveryFee.value = SHIPPING_COST
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "쿠폰이 만료되었습니다.")
+            true
         } else {
-            _deliveryFee.value = SHIPPING_COST
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "최소 주문 금액을 만족하지 못했습니다.")
+            val errorMessage =
+                if (totalPrice.value!! < coupon.minimumAmount) {
+                    ERROR_MESSAGE_MINIMUM_AMOUNT
+                } else {
+                    ERROR_MESSAGE_EXPIRED_COUPON
+                }
+            _couponUiState.value =
+                CouponUiState(
+                    isCouponApplied = false,
+                    errorMessage = errorMessage,
+                )
+            false
         }
     }
 
-    private fun applyTimeBasedDiscountCoupon(coupon: Coupon.TimeBasedDiscountCoupon) {
+    private fun applyTimeBasedDiscountCoupon(coupon: CouponUiModel.TimeBasedDiscountCouponUiModel): Boolean {
         val now = LocalTime.now()
-        if (now.isAfter(coupon.availableTimeStart) &&
-            now.isBefore(coupon.availableTimeEnd) &&
-            LocalDate.now().isBefore(coupon.expirationDate)
+        return if (now.isAfter(coupon.availableTimeStart) && now.isBefore(coupon.availableTimeEnd) &&
+            LocalDate.now()
+                .isBefore(coupon.expirationDate)
         ) {
             _couponDiscount.value = (_totalPrice.value!! * coupon.discount / 100)
             _couponUiState.value = CouponUiState(isCouponApplied = true)
-        } else if (now.isBefore(coupon.availableTimeStart) || now.isAfter(coupon.availableTimeEnd)) {
-            _couponDiscount.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "쿠폰이 적용 가능한 시간이 아닙니다.")
+            true
         } else {
-            _couponDiscount.value = 0
-            _couponUiState.value = CouponUiState(isCouponApplied = false, errorMessage = "쿠폰이 만료되었습니다.")
+            val errorMessage =
+                if (now.isBefore(coupon.availableTimeStart) || now.isAfter(coupon.availableTimeEnd)) {
+                    ERROR_MESSAGE_NOT_AVAILABLE_TIME
+                } else {
+                    ERROR_MESSAGE_EXPIRED_COUPON
+                }
+            _couponUiState.value =
+                CouponUiState(isCouponApplied = false, errorMessage = errorMessage)
+            false
         }
     }
 
@@ -156,8 +229,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     }
 
     private fun calculateTotalPayment() {
-        _totalPayment.value =
-            _totalPrice.value!! - _couponDiscount.value!! + _deliveryFee.value!!
+        _totalPayment.value = _totalPrice.value!! - _couponDiscount.value!! + _deliveryFee.value!!
     }
 
     fun orderItems() {
@@ -166,5 +238,9 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
 
     companion object {
         const val SHIPPING_COST = 3000
+        private const val ERROR_MESSAGE_EXPIRED_COUPON = "쿠폰이 만료되었습니다."
+        private const val ERROR_MESSAGE_MINIMUM_AMOUNT = "최소 주문 금액을 만족하지 못했습니다."
+        private const val ERROR_MESSAGE_NOT_BOGO_ITEM = "적용할 수 없는 쿠폰입니다.(BoGo 조건 미충족)"
+        private const val ERROR_MESSAGE_NOT_AVAILABLE_TIME = "쿠폰이 적용 가능한 시간이 아닙니다."
     }
 }

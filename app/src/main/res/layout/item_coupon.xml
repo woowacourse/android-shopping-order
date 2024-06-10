@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -12,25 +11,26 @@
 
         <variable
             name="coupon"
-            type="woowacourse.shopping.domain.model.Coupon" />
+            type="woowacourse.shopping.view.order.model.CouponUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="140dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/shape_border">
-
+        android:background="@drawable/shape_border"
+        android:onClick="@{() -> onClickCoupon.applyCoupon(coupon)}">
 
         <CheckBox
             android:id="@+id/checkBox"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:onClick="@{()->onClickCoupon.applyCoupon(coupon)}"
+            android:checked="@{coupon.isSelected}"
+            android:clickable="false"
+            android:focusableInTouchMode="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <TextView
             android:id="@+id/tv_cart_item_name"
