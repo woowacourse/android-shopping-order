@@ -28,6 +28,8 @@ classDiagram
   CartProductsAdapter <.. CartSelectFragment
   OrderRecommendViewModel <.. OrderRecommendFragment
   RecommendAdapter <.. OrderRecommendFragment
+  PaymentVieWModel <.. PaymentFragment
+  CouponListAdapter <.. PaymentFragment
   ProductListViewModel <.. ProductListActivity
   ProductListAdapter <.. ProductListActivity 
   ProductHistoryListAdapter <.. ProductListActivity
@@ -36,43 +38,37 @@ classDiagram
   ShoppingCartRepository <.. CartSelectViewModel
   ProductHistoryRepository <.. OrderRecommendViewModel
   ShoppingCartRepository <.. OrderRecommendViewModel
-  OrderRepository <.. OrderRecommendViewModel
   ProductRepository <.. ProductListViewModel
   ShoppingCartRepository <.. ProductListViewModel
   ProductHistoryRepository <.. ProductListViewModel
   ProductRepository <.. ProductDetailViewModel
   ShoppingCartRepository <.. ProductDetailViewModel
   ProductHistoryRepository <.. ProductDetailViewModel
-
-  ShoppingCartRepository <-- ShoppingCartRepositoryImpl
-  OrderRepository <-- OrderRepositoryImpl
-  ProductHistoryRepository <-- ProductHistoryRepositoryImpl
-  ProductRepository <-- ProductRepositoryImpl
+  CouponRepository <.. PaymentVieWModel
+  OrderRepository <.. PaymentViewModel
   
-  ProductHistoryLocalDataSource <-- ProductHistoryLocalDataSourceImpl
-  OrderRemoteDataSource <-- OrderRemoteDataSourceImpl
-  ProductRemoteDataSource <-- ProductRemoteDataSourceImpl
-  ShoppingRemoteCartDataSource <-- ShoppingRemoteCartDataSourceImpl
+  OrderRemoteDataSource <.. OrderRepository
+  ProductHistoryLocalDataSource <.. ProductHistoryRepository
+  ShoppingCartRepository <.. ProductHistoryRepository
+  ProductRemoteDataSource <.. ProductRepository
+  ShoppingRemoteCartDataSource <.. ProductRepository
+  CouponRemoteDataSource <.. CouponRepository
 
-  OrderRemoteDataSource <.. OrderRepositoryImpl
-  ProductHistoryLocalDataSource <.. ProductHistoryRepositoryImpl
-  ShoppingCartRepository <.. ProductHistoryRepositoryImpl
-  ProductRemoteDataSource <.. ProductRepositoryImpl
-  ShoppingRemoteCartDataSource <.. ProductRepositoryImpl
-  ShoppingCartRepositoryImpl <.. ShoppingRemoteCartDataSource
-
-  ProductHistoryDao <.. ProductHistoryLocalDataSourceImpl
-  OrderService <.. OrderRemoteDataSourceImpl
-  ProductService <.. ProductRemoteDataSourceImpl
-  CartService <.. ShoppingRemoteCartDataSourceImpl
+  ProductHistoryDao <.. ProductHistoryLocalDataSource
+  OrderService <.. OrderRemoteDataSource
+  ProductService <.. ProductRemoteDataSource
+  CartService <.. ShoppingRemoteCartDataSource
+  CouponService <.. CouponRemoteDataSource
 
   class CartSelectFragment
   class OrderRecommendFragment
+  class PaymentFragment
   class ProductListActivity
   class ProductDetailActivity
 
   class CartSelectViewModel
   class OrderRecommendViewModel
+  class PaymentVieWModel
   class ProductListViewModel
   class ProductDetailViewModel
 
@@ -80,26 +76,19 @@ classDiagram
   <<interface>> OrderRepository
   <<interface>> ProductHistoryRepository
   <<interface>> ProductRepository
-
-  class ShoppingCartRepositoryImpl
-  class OrderRepositoryImpl
-  class ProductHistoryRepositoryImpl
-  class ProductRepositoryImpl
-  
+  <<interface>> CouponRepository
+ 
   <<interface>> ProductHistoryLocalDataSource
   <<interface>> OrderRemoteDataSource
   <<interface>> ProductRemoteDataSource
   <<interface>> ShoppingRemoteCartDataSource
-
-  class ProductHistoryLocalDataSourceImpl
-  class OrderRemoteDataSourceImpl
-  class ProductRemoteDataSourceImpl
-  class ShoppingRemoteCartDataSourceImpl
+  <<interface>> CouponRemoteDataSource
 
   <<interface>> ProductHistoryDao
   <<interface>> CartService
   <<interface>> OrderService
   <<interface>> ProductService
+  <<interface>> CouponService
 ```
 
 #### Dynamic
