@@ -27,6 +27,7 @@
             android:layout_marginTop="6dp"
             android:backgroundTint="@color/teal_500"
             android:checked="@{couponUiModel.checked}"
+            android:onCheckedChanged="@{(_, isChecked) -> actionHandler.selectCoupon(couponUiModel.coupon.id, isChecked)}"
             tools:checked="true"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

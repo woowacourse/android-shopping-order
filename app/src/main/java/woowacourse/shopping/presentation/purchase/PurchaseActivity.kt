@@ -40,7 +40,7 @@ class PurchaseActivity : AppCompatActivity() {
     private fun initObserve() {
         viewModel.couponUiModels.observe(this) {
             adapter.submitList(it.couponUiModelList)
-            Log.d("Purchase", adapter.currentList.toString())
+            Log.d("Purchase", "hello")
         }
     }
 

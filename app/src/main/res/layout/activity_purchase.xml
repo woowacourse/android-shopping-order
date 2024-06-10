@@ -117,6 +117,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/tv_discounted_price_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="18dp"
+                android:text="@{@string/product_price(viewModel.discountPrice)}"
                 tools:text="-5,000원"
                 android:textSize="18dp"
                 android:textStyle="bold" />
@@ -124,6 +125,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{@string/product_price(viewModel.deliveryPrice)}"
                 tools:text="3,000원"
                 app:layout_constraintTop_toTopOf="@id/tv_delivery_fee_title"
                 app:layout_constraintBottom_toBottomOf="@id/tv_delivery_fee_title"
@@ -159,6 +161,7 @@
             app:layout_constraintTop_toTopOf="@id/tv_final_purchase_title"
             app:layout_constraintBottom_toBottomOf="@id/tv_final_purchase_title"
             app:layout_constraintEnd_toEndOf="parent"
+            android:text="@{@string/product_price(viewModel.finalPrice)}"
             tools:text="198,000원"
             android:textSize="18dp"
             android:textStyle="bold"

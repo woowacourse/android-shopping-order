@@ -29,10 +29,53 @@ class PurchaseViewModel(
     private val _couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
     val couponUiModels: LiveData<CouponUiModels> get() = _couponUiModels
 
+    val selectedCoupon: LiveData<Coupon?>
+        get() =
+            couponUiModels.map { couponUiModels ->
+                couponUiModels.couponUiModelList.firstOrNull {
+                    it.checked
+                }?.coupon
+            }
+
+    val discountPrice: LiveData<Int>
+        get() =
+            selectedCoupon.map {
+                when (it) {
+                    is Coupon.FixedCoupon -> -it.discount
+                    is Coupon.BuyXGetYCoupon -> -getBogoDiscount(it)
+                    is Coupon.PercentageCoupon -> -getMiracleDiscount(it)
+                    else -> 0
+                }
+            }
+
+    val deliveryPrice: LiveData<Int>
+        get() =
+            selectedCoupon.map {
+                if (it is Coupon.FreeShippingCoupon) 0 else 3000
+            }
+
+    val finalPrice: LiveData<Int>
+        get() =
+            totalPrice.map {
+                deliveryPrice.value?.plus(it) ?: 0
+            }.map { discountPrice.value?.plus(it) ?: 0 }
+
     init {
         savedStateHandle.get<IntArray>(PurchaseActivity.CART_ITEMS_ID)?.toList()
             ?.let(::getCartItems)
     }
+
+    private fun getBogoDiscount(coupon: Coupon.BuyXGetYCoupon): Int {
+        val mostExpensiveBogo =
+            cartItems.value?.filter {
+                it.quantity.count < coupon.buyQuantity
+            }?.maxBy {
+                it.product.price
+            }
+        return (mostExpensiveBogo?.product?.price?.times(coupon.getQuantity)) ?: 0
+    }
+
+    private fun getMiracleDiscount(coupon: Coupon.PercentageCoupon): Int = totalPrice.value?.let { (it * coupon.discount / 100) } ?: 0
 
     private fun getCartItems(cartItemIds: List<Int>) {
         viewModelScope.launch {
@@ -54,6 +97,23 @@ class PurchaseViewModel(
                 _couponUiModels.value = coupons.toCouponUiModels()
             }
         }
+    }
+
+    override fun selectCoupon(
+        couponId: Int,
+        isChecked: Boolean,
+    ) {
+        val unselected =
+            _couponUiModels.value?.couponUiModelList?.map { it.copy(checked = false) } ?: listOf()
+        val oneSelected =
+            unselected.map {
+                if (it.coupon.id == couponId) {
+                    it.copy(checked = true)
+                } else {
+                    it
+                }
+            }
+        _couponUiModels.value = CouponUiModels(oneSelected)
     }
 
     fun List<Coupon>.toCouponUiModels(): CouponUiModels = CouponUiModels(this.map { it.toCouponUiModel() })
