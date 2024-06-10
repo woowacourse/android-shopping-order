@@ -18,8 +18,8 @@ import woowacourse.shopping.view.home.HomeViewModelFactory
 import woowacourse.shopping.view.order.OrderViewModelFactory
 
 class FakeShoppingApplication : ShoppingApplication() {
-    override val productRepository: ProductRepository = FakeProductRepository()
-    override val cartRepository: CartRepository = FakeCartRepository()
+    override val productRepository: ProductRepository = FakeProductRepository(count = 100, cartCount = 20)
+    override val cartRepository: CartRepository = FakeCartRepository(count = 20)
     override val couponRepository: CouponRepository = FakeCouponRepository()
     override val orderRepository: OrderRepository = FakeOrderRepository()
     override val recentProductRepository: RecentProductRepository = FakeRecentProductRepository()

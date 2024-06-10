@@ -56,13 +56,14 @@ class DetailActivityTest {
     }
 
     @Test
-    fun `마지막으로_본_상품이_나타난다`() = runTest {
-        application.recentProductRepository.save(getFixtureProduct(1, 1000).toProduct())
-        application.recentProductRepository.save(getFixtureProduct(2, 2000).toProduct())
+    fun `마지막으로_본_상품이_나타난다`() =
+        runTest {
+            application.recentProductRepository.save(getFixtureProduct(1, 1000).toProduct())
+            application.recentProductRepository.save(getFixtureProduct(2, 2000).toProduct())
 
-        ActivityScenario.launch<DetailActivity>(intent)
+            ActivityScenario.launch<DetailActivity>(intent)
 
-        onView(withId(R.id.cl_recent_viewed_products))
-            .check(matches(isDisplayed()))
-    }
+            onView(withId(R.id.cl_recent_viewed_products))
+                .check(matches(isDisplayed()))
+        }
 }
