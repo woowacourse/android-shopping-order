@@ -72,7 +72,6 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                 onClickCartItemCounter = shoppingCartViewModel,
                 onClickNavigateShoppingCart = this,
             )
-        adapter.setShowSkeleton(true)
         shoppingCartViewModel.loadPagingCartItemList()
         binding.rvShoppingCart.adapter = adapter
     }
@@ -80,7 +79,6 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            adapter.setShowSkeleton(false)
             updateRecyclerView(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->

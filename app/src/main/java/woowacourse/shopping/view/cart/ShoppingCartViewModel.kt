@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.BaseViewModel
+import woowacourse.shopping.view.UiState
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
@@ -35,13 +36,19 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
+    private val _loadingState: MutableLiveData<UiState> =
+        MutableLiveData(UiState.Loading)
+    val loadingState : LiveData<UiState> = _loadingState
+
     fun loadPagingCartItemList() =
         viewModelScope.launch {
+            _loadingState.value = UiState.Loading
             shoppingCartRepository.loadPagingCartItems(
                 LOAD_SHOPPING_ITEM_OFFSET,
                 LOAD_SHOPPING_ITEM_SIZE,
             )
                 .onSuccess { pagingData ->
+                    _loadingState.value = UiState.Init
                     shoppingCart.addProducts(synchronizeLoadingData(pagingData))
                     setAllCheck()
                 }

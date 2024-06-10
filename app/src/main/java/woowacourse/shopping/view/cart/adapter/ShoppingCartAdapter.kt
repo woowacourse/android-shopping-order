@@ -4,13 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.databinding.ItemCartItemSkeletonBinding
 import woowacourse.shopping.databinding.ItemShoppingCartBinding
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.view.cart.OnClickNavigateShoppingCart
 import woowacourse.shopping.view.cart.OnClickShoppingCart
-import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartSkeletonViewHolder
 import woowacourse.shopping.view.cart.adapter.viewholder.ShoppingCartViewHolder
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
@@ -18,96 +15,57 @@ class ShoppingCartAdapter(
     private val onClickShoppingCart: OnClickShoppingCart,
     private val onClickCartItemCounter: OnClickCartItemCounter,
     private val onClickNavigateShoppingCart: OnClickNavigateShoppingCart,
-) : ListAdapter<ShoppingCartItem, RecyclerView.ViewHolder>(ShoppingCartDiffCallback()) {
-    private var showSkeleton: Boolean = true
+) : ListAdapter<CartItem, ShoppingCartViewHolder>(ShoppingCartDiffCallback()) {
 
-    class ShoppingCartDiffCallback : DiffUtil.ItemCallback<ShoppingCartItem>() {
+    class ShoppingCartDiffCallback : DiffUtil.ItemCallback<CartItem>() {
         override fun areItemsTheSame(
-            oldItem: ShoppingCartItem,
-            newItem: ShoppingCartItem,
+            oldItem: CartItem,
+            newItem: CartItem,
         ): Boolean {
-            return if (oldItem is ShoppingCartItem.CartProductItem && newItem is ShoppingCartItem.CartProductItem) {
-                oldItem.cartItem.product.id == newItem.cartItem.product.id
-            } else {
-                oldItem == newItem
-            }
+            return oldItem.product.id == newItem.product.id
         }
 
         override fun areContentsTheSame(
-            oldItem: ShoppingCartItem,
-            newItem: ShoppingCartItem,
+            oldItem: CartItem,
+            newItem: CartItem,
         ): Boolean {
             return oldItem == newItem
-        }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is ShoppingCartItem.CartProductItem -> VIEW_TYPE_CART_PRODUCT
-            else -> VIEW_TYPE_SKELETON
         }
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder {
-        return when (viewType) {
-            VIEW_TYPE_CART_PRODUCT -> {
-                val view = ItemShoppingCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart, onClickNavigateShoppingCart)
-            }
-            else -> {
-                val view = ItemCartItemSkeletonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ShoppingCartSkeletonViewHolder(view)
-            }
-        }
+    ): ShoppingCartViewHolder {
+        val view =
+            ItemShoppingCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ShoppingCartViewHolder(
+            view,
+            onClickCartItemCounter,
+            onClickShoppingCart,
+            onClickNavigateShoppingCart
+        )
     }
 
     override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
+        holder: ShoppingCartViewHolder,
         position: Int,
     ) {
-        if (holder is ShoppingCartViewHolder && position < currentList.size) {
-            val item = (getItem(position) as ShoppingCartItem.CartProductItem).cartItem
-            holder.bind(item)
-        }
+        val item = getItem(position)
+        holder.bind(item)
     }
 
     fun updateCartItems(addedCartItems: List<CartItem>) {
-        val updatedItems = mutableListOf<ShoppingCartItem>()
-        updatedItems.addAll(addedCartItems.map { ShoppingCartItem.CartProductItem(it) })
-        if (showSkeleton) {
-            updatedItems.addAll(List(SKELETON_COUNT) { ShoppingCartItem.SkeletonItem })
-        }
-        submitList(updatedItems)
+        submitList(addedCartItems)
     }
 
     fun updateCartItem(productId: Long) {
         val position =
             currentList.indexOfFirst {
-                it is ShoppingCartItem.CartProductItem && it.cartItem.product.id == productId
+                it.product.id == productId
             }
         if (position != -1) {
             notifyItemChanged(position)
         }
-    }
-
-    fun setShowSkeleton(show: Boolean) {
-        showSkeleton = show
-        val currentListWithoutSkeletons = currentList.filter { it !is ShoppingCartItem.SkeletonItem }
-        if (showSkeleton) {
-            val newList = currentListWithoutSkeletons.toMutableList()
-            newList.addAll(List(SKELETON_COUNT) { ShoppingCartItem.SkeletonItem })
-            submitList(newList)
-        } else {
-            submitList(currentListWithoutSkeletons)
-        }
-    }
-
-    companion object {
-        private const val VIEW_TYPE_CART_PRODUCT = 0
-        private const val VIEW_TYPE_SKELETON = 1
-        private const val SKELETON_COUNT = 10
     }
 }

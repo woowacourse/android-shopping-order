@@ -6,7 +6,7 @@
     <data>
         <variable
             name="vm"
-            type="woowacourse.shopping.view.products.ProductListViewModel" />
+            type="woowacourse.shopping.view.cart.ShoppingCartViewModel" />
     </data>
 
     <LinearLayout
