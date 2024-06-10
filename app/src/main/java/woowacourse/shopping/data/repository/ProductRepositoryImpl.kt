@@ -46,14 +46,12 @@ class ProductRepositoryImpl(
     override suspend fun allProducts(
         page: Int,
         size: Int,
-    ): List<Product> {
-        val result =
-            handleApiResult(
+    ): List<Product> = handleApiResult(
                 productDataSource.getProductsByOffset(page, size),
                 transform = ResponseProductsGetDto::toProductList,
-            )
-        return if (result is Fail.NotFound) emptyList() else result.result()
-    }
+            ).result()
+
+
 
     override suspend fun allProductsResponse(
         page: Int,
