@@ -8,7 +8,7 @@
 
         <variable
             name="countButtonClickListener"
-            type="woowacourse.shopping.ui.CountButtonClickListener" />
+            type="woowacourse.shopping.ui.listener.CountButtonClickListener" />
 
         <variable
             name="productWithQuantity"
@@ -16,7 +16,7 @@
 
         <variable
             name="addCartClickListener"
-            type="woowacourse.shopping.ui.utils.AddCartClickListener" />
+            type="woowacourse.shopping.ui.listener.AddCartClickListener" />
 
         <variable
             name="productItemClickListener"

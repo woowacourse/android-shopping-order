@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.utils
+package woowacourse.shopping.ui.listener
 
 interface AddCartClickListener {
     fun addCart(productId: Long)

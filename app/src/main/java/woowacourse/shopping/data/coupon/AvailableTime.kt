@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.coupon
 
 import woowacourse.shopping.data.dto.response.ResponseCouponDto
+import woowacourse.shopping.data.utils.toLocalTime
 import java.time.LocalTime
 
 data class AvailableTime(

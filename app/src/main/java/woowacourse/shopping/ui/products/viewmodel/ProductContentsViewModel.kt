@@ -14,12 +14,12 @@ import woowacourse.shopping.data.recentproduct.RecentProductRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
-import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.base.BaseViewModel
+import woowacourse.shopping.ui.listener.AddCartClickListener
+import woowacourse.shopping.ui.listener.CountButtonClickListener
 import woowacourse.shopping.ui.products.ProductItemClickListener
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
 import woowacourse.shopping.ui.products.toUiModel
-import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 

@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.listener.AddCartClickListener
+import woowacourse.shopping.ui.listener.CountButtonClickListener
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
-import woowacourse.shopping.ui.utils.AddCartClickListener
 
 class RecommendProductAdapter(
     private val countButtonClickListener: CountButtonClickListener,

@@ -15,12 +15,12 @@ import woowacourse.shopping.exception.ShoppingException
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
-import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
 import woowacourse.shopping.ui.cart.toUiModel
-import woowacourse.shopping.ui.utils.AddCartClickListener
+import woowacourse.shopping.ui.listener.AddCartClickListener
+import woowacourse.shopping.ui.listener.CountButtonClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 

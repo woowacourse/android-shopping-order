@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.coupon
 
 import woowacourse.shopping.data.dto.response.ResponseCouponDto
+import woowacourse.shopping.data.utils.toLocalDate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 data class Coupon(
     val id: Long,
@@ -35,7 +34,3 @@ fun ResponseCouponDto.toCoupon(): Coupon {
         availableTime = this.availableTime?.toModel(),
     )
 }
-
-fun String.toLocalTime(): LocalTime = LocalTime.parse(this, DateTimeFormatter.ofPattern("HH:mm:ss"))
-
-fun String.toLocalDate(): LocalDate = LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))

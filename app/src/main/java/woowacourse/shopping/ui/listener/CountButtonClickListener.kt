@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.listener
 
 interface CountButtonClickListener {
     fun plusCount(productId: Long)
