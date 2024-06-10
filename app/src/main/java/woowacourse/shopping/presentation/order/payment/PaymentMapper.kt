@@ -24,8 +24,7 @@ fun Coupon.toUiModel(): CouponUiModel {
         is PercentageCoupon -> 0
     }
     return CouponUiModel(
-        id = id,
-        name = description,
+        coupon = this,
         expirationDate = expirationDate.format(dateFormatter),
         minimumPrice = minimumPrice,
     )

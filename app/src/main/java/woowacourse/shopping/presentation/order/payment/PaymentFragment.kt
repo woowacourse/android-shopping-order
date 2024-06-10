@@ -70,7 +70,7 @@ class PaymentFragment : BindingFragment<FragmentPaymentBinding>(R.layout.fragmen
 
     private fun initObservers() {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            adapter.submitList(uiState.couponUis)
+            adapter.submitList(uiState.coupons)
         }
         viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
             showToast(getString(R.string.msg_success_payment))

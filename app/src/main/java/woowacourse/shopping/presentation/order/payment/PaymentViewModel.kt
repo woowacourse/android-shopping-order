@@ -76,9 +76,9 @@ class PaymentViewModel(
 
     private fun loadCoupons(productIds: List<Long>) {
         viewModelScope.launch {
-            loadAvailableDiscountCouponsUseCase(productIds).onSuccess { coupons ->
+            loadAvailableDiscountCouponsUseCase(productIds).onSuccess { newCoupons ->
                 _uiState.value =
-                    _uiState.value?.copy(coupons = coupons, couponUis = coupons.toUiModel())
+                    _uiState.value?.copy(coupons = newCoupons.toUiModel())
             }.onFailure {
                 Timber.e(it)
                 _errorEvent.setValue(PaymentErrorEvent.LoadCoupons)
@@ -89,13 +89,14 @@ class PaymentViewModel(
     private fun selectCoupon(couponId: Long) {
         val uiState = _uiState.value ?: return
         val discountResult =
-            uiState.coupons.findCouponById(couponId)
+            uiState.coupons.find { it.id == couponId }
+                ?.coupon
                 ?.discount(uiState.cart, SHIPPING_FEE)
                 ?: return
         _uiState.value =
             uiState.copy(
-                couponUis =
-                uiState.couponUis.map {
+                coupons =
+                uiState.coupons.map {
                     it.copy(isSelected = it.id == couponId)
                 },
                 discountResult = discountResult,
@@ -106,7 +107,7 @@ class PaymentViewModel(
         val uiState = _uiState.value ?: return
         _uiState.value =
             uiState.copy(
-                couponUis = uiState.couponUis.map { it.copy(isSelected = false) },
+                coupons = uiState.coupons.map { it.copy(isSelected = false) },
                 discountResult = uiState.discountResult.copy(discountPrice = 0),
             )
     }
