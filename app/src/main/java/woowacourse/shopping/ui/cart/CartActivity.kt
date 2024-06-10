@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -13,6 +14,7 @@ import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.local.ShoppingCartDataBase
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
+import woowacourse.shopping.data.remote.ApiError
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.coupon.CouponActivity
 
@@ -72,6 +74,7 @@ class CartActivity : AppCompatActivity() {
     private fun initializeView() {
         initializeToolbar()
         observeData()
+        observeErrorEvent()
     }
 
     private fun initializeToolbar() {
@@ -108,14 +111,44 @@ class CartActivity : AppCompatActivity() {
         viewModel.selectedCartItemIds.observe(this) {
             navigateToCouponView(it)
         }
-        viewModel.cartErrorEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            showToastCartFailure()
+    }
+
+    private fun observeErrorEvent() {
+        viewModel.productsLoadError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showCartErrorToast(throwable, R.string.product_load_error)
+        }
+        viewModel.cartItemAddError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showCartErrorToast(throwable, R.string.cart_item_add_error)
+        }
+        viewModel.cartItemDeleteError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showCartErrorToast(throwable, R.string.cart_item_delete_error)
         }
     }
 
-    private fun showToastCartFailure() {
-        Toast.makeText(this, R.string.common_error_retry, Toast.LENGTH_SHORT).show()
+    private fun showCartErrorToast(
+        throwable: Throwable,
+        @StringRes errorMessageResId: Int,
+    ) {
+        if (throwable is ApiError) {
+            showToast(errorMessageResId)
+        }
+        when (throwable) {
+            is ApiError.BadRequest -> showToast(errorMessageResId)
+            is ApiError.Unauthorized -> showToast(R.string.unauthorized_error)
+            is ApiError.Forbidden -> showToast(R.string.unauthorized_error)
+            is ApiError.NotFound -> showToast(R.string.product_not_found_error)
+            is ApiError.InternalServerError -> showToast(R.string.server_error)
+            is ApiError.Exception -> showToast(errorMessageResId)
+        }
+    }
+
+    private fun showToast(
+        @StringRes messageResId: Int,
+    ) {
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToCouponView(selectedCartItemIds: List<Int>) {

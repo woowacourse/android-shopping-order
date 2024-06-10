@@ -26,9 +26,6 @@ class CartViewModel(
     private val _isLoadingCart = MutableLiveData<Boolean>()
     val isLoadingCart: LiveData<Boolean> get() = _isLoadingCart
 
-    private val _cartErrorEvent = MutableLiveData<Event<Unit>>()
-    val cartErrorEvent: LiveData<Event<Unit>> get() = _cartErrorEvent
-
     private val _totalPrice = MutableLiveData<Int>(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
 
@@ -56,6 +53,15 @@ class CartViewModel(
     private val _selectedCartItemIds = MutableLiveData<List<Int>>()
     val selectedCartItemIds: LiveData<List<Int>> get() = _selectedCartItemIds
 
+    private val _productsLoadError = MutableLiveData<Event<Throwable>>()
+    val productsLoadError: LiveData<Event<Throwable>> get() = _productsLoadError
+
+    private val _cartItemAddError = MutableLiveData<Event<Throwable>>()
+    val cartItemAddError: LiveData<Event<Throwable>> get() = _cartItemAddError
+
+    private val _cartItemDeleteError = MutableLiveData<Event<Throwable>>()
+    val cartItemDeleteError: LiveData<Event<Throwable>> get() = _cartItemDeleteError
+
     fun loadAllCartItems() =
         viewModelScope.launch {
             _isLoadingCart.value = true
@@ -68,7 +74,7 @@ class CartViewModel(
                     cartItems.forEach { cartItem -> loadProduct(cartItem) }
                 }
                 .onFailure {
-                    setError()
+                    _productsLoadError.setError(it)
                 }
             _isLoadingCart.value = false
         }
@@ -80,7 +86,7 @@ class CartViewModel(
                     updateCartUiModels(product, cartItem)
                     updateCart()
                 }.onFailure {
-                    setError()
+                    _productsLoadError.setError(it)
                 }
         }
 
@@ -130,7 +136,7 @@ class CartViewModel(
             return
         }
         var newQuantity = cartUiModel.quantity
-        changeQuantity(cartUiModel, ++newQuantity)
+        changeQuantity(cartUiModel, ++newQuantity, _cartItemAddError)
     }
 
     private fun addCartItem(productId: Int) =
@@ -143,7 +149,7 @@ class CartViewModel(
                     }
                 }
                 .onFailure {
-                    setError()
+                    _cartItemAddError.setError(it)
                 }
         }
 
@@ -156,7 +162,7 @@ class CartViewModel(
             return
         }
         var newQuantity = cartUiModel.quantity
-        changeQuantity(cartUiModel, --newQuantity)
+        changeQuantity(cartUiModel, --newQuantity, _cartItemDeleteError)
     }
 
     override fun deleteCartItem(cartItemId: Int) {
@@ -171,7 +177,7 @@ class CartViewModel(
                     }
                 }
                 .onFailure {
-                    setError()
+                    _cartItemDeleteError.setError(it)
                 }
         }
     }
@@ -203,6 +209,7 @@ class CartViewModel(
     private fun changeQuantity(
         cartUiModel: CartUiModel,
         quantity: Quantity,
+        errorEvent: MutableLiveData<Event<Throwable>>,
     ) = viewModelScope.launch {
         cartRepository.changeQuantity(cartUiModel.cartItemId, quantity)
             .onSuccess {
@@ -212,7 +219,7 @@ class CartViewModel(
                 }
             }
             .onFailure {
-                setError()
+                errorEvent.setError(it)
             }
     }
 
@@ -255,7 +262,7 @@ class CartViewModel(
                 .onSuccess { recommendProducts ->
                     _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
                 }.onFailure {
-                    setError()
+                    _productsLoadError.setError(it)
                 }
         }
 
@@ -264,8 +271,8 @@ class CartViewModel(
         _selectedCartItemIds.value = cartItemIds
     }
 
-    private fun setError() {
-        _cartErrorEvent.value = Event(Unit)
+    private fun MutableLiveData<Event<Throwable>>.setError(throwable: Throwable) {
+        this.value = Event(throwable)
     }
 
     private fun cartUiModels(): CartUiModels {
