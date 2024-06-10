@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.data.datasource.local.LocalRecentViewedDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentRepository
-import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.local.entity.RecentProductEntity.Companion.toRecentProductEntity
 import java.time.LocalDateTime
 
-class RecentProductRepositoryImpl(private val localRecentViewedDataSource: LocalRecentViewedDataSourceImpl) : RecentRepository {
+class RecentProductRepositoryImpl(private val localRecentViewedDataSource: LocalRecentViewedDataSource) : RecentRepository {
     override suspend fun loadAll(): Result<List<Product>> {
         return runCatching {
             localRecentViewedDataSource.loadAll().map { it.toDomain() }

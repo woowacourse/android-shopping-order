@@ -4,8 +4,7 @@ import woowacourse.shopping.data.datasource.local.LocalRecentViewedDataSource
 import woowacourse.shopping.local.dao.RecentProductDao
 import woowacourse.shopping.local.entity.RecentProductEntity
 
-class LocalRecentViewedDataSourceImpl(private val dao: RecentProductDao) :
-    LocalRecentViewedDataSource {
+class LocalRecentViewedDataSourceImpl(private val dao: RecentProductDao) : LocalRecentViewedDataSource {
     override suspend fun loadAll(): List<RecentProductEntity> {
         return dao.loadAll()
     }
