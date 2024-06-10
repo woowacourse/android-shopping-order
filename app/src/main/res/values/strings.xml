@@ -17,4 +17,5 @@
     <string name="payment_delivery_title">배송비</string>
     <string name="payment_total_title">총 결제 금액</string>
     <string name="discount_won">-%,d원</string>
+    <string name="error_apply_coupon">적용할 수 없는 쿠폰입니다.</string>
 </resources>

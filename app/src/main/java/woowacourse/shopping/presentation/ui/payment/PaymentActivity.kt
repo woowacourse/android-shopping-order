@@ -90,6 +90,12 @@ class PaymentActivity :
             }
         )
 
+        viewModel.errorHandler.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { message ->
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     companion object {

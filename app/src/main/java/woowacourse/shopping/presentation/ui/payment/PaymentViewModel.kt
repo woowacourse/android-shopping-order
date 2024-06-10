@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.payment
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -79,7 +78,7 @@ class PaymentViewModel(
             val orderTotal = (_orderProducts.value as UiState.Success).data.sumOf {
                 it.quantity * it.price.toInt()
             }
-            _totalPrice.value = orderTotal - _couponPrice.value!! + _deliveryPrice.value!!
+            _totalPrice.value = orderTotal - (_couponPrice.value ?: 0) + (_deliveryPrice.value ?: 0)
         }
     }
 
@@ -94,34 +93,34 @@ class PaymentViewModel(
                     _eventHandler.value = EventState(CouponEvent.SuccessPay)
                 }.onFailure { _errorHandler.value = EventState(PAYMENT_ERROR) }
             } else {
-                // Handle the case when _cartProducts.value is not UiState.Success
+                _errorHandler.value = EventState(PAYMENT_ERROR)
             }
         }
     }
 
     override fun onCouponClick(selectedCoupon: Coupon) {
-        val coupons = (_coupons.value as UiState.Success).data
+        val coupons = (_coupons.value as? UiState.Success)?.data ?: return
 
-        selectedCoupon.discountPrice(
-            totalPrice.value as Int,
-            (_orderProducts.value as UiState.Success).data
-        ).also {
-            _couponPrice.value = it
-        }
-
-        coupons.forEach {
-            if (it.id == selectedCoupon.id) {
-                it.isSelected = !selectedCoupon.isSelected
-            } else {
-                it.isSelected = false
+        coupons.find { it.id == selectedCoupon.id }?.apply {
+            isSelected = !isSelected
+            val discountPrice = discountPrice(
+                totalPrice.value ?: 0,
+                (_orderProducts.value as UiState.Success).data
+            )
+            if (isSelected && discountPrice == 0) {
+                _errorHandler.value = EventState(APPLY_COUPON_ERROR)
+                isSelected = false
             }
+            _couponPrice.value = if (isSelected) discountPrice else 0
         }
 
+        coupons.forEach { if (it.id != selectedCoupon.id) it.isSelected = false }
         _coupons.value = UiState.Success(coupons)
     }
 
     companion object {
         const val COUPON_LOAD_ERROR = "LOAD ERROR"
         const val PAYMENT_ERROR = "PAYMENT ERROR"
+        const val APPLY_COUPON_ERROR = "APPLY COUPON ERROR"
     }
 }

@@ -1,13 +1,10 @@
 package woowacourse.shopping.domain.coupon
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.CartProduct
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@Parcelize
 data class Coupon(
     val id: Int,
     val code: String,
@@ -20,10 +17,10 @@ data class Coupon(
     val getQuantity: Int,
     val availableTime: AvailableTime?,
     var isSelected: Boolean = false,
-) : Parcelable {
+) {
 
     fun discountPrice(totalPrice: Int, orderItems: List<CartProduct>): Int {
-        if (!isAvailable()) return NO_DISCOUNT
+        if (isExpirationDate()) return NO_DISCOUNT
         return when (code) {
             CouponType.FIXED5000.name -> applyFixed5000(totalPrice)
             CouponType.BOGO.name -> applyBogo(orderItems)
@@ -33,10 +30,10 @@ data class Coupon(
         }
     }
 
-    private fun isAvailable(): Boolean {
+    private fun isExpirationDate(): Boolean {
         val formatter = DateTimeFormatter.ofPattern(EXPIRATION_DATE_PATTERN)
         val expirationLocalDate = LocalDate.parse(expirationDate, formatter)
-        return expirationLocalDate.isAfter(LocalDate.now())
+        return expirationLocalDate.isBefore(LocalDate.now())
     }
 
     private fun applyFixed5000(totalPrice: Int): Int {
