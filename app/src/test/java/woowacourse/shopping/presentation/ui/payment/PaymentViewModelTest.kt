@@ -63,7 +63,7 @@ class PaymentViewModelTest {
         }
 
     @Test
-    fun `주문 상품을 주문할 수 있다`() =
+    fun `상품을 성공적으로 주문하면 PaymentNavigateAction이 NavigateToProductList로 변경된다`() =
         runTest {
             // given
             coEvery { orderRepository.insertOrder(CARTS_WRAPPER.cartUiModels.map { it.id }) } returns
