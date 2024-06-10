@@ -3,7 +3,9 @@ package woowacourse.shopping.remote.api
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.model.remote.AvailableTimeDto
 import woowacourse.shopping.data.model.remote.CartDto
+import woowacourse.shopping.data.model.remote.CouponCodeDto
 import woowacourse.shopping.data.model.remote.CouponDto
+import woowacourse.shopping.data.model.remote.DiscountTypeDto
 import woowacourse.shopping.data.model.remote.ProductDto
 import woowacourse.shopping.domain.mapper.toPresentation
 import woowacourse.shopping.domain.model.Cart
@@ -154,33 +156,33 @@ object DummyData {
         listOf(
             CouponDto(
                 id = 1,
-                code = "FIXED5000",
+                code = CouponCodeDto.FIXED5000,
                 description = "5,000원 할인 쿠폰",
                 expirationDate = "2024-11-30",
                 discount = 5000,
                 minimumAmount = 100000,
-                discountType = "fixed",
+                discountType = DiscountTypeDto.FIXED,
             ),
             CouponDto(
                 id = 2,
-                code = "BOGO",
+                code = CouponCodeDto.BOGO,
                 description = "2개 구매 시 1개 무료 쿠폰",
                 expirationDate = "2024-05-30",
                 buyQuantity = 2,
                 getQuantity = 1,
-                discountType = "buyXgetY",
+                discountType = DiscountTypeDto.BUY_X_GET_Y,
             ),
             CouponDto(
                 id = 3,
-                code = "FREESHIPPING",
+                code = CouponCodeDto.FREESHIPPING,
                 description = "5만원 이상 구매 시 무료 배송 쿠폰",
                 expirationDate = "2024-08-31",
                 minimumAmount = 50000,
-                discountType = "freeShipping",
+                discountType = DiscountTypeDto.FREE_SHIPPING,
             ),
             CouponDto(
                 id = 4,
-                code = "MIRACLESALE",
+                code = CouponCodeDto.MIRACLESALE,
                 description = "미라클모닝 30% 할인 쿠폰",
                 expirationDate = "2024-07-31",
                 discount = 30,
@@ -189,7 +191,7 @@ object DummyData {
                         start = "04:00:00",
                         end = "07:00:00",
                     ),
-                discountType = "percentage",
+                discountType = DiscountTypeDto.PERCENTAGE,
             ),
         )
 

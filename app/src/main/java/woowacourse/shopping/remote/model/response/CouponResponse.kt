@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CouponResponse(
     val id: Int,
-    val code: String,
+    val code: CouponCodeResponse,
     val description: String,
     val expirationDate: String,
     val discount: Int? = null,
@@ -13,5 +13,5 @@ data class CouponResponse(
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
     val availableTime: AvailableTimeResponse? = null,
-    val discountType: String,
+    val discountType: DiscountTypeResponse,
 )
