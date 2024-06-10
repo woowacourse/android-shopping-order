@@ -6,6 +6,7 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
 import woowacourse.shopping.ui.order.OrderFragment
+import woowacourse.shopping.ui.payment.PaymentFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment.Companion.PRODUCT_ID
 import woowacourse.shopping.ui.productList.ProductListFragment
@@ -64,6 +65,13 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         }
     }
 
+    override fun navigateToPayment() {
+        supportFragmentManager.commit {
+            replace(R.id.container, PaymentFragment::class.java, null, PaymentFragment.TAG)
+            addToBackStack(PaymentFragment.TAG)
+        }
+    }
+
     override fun popBackStack() {
         supportFragmentManager.popBackStack()
     }
@@ -84,6 +92,8 @@ interface FragmentNavigator {
     fun navigateToProductDetail(productId: Long)
 
     fun navigateToOrder()
+
+    fun navigateToPayment()
 
     fun popBackStack()
 }
