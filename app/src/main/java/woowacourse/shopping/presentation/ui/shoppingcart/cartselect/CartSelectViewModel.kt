@@ -58,14 +58,14 @@ class CartSelectViewModel(
     private fun loadedCartProducts(pagingCartProduct: PagingCartProduct) {
         launch {
             val state = uiState.value ?: return@launch
-            val cartProducts = updateCheckedStatus(state.orderCarts, pagingCartProduct.cartProducts)
+            val cartProducts = updateCartProductCheckStatus(state.orderCarts, pagingCartProduct.cartProducts)
             val newPagingCartProduct = pagingCartProduct.copy(cartProducts = cartProducts)
 
             _uiState.postValue(state.copy(pagingCartProduct = newPagingCartProduct))
         }
     }
 
-    private fun updateCheckedStatus(
+    private fun updateCartProductCheckStatus(
         carts: List<Cart>,
         cartProducts: List<CartProduct>,
     ): List<CartProduct> {
@@ -217,7 +217,7 @@ class CartSelectViewModel(
             }
 
         val cartProducts =
-            updateCheckedStatus(state.orderCarts, state.pagingCartProduct.cartProducts)
+            updateCartProductCheckStatus(state.orderCarts, state.pagingCartProduct.cartProducts)
 
         _uiState.value =
             state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartProducts = cartProducts))
