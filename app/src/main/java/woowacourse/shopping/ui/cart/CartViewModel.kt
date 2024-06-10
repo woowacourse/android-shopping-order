@@ -26,29 +26,26 @@ class CartViewModel(
     private val _isLoadingCart = MutableLiveData<Boolean>()
     val isLoadingCart: LiveData<Boolean> get() = _isLoadingCart
 
-    private val _totalPrice = MutableLiveData<Int>(0)
-    val totalPrice: LiveData<Int> get() = _totalPrice
-
-    val isEnabledOrder: LiveData<Boolean> = _totalPrice.map { it != 0 }
-
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
-    private val cartItemSelectedCount = MutableLiveData<Int>(0)
-    val cartItemAllSelected: LiveData<Boolean> =
-        cartItemSelectedCount.map { it > 0 && it == cartUiModels().size }
+    val totalPrice: LiveData<Int> = _cartUiModels.map { it.selectedTotalPrice() }
+    val isEnabledOrder: LiveData<Boolean> = totalPrice.map { it != 0 }
+
+    val totalQuantity: LiveData<Int> = _cartUiModels.map { it.selectedTotalQuantity() }
+
+    private val cartItemSelectedCount: LiveData<Int> = _cartUiModels.map { it.selectedTotalCount() }
+    val cartItemAllSelected: LiveData<Boolean> = cartItemSelectedCount.map { it > 0 && it == cartUiModels().size }
 
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
 
     private val _orderEvent = MutableLiveData<Event<Unit>>()
+
     val orderEvent: LiveData<Event<Unit>> get() = _orderEvent
-
     private val _visibleAllToggleView = MutableLiveData(true)
-    val visibleAllToggleView: LiveData<Boolean> get() = _visibleAllToggleView
 
-    private val _totalQuantity = MutableLiveData<Int>(0)
-    val totalQuantity: LiveData<Int> get() = _totalQuantity
+    val visibleAllToggleView: LiveData<Boolean> get() = _visibleAllToggleView
 
     private val _selectedCartItemIds = MutableLiveData<List<Int>>()
     val selectedCartItemIds: LiveData<List<Int>> get() = _selectedCartItemIds
@@ -84,7 +81,6 @@ class CartViewModel(
             productRepository.find(cartItem.product.id)
                 .onSuccess { product ->
                     updateCartUiModels(product, cartItem)
-                    updateCart()
                 }.onFailure {
                     _productsLoadError.setError(it)
                 }
@@ -103,29 +99,6 @@ class CartViewModel(
 
         val newCartUiModels = oldCartUiModels.upsert(newCartUiModel)
         _cartUiModels.value = newCartUiModels
-    }
-
-    private fun updateCart() {
-        updateTotalQuantity()
-        updateTotalPrice()
-        updateCartSelectedCount()
-    }
-
-    private fun updateCartSelectedCount() {
-        val cartSelectedCount = cartUiModels().selectedTotalCount()
-        this.cartItemSelectedCount.value = cartSelectedCount
-    }
-
-    private fun updateTotalQuantity() {
-        val cartUiModels = cartUiModels()
-        val totalQuantity = cartUiModels.selectedTotalQuantity()
-        _totalQuantity.value = totalQuantity
-    }
-
-    private fun updateTotalPrice() {
-        val uiModels = cartUiModels()
-        val totalPrice = uiModels.selectedTotalPrice()
-        _totalPrice.value = totalPrice
     }
 
     override fun increaseQuantity(productId: Int) {
@@ -185,7 +158,6 @@ class CartViewModel(
     private fun updateDeletedCart(deletedCartUiModel: CartUiModel) {
         val newCartUiModels = cartUiModels().remove(deletedCartUiModel)
         _cartUiModels.value = newCartUiModels
-        updateCart()
     }
 
     private fun isRecommendProduct(productId: Int): Boolean {
@@ -236,7 +208,6 @@ class CartViewModel(
     ) {
         val newCartUiModels = cartUiModels().select(productId, isSelected)
         _cartUiModels.value = newCartUiModels
-        updateCart()
     }
 
     fun order() {
@@ -260,7 +231,8 @@ class CartViewModel(
 
             productRepository.findRecommendProducts(recentProductCategory, cartItems)
                 .onSuccess { recommendProducts ->
-                    _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
+                    _recommendProductUiModels.value =
+                        recommendProducts.map { ProductUiModel.from(it) }
                 }.onFailure {
                     _productsLoadError.setError(it)
                 }
