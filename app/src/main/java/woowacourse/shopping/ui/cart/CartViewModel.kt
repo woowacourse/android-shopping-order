@@ -102,7 +102,6 @@ class CartViewModel(
     }
 
     override fun increaseQuantity(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
         val cartUiModel = cartUiModels().findByProductId(productId)
         if (cartUiModel == null) {
             addCartItem(productId)
@@ -116,6 +115,7 @@ class CartViewModel(
         viewModelScope.launch {
             cartRepository.add(productId)
                 .onSuccess {
+                    _changedCartEvent.value = Event(Unit)
                     loadAllCartItems()
                     if (isRecommendProduct(productId)) {
                         updateRecommendProducts(productId)
@@ -127,8 +127,6 @@ class CartViewModel(
         }
 
     override fun decreaseQuantity(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
-
         val cartUiModel = cartUiModels().findByProductId(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
             deleteCartItem(cartUiModel.cartItemId)
@@ -140,10 +138,10 @@ class CartViewModel(
 
     override fun deleteCartItem(cartItemId: Int) {
         viewModelScope.launch {
-            _changedCartEvent.value = Event(Unit)
             val cartUiModel = cartUiModels().find(cartItemId) ?: return@launch
             cartRepository.delete(cartUiModel.cartItemId)
                 .onSuccess {
+                    _changedCartEvent.value = Event(Unit)
                     updateDeletedCart(cartUiModel)
                     if (isRecommendProduct(cartUiModel.productId)) {
                         updateRecommendProducts(cartUiModel.productId, Quantity())
@@ -185,6 +183,7 @@ class CartViewModel(
     ) = viewModelScope.launch {
         cartRepository.changeQuantity(cartUiModel.cartItemId, quantity)
             .onSuccess {
+                _changedCartEvent.value = Event(Unit)
                 loadProduct(cartUiModel.copy(quantity = quantity).toCartItem())
                 if (isRecommendProduct(cartUiModel.productId)) {
                     updateRecommendProducts(cartUiModel.productId, quantity)
