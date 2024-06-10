@@ -81,11 +81,15 @@ class PaymentActivity :
             EventObserver {
                 when (it) {
                     is CouponEvent.SuccessPay -> {
-                        Toast.makeText(this, "주문이 성공적으로 진행되었습니다.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, EVENT_SUCCESS_PAY, Toast.LENGTH_SHORT).show()
                         ShoppingActionActivity.createIntent(this).run {
                             startActivity(this)
                             finish()
                         }
+                    }
+
+                    is CouponEvent.ApplyCoupon -> {
+                        Toast.makeText(this, EVENT_APPLY_COUPON, Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -99,6 +103,8 @@ class PaymentActivity :
     }
 
     companion object {
+        const val EVENT_SUCCESS_PAY = "주문이 성공적으로 진행되었습니다."
+        const val EVENT_APPLY_COUPON = "쿠폰이 적용되었습니다."
         const val EXTRA_ORDER_PRODUCT = "orderProduct"
 
         fun createIntent(

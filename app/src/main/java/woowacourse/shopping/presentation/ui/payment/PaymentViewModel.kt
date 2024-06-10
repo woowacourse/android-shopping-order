@@ -113,6 +113,9 @@ class PaymentViewModel(
             if (isSelected && discountPrice == 0) {
                 _errorHandler.value = EventState(APPLY_COUPON_ERROR)
                 isSelected = false
+            } else {
+                _couponPrice.value = if (isSelected) discountPrice else 0
+                _eventHandler.value = EventState(CouponEvent.ApplyCoupon)
             }
             _couponPrice.value = if (isSelected) discountPrice else 0
         }
