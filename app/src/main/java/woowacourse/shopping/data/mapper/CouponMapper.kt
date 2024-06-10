@@ -24,6 +24,11 @@ fun CouponDto.toDomain(): Coupon {
         id = this.id,
         description = this.description,
         expirationDate = date,
+        discount = this.discount,
+        minimumAmount = this.minimumAmount,
+        buyQuantity = this.buyQuantity,
+        getQuantity = this.getQuantity,
+        availableTime = this.availableTime?.toDomain(),
         discountPolicy = this.discountType.toDiscountPolicy(this),
         couponCondition = this.discountType.toCouponCondition(this),
     )

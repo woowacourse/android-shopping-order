@@ -47,8 +47,6 @@ fun TextView.bindCouponDescription(couponUiModel: CouponUiModel) {
                     availableTime.end.hour,
                 )
             }
-
-            else -> return
         }
 
     this.text = description
