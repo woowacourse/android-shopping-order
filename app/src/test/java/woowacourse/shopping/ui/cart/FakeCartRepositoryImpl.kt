@@ -48,7 +48,7 @@ class FakeCartRepositoryImpl(private val cartItems: MutableList<CartItem>) : Car
         TODO("Not yet implemented")
     }
 
-    override fun findQuantityWithProductId(productId: Long): Int {
+    override suspend fun findQuantityWithProductId(productId: Long): Int {
         TODO("Not yet implemented")
     }
 

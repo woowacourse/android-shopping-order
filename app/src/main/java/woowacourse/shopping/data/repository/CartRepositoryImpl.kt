@@ -1,3 +1,4 @@
+/*
 package woowacourse.shopping.data.repository
 
 import android.content.Context
@@ -60,7 +61,7 @@ class CartRepositoryImpl(context: Context) : CartRepository {
         }
     }
 
-    override fun findQuantityWithProductId(productId: Long): Int {
+    override suspend fun findQuantityWithProductId(productId: Long): Int {
         var quantity = 0
         threadAction {
             quantity = dao.findQuantityWithProductId(productId)
@@ -157,3 +158,4 @@ class CartRepositoryImpl(context: Context) : CartRepository {
         latch.await()
     }
 }
+*/

@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.ui.cart.selection
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.presentation.state.UIState
 import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
@@ -65,6 +65,7 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     private fun setUpUIState() {
         val adapter = setUpRecyclerViewAdapter()
         viewModel.cartItemsState.observe(viewLifecycleOwner) { state ->
+            Log.d("crong", "$state")
             when (state) {
                 is UIState.Success -> showData(state.data, adapter)
                 is UIState.Empty -> {} // emptyCart()
@@ -137,7 +138,7 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     }
 
     override fun onSelectAllClick() {
-        OrderDatabase.postOrder(viewModel.order.value ?: Order())
+        OrderDatabase.postOrder(OrderDatabase.getOrder())
         viewModel.selectAllByCondition()
     }
 }

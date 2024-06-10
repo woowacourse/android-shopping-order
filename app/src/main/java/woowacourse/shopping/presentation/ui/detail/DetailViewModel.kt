@@ -1,8 +1,12 @@
 package woowacourse.shopping.presentation.ui.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -42,33 +46,75 @@ class DetailViewModel(
         get() = _addCartItem
 
     init {
-        loadShoppingProductData()
-        loadRecentProductData()
-        checkRecentProductVisibility()
+        Log.d("crong", "DetailViewModel: init")
+        Log.d("crong", "DetailViewModel: productId $productId")
+        viewModelScope.launch {
+            loadShoppingProductData()
+            loadRecentProductData()
+            checkRecentProductVisibility()
+        }
     }
 
-    private fun loadShoppingProductData() {
-        val shoppingProduct =
-            ShoppingProduct(
-                product = shoppingRepository.findProductItem(productId) ?: return,
-                quantity = fetchQuantity(),
-            )
-        _shoppingProduct.value = shoppingProduct
+    private suspend fun loadShoppingProductData() {
+        val loadedData =
+            viewModelScope.async {
+                shoppingRepository.findProductItem(productId)
+            }
+        // Log.d("crong", "loadShoppingProductData: ${loadedData.await()}")
+        loadedData.await().onSuccess {
+            Log.d("crong", "loadShoppingProductData1: $it")
+            _shoppingProduct.value =
+                ShoppingProduct(
+                    product = it ?: return@onSuccess,
+                    quantity = fetchQuantity(),
+                )
+        }
+        Log.d("crong", "loadShoppingProductData2: ${_shoppingProduct.value}")
+
+        /*viewModelScope.launch {
+            val product = shoppingRepository.findProductItem(productId)
+            product.onSuccess {
+                val shoppingProduct =
+                    ShoppingProduct(
+                        product = it ?: return@onSuccess,
+                        quantity = fetchQuantity(),
+                    )
+                _shoppingProduct.value = shoppingProduct
+            }
+        }*/
     }
 
-    private fun fetchQuantity(): Int {
-        return cartRepository.findOrNullWithProductId(productId)?.quantity ?: 1
+    private suspend fun fetchQuantity(): Int {
+        var quantity = 1
+        val transaction =
+            viewModelScope.async {
+                cartRepository.findOrNullWithProductId(productId)
+            }
+        transaction.await().onSuccess {
+            quantity = it?.quantity ?: 1
+        }
+        Log.d("crong", "fetchQuantity: $quantity")
+        return quantity
     }
 
     private fun loadRecentProductData() {
-        val recentProduct = recentProductRepository.loadSecondLatest() ?: return
-        _recentProduct.value = recentProduct
+        viewModelScope.launch {
+            val recentProduct = recentProductRepository.loadSecondLatest()
+            Log.d("crong", "loadRecentProductData: $recentProduct")
+            recentProduct.onSuccess {
+                _recentProduct.value = it
+                checkRecentProductVisibility()
+            }
+        }
     }
 
     fun createShoppingCartItem() {
         val product = shoppingProduct.value?.product ?: return
         val quantity = shoppingProduct.value?.quantity() ?: return
-        cartRepository.insert(product = product, quantity = quantity)
+        viewModelScope.launch {
+            cartRepository.insert(product = product, quantity = quantity)
+        }
+        // cartRepository.insert(product = product, quantity = quantity)
     }
 
     private fun checkRecentProductVisibility() {

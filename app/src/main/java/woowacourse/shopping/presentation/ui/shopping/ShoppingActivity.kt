@@ -17,7 +17,6 @@ import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.state.UIState
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
@@ -128,14 +127,16 @@ class ShoppingActivity : AppCompatActivity() {
 
     private fun showData(data: List<Product>) {
         shoppingAdapter.loadData(data)
-        shoppingAdapter.loadShoppingProductData(
+        /*shoppingAdapter.loadShoppingProductData(
             data.map {
                 ShoppingProduct(
                     product = it,
                     quantity = viewModel.fetchQuantity(it.id),
                 )
             },
-        )
+        )*/
+        viewModel.updateItems()
+        shoppingAdapter.loadShoppingProductData(viewModel.shoppingProducts.value ?: emptyList())
     }
 
     private fun showError(errorMessage: String) {

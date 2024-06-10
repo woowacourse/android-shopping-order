@@ -16,6 +16,7 @@ import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.order.OrderActivity
 
 class RecommendationFragment : Fragment(), RecommendationClickListener {
     private lateinit var binding: FragmentRecommendBinding
@@ -101,7 +102,7 @@ class RecommendationFragment : Fragment(), RecommendationClickListener {
     }
 
     override fun onMakeOrderClick() {
-        viewModel.completeOrder()
-        requireActivity().finish()
+        // viewModel.completeOrder()
+        startActivity(OrderActivity.createIntent(requireContext()))
     }
 }

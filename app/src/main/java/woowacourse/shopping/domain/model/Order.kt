@@ -1,7 +1,9 @@
 package woowacourse.shopping.domain.model
 
-class Order {
-    private val _list = mutableListOf<CartItem>()
+import java.io.Serializable
+
+data class Order(val cartItems: List<CartItem>) : Serializable {
+    private val _list = cartItems.toMutableList()
     val list: List<CartItem>
         get() = _list
 

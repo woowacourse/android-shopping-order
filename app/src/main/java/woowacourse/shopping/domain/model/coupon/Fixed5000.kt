@@ -1,0 +1,17 @@
+package woowacourse.shopping.domain.model.coupon
+
+import woowacourse.shopping.domain.model.CartItem
+
+class Fixed5000(override val coupon: Coupon) : CouponState() {
+    override fun createState(coupon: Coupon): CouponState = Fixed5000(coupon)
+
+    override fun isValidCoupon(carts: List<CartItem>): Boolean {
+        /*if (coupon.expirationDate < Date.from(Instant.now())) return false
+        val minimumAmount = coupon.minimumAmount ?: return false
+        val totalAmount = carts.sumOf { it.totalPrice }
+        return minimumAmount <= totalAmount*/
+        return true
+    }
+
+    override fun calculateDiscount(totalAmount: Int): Int = (coupon.discount ?: 0)
+}

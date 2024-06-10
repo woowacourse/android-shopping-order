@@ -6,50 +6,50 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 
 interface CartRepository {
-    fun updateCartItems()
+    suspend fun updateCartItems(): Result<Unit>
 
-    fun insert(
+    suspend fun insert(
         product: Product,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    fun update(
+    suspend fun update(
         productId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    fun updateQuantity(
+    suspend fun updateQuantity(
         cartItemId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    fun updateQuantityWithProductId(
+    suspend fun updateQuantityWithProductId(
         productId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    fun findQuantityWithProductId(productId: Long): Int
+    suspend fun findQuantityWithProductId(productId: Long): Result<Int>
 
-    fun makeOrder(order: Order)
+    suspend fun makeOrder(order: Order): Result<Unit>
 
-    fun size(): Int
+    suspend fun size(): Result<Int>
 
-    fun sumOfQuantity(): Int
+    suspend fun sumOfQuantity(): Result<Int>
 
-    fun findOrNullWithProductId(productId: Long): CartItem?
+    suspend fun findOrNullWithProductId(productId: Long): Result<CartItem?>
 
-    fun findWithCartItemId(cartItemId: Long): CartItem
+    suspend fun findWithCartItemId(cartItemId: Long): Result<CartItem>
 
-    fun findAll(): ShoppingCart
+    suspend fun findAll(): Result<ShoppingCart>
 
-    fun findAllPagedItems(
+    suspend fun findAllPagedItems(
         page: Int,
         pageSize: Int,
-    ): ShoppingCart
+    ): Result<ShoppingCart>
 
-    fun delete(cartItemId: Long)
+    suspend fun delete(cartItemId: Long): Result<Unit>
 
-    fun deleteWithProductId(productId: Long)
+    suspend fun deleteWithProductId(productId: Long): Result<Unit>
 
-    fun deleteAll()
+    suspend fun deleteAll(): Result<Unit>
 }

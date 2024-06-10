@@ -4,11 +4,11 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 
 interface RecentProductRepository {
-    fun save(product: Product)
+    suspend fun save(product: Product): Result<Unit>
 
-    fun loadLatest(): RecentProduct?
+    suspend fun loadLatest(): Result<RecentProduct?>
 
-    fun loadSecondLatest(): RecentProduct?
+    suspend fun loadSecondLatest(): Result<RecentProduct?>
 
-    fun loadLatestList(): List<RecentProduct>
+    suspend fun loadLatestList(): Result<List<RecentProduct>>
 }

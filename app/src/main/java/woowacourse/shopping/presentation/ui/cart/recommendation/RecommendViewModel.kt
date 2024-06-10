@@ -3,9 +3,12 @@ package woowacourse.shopping.presentation.ui.cart.recommendation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -40,6 +43,11 @@ class RecommendViewModel(
     val loading: LiveData<Boolean>
         get() = _loading
 
+    /*private val _navigateToOrder = MutableLiveData<Event<Boolean>>()
+
+    val navigateToOrder: LiveData<Event<Boolean>>
+        get() = _navigateToOrder*/
+
     private val _isEmpty = MutableLiveData<Boolean>(false)
     val isEmpty: LiveData<Boolean>
         get() = _isEmpty
@@ -51,6 +59,9 @@ class RecommendViewModel(
     init {
         fetchOrder()
         setUpUIState()
+        viewModelScope.launch {
+            shoppingRepository.initializeProducts()
+        }
     }
 
     private fun fetchOrder() {
@@ -59,13 +70,14 @@ class RecommendViewModel(
     }
 
     private fun setUpUIState() {
-        _recommendItemsState.value =
+        loadRecommendationProducts()
+        /*_recommendItemsState.value =
             try {
                 loadRecommendationProducts()
             } catch (e: Exception) {
                 UIState.Error(e)
                 loadRecommendationProducts()
-            }
+            }*/
     }
 
     private fun updatePriceAndQuantity() {
@@ -73,8 +85,60 @@ class RecommendViewModel(
         _totalOrderQuantity.value = _order.value?.getTotalQuantity() ?: 0
     }
 
-    private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
-        val recentProduct = recentProductRepository.loadLatest() ?: return UIState.Empty
+    private fun loadRecommendationProducts() {
+        var recentProduct: RecentProduct? = null
+        var items: List<ShoppingProduct> = listOf()
+
+        viewModelScope.launch {
+            recentProduct = recentProductRepository.loadLatest().getOrNull()
+
+            if (recentProduct == null) {
+                _recommendItemsState.value = UIState.Empty
+                return@launch
+            }
+
+            val cartItems = cartRepository.findAll()
+            var cartItemIds: List<Long> = listOf()
+            cartItems.onSuccess { shoppingCart ->
+                cartItemIds = shoppingCart.items.map { it.productId }
+            }
+            // val cartItemIds = cartRepository.findAll().items.map { it.productId }
+
+            /*items =
+                shoppingRepository.recommendProducts(
+                    recentProduct!!.category,
+                    DEFAULT_RECOMMEND_ITEM_COUNTS,
+                    cartItemIds,
+                ).mapperToShoppingProductList()*/
+
+            val recommendCandidates =
+                shoppingRepository.recommendProducts(
+                    recentProduct!!.category,
+                    DEFAULT_RECOMMEND_ITEM_COUNTS,
+                    cartItemIds,
+                )
+
+            recommendCandidates.onSuccess {
+                items = it.mapperToShoppingProductList()
+            }
+
+            _recommendItemsState.value =
+                if (items.isEmpty()) {
+                    UIState.Empty
+                } else {
+                    UIState.Success(items)
+                }
+        }
+    }
+
+    /*private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
+        var recentProduct: Result<RecentProduct?>
+        viewModelScope.launch {
+            recentProduct = recentProductRepository.loadLatest()
+            recentProduct.onSuccess {
+                if (it == null) return UIState.Empty
+            }
+        }
         cartRepository.updateCartItems()
         val cartItemIds = cartRepository.findAll().items.map { it.productId }
         val items =
@@ -88,7 +152,7 @@ class RecommendViewModel(
         } else {
             UIState.Success(items)
         }
-    }
+    }*/
 
     fun onLoading() {
         _loading.postValue(true)
@@ -103,22 +167,29 @@ class RecommendViewModel(
     }
 
     fun deleteItem(itemId: Long) {
-        cartRepository.delete(itemId)
-        loadRecommendationProducts()
-    }
-
-    fun completeOrder() {
-        val currentOrder = _order.value ?: return
-        cartRepository.makeOrder(currentOrder)
+        viewModelScope.launch {
+            val deleteTransaction = cartRepository.delete(itemId)
+            deleteTransaction.onSuccess {
+                loadRecommendationProducts()
+            }
+        }
     }
 
     override fun increaseCount(productId: Long) {
         val shoppingProduct =
             (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
         shoppingProduct?.increase()
-        val product = shoppingRepository.findProductItem(productId) ?: return
-        cartRepository.insert(product, shoppingProduct?.quantity() ?: 1)
+        viewModelScope.launch {
+            val product = shoppingRepository.findProductItem(productId)
+            product.onSuccess {
+                if (it == null) return@onSuccess
+                cartRepository.insert(it, shoppingProduct?.quantity() ?: 1)
+            }
+        }
         loadRecommendationProducts()
+        /*val product = shoppingRepository.findProductItem(productId) ?: return
+        cartRepository.insert(product, shoppingProduct?.quantity() ?: 1)
+        loadRecommendationProducts()*/
     }
 
     override fun decreaseCount(productId: Long) {
@@ -127,12 +198,18 @@ class RecommendViewModel(
         shoppingProduct?.decrease()
         val quantity = shoppingProduct?.quantity() ?: 0
 
-        if (quantity > 0) {
-            cartRepository.updateQuantity(productId, shoppingProduct?.quantity() ?: 1)
-        } else {
-            cartRepository.deleteWithProductId(productId)
+        viewModelScope.launch {
+            var transaction: Result<Unit>
+            if (quantity > 0) {
+                transaction =
+                    cartRepository.updateQuantity(productId, shoppingProduct?.quantity() ?: 1)
+            } else {
+                transaction = cartRepository.deleteWithProductId(productId)
+            }
+            transaction.onSuccess {
+                loadRecommendationProducts()
+            }
         }
-        loadRecommendationProducts()
     }
 
     companion object {
