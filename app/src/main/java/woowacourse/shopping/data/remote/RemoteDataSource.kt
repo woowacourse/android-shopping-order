@@ -42,5 +42,5 @@ interface RemoteDataSource {
 
     suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit>
 
-    suspend fun getCoupons() : Result<List<Coupons>>
+    suspend fun getCoupons(): Result<List<Coupons>>
 }

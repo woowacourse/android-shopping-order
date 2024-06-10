@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.coupon.Coupon
 class CouponAdapter(
     private val couponActionHandler: CouponActionHandler,
 ) : ListAdapter<Coupon, CouponViewHolder>(DIFF_CALLBACK) {
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -21,7 +20,10 @@ class CouponAdapter(
         return CouponViewHolder(binding, couponActionHandler)
     }
 
-    override fun onBindViewHolder(holder: CouponViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CouponViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
@@ -53,7 +55,6 @@ class CouponViewHolder(
     private val binding: ItemCouponBinding,
     private val couponActionHandler: CouponActionHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
-
     fun bind(item: Coupon) {
         binding.coupon = item
         binding.couponActionHandler = couponActionHandler

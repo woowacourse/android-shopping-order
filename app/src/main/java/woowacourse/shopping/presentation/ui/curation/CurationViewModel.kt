@@ -104,15 +104,16 @@ class CurationViewModel(
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 ).onSuccess {
                     _cartProducts.value = UiState.Success(cartProducts)
-                    _orderProducts.value = UiState.Success(
-                        (_orderProducts.value as UiState.Success).data.map {
-                            if (it.productId == cartProduct.productId) {
-                                it.copy(quantity = cartProducts[index].quantity)
-                            } else {
-                                it
-                            }
-                        }
-                    )
+                    _orderProducts.value =
+                        UiState.Success(
+                            (_orderProducts.value as UiState.Success).data.map {
+                                if (it.productId == cartProduct.productId) {
+                                    it.copy(quantity = cartProducts[index].quantity)
+                                } else {
+                                    it
+                                }
+                            },
+                        )
                 }.onFailure {
                     _errorHandler.value = EventState("아이템 증가 오류")
                 }
@@ -133,15 +134,16 @@ class CurationViewModel(
                 )
                     .onSuccess {
                         _cartProducts.value = UiState.Success(cartProducts)
-                        _orderProducts.value = UiState.Success(
-                            (_orderProducts.value as UiState.Success).data.map {
-                                if (it.productId == cartProduct.productId) {
-                                    it.copy(quantity = cartProducts[index].quantity)
-                                } else {
-                                    it
-                                }
-                            }
-                        )
+                        _orderProducts.value =
+                            UiState.Success(
+                                (_orderProducts.value as UiState.Success).data.map {
+                                    if (it.productId == cartProduct.productId) {
+                                        it.copy(quantity = cartProducts[index].quantity)
+                                    } else {
+                                        it
+                                    }
+                                },
+                            )
                     }
                     .onFailure {
                         _errorHandler.value = EventState("아이템 감소 오류")

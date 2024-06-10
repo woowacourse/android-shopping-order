@@ -48,14 +48,15 @@ class PaymentViewModel(
         _totalPrice.addSource(_deliveryPrice) { calculateTotalPrice() }
     }
 
-    fun getCoupons() = viewModelScope.launch {
-        repository.getCoupons()
-            .onSuccess {
-                _coupons.value = UiState.Success(it)
-            }.onFailure {
-                _errorHandler.value = EventState(COUPON_LOAD_ERROR)
-            }
-    }
+    fun getCoupons() =
+        viewModelScope.launch {
+            repository.getCoupons()
+                .onSuccess {
+                    _coupons.value = UiState.Success(it)
+                }.onFailure {
+                    _errorHandler.value = EventState(COUPON_LOAD_ERROR)
+                }
+        }
 
     private suspend fun orderProducts() {
         repository.getCartItems(0, 1000)
@@ -75,9 +76,10 @@ class PaymentViewModel(
 
     private fun calculateTotalPrice() {
         if (_orderProducts.value is UiState.Success) {
-            val orderTotal = (_orderProducts.value as UiState.Success).data.sumOf {
-                it.quantity * it.price.toInt()
-            }
+            val orderTotal =
+                (_orderProducts.value as UiState.Success).data.sumOf {
+                    it.quantity * it.price.toInt()
+                }
             _totalPrice.value = orderTotal - (_couponPrice.value ?: 0) + (_deliveryPrice.value ?: 0)
         }
     }
@@ -88,7 +90,7 @@ class PaymentViewModel(
                 repository.submitOrders(
                     OrderRequest(
                         ids.map { it.toInt() },
-                    )
+                    ),
                 ).onSuccess {
                     _eventHandler.value = EventState(CouponEvent.SuccessPay)
                 }.onFailure { _errorHandler.value = EventState(PAYMENT_ERROR) }
@@ -103,10 +105,11 @@ class PaymentViewModel(
 
         coupons.find { it.id == selectedCoupon.id }?.apply {
             isSelected = !isSelected
-            val discountPrice = discountPrice(
-                totalPrice.value ?: 0,
-                (_orderProducts.value as UiState.Success).data
-            )
+            val discountPrice =
+                discountPrice(
+                    totalPrice.value ?: 0,
+                    (_orderProducts.value as UiState.Success).data,
+                )
             if (isSelected && discountPrice == 0) {
                 _errorHandler.value = EventState(APPLY_COUPON_ERROR)
                 isSelected = false

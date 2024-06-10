@@ -17,7 +17,6 @@ class PaymentActivity :
     override val layoutResourceId: Int
         get() = R.layout.activity_coupon
 
-
     private val orderItemsId: List<Long> by lazy {
         intent.getIntegerArrayListExtra(EXTRA_ORDER_PRODUCT)?.map { it.toLong() } ?: emptyList()
     }
@@ -47,7 +46,6 @@ class PaymentActivity :
                     couponAdapter.submitList(it.data)
                     couponAdapter.notifyDataSetChanged()
                 }
-
             }
         }
 
@@ -87,7 +85,7 @@ class PaymentActivity :
                         }
                     }
                 }
-            }
+            },
         )
 
         viewModel.errorHandler.observe(this) { event ->
@@ -95,11 +93,11 @@ class PaymentActivity :
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     companion object {
         const val EXTRA_ORDER_PRODUCT = "orderProduct"
+
         fun createIntent(
             context: Context,
             orderItemsId: List<Int>,
@@ -107,13 +105,9 @@ class PaymentActivity :
             return Intent(context, PaymentActivity::class.java).apply {
                 putIntegerArrayListExtra(
                     EXTRA_ORDER_PRODUCT,
-                    orderItemsId as ArrayList<Int>
+                    orderItemsId as ArrayList<Int>,
                 )
             }
         }
     }
 }
-
-
-
-

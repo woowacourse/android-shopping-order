@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.ui.curation
 
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCurationBinding
@@ -68,7 +67,8 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
                     is CurationEvent.SuccessOrder -> {
                         PaymentActivity.createIntent(
                             this,
-                            (viewModel.orderProducts.value as UiState.Success).data.map { it.cartId.toInt() })
+                            (viewModel.orderProducts.value as UiState.Success).data.map { it.cartId.toInt() },
+                        )
                             .also {
                                 startActivity(it)
                             }

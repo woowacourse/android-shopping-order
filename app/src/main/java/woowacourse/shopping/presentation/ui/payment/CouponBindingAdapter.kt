@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import java.util.Locale
 
-
 @BindingAdapter("expirationDate")
 fun TextView.setFormattedExpirationDate(date: String) {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -19,7 +18,7 @@ fun TextView.setFormattedExpirationDate(date: String) {
 
 @BindingAdapter("minimumAmountIsVisible")
 fun TextView.setMinimumAmount(minimumAmount: Int) {
-    if(minimumAmount > 0) {
+    if (minimumAmount > 0) {
         text = "최소 주문 금액: ${minimumAmount}원"
     }
 }

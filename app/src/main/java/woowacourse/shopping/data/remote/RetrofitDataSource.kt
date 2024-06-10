@@ -18,23 +18,25 @@ class RetrofitDataSource(
     private val productApi: ProductApi = RetrofitModule.productApi,
     private val cartItemApi: CartItemApi = RetrofitModule.cartItemsApi,
     private val orderApi: OrderApi = RetrofitModule.orderApi,
-    private val couponApi: CouponApi = RetrofitModule.couponApi
+    private val couponApi: CouponApi = RetrofitModule.couponApi,
 ) : RemoteDataSource {
     override suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
-    ): Result<List<Product>> = runCatching {
-        productApi.getProducts(category = category, page = page, size = size).content
-    }
+    ): Result<List<Product>> =
+        runCatching {
+            productApi.getProducts(category = category, page = page, size = size).content
+        }
 
     override suspend fun addProduct(productRequest: ProductRequest) {
         productApi.addProduct(productRequest = productRequest)
     }
 
-    override suspend fun getProductById(id: Int): Result<Product> = runCatching {
-        productApi.getProductById(id = id)
-    }
+    override suspend fun getProductById(id: Int): Result<Product> =
+        runCatching {
+            productApi.getProductById(id = id)
+        }
 
     override suspend fun deleteProductById(id: Int) {
         productApi.deleteProductById(id = id)
@@ -43,35 +45,41 @@ class RetrofitDataSource(
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): Result<List<Cart>> = runCatching {
-        cartItemApi.getCartItems(page = page, size = size).content
-    }
+    ): Result<List<Cart>> =
+        runCatching {
+            cartItemApi.getCartItems(page = page, size = size).content
+        }
 
     override suspend fun addCartItem(cartItemRequest: CartItemRequest): Result<Response<Unit>> =
         runCatching {
             cartItemApi.addCartItem(cartItemRequest = cartItemRequest)
         }
 
-    override suspend fun deleteCartItem(id: Int): Result<Unit> = runCatching {
-        cartItemApi.deleteCartItem(id = id)
-    }
+    override suspend fun deleteCartItem(id: Int): Result<Unit> =
+        runCatching {
+            cartItemApi.deleteCartItem(id = id)
+        }
 
     override suspend fun updateCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
-    ): Result<Unit> = runCatching {
-        cartItemApi.updateCartItem(id = id, quantityRequest = quantityRequest)
-    }
+    ): Result<Unit> =
+        runCatching {
+            cartItemApi.updateCartItem(id = id, quantityRequest = quantityRequest)
+        }
 
-    override suspend fun getCartItemsCounts(): Result<QuantityResponse> = runCatching {
-        cartItemApi.getCartItemsCounts()
-    }
+    override suspend fun getCartItemsCounts(): Result<QuantityResponse> =
+        runCatching {
+            cartItemApi.getCartItemsCounts()
+        }
 
-    override suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit> = runCatching {
-        orderApi.submitOrders(orderRequest = orderRequest)
-    }
+    override suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit> =
+        runCatching {
+            orderApi.submitOrders(orderRequest = orderRequest)
+        }
 
-    override suspend fun getCoupons(): Result<List<Coupons>> = runCatching {
-        couponApi.getCoupons()
-    }
+    override suspend fun getCoupons(): Result<List<Coupons>> =
+        runCatching {
+            couponApi.getCoupons()
+        }
 }

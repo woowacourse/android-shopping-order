@@ -26,7 +26,7 @@ interface CartItemApi {
     suspend fun addCartItem(
         @Header("accept") accept: String = "*/*",
         @Body cartItemRequest: CartItemRequest,
-    ) : Response<Unit>
+    ): Response<Unit>
 
     @DELETE("cart-items/{id}")
     suspend fun deleteCartItem(

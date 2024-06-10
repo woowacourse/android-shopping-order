@@ -41,25 +41,27 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
     private var _orderItems = listOf<CartProductUiModel>()
     val orderItems: List<CartProductUiModel> get() = _orderItems
 
-    fun findCartByOffset() = viewModelScope.launch {
-        repository.getCartItems(offSet, 1000)
-            .onSuccess {
-                if (it == null) {
-                    _errorHandler.value = EventState(CART_LOAD_ERROR)
-                } else {
-                    _carts.value = UiState.Success(
-                        it.map { cartProduct ->
-                            CartProductUiModel(
-                                cartProduct,
+    fun findCartByOffset() =
+        viewModelScope.launch {
+            repository.getCartItems(offSet, 1000)
+                .onSuccess {
+                    if (it == null) {
+                        _errorHandler.value = EventState(CART_LOAD_ERROR)
+                    } else {
+                        _carts.value =
+                            UiState.Success(
+                                it.map { cartProduct ->
+                                    CartProductUiModel(
+                                        cartProduct,
+                                    )
+                                },
                             )
-                        },
-                    )
+                    }
                 }
-            }
-            .onFailure {
-                _errorHandler.value = EventState(CART_LOAD_ERROR)
-            }
-    }
+                .onFailure {
+                    _errorHandler.value = EventState(CART_LOAD_ERROR)
+                }
+        }
 
     override fun onDelete(cartProductUiModel: CartProductUiModel) {
         viewModelScope.launch {

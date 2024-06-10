@@ -18,8 +18,10 @@ data class Coupon(
     val availableTime: AvailableTime?,
     var isSelected: Boolean = false,
 ) {
-
-    fun discountPrice(totalPrice: Int, orderItems: List<CartProduct>): Int {
+    fun discountPrice(
+        totalPrice: Int,
+        orderItems: List<CartProduct>,
+    ): Int {
         if (isExpirationDate()) return NO_DISCOUNT
         return when (code) {
             CouponType.FIXED5000.name -> applyFixed5000(totalPrice)
@@ -56,7 +58,9 @@ data class Coupon(
             val endTime = LocalTime.parse(it.end)
             return if (orderTime.isAfter(startTime) && orderTime.isBefore(endTime)) {
                 (totalPrice * MIRACLE_SALE_DISCOUNT_RATE).toInt()
-            } else NO_DISCOUNT
+            } else {
+                NO_DISCOUNT
+            }
         }
         return NO_DISCOUNT
     }

@@ -137,6 +137,7 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
     companion object {
         const val GRIDLAYOUT_COL = 2
         const val EXTRA_UPDATED_PRODUCT = "updatedProduct"
+
         fun createIntent(context: Context): Intent {
             return Intent(context, ShoppingActionActivity::class.java)
         }

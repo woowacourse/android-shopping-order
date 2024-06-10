@@ -10,7 +10,6 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.data.remote.dto.response.Coupons
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.Recent
@@ -111,7 +110,6 @@ class RepositoryImpl(
             localDataSource.findOne()?.toDomain()
         }
 
-
     override fun saveCart(cart: Cart): Result<Long> =
         runCatching {
             localDataSource.saveCart(cart.toEntity())
@@ -151,37 +149,39 @@ class RepositoryImpl(
             .recoverCatching { throw it }
     }
 
-    override suspend fun getCuration(): Result<List<CartProduct>?> = runCatching {
-        localDataSource.findOne()?.toDomain()?.let {
-            val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
-            val cartResponse = remoteDataSource.getCartItems(0, 1000)
+    override suspend fun getCuration(): Result<List<CartProduct>?> =
+        runCatching {
+            localDataSource.findOne()?.toDomain()?.let {
+                val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
+                val cartResponse = remoteDataSource.getCartItems(0, 1000)
 
-            if (productResponse.isSuccess && cartResponse.isSuccess) {
-                val products = productResponse.getOrNull()
-                val cartItems = cartResponse.getOrNull()
+                if (productResponse.isSuccess && cartResponse.isSuccess) {
+                    val products = productResponse.getOrNull()
+                    val cartItems = cartResponse.getOrNull()
 
-                val cartProductIds = cartItems?.map { it.product.id }?.toSet()
-                val filteredProducts =
-                    products?.filter { product -> product.id !in cartProductIds!! }
-                val cartProducts = filteredProducts?.map { product ->
-                    val cart = cartItems?.find { it.product.id == product.id }
+                    val cartProductIds = cartItems?.map { it.product.id }?.toSet()
+                    val filteredProducts =
+                        products?.filter { product -> product.id !in cartProductIds!! }
+                    val cartProducts =
+                        filteredProducts?.map { product ->
+                            val cart = cartItems?.find { it.product.id == product.id }
 
-                    CartProduct(
-                        productId = product.id.toLong(),
-                        name = product.name,
-                        imgUrl = product.imageUrl,
-                        price = product.price.toLong(),
-                        category = product.category,
-                        cartId = cart?.id?.toLong() ?: 0,
-                        quantity = cart?.quantity ?: 0,
-                    )
+                            CartProduct(
+                                productId = product.id.toLong(),
+                                name = product.name,
+                                imgUrl = product.imageUrl,
+                                price = product.price.toLong(),
+                                category = product.category,
+                                cartId = cart?.id?.toLong() ?: 0,
+                                quantity = cart?.quantity ?: 0,
+                            )
+                        }
+                    cartProducts
+                } else {
+                    throw Throwable()
                 }
-                cartProducts
-            } else {
-                throw Throwable()
-            }
-        } ?: throw Throwable()
-    }
+            } ?: throw Throwable()
+        }
 
     override suspend fun getCoupons(): Result<List<Coupon>> {
         return remoteDataSource.getCoupons()
