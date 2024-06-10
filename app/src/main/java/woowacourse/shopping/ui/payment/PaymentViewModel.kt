@@ -24,7 +24,6 @@ class PaymentViewModel(
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(), CouponCheckListener {
-
     // TODO: 이거 왜 LiveData 로 안하면 안 되네
     private val _orders: MutableLiveData<Orders> = MutableLiveData()
     val orders: LiveData<Orders> get() = _orders
@@ -50,11 +49,12 @@ class PaymentViewModel(
                     couponRepository.availableCoupons(orders = orders.value ?: Orders.DEFAULT)
                         .onSuccess { coupons ->
                             withContext(Dispatchers.Main) {
-                                _loadedCoupons.postValue(coupons.map { coupon ->
-                                    coupon.toUi()
-                                })
+                                _loadedCoupons.postValue(
+                                    coupons.map { coupon ->
+                                        coupon.toUi()
+                                    },
+                                )
                             }
-
                         }
                         .onFailure {
                             // TODO: Error handling
@@ -70,7 +70,6 @@ class PaymentViewModel(
         }
     }
 
-
     override fun onCheck(coupon: CouponUi) {
         viewModelScope.launch(Dispatchers.IO) {
             couponRepository.discountAmount(coupon.id, orders = orders.value ?: Orders.DEFAULT)
@@ -78,13 +77,15 @@ class PaymentViewModel(
                     withContext(Dispatchers.Main) {
                         _discountedPrice.postValue(it)
                         _loadedCoupons.postValue(
-                            value = loadedCoupons.getValue()?.map { couponUi ->
-                                if (couponUi.id == coupon.id) {
-                                    couponUi.copy(isChecked = true)
-                                } else {
-                                    couponUi.copy(isChecked = false)
-                                }
-                            } ?: emptyList())
+                            value =
+                                loadedCoupons.getValue()?.map { couponUi ->
+                                    if (couponUi.id == coupon.id) {
+                                        couponUi.copy(isChecked = true)
+                                    } else {
+                                        couponUi.copy(isChecked = false)
+                                    }
+                                } ?: emptyList(),
+                        )
                     }
                 }
                 .onFailure {
@@ -108,7 +109,6 @@ class PaymentViewModel(
                     Log.e(TAG, "pay: failure $it")
                     throw it
                 }
-
         }
     }
 
@@ -118,13 +118,15 @@ class PaymentViewModel(
         fun factory(): UniversalViewModelFactory =
             UniversalViewModelFactory {
                 PaymentViewModel(
-                    couponRepository = DefaultCouponRepository(
-                        ShoppingApp.couponSource,
-                    ),
-                    orderRepository = DefaultOrderRepository(
-                        ShoppingApp.orderSource2,
-                        ShoppingApp.cartSource,
-                    )
+                    couponRepository =
+                        DefaultCouponRepository(
+                            ShoppingApp.couponSource,
+                        ),
+                    orderRepository =
+                        DefaultOrderRepository(
+                            ShoppingApp.orderSource2,
+                            ShoppingApp.cartSource,
+                        ),
                 )
             }
     }

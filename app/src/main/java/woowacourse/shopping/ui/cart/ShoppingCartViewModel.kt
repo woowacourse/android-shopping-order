@@ -23,10 +23,9 @@ import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class ShoppingCartViewModel(
     private val cartRepository: ShoppingCartRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
 ) : ViewModel(),
     ShoppingCartListener {
-
     private var _cartItems = MutableLiveData<List<CartItem>>()
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
@@ -106,11 +105,12 @@ class ShoppingCartViewModel(
             cartItems.value?.forEach { cartItem ->
                 if (cartItem.checked) {
                     orderRepository.save(
-                        orderItem = OrderItem(
-                            cartItemId = cartItem.id,
-                            quantity = cartItem.quantity,
-                            product = cartItem.product
-                        )
+                        orderItem =
+                            OrderItem(
+                                cartItemId = cartItem.id,
+                                quantity = cartItem.quantity,
+                                product = cartItem.product,
+                            ),
                     )
                         .onSuccess {
                             _event.postValue(ShoppingCartEvent.NavigationOrder)
@@ -166,9 +166,10 @@ class ShoppingCartViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val cart = cartItems.value?.find { cartItem ->
-            cartItem.product.id == productId
-        } ?: return
+        val cart =
+            cartItems.value?.find { cartItem ->
+                cartItem.product.id == productId
+            } ?: return
 
         viewModelScope.launch(Dispatchers.IO) {
             cartRepository.updateProductQuantity(cart.id, quantity)
@@ -255,7 +256,7 @@ class ShoppingCartViewModel(
                 DefaultOrderRepository(
                     orderSource = ShoppingApp.orderSource2,
                     cartSource = ShoppingApp.cartSource,
-                )
+                ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
                 ShoppingCartViewModel(shoppingCartRepository, orderRepository)

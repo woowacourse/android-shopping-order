@@ -16,4 +16,3 @@ fun AvailableTimeResponse?.toData2(): AvailableTimeData? {
         endTime = this.end,
     )
 }
-

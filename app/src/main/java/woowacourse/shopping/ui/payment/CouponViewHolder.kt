@@ -12,6 +12,4 @@ class CouponViewHolder(
         binding.coupon = coupon
         binding.couponListener = couponCheckListener
     }
-
 }
-

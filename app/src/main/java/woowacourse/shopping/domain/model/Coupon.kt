@@ -15,33 +15,37 @@ sealed class Coupon {
     abstract fun discountAmount(orders: Orders): Int
 }
 
-fun Coupon.toUi(): CouponUi = when (this) {
-    is FixedAmountCoupon -> CouponUi(
-        id = id,
-        description = description,
-        expirationDate = expirationDate,
-        minimumAmount = minimumAmount,
-    )
+fun Coupon.toUi(): CouponUi =
+    when (this) {
+        is FixedAmountCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = minimumAmount,
+            )
 
-    is FreeShippingCoupon -> CouponUi(
-        id = id,
-        description = description,
-        expirationDate = expirationDate,
-        minimumAmount = minimumAmount,
-    )
+        is FreeShippingCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = minimumAmount,
+            )
 
-    is BoGoCoupon -> CouponUi(
-        id = id,
-        description = description,
-        expirationDate = expirationDate,
-        minimumAmount = null
-    )
+        is BoGoCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = null,
+            )
 
-
-    is PercentageCoupon -> CouponUi(
-        id = id,
-        description = description,
-        expirationDate = expirationDate,
-        minimumAmount = null
-    )
-}
+        is PercentageCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = null,
+            )
+    }

@@ -5,10 +5,11 @@ import java.time.LocalTime
 
 data class AvailableTimeData(
     val startTime: String,
-    val endTime: String
+    val endTime: String,
 )
 
-fun AvailableTimeData.toDomain() = AvailableTime(
-    startTime = LocalTime.parse(startTime),
-    endTime = LocalTime.parse(endTime)
-)
+fun AvailableTimeData.toDomain() =
+    AvailableTime(
+        startTime = LocalTime.parse(startTime),
+        endTime = LocalTime.parse(endTime),
+    )

@@ -6,15 +6,12 @@ import woowacourse.shopping.domain.model.Orders
 interface OrderRepository {
     suspend fun order(): Result<Unit>
 
-    suspend fun save(
-        orderItem: OrderItem
-    ): Result<Unit>
+    suspend fun save(orderItem: OrderItem): Result<Unit>
 
     suspend fun updateOrderItem(
         productId: Long,
         quantity: Int,
     ): Result<Unit>
-
 
     suspend fun loadAllOrders(): Result<Orders>
 
@@ -23,7 +20,4 @@ interface OrderRepository {
     suspend fun orderItemsTotalPrice(): Result<Int>
 
     suspend fun clear(): Result<Unit>
-
 }
-
-

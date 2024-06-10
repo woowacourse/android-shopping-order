@@ -17,7 +17,6 @@ interface ShoppingCartRepository {
         quantity: Int,
     ): Result<Unit>
 
-
     suspend fun removeShoppingCartProduct(cartItemId: Long): Result<Unit>
 
     suspend fun findCartItemByProductId(productId: Long): Result<CartItem>

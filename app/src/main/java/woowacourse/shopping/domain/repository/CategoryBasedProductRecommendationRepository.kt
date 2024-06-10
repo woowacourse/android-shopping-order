@@ -12,29 +12,32 @@ class CategoryBasedProductRecommendationRepository(
     private val cartSource: ShoppingCartDataSource,
     private val historySource: ProductHistoryDataSource,
 ) : ProductsRecommendationRepository {
-    override suspend fun recommendedProducts(): Result<List<Product>> = runCatching {
-        val latestProductId = historySource.loadLatestProduct()
-            .map { it.id }
-            .recover {
-                productsSource.findByPaged(1).getOrThrow().random().id
-            }.getOrThrow()
+    override suspend fun recommendedProducts(): Result<List<Product>> =
+        runCatching {
+            val latestProductId =
+                historySource.loadLatestProduct()
+                    .map { it.id }
+                    .recover {
+                        productsSource.findByPaged(1).getOrThrow().random().id
+                    }.getOrThrow()
 
-        val latestProduct = productsSource.findById(latestProductId).getOrThrow()
+            val latestProduct = productsSource.findById(latestProductId).getOrThrow()
 
-        val allCartItemsProductsIds = cartSource.loadAllCartItems().getOrThrow().map { it.product.id }
+            val allCartItemsProductsIds = cartSource.loadAllCartItems().getOrThrow().map { it.product.id }
 
-        val productsWithCategory = productsSource.findByCategory(latestProduct.category).getOrThrow()
+            val productsWithCategory = productsSource.findByCategory(latestProduct.category).getOrThrow()
 
-        val filteredProducts = productsWithCategory.filterNot { productData ->
-            allCartItemsProductsIds.contains(productData.id)
+            val filteredProducts =
+                productsWithCategory.filterNot { productData ->
+                    allCartItemsProductsIds.contains(productData.id)
+                }
+
+            val minimumCount = min(filteredProducts.size, 10)
+
+            filteredProducts.subList(0, minimumCount).map { productData ->
+                productData.toDomain()
+            }
         }
-
-        val minimumCount = min(filteredProducts.size, 10)
-
-        filteredProducts.subList(0, minimumCount).map { productData ->
-            productData.toDomain()
-        }
-    }
 
     companion object {
         private const val TAG = "CategoryBasedProductRecommendationRepository"

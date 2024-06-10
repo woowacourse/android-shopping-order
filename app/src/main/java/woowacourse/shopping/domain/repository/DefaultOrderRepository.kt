@@ -15,7 +15,10 @@ class DefaultOrderRepository(
 
     override suspend fun save(orderItem: OrderItem): Result<Unit> = orderSource.saveOrderItem(orderItem)
 
-    override suspend fun updateOrderItem(productId: Long, quantity: Int): Result<Unit> {
+    override suspend fun updateOrderItem(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit> {
         val cartItem = cartSource.findCartItemByProductId(productId).getOrThrow()
 
         if (quantity == 0) {
@@ -24,11 +27,12 @@ class DefaultOrderRepository(
         }
 
         return orderSource.saveOrderItem(
-            orderItem = OrderItem(
-                cartItemId = cartItem.id,
-                quantity = quantity,
-                product = cartItem.product.toDomain(),
-            )
+            orderItem =
+                OrderItem(
+                    cartItemId = cartItem.id,
+                    quantity = quantity,
+                    product = cartItem.product.toDomain(),
+                ),
         )
     }
 
@@ -42,19 +46,19 @@ class DefaultOrderRepository(
         }
     }
 
-    override suspend fun allOrderItemsQuantity(): Result<Int> = orderSource.loadAllOrders().map { orderItems ->
-        orderItems.sumOf { orderItem -> orderItem.quantity }
-    }
+    override suspend fun allOrderItemsQuantity(): Result<Int> =
+        orderSource.loadAllOrders().map { orderItems ->
+            orderItems.sumOf { orderItem -> orderItem.quantity }
+        }
 
-    override suspend fun orderItemsTotalPrice(): Result<Int> = orderSource.loadAllOrders().map { orderItems ->
-        orderItems.sumOf { orderItem -> orderItem.product.price * orderItem.quantity }
-    }
+    override suspend fun orderItemsTotalPrice(): Result<Int> =
+        orderSource.loadAllOrders().map { orderItems ->
+            orderItems.sumOf { orderItem -> orderItem.product.price * orderItem.quantity }
+        }
 
     override suspend fun clear(): Result<Unit> = orderSource.clear()
 
-
     companion object {
         private const val TAG = "OrderRepository2"
-
     }
 }

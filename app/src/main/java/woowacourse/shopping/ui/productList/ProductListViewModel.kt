@@ -176,7 +176,10 @@ class ProductListViewModel(
         _detailProductDestinationId.setValue(productId)
     }
 
-    override fun onIncrease(productId: Long, quantity: Int) {
+    override fun onIncrease(
+        productId: Long,
+        quantity: Int,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             shoppingCartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
                 .onSuccess {
@@ -192,8 +195,7 @@ class ProductListViewModel(
         }
     }
 
-    private fun findCartItemOrNull(productId: Long): CartItem? =
-        cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
+    private fun findCartItemOrNull(productId: Long): CartItem? = cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
 
     private fun updateLoadedProduct(
         productId: Long,

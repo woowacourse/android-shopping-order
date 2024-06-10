@@ -6,11 +6,12 @@ import woowacourse.shopping.remote.model.response.toData
 import woowacourse.shopping.remote.service.CouponApiService
 
 class CouponRemoteDataSource(
-    private val couponApiService: CouponApiService
+    private val couponApiService: CouponApiService,
 ) : CouponDataSource {
-    override suspend fun couponsData(): Result<List<CouponData>> = runCatching {
-        couponApiService.coupons().map { it.toData() }
-    }
+    override suspend fun couponsData(): Result<List<CouponData>> =
+        runCatching {
+            couponApiService.coupons().map { it.toData() }
+        }
 
     override suspend fun coupon(couponId: Long): Result<CouponData> {
         return runCatching {

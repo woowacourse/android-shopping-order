@@ -11,12 +11,13 @@ data class Orders(
     companion object {
         private const val DEFAULT_DELIVERY_FEE = 3_000
 
-        val DEFAULT = Orders(
-            orderItems = listOf(),
-            totalPrice = 0,
-            orderDateTime = LocalDateTime.now(),
-            deliveryFee = DEFAULT_DELIVERY_FEE
-        )
+        val DEFAULT =
+            Orders(
+                orderItems = listOf(),
+                totalPrice = 0,
+                orderDateTime = LocalDateTime.now(),
+                deliveryFee = DEFAULT_DELIVERY_FEE,
+            )
     }
 }
 

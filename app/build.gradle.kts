@@ -44,7 +44,6 @@ android {
     val baseOrdersUrlDev: String = localProperties.getProperty("BASE_ORDERS_URL_DEV")
     val baseCouponsUrlDev: String = localProperties.getProperty("BASE_COUPONS_URL_DEV")
 
-
     val basicAuthUserDev: String = localProperties.getProperty("BASIC_AUTH_USER_DEV")
     val basicAuthPasswordDev: String = localProperties.getProperty("BASIC_AUTH_PASSWORD_DEV")
 

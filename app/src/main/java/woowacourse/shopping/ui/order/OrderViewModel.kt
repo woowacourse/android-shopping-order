@@ -42,7 +42,6 @@ class OrderViewModel(
     override fun order() {
         viewModelScope.launch(Dispatchers.IO) {
             _event.postValue(OrderEvent.CompleteOrder)
-
         }
     }
 
@@ -83,10 +82,7 @@ class OrderViewModel(
                     Log.e(TAG, "loadAll: orderItemsTotalPrice2 $it")
                     throw it
                 }
-
-
         }
-
     }
 
     override fun onIncrease(
@@ -148,8 +144,7 @@ class OrderViewModel(
         _totalPrice.postValue(_totalPrice.value?.plus(productQuantity(productId) * changeAmount) ?: 0)
     }
 
-    private fun productQuantity(productId: Long) =
-        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+    private fun productQuantity(productId: Long) = _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
 
     private fun updateRecommendProductsQuantity(
         productId: Long,
@@ -177,13 +172,12 @@ class OrderViewModel(
                 DefaultOrderRepository(
                     ShoppingApp.orderSource2,
                     ShoppingApp.cartSource,
-
-                    ),
+                ),
             productRecommendationRepository: ProductsRecommendationRepository =
                 CategoryBasedProductRecommendationRepository(
                     ShoppingApp.productSource,
                     ShoppingApp.cartSource,
-                    ShoppingApp.historySource
+                    ShoppingApp.historySource,
                 ),
             cartRepository: ShoppingCartRepository =
                 DefaultShoppingCartRepository(

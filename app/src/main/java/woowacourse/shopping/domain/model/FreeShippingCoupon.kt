@@ -8,10 +8,10 @@ data class FreeShippingCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
-    ) : Coupon() {
-        override fun isSatisfiedPolicy(orders: Orders): Boolean = overThanMinimumOrderPrice(orders)
+) : Coupon() {
+    override fun isSatisfiedPolicy(orders: Orders): Boolean = overThanMinimumOrderPrice(orders)
 
-        private fun overThanMinimumOrderPrice(orders: Orders) = orders.totalPrice >= minimumAmount
+    private fun overThanMinimumOrderPrice(orders: Orders) = orders.totalPrice >= minimumAmount
 
-        override fun discountAmount(orders: Orders): Int = orders.deliveryFee
-    }
+    override fun discountAmount(orders: Orders): Int = orders.deliveryFee
+}

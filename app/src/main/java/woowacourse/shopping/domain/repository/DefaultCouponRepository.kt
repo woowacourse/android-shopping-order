@@ -10,13 +10,15 @@ class DefaultCouponRepository(
 ) : CouponRepository {
     override suspend fun availableCoupons(orders: Orders): Result<List<Coupon>> {
         return couponSource.couponsData().mapCatching { couponDataList ->
-            val coupons = couponDataList.map {
-                it.toDomain()
-            }
+            val coupons =
+                couponDataList.map {
+                    it.toDomain()
+                }
 
-            val notExpiredCoupons = coupons.filter { coupon ->
-                coupon.isExpired(orders).not()
-            }
+            val notExpiredCoupons =
+                coupons.filter { coupon ->
+                    coupon.isExpired(orders).not()
+                }
 
             notExpiredCoupons.filter { coupon ->
                 coupon.isSatisfiedPolicy(orders)
@@ -24,10 +26,14 @@ class DefaultCouponRepository(
         }
     }
 
-    override suspend fun discountAmount(couponId: Long, orders: Orders): Result<Int> {
-        val coupon = couponSource.coupon(couponId).mapCatching { couponData ->
-            couponData.toDomain()
-        }.getOrThrow()
+    override suspend fun discountAmount(
+        couponId: Long,
+        orders: Orders,
+    ): Result<Int> {
+        val coupon =
+            couponSource.coupon(couponId).mapCatching { couponData ->
+                couponData.toDomain()
+            }.getOrThrow()
 
         return runCatching {
             coupon.discountAmount(orders)
@@ -37,5 +43,4 @@ class DefaultCouponRepository(
     companion object {
         private const val TAG = "DefaultCouponRepository"
     }
-
 }

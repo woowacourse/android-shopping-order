@@ -15,15 +15,16 @@ data class CouponResponse(
     val discountType: String,
 )
 
-fun CouponResponse.toData(): CouponData = CouponData(
-    id = id,
-    code = code,
-    description = description,
-    expirationDate = expirationDate,
-    discountType = discountType,
-    discount = discount,
-    minimumAmount = minimumAmount,
-    buyQuantity = buyQuantity,
-    getQuantity = getQuantity,
-    availableTime = this.availableTime?.toData2(),
-)
+fun CouponResponse.toData(): CouponData =
+    CouponData(
+        id = id,
+        code = code,
+        description = description,
+        expirationDate = expirationDate,
+        discountType = discountType,
+        discount = discount,
+        minimumAmount = minimumAmount,
+        buyQuantity = buyQuantity,
+        getQuantity = getQuantity,
+        availableTime = this.availableTime?.toData2(),
+    )

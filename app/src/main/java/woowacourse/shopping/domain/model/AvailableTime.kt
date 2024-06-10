@@ -4,5 +4,5 @@ import java.time.LocalTime
 
 data class AvailableTime(
     val startTime: LocalTime,
-    val endTime: LocalTime
+    val endTime: LocalTime,
 )
