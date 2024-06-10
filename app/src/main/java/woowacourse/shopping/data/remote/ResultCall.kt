@@ -27,7 +27,7 @@ class ResultCall<T : Any>(private val call: Call<T>) : Call<Result<T>> {
                     }
                     callback.onResponse(
                         this@ResultCall,
-                        Response.success(Result.failure(RuntimeException("Response error with code: ${response.code()}"))),
+                        Response.success(Result.failure(response.toApiError())),
                     )
                 }
 

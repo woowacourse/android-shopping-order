@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +15,7 @@ import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.local.ShoppingCartDataBase
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
+import woowacourse.shopping.data.remote.ApiError
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
@@ -79,7 +81,7 @@ class ProductsActivity : AppCompatActivity() {
         initializeProductList()
         initializeToolbar()
         initializePage()
-        observeData()
+        observeErrorEvent()
     }
 
     private fun initializeProductList() {
@@ -89,6 +91,9 @@ class ProductsActivity : AppCompatActivity() {
                 spanSizeLookup = ProductsSpanSizeLookUp(adapter)
             }
         binding.rvProducts.adapter = adapter
+        viewModel.productUiModels.observe(this) {
+            adapter.updateProducts(it)
+        }
         viewModel.recentProductUiModels.observe(this) {
             adapter.updateRecentProducts(it ?: return@observe)
         }
@@ -126,14 +131,42 @@ class ProductsActivity : AppCompatActivity() {
         binding.rvProducts.addOnScrollListener(onScrollListener)
     }
 
-    private fun observeData() {
-        viewModel.productUiModels.observe(this) {
-            adapter.updateProducts(it)
+    private fun observeErrorEvent() {
+        viewModel.productsLoadError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showProductsErrorToast(throwable, R.string.product_load_error)
         }
-        viewModel.productsErrorEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            Toast.makeText(this, R.string.load_page_error, Toast.LENGTH_SHORT).show()
+        viewModel.cartItemAddError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showProductsErrorToast(throwable, R.string.cart_item_add_error)
         }
+        viewModel.cartItemDeleteError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showProductsErrorToast(throwable, R.string.cart_item_delete_error)
+        }
+    }
+
+    private fun showProductsErrorToast(
+        throwable: Throwable,
+        @StringRes errorMessageResId: Int,
+    ) {
+        if (throwable is ApiError) {
+            showToast(errorMessageResId)
+        }
+        when (throwable) {
+            is ApiError.BadRequest -> showToast(errorMessageResId)
+            is ApiError.Unauthorized -> showToast(R.string.unauthorized_error)
+            is ApiError.Forbidden -> showToast(R.string.unauthorized_error)
+            is ApiError.NotFound -> showToast(R.string.product_not_found_error)
+            is ApiError.InternalServerError -> showToast(R.string.server_error)
+            is ApiError.Exception -> showToast(errorMessageResId)
+        }
+    }
+
+    private fun showToast(
+        @StringRes messageResId: Int,
+    ) {
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

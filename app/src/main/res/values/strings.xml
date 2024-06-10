@@ -45,4 +45,11 @@
     <string name="minimum_order_price">최소 주문 금액: %,d원</string>
     <string name="create_order_success">주문을 완료했습니다. 상품 목록으로 이동합니다.</string>
 
+    <string name="product_load_error">상품을 불러올 수 없습니다. 잠시후 다시 이용해 주세요.</string>
+    <string name="cart_item_add_error">상품을 장바구니에 추가하지 못했습니다.</string>
+    <string name="cart_item_delete_error">상품을 삭제하지 못했습니다.</string>
+    <string name="product_not_found_error">해당하는 상품이 존재하지 않습니다.</string>
+    <string name="server_error">서버에 문제가 발생했습니다. 잠시후 다시 이용해 주세요.</string>
+    <string name="unauthorized_error">접근 권한이 존재하지 않습니다. 로그인 후 다시 이용해 주세요.</string>
+
 </resources>
