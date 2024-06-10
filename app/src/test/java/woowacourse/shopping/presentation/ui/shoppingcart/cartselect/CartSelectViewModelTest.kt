@@ -1,14 +1,16 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
-import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.getOrAwaitValue
@@ -16,7 +18,10 @@ import woowacourse.shopping.remote.api.DummyData.CARTS_PULL
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@ExtendWith(MockKExtension::class, InstantTaskExecutorExtension::class)
+@ExperimentalCoroutinesApi
+@ExtendWith(MockKExtension::class)
+@ExtendWith(CoroutinesTestExtension::class)
+@ExtendWith(InstantTaskExecutorExtension::class)
 class CartSelectViewModelTest {
     private lateinit var viewModel: CartSelectViewModel
 
@@ -25,7 +30,7 @@ class CartSelectViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        every {
+        coEvery {
             repository.getCartProductsPaged(
                 0,
                 5,
@@ -37,7 +42,7 @@ class CartSelectViewModelTest {
                     pageable = CARTS_PULL.pageable.copy(pageNumber = 0),
                 ),
             )
-        every {
+        coEvery {
             repository.getCartProductsPaged(
                 1,
                 5,
@@ -49,10 +54,9 @@ class CartSelectViewModelTest {
                     pageable = CARTS_PULL.pageable.copy(pageNumber = 1),
                 ),
             )
-        every { repository.getAllCarts() } returns Result.success(CARTS_PULL)
+        coEvery { repository.getAllCarts() } returns Result.success(CARTS_PULL)
 
         viewModel = CartSelectViewModel(repository)
-        Thread.sleep(3000)
     }
 
     @Test
@@ -68,7 +72,6 @@ class CartSelectViewModelTest {
     fun `첫 번째 페이지에서 다음 페이지로 넘어가면 다음 페이지 장바구니를 불러온다`() {
         // when
         viewModel.loadNextPage()
-        Thread.sleep(5000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
@@ -81,12 +84,9 @@ class CartSelectViewModelTest {
     fun `두 번째 페이지에서 이전 페이지로 넘어가면 이전 페이지 장바구니를 불러온다`() {
         // given
         viewModel.loadNextPage()
-        Thread.sleep(5000)
         viewModel.loadNextPage()
-        Thread.sleep(5000)
         // when
         viewModel.loadPreviousPage()
-        Thread.sleep(5000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
@@ -99,8 +99,11 @@ class CartSelectViewModelTest {
     fun `주문을 삭제하면 장바구니에 주문이 사라진다`() {
         // given
         val productIdSlot = slot<Int>()
-        every { repository.deleteCartProductById(capture(productIdSlot)) } returns Result.success(Unit)
-        every {
+        coEvery { repository.deleteCartProductById(capture(productIdSlot)) } returns
+            Result.success(
+                Unit,
+            )
+        coEvery {
             repository.getCartProductsPaged(
                 0,
                 5,
@@ -120,7 +123,7 @@ class CartSelectViewModelTest {
         val latch = CountDownLatch(1)
         latch.await(1, TimeUnit.SECONDS)
 
-        verify { repository.deleteCartProductById(CARTS_PULL.content.first().id) }
+        coVerify { repository.deleteCartProductById(CARTS_PULL.content.first().id) }
         assertThat(productIdSlot.captured).isEqualTo(CARTS_PULL.content.first().id)
 
         val actual = viewModel.uiState.getOrAwaitValue()
@@ -144,7 +147,6 @@ class CartSelectViewModelTest {
     fun `전체 상품을 체크하면 전체 상품이 주문 상품에 추가된다`() {
         // given & when
         viewModel.checkAllCartProduct()
-        Thread.sleep(3000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
