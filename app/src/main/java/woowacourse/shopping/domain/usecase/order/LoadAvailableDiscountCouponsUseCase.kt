@@ -7,9 +7,13 @@ import woowacourse.shopping.domain.entity.coupon.Coupons
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
+import java.time.LocalDateTime
 
 interface LoadAvailableDiscountCouponsUseCase {
-    suspend operator fun invoke(productIds: List<Long>): Result<Coupons>
+    suspend operator fun invoke(
+        productIds: List<Long>,
+        targetDateTime: LocalDateTime = LocalDateTime.now(),
+    ): Result<Coupons>
 }
 
 class DefaultLoadAvailableDiscountCouponsUseCase(
@@ -17,7 +21,10 @@ class DefaultLoadAvailableDiscountCouponsUseCase(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
 ) : LoadAvailableDiscountCouponsUseCase {
-    override suspend fun invoke(productIds: List<Long>): Result<Coupons> =
+    override suspend fun invoke(
+        productIds: List<Long>,
+        targetDateTime: LocalDateTime,
+    ): Result<Coupons> =
         coroutineScope {
             productIds.forEach {
                 productRepository.findProductById(it)
@@ -35,9 +42,10 @@ class DefaultLoadAvailableDiscountCouponsUseCase(
             val cart =
                 cartJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
             val coupons =
-                couponsJob.await().onFailure { return@coroutineScope Result.failure(it) }.getOrThrow()
+                couponsJob.await().onFailure { return@coroutineScope Result.failure(it) }
+                    .getOrThrow()
 
-            Result.success(coupons.availableCoupons(cart))
+            Result.success(coupons.availableCoupons(cart, targetDateTime))
         }
 
     companion object {

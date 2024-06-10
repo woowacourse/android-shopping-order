@@ -7,6 +7,14 @@ import java.time.LocalTime
 private val targetDateTime = LocalDateTime.of(2024, 5, 1, 0, 0)
 private val targetDate = LocalDate.of(2024, 5, 1)
 
+fun fakeTargetDateTime(
+    hour: Int = 0,
+    minute: Int = 0,
+): LocalDateTime {
+    if (hour == 0 && minute == 0) return targetDateTime
+    return LocalDateTime.of(targetDate, LocalTime.of(hour, minute))
+}
+
 fun fakeCoupons(vararg coupons: Coupon): Coupons {
     return Coupons(
         coupons.toList(),
@@ -31,7 +39,6 @@ fun fakePercentageCoupon(
         id = 1,
         code = "PERCENTAGE",
         description = "30% 할인 쿠폰",
-        targetDateTime = targetDateTime,
         expirationDate = expirationDate,
         discountRate = discountRate,
         availableStartTime = LocalTime.of(availableStartTime, 0),
@@ -54,7 +61,6 @@ fun fakeFreeShippingCoupon(
         id = 1,
         code = "FREE_SHIPPING",
         description = "무료 배송 쿠폰",
-        targetDateTime = targetDateTime,
         expirationDate = expirationDate,
         discountableMinPrice = discountableMinPrice,
     )
@@ -76,7 +82,6 @@ fun fakeBOGOCoupon(
         id = 1,
         code = "BUY_X_GET_Y",
         description = "BOGO 쿠폰",
-        targetDateTime = targetDateTime,
         expirationDate = expirationDate,
         buyCount = buyCount,
         freeCount = freeCount,
@@ -99,7 +104,6 @@ fun fakeFixedCoupon(
         id = 1,
         code = "FIXED",
         description = "5,000원 할인 쿠폰",
-        targetDateTime = targetDateTime,
         expirationDate = expirationDate,
         discount = discount,
         discountableMinPrice = discountableMinPrice,

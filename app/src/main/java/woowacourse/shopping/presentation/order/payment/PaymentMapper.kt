@@ -17,12 +17,13 @@ fun Coupons.toUiModel(): List<CouponUiModel> {
 }
 
 fun Coupon.toUiModel(): CouponUiModel {
-    val minimumPrice = when (this) {
-        is FixedCoupon -> discountableMinPrice
-        is FreeShippingCoupon -> discountableMinPrice
-        is BOGOCoupon -> 0
-        is PercentageCoupon -> 0
-    }
+    val minimumPrice =
+        when (this) {
+            is FixedCoupon -> discountableMinPrice
+            is FreeShippingCoupon -> discountableMinPrice
+            is BOGOCoupon -> 0
+            is PercentageCoupon -> 0
+        }
     return CouponUiModel(
         coupon = this,
         expirationDate = expirationDate.format(dateFormatter),

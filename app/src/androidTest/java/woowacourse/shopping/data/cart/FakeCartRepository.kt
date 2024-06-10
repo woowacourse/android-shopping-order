@@ -74,7 +74,7 @@ class FakeCartRepository(
         return Result.success(cart)
     }
 
-    override suspend fun existsCartProduct(productId: Long): Boolean {
+    override fun existsCartProduct(productId: Long): Boolean {
         return cart.hasProductId(productId)
     }
 

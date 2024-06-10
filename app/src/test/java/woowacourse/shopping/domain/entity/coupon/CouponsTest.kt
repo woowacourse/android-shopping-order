@@ -19,7 +19,7 @@ class CouponsTest {
                 fakeFreeShippingCoupon(discountableMinPrice = 50_001),
             )
         // when
-        val actual = coupons.availableCoupons(cart)
+        val actual = coupons.availableCoupons(cart, fakeTargetDateTime(5))
         // then
         val expect =
             fakeCoupons(

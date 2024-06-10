@@ -10,10 +10,12 @@ sealed class Coupon(
     open val description: String,
     open val expirationDate: LocalDateTime,
 ) {
-    protected fun isExpired(targetDateTime: LocalDateTime): Boolean =
-        expirationDate.isBefore(targetDateTime)
+    protected fun isExpired(targetDateTime: LocalDateTime): Boolean = expirationDate.isBefore(targetDateTime)
 
-    abstract fun available(cart: Cart, targetDateTime: LocalDateTime): Boolean
+    abstract fun available(
+        cart: Cart,
+        targetDateTime: LocalDateTime,
+    ): Boolean
 
     fun discount(
         cart: Cart,

@@ -19,7 +19,7 @@ class BOGOCouponTest {
                 freeCount = 1,
             )
         // when
-        val actual = buyXGetYCoupon.available(cart)
+        val actual = buyXGetYCoupon.available(cart, fakeTargetDateTime())
         // then
         assertSoftly {
             actual.shouldBeTrue()
@@ -36,7 +36,7 @@ class BOGOCouponTest {
                 freeCount = 1,
             )
         // when
-        val actual = buyXGetYCoupon.available(cart)
+        val actual = buyXGetYCoupon.available(cart, fakeTargetDateTime())
         // then
         assertSoftly {
             actual.shouldBeFalse()
@@ -58,7 +58,7 @@ class BOGOCouponTest {
                 freeCount = 1,
             )
         // when
-        val actual = buyXGetYCoupon.discount(cart, 200)
+        val actual = buyXGetYCoupon.discount(cart, 200, fakeTargetDateTime())
         // then
         val expect = DiscountResult(18_000, 3000, 200)
         val expectPayment = 15_200
@@ -78,7 +78,7 @@ class BOGOCouponTest {
                 freeCount = 1,
             )
         // when
-        val actual = buyXGetYCoupon.discount(cart, 0)
+        val actual = buyXGetYCoupon.discount(cart, 0, fakeTargetDateTime())
         // then
         val expected = DiscountResult(orderPrice = 7000, discountPrice = 2000, 0)
         assertSoftly {

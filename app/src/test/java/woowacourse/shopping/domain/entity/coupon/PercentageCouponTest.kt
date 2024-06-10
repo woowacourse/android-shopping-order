@@ -21,13 +21,9 @@ class PercentageCouponTest {
             )
         val cart = Cart(fakeCartProduct(productId = 1, price = 2000, count = 1))
         // when
-        val isExpired = percentageCoupon.isExpired
-        val available = percentageCoupon.available(cart)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime(5))
         // then
-        assertSoftly {
-            isExpired.shouldBeFalse()
-            available.shouldBeTrue()
-        }
+        available.shouldBeTrue()
     }
 
     @Test
@@ -42,13 +38,9 @@ class PercentageCouponTest {
             )
         val cart = Cart(fakeCartProduct(productId = 1, price = 2000, count = 1))
         // when
-        val isExpired = percentageCoupon.isExpired
-        val available = percentageCoupon.available(cart)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime(3))
         // then
-        assertSoftly {
-            isExpired.shouldBeFalse()
-            available.shouldBeFalse()
-        }
+        available.shouldBeFalse()
     }
 
     @Test
@@ -57,11 +49,9 @@ class PercentageCouponTest {
         val percentageCoupon = fakePercentageCoupon(isExpired = true)
         val cart = Cart(fakeCartProduct(productId = 1, price = 2000, count = 1))
         // when
-        val isExpired = percentageCoupon.isExpired
-        val available = percentageCoupon.available(cart)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime(5))
         // then
         assertSoftly {
-            isExpired.shouldBeTrue()
             available.shouldBeFalse()
         }
     }
@@ -72,9 +62,8 @@ class PercentageCouponTest {
         val percentageCoupon = fakePercentageCoupon(isExpired = false)
         val cart = Cart(fakeCartProduct(productId = 1, price = 1000, count = 1))
         // when
-        val isExpired = percentageCoupon.isExpired
-        val available = percentageCoupon.available(cart)
-        val actual = percentageCoupon.discount(cart, shippingFee = 0)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime(5))
+        val actual = percentageCoupon.discount(cart, shippingFee = 0, fakeTargetDateTime(5))
         // then
         val expect =
             DiscountResult(
@@ -83,7 +72,6 @@ class PercentageCouponTest {
                 shippingFee = 0L,
             )
         assertSoftly {
-            isExpired.shouldBeFalse()
             available.shouldBeTrue()
             actual shouldBe expect
         }

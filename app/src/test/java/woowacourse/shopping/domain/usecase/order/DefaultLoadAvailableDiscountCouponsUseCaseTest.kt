@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.coupon.fakeCoupons
 import woowacourse.shopping.domain.entity.coupon.fakeFixedCoupon
 import woowacourse.shopping.domain.entity.coupon.fakeFreeShippingCoupon
+import woowacourse.shopping.domain.entity.coupon.fakeTargetDateTime
 import woowacourse.shopping.domain.entity.fakeCartProduct
 import woowacourse.shopping.domain.entity.fakeProduct
 import woowacourse.shopping.domain.repository.CartRepository
@@ -53,7 +54,7 @@ class DefaultLoadAvailableDiscountCouponsUseCaseTest {
                     coupons,
                 )
             // when
-            val actual = loadAvailableDiscountCouponsUseCase(listOf(productId))
+            val actual = loadAvailableDiscountCouponsUseCase(listOf(productId), fakeTargetDateTime())
             // then
             val expect =
                 fakeCoupons(

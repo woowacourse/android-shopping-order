@@ -13,6 +13,7 @@ data class BOGOCoupon(
     val freeCount: Int,
 ) : Coupon(id, code, description, expirationDate) {
     private val discountLimitCount = buyCount + freeCount
+
     override fun available(
         cart: Cart,
         targetDateTime: LocalDateTime,

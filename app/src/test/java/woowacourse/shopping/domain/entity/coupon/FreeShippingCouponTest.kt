@@ -19,8 +19,8 @@ class FreeShippingCouponTest {
             )
         val cart = Cart(cartProduct)
         // when
-        val available = percentageCoupon.available(cart)
-        val actual = percentageCoupon.discount(cart, shippingFee = 3000)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime())
+        val actual = percentageCoupon.discount(cart, shippingFee = 3000, fakeTargetDateTime())
         // then
         assertSoftly {
             available.shouldBeTrue()
@@ -39,8 +39,8 @@ class FreeShippingCouponTest {
             )
         val cart = Cart(cartProduct)
         // when
-        val available = percentageCoupon.available(cart)
-        val actual = percentageCoupon.discount(cart, shippingFee = 3000)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime())
+        val actual = percentageCoupon.discount(cart, shippingFee = 3000, fakeTargetDateTime())
         // then
         assertSoftly {
             available.shouldBeFalse()
@@ -55,12 +55,8 @@ class FreeShippingCouponTest {
         val percentageCoupon = fakePercentageCoupon(isExpired = true)
         val cart = Cart(fakeCartProduct(productId = 1, price = 2000, count = 1))
         // when
-        val isExpired = percentageCoupon.isExpired
-        val available = percentageCoupon.available(cart)
+        val available = percentageCoupon.available(cart, fakeTargetDateTime())
         // then
-        assertSoftly {
-            isExpired.shouldBeTrue()
-            available.shouldBeFalse()
-        }
+        available.shouldBeFalse()
     }
 }
