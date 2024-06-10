@@ -10,7 +10,7 @@ interface ShoppingActionHandler : ProductClickHandler {
 
     fun onCartClick()
 
-    fun loadMore()
+    fun loadProductMore()
 
     fun saveRecentProduct(cartProduct: CartProduct): Job
 }

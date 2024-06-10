@@ -6,13 +6,11 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.common.EventObserver
-import woowacourse.shopping.presentation.common.UiState
 import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.base.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.CartActivity
@@ -20,13 +18,12 @@ import woowacourse.shopping.presentation.ui.detail.ProductDetailActivity
 import woowacourse.shopping.presentation.ui.shopping.adapter.RecentAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
-import woowacourse.shopping.presentation.ui.shopping.model.NavigateUiState
+import woowacourse.shopping.presentation.ui.shopping.model.ShoppingNavigation
 import woowacourse.shopping.utils.getParcelableExtraCompat
 
 class ShoppingActivity : BindingActivity<ActivityShoppingBinding>(R.layout.activity_shopping) {
 
     private val viewModel: ShoppingViewModel by viewModels { ViewModelFactory() }
-
     private val shoppingAdapter: ShoppingAdapter by lazy { ShoppingAdapter(viewModel) }
     private val recentAdapter: RecentAdapter by lazy { RecentAdapter(viewModel) }
 
@@ -35,14 +32,8 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>(R.layout.activ
     override fun initStartView() {
         initTitle()
         initAdapter()
-        initData()
         initObserver()
         initLauncher()
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        restoreData(intent)
     }
 
     private fun initTitle() {
@@ -57,34 +48,15 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>(R.layout.activ
         binding.rvRecents.adapter = recentAdapter
     }
 
-    private fun initData() {
-        viewModel.loadProductsByOffset()
-        viewModel.loadAllCart()
-        viewModel.findAllRecent()
-    }
-
     private fun initObserver() {
         binding.shoppingActionHandler = viewModel
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        viewModel.cartProducts.observe(this) {
-            when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    binding.layoutShimmer.isVisible = false
-                    shoppingAdapter.submitList(it.data)
-                }
-            }
-        }
-        viewModel.recentProducts.observe(this) {
-            when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    recentAdapter.submitList(it.data) {
-                        binding.rvRecents.scrollToPosition(0)
-                    }
-                }
+        viewModel.uiState.observe(this) {
+            shoppingAdapter.submitList(it.cartProducts)
+            recentAdapter.submitList(it.recentProduct) {
+                binding.rvRecents.scrollToPosition(0)
             }
         }
         viewModel.errorHandler.observe(
@@ -97,12 +69,12 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>(R.layout.activ
             this,
             EventObserver {
                 when (it) {
-                    is NavigateUiState.ToDetail -> {
+                    is ShoppingNavigation.ToDetail -> {
                         resultLauncher.launch(
                             ProductDetailActivity.createIntent(this, it.cartProduct),
                         )
                     }
-                    is NavigateUiState.ToCart -> {
+                    is ShoppingNavigation.ToCart -> {
                         resultLauncher.launch(
                             CartActivity.createIntent(this),
                         )
@@ -123,9 +95,14 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>(R.layout.activ
                             viewModel.updateCartProducts(it)
                         }
                 }
-                viewModel.findAllRecent()
-                viewModel.getCartItemCounts()
+                viewModel.loadAllRecent()
+                viewModel.loadCartItemCounts()
             }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        restoreData(intent)
     }
 
     private fun restoreData(intent: Intent?) {

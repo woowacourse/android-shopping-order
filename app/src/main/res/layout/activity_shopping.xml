@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="shoppingActionHandler"
             type="woowacourse.shopping.presentation.ui.shopping.ShoppingActionHandler" />
@@ -61,7 +62,7 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/iv_cart"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="@{String.valueOf(viewModel.cartCount)}"
+                android:text="@{String.valueOf(viewModel.uiState.cartTotalCount)}"
                 app:layout_constraintTop_toTopOf="@id/iv_cart"
                 tools:text="0" />
 
@@ -127,7 +128,8 @@
                     <include
                         android:id="@+id/layout_shimmer"
                         app:layout_constraintTop_toBottomOf="@id/bar_shopping"
-                        layout="@layout/activity_shopping_shimmer"/>
+                        layout="@layout/activity_shopping_shimmer"
+                        android:visibility="@{viewModel.uiState.loading ? View.VISIBLE : View.GONE}"/>
 
                 </FrameLayout>
 
