@@ -5,11 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
+import kotlinx.coroutines.delay
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
+import woowacourse.shopping.presentation.base.LoadingProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.model.CartsWrapper
 import woowacourse.shopping.presentation.model.CouponUiModel
@@ -48,6 +50,8 @@ class PaymentViewModel(
 
     private fun loadCoupons() {
         launch {
+            showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
+            delay(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             couponRepository.getCoupons().onSuccess { coupons ->
                 hideError()
                 val state = uiState.value ?: return@launch
@@ -58,6 +62,8 @@ class PaymentViewModel(
             }.onFailure { e ->
                 showError(e)
             }
+            delay(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
+            hideLoading()
         }
     }
 
