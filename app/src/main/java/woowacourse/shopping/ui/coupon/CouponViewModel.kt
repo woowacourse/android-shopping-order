@@ -28,10 +28,7 @@ class CouponViewModel(
 
     val isEmptyCoupon = coupons.map { it.isEmpty() }
 
-    private val _couponErrorEvent = MutableLiveData<Event<Unit>>()
-    val couponErrorEvent: LiveData<Event<Unit>> get() = _couponErrorEvent
-
-    private val selectedCartItems = MutableLiveData<List<CartItem>>(emptyList())
+    private val selectedCartItems = MutableLiveData<List<CartItem>>()
 
     val orderPrice: LiveData<Int> = selectedCartItems.map { it.sumOf { cartItem -> cartItem.totalPrice() } }
 
@@ -44,8 +41,16 @@ class CouponViewModel(
     private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
     val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
 
+    private val _couponLoadError = MutableLiveData<Event<Throwable>>()
+    val couponLoadError: LiveData<Event<Throwable>> get() = _couponLoadError
+
+    private val _orderPossibleError = MutableLiveData<Event<Unit>>()
+    val orderPossibleError: LiveData<Event<Unit>> get() = _orderPossibleError
+
     init {
-        if (selectedCartItemIds.isEmpty()) setError()
+        if (selectedCartItemIds.isEmpty()) {
+            _orderPossibleError.value = Event(Unit)
+        }
         loadCoupons()
         observePrice()
     }
@@ -61,7 +66,7 @@ class CouponViewModel(
                     coupons.value = availableCoupons
                     _couponUiModels.value = availableCoupons.toCouponUiModels()
                 }
-                .onFailure { setError() }
+                .onFailure { _couponLoadError.value = Event(it) }
         }
 
     private suspend fun List<Int>.toCartItems(scope: CoroutineScope): List<CartItem> {
@@ -110,10 +115,6 @@ class CouponViewModel(
         _couponUiModels.value = couponUiModels().selectCoupon(couponId)
         val coupon = findCoupon(couponId) ?: return
         _discountPrice.value = coupon.discountPrice(selectedCartItems()) * -1
-    }
-
-    private fun setError() {
-        _couponErrorEvent.value = Event(Unit)
     }
 
     private fun couponUiModels(): CouponUiModels = _couponUiModels.value ?: CouponUiModels()

@@ -5,11 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.coupon.remote.RemoteCouponRepository
 import woowacourse.shopping.data.order.remote.RemoteOrderRepository
+import woowacourse.shopping.data.remote.ApiError
 import woowacourse.shopping.databinding.ActivityCouponBinding
 import woowacourse.shopping.ui.coupon.adapter.CouponAdapter
 import woowacourse.shopping.ui.products.ProductsActivity
@@ -38,6 +40,7 @@ class CouponActivity : AppCompatActivity() {
         initializeCouponList()
         initializeToolbar()
         observeData()
+        observeCouponErrorEvent()
     }
 
     private fun initializeCouponList() {
@@ -56,23 +59,15 @@ class CouponActivity : AppCompatActivity() {
     }
 
     private fun observeData() {
-        viewModel.couponErrorEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
-            showToastCouponFailure()
-        }
         viewModel.isSuccessCreateOrder.observe(this) {
             val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
             if (isSuccessCreateOrder) {
-                showToastOrderSuccess()
+                showToast(R.string.create_order_success)
                 navigateProductsView()
             } else {
-                showToastCouponFailure()
+                showToast(R.string.create_order_failure)
             }
         }
-    }
-
-    private fun showToastOrderSuccess() {
-        Toast.makeText(this, R.string.create_order_success, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateProductsView() {
@@ -81,8 +76,38 @@ class CouponActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showToastCouponFailure() {
-        Toast.makeText(this, R.string.common_error_retry, Toast.LENGTH_SHORT).show()
+    private fun observeCouponErrorEvent() {
+        viewModel.couponLoadError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showCouponLoadErrorToast(throwable, R.string.coupon_load_error)
+        }
+        viewModel.orderPossibleError.observe(this) {
+            it.getContentIfNotHandled() ?: return@observe
+            showToast(R.string.create_order_possible_error)
+        }
+    }
+
+    private fun showCouponLoadErrorToast(
+        throwable: Throwable,
+        @StringRes errorMessageResId: Int,
+    ) {
+        if (throwable is ApiError) {
+            showToast(errorMessageResId)
+        }
+        when (throwable) {
+            is ApiError.BadRequest -> showToast(errorMessageResId)
+            is ApiError.Unauthorized -> showToast(R.string.unauthorized_error)
+            is ApiError.Forbidden -> showToast(R.string.unauthorized_error)
+            is ApiError.NotFound -> showToast(R.string.product_not_found_error)
+            is ApiError.InternalServerError -> showToast(R.string.server_error)
+            is ApiError.Exception -> showToast(errorMessageResId)
+        }
+    }
+
+    private fun showToast(
+        @StringRes messageResId: Int,
+    ) {
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
     private fun selectedCartItemIds(): List<Int> {
