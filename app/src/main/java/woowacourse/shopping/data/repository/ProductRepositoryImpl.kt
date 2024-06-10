@@ -12,11 +12,10 @@ import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.result.Fail
 import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
 import woowacourse.shopping.domain.result.handleError
-import woowacourse.shopping.domain.result.result
+import woowacourse.shopping.domain.result.resultOrThrow
 import woowacourse.shopping.domain.result.resultOrNull
 import kotlin.math.min
 
@@ -29,7 +28,7 @@ class ProductRepositoryImpl(
         handleApiResult(
             productDataSource.getProductsById(id),
             ResponseProductIdGetDto::toProduct,
-        ).result()
+        ).resultOrThrow()
 
     override suspend fun productByIdOrNull(id: Long): Product? =
         handleApiResult(
@@ -49,7 +48,7 @@ class ProductRepositoryImpl(
     ): List<Product> = handleApiResult(
                 productDataSource.getProductsByOffset(page, size),
                 transform = ResponseProductsGetDto::toProductList,
-            ).result()
+            ).resultOrThrow()
 
 
 

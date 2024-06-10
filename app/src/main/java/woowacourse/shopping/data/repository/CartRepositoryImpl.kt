@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.datasource.impl.RemoteCartDataSource
-import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.api.resultOrNull
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
@@ -13,7 +12,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.result.Fail
 import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
-import woowacourse.shopping.domain.result.result
+import woowacourse.shopping.domain.result.resultOrThrow
 import woowacourse.shopping.domain.result.resultOrNull
 
 class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartDataSource()) :
@@ -56,7 +55,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
                 result = dataSource.getCartItems(0, count),
                 transform = ResponseCartItemsGetDto::toCartWithProduct,
             )
-        return if (response is Fail.NotFound) emptyList() else response.result()
+        return if (response is Fail.NotFound) emptyList() else response.resultOrThrow()
     }
 
     override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> =
@@ -85,7 +84,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         handleApiResult(
             result = dataSource.getCartItemCounts(),
             transform = { it.quantity },
-        ).result()
+        ).resultOrThrow()
 
     override suspend fun cartItemsCountOrNull(): Int? =
         handleApiResult(

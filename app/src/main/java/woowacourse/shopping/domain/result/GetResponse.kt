@@ -11,7 +11,7 @@ inline fun <T : Any?> Result<T>.resultOrNull(): T? =
         is Fail.InvalidAuthorized -> null
     }
 
-inline fun <T : Any?> Result<T>.result(): T =
+inline fun <T : Any?> Result<T>.resultOrThrow(): T =
     when (this) {
         is Result.Success -> this.result
         is Fail.Network -> throw IOException("네트워크 에러가 발생했습니다.")

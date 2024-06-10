@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.result.Fail
 import woowacourse.shopping.domain.result.Result
 import woowacourse.shopping.domain.result.handleApiResult
-import woowacourse.shopping.domain.result.result
+import woowacourse.shopping.domain.result.resultOrThrow
 
 class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
     CouponRepository {
@@ -26,7 +26,7 @@ class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCoup
                 result = dataSource.getCoupons(),
                 transform = { it.map { it.toDomain() } },
             )
-        return if (response is Fail.NotFound) emptyList() else response.result()
+        return if (response is Fail.NotFound) emptyList() else response.resultOrThrow()
     }
 
     override suspend fun allCouponsResponse(): Result<List<Coupon>> =
