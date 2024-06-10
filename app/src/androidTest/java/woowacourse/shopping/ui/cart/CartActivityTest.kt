@@ -18,12 +18,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.RecentProductLocalDataSourceImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.db.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.service.NetworkModule
 import woowacourse.shopping.ui.cart.adapter.CartViewHolder
 

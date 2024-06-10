@@ -2,8 +2,8 @@ package woowacourse.shopping.ui.payment.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.coupon.CouponRepository
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
 
 class PaymentViewModelFactory(
     private val orderProductIds: List<Long>,

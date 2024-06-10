@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import kotlin.math.min
 
 object ProductMockWebServerDispatcher : Dispatcher() {

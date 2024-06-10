@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.data.cart.CartWithProduct
+import woowacourse.shopping.domain.model.cart.CartWithProduct
 
 fun CartWithProduct.toUiModel(isChecked: Boolean) =
     CartUiModel(

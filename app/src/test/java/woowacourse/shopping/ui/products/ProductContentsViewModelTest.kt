@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.cart.Cart
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recentproduct.RecentProduct
-import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.model.local.RecentProduct
+import woowacourse.shopping.domain.model.cart.Cart
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import java.time.LocalDateTime
 

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.model.Quantity
+import woowacourse.shopping.domain.model.product.Quantity
 
 data class CartUiModel(
     val id: Long,

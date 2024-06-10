@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.cart.CartWithProduct
-import woowacourse.shopping.data.coupon.Coupon
-import woowacourse.shopping.data.coupon.CouponCode
-import woowacourse.shopping.data.coupon.CouponRepository
-import woowacourse.shopping.data.coupon.Fixed5000
+import woowacourse.shopping.domain.model.cart.CartWithProduct
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.CouponCode
+import woowacourse.shopping.domain.model.coupon.Fixed5000
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModel
 import java.time.LocalDate
 

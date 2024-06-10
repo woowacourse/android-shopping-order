@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.datasource.impl
 
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
-import woowacourse.shopping.data.recentproduct.RecentProduct
-import woowacourse.shopping.data.recentproduct.RecentProductDao
+import woowacourse.shopping.data.db.recentproduct.RecentProductDao
+import woowacourse.shopping.data.model.local.RecentProduct
 import woowacourse.shopping.exception.ShoppingError
 import woowacourse.shopping.exception.ShoppingException
 

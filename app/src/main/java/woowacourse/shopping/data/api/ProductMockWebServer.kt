@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockWebServer
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 class ProductMockWebServer : ProductServerApi {
     private val mockWebServer = MockWebServer()

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.payment
 
-import woowacourse.shopping.data.coupon.CouponState
+import woowacourse.shopping.domain.model.coupon.CouponState
 
 data class CouponUiModel(
     val couponState: CouponState,

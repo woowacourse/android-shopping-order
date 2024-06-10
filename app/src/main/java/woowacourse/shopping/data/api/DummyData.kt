@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.api
 
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 val MAC_BOOK =
     Product(

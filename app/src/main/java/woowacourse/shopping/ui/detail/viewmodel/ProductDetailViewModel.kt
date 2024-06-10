@@ -7,11 +7,11 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recentproduct.RecentProductRepository
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductWithQuantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.listener.CountButtonClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
