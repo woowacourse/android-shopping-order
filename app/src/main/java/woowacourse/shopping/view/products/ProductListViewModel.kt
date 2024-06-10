@@ -18,6 +18,7 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
+import woowacourse.shopping.view.UiState
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductListViewModel(
@@ -38,6 +39,10 @@ class ProductListViewModel(
         MutableSingleLiveData()
     val productListEvent: SingleLiveData<ProductListEvent> get() = _productListEvent
 
+    private val _loadingState: MutableLiveData<UiState> =
+        MutableLiveData(UiState.Loading)
+    val loadingState : LiveData<UiState> = _loadingState
+
     init {
         updateTotalCartItemCount()
         loadPagingRecentlyProduct()
@@ -45,9 +50,11 @@ class ProductListViewModel(
 
     fun loadPagingProduct() =
         viewModelScope.launch {
+            _loadingState.value = UiState.Loading
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
             productRepository.loadPagingProducts(itemSize)
                 .onSuccess {
+                    _loadingState.value = UiState.Init
                     _products.value = _products.value?.plus(it)
                 }
                 .onFailure {

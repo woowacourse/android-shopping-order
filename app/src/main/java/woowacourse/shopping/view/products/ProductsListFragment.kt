@@ -84,7 +84,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     private fun observeData() {
         productListViewModel.recentlyProducts.observe(viewLifecycleOwner) { recentlyData ->
             recentlyAdapter.updateProducts(recentlyData)
-            productAdapter.setShowSkeleton(false)
         }
         productListViewModel.products.observe(viewLifecycleOwner) { products ->
             productAdapter.updateProducts(addedProducts = products)
@@ -149,7 +148,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     }
 
     private fun loadPagingData() {
-        productAdapter.setShowSkeleton(true)
         productListViewModel.loadPagingProduct()
     }
 }

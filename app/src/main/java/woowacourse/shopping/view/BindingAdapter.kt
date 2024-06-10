@@ -25,3 +25,12 @@ fun setVisibleByItemCounter(
 ) {
     view.visibility = if (count > DEFAULT_ITEM_COUNT) View.VISIBLE else View.GONE
 }
+
+@BindingAdapter("loadingState")
+fun setLoadingState(view: View, uiState: UiState) {
+    view.visibility = if (uiState is UiState.Loading) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}

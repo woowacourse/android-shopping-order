@@ -103,6 +103,13 @@
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2"
                     tools:listitem="@layout/item_product" />
+
+                <include
+                    layout="@layout/cart_item_skeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:vm="@{vm}"/>
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_more_product"
                     android:layout_width="match_parent"
