@@ -5,6 +5,18 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.coupon.CouponViewModel" />
+
+        <variable
+            name="onclickNavigatePayment"
+            type="woowacourse.shopping.view.coupon.OnclickNavigateCoupon" />
+
+        <variable
+            name="onClickPayment"
+            type="woowacourse.shopping.view.coupon.OnClickCoupon" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@color/gray_5"
-            app:layout_constraintBottom_toTopOf="@id/useality_coupone"
+            app:layout_constraintBottom_toTopOf="@id/available_coupon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
@@ -45,7 +57,7 @@
             app:layout_constraintTop_toTopOf="@id/button_back" />
 
         <TextView
-            android:id="@+id/useality_coupone"
+            android:id="@+id/available_coupon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
@@ -67,7 +79,7 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/rv_coupon"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/useality_coupone" />
+            app:layout_constraintTop_toBottomOf="@id/available_coupon" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupon"
@@ -122,6 +134,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginRight="20dp"
+                    android:text="@{@string/formatted_price(vm.totalPrice)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -152,6 +165,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginRight="20dp"
+                    android:text="@{@string/formatted_price(-vm.couponCalculator.discountPrice)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -182,12 +196,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginRight="20dp"
-                    android:text="3,000원"
+                    android:text="@{@string/formatted_price(vm.deliveryCharge)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="3,000원" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
@@ -222,6 +237,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="50dp"
+                    android:text="@{@string/formatted_price(vm.totalPrice + vm.deliveryCharge-vm.couponCalculator.discountPrice)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -236,13 +252,14 @@
                 android:layout_height="48dp"
                 android:background="@color/primary"
                 android:gravity="center"
+                android:onClick="@{() ->onClickPayment.clickPayment()}"
+                android:text="결제하기"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/bottom_view"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/bottom_view"
-                tools:text="결제하기" />
+                app:layout_constraintTop_toTopOf="@+id/bottom_view" />
         </LinearLayout>
 
 

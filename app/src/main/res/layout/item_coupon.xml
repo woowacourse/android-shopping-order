@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="coupon"
-            type="woowacourse.shopping.domain.model.Coupon" />
-
+            type="woowacourse.shopping.domain.model.coupon.Coupon" />
         <variable
             name="onClickPayment"
-            type="woowacourse.shopping.view.payment.OnclickPayment" />
+            type="woowacourse.shopping.view.coupon.OnClickCoupon" />
+
+
     </data>
 
     <LinearLayout
@@ -30,10 +30,10 @@
             android:orientation="horizontal">
 
             <CheckBox
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
+                android:onClick="@{() -> onClickPayment.clickCoupon(coupon)}"
                 android:checked="@{coupon.itemSelector.isSelected}"
-                android:onClick="@{() -> onClickPayment.clickCoupon(coupon)}" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/tv_cart_item_name"
@@ -60,7 +60,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="@dimen/margin_payment"
             android:text=""
             tools:text="최소 주문 금액: 1,000원" />
     </LinearLayout>
