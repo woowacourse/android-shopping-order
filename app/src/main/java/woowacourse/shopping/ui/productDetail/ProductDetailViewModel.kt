@@ -93,7 +93,6 @@ class ProductDetailViewModel(
             cartRepository.addShoppingCartProduct(productId, productCount)
                 .onSuccess {
                     // TODO : handle success
-                    Log.d(TAG, "addProductToCart: success")
                 }
                 .onFailure {
                     // TODO : handle error

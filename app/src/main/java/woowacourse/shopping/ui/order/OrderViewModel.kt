@@ -39,15 +39,6 @@ class OrderViewModel(
     private val _event: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
     val event: SingleLiveData<OrderEvent> get() = _event
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            orderRepository.loadAllOrders().getOrThrow().also {
-                Log.d(TAG, "all orders: $it")
-            }
-        }
-
-    }
-
     override fun order() {
         viewModelScope.launch(Dispatchers.IO) {
             _event.postValue(OrderEvent.CompleteOrder)
@@ -105,11 +96,11 @@ class OrderViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
                 .onSuccess {
-                    Log.d(TAG, "onIncrease: save in cart success")
+                    // TODO : handle success
                 }
                 .onFailure {
                     // TODO : handle error
-                    Log.d(TAG, "onIncrease: addShoppingCartProduct2: $it")
+                    Log.e(TAG, "onIncrease: addShoppingCartProduct2: $it")
                     throw it
                 }
 
@@ -123,17 +114,10 @@ class OrderViewModel(
                 }
                 .onFailure {
                     // TODO : handle error
-                    Log.d(TAG, "onIncrease: saveOrderItem2: $it")
+                    Log.e(TAG, "onIncrease: saveOrderItem2: $it")
                     throw it
                 }
-
-
-            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository.loadAllOrders().getOrThrow()}")
-
-
         }
-
-
     }
 
     override fun onDecrease(
@@ -154,8 +138,6 @@ class OrderViewModel(
                     Log.e(TAG, "onDecrease: saveOrderItem2: $it")
                     throw it
                 }
-            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository.loadAllOrders().getOrThrow()}")
-
         }
     }
 

@@ -54,7 +54,6 @@ class PaymentViewModel(
                                     coupon.toUi()
                                 })
                             }
-                            Log.d(TAG, "loadCoupons: success: $coupons")
 
                         }
                         .onFailure {
@@ -73,7 +72,6 @@ class PaymentViewModel(
 
 
     override fun onCheck(coupon: CouponUi) {
-        Log.d(TAG, "onCheck: $coupon")
         viewModelScope.launch(Dispatchers.IO) {
             couponRepository.discountAmount(coupon.id, orders = orders.value ?: Orders.DEFAULT)
                 .onSuccess {

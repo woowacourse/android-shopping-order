@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import android.util.Log
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -16,12 +15,10 @@ class DefaultOrderRepository(
 
     override suspend fun save(orderItem: OrderItem): Result<Unit> = orderSource.saveOrderItem(orderItem)
 
-    // 추가, 감소, 제거
     override suspend fun updateOrderItem(productId: Long, quantity: Int): Result<Unit> {
         val cartItem = cartSource.findCartItemByProductId(productId).getOrThrow()
 
         if (quantity == 0) {
-            // 카트 소스에서도 제거하고, orderSource 에서도 제거
             cartSource.removeCartItem(cartItem.id).getOrThrow()
             return orderSource.removeOrderItem(cartItem.id)
         }
@@ -41,9 +38,7 @@ class DefaultOrderRepository(
                 orderItems = orderItems,
                 totalPrice = orderItems.sumOf { it.product.price * it.quantity },
                 orderDateTime = LocalDateTime.now(),
-            ).also {
-                Log.d(TAG, "orderes: $it")
-            }
+            )
         }
     }
 

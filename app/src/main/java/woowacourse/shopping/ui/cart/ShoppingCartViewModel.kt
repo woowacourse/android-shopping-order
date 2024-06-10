@@ -53,7 +53,7 @@ class ShoppingCartViewModel(
                 }
                 .onFailure {
                     // TODO : handle error
-                    Log.d(TAG, "loadAll: failure: $it")
+                    Log.e(TAG, "loadAll: failure: $it")
                     throw it
                 }
         }
@@ -75,7 +75,7 @@ class ShoppingCartViewModel(
                 }
                 .onFailure {
                     // TODO : handle error
-                    Log.d(TAG, "deleteItem: failure: $it")
+                    Log.e(TAG, "deleteItem: failure: $it")
                     throw it
                 }
         }
@@ -98,6 +98,7 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) {
             // TODO: show toast message: "선택된 상품이 없습니다."
+            // TODO: handle event
             return
         }
 
@@ -116,16 +117,11 @@ class ShoppingCartViewModel(
                         }
                         .onFailure {
                             // TODO : handle error
-                            Log.d(TAG, "navigateToOrder: failure: $it")
+                            Log.e(TAG, "navigateToOrder: failure: $it")
                             throw it
                         }
                 }
             }
-
-            Log.d(
-                TAG, "navigateToOrder: orderItems: " +
-                        "${orderRepository.loadAllOrders().getOrThrow()}"
-            )
         }
     }
 
@@ -144,7 +140,7 @@ class ShoppingCartViewModel(
                 }
                 .onFailure {
                     // TODO : handle error
-                    Log.d(TAG, "onIncrease: addShoppingCartProduct2: $it")
+                    Log.e(TAG, "onIncrease: addShoppingCartProduct2: $it")
                     throw it
                 }
         }
@@ -161,7 +157,7 @@ class ShoppingCartViewModel(
             }
             .onFailure {
                 // TODO: handle error
-                Log.d(TAG, "onIncrease - loadAllCartItems2 : failure: $it")
+                Log.e(TAG, "onIncrease - loadAllCartItems2 : failure: $it")
                 throw it
             }
     }
@@ -181,7 +177,7 @@ class ShoppingCartViewModel(
                 }
                 .onFailure {
                     // TODO : handle error
-                    Log.d(TAG, "onIncrease: updateProductQuantity2: $it")
+                    Log.e(TAG, "onIncrease: updateProductQuantity2: $it")
                     throw it
                 }
         }

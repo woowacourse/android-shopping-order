@@ -49,10 +49,7 @@ class DefaultOrderDataSource(
     companion object {
         private const val TAG = "OrderRemoteDataSource"
 
-        // TODO: 주석 제거
-        // id 와 개수 id 는 상품 아이디? (장바구니 아이디가 아니라)
         private val _orders: MutableList<OrderItem> = mutableListOf()
-
         val orders: List<OrderItem> get() = _orders
     }
 }
