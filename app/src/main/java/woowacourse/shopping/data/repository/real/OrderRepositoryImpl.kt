@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository.real
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,7 +14,7 @@ import java.util.concurrent.CountDownLatch
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(NetworkManager.getApiClient()),
 ) : OrderRepository {
-    override fun orderShoppingCart(ids: List<Int>) {
+    override fun orderShoppingCart(ids: List<Int>): Result<Unit> {
         val latch = CountDownLatch(1)
         var exception: Exception? = null
 
@@ -28,7 +27,6 @@ class OrderRepositoryImpl(
                     if (!response.isSuccessful) {
                         exception = NoSuchDataException()
                     }
-                    Log.d("OrderRepositoryImpl", "orderShoppingCart: ${response.code()}")
                     latch.countDown()
                 }
 
@@ -43,5 +41,6 @@ class OrderRepositoryImpl(
         )
 
         latch.awaitOrThrow(exception)
+        return Result.success(Unit)
     }
 }

@@ -74,10 +74,11 @@ class ShoppingCartViewModel(
     fun loadPagingCartItemList() {
         _loadingEvent.postValue(ShoppingCartEvent.LoadCartItemList.Loading)
         viewModelScope.launch {
-            val result = shoppingCartRepository.loadPagingCartItems(
-                LOAD_SHOPPING_ITEM_OFFSET,
-                LOAD_SHOPPING_ITEM_SIZE
-            )
+            val result =
+                shoppingCartRepository.loadPagingCartItems(
+                    LOAD_SHOPPING_ITEM_OFFSET,
+                    LOAD_SHOPPING_ITEM_SIZE,
+                )
 
             result.onSuccess { pagingData ->
                 _loadingEvent.postValue(ShoppingCartEvent.LoadCartItemList.Success)
@@ -94,7 +95,6 @@ class ShoppingCartViewModel(
             }
         }
     }
-
 
     fun checkAllItems() {
         if (allCheck.value == true) {
@@ -195,7 +195,6 @@ class ShoppingCartViewModel(
                 }
             }
         }
-
     }
 
     private fun updateCheckItemData() {

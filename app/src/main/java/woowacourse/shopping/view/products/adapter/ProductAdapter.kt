@@ -61,7 +61,7 @@ class ProductAdapter(
                     ItemProductSkeletonBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
-                        false
+                        false,
                     )
                 SkeletonViewHolder(view)
             }

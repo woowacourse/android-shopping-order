@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.UpdateCartItemResult
 import woowacourse.shopping.domain.model.UpdateCartItemType
 
 interface ShoppingCartRepository {
-    suspend fun addCartItem(product: Product) : Result<Unit>
+    suspend fun addCartItem(product: Product): Result<Unit>
 
     suspend fun loadPagingCartItems(
         offset: Int,

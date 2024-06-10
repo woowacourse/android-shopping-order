@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.source
 
-import retrofit2.Call
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.domain.model.CartItem

@@ -37,7 +37,7 @@ class ShoppingCartAdapter(
                     ItemShoppingCartBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
-                        false
+                        false,
                     )
                 ShoppingCartViewHolder(view, onClickCartItemCounter, onClickShoppingCart)
             }
@@ -47,7 +47,7 @@ class ShoppingCartAdapter(
                     ItemCartItemSkeletonBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
-                        false
+                        false,
                     )
                 ShoppingCartSkeletonViewHolder(view)
             }

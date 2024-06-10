@@ -86,7 +86,7 @@ class RecommendViewModel(
 
     private fun updateCarItem(
         product: Product,
-        updateCartItemType: UpdateCartItemType
+        updateCartItemType: UpdateCartItemType,
     ) {
         viewModelScope.launch {
             val result = shoppingCartRepository.updateCartItem(product, updateCartItemType)
@@ -112,7 +112,6 @@ class RecommendViewModel(
             }
         }
     }
-
 
     private fun addCartItem(product: Product) {
         try {

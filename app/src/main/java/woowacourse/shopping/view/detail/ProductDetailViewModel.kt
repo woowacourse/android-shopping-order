@@ -77,55 +77,58 @@ class ProductDetailViewModel(
         }
     }
 
-    fun loadProductItem(productId: Long) = viewModelScope.launch {
-        val loadItemCounter = loadProductItemCount(productId)
-            .onSuccess {
-                val product = productRepository.getProduct(productId).getOrThrow()
-                product.updateItemSelector(true)
-                product.updateCartItemCount(it.itemCount)
-                loadRecentlyProduct(product)
-                _product.value = product
-            }
-            .onFailure {
-                when (it) {
-                    is NoSuchDataException ->
-                        _errorEvent.setValue(
-                            ProductDetailEvent.LoadProductItem.Fail,
-                        )
+    fun loadProductItem(productId: Long) =
+        viewModelScope.launch {
+            val loadItemCounter =
+                loadProductItemCount(productId)
+                    .onSuccess {
+                        val product = productRepository.getProduct(productId).getOrThrow()
+                        product.updateItemSelector(true)
+                        product.updateCartItemCount(it.itemCount)
+                        loadRecentlyProduct(product)
+                        _product.value = product
+                    }
+                    .onFailure {
+                        when (it) {
+                            is NoSuchDataException ->
+                                _errorEvent.setValue(
+                                    ProductDetailEvent.LoadProductItem.Fail,
+                                )
 
-                    else ->
-                        _errorEvent.setValue(
-                            ProductDetailEvent.ErrorEvent.NotKnownError,
-                        )
+                            else ->
+                                _errorEvent.setValue(
+                                    ProductDetailEvent.ErrorEvent.NotKnownError,
+                                )
+                        }
+                    }
+        }
+
+    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) =
+        viewModelScope.launch {
+            deletePrevRecentlyProduct(recentlyProduct.id)
+            loadProductItemCount(recentlyProduct.productId)
+                .onSuccess { loadItemCounter ->
+                    val product = productRepository.getProduct(recentlyProduct.productId).getOrThrow()
+                    product.updateItemSelector(true)
+                    product.updateCartItemCount(loadItemCounter.itemCount)
+                    _product.value = product
+                    _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
+                    _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
                 }
-            }
-    }
+                .onFailure {
+                    when (it) {
+                        is NoSuchDataException ->
+                            _errorEvent.setValue(
+                                ProductDetailEvent.LoadProductItem.Fail,
+                            )
 
-    fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) = viewModelScope.launch {
-        deletePrevRecentlyProduct(recentlyProduct.id)
-        loadProductItemCount(recentlyProduct.productId)
-            .onSuccess { loadItemCounter ->
-                val product = productRepository.getProduct(recentlyProduct.productId).getOrThrow()
-                product.updateItemSelector(true)
-                product.updateCartItemCount(loadItemCounter.itemCount)
-                _product.value = product
-                _recentlyProduct.value = RecentlyProduct.defaultRecentlyProduct
-                _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
-            }
-            .onFailure {
-                when (it) {
-                    is NoSuchDataException ->
-                        _errorEvent.setValue(
-                            ProductDetailEvent.LoadProductItem.Fail,
-                        )
-
-                    else ->
-                        _errorEvent.setValue(
-                            ProductDetailEvent.ErrorEvent.NotKnownError,
-                        )
+                        else ->
+                            _errorEvent.setValue(
+                                ProductDetailEvent.ErrorEvent.NotKnownError,
+                            )
+                    }
                 }
-            }
-    }
+        }
 
     fun increaseItemCounter() {
         product.value?.cartItemCounter?.increase()
@@ -150,16 +153,17 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentlyProduct(product: Product) = viewModelScope.launch {
-        recentlyProductRepository.addRecentlyProduct(
-            RecentlyProduct(
-                productId = product.id,
-                imageUrl = product.imageUrl,
-                name = product.name,
-                category = product.category,
-            ),
-        )
-    }
+    private fun saveRecentlyProduct(product: Product) =
+        viewModelScope.launch {
+            recentlyProductRepository.addRecentlyProduct(
+                RecentlyProduct(
+                    productId = product.id,
+                    imageUrl = product.imageUrl,
+                    name = product.name,
+                    category = product.category,
+                ),
+            )
+        }
 
     private suspend fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
         return shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
@@ -172,25 +176,27 @@ class ProductDetailViewModel(
             }
     }
 
-    private fun deletePrevRecentlyProduct(recentlyProductId: Long) = viewModelScope.launch {
-        recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
-    }
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) =
+        viewModelScope.launch {
+            recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
+        }
 
-    private fun loadRecentlyProduct(product: Product) = viewModelScope.launch {
-        try {
-            val recentlyProduct = recentlyProductRepository.getMostRecentlyProduct().getOrThrow()
-            _recentlyProduct.value = recentlyProduct
-            _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
-            if (recentlyProduct.productId != product.id) {
-                saveRecentlyProduct(product)
-            }
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException -> _errorEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Fail)
-                else -> _errorEvent.setValue(ProductDetailEvent.ErrorEvent.NotKnownError)
+    private fun loadRecentlyProduct(product: Product) =
+        viewModelScope.launch {
+            try {
+                val recentlyProduct = recentlyProductRepository.getMostRecentlyProduct().getOrThrow()
+                _recentlyProduct.value = recentlyProduct
+                _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
+                if (recentlyProduct.productId != product.id) {
+                    saveRecentlyProduct(product)
+                }
+            } catch (e: Exception) {
+                when (e) {
+                    is NoSuchDataException -> _errorEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Fail)
+                    else -> _errorEvent.setValue(ProductDetailEvent.ErrorEvent.NotKnownError)
+                }
             }
         }
-    }
 
     private fun checkValidProduct(product: Product) {
         if (product.id == DEFAULT_PRODUCT_ID) throw NoSuchDataException()

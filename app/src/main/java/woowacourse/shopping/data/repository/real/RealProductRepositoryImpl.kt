@@ -10,7 +10,6 @@ import woowacourse.shopping.utils.DtoMapper.toProduct
 class RealProductRepositoryImpl(
     private val productDataSource: ProductDataSource = ProductDataSourceImpl(NetworkManager.getApiClient()),
 ) : ProductRepository {
-
     override suspend fun loadPagingProducts(offset: Int): Result<List<Product>> {
         val page = offset / PRODUCT_LOAD_PAGING_SIZE
         val response = productDataSource.loadProducts(page, PRODUCT_LOAD_PAGING_SIZE)
@@ -18,7 +17,6 @@ class RealProductRepositoryImpl(
             it.productDto.map { it.toProduct() }
         }
     }
-
 
     override suspend fun loadCategoryProducts(
         size: Int,

@@ -29,7 +29,7 @@ class CartItemDataSourceImpl(apiClient: ApiClient) : CartItemDataSource {
             cartApiService.requestCartItems(
                 page = page,
                 size = size,
-            )
+            ),
         )
     }
 
@@ -40,10 +40,10 @@ class CartItemDataSourceImpl(apiClient: ApiClient) : CartItemDataSource {
         return Result.runCatching {
             cartApiService.insertCartItem(
                 cartItemRequest =
-                CartItemRequest(
-                    productId = productId,
-                    quantity = quantity,
-                ),
+                    CartItemRequest(
+                        productId = productId,
+                        quantity = quantity,
+                    ),
             )
         }
     }

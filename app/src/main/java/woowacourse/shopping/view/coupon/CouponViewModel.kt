@@ -17,7 +17,7 @@ import woowacourse.shopping.view.recommend.RecommendEvent
 
 class CouponViewModel(
     private val orderRepository: OrderRepository,
-    private val couponRepository: CouponRepository
+    private val couponRepository: CouponRepository,
 ) : ViewModel(), OnClickCoupon {
     private var shoppingCart: ShoppingCart = ShoppingCart()
 
@@ -31,15 +31,15 @@ class CouponViewModel(
     val totalPrice: LiveData<Int> get() = _totalPrice
     val deliveryCharge = 3000
 
-
-    fun loadCoupons() = viewModelScope.launch {
-        couponRepository.loadCoupons()
-            .onSuccess { coupons ->
-                couponCalculator.loadCoupons(coupons)
-            }.onFailure {
-                _errorEvent.postValue(RecommendEvent.ErrorEvent.NotKnownError)
-            }
-    }
+    fun loadCoupons() =
+        viewModelScope.launch {
+            couponRepository.loadCoupons()
+                .onSuccess { coupons ->
+                    couponCalculator.loadCoupons(coupons)
+                }.onFailure {
+                    _errorEvent.postValue(RecommendEvent.ErrorEvent.NotKnownError)
+                }
+        }
 
     private fun orderItems() =
         viewModelScope.launch {
@@ -47,7 +47,7 @@ class CouponViewModel(
             orderRepository.orderShoppingCart(ids ?: throw NoSuchDataException())
                 .onSuccess {
                     _couponEvent.setValue(
-                        CouponEvent.OrderRecommends.Success
+                        CouponEvent.OrderRecommends.Success,
                     )
                 }
                 .onFailure {

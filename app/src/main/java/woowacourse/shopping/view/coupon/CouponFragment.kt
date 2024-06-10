@@ -27,12 +27,15 @@ class CouponFragment : Fragment(), OnclickNavigateCoupon {
     private var _binding: FragmentCouponBinding? = null
     private val binding get() = _binding!!
     private val couponViewModel: CouponViewModel by lazy {
-        ViewModelProvider(this, ViewModelFactory {
-            CouponViewModel(
-                orderRepository = OrderRepositoryImpl(),
-                couponRepository = CouponRepositoryImpl(),
-            )
-        })[CouponViewModel::class.java]
+        ViewModelProvider(
+            this,
+            ViewModelFactory {
+                CouponViewModel(
+                    orderRepository = OrderRepositoryImpl(),
+                    couponRepository = CouponRepositoryImpl(),
+                )
+            },
+        )[CouponViewModel::class.java]
     }
 
     private lateinit var couponAdapter: CouponItemRecyclerViewAdapter
@@ -45,14 +48,18 @@ class CouponFragment : Fragment(), OnclickNavigateCoupon {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCouponBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeData()
@@ -84,7 +91,7 @@ class CouponFragment : Fragment(), OnclickNavigateCoupon {
         }
         couponViewModel.errorEvent.observe(viewLifecycleOwner) {
             requireContext().makeToast(
-                "Error"
+                "Error",
             )
         }
     }
@@ -141,9 +148,7 @@ class CouponFragment : Fragment(), OnclickNavigateCoupon {
         }
     }
 
-
     companion object {
-
         fun createBundle(checkedShoppingCart: ShoppingCart): Bundle {
             return Bundle().apply {
                 putSerializable(CHECKED_SHOPPING_CART, checkedShoppingCart)

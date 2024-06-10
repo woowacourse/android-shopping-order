@@ -3,9 +3,9 @@ package woowacourse.shopping.utils
 import woowacourse.shopping.data.remote.dto.coupon.AvailableTimeDto
 import woowacourse.shopping.data.remote.dto.coupon.CouponDto
 import woowacourse.shopping.domain.model.AvailableTime
+import woowacourse.shopping.domain.model.ItemSelector
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponType
-import woowacourse.shopping.domain.model.ItemSelector
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

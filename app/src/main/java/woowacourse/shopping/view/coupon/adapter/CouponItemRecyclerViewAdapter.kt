@@ -12,17 +12,25 @@ class CouponItemRecyclerViewAdapter(
     private val onclickCoupon: OnClickCoupon,
 ) : RecyclerView.Adapter<CouponViewHolder>() {
     private val coupons = mutableListOf<Coupon>()
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CouponViewHolder {
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CouponViewHolder {
         return CouponViewHolder(
             ItemCouponBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            ), onclickCoupon
+                false,
+            ),
+            onclickCoupon,
         )
     }
 
-    override fun onBindViewHolder(holder: CouponViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CouponViewHolder,
+        position: Int,
+    ) {
         val item = coupons[position]
         holder.bind(item)
     }

@@ -8,7 +8,7 @@ import woowacourse.shopping.view.coupon.OnClickCoupon
 
 class CouponViewHolder(
     private val binding: ItemCouponBinding,
-    private val onClickCoupon: OnClickCoupon
+    private val onClickCoupon: OnClickCoupon,
 ) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(coupon: Coupon) {

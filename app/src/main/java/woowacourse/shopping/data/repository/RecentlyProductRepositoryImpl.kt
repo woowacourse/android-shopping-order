@@ -17,7 +17,7 @@ class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepositor
     override suspend fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {
         withContext(Dispatchers.IO) {
             recentlyProductDao.addRecentlyProduct(
-                recentlyProduct.toRecentlyProductEntity()
+                recentlyProduct.toRecentlyProductEntity(),
             )
         }
     }

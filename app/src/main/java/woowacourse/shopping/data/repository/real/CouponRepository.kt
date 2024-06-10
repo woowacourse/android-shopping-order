@@ -12,6 +12,7 @@ class CouponRepositoryImpl(
     override suspend fun loadCoupons(): Result<List<Coupon>> {
         return couponDataSource.loadCoupons()
     }
+
     companion object {
         private const val DELIVERY_CHARGE = 3000
     }

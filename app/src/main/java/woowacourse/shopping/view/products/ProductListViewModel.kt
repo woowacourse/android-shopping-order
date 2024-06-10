@@ -48,31 +48,33 @@ class ProductListViewModel(
         loadPagingRecentlyProduct()
     }
 
-    fun loadPagingProduct() = viewModelScope.launch {
-        _loadingEvent.postValue(ProductListEvent.LoadProductEvent.Loading)
-        try {
-            val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-            val pagingData = productRepository.loadPagingProducts(itemSize).getOrThrow()
-            _products.value = _products.value?.plus(pagingData)
+    fun loadPagingProduct() =
+        viewModelScope.launch {
+            _loadingEvent.postValue(ProductListEvent.LoadProductEvent.Loading)
+            try {
+                val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
+                val pagingData = productRepository.loadPagingProducts(itemSize).getOrThrow()
+                _products.value = _products.value?.plus(pagingData)
 
-            _loadingEvent.postValue(ProductListEvent.LoadProductEvent.Success)
-            _productListEvent.postValue(ProductListEvent.LoadProductEvent.Success)
-        } catch (e: Exception) {
-            when (e) {
-                is NoSuchDataException -> _errorEvent.postValue(ProductListEvent.LoadProductEvent.Fail)
-                else -> _errorEvent.postValue(ProductListEvent.ErrorEvent.NotKnownError)
+                _loadingEvent.postValue(ProductListEvent.LoadProductEvent.Success)
+                _productListEvent.postValue(ProductListEvent.LoadProductEvent.Success)
+            } catch (e: Exception) {
+                when (e) {
+                    is NoSuchDataException -> _errorEvent.postValue(ProductListEvent.LoadProductEvent.Fail)
+                    else -> _errorEvent.postValue(ProductListEvent.ErrorEvent.NotKnownError)
+                }
             }
         }
-    }
 
-    fun loadPagingRecentlyProduct() = viewModelScope.launch {
-        try {
-            val pagingData = recentlyProductRepository.getRecentlyProductList().getOrThrow()
-            _recentlyProducts.value = pagingData
-        } catch (e: Exception) {
-            _errorEvent.postValue(ProductListEvent.ErrorEvent.NotKnownError)
+    fun loadPagingRecentlyProduct() =
+        viewModelScope.launch {
+            try {
+                val pagingData = recentlyProductRepository.getRecentlyProductList().getOrThrow()
+                _recentlyProducts.value = pagingData
+            } catch (e: Exception) {
+                _errorEvent.postValue(ProductListEvent.ErrorEvent.NotKnownError)
+            }
         }
-    }
 
     fun increaseShoppingCart(product: Product) {
         updateCarItem(product, UpdateCartItemType.INCREASE)
@@ -113,8 +115,8 @@ class ProductListViewModel(
                         }
                         _productListEvent.setValue(
                             ProductListEvent.UpdateProductEvent.Success(
-                                product.id
-                            )
+                                product.id,
+                            ),
                         )
                     }
                 }

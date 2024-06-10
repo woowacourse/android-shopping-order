@@ -12,7 +12,7 @@ class ProductRepositoryImpl : ProductRepository {
         return Result.runCatching {
             mockProductService.findPagingProducts(
                 offset,
-                PRODUCT_LOAD_PAGING_SIZE
+                PRODUCT_LOAD_PAGING_SIZE,
             )
         }
     }
