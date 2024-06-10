@@ -23,28 +23,6 @@ class RepositoryImpl(
 ) : Repository {
     val productPagingSource = ProductPagingSource(remoteDataSource)
 
-    override fun findProductByPaging(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            localDataSource.findProductByPaging(offset, pageSize).map { it.toDomain() }
-        }
-
-    override suspend fun getProducts(
-        category: String,
-        page: Int,
-        size: Int,
-    ): Result<List<CartProduct>?> {
-        return remoteDataSource.getProducts(category, page, size)
-            .mapCatching {
-                it.map { it.toDomain() }
-            }
-            .recoverCatching {
-                throw it
-            }
-    }
-
     override suspend fun getProductsByPaging(): Result<List<CartProduct>?> {
         val data = productPagingSource.load()
         return when (data) {
@@ -92,14 +70,6 @@ class RepositoryImpl(
         return remoteDataSource.submitOrders(orderRequest).recoverCatching { throw it }
     }
 
-    override fun findCartByPaging(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            localDataSource.findCartByPaging(offset, pageSize).map { it.toDomain() }
-        }
-
     override suspend fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
             localDataSource.findByLimit(limit).map { it.toDomain() }
@@ -108,16 +78,6 @@ class RepositoryImpl(
     override suspend fun findOne(): Result<RecentProduct?> =
         runCatching {
             localDataSource.findOne()?.toDomain()
-        }
-
-    override fun saveCart(cart: Cart): Result<Long> =
-        runCatching {
-            localDataSource.saveCart(cart.toEntity())
-        }
-
-    override fun saveRecent(recent: Recent): Result<Long> =
-        runCatching {
-            localDataSource.saveRecent(recent.toEntity())
         }
 
     override suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
@@ -132,16 +92,6 @@ class RepositoryImpl(
     ) {
         localDataSource.updateRecentProduct(productId, quantity, cartId)
     }
-
-    override fun deleteCart(id: Long): Result<Long> =
-        runCatching {
-            localDataSource.deleteCart(id)
-        }
-
-    override fun getMaxCartCount(): Result<Int> =
-        runCatching {
-            localDataSource.getMaxCartCount()
-        }
 
     override suspend fun getCartItemsCounts(): Result<Int> {
         return remoteDataSource.getCartItemsCounts()

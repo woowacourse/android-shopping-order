@@ -18,6 +18,8 @@ val cartProducts =
 
 val cartProduct: CartProduct = cartProducts.first()
 
+val coupons = List(4) { createCoupon(id = it) }
+
 
 fun createCoupon(
     id: Int = 1,
