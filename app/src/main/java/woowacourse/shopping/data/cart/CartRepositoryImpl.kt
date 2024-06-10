@@ -9,8 +9,7 @@ class CartRepositoryImpl(
 ) : CartRepository {
     override suspend fun loadAll(): Result<List<Cart>> {
         return runCatching {
-            var maxCount = 0
-            getCount().onSuccess { maxCount = it }.onFailure { maxCount = MAXIMUM_CART_ITEM_COUNT }
+            val maxCount = getCount().getOrElse { MAXIMUM_CART_ITEM_COUNT }
             return load(
                 0,
                 maxCount,
@@ -34,12 +33,12 @@ class CartRepositoryImpl(
     }
 
     override suspend fun loadById(productId: Long): Result<Cart> {
-        return runCatching {
-            var foundCart: Cart? = null
-            loadAll().onSuccess { carts ->
-                foundCart = carts.firstOrNull { it.product.id == productId }
-            }
-            foundCart ?: throw NoSuchElementException(EXCEPTION_NO_SUCH_PRODUCT)
+        val currentCartItems = loadAll().getOrElse { emptyList() }
+        val foundCart = currentCartItems.firstOrNull { it.product.id == productId }
+        return if (foundCart != null) {
+            Result.success(foundCart)
+        } else {
+            Result.failure(NoSuchElementException(EXCEPTION_NO_SUCH_PRODUCT))
         }
     }
 
@@ -126,7 +125,7 @@ class CartRepositoryImpl(
     }
 
     companion object {
-        private const val EXCEPTION_NO_SUCH_PRODUCT = "상품이 장바구니에 존재하지 않습니다."
+        private const val EXCEPTION_NO_SUCH_PRODUCT = "상품을 장바구니에서 찾을 수 없습니다."
         const val MAXIMUM_CART_ITEM_COUNT = 999
     }
 }
