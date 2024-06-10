@@ -80,12 +80,10 @@ class ProductListViewModel(
     fun loadAll() {
         viewModelScope.launch {
             val page = currentPage.value ?: currentPageIsNullException()
-            (FIRST_PAGE..page).forEach { page ->
-                handle(productsRepository.loadProducts(page)) { productsPage ->
-                    _loadedProducts.value = productsPage.products
-                    _isLoading.value = false
-                    _isLastPage.postValue(productsPage.isLastPage)
-                }
+            handle(productsRepository.loadProducts(page)) { productsPage ->
+                _loadedProducts.value = productsPage.products
+                _isLoading.value = false
+                _isLastPage.postValue(productsPage.isLastPage)
             }
             updateCartItemsCount()
             loadProductsHistory()
@@ -162,7 +160,7 @@ class ProductListViewModel(
 
     companion object {
         private const val TAG = "ProductListViewModel"
-        private const val FIRST_PAGE = 1
+        private const val FIRST_PAGE = 0
         private const val PAGE_MOVE_COUNT = 1
 
         fun factory(
