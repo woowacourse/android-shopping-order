@@ -60,12 +60,7 @@ class ProductDetailViewModel(
                 hideError()
                 val state = uiState.value ?: return@launch
 
-                val productHistory =
-                    if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
-                        if (productHistories.size >= 2) productHistories[1] else null
-                    } else {
-                        productHistories.firstOrNull()
-                    }
+                val productHistory = getMostHistoryProduct(productHistories)
 
                 _uiState.postValue(
                     state.copy(
@@ -81,6 +76,29 @@ class ProductDetailViewModel(
                 showMessage(MessageProvider.DefaultErrorMessage)
             }
         }
+    }
+
+    fun getMostHistoryProduct(productHistories: List<Product>): Product? {
+        return if (isMostHistoryProduct(
+                productHistories,
+                productHistories.first().id,
+            )
+        ) {
+            getSecondHistoryProduct(productHistories)
+        } else {
+            productHistories.firstOrNull()
+        }
+    }
+
+    private fun isMostHistoryProduct(
+        productHistories: List<Product>,
+        cartProductId: Long,
+    ): Boolean {
+        return productHistories.isNotEmpty() && cartProductId == productHistories.first().id
+    }
+
+    private fun getSecondHistoryProduct(productHistories: List<Product>): Product? {
+        return if (productHistories.size >= 2) productHistories[1] else null
     }
 
     private fun isLastProductPage(
