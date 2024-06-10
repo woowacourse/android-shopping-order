@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.domain.model.Orders
 
-interface OrderRepository2 {
+interface OrderRepository {
     suspend fun order(): Result<Unit>
 
     suspend fun save(

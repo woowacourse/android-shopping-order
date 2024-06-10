@@ -8,10 +8,10 @@ import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.domain.model.Orders
 import java.time.LocalDateTime
 
-class DefaultOrderRepository2(
+class DefaultOrderRepository(
     private val orderSource: OrderDataSource,
     private val cartSource: ShoppingCartDataSource,
-) : OrderRepository2 {
+) : OrderRepository {
     override suspend fun order(): Result<Unit> = orderSource.order()
 
     override suspend fun save(orderItem: OrderItem): Result<Unit> = orderSource.saveOrderItem(orderItem)

@@ -14,15 +14,15 @@ import woowacourse.shopping.domain.model.Orders
 import woowacourse.shopping.domain.model.toUi
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.DefaultCouponRepository
-import woowacourse.shopping.domain.repository.DefaultOrderRepository2
-import woowacourse.shopping.domain.repository.OrderRepository2
+import woowacourse.shopping.domain.repository.DefaultOrderRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.model.CouponUi
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
-    private val orderRepository2: OrderRepository2,
+    private val orderRepository: OrderRepository,
 ) : ViewModel(), CouponCheckListener {
 
     // TODO: 이거 왜 LiveData 로 안하면 안 되네
@@ -37,7 +37,7 @@ class PaymentViewModel(
 
     fun loadOrders() {
         viewModelScope.launch(Dispatchers.IO) {
-            orderRepository2.loadAllOrders()
+            orderRepository.loadAllOrders()
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _orders.postValue(it)
@@ -103,7 +103,7 @@ class PaymentViewModel(
                     couponRepository = DefaultCouponRepository(
                         ShoppingApp.couponSource,
                     ),
-                    orderRepository2 = DefaultOrderRepository2(
+                    orderRepository = DefaultOrderRepository(
                         ShoppingApp.orderSource2,
                         ShoppingApp.cartSource,
                     )

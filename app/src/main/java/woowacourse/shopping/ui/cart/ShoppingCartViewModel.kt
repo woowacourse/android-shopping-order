@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.OrderItem
-import woowacourse.shopping.domain.repository.DefaultOrderRepository2
+import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.domain.repository.OrderRepository2
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 import woowacourse.shopping.ui.cart.listener.ShoppingCartListener
@@ -23,7 +23,7 @@ import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class ShoppingCartViewModel(
     private val cartRepository: ShoppingCartRepository,
-    private val realOrderRepository2: OrderRepository2
+    private val orderRepository: OrderRepository
 ) : ViewModel(),
     ShoppingCartListener {
 
@@ -104,7 +104,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartItems.value?.forEach { cartItem ->
                 if (cartItem.checked) {
-                    realOrderRepository2.save(
+                    orderRepository.save(
                         orderItem = OrderItem(
                             cartItemId = cartItem.id,
                             quantity = cartItem.quantity,
@@ -124,7 +124,7 @@ class ShoppingCartViewModel(
 
             Log.d(
                 TAG, "navigateToOrder: orderItems: " +
-                        "${realOrderRepository2.loadAllOrders().getOrThrow()}"
+                        "${orderRepository.loadAllOrders().getOrThrow()}"
             )
         }
     }
@@ -255,14 +255,14 @@ class ShoppingCartViewModel(
                 DefaultShoppingCartRepository(
                     cartSource = ShoppingApp.cartSource,
                 ),
-            realOrderRepository2: OrderRepository2 =
-                DefaultOrderRepository2(
+            orderRepository: OrderRepository =
+                DefaultOrderRepository(
                     orderSource = ShoppingApp.orderSource2,
                     cartSource = ShoppingApp.cartSource,
                 )
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
-                ShoppingCartViewModel(shoppingCartRepository, realOrderRepository2)
+                ShoppingCartViewModel(shoppingCartRepository, orderRepository)
             }
     }
 }

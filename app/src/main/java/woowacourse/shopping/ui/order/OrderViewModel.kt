@@ -11,9 +11,9 @@ import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CategoryBasedProductRecommendationRepository
-import woowacourse.shopping.domain.repository.DefaultOrderRepository2
+import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.domain.repository.OrderRepository2
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductsRecommendationRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.ui.order.event.OrderEvent
@@ -23,7 +23,7 @@ import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class OrderViewModel(
-    private val orderRepository2: OrderRepository2,
+    private val orderRepository: OrderRepository,
     private val productsRecommendationRepository: ProductsRecommendationRepository,
     private val cartRepository: ShoppingCartRepository,
 ) : ViewModel(), OrderListener {
@@ -41,7 +41,7 @@ class OrderViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            orderRepository2.loadAllOrders().getOrThrow().also {
+            orderRepository.loadAllOrders().getOrThrow().also {
                 Log.d(TAG, "all orders: $it")
             }
         }
@@ -69,7 +69,7 @@ class OrderViewModel(
                     throw it
                 }
 
-            orderRepository2.allOrderItemsQuantity()
+            orderRepository.allOrderItemsQuantity()
                 .onSuccess { allQuantity ->
                     withContext(Dispatchers.Main) {
                         _addedProductQuantity.postValue(allQuantity)
@@ -81,7 +81,7 @@ class OrderViewModel(
                     throw it
                 }
 
-            orderRepository2.orderItemsTotalPrice()
+            orderRepository.orderItemsTotalPrice()
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         _totalPrice.postValue(it)
@@ -113,7 +113,7 @@ class OrderViewModel(
                     throw it
                 }
 
-            orderRepository2.updateOrderItem(productId, quantity)
+            orderRepository.updateOrderItem(productId, quantity)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
@@ -128,7 +128,7 @@ class OrderViewModel(
                 }
 
 
-            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository2.loadAllOrders().getOrThrow()}")
+            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository.loadAllOrders().getOrThrow()}")
 
 
         }
@@ -141,7 +141,7 @@ class OrderViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            orderRepository2.updateOrderItem(productId, quantity)
+            orderRepository.updateOrderItem(productId, quantity)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
@@ -154,7 +154,7 @@ class OrderViewModel(
                     Log.e(TAG, "onDecrease: saveOrderItem2: $it")
                     throw it
                 }
-            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository2.loadAllOrders().getOrThrow()}")
+            Log.d(TAG, "onDecrease: orderREpo2: ${orderRepository.loadAllOrders().getOrThrow()}")
 
         }
     }
@@ -191,8 +191,8 @@ class OrderViewModel(
         private const val DECREASE_AMOUNT = -1
 
         fun factory(
-            orderRepository2: OrderRepository2 =
-                DefaultOrderRepository2(
+            orderRepository: OrderRepository =
+                DefaultOrderRepository(
                     ShoppingApp.orderSource2,
                     ShoppingApp.cartSource,
 
@@ -210,7 +210,7 @@ class OrderViewModel(
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
-                    orderRepository2,
+                    orderRepository,
                     productRecommendationRepository,
                     cartRepository,
                 )
