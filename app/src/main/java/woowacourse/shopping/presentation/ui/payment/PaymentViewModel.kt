@@ -53,8 +53,6 @@ class PaymentViewModel(
             showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
             delay(1000) // TODO 스켈레톤 UI를 보여주기 위한 sleep..zzz
             val coupons = couponRepository.getCoupons().getOrThrow()
-            throw IllegalArgumentException()
-
             hideError()
             val state = uiState.value ?: return@launch
             val couponUiModel = coupons.map { it.toPresentation() }
