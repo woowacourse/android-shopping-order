@@ -1,7 +1,9 @@
 package woowacourse.shopping
 
 import android.app.Application
+import woowacourse.shopping.data.source.CouponDataSource
 import woowacourse.shopping.data.source.OrderDataSource
+import woowacourse.shopping.data.source.OrderDataSource2
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -10,9 +12,12 @@ import woowacourse.shopping.local.history.HistoryProductDatabase
 import woowacourse.shopping.local.source.LocalHistoryProductDataSource
 import woowacourse.shopping.remote.RetrofitService
 import woowacourse.shopping.remote.service.CartItemApiService
+import woowacourse.shopping.remote.service.CouponApiService
 import woowacourse.shopping.remote.service.OrderApiService
 import woowacourse.shopping.remote.service.ProductsApiService
 import woowacourse.shopping.remote.source.CartItemRemoteDataSource
+import woowacourse.shopping.remote.source.CouponRemoteDataSource
+import woowacourse.shopping.remote.source.DefaultOrderDataSource
 import woowacourse.shopping.remote.source.OrderRemoteDataSource
 import woowacourse.shopping.remote.source.ProductRemoteDataSource
 
@@ -27,6 +32,10 @@ class ShoppingApp : Application() {
         RetrofitService.createRetorift(BuildConfig.BASE_ORDERS_URL_DEV).create(OrderApiService::class.java)
     }
 
+    private val couponApiService: CouponApiService by lazy {
+        RetrofitService.createRetorift(BuildConfig.BASE_COUPONS_URL_DEV).create(CouponApiService::class.java)
+    }
+
     private val historyProductDb: HistoryProductDatabase by lazy { HistoryProductDatabase.database(context = this) }
     private val historyProductDao: HistoryProductDao by lazy { historyProductDb.dao() }
 
@@ -36,6 +45,8 @@ class ShoppingApp : Application() {
         cartSource = CartItemRemoteDataSource(cartItemApi)
         historySource = LocalHistoryProductDataSource(historyProductDao)
         orderSource = OrderRemoteDataSource(orderApi)
+        orderSource2 = DefaultOrderDataSource(orderApi)
+        couponSource = CouponRemoteDataSource(couponApiService)
     }
 
     override fun onTerminate() {
@@ -55,6 +66,12 @@ class ShoppingApp : Application() {
             private set
 
         lateinit var orderSource: OrderDataSource
+            private set
+
+        lateinit var orderSource2: OrderDataSource2
+            private set
+
+        lateinit var couponSource: CouponDataSource
             private set
     }
 }
