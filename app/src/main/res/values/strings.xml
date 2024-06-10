@@ -26,4 +26,11 @@
     <string name="order_recommended_product_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
 
     <string name="order_items_count">주문하기(%d)</string>
+    <string name="payment_title">결제하기</string>
+    <string name="available_coupon">적용 가능한 쿠폰</string>
+    <string name="coupon_guide">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price">주문 금액</string>
+    <string name="coupon_discount_amount">쿠폰 할인 금액</string>
+    <string name="delivery_fee">배송비</string>
+    <string name="total_payment_amount">총 결제 금액</string>
 </resources>

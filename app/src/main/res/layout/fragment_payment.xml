@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.payment.PaymentFragment">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.ui.payment.PaymentViewModel" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_payment"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:backgroundTint="@color/gray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationIcon="?attr/homeAsUpIndicator"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/payment_title"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+            </androidx.appcompat.widget.Toolbar>
+
+
+            <TextView
+                android:id="@+id/tv_available_coupon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="25dp"
+                android:text="@string/available_coupon"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar_payment" />
+
+            <TextView
+                android:id="@+id/tv_coupon_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/coupon_guide"
+                app:layout_constraintStart_toStartOf="@id/tv_available_coupon"
+                app:layout_constraintTop_toBottomOf="@id/tv_available_coupon" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_payment_coupon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layoutManager="LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_coupon_guide"
+                tools:itemCount="3"
+                tools:listitem="@layout/holder_coupon" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider_payment_bw_coupon_amount"
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_payment_coupon" />
+
+            <TextView
+                android:id="@+id/tv_order_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/order_price"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider_payment_bw_coupon_amount"
+                tools:ignore="SpUsage" />
+
+            <TextView
+                android:id="@+id/tv_order_price_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:text="@{String.valueOf(vm.orders.totalPrice)}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_order_price"
+                tools:ignore="SpUsage"
+                tools:text="204,200원" />
+
+            <TextView
+                android:id="@+id/tv_payment_coupon_discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/coupon_discount_amount"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/tv_order_price"
+                app:layout_constraintTop_toBottomOf="@id/tv_order_price"
+                tools:ignore="SpUsage" />
+
+            <TextView
+                android:id="@+id/tv_payment_coupon_discount_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_payment_coupon_discount"
+                tools:ignore="SpUsage"
+                android:text="@{String.valueOf(vm.discountedPrice)}"
+                tools:text="-5,000원" />
+
+
+            <TextView
+                android:id="@+id/tv_payment_delivery_fee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/delivery_fee"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/tv_payment_coupon_discount"
+                app:layout_constraintTop_toBottomOf="@id/tv_payment_coupon_discount"
+                tools:ignore="SpUsage" />
+
+            <TextView
+                android:id="@+id/tv_payment_delivery_fee_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_payment_delivery_fee"
+                tools:ignore="SpUsage"
+                android:text="@{String.valueOf(vm.orders.deliveryFee)}"
+                tools:text="-5,000원" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider_payment_bw_amount_total_price"
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_payment_delivery_fee" />
+
+            <TextView
+                android:id="@+id/tv_payment_total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/total_payment_amount"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/tv_payment_delivery_fee"
+                app:layout_constraintTop_toBottomOf="@id/divider_payment_bw_amount_total_price"
+                tools:ignore="SpUsage" />
+
+            <TextView
+                android:id="@+id/tv_payment_total_price_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/btn_payment_pay"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_payment_total_price"
+                tools:ignore="SpUsage"
+                android:text="@{String.valueOf(vm.orders.totalPrice - vm.discountedPrice + vm.orders.deliveryFee)}"
+                tools:text="202,200원" />
+
+
+            <TextView
+                android:id="@+id/btn_payment_pay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/payment_title"
+                android:background="@color/teal_700"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="80dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_payment_total_price_value" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+
+</layout>
