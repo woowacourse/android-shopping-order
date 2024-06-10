@@ -108,7 +108,7 @@ class ProductDetailViewModel(
     private suspend fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
         return runCatching {
             shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
-                .mapCatching { result ->
+                .map { result ->
                     cartItemId = result.cartItemId
                     result.counter
                 }.getOrDefault(CartItemCounter())

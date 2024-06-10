@@ -86,7 +86,7 @@ class RemoteShoppingCartRepositoryImpl(
     ): UpdateCartItemResult {
         increaseItem(cartItemResult, product)
         return addCartItem(product)
-            .mapCatching {
+            .map {
                 UpdateCartItemResult.ADD
             }.getOrElse {
                 throw ErrorEvent.UpdateCartEvent()
@@ -106,7 +106,7 @@ class RemoteShoppingCartRepositoryImpl(
             id = cartItemResult.cartItemId.toInt(),
             quantity = cartItemResult.counter.itemCount,
         )
-            .mapCatching {
+            .map {
                 UpdateCartItemResult.UPDATED(cartItemResult)
             }.getOrElse {
                 throw ErrorEvent.UpdateCartEvent()
@@ -115,7 +115,7 @@ class RemoteShoppingCartRepositoryImpl(
 
     private suspend fun deleteCartItemResult(cartItemResult: CartItemResult): UpdateCartItemResult {
         return deleteCartItem(cartItemResult.cartItemId)
-            .mapCatching {
+            .map {
                 UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
             }.getOrElse {
                 throw ErrorEvent.DeleteCartEvent()
