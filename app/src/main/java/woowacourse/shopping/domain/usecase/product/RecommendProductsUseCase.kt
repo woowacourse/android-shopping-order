@@ -16,12 +16,13 @@ class DefaultRecommendProductsUseCase(
         val recentProducts = productRepository.loadRecentProducts(1).getOrNull() ?: emptyList()
         val category = recentProducts.firstOrNull()?.category
         val cart = cartRepository.loadCart().getOrNull() ?: return emptyList()
-        val products: List<Product> = if (category == null) {
-            productRepository.loadProducts(0, PRODUCT_SIZE).getOrNull() ?: emptyList()
-        } else {
-            productRepository.loadProducts(category = category, 0, PRODUCT_SIZE).getOrNull()
-                ?: emptyList()
-        }
+        val products: List<Product> =
+            if (category == null) {
+                productRepository.loadProducts(0, PRODUCT_SIZE).getOrNull() ?: emptyList()
+            } else {
+                productRepository.loadProducts(category = category, 0, PRODUCT_SIZE).getOrNull()
+                    ?: emptyList()
+            }
         return products.filterNot {
             cart.hasProductId(it.id)
         }.take(amount)

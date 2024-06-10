@@ -36,7 +36,6 @@ private fun CouponResponse.toFixedCoupon(): FixedCoupon {
         code = code,
         description = description,
         expirationDate = expirationDate.toLocalDateTime(),
-        targetDateTime = LocalDateTime.now(),
         discount = discount,
         discountableMinPrice = discountableMinPrice,
     )
@@ -48,7 +47,6 @@ private fun CouponResponse.toBOGOCoupon(): BOGOCoupon {
         code = code,
         description = description,
         expirationDate = expirationDate.toLocalDateTime(),
-        targetDateTime = LocalDateTime.now(),
         buyCount = buyQuantity,
         freeCount = getQuantity,
     )
@@ -60,7 +58,6 @@ private fun CouponResponse.toFreeShippingCoupon(): FreeShippingCoupon {
         code = code,
         description = description,
         expirationDate = expirationDate.toLocalDateTime(),
-        targetDateTime = LocalDateTime.now(),
         discountableMinPrice = discountableMinPrice,
     )
 }
@@ -71,7 +68,6 @@ private fun CouponResponse.toPercentageCoupon(): PercentageCoupon {
         code = code,
         description = description,
         expirationDate = expirationDate.toLocalDateTime(),
-        targetDateTime = LocalDateTime.now(),
         discountRate = discount.toFloat() / 100,
         availableStartTime = LocalTime.parse(availableTime.startTime, timeFormatter),
         availableEndTime = LocalTime.parse(availableTime.endTime, timeFormatter),

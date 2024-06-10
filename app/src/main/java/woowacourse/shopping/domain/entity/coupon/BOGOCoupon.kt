@@ -9,14 +9,15 @@ data class BOGOCoupon(
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDateTime,
-    override val targetDateTime: LocalDateTime,
     val buyCount: Int,
     val freeCount: Int,
-) : Coupon(id, code, description, 0L, expirationDate, targetDateTime) {
+) : Coupon(id, code, description, 0L, expirationDate) {
     private val discountLimitCount = buyCount + freeCount
-
-    override fun available(cart: Cart): Boolean {
-        return !isExpired && cart.cartProducts.any { it.count >= discountLimitCount }
+    override fun available(
+        cart: Cart,
+        targetDateTime: LocalDateTime,
+    ): Boolean {
+        return !isExpired(targetDateTime) && cart.cartProducts.any { it.count >= discountLimitCount }
     }
 
     override fun calculateDiscount(
