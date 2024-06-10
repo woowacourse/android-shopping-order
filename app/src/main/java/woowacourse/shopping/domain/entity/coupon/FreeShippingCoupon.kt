@@ -7,9 +7,9 @@ data class FreeShippingCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,
-    override val discountableMinPrice: Long,
     override val expirationDate: LocalDateTime,
-) : Coupon(id, code, description, discountableMinPrice, expirationDate) {
+    val discountableMinPrice: Long,
+) : Coupon(id, code, description, expirationDate) {
     override fun available(
         cart: Cart,
         targetDateTime: LocalDateTime,

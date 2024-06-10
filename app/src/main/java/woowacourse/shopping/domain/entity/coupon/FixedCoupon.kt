@@ -7,10 +7,10 @@ data class FixedCoupon(
     override val id: Long,
     override val code: String,
     override val description: String,
-    override val discountableMinPrice: Long,
     override val expirationDate: LocalDateTime,
+    val discountableMinPrice: Long,
     val discount: Long,
-) : Coupon(id, code, description, discountableMinPrice, expirationDate) {
+) : Coupon(id, code, description, expirationDate) {
     override fun available(
         cart: Cart,
         targetDateTime: LocalDateTime,

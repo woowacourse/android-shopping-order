@@ -8,7 +8,6 @@ sealed class Coupon(
     open val id: Long,
     open val code: String,
     open val description: String,
-    open val discountableMinPrice: Long,
     open val expirationDate: LocalDateTime,
 ) {
     protected fun isExpired(targetDateTime: LocalDateTime): Boolean =
