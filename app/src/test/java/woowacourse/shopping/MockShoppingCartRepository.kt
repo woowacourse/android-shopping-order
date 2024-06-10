@@ -1,92 +1,60 @@
 package woowacourse.shopping
 
+import woowacourse.shopping.TestFixture.cartItem0
+import woowacourse.shopping.TestFixture.cartItem1
+import woowacourse.shopping.TestFixture.cartItem2
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.CartItemResult
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class MockShoppingCartRepository : ShoppingCartRepository {
     val cartItems =
-        mutableListOf(
-            CartItem(
-                id = 0L,
-                product =
-                    Product(
-                        id = 0L,
-                        imageUrl =
-                            """
-                            https://s3-alpha-sig.figma.com/img/6a52/2b6a/05b81120d274b875b55d6da04de4749e?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=bF~PKj~RVd3Rg-U5LFz7izxp92X8QuDAiYxB6S4iXS41nq6BXyKGCmyZdn39WHzQIeIscToVmlFB7WwRKhnfDR-WxMbd7dTuJIRhwiR8iQ5lq6LUm7MLNEv9l779WDsICq0kUJp1MUPVJFDG72HKGqMJaL5KuqlmJeOhlT2Qy1rneIXyjuILXnqAbS56t3YlIPIPTI6BWe3Sk6j4zCPL49M0NNbkTY4bESgBSkqIzfXHTngQyHKXXbn~gM7IQSIumumWVSxY8j3Ms2q813-NrE7J0D1EMRQokCmMQDTnaIzioYiDgIAnoBwurFdR6Ehl~VJfS55vWo50ajYaaGKPMQ__
-                            """.trimIndent(),
-                        price = 10_000,
-                        name = "PET보틀-단지(400ml) 레몬청",
-                        category = "",
-                    ),
-            ),
-            CartItem(
-                id = 1L,
-                product =
-                    Product(
-                        id = 1L,
-                        imageUrl =
-                            """
-                            https://s3-alpha-sig.figma.com/img/6a52/2b6a/05b81120d274b875b55d6da04de4749e?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=bF~PKj~RVd3Rg-U5LFz7izxp92X8QuDAiYxB6S4iXS41nq6BXyKGCmyZdn39WHzQIeIscToVmlFB7WwRKhnfDR-WxMbd7dTuJIRhwiR8iQ5lq6LUm7MLNEv9l779WDsICq0kUJp1MUPVJFDG72HKGqMJaL5KuqlmJeOhlT2Qy1rneIXyjuILXnqAbS56t3YlIPIPTI6BWe3Sk6j4zCPL49M0NNbkTY4bESgBSkqIzfXHTngQyHKXXbn~gM7IQSIumumWVSxY8j3Ms2q813-NrE7J0D1EMRQokCmMQDTnaIzioYiDgIAnoBwurFdR6Ehl~VJfS55vWo50ajYaaGKPMQ__
-                            """.trimIndent(),
-                        price = 12_000,
-                        name = "PET보틀-납작(2000ml) 밀크티",
-                        category = "",
-                    ),
-            ),
-            CartItem(
-                id = 2L,
-                product =
-                    Product(
-                        id = 2L,
-                        imageUrl =
-                            """
-                            https://s3-alpha-sig.figma.com/img/6a52/2b6a/05b81120d274b875b55d6da04de4749e?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=bF~PKj~RVd3Rg-U5LFz7izxp92X8QuDAiYxB6S4iXS41nq6BXyKGCmyZdn39WHzQIeIscToVmlFB7WwRKhnfDR-WxMbd7dTuJIRhwiR8iQ5lq6LUm7MLNEv9l779WDsICq0kUJp1MUPVJFDG72HKGqMJaL5KuqlmJeOhlT2Qy1rneIXyjuILXnqAbS56t3YlIPIPTI6BWe3Sk6j4zCPL49M0NNbkTY4bESgBSkqIzfXHTngQyHKXXbn~gM7IQSIumumWVSxY8j3Ms2q813-NrE7J0D1EMRQokCmMQDTnaIzioYiDgIAnoBwurFdR6Ehl~VJfS55vWo50ajYaaGKPMQ__
-                            """.trimIndent(),
-                        price = 12_000,
-                        name = "PET보틀-밀크티(600ml)",
-                        category = "",
-                    ),
-            ),
-        )
+        mutableListOf(cartItem0, cartItem1, cartItem2)
 
-    override fun addCartItem(product: Product) {
-        val cartItem = CartItem(3L, product)
-        cartItems.add(cartItem)
+    override suspend fun insertCartItem(product: Product): Result<Unit> {
+        return Result.success(Unit)
     }
 
-    override fun loadPagingCartItems(
+    override suspend fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
-    ): List<CartItem> {
-        return if (offset + pagingSize <= cartItems.size) {
-            cartItems.subList(offset, offset + pagingSize)
-        } else {
-            cartItems.subList(offset, cartItems.size)
+    ): Result<List<CartItem>> {
+        return Result.success(cartItems)
+    }
+
+    override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
+        val cartItemResult =
+            cartItems.find { it.product.id == productId }?.let {
+                CartItemResult(it.id, it.product.cartItemCounter)
+            } ?: return Result.failure(Exception("정보 없음"))
+        return Result.success(cartItemResult)
+    }
+
+    override suspend fun deleteCartItem(itemId: Long): Result<Unit> {
+        return Result.success(Unit)
+    }
+
+    override suspend fun increaseCartItem(product: Product): Result<Unit> {
+        cartItems.filter { it.product.id == product.id }.forEach { it.product.cartItemCounter.increase() }
+        return Result.success(Unit)
+    }
+
+    override suspend fun decreaseCartItem(product: Product): Result<Unit> {
+        cartItems.filter { it.product.id == product.id }.forEach { it.product.cartItemCounter.decrease() }
+        return Result.success(Unit)
+    }
+
+    override suspend fun updateCartCount(cartItemResult: CartItemResult): Result<Unit> {
+        cartItems.filter { it.id == cartItemResult.cartItemId }.forEach {
+            it.product.cartItemCounter.updateCount(
+                cartItemResult.counter.itemCount,
+            )
         }
+        return Result.success(Unit)
     }
 
-    override fun deleteCartItem(itemId: Long) {
-        cartItems.removeIf { it.id == itemId }
-    }
-
-    override fun getCartItemResultFromProductId(productId: Long): CartItemResult {
-        return CartItemResult(0, CartItemCounter())
-    }
-
-    override fun updateCartItem(
-        product: Product,
-        updateCartItemType: UpdateCartItemType,
-    ): UpdateCartItemResult {
-        return UpdateCartItemResult.UPDATED(CartItemResult(0, CartItemCounter()))
-    }
-
-    override fun getTotalCartItemCount(): Int {
-        return cartItems.size
+    override suspend fun getTotalCartItemCount(): Result<Int> {
+        return Result.success(cartItems.size)
     }
 }
