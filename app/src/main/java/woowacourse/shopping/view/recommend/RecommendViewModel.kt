@@ -12,7 +12,6 @@ import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryI
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -22,7 +21,6 @@ import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class RecommendViewModel(
-    private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
