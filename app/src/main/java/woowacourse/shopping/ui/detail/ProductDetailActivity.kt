@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
@@ -14,6 +15,7 @@ import woowacourse.shopping.data.cart.remote.RemoteCartRepository
 import woowacourse.shopping.data.local.ShoppingCartDataBase
 import woowacourse.shopping.data.product.remote.RemoteProductRepository
 import woowacourse.shopping.data.recent.local.RoomRecentProductRepository
+import woowacourse.shopping.data.remote.ApiError
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.products.ProductsActivity
@@ -24,7 +26,11 @@ class ProductDetailActivity : AppCompatActivity() {
         ProductDetailViewModelFactory(
             productId(),
             RemoteProductRepository,
-            RoomRecentProductRepository.getInstance(ShoppingCartDataBase.getInstance(applicationContext).recentProductDao()),
+            RoomRecentProductRepository.getInstance(
+                ShoppingCartDataBase.getInstance(
+                    applicationContext,
+                ).recentProductDao(),
+            ),
             RemoteCartRepository,
             isNavigatedFromDetailView(),
         )
@@ -38,7 +44,8 @@ class ProductDetailActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.onClickLastRecentProductListener =
             OnClickLastRecentProductListener { productId ->
-                val intent = newIntent(this@ProductDetailActivity, productId, lastSeenProductVisible = true)
+                val intent =
+                    newIntent(this@ProductDetailActivity, productId, lastSeenProductVisible = true)
                 startActivity(intent)
                 finish()
             }
@@ -53,7 +60,7 @@ class ProductDetailActivity : AppCompatActivity() {
     private fun initializeView() {
         initializeToolbar()
         initializeAddCartButton()
-        initializeProductLoadError()
+        observeProductLoadErrorEvent()
         setRequireActivityResult()
     }
 
@@ -76,7 +83,7 @@ class ProductDetailActivity : AppCompatActivity() {
             if (isSuccess) {
                 showAddCartSuccessDialog()
             } else {
-                showAddCartFailureToast()
+                showToast(R.string.cart_item_add_error)
             }
         }
     }
@@ -95,27 +102,43 @@ class ProductDetailActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showAddCartFailureToast() {
-        Toast.makeText(this, R.string.add_cart_failure, Toast.LENGTH_SHORT).show()
-    }
-
     private fun navigateToCartView() {
         val intent = Intent(this, CartActivity::class.java)
         startActivity(intent)
     }
 
-    private fun initializeProductLoadError() {
-        viewModel.productLoadError.observe(this) { errorEvent ->
-            errorEvent.getContentIfNotHandled() ?: return@observe
-            showErrorSnackBar()
+    private fun observeProductLoadErrorEvent() {
+        viewModel.productLoadError.observe(this) {
+            val throwable = it.getContentIfNotHandled() ?: return@observe
+            showProductLoadError(throwable)
         }
     }
 
-    private fun showErrorSnackBar() {
+    private fun showProductLoadError(throwable: Throwable) {
+        if (throwable is ApiError) {
+            showProductLoadErrorSnackBar()
+        }
+        when (throwable) {
+            is ApiError.BadRequest -> showProductLoadErrorSnackBar()
+            is ApiError.Unauthorized -> showToast(R.string.unauthorized_error)
+            is ApiError.Forbidden -> showToast(R.string.unauthorized_error)
+            is ApiError.NotFound -> showToast(R.string.product_not_found_error)
+            is ApiError.InternalServerError -> showToast(R.string.server_error)
+            is ApiError.Exception -> showProductLoadErrorSnackBar()
+        }
+    }
+
+    private fun showProductLoadErrorSnackBar() {
         Snackbar
             .make(binding.root, getString(R.string.common_error_previous_view), Snackbar.LENGTH_INDEFINITE)
             .setAction(getString(R.string.common_confirm)) { finish() }
             .show()
+    }
+
+    private fun showToast(
+        @StringRes messageResId: Int,
+    ) {
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
     private fun productId(): Int = intent.getIntExtra(PRODUCT_ID_KEY, PRODUCT_ID_DEFAULT_VALUE)

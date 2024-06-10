@@ -26,8 +26,8 @@ class ProductDetailViewModel(
     private val _productUiModel = MutableLiveData<ProductUiModel>()
     val productUiModel: LiveData<ProductUiModel> get() = _productUiModel
 
-    private val _productLoadError = MutableLiveData<Event<Unit>>()
-    val productLoadError: LiveData<Event<Unit>> get() = _productLoadError
+    private val _productLoadError = MutableLiveData<Event<Throwable>>()
+    val productLoadError: LiveData<Event<Throwable>> get() = _productLoadError
 
     private val _isSuccessAddCart = MutableLiveData<Event<Boolean>>()
     val isSuccessAddCart: LiveData<Event<Boolean>> get() = _isSuccessAddCart
@@ -59,7 +59,7 @@ class ProductDetailViewModel(
                     _productUiModel.value = product.toProductUiModel(this)
                     saveRecentProduct()
                 }.onFailure {
-                    setError()
+                    setProductLoadError(it)
                 }
         }
 
@@ -75,8 +75,6 @@ class ProductDetailViewModel(
             productRepository.find(lastRecentProduct.product.id)
                 .onSuccess { product ->
                     _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
-                }.onFailure {
-                    setError()
                 }
         }
 
@@ -107,8 +105,8 @@ class ProductDetailViewModel(
                 .onFailure { _isSuccessAddCart.value = Event(false) }
         }
 
-    private fun setError() {
-        _productLoadError.value = Event(Unit)
+    private fun setProductLoadError(throwable: Throwable) {
+        _productLoadError.value = Event(throwable)
     }
 
     override fun onCleared() {
