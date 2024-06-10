@@ -37,7 +37,7 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.availableCouponsUiState.observe(this) { uiState ->
-            when(uiState) {
+            when (uiState) {
                 is UIState.Success -> couponAdapter.submitCoupons(uiState.data)
                 is UIState.Empty -> {}
                 is UIState.Error -> {

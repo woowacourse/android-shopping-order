@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 
 class DetailViewModel(
     private val cartRepository: CartRepository,
@@ -95,6 +96,7 @@ class DetailViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(productId, quantity)
             result.onSuccess {
+                SharedChangedIdsDB.addChangedProductsId(setOf(productId))
                 _isAddCartSuccess.value = Event(true)
             }.onFailure {
                 _isAddCartSuccess.value = Event(false)

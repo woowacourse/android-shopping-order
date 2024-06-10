@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.model.PageInfo
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.ShoppingProduct
+import woowacourse.shopping.domain.model.UpdatedQuantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
@@ -62,6 +63,7 @@ class ShoppingViewModel(
         get() = _isLoading
 
     fun loadProducts() {
+        setLoadingStart()
         viewModelScope.launch {
             val totalProducts: List<Product> =
                 async { asyncGetProductListWithSettingPageInfo() }.await()
@@ -82,7 +84,7 @@ class ShoppingViewModel(
                 withContext(Dispatchers.Main) { _pageInfo.value = productListInfo.pageInfo }
                 nextPage = productListInfo.pageInfo.currentPage + 1
             }.onFailure {
-                withContext(Dispatchers.Main) { _isLoading.value = Event(false) }
+                withContext(Dispatchers.Main) { setLoadingEnd() }
                 Log.d(this::class.java.simpleName, "$it")
             }
         }
@@ -96,7 +98,7 @@ class ShoppingViewModel(
             result.onSuccess { items ->
                 cartItems = items
             }.onFailure {
-                withContext(Dispatchers.Main) { _isLoading.value = Event(false) }
+                withContext(Dispatchers.Main) { setLoadingEnd() }
                 Log.d(this::class.java.simpleName, "$it")
             }
         }
@@ -110,7 +112,7 @@ class ShoppingViewModel(
         if (products != null && cartItems != null) {
             _shoppingProducts.value = convertToShoppingProductList(products, cartItems)
             _changedIds.value = products.map { it.id }.toSet()
-            _isLoading.value = Event(false)
+            setLoadingEnd()
         }
     }
 
@@ -147,6 +149,10 @@ class ShoppingViewModel(
 
     fun setLoadingStart() {
         _isLoading.value = Event(true)
+    }
+
+    fun setLoadingEnd() {
+        _isLoading.value = Event(false)
     }
 
     override fun onProductClick(productId: Long) {
@@ -238,6 +244,31 @@ class ShoppingViewModel(
                 it.copy(quantity = newQuantity)
             } else {
                 it
+            }
+        }.orEmpty()
+    }
+
+    fun acceptChangedItems(changedItems: Set<Long>) {
+        viewModelScope.launch {
+            val result = cartItemsRepository.getCartItemsQuantities(changedItems)
+            result.onSuccess { updatedQuantities ->
+                _shoppingProducts.value = applyUpdatedQuantities(updatedQuantities)
+                _changedIds.value = changedIds.value.orEmpty() + changedItems
+                updateTotalCartItemsQuantity()
+            }.onFailure {
+                Log.d(this::class.java.simpleName, "$it")
+            }
+        }
+    }
+
+    private fun applyUpdatedQuantities(updatedQuantities: List<UpdatedQuantity>): List<ShoppingProduct> {
+        val updatedQuantitiesMap = updatedQuantities.associateBy { it.productId }
+        return shoppingProducts.value?.map { shoppingProduct ->
+            val updatedQuantity = updatedQuantitiesMap[shoppingProduct.product.id]
+            if (updatedQuantity != null) {
+                shoppingProduct.copy(quantity = updatedQuantity.quantity)
+            } else {
+                shoppingProduct
             }
         }.orEmpty()
     }

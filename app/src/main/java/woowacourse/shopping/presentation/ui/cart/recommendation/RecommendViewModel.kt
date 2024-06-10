@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.event.SingleLiveEvent
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 
 class RecommendViewModel(
     private val cartRepository: CartRepository,
@@ -132,6 +133,7 @@ class RecommendViewModel(
         quantity: Int,
     ) {
         addOrder(productId, quantity)
+        SharedChangedIdsDB.addChangedProductsId(setOf(productId))
     }
 
     private fun addOrder(
@@ -166,6 +168,7 @@ class RecommendViewModel(
         } else {
             decreaseOrderQuantity(productId, quantity)
         }
+        SharedChangedIdsDB.addChangedProductsId(setOf(productId))
     }
 
     private fun removeOrder(productId: Long) {

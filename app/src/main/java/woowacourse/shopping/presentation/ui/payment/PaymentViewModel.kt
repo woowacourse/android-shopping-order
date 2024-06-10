@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.event.SingleLiveEvent
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 import java.time.LocalDateTime
 
 class PaymentViewModel(private val orderRepository: OrderRepository) : ViewModel(),
@@ -147,6 +148,7 @@ class PaymentViewModel(private val orderRepository: OrderRepository) : ViewModel
                 orderResult.onSuccess {
                     _isOrderSuccess.value = true
                     _toastMessage.value = MESSAGE_ORDER_SUCCESS
+                    SharedChangedIdsDB.addChangedProductsId(order.map.values.map { it.productId }.toSet())
                 }.onFailure {
                     _toastMessage.value = MESSAGE_ORDER_FAILURE
                     Log.d(this::class.java.simpleName, "$it")

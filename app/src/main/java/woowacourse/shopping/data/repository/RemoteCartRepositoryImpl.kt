@@ -6,6 +6,7 @@ import woowacourse.shopping.data.model.dto.CartItemsDto
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.domain.model.UpdatedQuantity
 import woowacourse.shopping.domain.repository.CartRepository
 
 class RemoteCartRepositoryImpl : CartRepository {
@@ -173,5 +174,23 @@ class RemoteCartRepositoryImpl : CartRepository {
         } else {
             Result.failure(RuntimeException("Failed to make order. Check Item Ids. code: ${response.code()}"))
         }
+    }
+
+    override suspend fun getCartItemsQuantities(productIds: Set<Long>): Result<List<UpdatedQuantity>> {
+        val result = fetchCartItemsInfo()
+        var updatedQuantities: List<UpdatedQuantity> = emptyList()
+        result.onSuccess { cartItems ->
+            updatedQuantities = productIds.map { productId ->
+                val item = cartItems.find { it.productId == productId }
+                if (item != null) {
+                    UpdatedQuantity(productId, item.quantity)
+                } else {
+                    UpdatedQuantity(productId, 0)
+                }
+            }
+        }.onFailure {
+            return Result.failure(RuntimeException("Failed to get cart items."))
+        }
+        return Result.success(updatedQuantities)
     }
 }

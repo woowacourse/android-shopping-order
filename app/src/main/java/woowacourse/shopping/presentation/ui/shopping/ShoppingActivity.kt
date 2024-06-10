@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 import woowacourse.shopping.presentation.ui.cart.CartActivity
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
 import woowacourse.shopping.presentation.ui.shopping.adapter.RecentProductAdapter
@@ -18,7 +20,6 @@ class ShoppingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityShoppingBinding
     private lateinit var shoppingAdapter: ShoppingAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
-
     private val viewModel: ShoppingViewModel by viewModels {
         ShoppingViewModelFactory(
             shoppingItemsRepository = RemoteShoppingRepositoryImpl(),
@@ -38,6 +39,7 @@ class ShoppingActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.countHandler = viewModel
         observeViewModel()
+        loadProductsInfo(savedInstanceState)
     }
 
     private fun setUpRecyclerView() {
@@ -80,6 +82,15 @@ class ShoppingActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadProductsInfo(savedInstanceState: Bundle?) {
+        viewModel.setLoadingStart()
+        if (savedInstanceState == null) {
+            viewModel.loadProducts()
+        } else {
+            viewModel.setLoadingEnd()
+        }
+    }
+
     private fun navigateToCart() {
         startActivity(CartActivity.createIntent(context = this))
     }
@@ -108,7 +119,9 @@ class ShoppingActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.setLoadingStart()
-        viewModel.loadProducts()
+        if (SharedChangedIdsDB.existChangedProducts()) {
+            viewModel.acceptChangedItems(SharedChangedIdsDB.getChangedProductsIds())
+            SharedChangedIdsDB.clearChangedProductsId()
+        }
     }
 }

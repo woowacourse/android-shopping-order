@@ -11,11 +11,10 @@ import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.event.SingleLiveEvent
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
 
 class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel(),
@@ -71,6 +70,10 @@ class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel
     private val _deletedId = MutableLiveData<Event<Long>>()
     val deletedId: LiveData<Event<Long>>
         get() = _deletedId
+
+    private val _changedProductIds = SingleLiveEvent<Set<Long>>()
+    val changedProductIds: LiveData<Set<Long>>
+        get() = _changedProductIds
 
     init {
         with(_isAllSelected) {
@@ -233,6 +236,7 @@ class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel
     }
 
     private fun deleteItem(itemId: Long) {
+        val productId = cartItems.find { it.id == itemId }?.productId
         viewModelScope.launch {
             val result = cartRepository.deleteCartItem(itemId)
             result.onSuccess {
@@ -243,6 +247,7 @@ class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel
                     (uiCartItemsState.value as UIState.Success<List<CartItemUiModel>>).data
                 val updatedCartItems = cartItems.filterNot { it.id == itemId }
                 _uiCartItemsState.value = UIState.Success(updatedCartItems)
+                productId?.let { SharedChangedIdsDB.addChangedProductsId(setOf(it)) }
             }.onFailure {
                 Log.d(this::class.java.simpleName, "$it")
             }
@@ -317,6 +322,7 @@ class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel
             }
         _uiCartItemsState.value = UIState.Success(uiCartItems)
         _quantityChangedIds.value = setOf(productId)
+        SharedChangedIdsDB.addChangedProductsId(setOf(productId))
     }
 
     private fun CartItem.toUiModel(isChecked: Boolean): CartItemUiModel {

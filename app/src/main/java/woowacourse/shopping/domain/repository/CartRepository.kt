@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.domain.model.UpdatedQuantity
 
 interface CartRepository {
     suspend fun fetchCartItemsInfo(): Result<List<CartItem>>
@@ -41,4 +42,6 @@ interface CartRepository {
     suspend fun deleteAllItems(): Result<Unit>
 
     suspend fun makeOrder(order: Order): Result<Unit>
+
+    suspend fun getCartItemsQuantities(productIds: Set<Long>): Result<List<UpdatedQuantity>>
 }
