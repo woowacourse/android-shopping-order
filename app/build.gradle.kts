@@ -42,6 +42,8 @@ android {
     val baseProductsUrlDev: String = localProperties.getProperty("BASE_PRODUCTS_URL_DEV")
     val baseCartItemsUrlDev: String = localProperties.getProperty("BASE_CART_ITEMS_URL_DEV")
     val baseOrdersUrlDev: String = localProperties.getProperty("BASE_ORDERS_URL_DEV")
+    val baseCouponsUrlDev: String = localProperties.getProperty("BASE_COUPONS_URL_DEV")
+
 
     val basicAuthUserDev: String = localProperties.getProperty("BASIC_AUTH_USER_DEV")
     val basicAuthPasswordDev: String = localProperties.getProperty("BASIC_AUTH_PASSWORD_DEV")
@@ -56,6 +58,7 @@ android {
             buildConfigField(type = "String", name = "BASE_PRODUCTS_URL_DEV", value = "\"$baseProductsUrlDev\"")
             buildConfigField(type = "String", name = "BASE_CART_ITEMS_URL_DEV", value = "\"$baseCartItemsUrlDev\"")
             buildConfigField(type = "String", name = "BASE_ORDERS_URL_DEV", value = "\"$baseOrdersUrlDev\"")
+            buildConfigField(type = "String", name = "BASE_COUPONS_URL_DEV", value = "\"$baseCouponsUrlDev\"")
 
             buildConfigField("String", "BASIC_AUTH_USER_DEV", "\"$basicAuthUserDev\"")
             buildConfigField("String", "BASIC_AUTH_PASSWORD_DEV", "\"$basicAuthPasswordDev\"")
