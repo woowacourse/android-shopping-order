@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
-        <variable
-            name="errorState"
-            type="woowacourse.shopping.presentation.base.ErrorState" />
+
+        <import type="android.view.View" />
+
 
         <variable
             name="vm"
@@ -16,7 +17,8 @@
         android:id="@+id/include_error_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:visibility="@{vm.error == null ? View.GONE : View.VISIBLE}">
 
 
         <TextView
@@ -25,9 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="5dp"
+            android:text="@{vm.error.title}"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:text="@{errorState.title}"
             app:layout_constraintBottom_toTopOf="@+id/error_description"
             app:layout_constraintEnd_toEndOf="@+id/error_description"
             app:layout_constraintStart_toStartOf="@+id/error_description"
@@ -37,11 +39,11 @@
             android:id="@+id/error_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{errorState.description}"
             android:layout_below="@id/error_title"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="50dp"
             android:gravity="center"
+            android:text="@{vm.error.description}"
             android:textColor="@color/gray5"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -53,10 +55,10 @@
         <Button
             android:id="@+id/retry_button"
             android:layout_width="wrap_content"
-            android:onClick="@{() -> vm.retry()}"
             android:layout_height="wrap_content"
             android:layout_below="@id/error_description"
             android:layout_marginTop="30dp"
+            android:onClick="@{() -> vm.retry()}"
             android:text="@string/retry_title"
             android:textColor="#FFFFFF"
             app:layout_constraintEnd_toEndOf="@+id/error_description"
