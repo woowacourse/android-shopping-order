@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.presentation.cart.CartViewModel" />
+
+        <variable
+            name="actionHandler"
+            type="woowacourse.shopping.presentation.cart.CartActionHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.cart.CartActivity">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_cart"
+            style="@style/ToolbarStyle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/cart_toolbar_title" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_view_cart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/layout_order_bottom_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_order_bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:background="@color/gray_500"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                setVisibility="@{viewModel.checkboxVisibility}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <CheckBox
+                    android:id="@+id/cb_select_order"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="20dp"
+                    android:buttonTint="@color/teal_200"
+                    android:checked="@{viewModel.cartItemAllSelected}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:onChecked="@{actionHandler}" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="전체"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/cb_select_order"
+                    app:layout_constraintStart_toStartOf="@id/cb_select_order"
+                    app:layout_constraintTop_toBottomOf="@id/cb_select_order" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="@{@string/product_price(viewModel.totalPrice)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_order"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="30,000원" />
+
+            <TextView
+                android:id="@+id/tv_order"
+                android:layout_width="122dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/selector_add_cart_button"
+                android:gravity="center"
+                setEnable="@{viewModel.orderButtonEnabled}"
+                android:text="@{@string/order_button_title(viewModel.cartItemSelectedCount)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:onClick="@{() ->actionHandler.navigateCartRecommend()}"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="주문하기(4)" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
