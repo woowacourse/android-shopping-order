@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.order
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -69,7 +68,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                         }
                     }
             }.onFailure {
-                Log.e("OrderViewModel", "loadCoupons: error $it")
+                _orderUiState.value = OrderUiState.Failure(it.message)
             }
         }
     }
@@ -89,10 +88,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                     is CouponUiModel.FixedDiscountCouponUiModel -> applyFixedDiscountCoupon(coupon)
                     is CouponUiModel.BogoCouponUiModel -> applyBogoCoupon(coupon)
                     is CouponUiModel.FreeShippingCouponUiModel -> applyFreeShippingCoupon(coupon)
-                    is CouponUiModel.TimeBasedDiscountCouponUiModel ->
-                        applyTimeBasedDiscountCoupon(
-                            coupon,
-                        )
+                    is CouponUiModel.TimeBasedDiscountCouponUiModel -> applyTimeBasedDiscountCoupon(coupon)
                 }
 
             if (isValidCoupon) {
@@ -133,10 +129,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     }
 
     private fun applyFixedDiscountCoupon(coupon: CouponUiModel.FixedDiscountCouponUiModel): Boolean {
-        return if (totalPrice.value!! >= coupon.minimumAmount &&
-            LocalDate.now()
-                .isBefore(coupon.expirationDate)
-        ) {
+        return if (totalPrice.value!! >= coupon.minimumAmount && isCouponValid(coupon.expirationDate)) {
             _couponDiscount.value = coupon.discount
             _couponUiState.value = CouponUiState.Applied
             true
@@ -147,8 +140,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 } else {
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
-            _couponUiState.value =
-                CouponUiState.Error(errorMessage)
+            _couponUiState.value = CouponUiState.Error(errorMessage)
             false
         }
     }
@@ -156,10 +148,10 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     private fun applyBogoCoupon(coupon: CouponUiModel.BogoCouponUiModel): Boolean {
         val cartItems = checkedShoppingCart.cartItems.value.orEmpty()
         val bogoItems =
-            cartItems.filter { it.product.cartItemCounter.itemCount >= coupon.buyQuantity }
+            cartItems.filter { it.product.cartItemCounter.itemCount >= (coupon.buyQuantity + 1) }
         val mostExpensiveItem = bogoItems.maxByOrNull { it.product.price }
 
-        return if (mostExpensiveItem != null && LocalDate.now().isBefore(coupon.expirationDate)) {
+        return if (mostExpensiveItem != null && isCouponValid(coupon.expirationDate)) {
             val discountAmount = mostExpensiveItem.product.price
             _couponDiscount.value = discountAmount
             _couponUiState.value = CouponUiState.Applied
@@ -171,17 +163,13 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 } else {
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
-            _couponUiState.value =
-                CouponUiState.Error(errorMessage)
+            _couponUiState.value = CouponUiState.Error(errorMessage)
             false
         }
     }
 
     private fun applyFreeShippingCoupon(coupon: CouponUiModel.FreeShippingCouponUiModel): Boolean {
-        return if (totalPrice.value!! >= coupon.minimumAmount &&
-            LocalDate.now()
-                .isBefore(coupon.expirationDate)
-        ) {
+        return if (totalPrice.value!! >= coupon.minimumAmount && isCouponValid(coupon.expirationDate)) {
             _deliveryFee.value = 0
             _couponUiState.value = CouponUiState.Applied
             true
@@ -192,10 +180,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 } else {
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
-            _couponUiState.value =
-                CouponUiState.Error(
-                    errorMessage,
-                )
+            _couponUiState.value = CouponUiState.Error(errorMessage)
             false
         }
     }
@@ -203,8 +188,9 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
     private fun applyTimeBasedDiscountCoupon(coupon: CouponUiModel.TimeBasedDiscountCouponUiModel): Boolean {
         val now = LocalTime.now()
         return if (now.isAfter(coupon.availableTimeStart) && now.isBefore(coupon.availableTimeEnd) &&
-            LocalDate.now()
-                .isBefore(coupon.expirationDate)
+            isCouponValid(
+                coupon.expirationDate,
+            )
         ) {
             _couponDiscount.value = (_totalPrice.value!! * coupon.discount / 100)
             _couponUiState.value = CouponUiState.Applied
@@ -216,8 +202,7 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
                 } else {
                     ERROR_MESSAGE_EXPIRED_COUPON
                 }
-            _couponUiState.value =
-                CouponUiState.Error(errorMessage)
+            _couponUiState.value = CouponUiState.Error(errorMessage)
             false
         }
     }
@@ -240,6 +225,11 @@ class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel()
 
     private fun calculateTotalPayment() {
         _totalPayment.value = _totalPrice.value!! - _couponDiscount.value!! + _deliveryFee.value!!
+    }
+
+    private fun isCouponValid(expirationDate: LocalDate): Boolean {
+        val now = LocalDate.now()
+        return now.isBefore(expirationDate) || now.isEqual(expirationDate)
     }
 
     fun orderItems() {
