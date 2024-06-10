@@ -67,7 +67,7 @@ class PaymentActivity : BaseActivity<ActivityPaymentBinding>(R.layout.activity_p
         }
 
         viewModel.uiState.observe(this) { state ->
-            couponsAdapter.submitList(state.couponsState)
+            couponsAdapter.submitList(state.coupons)
         }
     }
 

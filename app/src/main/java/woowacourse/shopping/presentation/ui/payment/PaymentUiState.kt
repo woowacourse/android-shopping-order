@@ -1,18 +1,22 @@
 package woowacourse.shopping.presentation.ui.payment
 
-import woowacourse.shopping.domain.model.coupon.CouponState
 import woowacourse.shopping.presentation.model.CartUiModel
+import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.model.toDomain
 
 data class PaymentUiState(
-    val couponsState: List<CouponState> = emptyList(),
+    val coupons: List<CouponUiModel> = emptyList(),
     val orderCarts: List<CartUiModel> = emptyList(),
+    val checkedCouponId: Int = -1,
 ) {
     val orderTotalPrice get() = orderCarts.sumOf { it.totalPrice }
 
     val couponDiscountPrice
         get() =
-            couponsState.firstOrNull { it.coupon.checked }?.calculateDiscount(orderTotalPrice)
-                ?: 0
+            coupons.find { it.id == checkedCouponId }?.discountPolicy?.calculateDiscount(
+                orderTotalPrice,
+                orderCarts.map { it.toDomain() },
+            ) ?: 0
 
     val paymentTotalPrice get() = orderCarts.sumOf { it.totalPrice } + DELIVERY_FEE_AMOUNT - couponDiscountPrice
 

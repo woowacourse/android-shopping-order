@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
-import woowacourse.shopping.domain.model.coupon.CouponState
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -13,7 +12,9 @@ import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.model.CartsWrapper
+import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.model.toDomain
+import woowacourse.shopping.presentation.model.toPresentation
 
 class PaymentViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -50,27 +51,28 @@ class PaymentViewModel(
             couponRepository.getCoupons().onSuccess { coupons ->
                 hideError()
                 val state = uiState.value ?: return@launch
-                val couponsState =
-                    coupons.filter { it.isValidCoupon(state.orderCarts.map { cartUiModel -> cartUiModel.toDomain() }) }
-                _uiState.postValue(state.copy(couponsState = couponsState))
+                val couponUiModel = coupons.map { it.toPresentation() }
+                val validCoupons =
+                    couponUiModel.filter { it.couponCondition.isValid(state.orderCarts.map { cartUiModel -> cartUiModel.toDomain() }) }
+                _uiState.postValue(state.copy(coupons = validCoupons))
             }.onFailure { e ->
                 showError(e)
             }
         }
     }
 
-    override fun toggleCoupon(couponState: CouponState) {
+    override fun toggleCoupon(couponUiModel: CouponUiModel) {
         val state = uiState.value ?: return
-        val updateCouponState =
-            state.couponsState.map { couponItem ->
-                if (couponItem.coupon == couponState.coupon) {
-                    couponItem.copy(checked = !couponItem.coupon.checked)
+        val updateCoupon =
+            state.coupons.map { couponItem ->
+                if (couponItem == couponUiModel) {
+                    couponItem.copy(checked = !couponItem.checked)
                 } else {
                     couponItem.copy(checked = false)
                 }
             }
 
-        _uiState.value = state.copy(couponsState = updateCouponState)
+        _uiState.value = state.copy(coupons = updateCoupon)
     }
 
     fun payment() {

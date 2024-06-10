@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.HolderCouponBinding
-import woowacourse.shopping.domain.model.coupon.CouponState
+import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.ui.payment.PaymentActionHandler
 
 class CouponsAdapter(private val actionHandler: PaymentActionHandler) :
-    ListAdapter<CouponState, CouponsAdapter.CouponViewHolder>(CouponDiffCallback) {
+    ListAdapter<CouponUiModel, CouponsAdapter.CouponViewHolder>(CouponDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -35,26 +35,26 @@ class CouponsAdapter(private val actionHandler: PaymentActionHandler) :
         private val binding: HolderCouponBinding,
         private val actionHandler: PaymentActionHandler,
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(couponState: CouponState) {
-            binding.couponState = couponState
+        fun bind(couponUiModel: CouponUiModel) {
+            binding.couponUiModel = couponUiModel
             binding.actionHandler = actionHandler
             binding.executePendingBindings()
         }
     }
 
-    object CouponDiffCallback : DiffUtil.ItemCallback<CouponState>() {
+    object CouponDiffCallback : DiffUtil.ItemCallback<CouponUiModel>() {
         override fun areItemsTheSame(
-            oldItem: CouponState,
-            newItem: CouponState,
+            oldItem: CouponUiModel,
+            newItem: CouponUiModel,
         ): Boolean {
-            return oldItem.coupon.id == newItem.coupon.id
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: CouponState,
-            newItem: CouponState,
+            oldItem: CouponUiModel,
+            newItem: CouponUiModel,
         ): Boolean {
-            return oldItem.coupon == newItem.coupon
+            return oldItem == newItem
         }
     }
 }

@@ -57,8 +57,8 @@ class PaymentViewModelTest {
         runTest {
             val actual = viewModel.uiState.getOrAwaitValue()
 
-            assertThat(actual.couponsState).anyMatch { it is Fixed5000 }
-            assertThat(actual.couponsState).anyMatch { it is FreeShipping }
+            assertThat(actual.coupons).anyMatch { it is Fixed5000 }
+            assertThat(actual.coupons).anyMatch { it is FreeShipping }
         }
 
     @Test

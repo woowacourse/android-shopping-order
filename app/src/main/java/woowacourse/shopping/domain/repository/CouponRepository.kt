@@ -1,9 +1,9 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.coupon.CouponState
+import woowacourse.shopping.domain.model.coupon.Coupon
 
 interface CouponRepository {
-    suspend fun getCoupons(): Result<List<CouponState>>
+    suspend fun getCoupons(): Result<List<Coupon>>
 
     companion object {
         private var instance: CouponRepository? = null

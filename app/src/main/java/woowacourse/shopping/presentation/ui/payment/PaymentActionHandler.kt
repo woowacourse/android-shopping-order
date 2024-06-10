@@ -1,7 +1,7 @@
 package woowacourse.shopping.presentation.ui.payment
 
-import woowacourse.shopping.domain.model.coupon.CouponState
+import woowacourse.shopping.presentation.model.CouponUiModel
 
 interface PaymentActionHandler {
-    fun toggleCoupon(couponState: CouponState)
+    fun toggleCoupon(couponUiModel: CouponUiModel)
 }

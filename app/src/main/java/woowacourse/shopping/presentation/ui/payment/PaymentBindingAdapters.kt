@@ -3,12 +3,11 @@ package woowacourse.shopping.presentation.ui.payment
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.coupon.Bogo
-import woowacourse.shopping.domain.model.coupon.CouponState
-import woowacourse.shopping.domain.model.coupon.Fixed5000
-import woowacourse.shopping.domain.model.coupon.FreeShipping
-import woowacourse.shopping.domain.model.coupon.MiracleSale
+import woowacourse.shopping.domain.model.coupon.BogoCondition
+import woowacourse.shopping.domain.model.coupon.MinimumPurchaseAmountCondition
+import woowacourse.shopping.domain.model.coupon.TimeBasedCondition
 import woowacourse.shopping.presentation.common.currency
+import woowacourse.shopping.presentation.model.CouponUiModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -23,27 +22,25 @@ fun TextView.bindCouponExpirationDate(expirationDate: Date?) {
 }
 
 @BindingAdapter("couponDescription")
-fun TextView.bindCouponDescription(couponState: CouponState?) {
+fun TextView.bindCouponDescription(couponUiModel: CouponUiModel) {
     val description =
-        when (couponState) {
-            is Bogo -> {
-                val buyQuantity = couponState.coupon.buyQuantity ?: return
-                val getQuantity = couponState.coupon.getQuantity ?: return
+        when (couponUiModel.couponCondition) {
+            is BogoCondition -> {
+                val buyQuantity = couponUiModel.buyQuantity ?: return
+                val getQuantity = couponUiModel.getQuantity ?: return
                 context.getString(R.string.bogo_coupon_description, buyQuantity, getQuantity)
             }
 
-            is Fixed5000 -> {
-                val minimumAmount = couponState.coupon.minimumAmount ?: return
+            is MinimumPurchaseAmountCondition -> {
+                val minimumAmount = couponUiModel.minimumAmount ?: return
                 context.getString(
                     R.string.fixed5000_coupon_description,
                     minimumAmount.currency(this.context),
                 )
             }
 
-            is FreeShipping -> context.getString(R.string.free_shipping_coupon_description)
-
-            is MiracleSale -> {
-                val availableTime = couponState.coupon.availableTime ?: return
+            is TimeBasedCondition -> {
+                val availableTime = couponUiModel.availableTime ?: return
                 context.getString(
                     R.string.miracle_sale_coupon_description,
                     availableTime.start.hour,
