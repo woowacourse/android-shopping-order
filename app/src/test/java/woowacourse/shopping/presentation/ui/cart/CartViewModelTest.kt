@@ -71,6 +71,7 @@ class CartViewModelTest {
         )
         Thread.sleep(1000)
         assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(
-            ErrorType.ERROR_CART_DELETE)
+            ErrorType.ERROR_CART_DELETE,
+        )
     }
 }

@@ -7,8 +7,8 @@ import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.presentation.base.BindingActivity
-import woowacourse.shopping.presentation.common.EventObserver
 import woowacourse.shopping.presentation.base.ViewModelFactory
+import woowacourse.shopping.presentation.common.EventObserver
 import woowacourse.shopping.presentation.ui.payment.adapter.PaymentAdapter
 import woowacourse.shopping.presentation.ui.payment.model.NavigateUiState
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
@@ -16,7 +16,6 @@ import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.utils.getParcelableExtraCompat
 
 class PaymentActivity : BindingActivity<ActivityPaymentBinding>(R.layout.activity_payment) {
-
     private val viewModel: PaymentActionViewModel by viewModels { ViewModelFactory() }
     private val paymentAdapter: PaymentAdapter by lazy { PaymentAdapter(viewModel) }
 

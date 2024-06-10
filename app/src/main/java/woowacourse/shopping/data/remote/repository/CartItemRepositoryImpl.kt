@@ -1,13 +1,12 @@
 package woowacourse.shopping.data.remote.repository
 
-import android.util.Log
 import woowacourse.shopping.data.remote.datasource.cartItem.CartItemDataSource
 import woowacourse.shopping.data.remote.datasource.cartItem.DefaultCartItemDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.utils.toIdOrNull
 
 class CartItemRepositoryImpl(

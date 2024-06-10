@@ -22,7 +22,7 @@ class ProductPagingSource(
         return LoadResult.Page(
             offset = body.number,
             data = body.content.map { it.toDomain() },
-            last = body.last
+            last = body.last,
         )
     }
 }

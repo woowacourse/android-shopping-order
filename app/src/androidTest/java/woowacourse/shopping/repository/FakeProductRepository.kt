@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class FakeProductRepository : ProductRepository {
-    override suspend fun getAllByPaging(
+    override suspend fun getAllByPagingAndCategory(
         category: String,
         page: Int,
         size: Int,

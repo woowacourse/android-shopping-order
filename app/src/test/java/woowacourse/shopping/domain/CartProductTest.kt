@@ -1,13 +1,10 @@
 package woowacourse.shopping.domain
 
-import android.os.Parcelable
 import io.kotest.matchers.shouldBe
-import kotlinx.parcelize.Parcelize
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.cartProduct
 
 class CartProductTest {
-
     @Test
     fun `갯수를 증가시킬 수 있다`() {
         val newCartProduct = cartProduct.copy(quantity = 2)
@@ -27,7 +24,6 @@ class CartProductTest {
         val newCartProduct = cartProduct.copy(quantity = 2)
         repeat(10) {
             newCartProduct.minusQuantity()
-
         }
         newCartProduct.quantity shouldBe 0
     }

@@ -6,8 +6,7 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.EventState
 
-open class BaseViewModel: ViewModel() {
-
+open class BaseViewModel : ViewModel() {
     private val _errorHandler = MutableLiveData<EventState<ErrorType>>()
     val errorHandler: LiveData<EventState<ErrorType>> get() = _errorHandler
 

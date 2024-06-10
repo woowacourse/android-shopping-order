@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
 abstract class BindingActivity<T : ViewDataBinding>(
-    private val layoutResourceId: Int
+    private val layoutResourceId: Int,
 ) : AppCompatActivity() {
     private var _binding: T? = null
     val binding

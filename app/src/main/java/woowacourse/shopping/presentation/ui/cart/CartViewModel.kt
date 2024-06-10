@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.EventState
 import woowacourse.shopping.presentation.common.UiState

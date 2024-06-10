@@ -4,118 +4,145 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
+import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
+import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.EventState
-import woowacourse.shopping.presentation.common.UiState
 import woowacourse.shopping.presentation.common.UpdateUiModel
-import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
+import woowacourse.shopping.presentation.ui.detail.model.DetailNavigation
+import woowacourse.shopping.presentation.ui.detail.model.DetailUiState
 
 class ProductDetailViewModel(
     private val cartItemRepository: CartItemRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), DetailActionHandler {
-    private val _cartProduct = MutableLiveData<UiState<DetailCartProduct>>(UiState.Loading)
-    val cartProduct: LiveData<UiState<DetailCartProduct>> get() = _cartProduct
+) : BaseViewModel(), DetailActionHandler {
+    private val _uiState = MutableLiveData<DetailUiState>(DetailUiState())
+    val uiState: LiveData<DetailUiState> get() = _uiState
 
-    private val _recentProduct = MutableLiveData<UiState<RecentProduct>>(UiState.Loading)
-    val recentProduct: LiveData<UiState<RecentProduct>> get() = _recentProduct
+    private val _navigateHandler = MutableLiveData<EventState<DetailNavigation>>()
+    val navigateHandler: LiveData<EventState<DetailNavigation>> get() = _navigateHandler
 
-    private val _errorHandler = MutableLiveData<EventState<ErrorType>>()
-    val errorHandler: LiveData<EventState<ErrorType>> get() = _errorHandler
-
-    private val _cartHandler = MutableLiveData<EventState<UpdateUiModel>>()
-    val cartHandler: LiveData<EventState<UpdateUiModel>> get() = _cartHandler
-
-    private val _navigateHandler = MutableLiveData<EventState<CartProduct>>()
-    val navigateHandler: LiveData<EventState<CartProduct>> get() = _navigateHandler
-
+    private val _updateHandler = MutableLiveData<EventState<UpdateUiModel>>()
+    val updateHandler: LiveData<EventState<UpdateUiModel>> get() = _updateHandler
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-    fun setCartProduct(cartProduct: CartProduct) =
-        viewModelScope.launch {
-            saveRecentProduct(cartProduct)
-            _cartProduct.postValue(UiState.Success(DetailCartProduct.fromCartProduct(cartProduct)))
-        }
+    fun setCartProduct(
+        cartProduct: CartProduct,
+        isLast: Boolean,
+    ) = viewModelScope.launch {
+        delay(500L) // skeleton
+        val currentState = _uiState.value ?: return@launch
+        _uiState.postValue(
+            currentState.copy(
+                isNewCartProduct = cartProduct.quantity == 0,
+                cartProduct =
+                    cartProduct.copy(
+                        quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
+                    ),
+                isLast = isLast,
+                isLoading = false,
+            ),
+        )
+        saveRecentProduct(cartProduct)
+    }
 
     fun findOneRecentProduct() =
         viewModelScope.launch {
             recentProductRepository.findOrNull().onSuccess {
-                if (it != null) {
-                    _recentProduct.postValue(UiState.Success(it))
-                }
+                val currentState = _uiState.value ?: return@launch
+                _uiState.postValue(
+                    currentState.copy(
+                        recentProduct = it,
+                    ),
+                )
             }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_LOAD))
+                showError(ErrorType.ERROR_PRODUCT_LOAD)
             }
         }
 
-    override fun onAddToCart(detailCartProduct: DetailCartProduct) =
+    override fun onSaveCart(cartProduct: CartProduct) =
         viewModelScope.launch {
-            when (detailCartProduct.isNew) {
+            val isFirstSave = _uiState.value?.isNewCartProduct ?: return@launch
+            when (isFirstSave) {
                 true -> {
-                    cartItemRepository.post(CartItemRequest.fromCartProduct(detailCartProduct.cartProduct))
+                    cartItemRepository.post(CartItemRequest.fromCartProduct(cartProduct))
                         .onSuccess {
-                            saveRecentProduct(detailCartProduct.cartProduct.copy(cartId = it.toLong()))
+                            val currentState = _uiState.value ?: return@launch
+                            saveRecentProduct(cartProduct.copy(cartId = it.toLong()))
                             updateUiModel.add(
-                                detailCartProduct.cartProduct.productId,
-                                detailCartProduct.cartProduct.copy(cartId = it.toLong()),
+                                cartProduct.productId,
+                                cartProduct.copy(cartId = it.toLong()),
                             )
-                            _cartProduct.postValue(UiState.Success(detailCartProduct))
+                            _uiState.postValue(
+                                currentState.copy(
+                                    cartProduct = cartProduct,
+                                ),
+                            )
                         }.onFailure {
-                            _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS))
+                            showError(ErrorType.ERROR_PRODUCT_PLUS)
                         }
                 }
 
                 false -> {
                     cartItemRepository.patch(
-                        id = detailCartProduct.cartProduct.cartId.toInt(),
+                        id = cartProduct.cartId.toInt(),
                         quantityRequestDto =
                             QuantityRequest(
-                                detailCartProduct.cartProduct.quantity,
+                                cartProduct.quantity,
                             ),
                     ).onSuccess {
-                        saveRecentProduct(detailCartProduct.cartProduct)
+                        val currentState = _uiState.value ?: return@launch
+                        saveRecentProduct(cartProduct)
                         updateUiModel.add(
-                            detailCartProduct.cartProduct.productId,
-                            detailCartProduct.cartProduct,
+                            cartProduct.productId,
+                            cartProduct,
                         )
-                        _cartProduct.postValue(UiState.Success(detailCartProduct))
+                        _uiState.postValue(
+                            currentState.copy(
+                                cartProduct = cartProduct,
+                            ),
+                        )
                     }.onFailure {
-                        _errorHandler.postValue(EventState(ErrorType.ERROR_PRODUCT_PLUS_MINUS))
+                        showError(ErrorType.ERROR_PRODUCT_PLUS_MINUS)
                     }
                 }
             }
-            _cartHandler.postValue(EventState(updateUiModel))
+            _updateHandler.postValue(EventState(updateUiModel))
         }
 
     override fun onNavigateToDetail(recentProduct: RecentProduct) {
-        _navigateHandler.value = EventState(recentProduct.toCartProduct())
+        _navigateHandler.value = EventState(DetailNavigation.ToDetail(recentProduct.toCartProduct()))
     }
 
     override fun onPlus(cartProduct: CartProduct) =
         viewModelScope.launch {
+            val currentState = _uiState.value ?: return@launch
             cartProduct.plusQuantity()
-            _cartProduct.postValue(
-                UiState.Success(
-                    (_cartProduct.value as UiState.Success).data.copy(cartProduct = cartProduct),
+
+            _uiState.postValue(
+                currentState.copy(
+                    cartProduct = cartProduct,
                 ),
             )
         }
 
     override fun onMinus(cartProduct: CartProduct) =
         viewModelScope.launch {
+            val currentState = _uiState.value ?: return@launch
             cartProduct.minusQuantity()
-            _cartProduct.postValue(
-                UiState.Success(
-                    (_cartProduct.value as UiState.Success).data.copy(cartProduct = cartProduct),
+
+            _uiState.postValue(
+                currentState.copy(
+                    cartProduct = cartProduct,
                 ),
             )
         }
@@ -123,7 +150,7 @@ class ProductDetailViewModel(
     override fun saveRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
             recentProductRepository.save(cartProduct.toRecentProduct()).onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
+                showError(ErrorType.ERROR_RECENT_INSERT)
             }
         }
 }

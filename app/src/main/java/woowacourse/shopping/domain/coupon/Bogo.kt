@@ -13,12 +13,12 @@ class Bogo(
     override val getQuantity: Int,
     override val discountType: String,
 ) : Coupon(
-    id,
-    code,
-    description,
-    discountType,
-    expirationDate,
-) {
+        id,
+        code,
+        description,
+        discountType,
+        expirationDate,
+    ) {
     override fun isValid(cartProducts: List<CartProduct>): Boolean {
         val currentDate = LocalDate.now()
         val expirationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_DATE)
