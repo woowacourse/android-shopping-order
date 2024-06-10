@@ -8,7 +8,6 @@ import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.utils.exception.ErrorEvent
 
-
 class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepository {
     private val recentlyProductDao =
         RecentlyProductDatabase.getInstance(context).recentlyProductDao()

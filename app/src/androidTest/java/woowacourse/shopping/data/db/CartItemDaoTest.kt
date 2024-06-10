@@ -14,7 +14,6 @@ import woowacourse.shopping.data.db.cartItem.CartItemDao
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.domain.model.product.Product
-import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
 class CartItemDaoTest {
@@ -23,17 +22,19 @@ class CartItemDaoTest {
     private lateinit var context: Context
 
     @Before
-    fun setup() = runTest {
-        context = ApplicationProvider.getApplicationContext<Context>()
-        database = CartItemDatabase.getInstance(context)
-        dao = database.cartItemDao()
-        database.deleteAll()
-    }
+    fun setup() =
+        runTest {
+            context = ApplicationProvider.getApplicationContext<Context>()
+            database = CartItemDatabase.getInstance(context)
+            dao = database.cartItemDao()
+            database.deleteAll()
+        }
 
     @After
-    fun tearDown()  = runTest {
-        database.deleteAll()
-    }
+    fun tearDown() =
+        runTest {
+            database.deleteAll()
+        }
 
     @Test
     fun `선택한_아이템을_장바구니에_저장할_수_있다`() =

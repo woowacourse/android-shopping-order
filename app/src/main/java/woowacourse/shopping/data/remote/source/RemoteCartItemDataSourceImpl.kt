@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.remote.source
 
+import woowacourse.shopping.data.mapper.CartItemDtoMapper.toCartItems
+import woowacourse.shopping.data.mapper.CartItemDtoMapper.toQuantity
 import woowacourse.shopping.data.remote.api.CartApiService
 import woowacourse.shopping.data.remote.api.NetworkManager
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
@@ -7,8 +9,6 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemRequest
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.utils.exception.ErrorEvent
-import woowacourse.shopping.data.mapper.CartItemDtoMapper.toCartItems
-import woowacourse.shopping.data.mapper.CartItemDtoMapper.toQuantity
 
 class RemoteCartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),

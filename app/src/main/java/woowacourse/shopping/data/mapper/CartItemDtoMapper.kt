@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.mapper
 
+import woowacourse.shopping.data.mapper.ProductDtoMapper.toProduct
 import woowacourse.shopping.data.remote.dto.cart.CartItemDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 import woowacourse.shopping.domain.model.cart.CartItem
-import woowacourse.shopping.data.mapper.ProductDtoMapper.toProduct
 
 object CartItemDtoMapper {
     fun CartItemResponse.toCartItems(): List<CartItem> {
