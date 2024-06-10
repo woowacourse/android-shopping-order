@@ -2,7 +2,7 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.source.CouponDataSource
-import woowacourse.shopping.data.source.OrderDataSource2
+import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
@@ -62,7 +62,7 @@ class ShoppingApp : Application() {
         lateinit var historySource: ProductHistoryDataSource
             private set
 
-        lateinit var orderSource2: OrderDataSource2
+        lateinit var orderSource2: OrderDataSource
             private set
 
         lateinit var couponSource: CouponDataSource

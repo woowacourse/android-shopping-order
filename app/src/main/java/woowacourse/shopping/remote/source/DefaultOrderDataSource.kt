@@ -1,13 +1,13 @@
 package woowacourse.shopping.remote.source
 
-import woowacourse.shopping.data.source.OrderDataSource2
+import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.remote.model.request.OrderRequest
 import woowacourse.shopping.remote.service.OrderApiService
 
 class DefaultOrderDataSource(
     private val orderApiService: OrderApiService
-) : OrderDataSource2 {
+) : OrderDataSource {
     override suspend fun order(): Result<Unit> = runCatching {
         orderApiService.createOrder2(
             OrderRequest(orders.map { it.cartItemId })

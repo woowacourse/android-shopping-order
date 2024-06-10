@@ -2,14 +2,14 @@ package woowacourse.shopping.domain.repository
 
 import android.util.Log
 import woowacourse.shopping.data.model.toDomain
-import woowacourse.shopping.data.source.OrderDataSource2
+import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.domain.model.Orders
 import java.time.LocalDateTime
 
 class DefaultOrderRepository2(
-    private val orderSource: OrderDataSource2,
+    private val orderSource: OrderDataSource,
     private val cartSource: ShoppingCartDataSource,
 ) : OrderRepository2 {
     override suspend fun order(): Result<Unit> = orderSource.order()

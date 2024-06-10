@@ -2,7 +2,7 @@ package woowacourse.shopping.data.source
 
 import woowacourse.shopping.domain.model.OrderItem
 
-interface OrderDataSource2 {
+interface OrderDataSource {
     suspend fun order(): Result<Unit>
 
     suspend fun saveOrderItem(
