@@ -10,6 +10,10 @@
         <variable
             name="coupon"
             type="woowacourse.shopping.ui.model.CouponUiModel" />
+
+        <variable
+            name="onCouponClickListener"
+            type="woowacourse.shopping.ui.payment.OnCouponClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,6 +27,8 @@
             android:id="@+id/checkbox_coupon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="@{coupon.checked}"
+            android:onClick="@{() -> onCouponClickListener.onCouponSelected(coupon.id)}"
             app:layout_constraintBottom_toBottomOf="@id/tv_coupon_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_coupon_title" />

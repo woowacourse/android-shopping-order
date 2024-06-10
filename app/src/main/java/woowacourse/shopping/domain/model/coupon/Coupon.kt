@@ -11,4 +11,8 @@ sealed interface Coupon {
     val discountType: String
 
     fun isAvailability(cartItems: List<CartItem>): Boolean
+
+    fun calculateDiscountAmount(cartItems: List<CartItem>): Int
+
+    fun copy(): Coupon
 }

@@ -20,7 +20,25 @@ data class PercentageDiscountCoupon(
         return isAvailableTime && isExpirationDate
     }
 
+    override fun calculateDiscountAmount(cartItems: List<CartItem>): Int {
+        val orderAmount: Int = cartItems.sumOf { it.product.price * it.quantity }
+        return -(orderAmount / PERCENTAGE) * discount
+    }
+
+    override fun copy(): Coupon =
+        PercentageDiscountCoupon(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = expirationDate,
+            discountType = discountType,
+            discount = discount,
+            availableTime = availableTime,
+        )
+
     companion object {
+        const val PERCENTAGE = 100
+
         fun PercentageDiscountCoupon.toUiModel() =
             CouponUiModel(
                 id = id,

@@ -19,6 +19,22 @@ data class BuyXGetYCoupon(
         return hasQuantityOfTwo && isExpirationDate
     }
 
+    override fun calculateDiscountAmount(cartItems: List<CartItem>): Int {
+        val discountTarget: CartItem = cartItems.filter { it.quantity % buyQuantity == 0 }.maxBy { it.product.price }
+        return -discountTarget.product.price
+    }
+
+    override fun copy(): Coupon =
+        BuyXGetYCoupon(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = expirationDate,
+            discountType = discountType,
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity,
+        )
+
     companion object {
         fun BuyXGetYCoupon.toUiModel() =
             CouponUiModel(

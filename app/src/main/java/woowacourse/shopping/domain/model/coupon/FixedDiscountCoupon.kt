@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.model.coupon
 
-import android.util.Log
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.ui.model.CouponUiModel
 import java.time.LocalDate
@@ -19,6 +18,19 @@ data class FixedDiscountCoupon(
         val isExpirationDate = LocalDate.now() <= expirationDate
         return isAmountThreshold && isExpirationDate
     }
+
+    override fun calculateDiscountAmount(cartItems: List<CartItem>): Int = -discount
+
+    override fun copy(): Coupon =
+        FixedDiscountCoupon(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = expirationDate,
+            discountType = discountType,
+            discount = discount,
+            minimumAmount = minimumAmount,
+        )
 
     companion object {
         fun FixedDiscountCoupon.toUiModel() =

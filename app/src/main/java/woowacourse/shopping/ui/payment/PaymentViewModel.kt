@@ -13,7 +13,8 @@ import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.data.coupon.remote.CouponRemoteRepository
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.Order
+import woowacourse.shopping.domain.model.coupon.Order.Companion.SHIPPING_FEE
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
@@ -26,8 +27,9 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
     private val cartItemRepository: CartItemRepository,
-): ViewModel() {
-    private val _coupons = MutableLiveData<List<Coupon>>()
+): ViewModel(), OnCouponClickListener {
+    private var order: Order = Order(emptyList())
+    private var selectedCartItems = listOf<CartItem>()
 
     private val _couponsUiModel = MutableLiveData<List<CouponUiModel>>(emptyList())
     val couponsUiModel: LiveData<List<CouponUiModel>> get() = _couponsUiModel
@@ -41,6 +43,15 @@ class PaymentViewModel(
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> get() = _errorMessage
 
+    private val _discountAmount = MutableLiveData<Int>(0)
+    val discountAmount: LiveData<Int> get() = _discountAmount
+
+    private val _shippingFee = MutableLiveData<Int>(SHIPPING_FEE)
+    val shippingFee: LiveData<Int> get() = _shippingFee
+
+    private val _totalPaymentAmount = MutableLiveData(orderInformation.orderAmount)
+    val totalPaymentAmount: LiveData<Int> get() = _totalPaymentAmount
+
     fun createOrder() {
         viewModelScope.launch {
             orderRepository.orderCartItems(orderInformation.cartItemIds)
@@ -50,19 +61,34 @@ class PaymentViewModel(
 
     fun loadCoupons() {
         viewModelScope.launch {
-            var selectedCartItems = emptyList<CartItem>()
             handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
                 selectedCartItems = cartItems.filter { it.id in orderInformation.cartItemIds }
             }
             handleResponseResult(couponRepository.loadCoupons(), _errorMessage) { coupons ->
-                val applicableCoupon = coupons.filter { it.isAvailability(selectedCartItems) }
+                order = Order(coupons)
+                val applicableCoupon = order.findAvailableCoupons(selectedCartItems)
                 _couponsUiModel.value = applicableCoupon.map { CouponUiModel.toUiModel(it) }
             }
+            _totalPaymentAmount.value = orderInformation.orderAmount + SHIPPING_FEE
         }
     }
 
+    override fun onCouponSelected(couponId: Long) {
+        val couponsUiModel = couponsUiModel.value ?: return
+        _couponsUiModel.value = couponsUiModel.map {
+            if (it.id == couponId) { it.copy(checked = !it.checked) }
+            else it.copy(checked = false)
+        }
+
+        val isChecked = !couponsUiModel.first { it.id == couponId }.checked
+        _discountAmount.value = order.calculateDiscountAmount(couponId, selectedCartItems, isChecked)
+        _shippingFee.value = order.calculateDeliveryFee(couponId, isChecked)
+
+        _totalPaymentAmount.value = order.calculateTotalAmount(couponId, selectedCartItems, isChecked)
+    }
+
     companion object {
-       fun factory(
+        fun factory(
            orderInformation: OrderInformation,
        ): UniversalViewModelFactory {
            return UniversalViewModelFactory {

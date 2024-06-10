@@ -24,7 +24,7 @@ class PaymentFragment : Fragment() {
     private lateinit var factory: UniversalViewModelFactory
     private lateinit var viewModel: PaymentViewModel
 
-    private val adapter: CouponAdapter by lazy { CouponAdapter() }
+    private val adapter: CouponAdapter by lazy { CouponAdapter(viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
