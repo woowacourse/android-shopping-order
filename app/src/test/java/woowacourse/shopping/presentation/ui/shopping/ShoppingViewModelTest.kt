@@ -17,6 +17,7 @@ import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.UiState
+import woowacourse.shopping.presentation.ui.shopping.model.ShoppingUiState
 
 @ExtendWith(InstantTaskExecutorExtension::class, CoroutinesTestExtension::class, MockKExtension::class)
 class ShoppingViewModelTest {
@@ -45,7 +46,12 @@ class ShoppingViewModelTest {
         coEvery { productRepository.getAllByPaging(any(), any()) } returns Result.success(LoadResult.Page(0, false, cartProducts))
         viewModel.loadProductsByOffset()
         Thread.sleep(1000)
-        assertEquals(viewModel.products.getOrAwaitValue(), UiState.Success(LoadResult.Page(0, false, cartProducts)))
+        assertEquals(viewModel.uiState.getOrAwaitValue(),
+            ShoppingUiState().copy(
+                cartProducts = cartProducts,
+                pageOffset = 0,
+                isPageEnd = false
+            ))
     }
 
     @Test

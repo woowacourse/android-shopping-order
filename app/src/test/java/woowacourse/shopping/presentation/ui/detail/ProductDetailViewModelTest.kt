@@ -12,7 +12,6 @@ import woowacourse.shopping.cartProduct
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.CoroutinesTestExtension
-import woowacourse.shopping.presentation.ui.detail.model.DetailCartProduct
 
 @ExtendWith(InstantTaskExecutorExtension::class, CoroutinesTestExtension::class, MockKExtension::class)
 class ProductDetailViewModelTest {
@@ -29,10 +28,7 @@ class ProductDetailViewModelTest {
     fun `상품을 장바구니에 저장한다`() {
         coEvery { cartItemRepository.post(any()) } returns Result.success(1)
         viewModel.onSaveCart(
-            DetailCartProduct(
-                isNew = true,
-                cartProduct = cartProduct,
-            ),
+            cartProduct
         )
         Thread.sleep(1000)
         coVerify(exactly = 1) { cartItemRepository.post(any()) }
