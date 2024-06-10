@@ -66,9 +66,6 @@ class OrderRecommendViewModelTest {
             // then
             val actual = viewModel.uiState.getOrAwaitValue()
 
-            println(actual.recommendProducts.toString())
-            println(actual.toString())
-
             assertThat(actual.orderCarts).isEqualTo(
                 listOf(Cart(id = cartItemId.id, product = recommendCarts.first(), quantity = 1)),
             )

@@ -76,19 +76,18 @@ class OrderRecommendViewModel(
         productId: Long,
         increment: Boolean,
     ) {
+        val recommendProducts = calculateUpdateProducts(productId, increment)
         val state = uiState.value ?: return
-
-        val recommendProducts =
-            calculateUpdateProducts(state.recommendProducts, productId, increment)
         _uiState.postValue(state.copy(recommendProducts = recommendProducts))
     }
 
     private fun calculateUpdateProducts(
-        products: List<Product>,
         productId: Long,
         increment: Boolean,
     ): List<Product> {
-        return products.map { product ->
+        val state = uiState.value ?: return emptyList()
+
+        return state.recommendProducts.map { product ->
             if (product.id == productId) {
                 val updatedQuantity = calculateUpdateQuantity(product.quantity, increment)
                 updateCart(product, updatedQuantity)

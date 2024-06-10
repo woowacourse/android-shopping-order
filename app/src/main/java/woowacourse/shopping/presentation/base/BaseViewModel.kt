@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.base
 
 import android.database.SQLException
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -56,7 +55,6 @@ abstract class BaseViewModel : ViewModel() {
         e: Throwable,
         onUnhandledError: () -> Unit = {},
     ) {
-        Log.d("Ttt e", e.toString())
         when (e) {
             is IllegalArgumentException -> showError("잘못된 요청", "잘못된 요청입니다.")
             is SecurityException -> showError("보안 오류", "인증 오류가 발생했습니다.")

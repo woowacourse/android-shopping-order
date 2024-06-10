@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -12,8 +13,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.domain.model.coupon.Fixed5000
-import woowacourse.shopping.domain.model.coupon.FreeShipping
+import woowacourse.shopping.domain.model.coupon.FixedAmountDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.MinimumPurchaseAmountCondition
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.getOrAwaitValue
@@ -55,10 +56,10 @@ class PaymentViewModelTest {
     @Test
     fun `수량이 2개 이상인 상품이 있고, 총 금액이 100_000원 이상일 때 5,000원 할인 쿠폰과 5만원 이상 구매 시 무료 배송 쿠폰을 받을 수 있다`() =
         runTest {
+            delay(2000)
             val actual = viewModel.uiState.getOrAwaitValue()
-
-            assertThat(actual.coupons).anyMatch { it is Fixed5000 }
-            assertThat(actual.coupons).anyMatch { it is FreeShipping }
+            assertThat(actual.coupons).anyMatch { it.discountPolicy is FixedAmountDiscountPolicy }
+            assertThat(actual.coupons).anyMatch { it.couponCondition is MinimumPurchaseAmountCondition }
         }
 
     @Test
