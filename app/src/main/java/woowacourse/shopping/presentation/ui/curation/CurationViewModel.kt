@@ -20,7 +20,6 @@ class CurationViewModel(
     private val cartItemRepository: CartItemRepository,
     private val curationUseCase: CurationUseCase,
 ) : BaseViewModel(), CurationActionHandler {
-
     private val _uiState = MutableLiveData<CurationUiState>(CurationUiState())
     val uiState: LiveData<CurationUiState> get() = _uiState
 
@@ -34,7 +33,7 @@ class CurationViewModel(
                 _uiState.postValue(
                     currentState.copy(
                         cartProducts = it,
-                        isLoading = false
+                        isLoading = false,
                     ),
                 )
             }.onFailure {
@@ -76,8 +75,8 @@ class CurationViewModel(
 
                         _uiState.postValue(
                             currentState.copy(
-                                cartProducts = currentCartProducts
-                            )
+                                cartProducts = currentCartProducts,
+                            ),
                         )
                     }
                     .onFailure {
@@ -89,12 +88,11 @@ class CurationViewModel(
                     quantityRequestDto = QuantityRequest(quantity = currentCartProducts[index].quantity),
                 )
                     .onSuccess {
-
                         val currentState = _uiState.value ?: return@launch
                         _uiState.postValue(
                             currentState.copy(
-                                cartProducts = currentCartProducts
-                            )
+                                cartProducts = currentCartProducts,
+                            ),
                         )
                     }
                     .onFailure {
@@ -119,8 +117,8 @@ class CurationViewModel(
                         val currentState = _uiState.value ?: return@launch
                         _uiState.postValue(
                             currentState.copy(
-                                cartProducts = currentCartProducts
-                            )
+                                cartProducts = currentCartProducts,
+                            ),
                         )
                     }
                     .onFailure {
@@ -131,8 +129,8 @@ class CurationViewModel(
                     val currentState = _uiState.value ?: return@launch
                     _uiState.postValue(
                         currentState.copy(
-                            cartProducts = currentCartProducts
-                        )
+                            cartProducts = currentCartProducts,
+                        ),
                     )
                 }.onFailure {
                     showError(ErrorType.ERROR_PRODUCT_PLUS)

@@ -28,7 +28,7 @@ class ProductDetailViewModelTest {
     fun `상품을 장바구니에 저장한다`() {
         coEvery { cartItemRepository.post(any()) } returns Result.success(1)
         viewModel.onSaveCart(
-            cartProduct
+            cartProduct,
         )
         Thread.sleep(1000)
         coVerify(exactly = 1) { cartItemRepository.post(any()) }

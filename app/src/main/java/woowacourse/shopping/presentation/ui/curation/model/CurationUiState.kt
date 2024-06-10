@@ -4,5 +4,5 @@ import woowacourse.shopping.domain.CartProduct
 
 data class CurationUiState(
     val cartProducts: List<CartProduct> = emptyList(),
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
 )

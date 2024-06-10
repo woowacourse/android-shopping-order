@@ -1,12 +1,8 @@
 package woowacourse.shopping.presentation.ui.shopping
 
-import androidx.lifecycle.viewModelScope
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,7 +16,6 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.common.ErrorType
-import woowacourse.shopping.presentation.common.UiState
 import woowacourse.shopping.presentation.ui.shopping.model.ShoppingUiState
 import woowacourse.shopping.recentProducts
 
@@ -40,10 +35,14 @@ class ShoppingViewModelTest {
     @BeforeEach
     fun setUp() {
         coEvery { cartItemRepository.getCount() } returns Result.success(10)
-        coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns Result.success(
-            cartProducts)
-        coEvery { recentProductRepository.findAllByLimit(any()) } returns Result.success(
-            recentProducts)
+        coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns
+            Result.success(
+                cartProducts,
+            )
+        coEvery { recentProductRepository.findAllByLimit(any()) } returns
+            Result.success(
+                recentProducts,
+            )
         viewModel =
             ShoppingViewModel(
                 productRepository, cartItemRepository, recentProductRepository,
@@ -55,12 +54,14 @@ class ShoppingViewModelTest {
         coEvery { productRepository.getAllByPaging(any(), any()) } returns Result.success(LoadResult.Page(0, false, cartProducts))
         viewModel.loadProductsByOffset()
         Thread.sleep(1000)
-        assertEquals(viewModel.uiState.getOrAwaitValue(),
+        assertEquals(
+            viewModel.uiState.getOrAwaitValue(),
             ShoppingUiState().copy(
                 cartProducts = cartProducts,
                 pageOffset = 0,
-                isPageEnd = false
-            ))
+                isPageEnd = false,
+            ),
+        )
     }
 
     @Test

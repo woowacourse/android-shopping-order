@@ -34,7 +34,6 @@ class ShoppingActivityTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(ShoppingActivity::class.java)
 
-
     @Before
     fun setUp() {
         ProductRepositoryInjector.setInstance(FakeProductRepository())
@@ -42,6 +41,7 @@ class ShoppingActivityTest {
         CouponRepositoryInjector.setInstance(FakeCouponRepository())
         OrderRepositoryInjector.setInstance(FakeOrderRepository())
     }
+
     @Test
     fun `상품_목록이_화면에_표시된다`() {
         onView(withId(R.id.rv_shopping))

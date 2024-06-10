@@ -75,7 +75,7 @@ class PaymentViewModel(
         }.also {
             _uiState.value =
                 currentState.copy(
-                    couponUiModels = it
+                    couponUiModels = it,
                 )
         }
     }
@@ -88,10 +88,10 @@ class PaymentViewModel(
                     _uiState.postValue(
                         currentState.copy(
                             couponUiModels =
-                            it.filter {
-                                it.isValid(cartProducts = _uiState.value!!.cartProducts)
-                            }.map { it.toUiModel() },
-                        )
+                                it.filter {
+                                    it.isValid(cartProducts = _uiState.value!!.cartProducts)
+                                }.map { it.toUiModel() },
+                        ),
                     )
                 }
                 .onFailure {

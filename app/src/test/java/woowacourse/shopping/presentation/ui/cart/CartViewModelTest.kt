@@ -18,7 +18,6 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.CoroutinesTestExtension
 import woowacourse.shopping.presentation.common.ErrorType
-import woowacourse.shopping.presentation.common.UiState
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 import woowacourse.shopping.presentation.ui.cart.model.CartUiState
 
@@ -37,33 +36,36 @@ class CartViewModelTest {
     private lateinit var viewModel: CartViewModel
 
     @Test
-    fun `카트 아이템을 pageCount개씩 불러온다`() = runTest {
-        coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns
-            Result.success(
-                cartProducts,
+    fun `카트 아이템을 pageCount개씩 불러온다`() =
+        runTest {
+            coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns
+                Result.success(
+                    cartProducts,
+                )
+            viewModel.findCartByOffset()
+            delay(2000)
+            assertThat(viewModel.uiState.getOrAwaitValue()).isEqualTo(
+                CartUiState().copy(
+                    cartProductUiModels =
+                        cartProducts.map {
+                                cartProduct ->
+                            CartProductUiModel(cartProduct)
+                        },
+                    isLoading = false,
+                ),
             )
-        viewModel.findCartByOffset()
-        delay(2000)
-        assertThat(viewModel.uiState.getOrAwaitValue()).isEqualTo(
-            CartUiState().copy(
-                cartProductUiModels = cartProducts.map {
-                        cartProduct ->
-                    CartProductUiModel(cartProduct)
-                },
-                isLoading = false,
-            )
-        )
-    }
+        }
 
     @Test
-    fun `카트 아이템을 불러오기 실패하면 Error 상태로 변화한다`() = runTest{
-        coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns Result.failure(Throwable())
-        viewModel.findCartByOffset()
-        delay(2000)
-        assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(
-            ErrorType.ERROR_CART_LOAD,
-        )
-    }
+    fun `카트 아이템을 불러오기 실패하면 Error 상태로 변화한다`() =
+        runTest {
+            coEvery { cartItemRepository.getAllByPaging(any(), any()) } returns Result.failure(Throwable())
+            viewModel.findCartByOffset()
+            delay(2000)
+            assertThat(viewModel.errorHandler.getOrAwaitValue().getContentIfNotHandled()).isEqualTo(
+                ErrorType.ERROR_CART_LOAD,
+            )
+        }
 
     @Test
     fun `데이터 삭제에 실패하면 Error 상태로 변화한다`() {

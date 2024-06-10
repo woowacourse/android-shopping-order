@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.curation
 
-import android.widget.Toast
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCurationBinding
