@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.CartProduct
 
 @Parcelize
-data class PaymentUiModel(
+data class PaymentUiState(
     val couponUiModels: List<CouponUiModel> = emptyList(),
     val cartProducts: List<CartProduct> = emptyList(),
 ) : Parcelable {

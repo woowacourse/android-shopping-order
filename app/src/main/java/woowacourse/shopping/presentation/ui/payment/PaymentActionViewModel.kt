@@ -11,93 +11,92 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.toRecentProduct
+import woowacourse.shopping.presentation.base.BaseViewModel
 import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.EventState
 import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.ui.payment.model.CouponUiModel
-import woowacourse.shopping.presentation.ui.payment.model.NavigateUiState
-import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
+import woowacourse.shopping.presentation.ui.payment.model.PaymentNavigation
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
 import woowacourse.shopping.presentation.ui.payment.model.toUiModel
 
 class PaymentActionViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), PaymentActionHandler {
-    private val _coupons = MutableLiveData<PaymentUiModel>()
-    val coupons: LiveData<PaymentUiModel> get() = _coupons
+) : BaseViewModel(), PaymentActionHandler {
+    private val _uiState = MutableLiveData<PaymentUiState>()
+    val uiState: LiveData<PaymentUiState> get() = _uiState
 
-    private val _errorHandler = MutableLiveData<EventState<ErrorType>>()
-    val errorHandler: LiveData<EventState<ErrorType>> get() = _errorHandler
-
-    private val _navigateHandler = MutableLiveData<EventState<NavigateUiState>>()
-    val navigateHandler: LiveData<EventState<NavigateUiState>> get() = _navigateHandler
+    private val _navigateHandler = MutableLiveData<EventState<PaymentNavigation>>()
+    val navigateHandler: LiveData<EventState<PaymentNavigation>> get() = _navigateHandler
 
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-    fun setPaymentUiModel(paymentUiModel: PaymentUiModel) {
-        _coupons.value = paymentUiModel
+    fun setPaymentUiModel(paymentUiModel: PaymentUiState) {
+        _uiState.value = paymentUiModel
     }
 
     override fun pay() =
         viewModelScope.launch {
-            if (_coupons.value == null) {
-                return@launch
-            }
+            val currentState = _uiState.value ?: return@launch
 
-            _coupons.value!!.cartProducts.forEach {
+            currentState.cartProducts.forEach {
                 updateRecentProduct(it)
                 updateUiModel.add(it.productId, it.copy(quantity = 0))
             }
 
             orderRepository.post(
                 OrderRequest(
-                    _coupons.value!!.cartProductIds,
+                    currentState.cartProductIds,
                 ),
             ).onSuccess {
-                _navigateHandler.postValue(EventState(NavigateUiState.ToShopping(updateUiModel)))
+                _navigateHandler.postValue(EventState(PaymentNavigation.ToShopping(updateUiModel)))
             }.onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_ORDER))
+                showError(ErrorType.ERROR_ORDER)
             }
         }
 
-    fun updateRecentProduct(cartProduct: CartProduct) =
+    private fun updateRecentProduct(cartProduct: CartProduct) =
         viewModelScope.launch {
             recentProductRepository.save(cartProduct.toRecentProduct().copy(quantity = 0)).onFailure {
-                _errorHandler.postValue(EventState(ErrorType.ERROR_RECENT_INSERT))
+                showError(ErrorType.ERROR_RECENT_INSERT)
             }
         }
 
     override fun checkCoupon(couponUiModel: CouponUiModel) {
-        if (_coupons.value == null) return
+        val currentState = _uiState.value ?: return
 
-        _coupons.value?.couponUiModels?.map {
+        currentState.couponUiModels.map {
             if (it.coupon.id == couponUiModel.coupon.id) {
                 it.copy(isChecked = !it.isChecked)
             } else {
                 it.copy(isChecked = false)
             }
-        }?.let {
-            _coupons.postValue(_coupons.value?.copy(couponUiModels = it))
+        }.also {
+            _uiState.value =
+                currentState.copy(
+                    couponUiModels = it
+                )
         }
     }
 
     fun loadCoupons() =
         viewModelScope.launch {
-            if (_coupons.value == null) return@launch
             couponRepository.getAll()
                 .onSuccess {
-                    _coupons.postValue(
-                        _coupons.value?.copy(
+                    val currentState = _uiState.value ?: return@launch
+                    _uiState.postValue(
+                        currentState.copy(
                             couponUiModels =
-                                it.filter {
-                                    it.isValid(cartProducts = _coupons.value!!.cartProducts)
-                                }.map { it.toUiModel() },
-                        ),
+                            it.filter {
+                                it.isValid(cartProducts = _uiState.value!!.cartProducts)
+                            }.map { it.toUiModel() },
+                        )
                     )
                 }
                 .onFailure {
-                    _errorHandler.postValue(EventState(ErrorType.ERROR_COUPON_LOAD))
+                    showError(ErrorType.ERROR_COUPON_LOAD)
                 }
         }
 }

@@ -15,7 +15,7 @@ import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 import woowacourse.shopping.presentation.ui.cart.model.CartNavigation
 import woowacourse.shopping.presentation.ui.cart.model.CartUiState
-import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
 
 class CartViewModel(
     private val cartItemRepository: CartItemRepository,
@@ -75,8 +75,8 @@ class CartViewModel(
         _navigateHandler.value = EventState(CartNavigation.ToPayment(getPaymentUiModel()))
     }
 
-    private fun getPaymentUiModel(): PaymentUiModel {
-        return PaymentUiModel(
+    private fun getPaymentUiModel(): PaymentUiState {
+        return PaymentUiState(
             cartProducts = _uiState.value?.cartProductUiModels?.filter { it.isChecked }?.map { it.cartProduct } ?: emptyList(),
         )
     }

@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.ui.curation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -15,7 +14,7 @@ import woowacourse.shopping.presentation.common.ErrorType
 import woowacourse.shopping.presentation.common.EventState
 import woowacourse.shopping.presentation.ui.curation.model.CurationNavigation
 import woowacourse.shopping.presentation.ui.curation.model.CurationUiState
-import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
 
 class CurationViewModel(
     private val cartItemRepository: CartItemRepository,
@@ -52,8 +51,8 @@ class CurationViewModel(
         // 상세 상품으로 갈 수 없음
     }
 
-    private fun getPaymentUiModel(): PaymentUiModel {
-        return PaymentUiModel(
+    private fun getPaymentUiModel(): PaymentUiState {
+        return PaymentUiState(
             cartProducts = _uiState.value?.cartProducts?.filter { it.quantity > 0 } ?: emptyList(),
         )
     }

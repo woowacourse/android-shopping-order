@@ -10,8 +10,8 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.base.ViewModelFactory
 import woowacourse.shopping.presentation.common.EventObserver
 import woowacourse.shopping.presentation.ui.payment.adapter.PaymentAdapter
-import woowacourse.shopping.presentation.ui.payment.model.NavigateUiState
-import woowacourse.shopping.presentation.ui.payment.model.PaymentUiModel
+import woowacourse.shopping.presentation.ui.payment.model.PaymentNavigation
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.utils.getParcelableExtraCompat
 
@@ -27,7 +27,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>(R.layout.activit
     }
 
     private fun initData() {
-        intent.getParcelableExtraCompat<PaymentUiModel>(EXTRA_PAYMENT_UI_MODEL)?.let {
+        intent.getParcelableExtraCompat<PaymentUiState>(EXTRA_PAYMENT_UI_MODEL)?.let {
             viewModel.setPaymentUiModel(it)
         } ?: run {
             Toast.makeText(this, "데이터가 없습니다", Toast.LENGTH_SHORT).show()
@@ -48,7 +48,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>(R.layout.activit
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         viewModel.loadCoupons()
-        viewModel.coupons.observe(this) {
+        viewModel.uiState.observe(this) {
             paymentAdapter.submitList(it.couponUiModels)
         }
         viewModel.errorHandler.observe(
@@ -61,7 +61,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>(R.layout.activit
             this,
             EventObserver {
                 when (it) {
-                    is NavigateUiState.ToShopping -> {
+                    is PaymentNavigation.ToShopping -> {
                         Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
                         ShoppingActivity.createIntent(this, it.updateUiModel).apply { startActivity(this) }
                     }
@@ -75,7 +75,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>(R.layout.activit
 
         fun createIntent(
             context: Context,
-            paymentUiModel: PaymentUiModel,
+            paymentUiModel: PaymentUiState,
         ): Intent {
             return Intent(context, PaymentActivity::class.java)
                 .apply {
