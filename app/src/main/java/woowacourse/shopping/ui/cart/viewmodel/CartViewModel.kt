@@ -19,6 +19,7 @@ import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
+import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.toUiModel
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
@@ -195,10 +196,8 @@ class CartViewModel(
         recommendProducts: List<ProductWithQuantity>?,
         productId: Long,
     ): Boolean {
-        if (recommendProducts != null) {
-            if (recommendProducts.any { it.product.id == productId }) return true
-        }
-        return false
+        if (recommendProducts == null) return false
+        return recommendProducts.any { it.product.id == productId }
     }
 
     private suspend fun updateCountToPlus(
@@ -209,12 +208,10 @@ class CartViewModel(
             it.id,
             it.quantity.value.inc(),
         ).onSuccess {
-            if (isRecommendPage.value == false) {
-                loadCartItems()
-            } else {
+            if (isRecommendPage.value == true) {
                 changeRecommendProductCount(productId)
-                loadCartItems()
             }
+            loadCartItems()
         }
     }
 
@@ -227,12 +224,10 @@ class CartViewModel(
                 it.id,
                 it.quantity.value.dec(),
             ).onSuccess {
-                if (isRecommendPage.value == false) {
-                    loadCartItems()
-                } else {
+                if (isRecommendPage.value == true) {
                     changeRecommendProductCount(productId)
-                    loadCartItems()
                 }
+                loadCartItems()
             }
         }
     }
@@ -249,18 +244,6 @@ class CartViewModel(
         }
     }
 
-    private fun productWithQuantities(
-        productId: Long,
-        quantity: Quantity,
-    ): MutableList<ProductWithQuantity> {
-        val changedRecommend =
-            requireNotNull(_products.value?.firstOrNull { it.product.id == productId })
-        val current = _products.value?.toMutableList() ?: mutableListOf()
-        current[current.indexOf(changedRecommend)] =
-            changedRecommend.copy(quantity = quantity)
-        return current
-    }
-
     private fun loadCartItems() {
         viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getAllCartItemsWithProduct().onSuccess {
@@ -274,6 +257,18 @@ class CartViewModel(
                 _cart.value = cart.value?.copy(isLoading = false)
             }
         }
+    }
+
+    private fun productWithQuantities(
+        productId: Long,
+        quantity: Quantity,
+    ): MutableList<ProductWithQuantity> {
+        val changedRecommend =
+            requireNotNull(_products.value?.firstOrNull { it.product.id == productId })
+        val current = _products.value?.toMutableList() ?: mutableListOf()
+        current[current.indexOf(changedRecommend)] =
+            changedRecommend.copy(quantity = quantity)
+        return current
     }
 
     private fun orderItemIds(): List<Long> {
