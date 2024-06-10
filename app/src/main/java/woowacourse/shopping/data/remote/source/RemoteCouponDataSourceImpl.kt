@@ -6,7 +6,7 @@ import woowacourse.shopping.data.source.CouponDataSource
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.utils.mapper.CouponMapper.toCoupon
 
-class CouponDataSourceImpl(
+class RemoteCouponDataSourceImpl(
     private val couponService: CouponApiService = NetworkManager.couponService(),
 ) : CouponDataSource {
     override suspend fun loadCoupons(): Result<List<Coupon>> {

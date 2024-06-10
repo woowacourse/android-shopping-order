@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.repository.remote
 
-import woowacourse.shopping.data.remote.source.ProductDataSourceImpl
+import woowacourse.shopping.data.remote.source.RemoteProductDataSourceImpl
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class RemoteProductRepositoryImpl(
-    private val productDataSource: ProductDataSource = ProductDataSourceImpl(),
+    private val productDataSource: ProductDataSource = RemoteProductDataSourceImpl(),
 ) : ProductRepository {
     override suspend fun loadPagingProducts(offset: Int): Result<List<Product>> {
         val page = offset / PRODUCT_LOAD_PAGING_SIZE

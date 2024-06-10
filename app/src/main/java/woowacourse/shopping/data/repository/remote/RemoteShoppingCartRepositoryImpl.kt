@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository.remote
 
-import woowacourse.shopping.data.remote.source.CartItemDataSourceImpl
+import woowacourse.shopping.data.remote.source.RemoteCartItemDataSourceImpl
 import woowacourse.shopping.data.source.CartItemDataSource
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
@@ -14,7 +14,7 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.cartcounter.ChangeCartItemResultState
 
 class RemoteShoppingCartRepositoryImpl(
-    private val cartItemDataSource: CartItemDataSource = CartItemDataSourceImpl(),
+    private val cartItemDataSource: CartItemDataSource = RemoteCartItemDataSourceImpl(),
 ) : ShoppingCartRepository {
     override suspend fun addCartItem(product: Product): Result<Unit> {
         return cartItemDataSource.addCartItem(

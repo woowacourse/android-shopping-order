@@ -10,7 +10,7 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.mapper.CartItemMapper.toCartItems
 import woowacourse.shopping.utils.mapper.CartItemMapper.toQuantity
 
-class CartItemDataSourceImpl(
+class RemoteCartItemDataSourceImpl(
     private val cartApiService: CartApiService = NetworkManager.cartService(),
 ) : CartItemDataSource {
     override suspend fun loadCartItems(

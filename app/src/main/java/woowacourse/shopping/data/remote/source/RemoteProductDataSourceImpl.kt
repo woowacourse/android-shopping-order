@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.utils.mapper.ProductMapper.toProduct
 import woowacourse.shopping.utils.mapper.ProductMapper.toProducts
 
-class ProductDataSourceImpl(
+class RemoteProductDataSourceImpl(
     private val productApiService: ProductApiService = NetworkManager.productService(),
 ) : ProductDataSource {
     override suspend fun loadProducts(
