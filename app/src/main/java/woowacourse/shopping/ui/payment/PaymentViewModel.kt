@@ -35,6 +35,9 @@ class PaymentViewModel(
     private val _discountedPrice: MutableLiveData<Int> = MutableLiveData()
     val discountedPrice: LiveData<Int> get() = _discountedPrice
 
+    private val _payEvent: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
+    val payEvent: MutableSingleLiveData<Boolean> get() = _payEvent
+
     fun loadOrders() {
         viewModelScope.launch(Dispatchers.IO) {
             orderRepository.loadAllOrders()
@@ -91,6 +94,23 @@ class PaymentViewModel(
                     Log.e(TAG, "onCheck: failure $it")
                     throw it
                 }
+        }
+    }
+
+    fun pay() {
+        viewModelScope.launch(Dispatchers.IO) {
+            orderRepository.order()
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        _payEvent.postValue(true)
+                    }
+                }
+                .onFailure {
+                    // TODO: Error handling
+                    Log.e(TAG, "pay: failure $it")
+                    throw it
+                }
+
         }
     }
 
