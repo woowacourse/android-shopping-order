@@ -3,7 +3,7 @@ package woowacourse.shopping
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class MockProductRepository : ProductRepository {
+class TestProductRepository : ProductRepository {
     val products =
         arrayListOf(
             Product(

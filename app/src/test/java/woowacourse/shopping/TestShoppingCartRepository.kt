@@ -8,11 +8,12 @@ import woowacourse.shopping.domain.model.CartItemResult
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
-class MockShoppingCartRepository : ShoppingCartRepository {
-    val cartItems =
+class TestShoppingCartRepository : ShoppingCartRepository {
+    private val cartItems =
         mutableListOf(cartItem0, cartItem1, cartItem2)
 
     override suspend fun insertCartItem(product: Product): Result<Unit> {
+        cartItems.add(CartItem(cartItems.size.toLong(), product))
         return Result.success(Unit)
     }
 

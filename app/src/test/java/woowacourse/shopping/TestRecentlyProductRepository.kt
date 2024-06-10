@@ -3,7 +3,7 @@ package woowacourse.shopping
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 
-class MockRecentlyProductRepository : RecentlyProductRepository {
+class TestRecentlyProductRepository : RecentlyProductRepository {
     override fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Long> = Result.success(0L)
 
     override fun getMostRecentlyProduct(): Result<RecentlyProduct> {
