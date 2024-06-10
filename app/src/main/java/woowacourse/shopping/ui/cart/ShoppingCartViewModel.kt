@@ -9,9 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.domain.repository.DefaultOrderRepository
+import woowacourse.shopping.domain.model.OrderItem
+import woowacourse.shopping.domain.repository.DefaultOrderRepository2
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.OrderRepository2
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 import woowacourse.shopping.ui.cart.listener.ShoppingCartListener
@@ -21,8 +22,8 @@ import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class ShoppingCartViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository,
-    private val orderRepository: OrderRepository,
+    private val cartRepository: ShoppingCartRepository,
+    private val realOrderRepository2: OrderRepository2
 ) : ViewModel(),
     ShoppingCartListener {
 
@@ -46,7 +47,7 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.loadAllCartItems()
+            cartRepository.loadAllCartItems()
                 .onSuccess {
                     _cartItems.postValue(it)
                 }
@@ -60,9 +61,9 @@ class ShoppingCartViewModel(
 
     fun deleteItem(cartItemId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.removeShoppingCartProduct(cartItemId)
+            cartRepository.removeShoppingCartProduct(cartItemId)
                 .onSuccess {
-                    shoppingCartRepository.loadAllCartItems()
+                    cartRepository.loadAllCartItems()
                         .onSuccess {
                             _cartItems.postValue(it)
                         }
@@ -103,7 +104,13 @@ class ShoppingCartViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             cartItems.value?.forEach { cartItem ->
                 if (cartItem.checked) {
-                    orderRepository.saveOrderItem(cartItem.id, cartItem.quantity)
+                    realOrderRepository2.save(
+                        orderItem = OrderItem(
+                            cartItemId = cartItem.id,
+                            quantity = cartItem.quantity,
+                            product = cartItem.product
+                        )
+                    )
                         .onSuccess {
                             _event.postValue(ShoppingCartEvent.NavigationOrder)
                         }
@@ -114,6 +121,11 @@ class ShoppingCartViewModel(
                         }
                 }
             }
+
+            Log.d(
+                TAG, "navigateToOrder: orderItems: " +
+                        "${realOrderRepository2.loadAllOrders().getOrThrow()}"
+            )
         }
     }
 
@@ -126,7 +138,7 @@ class ShoppingCartViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
+            cartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
                 .onSuccess {
                     updateCartItems()
                 }
@@ -139,7 +151,7 @@ class ShoppingCartViewModel(
     }
 
     private suspend fun updateCartItems() {
-        shoppingCartRepository.loadAllCartItems()
+        cartRepository.loadAllCartItems()
             .onSuccess { cartItems ->
                 withContext(Dispatchers.Main) {
                     updateCartItems(cartItems)
@@ -163,7 +175,7 @@ class ShoppingCartViewModel(
         } ?: return
 
         viewModelScope.launch(Dispatchers.IO) {
-            shoppingCartRepository.updateProductQuantity(cart.id, quantity)
+            cartRepository.updateProductQuantity(cart.id, quantity)
                 .onSuccess {
                     updateCartItems()
                 }
@@ -243,14 +255,14 @@ class ShoppingCartViewModel(
                 DefaultShoppingCartRepository(
                     cartSource = ShoppingApp.cartSource,
                 ),
-            orderRepository: OrderRepository =
-                DefaultOrderRepository(
-                    orderSource = ShoppingApp.orderSource,
+            realOrderRepository2: OrderRepository2 =
+                DefaultOrderRepository2(
+                    orderSource = ShoppingApp.orderSource2,
                     cartSource = ShoppingApp.cartSource,
-                ),
+                )
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {
-                ShoppingCartViewModel(shoppingCartRepository, orderRepository)
+                ShoppingCartViewModel(shoppingCartRepository, realOrderRepository2)
             }
     }
 }
