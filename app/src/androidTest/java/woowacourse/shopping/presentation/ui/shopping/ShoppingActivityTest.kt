@@ -14,17 +14,34 @@ import io.kotest.matchers.shouldBe
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
+import woowacourse.shopping.data.remote.injector.CartItemRepositoryInjector
+import woowacourse.shopping.data.remote.injector.CouponRepositoryInjector
+import woowacourse.shopping.data.remote.injector.OrderRepositoryInjector
+import woowacourse.shopping.data.remote.injector.ProductRepositoryInjector
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewHolder
+import woowacourse.shopping.repository.FakeCartItemRepository
+import woowacourse.shopping.repository.FakeCouponRepository
+import woowacourse.shopping.repository.FakeOrderRepository
+import woowacourse.shopping.repository.FakeProductRepository
 
 @RunWith(AndroidJUnit4::class)
 class ShoppingActivityTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(ShoppingActivity::class.java)
 
+
+    @Before
+    fun setUp() {
+        ProductRepositoryInjector.setInstance(FakeProductRepository())
+        CartItemRepositoryInjector.setInstance(FakeCartItemRepository())
+        CouponRepositoryInjector.setInstance(FakeCouponRepository())
+        OrderRepositoryInjector.setInstance(FakeOrderRepository())
+    }
     @Test
     fun `상품_목록이_화면에_표시된다`() {
         onView(withId(R.id.rv_shopping))
