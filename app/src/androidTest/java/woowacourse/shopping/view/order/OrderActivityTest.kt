@@ -75,24 +75,4 @@ class OrderActivityTest {
                 ),
             )
     }
-
-    private fun matchViewHolderAtPosition(
-        position: Int,
-        viewHolderClass: Class<out RecyclerView.ViewHolder>,
-    ): Matcher<View> {
-        return object : TypeSafeMatcher<View>() {
-            override fun describeTo(description: Description) {
-                description.appendText("Checking ViewHolder at position $position")
-            }
-
-            override fun matchesSafely(view: View): Boolean {
-                if (view !is RecyclerView) return false
-                val viewHolder = view.findViewHolderForAdapterPosition(position)
-                return viewHolder != null &&
-                    viewHolderClass.isInstance(
-                        viewHolder,
-                    )
-            }
-        }
-    }
 }
