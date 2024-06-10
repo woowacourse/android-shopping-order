@@ -23,20 +23,16 @@ class CartItemDaoTest {
     private lateinit var context: Context
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         context = ApplicationProvider.getApplicationContext<Context>()
         database = CartItemDatabase.getInstance(context)
         dao = database.cartItemDao()
-        thread {
-            database.deleteAll()
-        }.join()
+        database.deleteAll()
     }
 
     @After
-    fun tearDown() {
-        thread {
-            database.deleteAll()
-        }.join()
+    fun tearDown()  = runTest {
+        database.deleteAll()
     }
 
     @Test
