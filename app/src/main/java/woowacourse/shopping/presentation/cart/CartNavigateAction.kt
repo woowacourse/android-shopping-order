@@ -4,4 +4,6 @@ sealed class CartNavigateAction {
     class ProductDetailNavigateAction(val productId: Int) : CartNavigateAction()
 
     data object RecommendNavigateAction : CartNavigateAction()
+
+    data object PurchaseProductNavigateAction : CartNavigateAction()
 }

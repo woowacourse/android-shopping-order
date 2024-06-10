@@ -1,7 +1,5 @@
 package woowacourse.shopping.presentation.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,18 +11,21 @@ import com.example.domain.datasource.onFailure
 import com.example.domain.datasource.onSuccess
 import com.example.domain.model.Quantity
 import com.example.domain.repository.CartRepository
-import com.example.domain.repository.OrderRepository
 import com.example.domain.repository.RecentProductRepository
 import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.common.emit
+import woowacourse.shopping.presentation.cart.model.CartUiModel
+import woowacourse.shopping.presentation.cart.model.CouponUiModels
+import woowacourse.shopping.presentation.cart.model.toCartItem
+import woowacourse.shopping.presentation.cart.model.toCartUiModel
+import woowacourse.shopping.presentation.cart.model.toCartUiModels
 import woowacourse.shopping.presentation.products.ProductCountActionHandler
 import woowacourse.shopping.presentation.products.uimodel.ProductUiModel
 
 class CartViewModel(
     private val recommendRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartActionHandler, ProductCountActionHandler {
     private val _cartUiState = MutableLiveData<CartUiState>()
     val cartUiState: LiveData<CartUiState> get() = _cartUiState
@@ -65,7 +66,8 @@ class CartViewModel(
     private val _checkboxVisibility = MutableLiveData<Boolean>(true)
     val checkboxVisibility: LiveData<Boolean> get() = _checkboxVisibility
 
-    private val handler = Handler(Looper.getMainLooper())
+    private val _couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
+    val couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
 
     init {
         loadAllCartItems()
@@ -164,6 +166,10 @@ class CartViewModel(
         _checkboxVisibility.value = false
     }
 
+    override fun navigatePurchase() {
+        _navigateAction.emit(CartNavigateAction.PurchaseProductNavigateAction)
+    }
+
     fun loadRecommendProductUiModels() {
         val cartItems = cartUiState.value?.cartUiModels?.map { it.toCartItem() } ?: return
         val recommendProducts = recommendRepository.getRecommendProducts(cartItems = cartItems)
@@ -172,29 +178,6 @@ class CartViewModel(
                 val quantity = cartItems.find { it.product == product }?.quantity ?: Quantity(0)
                 ProductUiModel(product, quantity)
             }
-    }
-
-    fun createOrder() {
-        val cartUiModels = cartUiState.value?.cartUiModels ?: return
-        val cartItemIds = cartUiModels.filter { it.isSelected }.map { it.cartItemId }
-        viewModelScope.launch {
-            orderRepository.createOrder(cartItemIds)
-        }
-        /*
-        orderRepository.createOrder(
-            cartItemIds,
-            object : DataCallback<Unit> {
-                override fun onSuccess(result: Unit) {
-                    _isSuccessCreateOrder.value = Event(true)
-                    deleteCartItemIds(cartItemIds)
-                }
-
-                override fun onFailure(t: Throwable) {
-                    _isSuccessCreateOrder.value = Event(false)
-                }
-            },
-        )
-         */
     }
 
     private fun findCartUiModelByProductId(productId: Int): CartUiModel? {

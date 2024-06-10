@@ -1,0 +1,3 @@
+package woowacourse.shopping.presentation.purchase
+
+interface PurchaseActionHandler

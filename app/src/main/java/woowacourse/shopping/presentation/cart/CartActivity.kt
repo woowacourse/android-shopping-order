@@ -121,6 +121,8 @@ class CartActivity : AppCompatActivity() {
                         )
                     startActivity(intent)
                 }
+                is CartNavigateAction.PurchaseProductNavigateAction -> {
+                }
             }
         }
     }
