@@ -5,5 +5,5 @@ sealed class CartNavigateAction {
 
     data object RecommendNavigateAction : CartNavigateAction()
 
-    data object PurchaseProductNavigateAction : CartNavigateAction()
+    class PurchaseProductNavigateAction(val cartItems: List<Int>) : CartNavigateAction()
 }

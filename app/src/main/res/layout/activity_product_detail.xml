@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/product_price(3000)}"
+            android:text="@{@string/product_price(viewModel.productUiModel.product.price)}"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"

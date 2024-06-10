@@ -7,7 +7,6 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.data.repository.DefaultCartRepository
 import com.example.domain.repository.CouponRepository
 import com.example.domain.repository.OrderRepository
-import woowacourse.shopping.presentation.cart.CartViewModel
 import java.lang.IllegalArgumentException
 
 class PurchaseViewModelFactory(
@@ -19,7 +18,7 @@ class PurchaseViewModelFactory(
         modelClass: Class<T>,
         extras: CreationExtras,
     ): T {
-        if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(PurchaseViewModel::class.java)) {
             return PurchaseViewModel(
                 extras.createSavedStateHandle(),
                 cartRepository,

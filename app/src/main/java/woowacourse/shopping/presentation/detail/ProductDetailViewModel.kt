@@ -1,7 +1,5 @@
 package woowacourse.shopping.presentation.detail
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -37,8 +35,6 @@ class ProductDetailViewModel(
 
     private val _putOnCartEvent = MutableLiveData<Event<Boolean>>()
     val putOnCartEvent get() = _putOnCartEvent
-
-    private val handler = Handler(Looper.getMainLooper())
 
     init {
         savedStateHandle.get<Int>(PRODUCT_ID_KEY)?.let(::loadProduct)

@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.common.Event
 import woowacourse.shopping.common.emit
 import woowacourse.shopping.presentation.cart.model.CartUiModel
-import woowacourse.shopping.presentation.cart.model.CouponUiModels
 import woowacourse.shopping.presentation.cart.model.toCartItem
 import woowacourse.shopping.presentation.cart.model.toCartUiModel
 import woowacourse.shopping.presentation.cart.model.toCartUiModels
@@ -33,8 +32,14 @@ class CartViewModel(
     private val _changedCartEvent = MutableLiveData<Event<Unit>>()
     val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
 
+    private val cartItemSelected: LiveData<List<CartUiModel>>
+        get() =
+            cartUiState.map { cartUiState ->
+                cartUiState.cartUiModels.filter { it.isSelected }
+            }
+
     val cartItemSelectedCount: LiveData<Int>
-        get() = cartUiState.map { it.cartUiModels.count { cartUiModel -> cartUiModel.isSelected } }
+        get() = cartItemSelected.map { it.size }
 
     val cartItemAllSelected: LiveData<Boolean>
         get() =
@@ -57,17 +62,11 @@ class CartViewModel(
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
 
-    private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
-    val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
-
     private val _navigateAction = MutableLiveData<Event<CartNavigateAction>>()
     val navigateAction: LiveData<Event<CartNavigateAction>> get() = _navigateAction
 
-    private val _checkboxVisibility = MutableLiveData<Boolean>(true)
-    val checkboxVisibility: LiveData<Boolean> get() = _checkboxVisibility
-
-    private val _couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
-    val couponUiModels: MutableLiveData<CouponUiModels> = MutableLiveData()
+    private val _isOnCartRecommend = MutableLiveData<Boolean>(false)
+    val isOnCartRecommend: LiveData<Boolean> get() = _isOnCartRecommend
 
     init {
         loadAllCartItems()
@@ -161,13 +160,22 @@ class CartViewModel(
         }
     }
 
+    override fun onClickOrderButton() {
+        if (isOnCartRecommend.value == true) {
+            navigatePurchase()
+        } else {
+            navigateCartRecommend()
+        }
+    }
+
     override fun navigateCartRecommend() {
         _navigateAction.emit(CartNavigateAction.RecommendNavigateAction)
-        _checkboxVisibility.value = false
+        _isOnCartRecommend.value = true
     }
 
     override fun navigatePurchase() {
-        _navigateAction.emit(CartNavigateAction.PurchaseProductNavigateAction)
+        val cartItemIds = cartUiState.value?.cartUiModels?.filter { it.isSelected }?.map { it.cartItemId } ?: listOf()
+        _navigateAction.emit(CartNavigateAction.PurchaseProductNavigateAction(cartItemIds))
     }
 
     fun loadRecommendProductUiModels() {
