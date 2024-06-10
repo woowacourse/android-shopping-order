@@ -181,7 +181,11 @@ class CartSelectViewModel(
                     }
                 }
 
-            _uiState.postValue(state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct)))
+            _uiState.postValue(
+                state.copy(
+                    pagingCartProduct = state.pagingCartProduct.copy(cartList = newPagingCartProduct),
+                ),
+            )
         }
     }
 

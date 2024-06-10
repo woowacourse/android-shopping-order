@@ -9,9 +9,9 @@ data class CartSelectUiState(
 ) {
     val orderTotalPrice get() = orderCartList.values.sumOf { it.totalPrice }
 
-    val isAllChecked get() = totalElements == orderCartList.size
+    val isAllChecked get() = (totalElements == orderCartList.size)
 
-    val isAnyChecked get() = orderCartList.values.count { it.isChecked } > 0
+    val isAnyChecked get() = (orderCartList.values.isNotEmpty())
 
     val totalQuantity get() = orderCartList.values.sumOf { it.quantity }
 }
