@@ -31,7 +31,10 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
     private fun initObserve() {
         viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->
             when (navigateAction) {
-                is PaymentNavigateAction.NavigateToProductList -> activity?.finish()
+                is PaymentNavigateAction.NavigateToProductList -> {
+                    showToastMessage(getString(R.string.payment_success_message))
+                    activity?.finish()
+                }
             }
         }
 
