@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package woowacourse.shopping.domain.result
 
 import woowacourse.shopping.data.remote.api.ApiResponse
@@ -5,14 +7,14 @@ import woowacourse.shopping.data.remote.api.ApiResponse
 inline fun <T : Any?, S : Any?> handleApiResult(
     result: ApiResponse<S>,
     transform: (S) -> T = { it as T },
-): Result<out T> =
+): Result<T> =
     when (result) {
         is ApiResponse.Success -> Result.Success(transform(result.data))
         is ApiResponse.Error -> handleError(result)
         is ApiResponse.Exception -> Result.Exception(result.e)
     }
 
-inline fun <T : Any?, S : Any?> handleError(error: ApiResponse.Error<S>): Result<out T> =
+fun <T : Any?, S : Any?> handleError(error: ApiResponse.Error<S>): Result<T> =
     when (error.code) {
         401, 403 -> Fail.InvalidAuthorized(error.message)
         404 -> Fail.NotFound(error.message)
