@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_RECOMMEND_ITEM_SIZE
@@ -17,6 +18,7 @@ import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.base.UiState
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
@@ -28,8 +30,8 @@ class RecommendViewModel(
     private var _checkedShoppingCart = ShoppingCart()
     val checkedShoppingCart: ShoppingCart get() = _checkedShoppingCart
 
-    private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
-    val products: LiveData<List<Product>> get() = _products
+    private val _products: MutableLiveData<UiState<List<Product>>> = MutableLiveData(UiState.Loading)
+    val products: LiveData<UiState<List<Product>>> get() = _products
 
     private val _errorEvent: MutableSingleLiveData<RecommendEvent.ErrorEvent> =
         MutableSingleLiveData()
@@ -45,8 +47,13 @@ class RecommendViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            _products.value = UiState.Failure(throwable.message)
+        }
+
     fun loadRecentlyProductToRecommend() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             recentlyRepository.getMostRecentlyProduct()
                 .onSuccess { recentlyProduct ->
                     loadRecommendData(recentlyProduct)
@@ -57,7 +64,7 @@ class RecommendViewModel(
     }
 
     private fun loadRecommendData(recentlyProduct: RecentlyProduct) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             runCatching {
                 val myCartItemsResult =
                     shoppingCartRepository.loadPagingCartItems(
@@ -72,7 +79,7 @@ class RecommendViewModel(
                 Pair(myCartItemsResult, loadDataResult)
             }.onSuccess { (myCartItems, loadData) ->
                 val recommendData = getFilteredRandomProducts(myCartItems, loadData)
-                _products.value = recommendData
+                _products.value = UiState.Success(recommendData)
                 updateCheckItemData()
             }.onFailure {
                 _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
@@ -81,7 +88,7 @@ class RecommendViewModel(
     }
 
     private fun deleteCartItem(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             runCatching {
                 product.updateItemSelector(false)
                 _checkedShoppingCart.deleteProductFromProductId(product.id)
@@ -118,7 +125,7 @@ class RecommendViewModel(
     }
 
     override fun clickIncrease(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             shoppingCartRepository.increaseCartItem(product)
                 .onSuccess {
                     product.updateCartItemCount(product.cartItemCounter.itemCount)
@@ -130,13 +137,13 @@ class RecommendViewModel(
                     _checkedShoppingCart.addProduct(CartItem(product = product))
                     updateCheckItemData()
                 }.onFailure {
-                    // Todo: handle exception
+                    _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
                 }
         }
     }
 
     override fun clickDecrease(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             product.cartItemCounter.decrease()
             shoppingCartRepository.decreaseCartItem(product)
                 .onSuccess {
@@ -152,7 +159,7 @@ class RecommendViewModel(
                         updateCheckItemData()
                     }
                 }.onFailure {
-                    // Todo: handle exception
+                    _errorEvent.setValue(RecommendEvent.ErrorEvent.NotKnownError)
                 }
         }
     }

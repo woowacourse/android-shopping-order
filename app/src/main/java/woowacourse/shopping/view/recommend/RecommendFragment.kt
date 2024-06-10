@@ -17,6 +17,7 @@ import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
+import woowacourse.shopping.view.base.UiState
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
@@ -81,8 +82,14 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     }
 
     private fun observeData() {
-        recommendViewModel.products.observe(viewLifecycleOwner) { products ->
-            adapter.submitList(products)
+        recommendViewModel.products.observe(viewLifecycleOwner) { recommendState ->
+            when (recommendState) {
+                is UiState.Success -> adapter.submitList(recommendState.data)
+                else ->
+                    requireContext().makeToast(
+                        getString(R.string.error_default),
+                    )
+            }
         }
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {

@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
@@ -31,8 +32,13 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            handleException(throwable)
+        }
+
     fun loadPagingCartItemList() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             runCatching {
                 shoppingCartRepository.loadPagingCartItems(
                     LOAD_SHOPPING_ITEM_OFFSET,
@@ -99,7 +105,7 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         product: Product,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             runCatching {
                 shoppingCartRepository.deleteCartItem(cartItemId).getOrThrow()
             }.onSuccess {
@@ -130,7 +136,7 @@ class ShoppingCartViewModel(
     }
 
     override fun clickIncrease(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             shoppingCartRepository.increaseCartItem(product)
                 .onSuccess {
                     _shoppingCartEvent.value =
@@ -145,7 +151,7 @@ class ShoppingCartViewModel(
     }
 
     override fun clickDecrease(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             product.cartItemCounter.decrease()
             shoppingCartRepository.decreaseCartItem(product)
                 .onSuccess {

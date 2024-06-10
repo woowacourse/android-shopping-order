@@ -110,7 +110,7 @@
                     android:layout_margin="20dp"
                     android:background="@color/primary"
                     android:minWidth="0dp"
-                    android:onClick="@{()->onClickProduct.clickLoadPagingData()}"
+                    android:onClick="@{()-> onClickProduct.clickLoadPagingData()}"
                     android:text="더보기"
                     android:textColor="@color/white"
                     android:textSize="20sp"
