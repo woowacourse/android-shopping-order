@@ -266,7 +266,7 @@ class CartViewModel(
                 }
         }
 
-    fun navigateCoupon() {
+    fun updateSelectedCartItemIds() {
         val cartItemIds = cartUiModels().selectedCartItemIds()
         _selectedCartItemIds.value = cartItemIds
     }

@@ -105,7 +105,7 @@ class CartActivity : AppCompatActivity() {
             if (isVisibleCartSelectionFragment()) {
                 addFragment(cartRecommendFragment)
             } else {
-                viewModel.navigateCoupon()
+                viewModel.updateSelectedCartItemIds()
             }
         }
         viewModel.selectedCartItemIds.observe(this) {
