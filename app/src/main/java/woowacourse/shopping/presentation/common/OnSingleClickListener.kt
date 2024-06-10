@@ -2,20 +2,19 @@ package woowacourse.shopping.presentation.common
 
 import android.view.View
 import androidx.databinding.BindingAdapter
-import java.util.concurrent.atomic.AtomicBoolean
 
 class OnSingleClickListener(
     private val clickListener: View.OnClickListener,
     private val intervalMs: Long = 1000,
 ) : View.OnClickListener {
-    private var canClick = AtomicBoolean(true)
+    private var lastClickTime = 0L
 
     override fun onClick(v: View?) {
-        if (canClick.getAndSet(false)) {
-            v?.run {
-                postDelayed({ canClick.set(true) }, intervalMs)
-                clickListener.onClick(v)
-            }
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime >= intervalMs) {
+            lastClickTime = currentTime
+            if (v == null) return
+            clickListener.onClick(v)
         }
     }
 }
