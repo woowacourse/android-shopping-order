@@ -18,6 +18,14 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
             ProductIdsCountData(find.product.id, find.quantity)
         }
 
+    override suspend fun findCartItemByProductId(productId: Long): Result<CartItemData> = runCatching{
+        val allCartItems = cartItemApiService.requestCartItems2().content
+        val find =
+            allCartItems.find { it.product.id == productId }
+                ?: throw NoSuchElementException("there is no product with id $productId")
+        CartItemData(find.id, find.quantity, find.product.toData())
+    }
+
     override suspend fun loadAllCartItems(): Result<List<CartItemData>> =
         runCatching {
             val response = cartItemApiService.requestCartItems2().content

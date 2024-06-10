@@ -21,6 +21,10 @@ class FakeShoppingCartDataSource(
             ProductIdsCountData(foundItem.id, foundItem.quantity)
         }
 
+    override suspend fun findCartItemByProductId(productId: Long): Result<CartItemData> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun loadAllCartItems(): Result<List<CartItemData>> =
         runCatching {
             cartItemResponses.map { cartItemResponse ->
