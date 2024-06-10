@@ -2,10 +2,8 @@ package woowacourse.shopping.ui.cart.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
@@ -18,6 +16,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
 import woowacourse.shopping.ui.cart.toUiModel
@@ -29,7 +28,7 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), CountButtonClickListener, AddCartClickListener, CartItemClickListener {
+) : BaseViewModel(), CountButtonClickListener, AddCartClickListener, CartItemClickListener {
     private val _cart: MutableLiveData<CartItemsUiState> = MutableLiveData()
     val cart: LiveData<CartItemsUiState> = _cart
 
@@ -56,16 +55,10 @@ class CartViewModel(
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    val error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
-
     private val _order = MutableSingleLiveData<List<Long>>()
     val order: SingleLiveData<List<Long>> = _order
 
     private var removeState: Boolean = true
-    private val coroutineExceptionHandler =
-        CoroutineExceptionHandler { _, throwable ->
-            error.setValue(throwable)
-        }
 
     init {
         loadCartItems()
@@ -106,7 +99,7 @@ class CartViewModel(
                 removeState = true
             }.onFailure {
                 removeState = false
-                error.setValue(it)
+                setError(it)
             }
         }
     }
@@ -142,7 +135,7 @@ class CartViewModel(
             }
             setRecommendProducts(product)
         }.onFailure {
-            error.setValue(it)
+            setError(it)
         }
     }
 
@@ -187,7 +180,7 @@ class CartViewModel(
                     isLoading = false,
                 )
         }.onFailure {
-            error.setValue(it)
+            setError(it)
         }
     }
 

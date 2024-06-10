@@ -3,10 +3,8 @@ package woowacourse.shopping.ui.products.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.Cart
 import woowacourse.shopping.data.cart.CartRepository
@@ -16,6 +14,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductWithQuantity
 import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.products.ProductItemClickListener
 import woowacourse.shopping.ui.products.ProductWithQuantityUiState
 import woowacourse.shopping.ui.products.toUiModel
@@ -27,8 +26,7 @@ class ProductContentsViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-) :
-    ViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
+) : BaseViewModel(), CountButtonClickListener, ProductItemClickListener, AddCartClickListener {
     private val items = mutableListOf<Product>()
     private val products: MutableLiveData<List<Product>> = MutableLiveData()
     private val cart: MutableLiveData<List<Cart>> = MutableLiveData()
@@ -54,13 +52,6 @@ class ProductContentsViewModel(
 
     private val _productDetailId = MutableSingleLiveData<Long>()
     val productDetailId: SingleLiveData<Long> get() = _productDetailId
-
-    private val _error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
-    val error: SingleLiveData<Throwable> = _error
-    private val coroutineExceptionHandler =
-        CoroutineExceptionHandler { _, throwable ->
-            _error.setValue(throwable)
-        }
 
     private var currentOffset = 0
 

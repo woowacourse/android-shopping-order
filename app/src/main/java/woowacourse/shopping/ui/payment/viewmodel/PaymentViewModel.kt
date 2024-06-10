@@ -3,10 +3,8 @@ package woowacourse.shopping.ui.payment.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.CartRepository
 import woowacourse.shopping.data.cart.CartWithProduct
@@ -16,6 +14,7 @@ import woowacourse.shopping.data.coupon.CouponState
 import woowacourse.shopping.data.coupon.Fixed5000
 import woowacourse.shopping.data.coupon.Freeshipping
 import woowacourse.shopping.data.coupon.MiracleSale
+import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.payment.CouponClickListener
 import woowacourse.shopping.ui.payment.CouponUiModel
 import woowacourse.shopping.ui.payment.toUiModel
@@ -26,7 +25,7 @@ class PaymentViewModel(
     private val orderedCartItemIds: List<Long>,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
-) : ViewModel(), CouponClickListener {
+) : BaseViewModel(), CouponClickListener {
     private val orderedProducts: MutableLiveData<List<CartWithProduct>> =
         MutableLiveData(emptyList())
     val orderAmount: LiveData<Int> =
@@ -54,14 +53,6 @@ class PaymentViewModel(
 
     private val _paying: MutableSingleLiveData<Unit> = MutableSingleLiveData()
     val paying: SingleLiveData<Unit> = _paying
-
-    private val _error: MutableSingleLiveData<Throwable> = MutableSingleLiveData()
-    val error: SingleLiveData<Throwable> = _error
-
-    private val coroutineExceptionHandler =
-        CoroutineExceptionHandler { _, throwable ->
-            _error.setValue(throwable)
-        }
 
     init {
         loadOrderedCartItems()
