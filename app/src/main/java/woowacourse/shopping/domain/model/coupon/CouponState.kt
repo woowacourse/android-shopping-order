@@ -2,12 +2,19 @@ package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartItem
 
-sealed interface CouponState {
-    val coupon: Coupon
+sealed class CouponState(open val coupon: Coupon) {
+    abstract fun isValid(cartItems: List<CartItem>): Boolean
 
-    val cartItems: List<CartItem>
+    abstract fun discountPrice(cartItems: List<CartItem>): Int
 
-    fun isValid(): Boolean
-
-    fun discountPrice(): Int
+    companion object {
+        fun makeCouponState(coupon: Coupon): CouponState {
+            return when (coupon.discountType) {
+                DiscountType.FIXED -> FixedCoupon(coupon)
+                DiscountType.BUYXGETY -> BuyXgetYCoupon(coupon)
+                DiscountType.FREESHIPPING -> FreeShippingCoupon(coupon)
+                DiscountType.PERCENTAGE -> PercentageCoupon(coupon)
+            }
+        }
+    }
 }

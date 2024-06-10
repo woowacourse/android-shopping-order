@@ -10,11 +10,12 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.coupon.AvailableTime
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.model.coupon.DiscountType
+import woowacourse.shopping.domain.model.coupon.CouponState
+import woowacourse.shopping.domain.model.coupon.CouponState.Companion.makeCouponState
 import woowacourse.shopping.domain.model.coupon.DiscountType.Companion.getDiscountType
-import woowacourse.shopping.domain.model.coupon.FixedCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 fun Product.toRecentProductEntity(): RecentProductEntity {
     return RecentProductEntity(
@@ -44,8 +45,10 @@ fun CartItemDto.toCartItem(): CartItem {
     return CartItem(cartItemId, quantity, productDto.toProduct())
 }
 
-fun List<CouponDto>.toCoupons(): List<Coupon> {
-    return map { it.toCouPon() }
+fun List<CouponDto>.toCouponStates(): List<CouponState> {
+    return map { couponDto ->
+        makeCouponState(couponDto.toCouPon())
+    }
 }
 
 fun CouponDto.toCouPon(): Coupon {
@@ -64,5 +67,5 @@ fun CouponDto.toCouPon(): Coupon {
 }
 
 fun AvailableTimeDto.toAvailableTime(): AvailableTime {
-    return AvailableTime(start, end)
+    return AvailableTime(LocalTime.parse(start), LocalTime.parse(end))
 }

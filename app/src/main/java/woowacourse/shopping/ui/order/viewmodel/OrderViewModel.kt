@@ -7,7 +7,6 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
 import woowacourse.shopping.ui.order.action.OrderNotifyingActions
@@ -15,10 +14,7 @@ import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewI
 import woowacourse.shopping.ui.order.listener.OrderClickListener
 import woowacourse.shopping.ui.state.OrderState
 
-class OrderViewModel(
-    private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
-) : ViewModel(), OrderClickListener {
+class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), OrderClickListener {
     private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
     val orderState: LiveData<OrderState>
         get() = _orderState
@@ -224,7 +220,8 @@ class OrderViewModel(
             when (orderState) {
                 is OrderState.Cart -> {
                     _orderState.value = OrderState.Recommend
-                    _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToRecommend)
+                    _orderNavigationActions.value =
+                        Event(OrderNavigationActions.NavigateToRecommend)
                 }
 
                 is OrderState.Recommend -> {

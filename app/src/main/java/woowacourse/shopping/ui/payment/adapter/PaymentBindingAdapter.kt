@@ -21,12 +21,13 @@ fun setExpirationDate(
     view: TextView,
     expirationDate: LocalDate,
 ) {
-    view.text = view.context.getString(
-        R.string.expiration_date_format,
-        expirationDate.year,
-        expirationDate.monthValue,
-        expirationDate.dayOfMonth
-    )
+    view.text =
+        view.context.getString(
+            R.string.expiration_date_format,
+            expirationDate.year,
+            expirationDate.monthValue,
+            expirationDate.dayOfMonth,
+        )
 }
 
 @BindingAdapter("app:minOrderPrice")
@@ -58,5 +59,5 @@ fun <T> setCouponVisibility(
     paymentUiState: UiState<T>,
 ) {
     recyclerView.visibility =
-        if ((paymentUiState is UiState.Success && !isCouponEmpty) || paymentUiState is UiState.Loading) View.VISIBLE else View.GONE
+        if ((paymentUiState is UiState.Success && !isCouponEmpty) || paymentUiState is UiState.Loading) View.VISIBLE else View.INVISIBLE
 }

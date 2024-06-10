@@ -50,27 +50,31 @@ class RecommendViewModel(
                             _recommendProductViewItems.value?.map { recommendProductViewItem -> recommendProductViewItem.product.productId }
                                 ?: return@onSuccess
 
-                        val updatedRecommendProductViewItems = cartItems.filter { cartItem ->
-                            recommendProductIds.contains(cartItem.product.productId)
-                        }.map { updatedCartItem ->
-                            ProductViewItem(updatedCartItem.product, updatedCartItem.quantity)
-                        }
+                        val updatedRecommendProductViewItems =
+                            cartItems.filter { cartItem ->
+                                recommendProductIds.contains(cartItem.product.productId)
+                            }.map { updatedCartItem ->
+                                ProductViewItem(updatedCartItem.product, updatedCartItem.quantity)
+                            }
 
                         val newRecommendProductViewItems =
                             recommendProductViewItems.value?.toMutableList() ?: return@onSuccess
 
                         updatedRecommendProductViewItems.forEach { updatedRecommendProductViewItem ->
                             val updatePosition =
-                                newRecommendProductViewItems.indexOfFirst { it.product.productId == updatedRecommendProductViewItem.product.productId }
+                                newRecommendProductViewItems.indexOfFirst {
+                                    it.product.productId == updatedRecommendProductViewItem.product.productId
+                                }
                             if (updatePosition != -1) {
                                 newRecommendProductViewItems[updatePosition] =
                                     updatedRecommendProductViewItem
                             }
                         }
 
-                        val newCartViewItems = cartItems.map { cartItem ->
-                            CartViewItem(cartItem).check()
-                        }
+                        val newCartViewItems =
+                            cartItems.map { cartItem ->
+                                CartViewItem(cartItem).check()
+                            }
                         orderViewModel.updateSelectedCartViewItems(newCartViewItems)
 
                         _recommendProductViewItems.value = newRecommendProductViewItems

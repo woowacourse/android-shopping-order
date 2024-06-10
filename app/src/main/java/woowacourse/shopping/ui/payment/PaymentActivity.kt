@@ -14,7 +14,6 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponState
 import woowacourse.shopping.ui.home.HomeActivity
 import woowacourse.shopping.ui.payment.action.PaymentNavigationActions.NavigateToBack
@@ -72,6 +71,10 @@ class PaymentActivity : AppCompatActivity() {
                             ?: getString(R.string.unknown_error),
                     )
             }
+        }
+
+        viewModel.cartItems.observe(this) {
+            viewModel.loadCoupons()
         }
 
         viewModel.paymentNavigationActions.observe(this) { paymentNavigationActions ->

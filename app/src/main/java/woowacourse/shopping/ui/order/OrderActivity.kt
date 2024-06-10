@@ -10,9 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.app.ShoppingApplication.Companion.remoteOrderDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.ui.home.HomeActivity
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
@@ -28,10 +26,7 @@ class OrderActivity : AppCompatActivity() {
     private val cartFragment by lazy { CartFragment.newInstance() }
     private val recommendFragment by lazy { RecommendFragment.newInstance() }
     private val orderViewModel: OrderViewModel by viewModels {
-        OrderViewModelFactory(
-            orderRepository = OrderRepositoryImpl(remoteOrderDataSource),
-            cartRepository = CartRepositoryImpl(remoteCartDataSource),
-        )
+        OrderViewModelFactory(cartRepository = CartRepositoryImpl(remoteCartDataSource))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

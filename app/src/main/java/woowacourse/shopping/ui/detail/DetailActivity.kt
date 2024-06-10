@@ -141,6 +141,7 @@ class DetailActivity : AppCompatActivity() {
         private const val ORIGIN = "origin"
         private const val INVALID_ORIGIN = ""
         const val DETAIL_ORIGIN = "detail"
+
         fun createIntent(
             context: Context,
             productId: Int,
