@@ -28,7 +28,7 @@ class CartRepositoryImpl(
         pageSize: Int,
     ): Result<List<Cart>> {
         return runCatching {
-            remoteCartDataSource.load(startPage, pageSize).cartDto.map { it.toCart() }
+            remoteCartDataSource.load(startPage, pageSize).cartItemResponse.map { it.toCart() }
         }
     }
 

@@ -8,8 +8,8 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.dto.request.SaveCartRequestDto
-import woowacourse.shopping.data.dto.request.UpdateCartRequestDto
+import woowacourse.shopping.data.dto.request.AddCartRequestBody
+import woowacourse.shopping.data.dto.request.UpdateCartRequestBody
 import woowacourse.shopping.data.dto.response.CartQuantityResponse
 import woowacourse.shopping.data.dto.response.CartResponse
 
@@ -23,13 +23,13 @@ interface CartApiService {
 
     @POST("/cart-items")
     suspend fun requestAddCartItems(
-        @Body cartRequest: SaveCartRequestDto,
+        @Body addCartRequestBody: AddCartRequestBody,
     )
 
     @PATCH("/cart-items/{id}")
     suspend fun requestUpdateCartItems(
         @Path(value = "id") cartId: Long,
-        @Body request: UpdateCartRequestDto,
+        @Body updateCartRequestBody: UpdateCartRequestBody,
     )
 
     @DELETE("/cart-items/{id}")

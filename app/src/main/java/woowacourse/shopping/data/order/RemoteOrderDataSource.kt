@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.order
 
-import woowacourse.shopping.data.dto.request.OrderRequestDto
+import woowacourse.shopping.data.dto.request.OrderRequestBody
 import woowacourse.shopping.data.remote.ApiClient
 
 class RemoteOrderDataSource {
@@ -8,6 +8,6 @@ class RemoteOrderDataSource {
         ApiClient.getApiClient().create(OrderApiService::class.java)
 
     suspend fun order(cartItemIds: List<Long>) {
-        return orderApiService.requestOrder(OrderRequestDto(cartItemIds))
+        return orderApiService.requestOrder(OrderRequestBody(cartItemIds))
     }
 }

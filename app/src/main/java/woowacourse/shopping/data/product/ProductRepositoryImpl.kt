@@ -17,7 +17,7 @@ class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDa
                 category,
                 startPage,
                 pageSize,
-            ).content.map { it.toProduct() }
+            ).productItemResponse.map { it.toProduct() }
         }
     }
 
@@ -28,7 +28,7 @@ class ProductRepositoryImpl(private val remoteProductDataSource: RemoteProductDa
         return runCatching {
             val productResponse = remoteProductDataSource.load(startPage, pageSize)
             PagedProducts(
-                productResponse.content.map { it.toProduct() },
+                productResponse.productItemResponse.map { it.toProduct() },
                 productResponse.last,
             )
         }

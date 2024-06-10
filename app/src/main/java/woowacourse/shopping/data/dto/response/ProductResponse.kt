@@ -1,12 +1,14 @@
 package woowacourse.shopping.data.dto.response
 
+import com.google.gson.annotations.SerializedName
+
 data class ProductResponse(
-    val content: List<ProductDto>,
-    val pageable: PageableDto,
+    @SerializedName("content") val productItemResponse: List<ProductItemResponse>,
+    val pageable: PageableResponse,
     val last: Boolean,
     val totalPages: Int,
     val totalElements: Int,
-    val sort: SortDto,
+    val sort: SortResponse,
     val first: Boolean,
     val number: Int,
     val numberOfElements: Int,

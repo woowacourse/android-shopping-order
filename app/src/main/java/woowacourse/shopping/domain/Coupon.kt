@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain
 
-import woowacourse.shopping.data.dto.response.AvailableTime
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime

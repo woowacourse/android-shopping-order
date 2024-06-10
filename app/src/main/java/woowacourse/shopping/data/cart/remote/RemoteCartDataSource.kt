@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.cart.remote
 
-import woowacourse.shopping.data.dto.request.SaveCartRequestDto
-import woowacourse.shopping.data.dto.request.UpdateCartRequestDto
+import woowacourse.shopping.data.dto.request.AddCartRequestBody
+import woowacourse.shopping.data.dto.request.UpdateCartRequestBody
 import woowacourse.shopping.data.dto.response.CartQuantityResponse
 import woowacourse.shopping.data.dto.response.CartResponse
 import woowacourse.shopping.data.remote.ApiClient
@@ -22,8 +22,8 @@ class RemoteCartDataSource {
         quantity: Int,
     ) {
         return cartApiService.requestAddCartItems(
-            cartRequest =
-                SaveCartRequestDto(
+            addCartRequestBody =
+                AddCartRequestBody(
                     productId = productId,
                     quantity = quantity,
                 ),
@@ -36,7 +36,7 @@ class RemoteCartDataSource {
     ) {
         return cartApiService.requestUpdateCartItems(
             cartId = cartId,
-            request = UpdateCartRequestDto(quantity),
+            updateCartRequestBody = UpdateCartRequestBody(quantity),
         )
     }
 

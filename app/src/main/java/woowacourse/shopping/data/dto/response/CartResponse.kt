@@ -5,14 +5,14 @@ import com.google.gson.annotations.SerializedName
 data class CartResponse(
     val totalPages: Int,
     val totalElements: Int,
-    val sort: SortDto,
+    val sort: SortResponse,
     val first: Boolean,
     val last: Boolean,
-    val pageable: PageableDto,
+    val pageable: PageableResponse,
     val number: Int,
     val numberOfElements: Int,
     val size: Int,
-    @SerializedName("content") val cartDto: List<CartDto>,
+    @SerializedName("content") val cartItemResponse: List<CartItemResponse>,
     val empty: Boolean,
 )
 

@@ -7,10 +7,8 @@ import woowacourse.shopping.domain.FixedCoupon
 import woowacourse.shopping.domain.FreeShippingCoupon
 import woowacourse.shopping.domain.PercentageCoupon
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
-data class CouponDto(
+data class CouponItemResponse(
     val id: Int,
     val code: String,
     val description: String,
@@ -20,7 +18,7 @@ data class CouponDto(
     val discountType: String,
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
-    val availableTime: AvailableTimeDto? = null,
+    val availableTime: AvailableTimeResponse? = null,
 ) {
     fun toDomain(): Coupon {
         return when (DiscountType.from(discountType)) {
@@ -80,24 +78,3 @@ data class CouponDto(
         return LocalDate.parse(dateString)
     }
 }
-
-data class AvailableTimeDto(
-    val start: String,
-    val end: String,
-) {
-    fun toDomain(): AvailableTime =
-        AvailableTime(
-            start = toLocalTime(start),
-            end = toLocalTime(end),
-        )
-
-    private fun toLocalTime(timeString: String): LocalTime {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-        return LocalTime.parse(timeString, formatter)
-    }
-}
-
-data class AvailableTime(
-    val start: LocalTime,
-    val end: LocalTime,
-)
