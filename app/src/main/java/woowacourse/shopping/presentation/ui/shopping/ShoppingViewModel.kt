@@ -66,7 +66,7 @@ class ShoppingViewModel(
 
     fun fetchCartItemCount() {
         viewModelScope.launch {
-            cartRepository.getCount()
+            cartRepository.getTotalCartItemCount()
                 .onSuccess {
                     _cartItemQuantity.value = it
                 }.onFailure { Event(ShoppingError.CartItemCountNotFound) }

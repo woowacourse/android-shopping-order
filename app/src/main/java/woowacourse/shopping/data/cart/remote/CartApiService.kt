@@ -38,5 +38,5 @@ interface CartApiService {
     )
 
     @GET("/cart-items/counts")
-    suspend fun requestGetCartItemsCount(): CartQuantityResponse
+    suspend fun requestGetTotalCartItemCount(): CartQuantityResponse
 }

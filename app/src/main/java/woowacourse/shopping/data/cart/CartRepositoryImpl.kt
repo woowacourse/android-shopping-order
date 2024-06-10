@@ -9,7 +9,7 @@ class CartRepositoryImpl(
 ) : CartRepository {
     override suspend fun loadAll(): Result<List<Cart>> {
         return runCatching {
-            val maxCount = getCount().getOrElse { MAXIMUM_CART_ITEM_COUNT }
+            val maxCount = getTotalCartItemCount().getOrElse { MAXIMUM_CART_ITEM_COUNT }
             return load(
                 0,
                 maxCount,
@@ -17,9 +17,9 @@ class CartRepositoryImpl(
         }
     }
 
-    override suspend fun getCount(): Result<Int> {
+    override suspend fun getTotalCartItemCount(): Result<Int> {
         return runCatching {
-            remoteCartDataSource.getCount().quantity
+            remoteCartDataSource.getTotalCartItemCount().quantity
         }
     }
 

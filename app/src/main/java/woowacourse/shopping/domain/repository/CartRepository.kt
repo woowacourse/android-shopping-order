@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.Cart
 interface CartRepository {
     suspend fun loadAll(): Result<List<Cart>>
 
-    suspend fun getCount(): Result<Int>
+    suspend fun getTotalCartItemCount(): Result<Int>
 
     suspend fun load(
         startPage: Int,

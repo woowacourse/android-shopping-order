@@ -44,7 +44,7 @@ class RemoteCartDataSource {
         return cartApiService.requestDeleteCartItems(cartId = cartId)
     }
 
-    suspend fun getCount(): CartQuantityResponse {
-        return cartApiService.requestGetCartItemsCount()
+    suspend fun getTotalCartItemCount(): CartQuantityResponse {
+        return cartApiService.requestGetTotalCartItemCount()
     }
 }
