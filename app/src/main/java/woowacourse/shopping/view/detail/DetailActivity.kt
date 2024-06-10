@@ -54,7 +54,6 @@ class DetailActivity : AppCompatActivity() {
                 is DetailUiEvent.NavigateBack -> navigateBackToHome()
                 is DetailUiEvent.Error -> showToastMessage(getString(R.string.unknown_error))
             }
-            viewModel.saveRecentProduct()
         }
     }
 
@@ -81,6 +80,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun navigateBackToHome() {
+        viewModel.saveRecentProduct()
         val itemIds = viewModel.alteredProductIds.toIntArray()
         setResult(
             RESULT_OK,

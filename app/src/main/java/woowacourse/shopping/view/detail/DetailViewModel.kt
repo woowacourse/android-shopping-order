@@ -31,7 +31,7 @@ class DetailViewModel(
 
     val isRecentProductVisible: LiveData<Boolean> =
         productDetailUiState.map {
-            it.lastlyViewedProduct?.productId != productId
+            it.lastlyViewedProduct?.productId != productId && it.lastlyViewedProduct != null
         }.distinctUntilChanged()
 
     var alteredProductIds: Array<Int> = arrayOf()
