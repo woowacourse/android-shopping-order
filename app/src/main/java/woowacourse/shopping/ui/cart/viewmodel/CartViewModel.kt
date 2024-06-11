@@ -80,7 +80,7 @@ class CartViewModel(
     private fun loadCartItems() {
         viewModelLaunch(::cartExceptionHandler) {
             _cart.value = currentCartState().copy(isLoading = true)
-            cartRepository.allCartItemsResponse().onSuccess { carts ->
+            cartRepository.getAllCartItems().onSuccess { carts ->
                 _cart.value =
                     currentCartState().copy(
                         cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
@@ -93,12 +93,12 @@ class CartViewModel(
     fun loadRecommendProducts() {
         viewModelLaunch(::recommendExceptionHandler) {
             val recentProductId: Long =
-                recentProductRepository.mostRecentProductResponse().resultOrNull()?.productId
+                recentProductRepository.getMostRecentProduct().resultOrNull()?.productId
                     ?: DEFAULT_RECENT_PRODUCT_ID
             val category =
-                productRepository.productByIdResponse(recentProductId).resultOrNull()?.category
+                productRepository.getProductById(recentProductId).resultOrNull()?.category
                     ?: DEFAULT_RECOMMEND_CATEGORY
-            productRepository.allRecommendProductsResponse(category).onSuccess {
+            productRepository.getAllRecommendProducts(category).onSuccess {
                 _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
                 noRecommendProductState.value = false
             }.checkError {
@@ -158,7 +158,7 @@ class CartViewModel(
 
     override fun plusCount(productId: Long) {
         viewModelLaunch(::updateCartExceptionHandler) {
-            val cartItem = cartRepository.cartItemResponse(productId).resultOrThrow()
+            val cartItem = cartRepository.getCartItem(productId).resultOrThrow()
             cartRepository.patchCartItem(
                 cartItem.id,
                 cartItem.quantity.value.inc(),
@@ -175,7 +175,7 @@ class CartViewModel(
 
     override fun minusCount(productId: Long) {
         viewModelLaunch(::updateCartExceptionHandler) {
-            val cartItem = cartRepository.cartItemResponse(productId).resultOrThrow()
+            val cartItem = cartRepository.getCartItem(productId).resultOrThrow()
             if (cartItem.quantity.value <= 0) return@viewModelLaunch
             cartRepository.patchCartItem(
                 cartItem.id,
@@ -193,7 +193,7 @@ class CartViewModel(
 
     private fun changeRecommendProductCount(productId: Long) {
         viewModelLaunch(::cartExceptionHandler) {
-            cartRepository.cartItemResponse(productId).onSuccess { cartItem ->
+            cartRepository.getCartItem(productId).onSuccess { cartItem ->
                 val current = productWithQuantities(productId, cartItem.quantity)
                 _recommendProducts.value = current
             }.onSuccess {

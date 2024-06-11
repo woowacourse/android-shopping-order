@@ -4,9 +4,9 @@ import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.result.Result
 
 interface CartRepository {
-    suspend fun cartItemResponse(productId: Long): Result<CartWithProduct>
+    suspend fun getCartItem(productId: Long): Result<CartWithProduct>
 
-    suspend fun allCartItemsResponse(): Result<List<CartWithProduct>>
+    suspend fun getAllCartItems(): Result<List<CartWithProduct>>
 
     suspend fun postCartItems(
         productId: Long,
@@ -15,7 +15,7 @@ interface CartRepository {
 
     suspend fun deleteCartItem(id: Long): Result<Unit>
 
-    suspend fun cartItemsCountResponse(): Result<Int>
+    suspend fun getCartItemsCount(): Result<Int>
 
     suspend fun patchCartItem(
         id: Long,

@@ -57,7 +57,7 @@ class ProductDetailViewModel(
 
     fun loadProduct() {
         viewModelLaunch(::productExceptionHandler) {
-            productRepository.productByIdResponse(productId).onSuccess {
+            productRepository.getProductById(productId).onSuccess {
                 _productWithQuantity.value = ProductWithQuantity(product = it)
             }.checkError { _error.setValue(it) }
         }
@@ -87,11 +87,11 @@ class ProductDetailViewModel(
 
     fun addToRecentProduct(lastSeenProductState: Boolean) {
         viewModelLaunch(::recentExceptionHandler) {
-            recentProductRepository.mostRecentProductResponse().onSuccess {
+            recentProductRepository.getMostRecentProduct().onSuccess {
                 if (!lastSeenProductState) {
                     _mostRecentProductVisibility.value = false
                 } else {
-                    _mostRecentProduct.value = productRepository.productByIdResponse(it.productId).resultOrThrow()
+                    _mostRecentProduct.value = productRepository.getProductById(it.productId).resultOrThrow()
                     setMostRecentVisibility(it.id, productId)
                 }
             }.onFail {
@@ -103,7 +103,7 @@ class ProductDetailViewModel(
             }.onException {
                 _error.setValue(ProductDetailError.UnKnown)
             }
-            recentProductRepository.insertResponse(productId)
+            recentProductRepository.insert(productId)
         }
     }
 

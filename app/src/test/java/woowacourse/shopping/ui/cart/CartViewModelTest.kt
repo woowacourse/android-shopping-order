@@ -37,7 +37,7 @@ class CartViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         productRepository = mockk<ProductRepositoryImpl>()
         cartRepository = mockk<CartRepositoryImpl>()
-        coEvery { cartRepository.allCartItemsResponse() } returns Result.Success(CART_STUB)
+        coEvery { cartRepository.getAllCartItems() } returns Result.Success(CART_STUB)
         viewModel = CartViewModel(productRepository, cartRepository, recentProductRepository)
     }
 
@@ -52,7 +52,7 @@ class CartViewModelTest {
         val before = viewModel.cart.getOrAwaitValue()
         assertThat(before.cartItems).hasSize(4)
         coEvery { cartRepository.deleteCartItem(DELETED_CART_ID) } returns Result.Success(Unit)
-        coEvery { cartRepository.allCartItemsResponse() } returns Result.Success(CART_STUB.filterNot { it.id == DELETED_CART_ID })
+        coEvery { cartRepository.getAllCartItems() } returns Result.Success(CART_STUB.filterNot { it.id == DELETED_CART_ID })
 
         // given
         viewModel.removeCartItem(DELETED_CART_ID)

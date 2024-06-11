@@ -15,8 +15,8 @@ import woowacourse.shopping.domain.result.resultOrThrow
 
 class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartDataSource()) :
     CartRepository {
-    override suspend fun cartItemResponse(productId: Long): Result<CartWithProduct> {
-        return when (val carts = allCartItemsResponse()) {
+    override suspend fun getCartItem(productId: Long): Result<CartWithProduct> {
+        return when (val carts = getAllCartItems()) {
             is Result.Success -> {
                 val cartWithProduct = carts.result.firstOrNull { it.product.id == productId }
                 if (cartWithProduct != null) {
@@ -34,7 +34,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
     }
 
 
-    override suspend fun allCartItemsResponse(): Result<List<CartWithProduct>> {
+    override suspend fun getAllCartItems(): Result<List<CartWithProduct>> {
         val count =
             dataSource.getCartItemCounts().resultOrNull()?.quantity ?: DEFAULT_CART_COUNT
         return handleApiResult(
@@ -55,7 +55,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         result = dataSource.deleteCartItems(id)
     )
 
-    override suspend fun cartItemsCountResponse(): Result<Int> =
+    override suspend fun getCartItemsCount(): Result<Int> =
         handleApiResult(
             result = dataSource.getCartItemCounts(),
             transform = { it.quantity },
@@ -78,7 +78,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
         quantity: Int,
     ): Result<Unit> {
         val cart: CartWithProduct? =
-            allCartItemsResponse().resultOrThrow().firstOrNull { it.product.id == productId }
+            getAllCartItems().resultOrThrow().firstOrNull { it.product.id == productId }
         if (cart == null) {
             return postCartItems(productId, quantity)
         } else {

@@ -77,7 +77,7 @@ class ProductContentsViewModel(
         viewModelLaunch(::productExceptionHandler) {
             productWithQuantity.value = currentProduct().copy(isLoading = true)
 
-            productRepository.allProductsResponse(
+            productRepository.getAllProducts(
                 currentProduct().productWithQuantities.size / PAGE_SIZE,
                 PAGE_SIZE,
             ).onSuccess { loadedProducts ->
@@ -129,7 +129,7 @@ class ProductContentsViewModel(
     fun loadCartItems() {
         viewModelLaunch(::cartExceptionHandler) {
             productWithQuantity.value = currentProduct().copy(isLoading = true)
-            cartRepository.allCartItemsResponse().onSuccess { carts ->
+            cartRepository.getAllCartItems().onSuccess { carts ->
                 cart.value = carts
             }.checkError {
                 _error.setValue(it)
@@ -139,9 +139,9 @@ class ProductContentsViewModel(
 
     fun loadRecentProducts() {
         viewModelLaunch(::recentExceptionHandler) {
-            recentProductRepository.allRecentProductsResponse().onSuccess { recentProducts ->
+            recentProductRepository.getAllRecentProducts().onSuccess { recentProducts ->
                 _recentProducts.value =
-                    recentProducts.mapNotNull { productRepository.productByIdResponse(it.productId).resultOrNull() }
+                    recentProducts.mapNotNull { productRepository.getProductById(it.productId).resultOrNull() }
             }.checkError {
                 _error.setValue(it)
             }

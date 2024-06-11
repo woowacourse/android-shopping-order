@@ -4,5 +4,5 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.result.Result
 
 interface CouponRepository {
-    suspend fun allCouponsResponse(): Result<List<Coupon>>
+    suspend fun getAllCoupons(): Result<List<Coupon>>
 }

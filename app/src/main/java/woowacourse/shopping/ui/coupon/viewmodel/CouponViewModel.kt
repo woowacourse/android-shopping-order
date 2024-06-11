@@ -6,10 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.model.CartWithProduct
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -46,7 +43,7 @@ class CouponViewModel(
 
     fun loadAvailableCoupons(carts: List<CartUiModel>) {
         viewModelLaunch(::couponExceptionHandler) {
-            couponRepository.allCouponsResponse().onSuccess { coupons ->
+            couponRepository.getAllCoupons().onSuccess { coupons ->
                 order.value = Order(coupons)
                 _coupons.value =
                     order?.value?.canUseCoupons(carts.map { it.toCartWithProduct() })?.map { it.toUiModel() }

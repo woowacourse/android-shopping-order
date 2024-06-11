@@ -40,7 +40,7 @@ class ProductContentsViewModelTest {
         recentProductRepository = mockk<RecentProductRepository>()
         cartRepository = mockk<CartRepository>()
         coEvery {
-            productRepository.allProductsResponse(
+            productRepository.getAllProducts(
                 0,
                 20,
             )
@@ -58,7 +58,7 @@ class ProductContentsViewModelTest {
     fun `상품을 가져올 때, 20개씩 가져온다`() {
         // when
         coEvery {
-            productRepository.allProductsResponse(
+            productRepository.getAllProducts(
                 1,
                 20,
             )
@@ -76,7 +76,7 @@ class ProductContentsViewModelTest {
     fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
         // when
         coEvery { cartRepository.postCartItems(0, 1) } returns Result.Success(Unit)
-        coEvery { cartRepository.allCartItemsResponse() } returns
+        coEvery { cartRepository.getAllCartItems() } returns
             Result.Success(
                 listOf(
                     CartWithProduct(0L, PRODUCT_STUB.first(), Quantity(1)),

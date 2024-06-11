@@ -21,7 +21,7 @@ import woowacourse.shopping.domain.result.resultOrThrow
 class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
     CouponRepository {
 
-    override suspend fun allCouponsResponse(): Result<List<Coupon>> =
+    override suspend fun getAllCoupons(): Result<List<Coupon>> =
         handleApiResult(
             result = dataSource.getCoupons(),
             transform = { it.map { it.toDomain() } },

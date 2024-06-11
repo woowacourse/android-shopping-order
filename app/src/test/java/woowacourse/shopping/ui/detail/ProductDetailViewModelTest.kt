@@ -35,7 +35,7 @@ class ProductDetailViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         productRepository = mockk<ProductRepositoryImpl>()
         cartRepository = mockk<CartRepositoryImpl>()
-        coEvery { productRepository.productByIdResponse(PRODUCT_ID) } returns Result.Success(PRODUCT_STUB)
+        coEvery { productRepository.getProductById(PRODUCT_ID) } returns Result.Success(PRODUCT_STUB)
         viewModel =
             ProductDetailViewModel(PRODUCT_ID, productRepository, recentProductRepository, cartRepository)
     }

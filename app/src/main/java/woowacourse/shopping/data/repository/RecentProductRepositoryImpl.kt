@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :
     RecentProductRepository {
 
-        override suspend fun insertResponse(productId: Long): Result<Long> {
+        override suspend fun insert(productId: Long): Result<Long> {
             return try {
                 val productId =
                     recentProductDao.insert(
@@ -26,7 +26,7 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
         }
 
 
-        override suspend fun mostRecentProductResponse(): Result<RecentProduct> {
+        override suspend fun getMostRecentProduct(): Result<RecentProduct> {
             return try {
                 val result =
                     recentProductDao.findMostRecentProduct() ?: return Fail.NotFound("최근 상품이 없습니다.")
@@ -36,7 +36,7 @@ class RecentProductRepositoryImpl private constructor(private val recentProductD
             }
         }
 
-        override suspend fun allRecentProductsResponse(): Result<List<RecentProduct>> {
+        override suspend fun getAllRecentProducts(): Result<List<RecentProduct>> {
             return try {
                 Result.Success(recentProductDao.findAll())
             } catch (e: Exception) {

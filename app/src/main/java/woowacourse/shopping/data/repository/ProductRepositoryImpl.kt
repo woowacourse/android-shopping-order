@@ -24,7 +24,7 @@ class ProductRepositoryImpl(
     private val cartDataSource: CartDataSource = RemoteCartDataSource(),
 ) :
     ProductRepository {
-    override suspend fun productByIdResponse(id: Long): Result<Product> =
+    override suspend fun getProductById(id: Long): Result<Product> =
         handleApiResult(
             productDataSource.getProductsById(id),
             ResponseProductIdGetDto::toProduct,
@@ -32,7 +32,7 @@ class ProductRepositoryImpl(
 
 
 
-    override suspend fun allProductsResponse(
+    override suspend fun getAllProducts(
         page: Int,
         size: Int,
     ): Result<List<Product>> =
@@ -42,7 +42,7 @@ class ProductRepositoryImpl(
         )
 
 
-    override suspend fun allRecommendProductsResponse(category: String): Result<List<Product>> {
+    override suspend fun getAllRecommendProducts(category: String): Result<List<Product>> {
         try {
             val carts: List<CartWithProduct> = cartWithProducts()
 
