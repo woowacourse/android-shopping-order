@@ -41,6 +41,11 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        cartFragment.onResume()
+    }
+
     private fun setUpDataBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = orderViewModel
@@ -98,8 +103,6 @@ class OrderActivity : AppCompatActivity() {
     }
 
     companion object {
-
-
         fun createIntent(context: Context): Intent {
             return Intent(context, OrderActivity::class.java)
         }

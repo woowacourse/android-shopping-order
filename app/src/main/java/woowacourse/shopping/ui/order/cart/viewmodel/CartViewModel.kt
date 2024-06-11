@@ -55,7 +55,7 @@ class CartViewModel(
         }
     }
 
-    private fun loadCartViewItems() {
+    fun loadCartViewItems() {
         viewModelScope.launch {
             val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
             cartRepository.getCartItems(0, cartTotalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)

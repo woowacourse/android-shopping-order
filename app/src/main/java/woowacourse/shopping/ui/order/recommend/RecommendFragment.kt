@@ -110,12 +110,10 @@ class RecommendFragment : Fragment() {
     }
 
     private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(requireContext(), productId, RECOMMEND_ORIGIN))
+        startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
     companion object {
-        const val RECOMMEND_ORIGIN = "recommend"
-
         fun newInstance(): Fragment {
             return RecommendFragment()
         }

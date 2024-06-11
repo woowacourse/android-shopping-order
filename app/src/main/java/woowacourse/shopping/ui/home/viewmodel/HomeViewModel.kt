@@ -66,9 +66,11 @@ class HomeViewModel(
     }
 
     fun updateData() {
-        loadCartItems()
-        updateProductViewItems()
-        loadRecentProducts()
+        viewModelScope.launch {
+            loadCartItems().join()
+            updateProductViewItems()
+            loadRecentProducts()
+        }
     }
 
     private fun loadRecentProducts() {
@@ -104,15 +106,13 @@ class HomeViewModel(
         }
     }
 
-    private fun loadCartItems() {
-        viewModelScope.launch {
-            cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
-                .onSuccess {
-                    cartItems.clear()
-                    cartItems.addAll(it)
-                    _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
-                }
-        }
+    private fun loadCartItems() = viewModelScope.launch {
+        cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
+            .onSuccess {
+                cartItems.clear()
+                cartItems.addAll(it)
+                _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
+            }
     }
 
     private fun getCartItemByProductId(productId: Int): CartItem? {

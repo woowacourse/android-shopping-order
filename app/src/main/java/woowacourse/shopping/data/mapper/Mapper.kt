@@ -32,7 +32,6 @@ fun RecentProductEntity.toRecentProduct(): RecentProduct {
     )
 }
 
-
 fun Product.toRecentProductEntity(): RecentProductEntity {
     return RecentProductEntity(
         productId = productId,

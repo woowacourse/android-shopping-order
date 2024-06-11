@@ -55,6 +55,11 @@ class CartFragment : Fragment() {
         observeViewmodel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        cartViewModel.loadCartViewItems()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -111,7 +116,7 @@ class CartFragment : Fragment() {
     }
 
     private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(requireContext(), productId, CART_ORIGIN))
+        startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
     private fun notifyCartItemDeleted() {
@@ -119,9 +124,6 @@ class CartFragment : Fragment() {
     }
 
     companion object {
-        const val CART_ORIGIN = "cart"
-
-
         fun newInstance(): Fragment {
             return CartFragment()
         }
