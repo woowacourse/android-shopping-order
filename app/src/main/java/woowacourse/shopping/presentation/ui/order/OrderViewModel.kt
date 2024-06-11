@@ -7,12 +7,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.mapper.toUiModel
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.CouponModel
-import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
+import java.time.format.DateTimeFormatter
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,
@@ -43,7 +44,7 @@ class OrderViewModel(
     init {
         viewModelScope.launch {
             couponRepository.findCoupons(selectedCartIds)
-                .map { coupons -> coupons.map { it.toUiModel() } }
+                .map { coupons -> coupons.map { it.toUiModel(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) } }
                 .onSuccess { couponModels ->
                     _coupons.value = UiState.Success(couponModels)
                 }
