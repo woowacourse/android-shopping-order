@@ -47,7 +47,7 @@ class ShoppingApplication : Application() {
         )
     }
     val productHistoryRepository: ProductHistoryRepository by lazy {
-        ProductHistoryRepositoryImpl(productHistoryLocalDataSource, shoppingCartRepository)
+        ProductHistoryRepositoryImpl(productHistoryLocalDataSource, shoppingCartRemoteDataSource)
     }
 
     private val productRemoteDataSource: ProductRemoteDataSource by lazy {

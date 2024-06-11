@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ProductHistoryRepositoryImpl(
     private val productHistoryLocalDataSource: ProductHistoryLocalDataSource,
-    private val shoppingCartRepository: ShoppingCartRepository,
+    private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) :
     ProductHistoryRepository {
     override suspend fun insertProductHistory(
@@ -36,9 +36,9 @@ class ProductHistoryRepositoryImpl(
 
         return productHistoryLocalDataSource.getProductHistoriesByCategory(category = recentHistory.first().category)
             .mapCatching { result ->
-                val carts = shoppingCartRepository.getAllCarts().getOrNull()
-
-                val productsId = carts?.content?.map { it.product.id } ?: emptyList()
+                val cartTotalElement = shoppingCartRemoteDataSource.getCartsTotalElement()
+                val carts = shoppingCartRemoteDataSource.getEntireCarts(cartTotalElement).content
+                val productsId = carts.map { it.product.id }
                 result.filter {
                     it.id !in productsId
                 }.map { Cart(product = it) }.take(size)

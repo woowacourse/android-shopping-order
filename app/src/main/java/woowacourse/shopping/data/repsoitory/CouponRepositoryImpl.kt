@@ -19,18 +19,8 @@ class CouponRepositoryImpl(
     CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> =
         runCatching {
-            val totalElements =
-                shoppingCartRemoteDataSource.getCartProductsPaged(
-                    page = 0,
-                    size = 1,
-                ).totalElements
-
-            val carts =
-                shoppingCartRemoteDataSource.getCartProductsPaged(
-                    page = 0,
-                    size = totalElements,
-                ).content
-
+            val cartTotalElement = shoppingCartRemoteDataSource.getCartsTotalElement()
+            val carts = shoppingCartRemoteDataSource.getEntireCarts(cartTotalElement).content
             val coupons = couponRemoteDataSource.getCoupons()
 
             filteredCoupons(carts, coupons)

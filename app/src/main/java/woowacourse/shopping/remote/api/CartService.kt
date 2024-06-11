@@ -17,7 +17,7 @@ interface CartService {
     @GET(CART_RELATIVE_URL)
     suspend fun getCartItems(
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20,
+        @Query("size") size: Int = 1,
     ): CartsResponse
 
     @POST(CART_RELATIVE_URL)

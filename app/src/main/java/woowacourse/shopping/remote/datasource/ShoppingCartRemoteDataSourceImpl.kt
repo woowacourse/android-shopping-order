@@ -1,6 +1,5 @@
 package woowacourse.shopping.remote.datasource
 
-import retrofit2.Response
 import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.remote.api.CartService
@@ -38,11 +37,11 @@ class ShoppingCartRemoteDataSourceImpl(private val service: CartService) :
         size: Int,
     ): Carts = service.getCartItems(page = page, size = size).toDomain()
 
+    override suspend fun getCartsTotalElement(): Int = service.getCartItems().totalElements
+
+    override suspend fun getEntireCarts(size: Int): Carts = service.getCartItems(size = size).toDomain()
+
     override suspend fun getCartProductsQuantity(): Int = service.getCartItemsCount().quantity
 
-    override suspend fun deleteCartProductById(cartId: Int) {
-        service.deleteCartItem(id = cartId)
-    }
-
-    fun <T> Response<T>.toCartId(): Int = this.headers()["location"]?.split("/")?.last()?.toInt() ?: throw IllegalArgumentException()
+    override suspend fun deleteCartProductById(cartId: Int): Unit = service.deleteCartItem(id = cartId)
 }

@@ -11,19 +11,12 @@ class ProductRepositoryImpl(
     private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ProductRepository {
     override suspend fun getCartById(productId: Long): Result<Cart> {
-        val totalElements =
-            shoppingCartRemoteDataSource.getCartProductsPaged(page = FIRST_PAGE, size = FIRST_SIZE).totalElements
-
-        val cartsDto =
-            shoppingCartRemoteDataSource.getCartProductsPaged(
-                page = FIRST_PAGE,
-                size = totalElements,
-            ).content
-
+        val cartTotalElement = shoppingCartRemoteDataSource.getCartsTotalElement()
+        val carts = shoppingCartRemoteDataSource.getEntireCarts(cartTotalElement).content
         val product = productRemoteDataSource.findProductById(productId)
 
         return runCatching {
-            cartsDto.firstOrNull { product.id == it.product.id } ?: Cart(
+            carts.firstOrNull { product.id == it.product.id } ?: Cart(
                 product = product,
                 quantity = INIT_QUANTITY,
             )
@@ -39,8 +32,6 @@ class ProductRepositoryImpl(
         }
 
     companion object {
-        const val FIRST_PAGE = 0
-        const val FIRST_SIZE = 1
         const val INIT_QUANTITY = 1
     }
 }
