@@ -2,8 +2,6 @@ package woowacourse.shopping.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import woowacourse.shopping.domain.model.RecentProduct
-import java.time.LocalDateTime
 
 @Entity(tableName = "recent_products")
 data class RecentProductEntity(
@@ -14,17 +12,3 @@ data class RecentProductEntity(
     val dateTime: String,
     val category: String,
 )
-
-fun List<RecentProductEntity>.toRecentProducts(): List<RecentProduct> {
-    return this.map { recentProductEntity -> recentProductEntity.toRecentProduct() }
-}
-
-fun RecentProductEntity.toRecentProduct(): RecentProduct {
-    return RecentProduct(
-        productId = this.productId,
-        productName = this.productName,
-        imageUrl = this.imageUrl,
-        dateTime = LocalDateTime.parse(dateTime),
-        category = this.category,
-    )
-}

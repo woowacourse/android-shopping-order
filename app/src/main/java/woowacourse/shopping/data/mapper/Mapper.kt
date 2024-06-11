@@ -8,6 +8,7 @@ import woowacourse.shopping.data.dto.ProductDto
 import woowacourse.shopping.data.local.entity.RecentProductEntity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.coupon.AvailableTime
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponState
@@ -16,6 +17,21 @@ import woowacourse.shopping.domain.model.coupon.DiscountType.Companion.getDiscou
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+
+fun List<RecentProductEntity>.toRecentProducts(): List<RecentProduct> {
+    return this.map { recentProductEntity -> recentProductEntity.toRecentProduct() }
+}
+
+fun RecentProductEntity.toRecentProduct(): RecentProduct {
+    return RecentProduct(
+        productId = this.productId,
+        productName = this.productName,
+        imageUrl = this.imageUrl,
+        dateTime = LocalDateTime.parse(dateTime),
+        category = this.category,
+    )
+}
+
 
 fun Product.toRecentProductEntity(): RecentProductEntity {
     return RecentProductEntity(
