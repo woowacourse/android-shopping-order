@@ -1,12 +1,12 @@
 package woowacourse.shopping.view.products
 
-import androidx.fragment.app.activityViewModels
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
@@ -34,16 +34,17 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                 ProductListViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyProductRepository = RecentlyProductRepositoryImpl(
-                        RecentlyDataSourceImpl(
-                            RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao()
-                        )
-                    ),
+                    recentlyProductRepository =
+                        RecentlyProductRepositoryImpl(
+                            RecentlyDataSourceImpl(
+                                RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao(),
+                            ),
+                        ),
                 )
             }
         viewModelFactory.create(ProductListViewModel::class.java)
     }
-    private val mainViewModel : MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recentlyAdapter: RecentlyAdapter
@@ -121,7 +122,7 @@ class ProductsListFragment : Fragment(), OnClickProducts {
         mainViewModel.updateProductEvent.observe(viewLifecycleOwner) {
             productListViewModel.updateProducts(it)
         }
-        mainViewModel.updateRecentlyProductEvent.observe(viewLifecycleOwner){
+        mainViewModel.updateRecentlyProductEvent.observe(viewLifecycleOwner) {
             productListViewModel.loadPagingRecentlyProduct()
         }
     }

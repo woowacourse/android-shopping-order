@@ -30,12 +30,13 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
                 ProductDetailViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyProductRepository = RecentlyProductRepositoryImpl(
-                        RecentlyDataSourceImpl(
-                            RecentlyProductDatabase.getInstance(requireContext())
-                                .recentlyProductDao()
-                        )
-                    ),
+                    recentlyProductRepository =
+                        RecentlyProductRepositoryImpl(
+                            RecentlyDataSourceImpl(
+                                RecentlyProductDatabase.getInstance(requireContext())
+                                    .recentlyProductDao(),
+                            ),
+                        ),
                 )
             }
         viewModelFactory.create(ProductDetailViewModel::class.java)
@@ -73,7 +74,7 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
             when (productDetailState) {
                 is ProductDetailEvent.AddShoppingCart.Success -> {
                     mainViewModel.saveUpdateProduct(
-                        mapOf(productDetailState.productId to productDetailState.count)
+                        mapOf(productDetailState.productId to productDetailState.count),
                     )
                     requireContext().makeToast(
                         getString(R.string.add_cart_text),

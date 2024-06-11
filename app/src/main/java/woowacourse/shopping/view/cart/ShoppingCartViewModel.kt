@@ -38,7 +38,7 @@ class ShoppingCartViewModel(
 
     private val _loadingState: MutableLiveData<UiState> =
         MutableLiveData(UiState.Loading)
-    val loadingState : LiveData<UiState> = _loadingState
+    val loadingState: LiveData<UiState> = _loadingState
 
     fun loadPagingCartItemList() =
         viewModelScope.launch {

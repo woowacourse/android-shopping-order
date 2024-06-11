@@ -41,7 +41,7 @@ class ProductListViewModel(
 
     private val _loadingState: MutableLiveData<UiState> =
         MutableLiveData(UiState.Loading)
-    val loadingState : LiveData<UiState> = _loadingState
+    val loadingState: LiveData<UiState> = _loadingState
 
     init {
         updateTotalCartItemCount()

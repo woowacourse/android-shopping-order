@@ -37,16 +37,17 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
                 RecommendViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyRepository = RecentlyProductRepositoryImpl(
-                        RecentlyDataSourceImpl(
-                            RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao()
-                        )
-                    ),
+                    recentlyRepository =
+                        RecentlyProductRepositoryImpl(
+                            RecentlyDataSourceImpl(
+                                RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao(),
+                            ),
+                        ),
                 )
             }
         viewModelFactory.create(RecommendViewModel::class.java)
     }
-    private val mainViewModel : MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var adapter: RecommendAdapter
 
@@ -98,7 +99,7 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
             when (state) {
                 is RecommendEvent.UpdateProductEvent.Success -> {
                     mainViewModel.saveUpdateProduct(
-                        mapOf(state.product.id to state.product.cartItemCounter.itemCount)
+                        mapOf(state.product.id to state.product.cartItemCounter.itemCount),
                     )
                     mainViewModel.saveUpdateCartItem()
                     adapter.updateProduct(state.product)

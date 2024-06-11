@@ -36,7 +36,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             }
         viewModelFactory.create(ShoppingCartViewModel::class.java)
     }
-    private val mainViewModel : MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var adapter: ShoppingCartAdapter
 
@@ -90,13 +90,13 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
                     adapter.updateCartItem(cartState.productId)
                     mainViewModel.saveUpdateProduct(
-                        mapOf(cartState.productId to cartState.count)
+                        mapOf(cartState.productId to cartState.count),
                     )
                 }
 
                 is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
                     mainViewModel.saveUpdateProduct(
-                        mapOf(cartState.productId to DEFAULT_ITEM_COUNT)
+                        mapOf(cartState.productId to DEFAULT_ITEM_COUNT),
                     )
 
                     requireContext().makeToast(
@@ -120,7 +120,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             )
         }
 
-        mainViewModel.updateCartItemEvent.observe(viewLifecycleOwner){
+        mainViewModel.updateCartItemEvent.observe(viewLifecycleOwner) {
             shoppingCartViewModel.loadPagingCartItemList()
         }
     }

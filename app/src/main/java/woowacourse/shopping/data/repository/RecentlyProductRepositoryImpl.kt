@@ -8,7 +8,6 @@ import woowacourse.shopping.utils.exception.ErrorEvent
 class RecentlyProductRepositoryImpl(
     private val recentlyDataSource: RecentlyDataSource,
 ) : RecentlyProductRepository {
-
     override suspend fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Unit> {
         return recentlyDataSource.addRecentlyProduct(recentlyProduct)
     }

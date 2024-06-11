@@ -16,7 +16,6 @@ class ShoppingCartAdapter(
     private val onClickCartItemCounter: OnClickCartItemCounter,
     private val onClickNavigateShoppingCart: OnClickNavigateShoppingCart,
 ) : ListAdapter<CartItem, ShoppingCartViewHolder>(ShoppingCartDiffCallback()) {
-
     class ShoppingCartDiffCallback : DiffUtil.ItemCallback<CartItem>() {
         override fun areItemsTheSame(
             oldItem: CartItem,
@@ -43,7 +42,7 @@ class ShoppingCartAdapter(
             view,
             onClickCartItemCounter,
             onClickShoppingCart,
-            onClickNavigateShoppingCart
+            onClickNavigateShoppingCart,
         )
     }
 

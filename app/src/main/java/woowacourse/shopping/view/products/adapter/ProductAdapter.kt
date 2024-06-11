@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
@@ -15,7 +14,6 @@ class ProductAdapter(
     private val onClickProducts: OnClickProducts,
     private val onClickCartItemCounter: OnClickCartItemCounter,
 ) : ListAdapter<Product, ProductViewHolder>(DiffCallback()) {
-
     class DiffCallback : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(
             oldItem: Product,

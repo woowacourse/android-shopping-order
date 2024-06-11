@@ -1,7 +1,6 @@
 package woowacourse.shopping.view
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
@@ -9,7 +8,6 @@ import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.view.products.ProductsListFragment
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
-
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
