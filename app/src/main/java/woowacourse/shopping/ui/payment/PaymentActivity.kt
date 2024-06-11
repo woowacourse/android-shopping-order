@@ -73,10 +73,6 @@ class PaymentActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.cartItems.observe(this) {
-            viewModel.loadCoupons()
-        }
-
         viewModel.paymentNavigationActions.observe(this) { paymentNavigationActions ->
             paymentNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
