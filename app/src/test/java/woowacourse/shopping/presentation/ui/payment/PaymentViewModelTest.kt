@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
@@ -35,27 +34,25 @@ class PaymentViewModelTest {
     @MockK
     private lateinit var orderRepository: OrderRepository
 
-    @BeforeEach
-    fun setUp() {
-        coEvery {
-            couponRepository.getCoupons()
-        } returns Result.success(COUPONS_STATE)
-
-        val initialState =
-            mapOf(PaymentActivity.PUT_EXTRA_CARTS_WRAPPER_KEY to CARTS_WRAPPER)
-        savedStateHandle = SavedStateHandle(initialState)
-
-        viewModel =
-            PaymentViewModel(
-                savedStateHandle,
-                couponRepository,
-                orderRepository,
-            )
-    }
-
     @Test
     fun `수량이 2개 이상인 상품이 있고, 총 금액이 100_000원 이상일 때 5,000원 할인 쿠폰과 5만원 이상 구매 시 무료 배송 쿠폰을 받을 수 있다`() =
         runTest {
+            // given
+            coEvery {
+                couponRepository.getCoupons()
+            } returns Result.success(COUPONS_STATE)
+
+            val initialState =
+                mapOf(PaymentActivity.PUT_EXTRA_CARTS_WRAPPER_KEY to CARTS_WRAPPER)
+            savedStateHandle = SavedStateHandle(initialState)
+
+            viewModel =
+                PaymentViewModel(
+                    savedStateHandle,
+                    couponRepository,
+                    orderRepository,
+                )
+
             delay(2000)
             val actual = viewModel.uiState.getOrAwaitValue()
             assertThat(actual.coupons).anyMatch { it.discountPolicy is FixedAmountDiscountPolicy }
@@ -65,6 +62,21 @@ class PaymentViewModelTest {
     @Test
     fun `상품을 성공적으로 주문하면 PaymentNavigateAction이 NavigateToProductList로 변경된다`() =
         runTest {
+            coEvery {
+                couponRepository.getCoupons()
+            } returns Result.success(COUPONS_STATE)
+
+            val initialState =
+                mapOf(PaymentActivity.PUT_EXTRA_CARTS_WRAPPER_KEY to CARTS_WRAPPER)
+            savedStateHandle = SavedStateHandle(initialState)
+
+            viewModel =
+                PaymentViewModel(
+                    savedStateHandle,
+                    couponRepository,
+                    orderRepository,
+                )
+
             // given
             coEvery { orderRepository.insertOrder(CARTS_WRAPPER.cartUiModels.map { it.id }) } returns
                 Result.success(Unit)
