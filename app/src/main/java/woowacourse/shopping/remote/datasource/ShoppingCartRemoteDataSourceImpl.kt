@@ -1,15 +1,15 @@
 package woowacourse.shopping.remote.datasource
 
 import retrofit2.Response
-import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.remote.api.CartService
 import woowacourse.shopping.remote.mapper.toDomain
 import woowacourse.shopping.remote.model.request.PatchCartItemRequest
 import woowacourse.shopping.remote.model.request.PostCartItemRequest
 
-class ShoppingRemoteCartDataSourceImpl(private val service: CartService) :
-    ShoppingRemoteCartDataSource {
+class ShoppingCartRemoteDataSourceImpl(private val service: CartService) :
+    ShoppingCartRemoteDataSource {
     override suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,

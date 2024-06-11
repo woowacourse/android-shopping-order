@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.repsoitory
 
-import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
-class ShoppingCartRepositoryImpl(private val dataSource: ShoppingRemoteCartDataSource) :
+class ShoppingCartRepositoryImpl(private val dataSource: ShoppingCartRemoteDataSource) :
     ShoppingCartRepository {
     override suspend fun insertCartProduct(
         productId: Long,

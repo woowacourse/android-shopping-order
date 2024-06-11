@@ -2,7 +2,7 @@ package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.domain.model.Carts
 
-interface ShoppingRemoteCartDataSource {
+interface ShoppingCartRemoteDataSource {
     suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,

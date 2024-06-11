@@ -1,21 +1,21 @@
 package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
-    private val shoppingRemoteCartDataSource: ShoppingRemoteCartDataSource,
+    private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ProductRepository {
     override suspend fun getCartById(productId: Long): Result<Cart> {
         val totalElements =
-            shoppingRemoteCartDataSource.getCartProductsPaged(page = FIRST_PAGE, size = FIRST_SIZE).totalElements
+            shoppingCartRemoteDataSource.getCartProductsPaged(page = FIRST_PAGE, size = FIRST_SIZE).totalElements
 
         val cartsDto =
-            shoppingRemoteCartDataSource.getCartProductsPaged(
+            shoppingCartRemoteDataSource.getCartProductsPaged(
                 page = FIRST_PAGE,
                 size = totalElements,
             ).content

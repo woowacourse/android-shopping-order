@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repsoitory
 
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
-import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.coupons.BOGO
 import woowacourse.shopping.domain.model.coupons.Coupon
@@ -14,7 +14,7 @@ import java.time.LocalTime
 
 class CouponRepositoryImpl(
     private val couponRemoteDataSource: CouponRemoteDataSource,
-    private val shoppingCartRemoteDataSource: ShoppingRemoteCartDataSource,
+    private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) :
     CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> =
