@@ -101,7 +101,7 @@ class DetailActivity : AppCompatActivity() {
         viewModel.detailNotifyingActions.observe(this) { detailNotifyingActions ->
             detailNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is DetailNotifyingActions.NotifyPutCartItem -> notifyPutCartItem()
+                    is DetailNotifyingActions.NotifyPutInCartItem -> notifyPutInCartItem()
                 }
             }
         }
@@ -111,8 +111,8 @@ class DetailActivity : AppCompatActivity() {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
-    private fun notifyPutCartItem() {
-        Toast.makeText(this, PUR_CART_MESSAGE, Toast.LENGTH_SHORT).show()
+    private fun notifyPutInCartItem() {
+        Toast.makeText(this, getString(R.string.put_in_cart), Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToHome() {
@@ -137,7 +137,6 @@ class DetailActivity : AppCompatActivity() {
     companion object {
         private const val PRODUCT_ID = "product_id"
         private const val INVALID_PRODUCT_ID = -1
-        private const val PUR_CART_MESSAGE = "장바구니에 상품이 추가되었습니다!"
         private const val ORIGIN = "origin"
         private const val INVALID_ORIGIN = ""
         const val DETAIL_ORIGIN = "detail"

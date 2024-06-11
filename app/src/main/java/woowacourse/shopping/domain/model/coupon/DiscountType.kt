@@ -8,7 +8,7 @@ enum class DiscountType {
 
     companion object {
         fun getDiscountType(discountType: String): DiscountType {
-            return DiscountType.entries.find { it.name == discountType.toUpperCase() }
+            return DiscountType.entries.find { it.name == discountType.uppercase() }
                 ?: throw IllegalArgumentException()
         }
     }

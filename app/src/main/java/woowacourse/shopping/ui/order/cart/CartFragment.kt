@@ -115,12 +115,12 @@ class CartFragment : Fragment() {
     }
 
     private fun notifyCartItemDeleted() {
-        Toast.makeText(requireContext(), DELETE_ITEM_MESSAGE, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.deleted_cart_item), Toast.LENGTH_SHORT).show()
     }
 
     companion object {
         const val CART_ORIGIN = "cart"
-        private const val DELETE_ITEM_MESSAGE = "장바구니에서 상품을 삭제했습니다!"
+
 
         fun newInstance(): Fragment {
             return CartFragment()

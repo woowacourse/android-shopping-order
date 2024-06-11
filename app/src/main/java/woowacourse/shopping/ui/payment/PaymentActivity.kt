@@ -116,12 +116,11 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     private fun notifyPaymentCompleted() {
-        Toast.makeText(this, PAYMENT_COMPLETED_MESSAGE, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.payment_complete), Toast.LENGTH_SHORT).show()
     }
 
     companion object {
         private const val CART_ITEM_IDS = "cartItemIds"
-        private const val PAYMENT_COMPLETED_MESSAGE = "상품 주문이 완료되었습니다!"
 
         fun createIntent(
             context: Context,

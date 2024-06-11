@@ -122,9 +122,9 @@ class DetailViewModel(
         }
     }
 
-    override fun onPutCartButtonClick() {
+    override fun onPutInCartButtonClick() {
         saveCartItem()
-        _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyPutCartItem)
+        _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyPutInCartItem)
     }
 
     override fun onRecentProductClick() {

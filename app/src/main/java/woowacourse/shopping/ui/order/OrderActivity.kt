@@ -94,11 +94,11 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun notifyCanNotOrder() {
-        Toast.makeText(this, CAN_NOT_ORDER_MESSAGE, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.can_not_order), Toast.LENGTH_SHORT).show()
     }
 
     companion object {
-        private const val CAN_NOT_ORDER_MESSAGE = "최소 1개 이상의 상품을 주문해주세요!"
+
 
         fun createIntent(context: Context): Intent {
             return Intent(context, OrderActivity::class.java)

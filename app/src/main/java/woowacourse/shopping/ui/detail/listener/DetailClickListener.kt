@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.detail.listener
 
 interface DetailClickListener {
-    fun onPutCartButtonClick()
+    fun onPutInCartButtonClick()
 
     fun onRecentProductClick()
 

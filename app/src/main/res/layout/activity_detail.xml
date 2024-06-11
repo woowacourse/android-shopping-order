@@ -114,7 +114,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:onClick="@{() -> viewModel.onPutCartButtonClick()}"
+            android:onClick="@{() -> viewModel.onPutInCartButtonClick()}"
             android:text="장바구니 담기"
             android:textColor="@color/white"
             android:textSize="20dp"
