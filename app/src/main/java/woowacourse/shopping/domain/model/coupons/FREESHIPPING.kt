@@ -10,7 +10,7 @@ data class FREESHIPPING(
     override val expirationDate: LocalDate,
     override val discountType: String,
     val minimumAmount: Int,
-) : Coupon() {
+) : Coupon {
     override fun calculateDiscountRate(carts: List<Cart>): Int {
         return 3000
     }

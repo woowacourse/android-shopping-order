@@ -11,7 +11,7 @@ data class FIXED5000(
     override val discountType: String,
     val discount: Int,
     val minimumAmount: Int,
-) : Coupon() {
+) : Coupon {
     override fun calculateDiscountRate(carts: List<Cart>): Int {
         return discount
     }

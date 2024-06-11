@@ -12,7 +12,7 @@ data class MIRACLESALE(
     override val discountType: String,
     val discount: Int,
     val availableTime: AvailableLocalTime,
-) : Coupon() {
+) : Coupon {
     data class AvailableLocalTime(
         val start: LocalTime,
         val end: LocalTime,
