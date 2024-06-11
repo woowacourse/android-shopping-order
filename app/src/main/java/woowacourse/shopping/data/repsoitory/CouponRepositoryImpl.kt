@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repsoitory
 
-import android.util.Log
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
 import woowacourse.shopping.domain.model.Cart
@@ -55,6 +54,6 @@ class CouponRepositoryImpl(
                 is FREESHIPPING -> totalPrice >= it.minimumAmount
                 is MIRACLESALE -> todayTime in it.availableTime.start..it.availableTime.end
             }
-        }.also { Log.d("0inn", "filteredCoupons: $it") }
+        }
     }
 }

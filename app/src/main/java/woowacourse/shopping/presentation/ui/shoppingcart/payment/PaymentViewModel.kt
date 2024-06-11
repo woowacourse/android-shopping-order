@@ -99,7 +99,6 @@ class PaymentViewModel(
                 couponUiStates =
                     state.couponUiStates.map {
                         if (it.coupon.code == coupon.code) {
-                            Log.d("HELLO", "selectCoupon: ${it.coupon.code} ${coupon.code}")
                             it.copy(
                                 isChecked = !it.isChecked,
                             )
