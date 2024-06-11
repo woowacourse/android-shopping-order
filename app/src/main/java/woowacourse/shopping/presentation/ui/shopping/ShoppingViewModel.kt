@@ -109,8 +109,9 @@ class ShoppingViewModel(
     fun fetchRecentProducts() {
         viewModelScope.launch {
             recentRepository.loadAll()
-                .onSuccess { recentViewed ->
-                    _recentProducts.value = UiState.Success(recentViewed.map { it.toUiModel() })
+                .map { recentViewed -> recentViewed.map { it.toUiModel() } }
+                .onSuccess { recentViewedModel ->
+                    _recentProducts.value = UiState.Success(recentViewedModel)
                 }.onFailure {
                     _error.value = Event(ShoppingError.RecentProductItemsNotFound)
                 }

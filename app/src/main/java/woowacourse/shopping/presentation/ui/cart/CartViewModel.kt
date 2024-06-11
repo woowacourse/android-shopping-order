@@ -70,8 +70,8 @@ class CartViewModel(
     private fun loadAllCartItems(pageSize: Int) {
         viewModelScope.launch {
             cartRepository.load(0, pageSize)
-                .onSuccess { carts ->
-                    val loadedCarts = carts.map { it.toUiModel() }
+                .map { carts -> carts.map { it.toUiModel() } }
+                .onSuccess { loadedCarts ->
                     val currentCartItems = cartItemsData.associateBy { it.cartId }
                     val newCartItems =
                         loadedCarts.map { cartModel ->

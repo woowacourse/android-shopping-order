@@ -64,10 +64,9 @@ class ProductDetailViewModel(
     private fun loadLastProduct() {
         viewModelScope.launch {
             recentRepository.loadMostRecent()
+                .map { it?.toUiModel() }
                 .onSuccess { product ->
-                    product?.let {
-                        _lastProduct.value = it.toUiModel()
-                    }
+                    product?.let { _lastProduct.value = it }
                 }.onFailure {
                     _error.value = Event(DetailError.RecentItemNotFound)
                 }

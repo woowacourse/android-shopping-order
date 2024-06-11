@@ -43,8 +43,8 @@ class OrderViewModel(
     init {
         viewModelScope.launch {
             couponRepository.findCoupons(selectedCartIds)
-                .onSuccess { result ->
-                    val couponModels = result.map { it.toUiModel() }
+                .map { coupons -> coupons.map { it.toUiModel() } }
+                .onSuccess { couponModels ->
                     _coupons.value = UiState.Success(couponModels)
                 }
                 .onFailure { _error.value = Event(OrderError.CouponsNotFound) }
