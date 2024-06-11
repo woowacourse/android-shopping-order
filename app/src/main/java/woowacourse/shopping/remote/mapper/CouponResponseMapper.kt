@@ -4,7 +4,6 @@ import woowacourse.shopping.domain.model.BuyXGetYDiscountStrategy
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.DiscountStrategy
-import woowacourse.shopping.domain.model.DiscountType
 import woowacourse.shopping.domain.model.FixedDiscountStrategy
 import woowacourse.shopping.domain.model.FreeShippingDiscountStrategy
 import woowacourse.shopping.domain.model.PercentageDiscountStrategy

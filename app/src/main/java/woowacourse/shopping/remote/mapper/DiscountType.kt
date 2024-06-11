@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.remote.mapper
 
 enum class DiscountType(private val discountType: String) {
     FIXED("fixed"),
