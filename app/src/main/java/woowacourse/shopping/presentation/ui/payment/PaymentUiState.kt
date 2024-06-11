@@ -13,10 +13,11 @@ data class PaymentUiState(
 
     val couponDiscountPrice
         get() =
-            coupons.find { it.id == checkedCouponId }?.discountPolicy?.calculateDiscount(
-                orderTotalPrice,
-                orderCarts.map { it.toDomain() },
-            ) ?: 0
+            checkedCoupon?.calculateDiscount(orderTotalPrice, orderCarts.map { it.toDomain() })
+                ?: 0
+
+    private val checkedCoupon: CouponUiModel?
+        get() = coupons.find { it.id == checkedCouponId }
 
     val paymentTotalPrice get() = orderCarts.sumOf { it.totalPrice } + DELIVERY_FEE_AMOUNT - couponDiscountPrice
 

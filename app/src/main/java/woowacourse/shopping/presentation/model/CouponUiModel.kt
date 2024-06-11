@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.model
 
 import woowacourse.shopping.domain.model.AvailableTime
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponCondition
 import woowacourse.shopping.domain.model.coupon.DiscountPolicy
@@ -17,7 +18,14 @@ data class CouponUiModel(
     val discountPolicy: DiscountPolicy,
     val couponCondition: CouponCondition,
     val checked: Boolean = false,
-)
+) {
+    fun calculateDiscount(
+        orderTotalPrice: Int,
+        carts: List<Cart>,
+    ): Int {
+        return discountPolicy.calculateDiscount(orderTotalPrice, carts)
+    }
+}
 
 fun Coupon.toPresentation(): CouponUiModel {
     return CouponUiModel(
