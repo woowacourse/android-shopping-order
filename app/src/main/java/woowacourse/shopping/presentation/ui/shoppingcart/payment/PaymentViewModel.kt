@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.payment
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -109,12 +108,12 @@ class PaymentViewModel(
                         }
                     },
                 discountPrice =
-                    -when (coupon) {
+                    when (coupon) {
                         is FIXED5000 -> coupon.calculateDiscountRate(carts)
                         is BOGO -> coupon.calculateDiscountRate(carts)
                         is FREESHIPPING -> coupon.calculateDiscountRate(carts)
                         is MIRACLESALE -> coupon.calculateDiscountRate(carts)
-                    },
+                    }.unaryMinus(),
             )
     }
 
