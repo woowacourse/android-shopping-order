@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
@@ -14,6 +15,7 @@ import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
 import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
 import woowacourse.shopping.view.cart.model.ShoppingCart
@@ -34,6 +36,8 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             }
         viewModelFactory.create(ShoppingCartViewModel::class.java)
     }
+    private val mainViewModel : MainViewModel by activityViewModels()
+
     private lateinit var adapter: ShoppingCartAdapter
 
     override fun onAttach(context: Context) {
@@ -85,16 +89,14 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             when (cartState) {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
                     adapter.updateCartItem(cartState.productId)
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        cartState.count,
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(cartState.productId to cartState.count)
                     )
                 }
 
                 is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        DEFAULT_ITEM_COUNT,
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(cartState.productId to DEFAULT_ITEM_COUNT)
                     )
 
                     requireContext().makeToast(
@@ -118,7 +120,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             )
         }
 
-        mainActivityListener?.observeCartItem {
+        mainViewModel.updateCartItemEvent.observe(viewLifecycleOwner){
             shoppingCartViewModel.loadPagingCartItemList()
         }
     }

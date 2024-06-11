@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
@@ -16,6 +17,7 @@ import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
@@ -38,6 +40,7 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
             }
         viewModelFactory.create(RecommendViewModel::class.java)
     }
+    private val mainViewModel : MainViewModel by activityViewModels()
 
     private lateinit var adapter: RecommendAdapter
 
@@ -88,13 +91,10 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is RecommendEvent.UpdateProductEvent.Success -> {
-                    mainActivityListener?.apply {
-                        saveUpdateProduct(
-                            productId = state.product.id,
-                            count = state.product.cartItemCounter.itemCount,
-                        )
-                        saveUpdateCartItem()
-                    }
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(state.product.id to state.product.cartItemCounter.itemCount)
+                    )
+                    mainViewModel.saveUpdateCartItem()
                     adapter.updateProduct(state.product)
                 }
                 is RecommendEvent.OrderRecommends.Success -> {

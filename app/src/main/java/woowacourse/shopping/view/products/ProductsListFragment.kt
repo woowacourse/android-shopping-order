@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.products
 
+import androidx.fragment.app.activityViewModels
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.detail.ProductDetailFragment
@@ -35,6 +37,8 @@ class ProductsListFragment : Fragment(), OnClickProducts {
             }
         viewModelFactory.create(ProductListViewModel::class.java)
     }
+    private val mainViewModel : MainViewModel by activityViewModels()
+
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recentlyAdapter: RecentlyAdapter
 
@@ -108,10 +112,10 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                 errorState.receiveErrorMessage(),
             )
         }
-        mainActivityListener?.observeProductList { updatedProducts ->
-            productListViewModel.updateProducts(updatedProducts)
+        mainViewModel.updateProductEvent.observe(viewLifecycleOwner) {
+            productListViewModel.updateProducts(it)
         }
-        mainActivityListener?.observeRecentlyProduct {
+        mainViewModel.updateRecentlyProductEvent.observe(viewLifecycleOwner){
             productListViewModel.loadPagingRecentlyProduct()
         }
     }

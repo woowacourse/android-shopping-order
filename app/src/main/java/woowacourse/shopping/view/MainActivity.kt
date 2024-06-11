@@ -9,7 +9,6 @@ import woowacourse.shopping.databinding.ActivityMainBinding
 import woowacourse.shopping.view.products.ProductsListFragment
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
-    private val mainViewModel: MainViewModel by viewModels()
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -40,38 +39,5 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         val intent = intent
         finish()
         startActivity(intent)
-    }
-
-    override fun observeProductList(products: (Map<Long, Int>) -> Unit) {
-        mainViewModel.updateProductEvent.observe(this) {
-            products(it)
-        }
-    }
-
-    override fun saveUpdateProduct(
-        productId: Long,
-        count: Int,
-    ) {
-        mainViewModel.saveUpdateProduct(mapOf(productId to count))
-    }
-
-    override fun observeRecentlyProduct(reset: () -> Unit) {
-        mainViewModel.updateRecentlyProductEvent.observe(this) {
-            reset()
-        }
-    }
-
-    override fun saveUpdateRecentlyProduct() {
-        mainViewModel.saveUpdateRecentlyProduct()
-    }
-
-    override fun observeCartItem(reset: () -> Unit) {
-        mainViewModel.updateCartItemEvent.observe(this) {
-            reset()
-        }
-    }
-
-    override fun saveUpdateCartItem() {
-        mainViewModel.saveUpdateCartItem()
     }
 }

@@ -90,4 +90,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    implementation("androidx.fragment:fragment-ktx:1.3.6")
 }
