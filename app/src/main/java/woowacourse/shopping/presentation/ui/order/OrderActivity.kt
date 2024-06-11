@@ -6,15 +6,31 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.api.ApiClient
+import woowacourse.shopping.remote.api.CouponApiService
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteCouponDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteOrderDataSourceImpl
 
 class OrderActivity : BindingActivity<ActivityOrderBinding>() {
     private val viewModel: OrderViewModel by viewModels {
+        val couponRepository =
+            CouponRepositoryImpl(
+                RemoteCouponDataSourceImpl(ApiClient.getApiClient().create(CouponApiService::class.java)),
+                RemoteCartDataSourceImpl(),
+            )
+        val orderRepository = OrderRepositoryImpl(RemoteOrderDataSourceImpl())
+
         OrderViewModel.Companion.Factory(
+            couponRepository,
+            orderRepository,
             getSelectedCartIds(),
             getTotalOrderPrice(),
         )

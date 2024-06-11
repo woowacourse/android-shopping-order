@@ -7,21 +7,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
-import woowacourse.shopping.local.database.AppDatabase
-import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.ui.model.ProductModel
 import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
-import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
-import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -150,13 +143,18 @@ class ProductDetailViewModel(
     companion object {
         const val DEFAULT_PRODUCT_COUNT = 1
 
-        class Factory(private val productId: Long, private val isLastViewedItem: Boolean) : ViewModelProvider.Factory {
+        class Factory(
+            private val productRepository: ProductRepository,
+            private val cartRepository: CartRepository,
+            private val recentRepository: RecentRepository,
+            private val productId: Long,
+            private val isLastViewedItem: Boolean,
+        ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
                 return ProductDetailViewModel(
-                    ProductRepositoryImpl(RemoteProductDataSourceImpl()),
-                    CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl()),
-                    RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(recentDao)),
+                    productRepository,
+                    cartRepository,
+                    recentRepository,
                     productId,
                     isLastViewedItem,
                 ) as T

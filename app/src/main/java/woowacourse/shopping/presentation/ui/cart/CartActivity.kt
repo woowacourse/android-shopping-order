@@ -7,7 +7,12 @@ import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.cart.cartList.CartListFragment
 import woowacourse.shopping.presentation.ui.cart.recommend.RecommendFragment
@@ -15,14 +20,25 @@ import woowacourse.shopping.presentation.ui.model.UpdatedProductData
 import woowacourse.shopping.presentation.ui.order.OrderActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_cart
 
     private val viewModel: CartViewModel by viewModels {
+        val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
+        val productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl())
+        val recentRepository =
+            RecentProductRepositoryImpl(
+                LocalRecentViewedDataSourceImpl(
+                    AppDatabase.instanceOrNull.recentProductDao(),
+                ),
+            )
         val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
-        CartViewModel.Companion.Factory(initialItemQuantity)
+
+        CartViewModel.Companion.Factory(cartRepository, productRepository, recentRepository, initialItemQuantity)
     }
 
     override fun initStartView(savedInstanceState: Bundle?) {

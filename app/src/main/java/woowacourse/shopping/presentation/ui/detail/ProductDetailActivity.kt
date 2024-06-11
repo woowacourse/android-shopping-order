@@ -6,17 +6,32 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_product_detail
 
     private val viewModel: ProductDetailViewModel by viewModels {
+        val productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl())
+        val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
+        val recentRepository =
+            RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(AppDatabase.instanceOrNull.recentProductDao()))
+
         ProductDetailViewModel.Companion.Factory(
+            productRepository,
+            cartRepository,
+            recentRepository,
             getProductId(),
             checkIsLastViewedProduct(),
         )

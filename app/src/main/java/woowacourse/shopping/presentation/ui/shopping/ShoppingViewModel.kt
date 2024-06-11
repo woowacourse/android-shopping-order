@@ -8,22 +8,15 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
-import woowacourse.shopping.local.database.AppDatabase
-import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.ProductModel
 import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
-import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
-import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ShoppingViewModel(
     private val productRepository: ProductRepository,
@@ -261,13 +254,16 @@ class ShoppingViewModel(
         const val INCREMENT_AMOUNT = 1
         const val DECREMENT_AMOUNT = 1
 
-        class Factory : ViewModelProvider.Factory {
+        class Factory(
+            private val productRepository: ProductRepository,
+            private val recentRepository: RecentRepository,
+            private val cartRepository: CartRepository,
+        ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
                 return ShoppingViewModel(
-                    productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl()),
-                    recentRepository = RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(recentDao)),
-                    cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl()),
+                    productRepository,
+                    recentRepository,
+                    cartRepository,
                 ) as T
             }
         }

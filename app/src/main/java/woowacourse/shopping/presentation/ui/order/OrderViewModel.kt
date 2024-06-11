@@ -7,19 +7,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CouponRepositoryImpl
-import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.CouponModel
 import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
-import woowacourse.shopping.remote.api.ApiClient
-import woowacourse.shopping.remote.api.CouponApiService
-import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
-import woowacourse.shopping.remote.datasource.RemoteCouponDataSourceImpl
-import woowacourse.shopping.remote.datasource.RemoteOrderDataSourceImpl
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,
@@ -82,17 +75,15 @@ class OrderViewModel(
 
     companion object {
         class Factory(
+            private val couponRepository: CouponRepository,
+            private val orderRepository: OrderRepository,
             private val selectedCartIds: List<Long>,
             private val totalPriceWithoutDiscount: Long,
         ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val couponApiService = ApiClient.getApiClient().create(CouponApiService::class.java)
                 return OrderViewModel(
-                    CouponRepositoryImpl(
-                        RemoteCouponDataSourceImpl(couponApiService),
-                        RemoteCartDataSourceImpl(),
-                    ),
-                    OrderRepositoryImpl(RemoteOrderDataSourceImpl()),
+                    couponRepository,
+                    orderRepository,
                     selectedCartIds,
                     totalPriceWithoutDiscount,
                 ) as T

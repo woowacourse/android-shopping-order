@@ -9,7 +9,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.CartActivity
@@ -19,12 +24,22 @@ import woowacourse.shopping.presentation.ui.model.UpdatedProductData
 import woowacourse.shopping.presentation.ui.shopping.adapter.ProductListAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_shopping
 
-    private val viewModel: ShoppingViewModel by viewModels { ShoppingViewModel.Companion.Factory() }
+    private val viewModel: ShoppingViewModel by viewModels {
+        val productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl())
+        val recentDao = AppDatabase.instanceOrNull.recentProductDao()
+        val recentRepository =
+            RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(recentDao))
+        val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
+
+        ShoppingViewModel.Companion.Factory(productRepository, recentRepository, cartRepository)
+    }
 
     private val adapter: ProductListAdapter by lazy {
         ProductListAdapter(viewModel)
