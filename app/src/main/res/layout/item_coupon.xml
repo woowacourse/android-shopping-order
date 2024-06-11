@@ -6,12 +6,16 @@
     <data>
 
         <variable
-            name="coupon"
-            type="woowacourse.shopping.ui.coupon.uimodel.CouponUiModel" />
+            name="couponId"
+            type="Long" />
 
         <variable
             name="CouponClickListener"
             type="woowacourse.shopping.ui.coupon.uimodel.CouponClickListener" />
+
+        <variable
+            name="isChecked"
+            type="Boolean" />
 
     </data>
 
@@ -30,8 +34,8 @@
             android:layout_marginTop="3dp"
             android:background="@drawable/checkbox"
             android:button="@null"
-            android:checked="@{coupon.isChecked}"
-            android:onClick="@{() -> CouponClickListener.onCheckBoxClicked(coupon.id)}"
+            android:checked="@{isChecked}"
+            android:onClick="@{() -> CouponClickListener.onCheckBoxClicked(couponId)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:checked="true" />
@@ -41,7 +45,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="11dp"
-            android:text="@{coupon.title}"
             android:textColor="@color/gray5"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -55,7 +58,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{@string/coupon_expire(coupon.expireDate)}"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_item_title"
             tools:text="만료일: 2024년 11월 30일" />
@@ -65,16 +67,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
-            android:text="@{@string/coupon_minimum_amount(coupon.minimumAmount)}"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_item_expire_date"
             tools:text="최소 주문 금액: 100,000원" />
 
         <TextView
-            isVisible="@{coupon.availableEndTime!=null || coupon.availableStartTime!=null}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{@string/coupon_available_time(coupon.availableStartTime, coupon.availableEndTime)}"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_item_minimum_order_price"
             tools:text="적용 가능 시간: 04:00 ~ 07:00" />

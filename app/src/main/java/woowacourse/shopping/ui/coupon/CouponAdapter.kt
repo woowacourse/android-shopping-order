@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemCouponBinding
 import woowacourse.shopping.ui.coupon.uimodel.CouponClickListener
 import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
@@ -17,8 +18,15 @@ class CouponAdapter(
         private val onClick: CouponClickListener,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(item: CouponUiModel) {
-            binding.coupon = item
-            binding.couponClickListener = onClick
+            with(binding) {
+                tvCouponItemTitle.text = item.title
+                tvCouponItemExpireDate.text = itemView.context.getString(R.string.coupon_expire).format(item.expireDate)
+                    .format(item.availableStartTime, item.availableEndTime)
+                tvCouponItemMinimumOrderPrice.text = itemView.context.getString(R.string.coupon_minimum_amount).format(item.minimumAmount)
+                isChecked = item.isChecked
+                couponClickListener = onClick
+                couponId = item.id
+            }
         }
     }
 
