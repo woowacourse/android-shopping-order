@@ -152,7 +152,7 @@ object DummyData {
             ),
         )
 
-    val COUPONS =
+    val COUPONS_DTO =
         listOf(
             CouponDto(
                 id = 1,
@@ -195,5 +195,5 @@ object DummyData {
             ),
         )
 
-    val COUPONS_STATE = COUPONS.map { it.toDomain() }
+    val COUPONS = COUPONS_DTO.map { it.toDomain() }
 }

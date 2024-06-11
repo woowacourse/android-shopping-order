@@ -18,7 +18,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.remote.api.DummyData.CARTS_WRAPPER
-import woowacourse.shopping.remote.api.DummyData.COUPONS_STATE
+import woowacourse.shopping.remote.api.DummyData.COUPONS
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
@@ -35,12 +35,12 @@ class PaymentViewModelTest {
     private lateinit var orderRepository: OrderRepository
 
     @Test
-    fun `수량이 2개 이상인 상품이 있고, 총 금액이 100_000원 이상일 때 5,000원 할인 쿠폰과 5만원 이상 구매 시 무료 배송 쿠폰을 받을 수 있다`() =
+    fun `주문 할 상품의 수량이 2개 이상이고 총 가격이 100_000원 이상일 때, 5,000원 할인 쿠폰과 5만원 이상 구매 시 무료 배송 쿠폰을 받을 수 있다`() =
         runTest {
-            // given
+            // given & when
             coEvery {
                 couponRepository.getCoupons()
-            } returns Result.success(COUPONS_STATE)
+            } returns Result.success(COUPONS)
 
             val initialState =
                 mapOf(PaymentActivity.PUT_EXTRA_CARTS_WRAPPER_KEY to CARTS_WRAPPER)
@@ -53,6 +53,7 @@ class PaymentViewModelTest {
                     orderRepository,
                 )
 
+            // then
             delay(2000)
             val actual = viewModel.uiState.getOrAwaitValue()
             assertThat(actual.coupons).anyMatch { it.discountPolicy is FixedAmountDiscountPolicy }
@@ -64,7 +65,7 @@ class PaymentViewModelTest {
         runTest {
             coEvery {
                 couponRepository.getCoupons()
-            } returns Result.success(COUPONS_STATE)
+            } returns Result.success(COUPONS)
 
             val initialState =
                 mapOf(PaymentActivity.PUT_EXTRA_CARTS_WRAPPER_KEY to CARTS_WRAPPER)
