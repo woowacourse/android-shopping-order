@@ -72,21 +72,24 @@ class CartViewModel(
             cartRepository.load(0, pageSize)
                 .map { carts -> carts.map { it.toUiModel() } }
                 .onSuccess { loadedCarts ->
-                    val currentCartItems = cartItemsData.associateBy { it.cartId }
-                    val newCartItems =
-                        loadedCarts.map { cartModel ->
-                            val find = currentCartItems[cartModel.cartId]
-                            if (find == null) {
-                                cartModel.copy(isChecked = true)
-                            } else {
-                                cartModel.copy(isChecked = find.isChecked)
-                            }
-                        }
+                    val newCartItems = processLoadedCarts(loadedCarts)
                     _cartItems.value = UiState.Success(newCartItems)
                 }
                 .onFailure {
                     _error.value = Event(CartError.CartItemsNotFound)
                 }
+        }
+    }
+
+    private fun processLoadedCarts(loadedCarts: List<CartModel>): List<CartModel> {
+        val currentCartItems = cartItemsData.associateBy { it.cartId }
+        return loadedCarts.map { cartModel ->
+            val find = currentCartItems[cartModel.cartId]
+            if (find == null) {
+                cartModel.copy(isChecked = INITIAL_CHECK_VALUE)
+            } else {
+                cartModel.copy(isChecked = find.isChecked)
+            }
         }
     }
 
@@ -228,14 +231,12 @@ class CartViewModel(
     }
 
     override fun addProductToCart(productId: Long) {
-        val initialCount = 1
-
         viewModelScope.launch {
-            cartRepository.saveNewCartItem(productId, initialCount)
+            cartRepository.saveNewCartItem(productId, INITIAL_COUNT)
                 .onSuccess {
-                    updateRecommendedProducts(productId, initialCount)
-                    loadAllCartItems(cartItemsData.sumOf { it.quantity } + initialCount)
-                    _changedCartProducts[productId] = initialCount
+                    updateRecommendedProducts(productId, INITIAL_COUNT)
+                    loadAllCartItems(cartItemsData.sumOf { it.quantity } + INITIAL_COUNT)
+                    _changedCartProducts[productId] = INITIAL_COUNT
                 }
                 .onFailure { _error.value = Event(CartError.CartItemsNotModified) }
         }
@@ -246,6 +247,9 @@ class CartViewModel(
     }
 
     companion object {
+        const val INITIAL_CHECK_VALUE = true
+        const val INITIAL_COUNT = 1
+
         class Factory(
             private val cartRepository: CartRepository,
             private val productRepository: ProductRepository,
