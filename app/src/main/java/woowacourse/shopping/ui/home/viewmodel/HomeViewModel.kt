@@ -59,9 +59,11 @@ class HomeViewModel(
 
     init {
         Handler(Looper.getMainLooper()).postDelayed({
-            loadCartItems()
-            loadProductViewItems()
-            loadRecentProducts()
+            viewModelScope.launch {
+                loadCartItems().join()
+                loadProductViewItems()
+                loadRecentProducts()
+            }
         }, 1000)
     }
 
@@ -73,36 +75,32 @@ class HomeViewModel(
         }
     }
 
-    private fun loadRecentProducts() {
-        viewModelScope.launch {
-            recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
-                .onSuccess { recentProducts ->
-                    _recentProducts.value = recentProducts
-                }
-        }
+    private suspend fun loadRecentProducts() {
+        recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
+            .onSuccess { recentProducts ->
+                _recentProducts.value = recentProducts
+            }
     }
 
-    private fun loadProductViewItems() {
-        viewModelScope.launch {
-            productRepository.getProducts(
-                category = CATEGORY_UNDEFINED,
-                page = page,
-                size = PAGE_SIZE,
-                sort = ASCENDING_SORT_ORDER,
-            ).onSuccess { homeInfo ->
-                page += 1
-                val products = homeInfo.products
-                val productViewItems =
-                    products.map { product ->
-                        val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
-                        ProductViewItem(product, quantity)
-                    }
-                _canLoadMore.value = homeInfo.canLoadMore
-                loadedProductViewItems.addAll(productViewItems)
-                _homeUiState.value = UiState.Success(loadedProductViewItems)
-            }.onFailure {
-                _homeUiState.value = UiState.Error(it)
-            }
+    private suspend fun loadProductViewItems() {
+        productRepository.getProducts(
+            category = CATEGORY_UNDEFINED,
+            page = page,
+            size = PAGE_SIZE,
+            sort = ASCENDING_SORT_ORDER,
+        ).onSuccess { homeInfo ->
+            page += 1
+            val products = homeInfo.products
+            val productViewItems =
+                products.map { product ->
+                    val quantity = getCartItemByProductId(product.productId)?.quantity ?: 0
+                    ProductViewItem(product, quantity)
+                }
+            _canLoadMore.value = homeInfo.canLoadMore
+            loadedProductViewItems.addAll(productViewItems)
+            _homeUiState.value = UiState.Success(loadedProductViewItems)
+        }.onFailure {
+            _homeUiState.value = UiState.Error(it)
         }
     }
 
@@ -162,7 +160,9 @@ class HomeViewModel(
     }
 
     override fun onLoadMoreButtonClick() {
-        loadProductViewItems()
+        viewModelScope.launch {
+            loadProductViewItems()
+        }
     }
 
     override fun onShoppingCartButtonClick() {
