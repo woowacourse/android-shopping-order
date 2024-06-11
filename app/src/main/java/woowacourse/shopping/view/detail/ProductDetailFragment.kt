@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
+import woowacourse.shopping.data.source.RecentlyDataSourceImpl
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
@@ -28,12 +30,17 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
                 ProductDetailViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyProductRepository = RecentlyProductRepositoryImpl(requireContext()),
+                    recentlyProductRepository = RecentlyProductRepositoryImpl(
+                        RecentlyDataSourceImpl(
+                            RecentlyProductDatabase.getInstance(requireContext())
+                                .recentlyProductDao()
+                        )
+                    ),
                 )
             }
         viewModelFactory.create(ProductDetailViewModel::class.java)
     }
-    private val mainViewModel : MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

@@ -8,9 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
+import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
+import woowacourse.shopping.data.source.RecentlyDataSourceImpl
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
@@ -32,7 +34,11 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                 ProductListViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyProductRepository = RecentlyProductRepositoryImpl(requireContext()),
+                    recentlyProductRepository = RecentlyProductRepositoryImpl(
+                        RecentlyDataSourceImpl(
+                            RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao()
+                        )
+                    ),
                 )
             }
         viewModelFactory.create(ProductListViewModel::class.java)
