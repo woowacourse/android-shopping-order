@@ -9,4 +9,5 @@ enum class CartError(
     CartItemsNotFound(R.string.error_cart_item_not_found),
     CartItemNotDeleted(R.string.error_cart_item_not_deleted),
     CartItemsNotModified(R.string.error_cart_item_not_modified),
+    RecommendItemsNotFound(R.string.error_recommend_item_not_modified),
 }

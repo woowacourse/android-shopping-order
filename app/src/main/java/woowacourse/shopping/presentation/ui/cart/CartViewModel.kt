@@ -9,8 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.mapper.toUiModel
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentRepository
+import woowacourse.shopping.domain.repository.RecommendRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.CartModel
 import woowacourse.shopping.presentation.ui.model.ProductModel
@@ -18,8 +17,7 @@ import woowacourse.shopping.presentation.util.Event
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
-    private val recentRepository: RecentRepository,
+    private val recommendRepository: RecommendRepository,
     initialTotalCartItemCount: Int,
 ) : ViewModel(), CartHandler {
     private val _error = MutableLiveData<Event<CartError>>()
@@ -212,21 +210,17 @@ class CartViewModel(
             }
     }
 
-    fun buildRecommendProducts() {
+    fun loadRecommendProducts() {
         viewModelScope.launch {
-            recentRepository.loadMostRecent().onSuccess { product ->
-                val recentViewedCategory = product?.category ?: return@launch
-                viewModelScope.launch {
-                    productRepository.loadWithCategory(recentViewedCategory, 0, 20)
-                        .onSuccess { products ->
-                            val existingCartItem = cartItemsData.groupBy { it.productId }
-                            _recommendedProduct.value =
-                                products.asSequence().filter { existingCartItem[it.id] == null }
-                                    .map { it.toUiModel() }.associateBy { it.id }
-                        }
-                        .onFailure { }
+            val existingProductIds = cartItemsData.map { it.productId }
+            recommendRepository.generateRecommendProducts(existingProductIds)
+                .map { recommend -> recommend.map { it.toUiModel() } }
+                .onSuccess { recommendModel ->
+                    _recommendedProduct.value = recommendModel.associateBy { it.id }
                 }
-            }
+                .onFailure {
+                    _error.value = Event(CartError.RecommendItemsNotFound)
+                }
         }
     }
 
@@ -252,15 +246,13 @@ class CartViewModel(
 
         class Factory(
             private val cartRepository: CartRepository,
-            private val productRepository: ProductRepository,
-            private val recentRepository: RecentRepository,
+            private val recommendRepository: RecommendRepository,
             private val initialTotalCartItemCount: Int,
         ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return CartViewModel(
                     cartRepository,
-                    productRepository,
-                    recentRepository,
+                    recommendRepository,
                     initialTotalCartItemCount,
                 ) as T
             }

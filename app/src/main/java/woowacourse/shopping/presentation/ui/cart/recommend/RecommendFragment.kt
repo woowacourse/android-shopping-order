@@ -31,7 +31,7 @@ class RecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initCartAdapter()
         observeRecommendedUpdates()
-        viewModel.buildRecommendProducts()
+        viewModel.loadRecommendProducts()
     }
 
     private fun initCartAdapter() {

@@ -8,8 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecommendRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.local.database.AppDatabase
 import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
@@ -29,16 +28,14 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
 
     private val viewModel: CartViewModel by viewModels {
         val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
-        val productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl())
-        val recentRepository =
-            RecentProductRepositoryImpl(
-                LocalRecentViewedDataSourceImpl(
-                    AppDatabase.instanceOrNull.recentProductDao(),
-                ),
+        val recommendRepository =
+            RecommendRepositoryImpl(
+                LocalRecentViewedDataSourceImpl(AppDatabase.instanceOrNull.recentProductDao()),
+                RemoteProductDataSourceImpl(),
             )
         val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
 
-        CartViewModel.Companion.Factory(cartRepository, productRepository, recentRepository, initialItemQuantity)
+        CartViewModel.Companion.Factory(cartRepository, recommendRepository, initialItemQuantity)
     }
 
     override fun initStartView(savedInstanceState: Bundle?) {
