@@ -14,9 +14,9 @@ class ShoppingApplication : Application() {
     }
 
     private fun initAuthorization() {
-        val baseUrl = BuildConfig.base_url
-        val userName = BuildConfig.authorization_username
-        val password = BuildConfig.authorization_password
+        val baseUrl = BuildConfig.BASE_URL
+        val userName = BuildConfig.USERNAME
+        val password = BuildConfig.PASSWORD
         val interceptor = AuthorizationInterceptor(userName, password)
 
         ApiClient.setApiClient(baseUrl, interceptor)

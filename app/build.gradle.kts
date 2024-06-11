@@ -24,9 +24,9 @@ android {
 
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
-        buildConfigField("String", "base_url", properties.getProperty("base.url"))
-        buildConfigField("String", "authorization_username", properties.getProperty("authorization.username"))
-        buildConfigField("String", "authorization_password", properties.getProperty("authorization.password"))
+        buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL"))
+        buildConfigField("String", "USERNAME", properties.getProperty("USERNAME"))
+        buildConfigField("String", "PASSWORD", properties.getProperty("PASSWORD"))
     }
 
     buildTypes {
