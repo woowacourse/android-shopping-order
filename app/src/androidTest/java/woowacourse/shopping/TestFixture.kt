@@ -3,7 +3,7 @@ package woowacourse.shopping
 import woowacourse.shopping.data.db.cartItem.CartItemDatabase
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.model.RecentlyProductEntity
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 object TestFixture {
     fun CartItemDatabase.deleteAll() {
@@ -26,7 +26,7 @@ object TestFixture {
     fun makeRecentlyProductEntity(): RecentlyProductEntity {
         return RecentlyProductEntity(
             id = 2L,
-            productId = 999L,
+            productId = 9999999L,
             imageUrl = "",
             name = "",
             category = "fashion",

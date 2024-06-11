@@ -6,15 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
+import woowacourse.shopping.data.source.RecentlyDataSourceImpl
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.utils.exception.ErrorEvent
+import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
-import woowacourse.shopping.view.model.event.ErrorEvent
 
 class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
     private var mainActivityListener: MainActivityListener? = null
@@ -26,11 +30,18 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
                 ProductDetailViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyProductRepository = RecentlyProductRepositoryImpl(requireContext()),
+                    recentlyProductRepository =
+                        RecentlyProductRepositoryImpl(
+                            RecentlyDataSourceImpl(
+                                RecentlyProductDatabase.getInstance(requireContext())
+                                    .recentlyProductDao(),
+                            ),
+                        ),
                 )
             }
         viewModelFactory.create(ProductDetailViewModel::class.java)
     }
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -62,9 +73,8 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
         productDetailViewModel.productDetailEvent.observe(viewLifecycleOwner) { productDetailState ->
             when (productDetailState) {
                 is ProductDetailEvent.AddShoppingCart.Success -> {
-                    mainActivityListener?.saveUpdateProduct(
-                        productDetailState.productId,
-                        productDetailState.count,
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(productDetailState.productId to productDetailState.count),
                     )
                     requireContext().makeToast(
                         getString(R.string.add_cart_text),
@@ -72,7 +82,7 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
                 }
 
                 ProductDetailEvent.UpdateRecentlyProductItem.Success -> {
-                    mainActivityListener?.saveUpdateRecentlyProduct()
+                    mainViewModel.saveUpdateRecentlyProduct()
                 }
             }
         }
@@ -91,7 +101,6 @@ class ProductDetailFragment : Fragment(), OnClickNavigateDetail {
     private fun loadProduct() {
         try {
             productDetailViewModel.loadProductItem(receiveId())
-            productDetailViewModel
         } catch (e: ErrorEvent.LoadDataEvent) {
             requireContext().makeToast(
                 getString(R.string.error_data_load),

@@ -1,11 +1,13 @@
 package woowacourse.shopping.view.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.MockProductRepository
 import woowacourse.shopping.MockRecentlyProductRepository
@@ -15,6 +17,8 @@ import woowacourse.shopping.view.products.ProductListViewModel
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductListViewModelTest {
     @get:Rule

@@ -12,4 +12,8 @@ sealed interface ShoppingCartEvent {
     sealed interface SendCartItem : ShoppingCartEvent {
         data class Success(val shoppingCart: ShoppingCart) : SendCartItem
     }
+
+    sealed interface UpdateCheckBox : ShoppingCartEvent {
+        data object Success : UpdateCheckBox
+    }
 }

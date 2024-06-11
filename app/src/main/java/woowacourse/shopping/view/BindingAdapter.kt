@@ -5,7 +5,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
-import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
+import woowacourse.shopping.domain.model.cart.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
 
 @BindingAdapter("bindingImageUrl")
 fun setImageUrl(
@@ -24,4 +24,17 @@ fun setVisibleByItemCounter(
     count: Int,
 ) {
     view.visibility = if (count > DEFAULT_ITEM_COUNT) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("loadingState")
+fun setLoadingState(
+    view: View,
+    uiState: UiState,
+) {
+    view.visibility =
+        if (uiState is UiState.Loading) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
 }

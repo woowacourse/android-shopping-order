@@ -2,21 +2,23 @@ package woowacourse.shopping.view.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import woowacourse.shopping.domain.model.CartItem.Companion.DEFAULT_CART_ITEM_ID
-import woowacourse.shopping.domain.model.CartItemCounter
-import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Product.Companion.DEFAULT_PRODUCT_ID
-import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.domain.model.UpdateCartItemType
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.cart.CartItem.Companion.DEFAULT_CART_ITEM_ID
+import woowacourse.shopping.domain.model.cart.CartItemCounter
+import woowacourse.shopping.domain.model.cart.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
+import woowacourse.shopping.domain.model.cart.UpdateCartItemType
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Product.Companion.DEFAULT_PRODUCT_ID
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.view.model.event.ErrorEvent
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -34,12 +36,26 @@ class ProductDetailViewModel(
     private val _productDetailEvent = MutableSingleLiveData<ProductDetailEvent>()
     val productDetailEvent: SingleLiveData<ProductDetailEvent> = _productDetailEvent
 
-    fun addShoppingCartItem(product: Product) {
-        runCatching {
-            checkValidProduct(product)
+    fun addShoppingCartItem(product: Product) =
+        viewModelScope.launch {
+            if (isInValidProduct(product)) {
+                handleException(ErrorEvent.AddCartEvent())
+                return@launch
+            }
             when (cartItemId) {
                 DEFAULT_CART_ITEM_ID -> {
                     shoppingCartRepository.addCartItem(product)
+                        .onSuccess {
+                            _productDetailEvent.setValue(
+                                ProductDetailEvent.AddShoppingCart.Success(
+                                    productId = product.id,
+                                    count = product.cartItemCounter.itemCount,
+                                ),
+                            )
+                        }
+                        .onFailure {
+                            handleException(ErrorEvent.AddCartEvent())
+                        }
                 }
 
                 else -> {
@@ -47,47 +63,55 @@ class ProductDetailViewModel(
                         product = product,
                         UpdateCartItemType.UPDATE(product.cartItemCounter.itemCount),
                     )
+                        .onSuccess {
+                            _productDetailEvent.setValue(
+                                ProductDetailEvent.AddShoppingCart.Success(
+                                    productId = product.id,
+                                    count = product.cartItemCounter.itemCount,
+                                ),
+                            )
+                        }
+                        .onFailure {
+                            handleException(ErrorEvent.UpdateCartEvent())
+                        }
                 }
             }
         }
-            .onSuccess {
-                _productDetailEvent.setValue(
-                    ProductDetailEvent.AddShoppingCart.Success(
-                        productId = product.id,
-                        count = product.cartItemCounter.itemCount,
-                    ),
-                )
-            }
-            .onFailure {
-                handleException(it)
-            }
-    }
 
-    fun loadProductItem(productId: Long) {
-        val loadItemCounter = loadProductItemCount(productId)
-        runCatching {
-            productRepository.getProduct(productId).getOrThrow()
-        }.onSuccess { product ->
-            product.updateItemSelector(true)
-            product.updateCartItemCount(loadItemCounter.itemCount)
-            loadRecentlyProduct(product)
-            _product.value = product
+    fun loadProductItem(productId: Long) =
+        viewModelScope.launch {
+            loadProductItemCount(productId)
+                .onSuccess { loadItemCounter ->
+                    updateLoadProduct(productId, loadItemCounter)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
         }
+
+    private fun updateLoadProduct(
+        productId: Long,
+        loadItemCounter: CartItemCounter,
+    ) = viewModelScope.launch {
+        productRepository.getProduct(productId)
+            .onSuccess { product ->
+                product.updateItemSelector(true)
+                product.updateCartItemCount(loadItemCounter.itemCount)
+                loadRecentlyProduct(product)
+                _product.value = product
+            }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.LoadDataEvent())
             }
     }
 
-    private fun loadProductItemCount(productId: Long): CartItemCounter {
-        return try {
-            val result =
-                shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
-                    .getOrThrow()
-            cartItemId = result.cartItemId
-            result.counter
-        } catch (e: Exception) {
-            handleException(e)
-            CartItemCounter()
+    private suspend fun loadProductItemCount(productId: Long): Result<CartItemCounter> {
+        return runCatching {
+            shoppingCartRepository.getCartItemResultFromProductId(productId = productId)
+                .map { result ->
+                    cartItemId = result.cartItemId
+                    result.counter
+                }.getOrDefault(CartItemCounter())
         }
     }
 
@@ -114,8 +138,8 @@ class ProductDetailViewModel(
         }
     }
 
-    private fun saveRecentlyProduct(product: Product) {
-        runCatching {
+    private fun saveRecentlyProduct(product: Product) =
+        viewModelScope.launch {
             recentlyProductRepository.addRecentlyProduct(
                 RecentlyProduct(
                     productId = product.id,
@@ -125,22 +149,30 @@ class ProductDetailViewModel(
                 ),
             )
         }
-            .onFailure {
-                handleException(it)
-            }
-    }
 
-    private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
-        recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
-    }
-
-    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
-        runCatching {
-            deletePrevRecentlyProduct(recentlyProduct.id)
-            productRepository.getProduct(recentlyProduct.productId).getOrThrow()
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) =
+        viewModelScope.launch {
+            recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
         }
-            .onSuccess { product ->
-                val loadItemCounter = loadProductItemCount(recentlyProduct.productId)
+
+    private fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) =
+        viewModelScope.launch {
+            deletePrevRecentlyProduct(recentlyProduct.id)
+            productRepository.getProduct(recentlyProduct.productId)
+                .onSuccess { product ->
+                    updateLoadRecentlyProduct(recentlyProduct, product)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
+
+    private fun updateLoadRecentlyProduct(
+        recentlyProduct: RecentlyProduct,
+        product: Product,
+    ) = viewModelScope.launch {
+        loadProductItemCount(recentlyProduct.productId)
+            .onSuccess { loadItemCounter ->
                 product.updateItemSelector(true)
                 product.updateCartItemCount(loadItemCounter.itemCount)
                 _product.value = product
@@ -148,29 +180,27 @@ class ProductDetailViewModel(
                 _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.UpdateCartEvent())
             }
     }
 
-    private fun loadRecentlyProduct(product: Product) {
-        runCatching {
-            recentlyProductRepository.getMostRecentlyProduct().getOrThrow()
-        }
-            .onSuccess { recentlyProduct ->
-                _recentlyProduct.value = recentlyProduct
-                _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
-                if (recentlyProduct.productId != product.id) {
+    private fun loadRecentlyProduct(product: Product) =
+        viewModelScope.launch {
+            recentlyProductRepository.getMostRecentlyProduct()
+                .onSuccess { recentlyProduct ->
+                    _recentlyProduct.value = recentlyProduct
+                    _productDetailEvent.setValue(ProductDetailEvent.UpdateRecentlyProductItem.Success)
+                    if (recentlyProduct.productId != product.id) {
+                        saveRecentlyProduct(product)
+                    }
+                }
+                .onFailure {
                     saveRecentlyProduct(product)
                 }
-            }
-            .onFailure {
-                handleException(it)
-            }
-    }
+        }
 
-    private fun checkValidProduct(product: Product) {
-        if (product.id == DEFAULT_PRODUCT_ID) throw ErrorEvent.LoadDataEvent()
-        if (product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT) throw ErrorEvent.LoadDataEvent()
+    private fun isInValidProduct(product: Product): Boolean {
+        return product.id == DEFAULT_PRODUCT_ID || product.cartItemCounter.itemCount == DEFAULT_ITEM_COUNT
     }
 
     override fun clickIncrease(product: Product) {

@@ -1,20 +1,22 @@
 package woowacourse.shopping.view.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
+import woowacourse.shopping.domain.model.cart.UpdateCartItemType
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.view.BaseViewModel
+import woowacourse.shopping.view.UiState
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.view.model.event.ErrorEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
@@ -25,7 +27,7 @@ class ShoppingCartViewModel(
         MutableLiveData()
     val shoppingCartEvent: LiveData<ShoppingCartEvent> get() = _shoppingCartEvent
 
-    val checkedShoppingCart = ShoppingCart()
+    private val checkedShoppingCart = ShoppingCart()
 
     private val _allCheck: MutableLiveData<Boolean> = MutableLiveData(false)
     val allCheck: LiveData<Boolean> get() = _allCheck
@@ -34,24 +36,30 @@ class ShoppingCartViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    fun loadPagingCartItemList() {
-        runCatching {
+    private val _loadingState: MutableLiveData<UiState> =
+        MutableLiveData(UiState.Loading)
+    val loadingState: LiveData<UiState> = _loadingState
+
+    fun loadPagingCartItemList() =
+        viewModelScope.launch {
+            _loadingState.value = UiState.Loading
             shoppingCartRepository.loadPagingCartItems(
                 LOAD_SHOPPING_ITEM_OFFSET,
                 LOAD_SHOPPING_ITEM_SIZE,
-            ).getOrThrow()
+            )
+                .onSuccess { pagingData ->
+                    _loadingState.value = UiState.Init
+                    shoppingCart.addProducts(synchronizeLoadingData(pagingData))
+                    setAllCheck()
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
         }
-            .onSuccess { pagingData ->
-                shoppingCart.addProducts(synchronizeLoadingData(pagingData))
-                setAllCheck()
-            }
-            .onFailure {
-                handleException(it)
-            }
-    }
 
     private fun setAllCheck() {
         _allCheck.value = shoppingCart.cartItems.value?.all { it.cartItemSelector.isSelected }
+        _shoppingCartEvent.value = ShoppingCartEvent.UpdateCheckBox.Success
     }
 
     private fun checkAllItems() {
@@ -93,16 +101,14 @@ class ShoppingCartViewModel(
     private fun updateCartItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ) {
-        runCatching {
-            shoppingCartRepository.updateCartItem(
-                product,
-                updateCartItemType,
-            ).getOrThrow()
-        }
+    ) = viewModelScope.launch {
+        shoppingCartRepository.updateCartItem(
+            product,
+            updateCartItemType,
+        )
             .onSuccess { updateCartItemResult ->
                 when (updateCartItemResult) {
-                    UpdateCartItemResult.ADD -> throw ErrorEvent.UpdateCartEvent()
+                    UpdateCartItemResult.ADD -> {}
                     is UpdateCartItemResult.DELETE ->
                         deleteShoppingCartItem(
                             updateCartItemResult.cartItemId,
@@ -120,7 +126,7 @@ class ShoppingCartViewModel(
                 }
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.UpdateCartEvent())
             }
     }
 
@@ -134,16 +140,17 @@ class ShoppingCartViewModel(
     private fun deleteShoppingCartItem(
         cartItemId: Long,
         product: Product,
-    ) {
-        try {
-            shoppingCartRepository.deleteCartItem(cartItemId)
-            shoppingCart.deleteProduct(cartItemId)
-            _shoppingCartEvent.value =
-                ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
-            deleteCheckedItem(CartItem(cartItemId, product))
-        } catch (e: Exception) {
-            handleException(e)
-        }
+    ) = viewModelScope.launch {
+        shoppingCartRepository.deleteCartItem(cartItemId)
+            .onSuccess {
+                shoppingCart.deleteProduct(cartItemId)
+                _shoppingCartEvent.value =
+                    ShoppingCartEvent.UpdateProductEvent.DELETE(productId = product.id)
+                deleteCheckedItem(CartItem(cartItemId, product))
+            }
+            .onFailure {
+                handleException(ErrorEvent.DeleteCartEvent())
+            }
     }
 
     private fun deleteCheckedItem(cartItem: CartItem) {
@@ -190,7 +197,6 @@ class ShoppingCartViewModel(
     }
 
     override fun clickOrder() {
-        Log.d("cartsfd", checkedShoppingCart.toString())
         _shoppingCartEvent.value = ShoppingCartEvent.SendCartItem.Success(checkedShoppingCart)
     }
 }

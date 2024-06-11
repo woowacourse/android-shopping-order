@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -31,20 +32,19 @@ class RecommendFragmentTest {
     private lateinit var context: Context
 
     @Before
-    fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
-        database = RecentlyProductDatabase.getInstance(context)
-        dao = database.recentlyProductDao()
-        thread {
+    fun setUp() =
+        runTest {
+            context = ApplicationProvider.getApplicationContext()
+            database = RecentlyProductDatabase.getInstance(context)
+            dao = database.recentlyProductDao()
             dao.addRecentlyProduct(TestFixture.makeRecentlyProductEntity())
-        }.join()
 
-        activityRule.scenario.onActivity { activity ->
-            activity.supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, RecommendFragment())
-                .commitNow()
+            activityRule.scenario.onActivity { activity ->
+                activity.supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, RecommendFragment())
+                    .commitNow()
+            }
         }
-    }
 
     @After
     fun clearDB() {
@@ -68,7 +68,7 @@ class RecommendFragmentTest {
     @Test
     fun `추천_상품_제목을_보여준다`() {
         onView(withId(R.id.tv_subject))
-            .check(matches(withText("이런 상품은 어떠세요?")))
+            .check(matches(withText(context.getString(R.string.recomend_product_subject))))
     }
 
     @Test

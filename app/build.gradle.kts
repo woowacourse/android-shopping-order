@@ -77,6 +77,7 @@ dependencies {
     androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.3.0")
 
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("com.google.code.gson:gson:2.8.8")
 
@@ -89,4 +90,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    implementation("androidx.fragment:fragment-ktx:1.3.6")
 }

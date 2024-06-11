@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.service
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 interface ProductService {
     fun findAll(): List<Product>

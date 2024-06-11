@@ -2,29 +2,28 @@ package woowacourse.shopping.view.recommend
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.CartItemEntity
 import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_RECOMMEND_ITEM_SIZE
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_OFFSET
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl.Companion.LOAD_SHOPPING_ITEM_SIZE
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
-import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.UpdateCartItemResult
+import woowacourse.shopping.domain.model.cart.UpdateCartItemType
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.utils.exception.ErrorEvent
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
 import woowacourse.shopping.view.BaseViewModel
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
-import woowacourse.shopping.view.model.event.ErrorEvent
 
 class RecommendViewModel(
-    private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyRepository: RecentlyProductRepository,
@@ -43,79 +42,82 @@ class RecommendViewModel(
     private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    private fun loadRecentlyProduct(): RecentlyProduct {
-        return recentlyRepository.getMostRecentlyProduct().getOrThrow()
-    }
-
-    private fun loadCategoryProducts(category: String): List<Product> {
-        return productRepository.loadCategoryProducts(
-            size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
-            category = category,
-        ).getOrThrow()
-    }
-
-    private fun loadMyCartItems(): List<CartItem> {
-        return shoppingCartRepository.loadPagingCartItems(
-            LOAD_SHOPPING_ITEM_OFFSET,
-            LOAD_SHOPPING_ITEM_SIZE,
-        ).getOrThrow()
-    }
-
-    fun loadRecommendData() {
-        runCatching {
-            val recentlyProduct = loadRecentlyProduct()
-            val loadCategoryProducts = loadCategoryProducts(recentlyProduct.category)
-            val myCartItems = loadMyCartItems()
-            val recommendData =
-                getFilteredRandomProducts(
-                    myCartItems = myCartItems,
-                    loadData = loadCategoryProducts,
-                )
-            _products.value = recommendData
-            updateCheckItemData()
+    fun loadRecommendData() =
+        viewModelScope.launch {
+            recentlyRepository.getMostRecentlyProduct()
+                .onSuccess { recentlyProduct ->
+                    loadCategoryProducts(recentlyProduct.category)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
         }
-            .onFailure {
-                handleException(it)
-            }
-    }
 
-    private fun orderItems() {
-        val ids = checkedShoppingCart.cartItems.value?.map { it.id.toInt() }
-        runCatching {
-            orderRepository.orderShoppingCart(ids ?: throw ErrorEvent.OrderItemsEvent())
+    private fun loadMyCartItems(categoryProducts: List<Product>) =
+        viewModelScope.launch {
+            shoppingCartRepository.loadPagingCartItems(
+                LOAD_SHOPPING_ITEM_OFFSET,
+                LOAD_SHOPPING_ITEM_SIZE,
+            )
+                .onSuccess { myCartItems ->
+                    val recommendData =
+                        getFilteredRandomProducts(
+                            myCartItems = myCartItems,
+                            loadData = categoryProducts,
+                        )
+                    _products.value = recommendData
+                    updateCheckItemData()
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
         }
-            .onSuccess {
-                _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success)
-            }
-            .onFailure {
-                handleException(it)
-            }
-    }
+
+    private fun loadCategoryProducts(category: String) =
+        viewModelScope.launch {
+            productRepository.loadCategoryProducts(
+                size = LOAD_SHOPPING_ITEM_SIZE + LOAD_RECOMMEND_ITEM_SIZE,
+                category = category,
+            )
+                .onSuccess { categoryProducts ->
+                    loadMyCartItems(categoryProducts)
+                }
+                .onFailure {
+                    handleException(ErrorEvent.LoadDataEvent())
+                }
+        }
 
     private fun updateCarItem(
         product: Product,
         updateCartItemType: UpdateCartItemType,
-    ) {
-        runCatching {
-            shoppingCartRepository.updateCartItem(
-                product,
-                updateCartItemType,
-            ).getOrThrow()
-        }
+    ) = viewModelScope.launch {
+        shoppingCartRepository.updateCartItem(
+            product,
+            updateCartItemType,
+        )
             .onSuccess { updateCartItemResult ->
                 when (updateCartItemResult) {
                     UpdateCartItemResult.ADD -> addCartItem(product)
                     is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-                    is UpdateCartItemResult.UPDATED -> {
-                        product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
-                        updateCheckItemData()
-                    }
+                    is UpdateCartItemResult.UPDATED ->
+                        updateCartItem(
+                            product = product,
+                            itemCount = updateCartItemResult.cartItemResult.counter.itemCount,
+                        )
                 }
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.UpdateCartEvent())
             }
+    }
+
+    private fun updateCartItem(
+        product: Product,
+        itemCount: Int,
+    ) {
+        product.updateCartItemCount(itemCount)
+        _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
+        updateCheckItemData()
     }
 
     private fun addCartItem(product: Product) {
@@ -129,7 +131,7 @@ class RecommendViewModel(
                 updateCheckItemData()
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.AddCartEvent())
             }
     }
 
@@ -142,7 +144,7 @@ class RecommendViewModel(
                 _recommendEvent.setValue(RecommendEvent.UpdateProductEvent.Success(product))
             }
             .onFailure {
-                handleException(it)
+                handleException(ErrorEvent.DeleteCartEvent())
             }
     }
 
@@ -179,6 +181,6 @@ class RecommendViewModel(
     }
 
     override fun clickOrder() {
-        orderItems()
+        _recommendEvent.setValue(RecommendEvent.OrderRecommends.Success(checkedShoppingCart))
     }
 }

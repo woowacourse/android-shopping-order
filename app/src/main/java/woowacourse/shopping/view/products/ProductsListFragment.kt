@@ -6,14 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
+import woowacourse.shopping.data.source.RecentlyDataSourceImpl
 import woowacourse.shopping.databinding.FragmentProductListBinding
-import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.domain.model.product.RecentlyProduct
+import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.detail.ProductDetailFragment
@@ -30,11 +34,18 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                 ProductListViewModel(
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyProductRepository = RecentlyProductRepositoryImpl(requireContext()),
+                    recentlyProductRepository =
+                        RecentlyProductRepositoryImpl(
+                            RecentlyDataSourceImpl(
+                                RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao(),
+                            ),
+                        ),
                 )
             }
         viewModelFactory.create(ProductListViewModel::class.java)
     }
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recentlyAdapter: RecentlyAdapter
 
@@ -84,7 +95,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     private fun observeData() {
         productListViewModel.recentlyProducts.observe(viewLifecycleOwner) { recentlyData ->
             recentlyAdapter.updateProducts(recentlyData)
-            productAdapter.setShowSkeleton(false)
         }
         productListViewModel.products.observe(viewLifecycleOwner) { products ->
             productAdapter.updateProducts(addedProducts = products)
@@ -109,10 +119,10 @@ class ProductsListFragment : Fragment(), OnClickProducts {
                 errorState.receiveErrorMessage(),
             )
         }
-        mainActivityListener?.observeProductList { updatedProducts ->
-            productListViewModel.updateProducts(updatedProducts)
+        mainViewModel.updateProductEvent.observe(viewLifecycleOwner) {
+            productListViewModel.updateProducts(it)
         }
-        mainActivityListener?.observeRecentlyProduct {
+        mainViewModel.updateRecentlyProductEvent.observe(viewLifecycleOwner) {
             productListViewModel.loadPagingRecentlyProduct()
         }
     }
@@ -149,7 +159,6 @@ class ProductsListFragment : Fragment(), OnClickProducts {
     }
 
     private fun loadPagingData() {
-        productAdapter.setShowSkeleton(true)
         productListViewModel.loadPagingProduct()
     }
 }

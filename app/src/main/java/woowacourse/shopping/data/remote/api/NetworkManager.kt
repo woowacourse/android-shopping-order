@@ -28,4 +28,6 @@ object NetworkManager {
     fun cartService(): CartApiService = getRetrofit().create(CartApiService::class.java)
 
     fun orderService(): OrderApiService = getRetrofit().create(OrderApiService::class.java)
+
+    fun couponService(): CouponApiService = getRetrofit().create(CouponApiService::class.java)
 }

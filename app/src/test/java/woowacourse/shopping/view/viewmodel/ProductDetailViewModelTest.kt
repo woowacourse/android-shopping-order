@@ -1,20 +1,24 @@
 package woowacourse.shopping.view.viewmodel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.MockProductRepository
 import woowacourse.shopping.MockRecentlyProductRepository
 import woowacourse.shopping.MockShoppingCartRepository
 import woowacourse.shopping.TestFixture.getOrAwaitValue
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.view.detail.ProductDetailViewModel
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductDetailViewModelTest {
     private lateinit var productRepository: ProductRepository

@@ -3,18 +3,19 @@ package woowacourse.shopping.view.cart
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
+import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
 import woowacourse.shopping.view.cart.model.ShoppingCart
@@ -35,6 +36,8 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             }
         viewModelFactory.create(ShoppingCartViewModel::class.java)
     }
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     private lateinit var adapter: ShoppingCartAdapter
 
     override fun onAttach(context: Context) {
@@ -73,7 +76,6 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                 onClickCartItemCounter = shoppingCartViewModel,
                 onClickNavigateShoppingCart = this,
             )
-        adapter.setShowSkeleton(true)
         shoppingCartViewModel.loadPagingCartItemList()
         binding.rvShoppingCart.adapter = adapter
     }
@@ -81,25 +83,20 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
     @SuppressLint("NotifyDataSetChanged")
     private fun observeData() {
         shoppingCartViewModel.shoppingCart.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            adapter.setShowSkeleton(false)
             updateRecyclerView(cartItems)
         }
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
             when (cartState) {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
                     adapter.updateCartItem(cartState.productId)
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        cartState.count,
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(cartState.productId to cartState.count),
                     )
                 }
 
                 is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
-                    adapter.deleteCartItem(cartState.productId)
-
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        DEFAULT_ITEM_COUNT,
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(cartState.productId to DEFAULT_ITEM_COUNT),
                     )
 
                     requireContext().makeToast(
@@ -109,10 +106,12 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                     )
                 }
                 is ShoppingCartEvent.SendCartItem.Success -> {
-                    Log.d("cartsfd", cartState.shoppingCart.toString())
-                    navigateOrder(cartState.shoppingCart)
+                    navigateRecommend(cartState.shoppingCart)
                 }
+
+                ShoppingCartEvent.UpdateCheckBox.Success -> {}
             }
+            adapter.notifyDataSetChanged()
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
@@ -121,7 +120,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
             )
         }
 
-        mainActivityListener?.observeCartItem {
+        mainViewModel.updateCartItemEvent.observe(viewLifecycleOwner) {
             shoppingCartViewModel.loadPagingCartItemList()
         }
     }
@@ -144,7 +143,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
         mainActivityListener?.changeFragment(productFragment)
     }
 
-    private fun navigateOrder(checkedShoppingCart: ShoppingCart) {
+    private fun navigateRecommend(checkedShoppingCart: ShoppingCart) {
         val recommendFragment =
             RecommendFragment().apply {
                 arguments =

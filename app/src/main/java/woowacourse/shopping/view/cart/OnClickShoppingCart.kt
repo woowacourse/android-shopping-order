@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.cart
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.cart.CartItem
 
 interface OnClickShoppingCart {
     fun clickRemoveCartItem(cartItem: CartItem)

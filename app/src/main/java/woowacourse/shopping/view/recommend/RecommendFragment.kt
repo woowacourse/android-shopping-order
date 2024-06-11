@@ -7,20 +7,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
-import woowacourse.shopping.data.repository.remote.RemoteOrderRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
+import woowacourse.shopping.data.source.RecentlyDataSourceImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
-import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
+import woowacourse.shopping.domain.model.product.RecentlyProduct
+import woowacourse.shopping.utils.exception.ErrorEvent
+import woowacourse.shopping.utils.helper.ToastMessageHelper.makeToast
 import woowacourse.shopping.view.MainActivityListener
+import woowacourse.shopping.view.MainViewModel
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.detail.ProductDetailFragment
-import woowacourse.shopping.view.model.event.ErrorEvent
+import woowacourse.shopping.view.payment.PaymentFragment
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts {
@@ -31,14 +35,19 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         val viewModelFactory =
             ViewModelFactory {
                 RecommendViewModel(
-                    orderRepository = RemoteOrderRepositoryImpl(),
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
-                    recentlyRepository = RecentlyProductRepositoryImpl(requireContext()),
+                    recentlyRepository =
+                        RecentlyProductRepositoryImpl(
+                            RecentlyDataSourceImpl(
+                                RecentlyProductDatabase.getInstance(requireContext()).recentlyProductDao(),
+                            ),
+                        ),
                 )
             }
         viewModelFactory.create(RecommendViewModel::class.java)
     }
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var adapter: RecommendAdapter
 
@@ -89,22 +98,20 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is RecommendEvent.UpdateProductEvent.Success -> {
-                    mainActivityListener?.apply {
-                        saveUpdateProduct(
-                            productId = state.product.id,
-                            count = state.product.cartItemCounter.itemCount,
-                        )
-                        saveUpdateCartItem()
-                    }
+                    mainViewModel.saveUpdateProduct(
+                        mapOf(state.product.id to state.product.cartItemCounter.itemCount),
+                    )
+                    mainViewModel.saveUpdateCartItem()
                     adapter.updateProduct(state.product)
                 }
-
-                RecommendEvent.OrderRecommends.Success -> navigateToProduct()
+                is RecommendEvent.OrderRecommends.Success -> {
+                    navigateOrder(state.shoppingCart)
+                }
             }
         }
-        recommendViewModel.errorEvent.observe(viewLifecycleOwner) {
+        recommendViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             requireContext().makeToast(
-                getString(R.string.error_default),
+                errorState.receiveErrorMessage(),
             )
         }
     }
@@ -146,10 +153,6 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         }
     }
 
-    private fun navigateToProduct() {
-        mainActivityListener?.resetFragment()
-    }
-
     private fun loadCheckedShoppingCart() {
         try {
             val shoppingCart = receiveCheckedShoppingCart()
@@ -162,6 +165,15 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
         }
     }
 
+    private fun navigateOrder(checkedShoppingCart: ShoppingCart) {
+        val paymentFragment =
+            PaymentFragment().apply {
+                arguments =
+                    createBundle(checkedShoppingCart)
+            }
+        mainActivityListener?.changeFragment(paymentFragment)
+    }
+
     companion object {
         fun createBundle(checkedShoppingCart: ShoppingCart): Bundle {
             return Bundle().apply {
@@ -169,6 +181,6 @@ class RecommendFragment : Fragment(), OnClickNavigateRecommend, OnClickProducts 
             }
         }
 
-        private const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
+        const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
     }
 }

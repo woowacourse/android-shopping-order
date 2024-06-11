@@ -2,7 +2,7 @@ package woowacourse.shopping.view.products.adapter.viewholder
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentlyProductBinding
-import woowacourse.shopping.domain.model.RecentlyProduct
+import woowacourse.shopping.domain.model.product.RecentlyProduct
 import woowacourse.shopping.view.products.OnClickProducts
 
 class RecentlyViewHolder(

@@ -9,32 +9,32 @@ import woowacourse.shopping.data.model.CartItemEntity
 @Dao
 interface CartItemDao {
     @Insert
-    fun saveCartItem(cartItemEntity: CartItemEntity): Long
+    suspend fun saveCartItem(cartItemEntity: CartItemEntity): Long
 
     @Query("SELECT * FROM $CART_ITEMS_DB_NAME")
-    fun findAll(): List<CartItemEntity>
+    suspend fun findAll(): List<CartItemEntity>
 
     @Query("SELECT * FROM $CART_ITEMS_DB_NAME LIMIT :pagingSize OFFSET :offset")
-    fun findPagingCartItem(
+    suspend fun findPagingCartItem(
         offset: Int,
         pagingSize: Int,
     ): List<CartItemEntity>
 
     @Query("SELECT * FROM $CART_ITEMS_DB_NAME WHERE id = :itemId")
-    fun findCartItemById(itemId: Long): CartItemEntity?
+    suspend fun findCartItemById(itemId: Long): CartItemEntity?
 
     @Query("DELETE FROM $CART_ITEMS_DB_NAME WHERE id = :itemId")
-    fun deleteCartItemById(itemId: Long): Int
+    suspend fun deleteCartItemById(itemId: Long): Int
 
     @Query("UPDATE $CART_ITEMS_DB_NAME SET count = :count WHERE id = :itemId")
-    fun updateCartItemCount(
+    suspend fun updateCartItemCount(
         itemId: Long,
         count: Int,
     ): Int
 
     @Query("SELECT * FROM $CART_ITEMS_DB_NAME WHERE productId = :productId")
-    fun findCartItemByProductId(productId: Long): CartItemEntity?
+    suspend fun findCartItemByProductId(productId: Long): CartItemEntity?
 
     @Query("SELECT SUM(count) FROM $CART_ITEMS_DB_NAME")
-    fun getTotalItemCount(): Int
+    suspend fun getTotalItemCount(): Int
 }

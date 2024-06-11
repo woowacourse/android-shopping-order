@@ -7,7 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.data.db.product.MockProductService
 import woowacourse.shopping.data.db.product.ProductDatabase
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 @RunWith(AndroidJUnit4::class)
 class MockProductServiceTest {
