@@ -8,11 +8,12 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.CouponRepository
-import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.DiscountType
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.presentation.ui.CouponModel
+import woowacourse.shopping.presentation.ui.CouponModel.Companion.toUiModel
 import woowacourse.shopping.presentation.util.Event
 import java.time.LocalDateTime
 
@@ -24,19 +25,19 @@ class PaymentViewModel(
     private val _error = MutableLiveData<Event<PaymentError>>()
     val error: LiveData<Event<PaymentError>> get() = _error
 
-    private val _coupons = MutableLiveData<List<Coupon>>()
-    val coupons: LiveData<List<Coupon>> get() = _coupons
+    private val _couponModels = MutableLiveData<List<CouponModel>>()
+    val couponModels: LiveData<List<CouponModel>> get() = _couponModels
 
     private val carts = MutableLiveData<List<ProductListItem.ShoppingProductItem>>()
 
-    private val selectedCoupon: LiveData<Coupon?> =
-        coupons.map { coupons ->
+    private val selectedCoupon: LiveData<CouponModel?> =
+        _couponModels.map { coupons ->
             coupons.firstOrNull { it.isChecked }
         }
 
     val deliveryPrice =
         selectedCoupon.map {
-            if (it == null || it.discountType != DiscountType.FreeShipping) {
+            if (it == null || it.coupon.discountType != DiscountType.FreeShipping) {
                 DELIVERY_PRICE
             } else {
                 0L
@@ -88,14 +89,14 @@ class PaymentViewModel(
 
     private fun checkDiscount(
         carts: LiveData<List<ProductListItem.ShoppingProductItem>>,
-        selectedCoupon: LiveData<Coupon?>,
+        selectedCoupon: LiveData<CouponModel?>,
     ): Long {
         return carts.value?.let {
             val selectedCoupon = selectedCoupon.value
-            if (selectedCoupon == null || selectedCoupon.discountType == DiscountType.FreeShipping) {
+            if (selectedCoupon == null || selectedCoupon.coupon.discountType == DiscountType.FreeShipping) {
                 0L
             } else {
-                selectedCoupon.calculateDiscount(it, LocalDateTime.now())
+                selectedCoupon.coupon.calculateDiscount(it, LocalDateTime.now())
             }
         } ?: 0L
     }
@@ -119,8 +120,8 @@ class PaymentViewModel(
 
     private fun fetchCoupon() {
         viewModelScope.launch {
-            couponRepository.loadAll().onSuccess {
-                _coupons.value = it
+            couponRepository.loadAll().onSuccess { coupons ->
+                _couponModels.value = coupons.map { it.toUiModel() }
             }.onFailure {
                 _error.value = Event(PaymentError.CouponNotFound)
             }
@@ -139,17 +140,17 @@ class PaymentViewModel(
         }
     }
 
-    override fun onCouponClicked(coupon: Coupon) {
-        val coupons = coupons.value ?: return
+    override fun onCouponClicked(couponModel: CouponModel) {
+        val coupons = couponModels.value ?: return
         val updatedCoupon =
             coupons.map {
-                if (it.id == coupon.id) {
-                    it.updateCheck(!it.isChecked)
+                if (it.coupon.id == couponModel.coupon.id) {
+                    it.copy(isChecked = !it.isChecked)
                 } else {
-                    it.updateCheck(false)
+                    it.copy(isChecked = false)
                 }
             }
-        _coupons.value = updatedCoupon
+        _couponModels.value = updatedCoupon
     }
 
     override fun onPaymentClicked() {

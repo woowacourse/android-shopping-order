@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="coupon"
-            type="woowacourse.shopping.domain.Coupon" />
+            name="couponModel"
+            type="woowacourse.shopping.presentation.ui.CouponModel" />
 
         <variable
             name="handler"
@@ -20,15 +20,15 @@
         android:layout_marginHorizontal="18dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/radius_4_strock"
-        android:onClick="@{()->handler.onCouponClicked(coupon)}"
+        android:onClick="@{()->handler.onCouponClicked(couponModel)}"
         android:padding="18dp">
 
         <CheckBox
             android:id="@+id/check_box_coupon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:onClick="@{()->handler.onCouponClicked(coupon)}"
-            android:checked="@{coupon.isChecked}"
+            android:onClick="@{()->handler.onCouponClicked(couponModel)}"
+            android:checked="@{couponModel.isChecked}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,7 +37,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="@{coupon.description}"
+            android:text="@{couponModel.coupon.description}"
             android:textColor="@color/dark_grey"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -50,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{coupon.expirationDate.toString()}"
+            android:text="@{couponModel.coupon.expirationDate.toString()}"
             android:textColor="@color/dark_grey"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +58,7 @@
 
         <TextView
             android:id="@+id/tv_minumum_order_price"
-            bindCouponDetail="@{coupon}"
+            bindCouponDetail="@{couponModel.coupon}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/dark_grey"

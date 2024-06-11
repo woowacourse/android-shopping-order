@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCouponBinding
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.presentation.ui.CouponModel
 import woowacourse.shopping.presentation.ui.payment.PaymentHandler
 import woowacourse.shopping.presentation.util.ItemDiffCallback
 
 class CouponAdapter(private val paymentHandler: PaymentHandler) :
-    ListAdapter<Coupon, CouponViewHolder>(CouponAdapterDiffCallback) {
+    ListAdapter<CouponModel, CouponViewHolder>(CouponModelAdapterDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -26,10 +26,10 @@ class CouponAdapter(private val paymentHandler: PaymentHandler) :
     }
 
     companion object {
-        private val CouponAdapterDiffCallback =
-            ItemDiffCallback<Coupon>(
+        private val CouponModelAdapterDiffCallback =
+            ItemDiffCallback<CouponModel>(
                 onItemsTheSame = { old, new ->
-                    old.id == new.id
+                    old.coupon.id == new.coupon.id
                 },
                 onContentsTheSame = { old, new ->
                     old == new

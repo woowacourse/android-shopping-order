@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.ui.payment
 
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.presentation.ui.CouponModel
 
 interface PaymentHandler {
-    fun onCouponClicked(coupon: Coupon)
+    fun onCouponClicked(couponModel: CouponModel)
 
     fun onPaymentClicked()
 }

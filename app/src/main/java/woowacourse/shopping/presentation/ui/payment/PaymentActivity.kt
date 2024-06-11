@@ -43,7 +43,7 @@ class PaymentActivity : BindingActivity<ActivityPaymentBinding>() {
     }
 
     private fun observeCoupon() {
-        viewModel.coupons.observe(this) {
+        viewModel.couponModels.observe(this) {
             couponAdapter.submitList(it.toList())
         }
     }
