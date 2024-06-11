@@ -4,6 +4,7 @@ import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.dto.CartItemRequest
 import woowacourse.shopping.data.dto.CartQuantityDto
 import woowacourse.shopping.data.dto.CartResponse
+import woowacourse.shopping.data.mapper.toCartItemId
 import woowacourse.shopping.data.remote.service.CartService
 
 class RemoteCartDataSource(
@@ -24,9 +25,7 @@ class RemoteCartDataSource(
             val location =
                 cartService.addCartItem(cartItemRequest).headers()["location"]
                     ?: throw IllegalArgumentException()
-            val segments = location.split("/")
-            val cartItemId = segments.last().toInt()
-            cartItemId
+            location.toCartItemId()
         }
     }
 

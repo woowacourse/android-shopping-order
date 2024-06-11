@@ -85,3 +85,7 @@ fun CouponDto.toCouPon(): Coupon {
 fun AvailableTimeDto.toAvailableTime(): AvailableTime {
     return AvailableTime(LocalTime.parse(start), LocalTime.parse(end))
 }
+
+fun String.toCartItemId(): Int {
+    return split("/").last().toInt()
+}
