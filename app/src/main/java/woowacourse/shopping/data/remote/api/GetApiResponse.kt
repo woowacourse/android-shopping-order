@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.remote.api
 
-inline fun <T : Any?> ApiResponse<T>.result(): T =
+fun <T : Any?> ApiResponse<T>.result(): T =
     when (this) {
         is ApiResponse.Success -> data
         is ApiResponse.Error -> throw RuntimeException(message)
         is ApiResponse.Exception -> throw e
     }
 
-inline fun <T : Any?> ApiResponse<T>.resultOrNull(): T? =
+fun <T : Any?> ApiResponse<T>.resultOrNull(): T? =
     when (this) {
         is ApiResponse.Success -> data
         is ApiResponse.Error -> null
