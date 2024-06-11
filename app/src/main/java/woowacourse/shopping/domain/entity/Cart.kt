@@ -76,6 +76,8 @@ data class Cart(
         return Cart(newProductMap)
     }
 
+    fun totalPrice(): Long = cartProducts.sumOf { it.totalPrice }
+
     companion object {
         private const val ERROR_ALREADY_EXIST_PRODUCT = "이미 존재하는 상품입니다. %s"
         private const val ERROR_NOT_EXIST_PRODUCT = "해당 상품이 존재하지 않습니다. %s"

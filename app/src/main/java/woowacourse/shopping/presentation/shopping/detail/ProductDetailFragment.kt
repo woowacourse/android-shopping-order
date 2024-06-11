@@ -14,12 +14,11 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.data.shopping.ProductRepositoryInjector
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
-import woowacourse.shopping.domain.usecase.DefaultCreateCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.DefaultAddCartProductUseCase
 import woowacourse.shopping.presentation.base.BindingFragment
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
 import woowacourse.shopping.presentation.shopping.ShoppingEventBusViewModel
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
-import woowacourse.shopping.presentation.shopping.toErrorMessageFrom
 import woowacourse.shopping.presentation.util.showToast
 
 class ProductDetailFragment :
@@ -31,7 +30,7 @@ class ProductDetailFragment :
         val shoppingRepository =
             ProductRepositoryInjector.productRepository(requireContext().applicationContext)
         ProductDetailViewModel.factory(
-            DefaultCreateCartProductUseCase.instance(cartRepository, shoppingRepository),
+            DefaultAddCartProductUseCase.instance(cartRepository, shoppingRepository),
             shoppingRepository,
         )
     }

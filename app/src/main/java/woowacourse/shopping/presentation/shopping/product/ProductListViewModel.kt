@@ -4,19 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import timber.log.Timber
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.usecase.DecreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.IncreaseCartProductUseCase
-import woowacourse.shopping.domain.usecase.LoadCartUseCase
+import woowacourse.shopping.domain.usecase.cart.DecreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.IncreaseCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.LoadCartUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.shopping.toShoppingUiModel
 import woowacourse.shopping.presentation.shopping.toUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
-import kotlin.concurrent.thread
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
@@ -26,84 +29,93 @@ class ProductListViewModel(
 ) : ViewModel(), ProductItemListener {
     private val _uiState = MutableLiveData(ProductListUiState(currentPage = START_PAGE))
     val uiState: LiveData<ProductListUiState> get() = _uiState
-
     private val _navigateToDetailEvent = MutableSingleLiveData<Long>()
     val navigateToDetailEvent: SingleLiveData<Long> = _navigateToDetailEvent
     private val _errorEvent = MutableSingleLiveData<ProductListErrorEvent>()
     val errorEvent: SingleLiveData<ProductListErrorEvent> = _errorEvent
+    private var productLoadJob: Job? = null
 
     init {
         loadProducts()
+        loadCartProducts()
         loadRecentProducts()
     }
 
     override fun loadProducts() {
-        val uiState = _uiState.value ?: return
-        val currentPage = uiState.currentPage
-        productRepository.loadProducts(currentPage, PAGE_SIZE)
-            .onSuccess {
-                val newProducts = it.map(Product::toShoppingUiModel)
-                val nextPage = currentPage.plus(1)
-                _uiState.value =
-                    uiState.copy(
-                        products = uiState.products + newProducts,
-                        loadMoreModel = getLoadMore(nextPage),
-                    )
-                loadCartProducts()
-            }.onFailure {
-                Timber.e(it)
-                _errorEvent.postValue(ProductListErrorEvent.LoadProducts)
+        productLoadJob =
+            viewModelScope.launch {
+                val currentPage = _uiState.value?.currentPage ?: return@launch
+                _uiState.value = _uiState.value?.copy(isLoading = true)
+                productRepository.loadProducts(currentPage, PAGE_SIZE)
+                    .onSuccess {
+                        val uiState = _uiState.value ?: return@onSuccess
+                        val newProducts = it.map(Product::toShoppingUiModel)
+                        val nextPage = currentPage.plus(1)
+                        _uiState.value =
+                            uiState.copy(
+                                products = uiState.products + newProducts,
+                                loadMoreModel = getLoadMore(nextPage),
+                                isLoading = false,
+                            )
+                    }.onFailure {
+                        Timber.e(it)
+                        val uiState = _uiState.value ?: return@onFailure
+                        _uiState.value = uiState.copy(isLoading = false)
+                        _errorEvent.postValue(ProductListErrorEvent.LoadProducts)
+                    }
             }
     }
 
     fun loadCartProducts() {
-        val uiState = uiState.value ?: return
-        val ids = uiState.products.map { it.id }
-        loadCartUseCase(ids).onSuccess { newCart ->
-            val newPage = uiState.currentPage + 1
-            _uiState.value =
-                uiState.updateCartProducts(
-                    newCart,
-                    getLoadMore(newPage),
-                )
-        }.onFailure {
-            Timber.e(it)
-            _errorEvent.postValue(ProductListErrorEvent.LoadCartProducts)
+        viewModelScope.launch {
+            if (productLoadJob?.isActive == true) productLoadJob?.join()
+            val ids = uiState.value?.products?.map { it.id } ?: return@launch
+            loadCartUseCase(ids).onSuccess { newCart ->
+                val uiState = uiState.value ?: return@onSuccess
+                val nextPage = uiState.currentPage + 1
+                _uiState.value =
+                    uiState.updateCartProducts(
+                        newCart,
+                        getLoadMore(nextPage),
+                    )
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
+            }
         }
     }
 
     fun loadRecentProducts() {
-        val uiState = _uiState.value ?: return
-        thread {
+        viewModelScope.launch {
             productRepository.loadRecentProducts(RECENT_PRODUCT_COUNT).onSuccess {
-                _uiState.postValue(uiState.copy(recentProducts = it.map(Product::toUiModel)))
+                val uiState = _uiState.value ?: return@launch
+                _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
             }.onFailure {
                 Timber.e(it)
-                _errorEvent.postValue(ProductListErrorEvent.LoadRecentProducts)
+                _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
             }
         }
     }
 
     override fun increaseProductCount(id: Long) {
-        thread {
-            val uiState = _uiState.value ?: return@thread
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
             increaseCartProductUseCase(id, INCREMENT_AMOUNT).onSuccess { newCart ->
-                _uiState.postValue(uiState.increaseProductCount(id, newCart))
+                _uiState.value = uiState.increaseProductCount(id, newCart)
             }.onFailure {
                 Timber.e(it)
-                _errorEvent.postValue(ProductListErrorEvent.IncreaseCartCount)
+                _errorEvent.setValue(ProductListErrorEvent.IncreaseCartCount)
             }
         }
     }
 
     override fun decreaseProductCount(id: Long) {
-        thread {
-            val uiState = _uiState.value ?: return@thread
+        viewModelScope.launch {
+            val uiState = _uiState.value ?: return@launch
             decreaseCartProductUseCase(id, INCREMENT_AMOUNT).onSuccess { newCart ->
-                _uiState.postValue(uiState.decreaseProductCount(id, newCart))
+                _uiState.value = uiState.decreaseProductCount(id, newCart)
             }.onFailure {
                 Timber.e(it)
-                _errorEvent.postValue(ProductListErrorEvent.DecreaseCartCount)
+                _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
             }
         }
     }

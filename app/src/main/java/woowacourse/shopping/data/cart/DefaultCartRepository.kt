@@ -2,7 +2,6 @@ package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.cart.datasource.CartDataSource
 import woowacourse.shopping.data.cart.model.CartPageData
-import woowacourse.shopping.data.cart.order.OrderDataSource
 import woowacourse.shopping.domain.entity.Cart
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.entity.Product
@@ -10,23 +9,23 @@ import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
     private val cartDataSource: CartDataSource,
-    private val orderDataSource: OrderDataSource,
 ) : CartRepository {
     private var cartPageData: CartPageData? = null
     private var cachedCart: Cart = Cart()
 
-    init {
-        loadCart()
-    }
-
-    override fun findCartProduct(productId: Long): Result<CartProduct> {
+    override suspend fun findCartProduct(productId: Long): Result<CartProduct> {
+        if (cachedCart.isEmpty()) loadCart()
         val cartProduct =
             cachedCart.findCartProductByProductId(productId)
                 ?: return Result.failure(NoSuchElementException("there's no such product"))
         return Result.success(cartProduct)
     }
 
-    override fun loadCurrentPageCart(
+    override fun existsCartProduct(productId: Long): Boolean {
+        return cachedCart.hasProductId(productId)
+    }
+
+    override suspend fun loadCurrentPageCart(
         currentPage: Int,
         pageSize: Int,
     ): Result<Cart> {
@@ -35,18 +34,19 @@ class DefaultCartRepository(
             .concatCart()
     }
 
-    override fun loadCart(): Result<Cart> {
+    override suspend fun loadCart(): Result<Cart> {
         return cartDataSource.loadTotalCarts()
             .toCart()
     }
 
-    override fun filterCartProducts(productIds: List<Long>): Result<Cart> {
+    override suspend fun filterCartProducts(productIds: List<Long>): Result<Cart> {
         return runCatching {
+            if (cachedCart.isEmpty()) loadCart()
             cachedCart.filterByProductIds(productIds)
         }
     }
 
-    override fun createCartProduct(
+    override suspend fun createCartProduct(
         product: Product,
         count: Int,
     ): Result<Cart> {
@@ -59,7 +59,7 @@ class DefaultCartRepository(
         return Result.success(cachedCart)
     }
 
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         product: Product,
         count: Int,
     ): Result<Cart> {
@@ -76,7 +76,7 @@ class DefaultCartRepository(
             }
     }
 
-    override fun deleteCartProduct(productId: Long): Result<Cart> {
+    override suspend fun deleteCartProduct(productId: Long): Result<Cart> {
         val cartProduct =
             findCartProduct(productId).onFailure {
                 return Result.failure(it)
@@ -103,12 +103,9 @@ class DefaultCartRepository(
         return Result.success(cartPageData.totalProductSize > minSize)
     }
 
-    override fun orderCartProducts(productIds: List<Long>): Result<Unit> {
-        val cart = cachedCart.filterByProductIds(productIds)
-        val cartIds = cart.cartProducts.map { it.id }
-        return orderDataSource.orderProducts(cartIds).onSuccess {
-            loadCart()
-        }
+    override fun clearCart() {
+        cachedCart = Cart()
+        cartPageData = null
     }
 
     private fun Result<CartPageData>.toCart(): Result<Cart> {

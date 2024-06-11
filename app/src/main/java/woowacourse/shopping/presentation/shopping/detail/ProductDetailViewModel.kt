@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.usecase.CreateCartProductUseCase
+import woowacourse.shopping.domain.usecase.cart.AddCartProductUseCase
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.cart.toDomain
 import woowacourse.shopping.presentation.shopping.toCartUiModel
@@ -13,7 +15,7 @@ import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 
 class ProductDetailViewModel(
-    private val createCartUseCase: CreateCartProductUseCase,
+    private val createCartUseCase: AddCartProductUseCase,
     private val productRepository: ProductRepository,
 ) : ViewModel(), DetailProductListener {
     private val _uiState = MutableLiveData<ProductDetailUiState>(ProductDetailUiState.init())
@@ -37,11 +39,13 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct(id: Long) {
-        productRepository.saveRecentProduct(id)
-        productRepository.findProductById(id).onSuccess {
-            _uiState.value = uiState.value?.copy(cartProductUi = it.toCartUiModel())
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadProduct)
+        viewModelScope.launch {
+            launch { productRepository.saveRecentProduct(id) }
+            productRepository.findProductById(id).onSuccess {
+                _uiState.value = uiState.value?.copy(cartProductUi = it.toCartUiModel())
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.LoadProduct)
+            }
         }
     }
 
@@ -64,36 +68,42 @@ class ProductDetailViewModel(
     }
 
     override fun addCartProduct() {
-        val cartProduct = uiState.value?.cartProductUi ?: return
-        createCartUseCase(cartProduct.product.id, cartProduct.count).onSuccess {
-            _addCartEvent.setValue(Unit)
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.AddCartProduct)
+        viewModelScope.launch {
+            val cartProduct = uiState.value?.cartProductUi ?: return@launch
+            createCartUseCase(cartProduct.product.id, cartProduct.count).onSuccess {
+                _addCartEvent.setValue(Unit)
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.AddCartProduct)
+            }
         }
     }
 
     fun navigateToRecentProduct() {
-        val recentId = _uiState.value?.recentProduct?.id ?: return
-        productRepository.saveRecentProduct(recentId).onSuccess {
-            _recentProductEvent.setValue(recentId)
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
+        viewModelScope.launch {
+            val recentId = _uiState.value?.recentProduct?.id ?: return@launch
+            productRepository.saveRecentProduct(recentId).onSuccess {
+                _recentProductEvent.setValue(recentId)
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
+            }
         }
     }
 
     private fun loadRecentProduct() {
-        productRepository.loadRecentProducts(1).onSuccess {
-            if (it.isEmpty()) return
-            _uiState.value = uiState.value?.copy(recentProduct = it.first())
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadProduct)
+        viewModelScope.launch {
+            productRepository.loadRecentProducts(1).onSuccess {
+                if (it.isEmpty()) return@launch
+                _uiState.value = uiState.value?.copy(recentProduct = it.first())
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.LoadProduct)
+            }
         }
     }
 
     companion object {
         fun factory(
-            createCartUseCase: CreateCartProductUseCase,
+            createCartUseCase: AddCartProductUseCase,
             productRepository: ProductRepository,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {

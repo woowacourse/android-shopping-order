@@ -8,9 +8,10 @@ import woowacourse.shopping.databinding.ActivityShoppingBinding
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.cart.CartFragment
 import woowacourse.shopping.presentation.cart.CartProductUi
-import woowacourse.shopping.presentation.cart.order.OrderFragment
-import woowacourse.shopping.presentation.cart.order.OrderNavArgs
 import woowacourse.shopping.presentation.navigation.ShoppingNavigator
+import woowacourse.shopping.presentation.order.payment.PaymentFragment
+import woowacourse.shopping.presentation.order.recommend.OrderProductNavArgs
+import woowacourse.shopping.presentation.order.recommend.RecommendProductFragment
 import woowacourse.shopping.presentation.shopping.detail.ProductDetailFragment
 import woowacourse.shopping.presentation.shopping.product.ProductListFragment
 
@@ -57,15 +58,30 @@ class ShoppingActivity :
     }
 
     override fun navigateToRecommend(
-        productOrders: List<CartProductUi>,
+        orderProducts: List<CartProductUi>,
         addBackStack: Boolean,
         tag: String?,
     ) {
         supportFragmentManager.commit {
-            replace<OrderFragment>(
+            replace<RecommendProductFragment>(
                 R.id.fragment_container_shopping,
-                OrderFragment.TAG,
-                OrderFragment.args(OrderNavArgs(productOrders)),
+                RecommendProductFragment.TAG,
+                RecommendProductFragment.args(OrderProductNavArgs(orderProducts)),
+            )
+            if (addBackStack) addToBackStack(tag)
+        }
+    }
+
+    override fun navigateToPayment(
+        orderProducts: List<CartProductUi>,
+        addBackStack: Boolean,
+        tag: String?,
+    ) {
+        supportFragmentManager.commit {
+            replace<PaymentFragment>(
+                R.id.fragment_container_shopping,
+                PaymentFragment.TAG,
+                PaymentFragment.args(OrderProductNavArgs(orderProducts)),
             )
             if (addBackStack) addToBackStack(tag)
         }
