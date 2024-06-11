@@ -27,7 +27,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:checked="@{coupon.isChecked}"
-            android:onClick="@{() -> orderHandler.onCheckBoxClicked(coupon.id)}"
+            android:onClick="@{() -> orderHandler.selectCoupon(coupon.id)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

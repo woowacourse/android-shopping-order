@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:onClick="@{()->shoppingHandler.onProductItemClick(product.id)}">
+        android:onClick="@{()->shoppingHandler.navigateToDetail(product.id)}">
 
         <ImageView
             android:id="@+id/img_item"
@@ -82,7 +82,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="@{()->shoppingHandler.onPlusButtonClick(product.id)}"
+            android:onClick="@{()->shoppingHandler.addProductToCart(product.id)}"
             android:src="@drawable/ic_white_plus"
             app:layout_constraintBottom_toBottomOf="@id/img_item"
             app:layout_constraintEnd_toEndOf="@id/img_item" />

@@ -16,7 +16,7 @@ import java.util.Locale
 fun CheckBox.totalCheckBox(handler: CartHandler) {
     this.setOnClickListener {
         val isChecked = this.isChecked
-        handler.onTotalCheckBoxClicked(isChecked)
+        handler.selectAllCartItems(isChecked)
     }
 }
 

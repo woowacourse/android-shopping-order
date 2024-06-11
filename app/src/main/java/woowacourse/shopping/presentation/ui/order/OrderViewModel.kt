@@ -52,7 +52,7 @@ class OrderViewModel(
         }
     }
 
-    override fun onCheckBoxClicked(couponId: Long) {
+    override fun selectCoupon(couponId: Long) {
         val selectedCoupon = couponsData.find { it.id == couponId } ?: return
         val updated =
             couponsData.map {
@@ -66,7 +66,7 @@ class OrderViewModel(
         _discountAmount.value = selectedCoupon.discountAmount
     }
 
-    override fun onPayButtonClicked() {
+    override fun completeOrder() {
         viewModelScope.launch {
             orderRepository.completeOrder(selectedCartIds)
                 .onSuccess { _completeOrder.value = Event(true) }

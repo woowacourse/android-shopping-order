@@ -81,7 +81,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="@{()->cartHandler.onPlusButtonClick(product.id)}"
+            android:onClick="@{()->cartHandler.addProductToCart(product.id)}"
             android:src="@drawable/ic_white_plus"
             app:layout_constraintBottom_toBottomOf="@id/img_item"
             app:layout_constraintEnd_toEndOf="@id/img_item" />

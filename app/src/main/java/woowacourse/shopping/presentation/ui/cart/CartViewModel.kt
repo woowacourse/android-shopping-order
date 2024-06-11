@@ -90,7 +90,7 @@ class CartViewModel(
         }
     }
 
-    override fun onDeleteClick(cartId: Long) {
+    override fun deleteCartItem(cartId: Long) {
         viewModelScope.launch {
             cartRepository.deleteCartItem(cartId)
                 .onSuccess {
@@ -104,7 +104,7 @@ class CartViewModel(
         }
     }
 
-    override fun onCheckBoxClicked(cartId: Long) {
+    override fun selectCartItem(cartId: Long) {
         val checkedCartItems =
             cartItemsData.map { cartItem ->
                 if (cartItem.cartId == cartId) {
@@ -116,12 +116,12 @@ class CartViewModel(
         _cartItems.value = UiState.Success(checkedCartItems)
     }
 
-    override fun onTotalCheckBoxClicked(isChecked: Boolean) {
+    override fun selectAllCartItems(isChecked: Boolean) {
         val updatedItems = cartItemsData.map { it.copy(isChecked = isChecked) }
         _cartItems.value = UiState.Success(updatedItems)
     }
 
-    override fun onOrderClicked() {
+    override fun handleOrderState() {
         when (orderState.value ?: return) {
             OrderState.CartList -> {
                 if (totalCount.value == 0) return
@@ -137,7 +137,7 @@ class CartViewModel(
         }
     }
 
-    override fun onDecreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Long) {
         val selectedItem = cartItemsData.find { it.productId == productId } ?: return
         val updatedQuantity = selectedItem.quantity - 1
         if (orderState.value is OrderState.CartList && updatedQuantity < 1) return
@@ -160,7 +160,7 @@ class CartViewModel(
         }
     }
 
-    override fun onIncreaseQuantity(productId: Long) {
+    override fun increaseQuantity(productId: Long) {
         val selectedItem = cartItemsData.find { it.productId == productId } ?: return
         val updatedQuantity = selectedItem.quantity + 1
         val selectedCartId = selectedItem.cartId
@@ -227,7 +227,7 @@ class CartViewModel(
         }
     }
 
-    override fun onPlusButtonClick(productId: Long) {
+    override fun addProductToCart(productId: Long) {
         val initialCount = 1
 
         viewModelScope.launch {

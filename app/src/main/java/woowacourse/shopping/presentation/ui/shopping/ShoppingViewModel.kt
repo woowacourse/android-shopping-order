@@ -143,12 +143,12 @@ class ShoppingViewModel(
         _shoppingProducts.value = UiState.Success(updatedProducts)
     }
 
-    override fun onProductItemClick(productId: Long) {
+    override fun navigateToDetail(productId: Long) {
         val cartId = cartItems.find { it.product.id == productId }?.cartId ?: -1
         _moveEvent.value = Event(FromShoppingToScreen.ProductDetail(productId, cartId))
     }
 
-    override fun onLoadMoreClick() {
+    override fun onLoadMoreProducts() {
         viewModelScope.launch(Dispatchers.IO) {
             productRepository.load(currentPage, PRODUCT_PAGE_SIZE)
                 .onSuccess { result ->
@@ -161,11 +161,11 @@ class ShoppingViewModel(
         }
     }
 
-    override fun onCartMenuItemClick() {
+    override fun navigateToCart() {
         _moveEvent.value = Event(FromShoppingToScreen.Cart)
     }
 
-    override fun onPlusButtonClick(productId: Long) {
+    override fun addProductToCart(productId: Long) {
         val selectedProduct = shoppingProductsData.find { it.id == productId } ?: return
         val initialCount = 1
 
@@ -187,7 +187,7 @@ class ShoppingViewModel(
         }
     }
 
-    override fun onDecreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Long) {
         val selectedProduct = shoppingProductsData.find { it.id == productId } ?: return
         val newQuantity = selectedProduct.quantity - DECREMENT_AMOUNT
         val cartItem = cartItems.find { it.product.id == productId } ?: return
@@ -212,7 +212,7 @@ class ShoppingViewModel(
         }
     }
 
-    override fun onIncreaseQuantity(productId: Long) {
+    override fun increaseQuantity(productId: Long) {
         val selectedProduct = shoppingProductsData.find { it.id == productId } ?: return
         val newQuantity = selectedProduct.quantity + INCREMENT_AMOUNT
         val cartItem = cartItems.find { it.product.id == productId } ?: return

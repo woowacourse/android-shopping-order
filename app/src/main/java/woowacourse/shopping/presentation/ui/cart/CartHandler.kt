@@ -3,13 +3,13 @@ package woowacourse.shopping.presentation.ui.cart
 import woowacourse.shopping.presentation.ui.QuantityHandler
 
 interface CartHandler : QuantityHandler {
-    fun onDeleteClick(cartId: Long)
+    fun deleteCartItem(cartId: Long)
 
-    fun onCheckBoxClicked(cartId: Long)
+    fun selectCartItem(cartId: Long)
 
-    fun onTotalCheckBoxClicked(isChecked: Boolean)
+    fun selectAllCartItems(isChecked: Boolean)
 
-    fun onOrderClicked()
+    fun handleOrderState()
 
-    fun onPlusButtonClick(productId: Long)
+    fun addProductToCart(productId: Long)
 }

@@ -32,8 +32,8 @@ class ProductDetailViewModel(
     private val _error = MutableLiveData<Event<DetailError>>()
     val error: LiveData<Event<DetailError>> get() = _error
 
-    private val _moveEvent = MutableLiveData<Event<FromDetailToScreen>>()
-    val moveEvent: LiveData<Event<FromDetailToScreen>> get() = _moveEvent
+    private val _navigationEvent = MutableLiveData<Event<FromDetailToScreen>>()
+    val navigationEvent: LiveData<Event<FromDetailToScreen>> get() = _navigationEvent
 
     val showLastProduct: LiveData<Boolean> = lastProduct.map { it != ProductModel.INVALID_PRODUCT_MODEL && it.id != productId }
 
@@ -73,7 +73,7 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun onAddCartClick() {
+    override fun addProductToCart() {
         viewModelScope.launch {
             cartRepository.loadAll()
                 .onSuccess { carts ->
@@ -100,7 +100,7 @@ class ProductDetailViewModel(
         viewModelScope.launch {
             cartRepository.saveNewCartItem(productId, product.quantity)
                 .onSuccess {
-                    _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
+                    _navigationEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
                 }
                 .onFailure {
                     _error.value = Event(DetailError.CartItemNotFound)
@@ -115,25 +115,25 @@ class ProductDetailViewModel(
         val newQuantity = cartItem.quantity + product.quantity
         viewModelScope.launch {
             cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity)
-                .onSuccess { _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity)) }
+                .onSuccess { _navigationEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity)) }
                 .onFailure { _error.value = Event(DetailError.CartItemNotFound) }
         }
     }
 
-    override fun onLastProductClick(productId: Long) {
-        _moveEvent.value = Event(FromDetailToScreen.ProductDetail(productId))
+    override fun navigateToDetailWithRecentViewed(productId: Long) {
+        _navigationEvent.value = Event(FromDetailToScreen.ProductDetail(productId))
     }
 
-    override fun onCloseClick() {
-        _moveEvent.value = Event(FromDetailToScreen.Shopping)
+    override fun navigateToBack() {
+        _navigationEvent.value = Event(FromDetailToScreen.Shopping)
     }
 
-    override fun onIncreaseQuantity(productId: Long) {
+    override fun increaseQuantity(productId: Long) {
         val updatedQuantity = product.value?.quantity?.plus(1) ?: 1
         _product.value = product.value?.copy(quantity = updatedQuantity)
     }
 
-    override fun onDecreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Long) {
         val updatedQuantity = product.value?.quantity?.minus(1) ?: 1
         if (updatedQuantity < 1) return
         _product.value = product.value?.copy(quantity = updatedQuantity)

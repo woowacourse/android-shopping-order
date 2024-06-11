@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:onClick="@{()->shoppingHandler.onProductItemClick(recentProduct.id)}">
+        android:onClick="@{()->shoppingHandler.navigateToDetail(recentProduct.id)}">
 
         <ImageView
             android:id="@+id/iv_recent_product"

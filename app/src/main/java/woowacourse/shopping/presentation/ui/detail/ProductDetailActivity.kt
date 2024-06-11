@@ -59,7 +59,7 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     }
 
     private fun observeMoveEvent() {
-        viewModel.moveEvent.observe(
+        viewModel.navigationEvent.observe(
             this,
             EventObserver {
                 when (it) {

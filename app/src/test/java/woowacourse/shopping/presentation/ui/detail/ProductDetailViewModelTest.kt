@@ -75,9 +75,9 @@ class ProductDetailViewModelTest {
             coEvery { cartRepository.loadAll() } returns Result.success(dummyCarts)
             coEvery { cartRepository.saveNewCartItem(any(), any()) } returns Result.success(10L)
 
-            viewModel.onAddCartClick()
+            viewModel.addProductToCart()
 
-            val actual = viewModel.moveEvent.getOrAwaitValue().getContentIfNotHandled()
+            val actual = viewModel.navigationEvent.getOrAwaitValue().getContentIfNotHandled()
             val expected = FromDetailToScreen.ShoppingWithUpdated(productId, 1)
             assertThat(actual).isEqualTo(expected)
         }
