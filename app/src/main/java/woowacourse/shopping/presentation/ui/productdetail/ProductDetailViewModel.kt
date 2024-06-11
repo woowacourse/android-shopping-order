@@ -17,7 +17,6 @@ import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.productdetail.ProductDetailActivity.Companion.PUT_EXTRA_PRODUCT_ID
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -95,13 +94,10 @@ class ProductDetailViewModel(
     fun addToCart() {
         _uiState.value?.let { state ->
             state.cart?.let { cart ->
-
-                thread {
-                    if (cart.id == Cart.EMPTY_CART_ID) {
-                        insertCart(cart)
-                    } else {
-                        updateCart(cart)
-                    }
+                if (cart.id == Cart.EMPTY_CART_ID) {
+                    insertCart(cart)
+                } else {
+                    updateCart(cart)
                 }
             }
         }
