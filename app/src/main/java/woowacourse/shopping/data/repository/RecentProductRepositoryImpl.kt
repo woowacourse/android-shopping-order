@@ -19,7 +19,7 @@ class RecentProductRepositoryImpl(private val localRecentViewedDataSource: Local
         }
     }
 
-    override suspend fun add(recentProduct: Product): Result<Long> {
+    override suspend fun add(recentProduct: Product): Result<Unit> {
         return runCatching {
             localRecentViewedDataSource.save(
                 recentProduct.toRecentProductEntity(LocalDateTime.now()),

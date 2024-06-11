@@ -9,8 +9,8 @@ class LocalRecentViewedDataSourceImpl(private val dao: RecentProductDao) : Local
         return dao.loadAll()
     }
 
-    override suspend fun save(recentProduct: RecentProductEntity): Long {
-        return dao.insert(recentProduct)
+    override suspend fun save(recentProduct: RecentProductEntity) {
+        dao.insert(recentProduct)
     }
 
     override suspend fun getMostRecent(): RecentProductEntity? {

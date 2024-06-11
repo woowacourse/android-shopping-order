@@ -7,5 +7,5 @@ interface RecentRepository {
 
     suspend fun loadMostRecent(): Result<Product?>
 
-    suspend fun add(recentProduct: Product): Result<Long>
+    suspend fun add(recentProduct: Product): Result<Unit>
 }
