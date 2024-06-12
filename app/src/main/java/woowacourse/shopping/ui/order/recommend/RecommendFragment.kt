@@ -74,7 +74,7 @@ class RecommendFragment : Fragment() {
     private fun setUpAdapter() {
         adapter = RecommendAdapter(recommendViewModel)
         binding.rvRecommend.adapter = adapter
-        recommendViewModel.generateRecommendProductViewItems()
+//        recommendViewModel.generateRecommendProductViewItems()
     }
 
     private fun setUpDataBinding() {

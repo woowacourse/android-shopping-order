@@ -33,9 +33,7 @@ class RecommendViewModel(
     val recommendUiState: LiveData<UiState<List<ProductViewItem>>>
         get() = _recommendUiState
 
-    private val _recommendProductViewItems = MutableLiveData<List<ProductViewItem>>(emptyList())
-    val recommendProductViewItems: LiveData<List<ProductViewItem>>
-        get() = _recommendProductViewItems
+    private var recommendProductViewItems: List<ProductViewItem> = emptyList()
 
     private val _recommendNavigationActions = MutableLiveData<Event<RecommendNavigationActions>>()
     val recommendNavigationActions: LiveData<Event<RecommendNavigationActions>>
@@ -45,6 +43,10 @@ class RecommendViewModel(
     val recommendNotifyingActions: LiveData<Event<RecommendNotifyingActions>>
         get() = _recommendNotifyingActions
 
+    init {
+        generateRecommendProductViewItems()
+    }
+
     fun updateRecommendProductViewItems() {
         if (recommendUiState.value is UiState.Success) {
             viewModelScope.launch {
@@ -52,8 +54,7 @@ class RecommendViewModel(
                 cartRepository.getCartItems(0, totalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
                     .onSuccess { cartItems ->
                         val recommendProductIds =
-                            _recommendProductViewItems.value?.map { recommendProductViewItem -> recommendProductViewItem.product.productId }
-                                ?: return@onSuccess
+                            recommendProductViewItems.map { recommendProductViewItem -> recommendProductViewItem.product.productId }
 
                         val updatedRecommendProductViewItems =
                             cartItems.filter { cartItem ->
@@ -63,7 +64,7 @@ class RecommendViewModel(
                             }
 
                         val newRecommendProductViewItems =
-                            recommendProductViewItems.value?.toMutableList() ?: return@onSuccess
+                            recommendProductViewItems.toMutableList()
 
                         updatedRecommendProductViewItems.forEach { updatedRecommendProductViewItem ->
                             val updatePosition =
@@ -82,9 +83,9 @@ class RecommendViewModel(
                             }
                         orderViewModel.updateSelectedCartViewItems(newCartViewItems)
 
-                        _recommendProductViewItems.value = newRecommendProductViewItems
+                        recommendProductViewItems = newRecommendProductViewItems
                         _recommendUiState.value =
-                            UiState.Success(recommendProductViewItems.value ?: emptyList())
+                            UiState.Success(recommendProductViewItems)
                     }.onFailure {
                         _recommendNotifyingActions.value =
                             Event(RecommendNotifyingActions.NotifyError)
@@ -93,7 +94,7 @@ class RecommendViewModel(
         }
     }
 
-    fun generateRecommendProductViewItems() {
+    private fun generateRecommendProductViewItems() {
         viewModelScope.launch {
             val mostRecentProductCategory =
                 recentProductRepository.findMostRecentProduct().getOrNull()?.category
@@ -115,11 +116,10 @@ class RecommendViewModel(
 
                 val numberOfRecommend =
                     min(OrderViewModel.DEFAULT_NUMBER_OF_RECOMMEND, sameCategoryProducts.size)
-                _recommendProductViewItems.value =
-                    sameCategoryProducts.subList(0, numberOfRecommend)
-                        .map(HomeViewItem::ProductViewItem)
+                recommendProductViewItems = sameCategoryProducts.subList(0, numberOfRecommend)
+                    .map(HomeViewItem::ProductViewItem)
                 _recommendUiState.value =
-                    UiState.Success(recommendProductViewItems.value ?: emptyList())
+                    UiState.Success(recommendProductViewItems)
             }.onFailure {
                 _recommendNotifyingActions.value =
                     Event(RecommendNotifyingActions.NotifyError)
