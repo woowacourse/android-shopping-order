@@ -7,12 +7,9 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource,
 ) : OrderRepository {
-    override suspend fun post(orderRequest: OrderRequest): Result<Unit> =
-        runCatching {
-            val response = orderDataSource.post(orderRequest)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    override suspend fun post(orderRequest: OrderRequest): Result<Unit> {
+        return orderDataSource.post(orderRequest).mapCatching {
+            it.body
         }
+    }
 }
