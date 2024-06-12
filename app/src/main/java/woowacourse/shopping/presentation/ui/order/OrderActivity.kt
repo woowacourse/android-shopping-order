@@ -3,8 +3,10 @@ package woowacourse.shopping.presentation.ui.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCouponRepositoryImpl
@@ -61,6 +63,7 @@ class OrderActivity : AppCompatActivity(), OrderClickListener {
 
     override fun order() {
         viewModel.payment()
+        Toast.makeText(this, getString(R.string.message_order_complete), Toast.LENGTH_SHORT).show()
         finish()
     }
 

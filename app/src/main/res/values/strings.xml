@@ -23,4 +23,5 @@
     <string name="free_shipping_coupon_description">배송비 무료 쿠폰은 도서 및 산간 지역인 경우에도 무료 배송이 가능합니다.</string>
     <string name="miracle_sale_coupon_description">오전 %d시부터 오후 %d시까지</string>
     <string name="payment_title">결제하기</string>
+    <string name="message_order_complete">주문이 완료되었습니다.</string>
 </resources>
