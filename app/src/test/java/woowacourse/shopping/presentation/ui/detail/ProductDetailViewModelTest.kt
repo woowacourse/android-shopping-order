@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
+import woowacourse.shopping.domain.mapper.toUiModel
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
@@ -18,7 +19,6 @@ import woowacourse.shopping.dummyCarts
 import woowacourse.shopping.dummyProduct
 import woowacourse.shopping.dummyProducts
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.presentation.ui.model.toUiModel
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
@@ -42,7 +42,7 @@ class ProductDetailViewModelTest {
     @BeforeEach
     fun setup() {
         coEvery { productRepository.loadById(10L) } returns Result.success(dummyProduct)
-        coEvery { recentRepository.add(any()) } returns Result.success(1L)
+        coEvery { recentRepository.add(any()) } returns Result.success(Unit)
         coEvery { recentRepository.loadMostRecent() } returns Result.success(dummyProducts[1])
 
         viewModel =
@@ -58,19 +58,20 @@ class ProductDetailViewModelTest {
     @Test
     fun `선택된 상품의 상세 데이터를 불러온다`() =
         runTest {
-            val expected = dummyProduct.toUiModel(1)
+            val expected = dummyProduct.toUiModel(quantity = 1)
             assertThat(viewModel.product.getOrAwaitValue()).isEqualTo(expected)
         }
 
     @Test
     fun `가장 최근에 본 데이터를 불러온다`() =
         runTest {
+            val actual = viewModel.lastProduct.getOrAwaitValue()
             val expected = dummyProducts[1].toUiModel()
-            assertThat(viewModel.lastProduct.getOrAwaitValue()).isEqualTo(expected)
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
-    fun `선택한 상품을 장바구니에 추가한다`() =
+    fun `선택한 상품을 장바구니에 추가하면 화면 이동 이벤트를 발생시킨다`() =
         runTest {
             coEvery { cartRepository.loadAll() } returns Result.success(dummyCarts)
             coEvery { cartRepository.saveNewCartItem(any(), any()) } returns Result.success(10L)

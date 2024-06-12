@@ -6,18 +6,17 @@ import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
+import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentRepository
-import woowacourse.shopping.dummyCarts
+import woowacourse.shopping.domain.repository.RecommendRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.model.toUiModel
+import woowacourse.shopping.presentation.ui.model.CartModel
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
@@ -25,74 +24,113 @@ import woowacourse.shopping.presentation.ui.model.toUiModel
 @ExtendWith(MockKExtension::class)
 class CartViewModelTest {
     @MockK
-    private lateinit var productRepository: ProductRepository
+    private lateinit var recommendRepository: RecommendRepository
 
     @MockK
     private lateinit var cartRepository: CartRepository
 
-    @MockK
-    private lateinit var recentRepository: RecentRepository
-
     private lateinit var viewModel: CartViewModel
 
-    private val initialTotalCartItemCount: Int = dummyCarts.size
-
-    private val dummyCartUiWithChecked = dummyCarts.map { it.toUiModel(isChecked = true) }
-
-    @BeforeEach
-    fun setUp() {
-        coEvery { cartRepository.load(0, initialTotalCartItemCount) } returns
-            Result.success(
-                dummyCarts,
-            )
-        viewModel = CartViewModel(cartRepository, productRepository, recentRepository, initialTotalCartItemCount)
-    }
-
     @Test
-    fun `모든 장바구니 아이템들을 불러와 주문 목록에 포함한다`() =
+    fun `모든 장바구니 아이템들을 불러와 주문 목록에 포함시킨다`() =
         runTest {
-            val actual = viewModel.cartItems.getOrAwaitValue()
-            val expected = UiState.Success(dummyCarts.map { it.toUiModel(isChecked = true) })
+            val cartItems = listOf(Cart(0L), Cart(1L))
+            coEvery { cartRepository.load(any(), any()) } returns Result.success(cartItems)
 
-            assertThat(actual).isEqualTo(expected)
-        }
-
-    @Test
-    fun `선택한 장바구니 아이템을 삭제한다`() =
-        runTest {
-            val deletedItem = dummyCarts[0].toUiModel()
-            coEvery { cartRepository.deleteCartItem(deletedItem.cartId) } returns Result.success(Unit)
-
-            viewModel.deleteCartItem(deletedItem.cartId)
+            viewModel = CartViewModel(cartRepository, recommendRepository, 2)
 
             val actual = viewModel.cartItems.getOrAwaitValue()
-            val expected = dummyCartUiWithChecked.toMutableList().apply { removeAt(0) }
+            val expected = listOf(CartModel(0L, isChecked = true), CartModel(1L, isChecked = true))
             assertThat(actual).isEqualTo(UiState.Success(expected))
         }
 
     @Test
-    fun `장바구니 아이템들 중 선택한 아이템들의 총 개수를 알 수 있다`() =
+    fun `첫 번째 장바구니 아이템을 삭제하면, 선택된 장바구니 아이템은 장바구니 목록에서 제거 된다`() =
         runTest {
+            val cartItems = listOf(Cart(0L), Cart(1L))
+            coEvery { cartRepository.load(any(), any()) } returns Result.success(cartItems)
+            coEvery { cartRepository.deleteCartItem(0L) } returns Result.success(Unit)
+
+            viewModel = CartViewModel(cartRepository, recommendRepository, 2)
+            viewModel.deleteCartItem(0L)
+
+            val actual = viewModel.cartItems.getOrAwaitValue()
+            val expected = listOf(CartModel(1L, isChecked = true))
+            assertThat(actual).isEqualTo(UiState.Success(expected))
+        }
+
+    @Test
+    fun `수량이 2개 씩인 장바구니 아이템 전체 2개를 모두 선택한 경우, 선택된 아이템들의 총 개수는 4이다`() =
+        runTest {
+            val cartItems = listOf(Cart(0L, quantity = 2), Cart(1L, quantity = 2))
+            coEvery { cartRepository.load(any(), any()) } returns Result.success(cartItems)
+
+            viewModel = CartViewModel(cartRepository, recommendRepository, 2)
+
             val actual = viewModel.totalCount.getOrAwaitValue()
-            val expected = dummyCartUiWithChecked.sumOf { it.quantity }
+            val expected = 4
             assertThat(actual).isEqualTo(expected)
         }
 
     @Test
-    fun `장바구니 아이템들 중 선택한 아이템들의 총 가격을 알 수 있다`() =
+    fun `수량이 2개 씩인 장바구니 아이템 전체 2개 중 하나를 선택 해제할 경우, 선택된 아이템들의 총 개수는 2이다`() =
         runTest {
-            val actual = viewModel.totalPrice.getOrAwaitValue()
-            val expected = dummyCartUiWithChecked.sumOf { it.quantity * it.price }
+            val cartItems = listOf(Cart(0L, quantity = 2), Cart(1L, quantity = 2))
+            coEvery { cartRepository.load(any(), any()) } returns Result.success(cartItems)
+
+            viewModel = CartViewModel(cartRepository, recommendRepository, 2)
+            viewModel.selectCartItem(0L)
+
+            val actual = viewModel.totalCount.getOrAwaitValue()
+            val expected = 2
             assertThat(actual).isEqualTo(expected)
         }
 
     @Test
     fun `한 번에 모든 장바구니 아이템을 주문 목록 포함을 해제시킬 수 있다`() =
         runTest {
+            val cartItems = listOf(Cart(0L), Cart(1L))
+            coEvery { cartRepository.load(any(), any()) } returns Result.success(cartItems)
+            coEvery { cartRepository.deleteCartItem(0L) } returns Result.success(Unit)
+
+            viewModel = CartViewModel(cartRepository, recommendRepository, 2)
             viewModel.selectAllCartItems(isChecked = false)
 
             val actual = viewModel.isAllCartItemsSelected.getOrAwaitValue()
             val expected = false
             assertThat(actual).isEqualTo(expected)
         }
+}
+
+private fun Cart(
+    id: Long,
+    productPrice: Int = 1_000,
+    quantity: Int = 1,
+): Cart {
+    return Cart(cartId = id, product = Product(id, productPrice), quantity = quantity)
+}
+
+private fun Product(
+    id: Long,
+    price: Int,
+): Product {
+    return Product(id, "상품 샘플", "", price.toLong(), "")
+}
+
+private fun CartModel(
+    id: Long,
+    productPrice: Int = 1_000,
+    quantity: Int = 1,
+    isChecked: Boolean,
+): CartModel {
+    return CartModel(
+        cartId = id,
+        productId = id,
+        name = "상품 샘플",
+        imageUrl = "",
+        price = productPrice.toLong(),
+        quantity = quantity,
+        isChecked = isChecked,
+        calculatedPrice = (productPrice * quantity),
+    )
 }
