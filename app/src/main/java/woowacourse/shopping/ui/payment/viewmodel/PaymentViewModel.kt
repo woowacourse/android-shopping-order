@@ -81,7 +81,7 @@ class PaymentViewModel(
     }
 
     fun isCouponsEmpty(): Boolean {
-        return coupons.value?.isEmpty() ?: true
+        return coupons.value?.isEmpty() ?: false
     }
 
     private fun loadOrderedCartItems() {
