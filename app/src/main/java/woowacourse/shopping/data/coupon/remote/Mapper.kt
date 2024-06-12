@@ -1,11 +1,17 @@
 package woowacourse.shopping.data.coupon.remote
 
+import woowacourse.shopping.domain.model.AmountDiscountCondition
 import woowacourse.shopping.domain.model.AvailableTime
-import woowacourse.shopping.domain.model.BuyXgetYCoupon
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.model.FixedCoupon
-import woowacourse.shopping.domain.model.FreeShippingCoupon
-import woowacourse.shopping.domain.model.PercentageCoupon
+import woowacourse.shopping.domain.model.DiscountCondition
+import woowacourse.shopping.domain.model.DiscountPolicy
+import woowacourse.shopping.domain.model.FixedDiscountPolicy
+import woowacourse.shopping.domain.model.FreeQuantityDiscountPolicy
+import woowacourse.shopping.domain.model.FreeShippingDiscountPolicy
+import woowacourse.shopping.domain.model.PercentDiscountPolicy
+import woowacourse.shopping.domain.model.Quantity
+import woowacourse.shopping.domain.model.QuantityDiscountCondition
+import woowacourse.shopping.domain.model.TimeDiscountCondition
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.LocalTime
@@ -15,55 +21,68 @@ private const val INVALID_COUPON_DTO_PARAMETER = "쿠폰의 매개변수가 올�
 fun List<CouponDto>.toCoupons(): List<Coupon> = map { it.toCoupon() }
 
 fun CouponDto.toCoupon(): Coupon {
+    return Coupon(
+        id,
+        description,
+        LocalDate.parse(expirationDate) ?: throw IllegalArgumentException(
+            INVALID_COUPON_DTO_PARAMETER,
+        ),
+        minimumAmount,
+        this.toDiscountPolicy(),
+    )
+}
+
+fun CouponDto.toDiscountPolicy(): DiscountPolicy {
+    val discountConditions = this.toDiscountConditions()
     val discountType = DiscountType.from(discountType)
     return when (discountType) {
-        DiscountType.FIXED -> this.toFixedCoupon()
-        DiscountType.BUY_X_GET_Y -> this.toBuyXgetYCoupon()
-        DiscountType.FREE_SHIPPING -> this.toFreeShippingCoupon()
-        DiscountType.PERCENTAGE -> this.toPercentageCoupon()
+        DiscountType.FIXED -> this.toFixedDiscountPolicy(discountConditions)
+        DiscountType.BUY_X_GET_Y -> this.toFreeQuantityDiscountPolicy(discountConditions)
+        DiscountType.FREE_SHIPPING -> this.toFreeShippingDiscountPolicy(discountConditions)
+        DiscountType.PERCENTAGE -> this.toPercentDiscountPolicy(discountConditions)
     }
 }
 
-private fun CouponDto.toFixedCoupon(): FixedCoupon {
-    return FixedCoupon(
-        id,
-        code,
-        description,
-        LocalDate.parse(expirationDate) ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
+private fun CouponDto.toDiscountConditions(): List<DiscountCondition> {
+    val discountConditions = mutableListOf<DiscountCondition>()
+    if (minimumAmount != null) {
+        discountConditions.add(AmountDiscountCondition(minimumAmount))
+    }
+    if (buyQuantity != null && getQuantity != null) {
+        discountConditions.add(QuantityDiscountCondition(Quantity(buyQuantity + getQuantity)))
+    }
+    if (availableTime != null) {
+        discountConditions.add(TimeDiscountCondition(availableTime.toAvailableTime()))
+    }
+    return discountConditions
+}
+
+private fun CouponDto.toFixedDiscountPolicy(discountConditions: List<DiscountCondition>): FixedDiscountPolicy {
+    return FixedDiscountPolicy(
+        discountConditions,
         discount ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
-        minimumAmount ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
     )
 }
 
-private fun CouponDto.toBuyXgetYCoupon(): BuyXgetYCoupon {
-    return BuyXgetYCoupon(
-        id,
-        code,
-        description,
-        LocalDate.parse(expirationDate) ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
-        buyQuantity ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
-        getQuantity ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
+private fun CouponDto.toFreeQuantityDiscountPolicy(discountConditions: List<DiscountCondition>): FreeQuantityDiscountPolicy {
+    val buyQuantity = buyQuantity ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER)
+    val getQuantity = getQuantity ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER)
+    val minimumQuantity = buyQuantity + getQuantity
+    return FreeQuantityDiscountPolicy(
+        discountConditions,
+        Quantity(minimumQuantity),
+        Quantity(getQuantity),
     )
 }
 
-private fun CouponDto.toFreeShippingCoupon(): FreeShippingCoupon {
-    return FreeShippingCoupon(
-        id,
-        code,
-        description,
-        LocalDate.parse(expirationDate) ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
-        minimumAmount ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
-    )
+private fun CouponDto.toFreeShippingDiscountPolicy(discountConditions: List<DiscountCondition>): FreeShippingDiscountPolicy {
+    return FreeShippingDiscountPolicy(discountConditions)
 }
 
-private fun CouponDto.toPercentageCoupon(): PercentageCoupon {
-    return PercentageCoupon(
-        id,
-        code,
-        description,
-        LocalDate.parse(expirationDate) ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
+private fun CouponDto.toPercentDiscountPolicy(discountConditions: List<DiscountCondition>): PercentDiscountPolicy {
+    return PercentDiscountPolicy(
+        discountConditions,
         discount ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
-        availableTime?.toAvailableTime() ?: throw IllegalArgumentException(INVALID_COUPON_DTO_PARAMETER),
     )
 }
 

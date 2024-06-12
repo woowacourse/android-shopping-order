@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-data class Quantity(val count: Int = DEFAULT_VALUE) {
+data class Quantity(val count: Int = DEFAULT_VALUE) : Comparable<Quantity> {
     init {
         require(count >= MIN_VALUE) { INVALID_MIN_VALUE_MESSAGE }
     }
@@ -19,11 +19,15 @@ data class Quantity(val count: Int = DEFAULT_VALUE) {
 
     fun isGreaterThanMin() = count > MIN_VALUE
 
+    override fun compareTo(other: Quantity): Int {
+        return count - other.count
+    }
+
     companion object {
         private const val DEFAULT_VALUE = 0
         private const val MAX_VALUE = 99
-        private const val MIN_VALUE = 0
 
+        private const val MIN_VALUE = 0
         private const val INVALID_MIN_VALUE_MESSAGE = "개수는 $MIN_VALUE 보다 작을 수 없습니다."
     }
 }
