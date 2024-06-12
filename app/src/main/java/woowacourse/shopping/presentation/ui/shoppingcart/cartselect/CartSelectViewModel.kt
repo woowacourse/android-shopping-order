@@ -3,6 +3,9 @@ package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -13,7 +16,6 @@ import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.ShoppingCartPagingSource
-import kotlin.concurrent.thread
 
 class CartSelectViewModel(
     private val shoppingRepository: ShoppingCartRepository,
@@ -32,19 +34,20 @@ class CartSelectViewModel(
     private val shoppingCartPagingSource = ShoppingCartPagingSource(shoppingRepository)
 
     init {
-        thread {
+        launch {
             showLoading(loadingProvider = LoadingProvider.SKELETON_LOADING)
             loadCartProducts(INIT_PAGE)
-            Thread.sleep(1000)
+            delay(1000)
             hideLoading()
         }
     }
 
     private fun loadCartProducts(page: Int) {
-        thread {
+        launch {
             shoppingCartPagingSource.load(page).onSuccess { pagingCartProduct ->
                 hideError()
                 loadedCartProducts(pagingCartProduct)
+                loadTotalElements()
             }.onFailure { e ->
                 showError(e)
                 showMessage(MessageProvider.DefaultErrorMessage)
@@ -53,27 +56,41 @@ class CartSelectViewModel(
     }
 
     private fun loadedCartProducts(pagingCartProduct: PagingCartProduct) {
-        val state = uiState.value ?: return
-        val cartIdList = state.orderCarts.map { it.id }
+        launch {
+            val state = uiState.value ?: return@launch
+            val cartProducts =
+                updateCartProductCheckStatus(state.orderCarts, pagingCartProduct.cartProducts)
+            val newPagingCartProduct = pagingCartProduct.copy(cartProducts = cartProducts)
 
-        val cartProducts =
-            pagingCartProduct.cartProducts.map { cart ->
-                if (cart.cart.id in cartIdList) {
-                    cart.copy(isChecked = true)
-                } else {
-                    cart.copy(isChecked = false)
-                }
+            _uiState.postValue(state.copy(pagingCartProduct = newPagingCartProduct))
+        }
+    }
+
+    private fun updateCartProductCheckStatus(
+        carts: List<Cart>,
+        cartProducts: List<CartProduct>,
+    ): List<CartProduct> {
+        val cartIds = carts.map { it.id }
+
+        return cartProducts.map { cart ->
+            if (cart.cart.id in cartIds) {
+                cart.copy(isChecked = true)
+            } else {
+                cart.copy(isChecked = false)
             }
+        }
+    }
 
-        val newPagingCartProduct = pagingCartProduct.copy(cartProducts = cartProducts)
-        val totalElements = shoppingRepository.getAllCarts().getOrNull()?.totalElements ?: 0
-
-        _uiState.postValue(
-            state.copy(
-                pagingCartProduct = newPagingCartProduct,
-                totalElements = totalElements,
-            ),
-        )
+    private fun loadTotalElements() {
+        launch {
+            shoppingRepository.getAllCarts().onSuccess { carts ->
+                hideError()
+                val state = uiState.value ?: return@launch
+                _uiState.postValue(state.copy(totalElements = carts.totalElements))
+            }.onFailure { e ->
+                showError(e)
+            }
+        }
     }
 
     override fun retry() {
@@ -82,17 +99,11 @@ class CartSelectViewModel(
         }
     }
 
-    override fun plusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun plusProductQuantity(productId: Long) {
         updateProductQuantity(productId = productId, increment = true)
     }
 
-    override fun minusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun minusProductQuantity(productId: Long) {
         updateProductQuantity(productId = productId, increment = false)
     }
 
@@ -101,18 +112,27 @@ class CartSelectViewModel(
         increment: Boolean,
     ) {
         val state = uiState.value ?: return
-
         val updateCartProducts =
-            state.pagingCartProduct.cartProducts.map { cartProduct ->
-                if (cartProduct.cart.product.id == productId) {
-                    val quantity = calculateUpdatedQuantity(cartProduct.cart.quantity, increment)
-                    calculatedUpdateCart(cartProduct, quantity)
-                    cartProduct.copy(cart = cartProduct.cart.copy(quantity = quantity))
-                } else {
-                    cartProduct
-                }
+            updateCartProducts(state.pagingCartProduct.cartProducts, productId, increment)
+
+        _uiState.value =
+            state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartProducts = updateCartProducts))
+    }
+
+    private fun updateCartProducts(
+        cartProducts: List<CartProduct>,
+        productId: Long,
+        increment: Boolean,
+    ): List<CartProduct> {
+        return cartProducts.map { cartProduct ->
+            if (cartProduct.cart.product.id == productId) {
+                val quantity = calculateUpdatedQuantity(cartProduct.cart.quantity, increment)
+                calculatedUpdateCart(cartProduct, quantity)
+                cartProduct.copy(cart = cartProduct.cart.copy(quantity = quantity))
+            } else {
+                cartProduct
             }
-        _uiState.value = state.copy(pagingCartProduct = PagingCartProduct(updateCartProducts))
+        }
     }
 
     private fun calculateUpdatedQuantity(
@@ -139,7 +159,7 @@ class CartSelectViewModel(
     ): Boolean = productId in orderCartIds
 
     override fun deleteCartProduct(cartProduct: CartProduct) {
-        thread {
+        launch {
             shoppingRepository.deleteCartItem(cartId = cartProduct.cart.id).onSuccess {
                 val state = uiState.value ?: return@onSuccess
                 loadCartProducts(state.pagingCartProduct.currentPage)
@@ -162,7 +182,7 @@ class CartSelectViewModel(
         cartProduct: CartProduct,
         quantity: Int,
     ) {
-        thread {
+        launch {
             shoppingRepository.patchCartItem(
                 cartId = cartProduct.cart.id,
                 quantity = quantity,
@@ -182,7 +202,7 @@ class CartSelectViewModel(
         }
     }
 
-    override fun updateCheckState(cartProduct: CartProduct) {
+    override fun toggleCartProduct(cartProduct: CartProduct) {
         var state = uiState.value ?: return
         state =
             if (cartProduct.isChecked) {
@@ -191,22 +211,15 @@ class CartSelectViewModel(
                 state.copy(orderCarts = state.orderCarts + cartProduct.cart)
             }
 
-        val cartIds = state.orderCarts.map { it.id }
-        val newPagingCartProduct =
-            state.pagingCartProduct.cartProducts.map { newCartProduct ->
-                if (newCartProduct.cart.id in cartIds) {
-                    newCartProduct.copy(isChecked = true)
-                } else {
-                    newCartProduct.copy(isChecked = false)
-                }
-            }
+        val cartProducts =
+            updateCartProductCheckStatus(state.orderCarts, state.pagingCartProduct.cartProducts)
 
         _uiState.value =
-            state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartProducts = newPagingCartProduct))
+            state.copy(pagingCartProduct = state.pagingCartProduct.copy(cartProducts = cartProducts))
     }
 
     override fun checkAllCartProduct() {
-        thread {
+        viewModelScope.launch {
             shoppingRepository.getAllCarts().onSuccess { carts ->
                 hideError()
                 val state = uiState.value ?: return@onSuccess

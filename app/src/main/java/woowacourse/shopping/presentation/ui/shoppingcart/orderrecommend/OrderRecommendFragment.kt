@@ -4,12 +4,13 @@ import android.os.Build
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentOrderRecommendBinding
-import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.observeEvent
+import woowacourse.shopping.presentation.model.CartsWrapper
+import woowacourse.shopping.presentation.model.toDomain
+import woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartNavigateAction
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.adapter.RecommendAdapter
 
 class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
@@ -19,7 +20,6 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
         OrderRecommendViewModel.factory(
             ProductHistoryRepository.getInstance(),
             ShoppingCartRepository.getInstance(),
-            OrderRepository.getInstance(),
         )
     }
 
@@ -29,16 +29,17 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
         initDataBinding()
         initAdapter()
         initObserve()
-
-        val orderCarts =
+        val cartsWrapper: CartsWrapper? =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                arguments?.getParcelableArray(PUT_EXTRA_CART_IDS_KEY, Cart::class.java)
+                arguments?.getSerializable(PUT_EXTRA_CART_IDS_KEY, CartsWrapper::class.java)
             } else {
-                arguments?.getParcelableArray(PUT_EXTRA_CART_IDS_KEY)
+                @Suppress("DEPRECATION")
+                arguments?.getSerializable(PUT_EXTRA_CART_IDS_KEY)
+                    as? CartsWrapper
             }
 
-        orderCarts?.let { carts ->
-            viewModel.load(carts.map { it as Cart })
+        cartsWrapper?.let {
+            viewModel.load(it.cartUiModels.map { cartUiModel -> cartUiModel.toDomain() })
         }
     }
 
@@ -60,7 +61,9 @@ class OrderRecommendFragment : BaseFragment<FragmentOrderRecommendBinding>() {
 
         viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->
             when (navigateAction) {
-                is OrderRecommendNavigateAction.NavigateToProductList -> activity?.finish()
+                is OrderRecommendNavigateAction.NavigateToPayment -> {
+                    (activity as? ShoppingCartNavigateAction)?.navigateToPayment(navigateAction.cartsWrapper)
+                }
             }
         }
     }

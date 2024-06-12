@@ -4,26 +4,26 @@ import woowacourse.shopping.data.model.remote.CartItemIdDto
 import woowacourse.shopping.data.model.remote.CartsDto
 
 interface ShoppingCartDataSource {
-    fun postCartItem(
+    suspend fun postCartItem(
         productId: Long,
         quantity: Int,
     ): Result<CartItemIdDto>
 
-    fun patchCartItem(
+    suspend fun patchCartItem(
         cartId: Int,
         quantity: Int,
     ): Result<Unit>
 
-    fun getCartProductsPaged(
+    suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
     ): Result<CartsDto>
 
-    fun getCartProductTotalElements(): Result<Int>
+    suspend fun getCartProductTotalElements(): Result<Int>
 
-    fun getCartItemsCount(): Result<Int>
+    suspend fun getCartItemsCount(): Result<Int>
 
-    fun deleteCartItem(cartId: Int): Result<Unit>
+    suspend fun deleteCartItem(cartId: Int): Result<Unit>
 
     companion object {
         private var instance: ShoppingCartDataSource? = null

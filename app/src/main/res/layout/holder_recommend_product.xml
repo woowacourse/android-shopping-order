@@ -88,7 +88,7 @@
             android:layout_height="48dp"
             android:layout_margin="8dp"
             android:background="@drawable/bg_white_shape_oval"
-            android:onClick="@{() -> productCountHandler.plusProductQuantity(cart.product.id, position)}"
+            android:onClick="@{() -> productCountHandler.plusProductQuantity(cart.product.id)}"
             android:src="@drawable/ic_plus"
             android:visibility="@{cart.quantity == 0 ? View.VISIBLE : View.GONE}"
             app:backgroundTint="@color/white"

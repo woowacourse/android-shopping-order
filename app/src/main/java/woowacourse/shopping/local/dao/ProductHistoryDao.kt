@@ -9,20 +9,20 @@ import woowacourse.shopping.local.model.ProductHistoryEntity
 @Dao
 interface ProductHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProductHistory(productHistoryEntity: ProductHistoryEntity)
+    suspend fun insertProductHistory(productHistoryEntity: ProductHistoryEntity)
 
     @Query("SELECT * FROM productHistoryEntity WHERE productId = :productId")
-    fun findProductHistory(productId: Long): ProductHistoryEntity
+    suspend fun findProductHistory(productId: Long): ProductHistoryEntity
 
     @Query("SELECT * FROM productHistoryEntity WHERE category = :category ORDER BY createAt")
-    fun getProductHistoriesByCategory(category: String): List<ProductHistoryEntity>
+    suspend fun getProductHistoriesByCategory(category: String): List<ProductHistoryEntity>
 
     @Query("SELECT * FROM productHistoryEntity ORDER BY createAt DESC LIMIT :size")
-    fun getProductHistoryPaged(size: Int): List<ProductHistoryEntity>
+    suspend fun getProductHistoryPaged(size: Int): List<ProductHistoryEntity>
 
     @Query("DELETE FROM productHistoryEntity WHERE productId = :productId")
-    fun deleteProductHistory(productId: Long)
+    suspend fun deleteProductHistory(productId: Long)
 
     @Query("DELETE FROM productHistoryEntity")
-    fun deleteAllProductHistory()
+    suspend fun deleteAllProductHistory()
 }

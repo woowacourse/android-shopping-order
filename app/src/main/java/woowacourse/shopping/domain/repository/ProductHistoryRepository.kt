@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface ProductHistoryRepository {
-    fun insertProductHistory(
+    suspend fun insertProductHistory(
         productId: Long,
         name: String,
         price: Int,
@@ -11,15 +11,15 @@ interface ProductHistoryRepository {
         imageUrl: String,
     ): Result<Unit>
 
-    fun findProductHistory(productId: Long): Result<Product>
+    suspend fun findProductHistory(productId: Long): Result<Product>
 
-    fun getRecommendedProducts(size: Int): Result<List<Product>>
+    suspend fun getRecommendedProducts(size: Int): Result<List<Product>>
 
-    fun getProductHistory(size: Int): Result<List<Product>>
+    suspend fun getProductHistory(size: Int): Result<List<Product>>
 
-    fun deleteProductHistory(productId: Long): Result<Unit>
+    suspend fun deleteProductHistory(productId: Long): Result<Unit>
 
-    fun deleteAllProductHistory(): Result<Unit>
+    suspend fun deleteAllProductHistory(): Result<Unit>
 
     companion object {
         private var instance: ProductHistoryRepository? = null

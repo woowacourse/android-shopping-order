@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource,
 ) : OrderRepository {
-    override fun insertOrder(cartItemsIds: List<Int>): Result<Unit> =
+    override suspend fun insertOrder(cartItemsIds: List<Int>): Result<Unit> =
         runCatching {
             orderDataSource.postOrder(cartItemsIds)
         }

@@ -7,7 +7,7 @@ class ProductListPagingSource(private val productRepository: ProductRepository) 
     private var currentPage = INIT_PAGE_NUM
     private var last = false
 
-    fun load(): Result<PagingProduct> {
+    suspend fun load(): Result<PagingProduct> {
         if (last) return Result.failure(NoSuchElementException())
 
         val result = productRepository.getPagingProduct(page = currentPage, pageSize = PAGING_SIZE)

@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.ui.productlist
 
+import android.content.Context
+import android.content.Intent
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -90,5 +92,11 @@ class ProductListActivity :
     override fun onResume() {
         super.onResume()
         viewModel.updatePagingProduct()
+    }
+
+    companion object {
+        fun getIntent(context: Context): Intent {
+            return Intent(context, ProductListActivity::class.java)
+        }
     }
 }

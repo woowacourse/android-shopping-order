@@ -11,7 +11,7 @@ class ProductHistoryRepositoryImpl(
     private val shoppingCartDataSource: ShoppingCartDataSource,
 ) :
     ProductHistoryRepository {
-    override fun insertProductHistory(
+    override suspend fun insertProductHistory(
         productId: Long,
         name: String,
         price: Int,
@@ -26,11 +26,11 @@ class ProductHistoryRepositoryImpl(
             imageUrl = imageUrl,
         )
 
-    override fun findProductHistory(productId: Long): Result<Product> =
+    override suspend fun findProductHistory(productId: Long): Result<Product> =
         productHistoryDataSource.findProductHistory(productId = productId)
             .mapCatching { it.toDomain() }
 
-    override fun getRecommendedProducts(size: Int): Result<List<Product>> {
+    override suspend fun getRecommendedProducts(size: Int): Result<List<Product>> {
         val recentHistory =
             productHistoryDataSource.getProductHistory(1).getOrNull() ?: return Result.success(
                 emptyList(),
@@ -58,13 +58,14 @@ class ProductHistoryRepositoryImpl(
             }
     }
 
-    override fun getProductHistory(size: Int): Result<List<Product>> =
+    override suspend fun getProductHistory(size: Int): Result<List<Product>> =
         productHistoryDataSource.getProductHistory(size = size)
             .mapCatching { result -> result.map { it.toDomain() } }
 
-    override fun deleteProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.deleteProductHistory(productId = productId)
+    override suspend fun deleteProductHistory(productId: Long): Result<Unit> =
+        productHistoryDataSource.deleteProductHistory(productId = productId)
 
-    override fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
+    override suspend fun deleteAllProductHistory(): Result<Unit> = productHistoryDataSource.deleteAllProductHistory()
 
     companion object {
         private const val FIRST_PAGE = 0

@@ -1,7 +1,5 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.cartselect
 
-import android.os.Bundle
-import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartSelectBinding
@@ -9,8 +7,8 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.base.observeEvent
+import woowacourse.shopping.presentation.ui.shoppingcart.ShoppingCartNavigateAction
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.adapter.CartProductsAdapter
-import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendFragment
 
 class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
     override val layoutResourceId: Int get() = R.layout.fragment_cart_select
@@ -52,19 +50,9 @@ class CartSelectFragment : BaseFragment<FragmentCartSelectBinding>() {
         viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->
             when (navigateAction) {
                 is CartSelectNavigateAction.NavigateToRecommend -> {
-                    val bundle = Bundle()
-
-                    bundle.putParcelableArray(
-                        OrderRecommendFragment.PUT_EXTRA_CART_IDS_KEY,
-                        navigateAction.orderCartProducts.toTypedArray(),
+                    (activity as? ShoppingCartNavigateAction)?.navigateToOrderRecommend(
+                        navigateAction.orderCartProducts,
                     )
-
-                    val orderRecommendFragment = OrderRecommendFragment()
-                    orderRecommendFragment.arguments = bundle
-                    parentFragmentManager.commit {
-                        replace(R.id.fragment_container_view_main, orderRecommendFragment)
-                        addToBackStack(OrderRecommendFragment.TAG)
-                    }
                 }
             }
         }

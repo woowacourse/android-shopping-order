@@ -1,9 +1,11 @@
 package woowacourse.shopping.remote.model.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SortResponse(
     val sorted: Boolean,
-    @SerializedName("unsorted") val unSorted: Boolean,
+    @SerialName("unsorted") val unSorted: Boolean,
     val empty: Boolean,
 )

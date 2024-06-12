@@ -3,9 +3,9 @@ package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.domain.mapper.toPresentation
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.base.BaseViewModel
@@ -13,13 +13,12 @@ import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.Event
 import woowacourse.shopping.presentation.base.emit
 import woowacourse.shopping.presentation.common.ProductCountHandler
+import woowacourse.shopping.presentation.model.CartsWrapper
 import woowacourse.shopping.presentation.model.ProductItemId
-import kotlin.concurrent.thread
 
 class OrderRecommendViewModel(
     private val productHistoryRepository: ProductHistoryRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
-    private val orderRepository: OrderRepository,
 ) : BaseViewModel(), ProductCountHandler {
     private val _uiState: MutableLiveData<OrderRecommendUiState> =
         MutableLiveData(OrderRecommendUiState())
@@ -36,7 +35,7 @@ class OrderRecommendViewModel(
     }
 
     private fun recommendProductLoad() {
-        thread {
+        launch {
             productHistoryRepository.getRecommendedProducts(10).onSuccess { recommendProducts ->
                 hideError()
                 val state = uiState.value ?: return@onSuccess
@@ -46,36 +45,24 @@ class OrderRecommendViewModel(
     }
 
     fun load(orderCarts: List<Cart>) {
-        _uiState.value?.let { state ->
-            _uiState.value = state.copy(orderCarts = orderCarts)
-        }
+        val state = uiState.value ?: return
+        _uiState.value = state.copy(orderCarts = orderCarts)
     }
 
-    override fun retry() {}
+    override fun retry() {
+        recommendProductLoad()
+    }
 
     fun order() {
-        thread {
-            val state = uiState.value ?: return@thread
-            orderRepository.insertOrder(state.orderCarts.map { it.id }).onSuccess {
-                hideError()
-                _navigateAction.emit(OrderRecommendNavigateAction.NavigateToProductList)
-            }.onFailure { e ->
-                showError(e)
-            }
-        }
+        val state = uiState.value ?: return
+        _navigateAction.emit(OrderRecommendNavigateAction.NavigateToPayment(CartsWrapper(state.orderCarts.map { it.toPresentation() })))
     }
 
-    override fun plusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun plusProductQuantity(productId: Long) {
         updateProductQuantity(productId, increment = true)
     }
 
-    override fun minusProductQuantity(
-        productId: Long,
-        position: Int,
-    ) {
+    override fun minusProductQuantity(productId: Long) {
         updateProductQuantity(productId, increment = false)
     }
 
@@ -83,19 +70,18 @@ class OrderRecommendViewModel(
         productId: Long,
         increment: Boolean,
     ) {
+        val recommendProducts = calculateUpdateProducts(productId, increment)
         val state = uiState.value ?: return
-
-        val recommendProducts =
-            calculateUpdateProducts(state.recommendProducts, productId, increment)
         _uiState.postValue(state.copy(recommendProducts = recommendProducts))
     }
 
     private fun calculateUpdateProducts(
-        products: List<Product>,
         productId: Long,
         increment: Boolean,
     ): List<Product> {
-        return products.map { product ->
+        val state = uiState.value ?: return emptyList()
+
+        return state.recommendProducts.map { product ->
             if (product.id == productId) {
                 val updatedQuantity = calculateUpdateQuantity(product.quantity, increment)
                 updateCart(product, updatedQuantity)
@@ -134,7 +120,7 @@ class OrderRecommendViewModel(
         product: Product,
         quantity: Int,
     ) {
-        thread {
+        launch {
             shoppingCartRepository.postCartItem(
                 productId = product.id,
                 quantity = quantity,
@@ -154,7 +140,7 @@ class OrderRecommendViewModel(
         productId: Long,
         cartId: Int,
     ) {
-        thread {
+        launch {
             shoppingCartRepository.deleteCartItem(
                 cartId = cartId,
             ).onSuccess {
@@ -174,7 +160,7 @@ class OrderRecommendViewModel(
         cartId: Int,
         quantity: Int,
     ) {
-        thread {
+        launch {
             shoppingCartRepository.patchCartItem(
                 cartId = cartId,
                 quantity = quantity,
@@ -198,13 +184,11 @@ class OrderRecommendViewModel(
         fun factory(
             productHistoryRepository: ProductHistoryRepository,
             shoppingCartRepository: ShoppingCartRepository,
-            orderRepository: OrderRepository,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
                 OrderRecommendViewModel(
                     productHistoryRepository,
                     shoppingCartRepository,
-                    orderRepository,
                 )
             }
         }

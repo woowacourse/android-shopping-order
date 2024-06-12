@@ -4,9 +4,9 @@ import woowacourse.shopping.data.model.remote.ProductDto
 import woowacourse.shopping.data.model.remote.ProductsDto
 
 interface ProductDataSource {
-    fun findProductById(id: Long): Result<ProductDto>
+    suspend fun findProductById(id: Long): Result<ProductDto>
 
-    fun getPagingProduct(
+    suspend fun getPagingProduct(
         page: Int,
         pageSize: Int,
     ): Result<ProductsDto>
