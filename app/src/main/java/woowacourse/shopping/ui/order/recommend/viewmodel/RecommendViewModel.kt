@@ -130,6 +130,24 @@ class RecommendViewModel(
         }
     }
 
+    private fun updateRecommendState(
+        recommendProductViewItems: List<ProductViewItem>,
+        updatedCartViewItem: CartViewItem,
+        updateQuantity: Int
+    ) {
+        val recommendPosition =
+            recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
+                recommendProductViewItem.product.productId == updatedCartViewItem.cartItem.product.productId
+            }
+        val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
+        newRecommendProductViewItems[recommendPosition] =
+            ProductViewItem(
+                updatedCartViewItem.cartItem.product,
+                updatedCartViewItem.cartItem.quantity + updateQuantity,
+            )
+        _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+    }
+
     override fun onProductClick(productId: Int) {
         _recommendNavigationActions.value =
             Event(RecommendNavigationActions.NavigateToDetail(productId))
@@ -143,11 +161,6 @@ class RecommendViewModel(
                     .onSuccess { cartItemId ->
                         var updatedCartViewItem = CartViewItem(CartItem(cartItemId, 1, product))
                         updatedCartViewItem = updatedCartViewItem.check()
-
-                        val newCatViewItems =
-                            orderViewModel.cartViewItems.value?.toMutableList() ?: return@onSuccess
-                        newCatViewItems.add(updatedCartViewItem)
-                        orderViewModel.updateCartViewItems(newCatViewItems)
 
                         val newCartViewItems =
                             orderViewModel.cartViewItems.value?.toMutableList() ?: return@onSuccess
@@ -176,40 +189,18 @@ class RecommendViewModel(
 
         val recommendState = recommendUiState.value
         if (recommendState is UiState.Success) {
-            val recommendProductViewItems = recommendState.data
-            val recommendPosition =
-                recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
-                    recommendProductViewItem.product.productId == updatedCartViewItem.cartItem.product.productId
-                }
-            val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
-            newRecommendProductViewItems[recommendPosition] =
-                ProductViewItem(
-                    updatedCartViewItem.cartItem.product,
-                    updatedCartViewItem.cartItem.quantity + 1,
-                )
-            _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+            updateRecommendState(recommendState.data, updatedCartViewItem, 1)
         }
 
         orderViewModel.onQuantityPlusButtonClick(productId)
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
-        val updatedCartItem = orderViewModel.getCartViewItemByProductId(productId) ?: return
+        val updatedCartViewItem = orderViewModel.getCartViewItemByProductId(productId) ?: return
 
         val recommendState = recommendUiState.value
-        if (updatedCartItem.cartItem.quantity >= 1 && recommendState is UiState.Success) {
-            val recommendProductViewItems = recommendState.data
-            val recommendPosition =
-                recommendProductViewItems.indexOfFirst { recommendProductViewItem ->
-                    recommendProductViewItem.product.productId == updatedCartItem.cartItem.product.productId
-                }
-            val newRecommendProductViewItems = recommendProductViewItems.toMutableList()
-            newRecommendProductViewItems[recommendPosition] =
-                ProductViewItem(
-                    updatedCartItem.cartItem.product,
-                    updatedCartItem.cartItem.quantity - 1,
-                )
-            _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+        if (updatedCartViewItem.cartItem.quantity >= 1 && recommendState is UiState.Success) {
+            updateRecommendState(recommendState.data, updatedCartViewItem, -1)
         }
 
         orderViewModel.onQuantityMinusButtonClick(productId)
