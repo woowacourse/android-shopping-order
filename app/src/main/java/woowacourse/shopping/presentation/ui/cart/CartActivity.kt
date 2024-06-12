@@ -30,8 +30,12 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        initData()
         initObserver()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initData()
     }
 
     private fun initData() {
