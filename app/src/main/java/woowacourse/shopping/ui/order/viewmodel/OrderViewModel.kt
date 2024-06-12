@@ -70,17 +70,17 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
     }
 
     fun getCartViewItemByProductId(productId: Int): CartViewItem? {
-        return _cartViewItems.value?.firstOrNull { cartViewItem ->
+        return cartViewItems.value?.firstOrNull { cartViewItem ->
             cartViewItem.cartItem.product.productId == productId
         }
     }
 
     private fun getCartViewItemByCartItemId(cartItemId: Int): CartViewItem? {
-        return _cartViewItems.value?.firstOrNull { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
+        return cartViewItems.value?.firstOrNull { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
     }
 
     private fun getCartViewItemPosition(cartItemId: Int): Int? {
-        return _cartViewItems.value?.indexOfFirst { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
+        return cartViewItems.value?.indexOfFirst { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
     }
 
     fun onCheckBoxClick(cartItemId: Int) {

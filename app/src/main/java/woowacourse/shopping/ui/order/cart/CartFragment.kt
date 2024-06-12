@@ -108,7 +108,7 @@ class CartFragment : Fragment() {
     }
 
     private fun showData(cartViewItems: List<ShoppingCartViewItem>) {
-        adapter.submitCartViewItems(cartViewItems.toList())
+        adapter.submitCartViewItems(cartViewItems)
     }
 
     private fun showError(errorMessage: String) {

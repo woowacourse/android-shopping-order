@@ -156,8 +156,6 @@ class RecommendViewModel(
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
-        orderViewModel.onQuantityPlusButtonClick(productId)
-
         val updatedCartViewItem = orderViewModel.getCartViewItemByProductId(productId) ?: return
 
         val recommendState = recommendUiState.value
@@ -171,16 +169,16 @@ class RecommendViewModel(
             newRecommendProductViewItems[recommendPosition] =
                 ProductViewItem(
                     updatedCartViewItem.cartItem.product,
-                    updatedCartViewItem.cartItem.quantity,
+                    updatedCartViewItem.cartItem.quantity + 1,
                 )
             _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
         }
+
+        orderViewModel.onQuantityPlusButtonClick(productId)
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
         val updatedCartItem = orderViewModel.getCartViewItemByProductId(productId) ?: return
-
-        orderViewModel.onQuantityMinusButtonClick(productId)
 
         val recommendState = recommendUiState.value
         if (updatedCartItem.cartItem.quantity >= 1 && recommendState is UiState.Success) {
@@ -197,5 +195,7 @@ class RecommendViewModel(
                 )
             _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
         }
+
+        orderViewModel.onQuantityMinusButtonClick(productId)
     }
 }

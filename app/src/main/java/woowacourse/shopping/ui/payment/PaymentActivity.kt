@@ -99,8 +99,8 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-    private fun showData(data: List<CouponState>) {
-        adapter.submitList(data.toList())
+    private fun showData(couponStates: List<CouponState>) {
+        adapter.submitList(couponStates)
     }
 
     private fun showError(errorMessage: String) {

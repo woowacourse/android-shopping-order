@@ -98,8 +98,8 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showData(data: List<HomeViewItem>) {
-        productAdapter.submitProductViewItems(data.toList(), viewModel.canLoadMore.value ?: false)
+    private fun showData(homeViewItems: List<HomeViewItem>) {
+        productAdapter.submitProductViewItems(homeViewItems, viewModel.canLoadMore.value ?: false)
     }
 
     private fun showError(errorMessage: String) {

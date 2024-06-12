@@ -17,7 +17,7 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
-import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
+import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
 import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.NavigateToDetail
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
@@ -101,7 +101,7 @@ class RecommendFragment : Fragment() {
         }
     }
 
-    private fun showData(productViewItems: List<HomeViewItem.ProductViewItem>) {
+    private fun showData(productViewItems: List<ProductViewItem>) {
         adapter.submitList(productViewItems)
     }
 
