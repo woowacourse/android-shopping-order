@@ -6,13 +6,12 @@ import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.request.RequestOrdersPostDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
+import woowacourse.shopping.data.exception.ShoppingError
 import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.cart.CartWithProduct
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.product.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.exception.ShoppingError
-import woowacourse.shopping.exception.ShoppingException
 
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
@@ -21,13 +20,13 @@ class CartRepositoryImpl(
     override suspend fun getCartItemByProductId(productId: Long): Result<CartWithProduct> =
         getAllCartItemsWithProduct().mapCatching { cartWithProducts ->
             cartWithProducts.firstOrNull { cartWithProduct -> cartWithProduct.product.id == productId }
-                ?: throw ShoppingException(ShoppingError.CartNotFound)
+                ?: throw ShoppingError.CartNotFound
         }
 
     override suspend fun getCartItemByCartId(cartId: Long): Result<CartWithProduct> =
         getAllCartItemsWithProduct().mapCatching { cartWithProducts ->
             cartWithProducts.firstOrNull { cartWithProduct -> cartWithProduct.id == cartId }
-                ?: throw ShoppingException(ShoppingError.CartNotFound)
+                ?: throw ShoppingError.CartNotFound
         }
 
     override suspend fun getAllCartItems(): Result<List<Cart>> {

@@ -14,5 +14,5 @@ abstract class BaseViewModel : ViewModel() {
             _error.setValue(throwable)
         }
 
-    fun setError(throwable: Throwable) = _error.setValue(throwable)
+    fun setError(error: Throwable) = _error.setValue(error)
 }

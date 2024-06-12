@@ -15,7 +15,6 @@ import woowacourse.shopping.data.remote.service.NetworkModule
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.payment.adapter.CouponAdapter
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModel
 import woowacourse.shopping.ui.payment.viewmodel.PaymentViewModelFactory
@@ -93,8 +92,7 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun observeError() {
         viewModel.error.observe(this) {
-            val errMsg = handleError(it)
-            toast = Toast.makeText(this, errMsg, Toast.LENGTH_SHORT)
+            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
             toast?.show()
         }
     }

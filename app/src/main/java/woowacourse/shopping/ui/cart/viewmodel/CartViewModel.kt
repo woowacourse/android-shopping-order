@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.exception.ShoppingError
 import woowacourse.shopping.data.model.RecentProduct
 import woowacourse.shopping.domain.model.cart.CartWithProduct
 import woowacourse.shopping.domain.model.product.Product
@@ -13,8 +14,6 @@ import woowacourse.shopping.domain.model.product.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.exception.ShoppingError
-import woowacourse.shopping.exception.ShoppingException
 import woowacourse.shopping.ui.base.BaseViewModel
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartItemsUiState
@@ -104,7 +103,7 @@ class CartViewModel(
                 removeState = true
             }.onFailure {
                 removeState = false
-                setError(it)
+                setError(it as ShoppingError)
             }
         }
     }
@@ -140,7 +139,7 @@ class CartViewModel(
             }
             setRecommendProducts(product)
         }.onFailure {
-            setError(it)
+            setError(it as ShoppingError)
         }
     }
 
@@ -185,7 +184,7 @@ class CartViewModel(
                     isLoading = false,
                 )
         }.onFailure {
-            setError(it)
+            setError(it as ShoppingError)
         }
     }
 
@@ -283,6 +282,6 @@ class CartViewModel(
 
     private fun findCartIdByProductId(productId: Long): Long {
         return cart.value?.cartItems?.firstOrNull { it.productId == productId }?.id
-            ?: throw ShoppingException(ShoppingError.CartNotFound)
+            ?: throw IllegalStateException()
     }
 }

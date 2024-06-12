@@ -5,9 +5,8 @@ import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
 import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
 import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
+import woowacourse.shopping.data.exception.ShoppingError
 import woowacourse.shopping.data.remote.service.CartItemService
-import woowacourse.shopping.exception.ShoppingError
-import woowacourse.shopping.exception.ShoppingException
 
 class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemoteDataSource {
     override suspend fun getCartItems(
@@ -15,9 +14,8 @@ class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemot
         size: Int,
     ): Result<ResponseCartItemsGetDto> =
         runCatching {
-            service.getCartItems(page = page, size = size).body() ?: throw ShoppingException(
-                ShoppingError.CartNotFound,
-            )
+            service.getCartItems(page = page, size = size).body()
+                ?: throw ShoppingError.CartNotFound
         }
 
     override suspend fun postCartItems(request: RequestCartItemPostDto): Result<Unit> =
@@ -41,6 +39,6 @@ class CartRemoteDataSourceImpl(private val service: CartItemService) : CartRemot
     override suspend fun getCartItemCounts(): Result<ResponseCartItemCountsGetDto> =
         runCatching {
             service.getCartItemCounts().body()
-                ?: throw ShoppingException(ShoppingError.CartItemCountConfirmError)
+                ?: throw ShoppingError.CartItemCountConfirmError
         }
 }

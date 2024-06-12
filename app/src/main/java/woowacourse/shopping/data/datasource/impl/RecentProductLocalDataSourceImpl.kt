@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.datasource.impl
 
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
+import woowacourse.shopping.data.exception.ShoppingError
 import woowacourse.shopping.data.local.db.recentproduct.RecentProductDao
 import woowacourse.shopping.data.model.RecentProduct
-import woowacourse.shopping.exception.ShoppingError
-import woowacourse.shopping.exception.ShoppingException
 
 class RecentProductLocalDataSourceImpl(private val dao: RecentProductDao) :
     RecentProductLocalDataSource {
@@ -16,7 +15,7 @@ class RecentProductLocalDataSourceImpl(private val dao: RecentProductDao) :
     override suspend fun findMostRecentProduct(): Result<RecentProduct> =
         runCatching {
             dao.findMostRecentProduct()
-                ?: throw ShoppingException(ShoppingError.RecentProductNotFound)
+                ?: throw ShoppingError.RecentProductNotFound
         }
 
     override suspend fun findAll(): Result<List<RecentProduct>> =
