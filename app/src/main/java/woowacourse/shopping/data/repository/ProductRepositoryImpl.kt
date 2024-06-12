@@ -31,8 +31,13 @@ class ProductRepositoryImpl(
 
     override suspend fun getProductById(id: Int): Result<OrderableProduct> {
         return runCatching {
-            val cartItem = getEntireCartItems().firstOrNull { it.productId == id }
-            remoteProductDataSource.getProductById(id).toOrderableProduct(cartItem)
+            val cartItem =
+                getEntireCartItems().firstOrNull {
+                    it.productId == id
+                }
+            remoteProductDataSource
+                .getProductById(id)
+                .toOrderableProduct(cartItem)
         }
     }
 
@@ -49,7 +54,9 @@ class ProductRepositoryImpl(
                         page = page++,
                         size = RECOMMEND_PAGE_SIZE,
                         sort = SORT_CART_ITEMS,
-                    ).toProductDomain(cartData).orderableProducts.filter {
+                    ).toProductDomain(
+                        cartData,
+                    ).orderableProducts.filter {
                         it.cartData == null
                     }
                 products.forEach {
@@ -70,7 +77,9 @@ class ProductRepositoryImpl(
             PAGE_CART_ITEMS,
             totalCartQuantity,
             SORT_CART_ITEMS,
-        ).cartItems.map(CartItem::toCartData)
+        )
+            .cartItems
+            .map(CartItem::toCartData)
     }
 
     companion object {

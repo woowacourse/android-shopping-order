@@ -21,40 +21,38 @@ class CartRepositoryImpl(
         sort: String,
     ): Result<CartDomain> {
         return runCatching {
-            remoteCartDataSource.getCartItems(page, size, sort).toCartDomain()
+            remoteCartDataSource
+                .getCartItems(page, size, sort)
+                .toCartDomain()
         }
     }
 
     override suspend fun getEntireCartData(): Result<List<CartData>> {
         return runCatching {
             val totalCartQuantity = remoteCartDataSource.getCartTotalQuantity().quantity
-            remoteCartDataSource.getCartItems(
-                PAGE_CART_ITEMS,
-                totalCartQuantity,
-                SORT_CART_ITEMS,
-            ).cartItems.map(CartItem::toCartData)
+            remoteCartDataSource
+                .getCartItems(PAGE_CART_ITEMS, totalCartQuantity, SORT_CART_ITEMS)
+                .cartItems
+                .map(CartItem::toCartData)
         }
     }
 
     override suspend fun getEntireCartItems(): Result<List<CartItemDomain>> {
         return runCatching {
             val totalCartQuantity = remoteCartDataSource.getCartTotalQuantity().quantity
-            remoteCartDataSource.getCartItems(
-                PAGE_CART_ITEMS,
-                totalCartQuantity,
-                SORT_CART_ITEMS,
-            ).cartItems.map(CartItem::toCartItemDomain)
+            remoteCartDataSource
+                .getCartItems(PAGE_CART_ITEMS, totalCartQuantity, SORT_CART_ITEMS)
+                .cartItems
+                .map(CartItem::toCartItemDomain)
         }
     }
 
     override suspend fun getEntireCartItemsForCart(): Result<CartDomain> {
         return runCatching {
             val totalCartQuantity = remoteCartDataSource.getCartTotalQuantity().quantity
-            remoteCartDataSource.getCartItems(
-                PAGE_CART_ITEMS,
-                totalCartQuantity,
-                SORT_CART_ITEMS,
-            ).toCartDomain()
+            remoteCartDataSource
+                .getCartItems(PAGE_CART_ITEMS, totalCartQuantity, SORT_CART_ITEMS)
+                .toCartDomain()
         }
     }
 

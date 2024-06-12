@@ -24,8 +24,7 @@ class OrderViewModel(
     val orderUiState: LiveData<OrderUiState>
         get() = _orderUiState
 
-    private val _orderUiEvent: MutableLiveData<Event<OrderUiEvent>> =
-        MutableLiveData()
+    private val _orderUiEvent: MutableLiveData<Event<OrderUiEvent>> = MutableLiveData()
     val orderUiEvent: LiveData<Event<OrderUiEvent>>
         get() = _orderUiEvent
 

@@ -11,7 +11,9 @@ class CouponRepositoryImpl(
 ) : CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> {
         return runCatching {
-            couponRemoteDataSource.getCoupons().map(CouponResponseItem::toCoupon)
+            couponRemoteDataSource
+                .getCoupons()
+                .map(CouponResponseItem::toCoupon)
         }
     }
 }
