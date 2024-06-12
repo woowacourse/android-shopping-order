@@ -5,18 +5,14 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.domain.model.coupon.Bogo
 import woowacourse.shopping.domain.model.coupon.CouponState
 import woowacourse.shopping.domain.model.coupon.Fixed5000
 import woowacourse.shopping.domain.model.coupon.FreeShipping
 import woowacourse.shopping.domain.model.coupon.MiracleSale
-import woowacourse.shopping.presentation.ui.shopping.adapter.RecentProductAdapter
-import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingAdapter
+import woowacourse.shopping.presentation.event.Event
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,29 +25,18 @@ fun loadImage(
     if (!url.isNullOrEmpty()) {
         Glide.with(view.context)
             .load(url)
-            .placeholder(R.drawable.ic_launcher_background)
-            .error(R.drawable.ic_launcher_background)
             .into(view)
     }
 }
 
-@BindingAdapter("app:shoppingProducts")
-fun setShoppingProductItems(
-    recyclerView: RecyclerView,
-    shoppingProducts: List<ShoppingProduct>?,
+@BindingAdapter("app:loadingVisibility")
+fun setLoadingVisibility(
+    view: View,
+    isLoading: Event<Boolean>,
 ) {
-    shoppingProducts?.let {
-        (recyclerView.adapter as? ShoppingAdapter)?.loadShoppingProductData(it)
-    }
-}
-
-@BindingAdapter("app:recentProducts")
-fun setRecentProductItems(
-    recyclerView: RecyclerView,
-    recentProducts: List<RecentProduct>?,
-) {
-    recentProducts?.let {
-        (recyclerView.adapter as? RecentProductAdapter)?.loadRecentProductData(it)
+    val isVisible = isLoading.getContentIfNotHandled()
+    if (isVisible != null) {
+        view.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 }
 
@@ -120,7 +105,8 @@ fun setOrderWithQuantityText(
     view: TextView,
     totalQuantity: Int?,
 ) {
-    view.text = view.context.getString(R.string.make_order_with_total_quantity, totalQuantity ?: 0)
+    view.text =
+        view.context.getString(R.string.make_order_with_total_quantity, totalQuantity ?: 0)
 }
 
 @BindingAdapter("app:couponExpirationDate")

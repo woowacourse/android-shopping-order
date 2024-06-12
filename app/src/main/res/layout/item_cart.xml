@@ -23,16 +23,17 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:background="@drawable/shopping_cart_item_gridview"
-        android:onClick="@{() -> eventHandler.navigateToDetail(cartItem.productId)}">
+        android:onClick="@{() -> eventHandler.onItemClicked(cartItem.id)}">
 
         <CheckBox
-            android:onClick="@{() -> eventHandler.onCheckItem(cartItem.id)}"
-            android:checked="@{cartItem.isChecked}"
             android:id="@+id/checkBox"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
+            android:checked="@{cartItem.isChecked}"
+            android:focusable="false"
+            android:clickable="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
