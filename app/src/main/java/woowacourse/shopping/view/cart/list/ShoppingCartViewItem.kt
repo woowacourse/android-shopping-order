@@ -9,7 +9,7 @@ sealed class ShoppingCartViewItem(open val viewType: Int) {
         override val viewType: Int = CART_VIEW_TYPE,
     ) : ShoppingCartViewItem(viewType)
 
-    data class CartPlaceHolderViewItem(override val viewType: Int = CART_PLACEHOLDER_VIEW_TYPE) :
+    class CartPlaceHolderViewItem(override val viewType: Int = CART_PLACEHOLDER_VIEW_TYPE) :
         ShoppingCartViewItem(viewType)
 
     companion object {

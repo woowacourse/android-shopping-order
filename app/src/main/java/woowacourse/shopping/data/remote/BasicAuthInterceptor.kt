@@ -4,6 +4,7 @@ import android.util.Base64
 import okhttp3.Interceptor
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.local.preferences.ShoppingPreferencesManager
+
 class BasicAuthInterceptor(
     private val shoppingPreferencesManager: ShoppingPreferencesManager
 ) : Interceptor {

@@ -3,7 +3,7 @@ package woowacourse.shopping.view.order
 sealed class CouponViewItem(
     open val viewType: Int,
 ) {
-    data class Loading(override val viewType: Int = VIEW_TYPE_LOADING) : CouponViewItem(viewType)
+    class Loading(override val viewType: Int = VIEW_TYPE_LOADING) : CouponViewItem(viewType)
 
     data class CouponItem(
         val coupon: woowacourse.shopping.domain.model.Coupon,

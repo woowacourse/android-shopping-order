@@ -10,7 +10,7 @@ sealed class HomeViewItem(open val viewType: Int) {
         fun isQuantityControlVisible(): Boolean = (orderableProduct.cartData?.quantity ?: 0) >= 1
     }
 
-    data class ProductPlaceHolderViewItem(
+    class ProductPlaceHolderViewItem(
         override val viewType: Int = PRODUCT_PLACEHOLDER_VIEW_TYPE,
     ) : HomeViewItem(viewType)
 
