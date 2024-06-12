@@ -10,7 +10,6 @@ data class CartUiModel(
     val quantity: Quantity,
     val imageUrl: String,
     val isChecked: Boolean = false,
-    val isLoading: Boolean = true,
 ) {
     val totalPrice = price * quantity.value
 }
