@@ -3,13 +3,13 @@ package woowacourse.shopping.domain.model
 import java.time.LocalDate
 import java.time.LocalTime
 
-sealed class Coupon(
-    open val id: Int,
-    open val code: String,
-    open val description: String,
-    open val expirationDate: LocalDate,
-    open val discountType: String,
-) {
+sealed interface Coupon {
+    val id: Int
+    val code: String
+    val description: String
+    val expirationDate: LocalDate
+    val discountType: String
+
     data class Fixed(
         override val id: Int,
         override val code: String,
@@ -18,7 +18,7 @@ sealed class Coupon(
         override val discountType: String,
         val discount: Int,
         val minimumAmount: Int,
-    ) : Coupon(id, code, description, expirationDate, discountType)
+    ) : Coupon
 
     data class BuyXGetY(
         override val id: Int,
@@ -28,7 +28,7 @@ sealed class Coupon(
         override val discountType: String,
         val buyQuantity: Int,
         val getQuantity: Int,
-    ) : Coupon(id, code, description, expirationDate, discountType)
+    ) : Coupon
 
     data class FreeShipping(
         override val id: Int,
@@ -37,7 +37,7 @@ sealed class Coupon(
         override val expirationDate: LocalDate,
         override val discountType: String,
         val minimumAmount: Int,
-    ) : Coupon(id, code, description, expirationDate, discountType)
+    ) : Coupon
 
     data class MiracleSale(
         override val id: Int,
@@ -48,7 +48,7 @@ sealed class Coupon(
         val discount: Int,
         val startTime: LocalTime,
         val endTime: LocalTime,
-    ) : Coupon(id, code, description, expirationDate, discountType)
+    ) : Coupon
 
     companion object {
         const val DISCOUNT_TYPE_FIXED = "fixed"
