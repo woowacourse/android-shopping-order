@@ -41,7 +41,7 @@ class ProductRepositoryImpl(
         }
     }
 
-    override suspend fun getRecommendedProducts(): Result<List<OrderableProduct>> {
+    override suspend fun getRecommendedProducts(requiredSize: Int): Result<List<OrderableProduct>> {
         return runCatching {
             val lastlyViewedProduct = recentProductDao.findMostRecentProduct()
             val cartData = getEntireCartItems()
@@ -52,7 +52,7 @@ class ProductRepositoryImpl(
                     remoteProductDataSource.getProducts(
                         category = lastlyViewedProduct?.category,
                         page = page++,
-                        size = RECOMMEND_PAGE_SIZE,
+                        size = requiredSize,
                         sort = SORT_CART_ITEMS,
                     ).toProductDomain(
                         cartData,
@@ -60,13 +60,13 @@ class ProductRepositoryImpl(
                         it.cartData == null
                     }
                 products.forEach {
-                    if (orderableProducts.size < 10) {
+                    if (orderableProducts.size < requiredSize) {
                         orderableProducts.add(it)
                     } else {
                         return@forEach
                     }
                 }
-            } while (orderableProducts.size >= 10 || products.isEmpty())
+            } while (orderableProducts.size >= requiredSize || products.isEmpty())
             orderableProducts
         }
     }
@@ -84,7 +84,6 @@ class ProductRepositoryImpl(
 
     companion object {
         private const val PAGE_CART_ITEMS = 0
-        private const val RECOMMEND_PAGE_SIZE = 10
         private const val SORT_CART_ITEMS = "asc"
     }
 }

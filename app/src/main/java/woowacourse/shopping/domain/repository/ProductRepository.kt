@@ -13,5 +13,5 @@ interface ProductRepository {
 
     suspend fun getProductById(id: Int): Result<OrderableProduct>
 
-    suspend fun getRecommendedProducts(): Result<List<OrderableProduct>>
+    suspend fun getRecommendedProducts(requiredSize: Int): Result<List<OrderableProduct>>
 }

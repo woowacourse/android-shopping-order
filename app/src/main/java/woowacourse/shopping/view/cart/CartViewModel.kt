@@ -198,7 +198,7 @@ class CartViewModel(
 
     private fun loadRecommendedItems() {
         viewModelScope.launch {
-            val recommendedProducts = productRepository.getRecommendedProducts().getOrNull()
+            val recommendedProducts = productRepository.getRecommendedProducts(requiredSize = 10).getOrNull()
             val uiState = recommendedListUiState.value
             if (recommendedProducts == null || uiState == null) {
                 return@launch

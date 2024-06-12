@@ -38,10 +38,9 @@ class FakeProductRepository(
         }
     }
 
-    override suspend fun getRecommendedProducts(): Result<List<OrderableProduct>> {
+    override suspend fun getRecommendedProducts(requiredSize: Int): Result<List<OrderableProduct>> {
         return runCatching {
             val lastlyViewedProduct = recentProductRepository.findMostRecentProduct()
-            val cartData = getEntireCartItems()
             val orderableProducts = mutableListOf<OrderableProduct>()
             var page = 0
             do {
@@ -49,19 +48,19 @@ class FakeProductRepository(
                     getProducts(
                         category = lastlyViewedProduct?.category,
                         page = page++,
-                        size = RECOMMEND_PAGE_SIZE,
+                        size = requiredSize,
                         sort = SORT_CART_ITEMS,
                     ).getOrThrow().orderableProducts.filter {
                         it.cartData == null
                     }
                 products.forEach {
-                    if (orderableProducts.size < 10) {
+                    if (orderableProducts.size < requiredSize) {
                         orderableProducts.add(it)
                     } else {
                         return@forEach
                     }
                 }
-            } while (orderableProducts.size >= 10 || products.isEmpty())
+            } while (orderableProducts.size >= requiredSize || products.isEmpty())
             orderableProducts
         }
     }
@@ -79,7 +78,6 @@ class FakeProductRepository(
 
     companion object {
         private const val PAGE_CART_ITEMS = 0
-        private const val RECOMMEND_PAGE_SIZE = 10
         private const val SORT_CART_ITEMS = "asc"
     }
 }
