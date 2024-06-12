@@ -21,7 +21,7 @@ class RepositoryImpl(
 ) : Repository {
     val productPagingSource = ProductPagingSource(remoteDataSource)
 
-    override suspend fun getProductsByPaging(): Result<List<CartProduct>?> {
+    override suspend fun getProductsByPaging(): Result<List<CartProduct>> {
         val data = productPagingSource.load()
         return when (data) {
             is LoadResult.Page -> {
@@ -37,7 +37,7 @@ class RepositoryImpl(
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>?> {
+    ): Result<List<CartProduct>> {
         return remoteDataSource.getCartItems(page, size)
             .mapCatching {
                 it.map { it.toDomain() }
@@ -97,7 +97,7 @@ class RepositoryImpl(
             .recoverCatching { throw it }
     }
 
-    override suspend fun getCuration(): Result<List<CartProduct>?> =
+    override suspend fun getCuration(): Result<List<CartProduct>> =
         runCatching {
             localDataSource.findOne()?.toDomain()?.let {
                 val productResponse = remoteDataSource.getProducts(it.category, 0, 10)

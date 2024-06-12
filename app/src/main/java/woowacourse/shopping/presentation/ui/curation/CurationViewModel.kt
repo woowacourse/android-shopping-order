@@ -45,13 +45,9 @@ class CurationViewModel(
     private suspend fun orderProducts() {
         repository.getCartItems(0, 1000)
             .onSuccess {
-                if (it == null) {
-                    _errorHandler.value = EventState(LOAD_ERROR)
-                } else {
-                    val filteredCartItems =
-                        it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
-                    _orderProducts.value = UiState.Success(filteredCartItems)
-                }
+                val filteredCartItems =
+                    it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
+                _orderProducts.value = UiState.Success(filteredCartItems)
             }
             .onFailure {
                 _errorHandler.value = EventState(LOAD_ERROR)

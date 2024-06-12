@@ -45,18 +45,14 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
         viewModelScope.launch {
             repository.getCartItems(offSet, 1000)
                 .onSuccess {
-                    if (it == null) {
-                        _errorHandler.value = EventState(CART_LOAD_ERROR)
-                    } else {
-                        _carts.value =
-                            UiState.Success(
-                                it.map { cartProduct ->
-                                    CartProductUiModel(
-                                        cartProduct,
-                                    )
-                                },
-                            )
-                    }
+                    _carts.value =
+                        UiState.Success(
+                            it.map { cartProduct ->
+                                CartProductUiModel(
+                                    cartProduct,
+                                )
+                            },
+                        )
                 }
                 .onFailure {
                     _errorHandler.value = EventState(CART_LOAD_ERROR)

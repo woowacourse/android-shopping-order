@@ -71,15 +71,11 @@ class ShoppingViewModel(private val repository: Repository) :
     fun loadProductByOffset() =
         viewModelScope.launch {
             repository.getProductsByPaging().onSuccess { it ->
-                if (it == null) {
-                    _errorHandler.value = EventState(LOAD_ERROR)
+                if (_products.value is UiState.Loading) {
+                    _products.value = UiState.Success(it)
                 } else {
-                    if (_products.value is UiState.Loading) {
-                        _products.value = UiState.Success(it)
-                    } else {
-                        _products.value =
-                            UiState.Success((_products.value as UiState.Success).data + it)
-                    }
+                    _products.value =
+                        UiState.Success((_products.value as UiState.Success).data + it)
                 }
             }.onFailure { _errorHandler.value = EventState(LOAD_ERROR) }
         }
@@ -88,11 +84,7 @@ class ShoppingViewModel(private val repository: Repository) :
         viewModelScope.launch {
             repository.getCartItems(0, 2000)
                 .onSuccess {
-                    if (it == null) {
-                        _errorHandler.value = EventState(LOAD_ERROR)
-                    } else {
-                        _carts.value = UiState.Success(it)
-                    }
+                    _carts.value = UiState.Success(it)
                 }
                 .onFailure { _errorHandler.value = EventState(CartViewModel.CART_LOAD_ERROR) }
         }
