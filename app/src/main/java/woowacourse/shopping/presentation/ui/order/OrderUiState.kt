@@ -13,7 +13,8 @@ data class OrderUiState(
     val couponDiscountPrice
         get() = couponsState.firstOrNull { it.coupon.checked }?.calculateDiscount(totalPrice) ?: 0
 
-    val paymentTotalPrice get() = orderCarts.sumOf { it.totalPrice } + DELIVERY_FEE_AMOUNT - couponDiscountPrice
+    val paymentTotalPrice
+        get() = orderCarts.sumOf { it.totalPrice } + DELIVERY_FEE_AMOUNT - couponDiscountPrice
 
     companion object {
         const val DELIVERY_FEE_AMOUNT = 3_000L

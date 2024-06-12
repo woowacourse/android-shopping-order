@@ -6,12 +6,24 @@
     <data>
 
         <variable
+            name="orderClickListener"
+            type="woowacourse.shopping.presentation.ui.order.OrderClickListener" />
+
+        <variable
             name="eventHandler"
             type="woowacourse.shopping.presentation.ui.order.OrderEventHandler" />
 
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.ui.order.OrderViewModel" />
+
+        <variable
+            name="uiState"
+            type= "woowacourse.shopping.presentation.ui.order.OrderUiState"/>
+
+        <variable
+            name="number"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,6 +40,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:onClick="@{() -> orderClickListener.onBackClick()}"
                 android:id="@+id/iv_payment_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,7 +169,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="21dp"
                     android:layout_marginEnd="18dp"
-                    android:text="@{@string/price_format(viewModel.totalPrice)}"
+                    app:price="@{uiState.totalPrice}"
                     android:textColor="@color/black"
                     android:textSize="18dp"
                     android:textStyle="bold"
@@ -170,7 +183,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
-                    android:text="0"
+                    app:price="@{uiState.couponDiscountPrice}"
                     android:textColor="@color/black"
                     android:textSize="18dp"
                     android:textStyle="bold"
@@ -184,8 +197,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
-                    android:text="0"
                     android:textColor="@color/black"
+                    app:price="@{uiState.DELIVERY_FEE_AMOUNT}"
                     android:textSize="18dp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -221,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="21dp"
                     android:layout_marginEnd="18dp"
-
+                    app:price="@{uiState.paymentTotalPrice}"
                     android:textColor="@color/black"
                     android:textSize="18dp"
                     android:textStyle="bold"
@@ -243,7 +256,7 @@
             android:layout_height="wrap_content"
             android:background="@color/green_300"
             android:gravity="center"
-
+            android:onClick="@{() -> orderClickListener.order()}"
             android:paddingVertical="12dp"
             android:text="결제하기"
             android:textColor="@color/white"

@@ -19,6 +19,26 @@ class Order(cartItems: List<CartItem> = emptyList()) : Serializable {
         _list.remove(cartItem)
     }
 
+    fun addCount(cartItem: CartItem) {
+        val index = _list.find { it.id == cartItem.id }?.let { _list.indexOf(it) } ?: -1
+        if (index == -1) {
+            addCartItem(cartItem)
+        } else {
+            _list[index] = cartItem.copy(quantity = cartItem.quantity)
+        }
+    }
+
+    fun subCount(cartItem: CartItem) {
+        val index = _list.find { it.id == cartItem.id }?.let { _list.indexOf(it) } ?: -1
+        if (index != -1) {
+            if (cartItem.quantity == 0) {
+                removeCartItem(cartItem)
+            } else {
+                _list[index] = cartItem.copy(quantity = cartItem.quantity - 1)
+            }
+        }
+    }
+
     fun clearOrder() {
         _list.forEach { it.isChecked = false }
         _list.clear()

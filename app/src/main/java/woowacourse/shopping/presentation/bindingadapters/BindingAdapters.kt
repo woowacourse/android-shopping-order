@@ -48,6 +48,14 @@ fun setPrice(
     view.text = price?.let { view.context.getString(R.string.price_format, it) } ?: ""
 }
 
+@BindingAdapter("app:price")
+fun setPrice(
+    view: TextView,
+    price: Int?,
+) {
+    view.text = price?.let { view.context.getString(R.string.price_format, it) } ?: ""
+}
+
 @BindingAdapter("app:visibility")
 fun setLoadMoreBtnVisibility(
     view: View,
