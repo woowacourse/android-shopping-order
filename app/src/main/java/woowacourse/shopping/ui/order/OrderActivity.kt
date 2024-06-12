@@ -63,7 +63,8 @@ class OrderActivity : AppCompatActivity() {
                     is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
                     is OrderNavigationActions.NavigateToPayment -> {
                         val cartItemIds =
-                            orderViewModel.selectedCartViewItems.value?.map { it.cartItem.cartItemId }
+                            orderViewModel.cartViewItems.value?.filter { cartViewItem -> cartViewItem.isChecked }
+                                ?.map { it.cartItem.cartItemId }
                                 ?: return@observe
                         navigateToPayment(cartItemIds)
                     }

@@ -66,7 +66,7 @@ class DetailViewModel(
         }
     }
 
-    suspend fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
+    private suspend fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
         recentProductRepository.findMostRecentProduct()
             .onSuccess { mostRecentProduct ->
                 _mostRecentProduct.value = mostRecentProduct

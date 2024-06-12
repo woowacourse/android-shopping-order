@@ -81,7 +81,7 @@ class RecommendViewModel(
                             cartItems.map { cartItem ->
                                 CartViewItem(cartItem).check()
                             }
-                        orderViewModel.updateSelectedCartViewItems(newCartViewItems)
+                        orderViewModel.updateCartViewItems(newCartViewItems)
 
                         recommendProductViewItems = newRecommendProductViewItems
                         _recommendUiState.value =
@@ -106,8 +106,10 @@ class RecommendViewModel(
                 HomeViewModel.ASCENDING_SORT_ORDER,
             ).onSuccess {
                 val selectedProducts =
-                    orderViewModel.selectedCartViewItems.value?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
+                    orderViewModel.cartViewItems.value?.filter { cartViewItem -> cartViewItem.isChecked }
+                        ?.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
                         ?: return@onSuccess
+
                 var sameCategoryProducts = it.products
                 sameCategoryProducts =
                     sameCategoryProducts.filter { sameCategoryProduct ->
@@ -116,8 +118,9 @@ class RecommendViewModel(
 
                 val numberOfRecommend =
                     min(OrderViewModel.DEFAULT_NUMBER_OF_RECOMMEND, sameCategoryProducts.size)
-                recommendProductViewItems = sameCategoryProducts.subList(0, numberOfRecommend)
-                    .map(HomeViewItem::ProductViewItem)
+                recommendProductViewItems =
+                    sameCategoryProducts.subList(0, numberOfRecommend)
+                        .map(HomeViewItem::ProductViewItem)
                 _recommendUiState.value =
                     UiState.Success(recommendProductViewItems)
             }.onFailure {
@@ -146,11 +149,10 @@ class RecommendViewModel(
                         newCatViewItems.add(updatedCartViewItem)
                         orderViewModel.updateCartViewItems(newCatViewItems)
 
-                        val newSelectedCatViewItems =
-                            orderViewModel.selectedCartViewItems.value?.toMutableList()
-                                ?: return@onSuccess
-                        newSelectedCatViewItems.add(updatedCartViewItem)
-                        orderViewModel.updateSelectedCartViewItems(newSelectedCatViewItems)
+                        val newCartViewItems =
+                            orderViewModel.cartViewItems.value?.toMutableList() ?: return@onSuccess
+                        newCartViewItems.add(updatedCartViewItem)
+                        orderViewModel.updateCartViewItems(newCartViewItems)
 
                         val recommendProductViewItems = recommendState.data
                         val recommendPosition =
