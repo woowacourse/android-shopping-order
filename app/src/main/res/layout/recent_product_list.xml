@@ -25,6 +25,7 @@
             android:layout_height="wrap_content" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
+            app:visibility="@{viewModel.isLoading}"
             android:id="@+id/shimmer_recent_product_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,12 +50,12 @@
         </com.facebook.shimmer.ShimmerFrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
+            app:visibility="@{!viewModel.isLoading}"
             android:id="@+id/rv_recent_product"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="40dp"
             android:layout_marginHorizontal="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:recentProducts="@{viewModel.recentProducts}"
             android:orientation="horizontal"
             tools:listitem="@layout/item_recent_product"
             android:layout_width="match_parent"

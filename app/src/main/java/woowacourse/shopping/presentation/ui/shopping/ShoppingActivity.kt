@@ -1,16 +1,11 @@
 package woowacourse.shopping.presentation.ui.shopping
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.NestedScrollView
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
@@ -32,7 +27,7 @@ class ShoppingActivity : AppCompatActivity() {
         ShoppingViewModelFactory(
             shoppingItemsRepository = RemoteShoppingRepositoryImpl(),
             cartItemsRepository = RemoteCartRepositoryImpl(),
-            recentProductRepository = RecentProductRepositoryImpl(context = this),
+            recentProductRepository = RecentProductRepositoryImpl(context = applicationContext),
         )
     }
 
@@ -46,7 +41,6 @@ class ShoppingActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         observeViewModel()
-        showShimmerListTest()
     }
 
     override fun onResume() {
@@ -55,26 +49,14 @@ class ShoppingActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-        binding.rvProductList.layoutManager = GridLayoutManager(this, 2)
-        setUpRecyclerViewAdapter()
-        viewModel.hideLoadMore()
-        checkLoadMoreBtnVisibility()
-    }
-
-    private fun setUpRecyclerViewAdapter() {
         shoppingAdapter = ShoppingAdapter(viewModel, viewModel)
         recentProductAdapter = RecentProductAdapter(viewModel)
 
         binding.rvProductList.adapter = shoppingAdapter
         binding.horizontalView.rvRecentProduct.adapter = recentProductAdapter
 
-        try {
-            viewModel.products.observe(this) { products ->
-                shoppingAdapter.loadData(products)
-            }
-        } catch (exception: Exception) {
-            Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
-        }
+        viewModel.hideLoadMore()
+        checkLoadMoreBtnVisibility()
     }
 
     private fun observeViewModel() {
@@ -86,6 +68,16 @@ class ShoppingActivity : AppCompatActivity() {
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
                     )
+            }
+        }
+
+        viewModel.products.observe(this) { products ->
+            shoppingAdapter.loadData(products)
+        }
+
+        viewModel.isLoading.observe(this) { event ->
+            event?.let {
+                showSkeletonUI(it)
             }
         }
 
@@ -102,6 +94,7 @@ class ShoppingActivity : AppCompatActivity() {
         }
 
         viewModel.shoppingProducts.observe(this) {
+            shoppingAdapter.loadShoppingProductData(it)
             shoppingAdapter.submitList(it)
         }
 
@@ -127,14 +120,6 @@ class ShoppingActivity : AppCompatActivity() {
 
     private fun showData(data: List<Product>) {
         shoppingAdapter.loadData(data)
-        /*shoppingAdapter.loadShoppingProductData(
-            data.map {
-                ShoppingProduct(
-                    product = it,
-                    quantity = viewModel.fetchQuantity(it.id),
-                )
-            },
-        )*/
         viewModel.updateItems()
         shoppingAdapter.loadShoppingProductData(viewModel.shoppingProducts.value ?: emptyList())
     }
@@ -151,29 +136,13 @@ class ShoppingActivity : AppCompatActivity() {
         startActivity(DetailActivity.createIntent(this, productId))
     }
 
-    private fun showShimmerListTest() {
-        lifecycleScope.launch {
-            showProductData(isLoading = true)
-            delay(2500)
-            showProductData(isLoading = false)
-        }
-    }
-
-    private fun showProductData(isLoading: Boolean) {
+    private fun showSkeletonUI(isLoading: Boolean) {
         if (isLoading) {
             binding.horizontalView.shimmerRecentProductList.startShimmer()
             binding.shimmerProductList.startShimmer()
-            binding.horizontalView.shimmerRecentProductList.visibility = View.VISIBLE
-            binding.shimmerProductList.visibility = View.VISIBLE
-            binding.horizontalView.rvRecentProduct.visibility = View.GONE
-            binding.rvProductList.visibility = View.GONE
         } else {
             binding.horizontalView.shimmerRecentProductList.stopShimmer()
             binding.shimmerProductList.stopShimmer()
-            binding.horizontalView.shimmerRecentProductList.visibility = View.GONE
-            binding.shimmerProductList.visibility = View.GONE
-            binding.horizontalView.rvRecentProduct.visibility = View.VISIBLE
-            binding.rvProductList.visibility = View.VISIBLE
         }
     }
 }

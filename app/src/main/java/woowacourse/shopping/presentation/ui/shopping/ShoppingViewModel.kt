@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.shopping
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,6 +50,10 @@ class ShoppingViewModel(
     val navigateToCart: LiveData<Event<Boolean>>
         get() = _navigateToCart
 
+    private val _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     private var numberOfProduct: Int = 0
 
     private val _showLoadMore = MutableLiveData<Boolean>(false)
@@ -68,19 +71,21 @@ class ShoppingViewModel(
             numberOfProduct = fetchNumberOfProduct()
 
             val nextOffSet = calculateNextOffset()
-            Log.d("crong", "nextOffset: $nextOffSet")
             val initialProducts = loadProducts(nextOffSet)
             if (nextOffSet != initialProducts.size) throw IllegalStateException("Something went wrong, please try again..")
             offset = nextOffSet
 
             _products.value = (initialProducts)
             _shoppingProducts.value = (convertToShoppingProductList(initialProducts))
-            Log.d("crong", "initializeProducts: ${_shoppingProducts.value}")
             _shoppingUiState.value = UIState.Success(products.value ?: emptyList())
             val recentProducts = recentProductRepository.loadLatestList()
             recentProducts.onSuccess {
                 _recentProducts.postValue(it)
             }
+
+            // To check shimmer loading is working properly
+            // delay(2000)
+            setLoadingEnd()
         }
     }
 
@@ -100,15 +105,11 @@ class ShoppingViewModel(
         var loadedProducts = emptyList<Product>()
         val transaction =
             viewModelScope.async {
-                // Log.d("crong", "loadProducts: ${shoppingItemsRepository.fetchProductsWithIndex(end = end)}")
                 shoppingItemsRepository.fetchProductsWithIndex(end = end)
             }
         transaction.await().onSuccess {
             loadedProducts = it
-            Log.d("crong", "loadProducts: $it")
         }
-        //
-        // Log.d("crong", "loadProducts: $loadedProducts")
         return loadedProducts
     }
 
@@ -121,7 +122,6 @@ class ShoppingViewModel(
         viewModelScope.launch {
             cartItemsRepository.updateCartItems()
             _shoppingProducts.value = convertToShoppingProductList(loadProducts(end = offset))
-            Log.d("crong", "reloadProducts: ${_shoppingProducts.value}")
             val totalCountOfCartItems = cartItemsRepository.sumOfQuantity()
             totalCountOfCartItems.onSuccess {
                 _cartCount.value = it
@@ -204,7 +204,7 @@ class ShoppingViewModel(
 
             if (currentProducts == null) return@launch
             _products.postValue(currentProducts + nextProducts)
-            _shoppingProducts.postValue(convertToShoppingProductList(currentProducts + nextProducts))
+            _shoppingProducts.value = (convertToShoppingProductList(currentProducts + nextProducts))
         }
     }
 
@@ -234,7 +234,6 @@ class ShoppingViewModel(
         viewModelScope.launch {
             recentProductRepository.save(product)
             val recentProducts = recentProductRepository.loadLatestList()
-            // _recentProducts.value = recentProducts
             recentProducts.onSuccess {
                 _recentProducts.postValue(it)
             }
@@ -245,7 +244,6 @@ class ShoppingViewModel(
         viewModelScope.launch {
             val sumOfQuantity = cartItemsRepository.sumOfQuantity()
             sumOfQuantity.onSuccess {
-                Log.d("crong", "updateCartCount: $it")
                 _cartCount.value = it
             }
         }
@@ -268,10 +266,9 @@ class ShoppingViewModel(
             product.onSuccess {
                 cartItemsRepository.insert(it!!, shoppingProduct?.quantity() ?: 1)
             }
+            _shoppingProducts.value = shoppingProducts
+            updateCartCount()
         }
-        _shoppingProducts.value = shoppingProducts
-        updateCartCount()
-        Log.d("crong", "increaseCount: ${cartCount.value}")
     }
 
     override fun decreaseCount(productId: Long) {
@@ -279,7 +276,6 @@ class ShoppingViewModel(
         val shoppingProduct = shoppingProducts.find { it.product.id == productId }
         shoppingProduct?.decrease()
         val quantity = shoppingProduct?.quantity() ?: 0
-        Log.d("crong", "decreaseCount: $quantity")
 
         viewModelScope.launch {
             if (quantity > 0) {
@@ -287,11 +283,17 @@ class ShoppingViewModel(
             } else {
                 cartItemsRepository.deleteWithProductId(productId)
             }
+            _shoppingProducts.value = shoppingProducts
+            updateCartCount()
         }
-        _shoppingProducts.value = shoppingProducts
-        // Log.d("crong", "decreaseCount: ${cartCount.value}")
-        updateCartCount()
-        Log.d("crong", "decreaseCount: ${cartCount.value}")
+    }
+
+    private fun setLoadingStart() {
+        _isLoading.value = true
+    }
+
+    private fun setLoadingEnd() {
+        _isLoading.value = false
     }
 
     companion object {
