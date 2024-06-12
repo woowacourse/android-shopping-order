@@ -52,7 +52,13 @@ class PaymentViewModel(
         viewModelScope.launch {
             repository.getCoupons()
                 .onSuccess {
-                    _coupons.value = UiState.Success(it)
+                    val applyCoupon = it.filter {
+                        it.discountPrice(
+                            totalPrice.value ?: 0,
+                            (_orderProducts.value as UiState.Success).data
+                        ) > 0
+                    }
+                    _coupons.value = UiState.Success(applyCoupon)
                 }.onFailure {
                     _errorHandler.value = EventState(COUPON_LOAD_ERROR)
                 }
@@ -125,8 +131,8 @@ class PaymentViewModel(
     }
 
     companion object {
-        const val COUPON_LOAD_ERROR = "LOAD ERROR"
-        const val PAYMENT_ERROR = "PAYMENT ERROR"
-        const val APPLY_COUPON_ERROR = "APPLY COUPON ERROR"
+        const val COUPON_LOAD_ERROR = "쿠폰을 불러오지 못했습니다."
+        const val PAYMENT_ERROR = "결제 오류입니다."
+        const val APPLY_COUPON_ERROR = "적용 불가능한 쿠폰 입니다."
     }
 }
