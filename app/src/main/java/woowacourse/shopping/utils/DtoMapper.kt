@@ -55,8 +55,8 @@ object DtoMapper {
                     description = this.description,
                     expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    discount = this.discount ?: 0,
-                    minimumAmount = this.minimumAmount ?: 0,
+                    discount = this.discount ?: throw IllegalArgumentException("Discount가 필요합니다"),
+                    minimumAmount = this.minimumAmount ?: throw IllegalArgumentException("Minimum amount가 필요합니다"),
                 )
             "BOGO" ->
                 Coupon.BogoCoupon(
@@ -65,8 +65,8 @@ object DtoMapper {
                     description = this.description,
                     expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    buyQuantity = this.buyQuantity ?: 0,
-                    getQuantity = this.getQuantity ?: 0,
+                    buyQuantity = this.buyQuantity ?: throw IllegalArgumentException("Buy quantity가 필요합니다"),
+                    getQuantity = this.getQuantity ?: throw IllegalArgumentException("Get quantity가 필요합니다"),
                 )
             "FREESHIPPING" ->
                 Coupon.FreeShippingCoupon(
@@ -75,7 +75,7 @@ object DtoMapper {
                     description = this.description,
                     expirationDate = this.expirationDate.toLocalDate(),
                     discountType = this.discountType,
-                    minimumAmount = this.minimumAmount ?: 0,
+                    minimumAmount = this.minimumAmount ?: throw IllegalArgumentException("Minimum amount가 필요합니다"),
                 )
             "MIRACLESALE" ->
                 Coupon.TimeBasedDiscountCoupon(
@@ -88,7 +88,7 @@ object DtoMapper {
                     availableTimeStart = this.availableTime?.start?.toLocalTime() ?: LocalTime.MIN,
                     availableTimeEnd = this.availableTime?.end?.toLocalTime() ?: LocalTime.MAX,
                 )
-            else -> throw IllegalArgumentException("Unknown discount type: ${this.discountType}")
+            else -> throw IllegalArgumentException("모르는 쿠폰 타입: ${this.discountType}")
         }
     }
 
