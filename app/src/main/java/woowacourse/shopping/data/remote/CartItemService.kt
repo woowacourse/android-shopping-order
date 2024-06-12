@@ -11,24 +11,8 @@ import woowacourse.shopping.data.cart.remote.AddCartItemRequest
 import woowacourse.shopping.data.cart.remote.CartItemQuantityRequest
 import woowacourse.shopping.data.cart.remote.CartResponse
 import woowacourse.shopping.data.cart.remote.CountResponse
-import woowacourse.shopping.data.coupon.remote.CouponDto
-import woowacourse.shopping.data.order.remote.CreateOrderRequest
-import woowacourse.shopping.data.product.remote.Content
-import woowacourse.shopping.data.product.remote.ProductResponse
 
-interface RetrofitService {
-    @GET("/products")
-    suspend fun requestProducts(
-        @Query("category") category: String? = null,
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20,
-    ): Result<ProductResponse>
-
-    @GET("/products/{id}")
-    suspend fun requestProduct(
-        @Path("id") id: Int = 0,
-    ): Result<Content>
-
+interface CartItemService {
     @GET("/cart-items")
     suspend fun requestCartItems(
         @Query("page") page: Int = 0,
@@ -50,15 +34,7 @@ interface RetrofitService {
     suspend fun requestCartQuantityCount(): Result<CountResponse>
 
     @POST("/cart-items")
-    suspend fun requestCartQuantityCount(
+    suspend fun addCartItem(
         @Body addCartItemRequest: AddCartItemRequest,
     ): Result<Unit>
-
-    @POST("/orders")
-    suspend fun requestCreateOrder(
-        @Body createOrderRequest: CreateOrderRequest,
-    ): Result<Unit>
-
-    @GET("/coupons")
-    suspend fun requestCoupons(): Result<List<CouponDto>>
 }

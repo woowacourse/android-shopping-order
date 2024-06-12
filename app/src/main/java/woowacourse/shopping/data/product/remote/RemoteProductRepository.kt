@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.product.remote
 
-import woowacourse.shopping.data.remote.RetrofitClient.retrofitApi
+import woowacourse.shopping.data.remote.RetrofitClient.productApi
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -10,21 +10,21 @@ object RemoteProductRepository : ProductRepository {
     private const val RECOMMEND_PRODUCTS_COUNT = 10
 
     override suspend fun find(id: Int): Result<Product> {
-        return retrofitApi.requestProduct(id = id).map { it.toProduct() }
+        return productApi.requestProduct(id = id).map { it.toProduct() }
     }
 
     override suspend fun findPage(
         page: Int,
         pageSize: Int,
     ): Result<List<Product>> {
-        return retrofitApi.requestProducts(page = page, size = pageSize).map { it.toProductList() }
+        return productApi.requestProducts(page = page, size = pageSize).map { it.toProductList() }
     }
 
     override suspend fun isLastPage(
         page: Int,
         pageSize: Int,
     ): Result<Boolean> {
-        return retrofitApi.requestProducts(page = page, size = pageSize).map { it.last }
+        return productApi.requestProducts(page = page, size = pageSize).map { it.last }
     }
 
     override suspend fun findRecommendProducts(
@@ -40,7 +40,7 @@ object RemoteProductRepository : ProductRepository {
     }
 
     private suspend fun findCategoryProducts(category: String): Result<List<Product>> {
-        return retrofitApi.requestProducts(category = category, page = 0, size = MAX_PRODUCT_COUNT)
+        return productApi.requestProducts(category = category, page = 0, size = MAX_PRODUCT_COUNT)
             .map { it.toProductList() }
     }
 }
