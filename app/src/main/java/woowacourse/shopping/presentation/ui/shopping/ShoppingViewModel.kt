@@ -102,21 +102,40 @@ class ShoppingViewModel(
         val productIndex = shoppingProductsData.indexOfFirst { it.id == productId }
         if (productIndex == -1) return
 
-        cartItems =
-            if (newQuantity == 0) {
-                cartItems.filter { it.product.id != productId }
+        if (newQuantity == 0) {
+            cartItems = cartItems.filter { it.product.id != productId }
+        } else {
+            val existingCartItem = cartItems.find { it.product.id == productId }
+            if (existingCartItem == null) {
+                updateAllCartItems()
             } else {
-                cartItems.map { cartItem ->
-                    if (cartItem.product.id == productId) {
-                        cartItem.copy(quantity = newQuantity)
-                    } else {
-                        cartItem
-                    }
-                }
+                updateCartItemWithProductId(productId, newQuantity)
             }
-
+        }
         val updatedProducts = shoppingProductsData.map { if (it.id == productId) it.copy(quantity = newQuantity) else it }
         _shoppingProducts.value = UiState.Success(updatedProducts)
+    }
+
+    private fun updateAllCartItems() {
+        viewModelScope.launch {
+            cartRepository.loadAll()
+                .onSuccess { cartItems = it }
+                .onFailure { _error.value = Event(ShoppingError.CartItemsNotModified) }
+        }
+    }
+
+    private fun updateCartItemWithProductId(
+        productId: Long,
+        newQuantity: Int,
+    ) {
+        cartItems =
+            cartItems.map { cartItem ->
+                if (cartItem.product.id == productId) {
+                    cartItem.copy(quantity = newQuantity)
+                } else {
+                    cartItem
+                }
+            }
     }
 
     override fun navigateToDetail(productId: Long) {

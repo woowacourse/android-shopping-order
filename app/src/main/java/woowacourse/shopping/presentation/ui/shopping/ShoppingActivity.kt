@@ -56,12 +56,12 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         }
 
     private fun updateSingleProductQuantity(intent: Intent) {
-        val modifiedProductId = intent.getLongExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, -1L)
-        val newQuantity = intent.getIntExtra(ProductDetailActivity.EXTRA_NEW_PRODUCT_QUANTITY, -1)
+        val productId = intent.getLongExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, INVALID_ID)
+        val newQuantity = intent.getIntExtra(ProductDetailActivity.EXTRA_NEW_PRODUCT_QUANTITY, INVALID_COUNT)
 
         viewModel.fetchRecentProducts()
-        if (modifiedProductId != -1L && newQuantity != -1) {
-            viewModel.updateProductQuantity(modifiedProductId, newQuantity)
+        if (productId != INVALID_ID && newQuantity != INVALID_COUNT) {
+            viewModel.updateProductQuantity(productId, newQuantity)
         }
     }
 
@@ -173,6 +173,8 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         private const val EXTRA_PRODUCT_ID = "productId"
         private const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
         private const val EXTRA_UPDATED_PRODUCTS = "updatedProductsData"
+        private const val INVALID_ID = -1L
+        private const val INVALID_COUNT = -1
 
         fun startWithNewProductQuantity(
             context: Context,

@@ -10,3 +10,7 @@ data class CartModel(
     val isChecked: Boolean,
     val calculatedPrice: Int,
 )
+
+fun CartModel.updateQuantity(updatedQuantity: Int): CartModel {
+    return this.copy(quantity = updatedQuantity, calculatedPrice = (this.price * updatedQuantity).toInt())
+}

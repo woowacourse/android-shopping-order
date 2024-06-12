@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.repository.RecommendRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.CartModel
 import woowacourse.shopping.presentation.ui.model.ProductModel
+import woowacourse.shopping.presentation.ui.model.updateQuantity
 import woowacourse.shopping.presentation.util.Event
 
 class CartViewModel(
@@ -150,7 +151,10 @@ class CartViewModel(
                     if (updatedQuantity == 0) {
                         updateDeletedCartItem(selectedCartId)
                     } else {
-                        updateCartItems(selectedCartId, updatedCartItem = selectedItem.copy(quantity = updatedQuantity))
+                        updateCartItems(
+                            selectedCartId,
+                            updatedCartItem = selectedItem.updateQuantity(updatedQuantity),
+                        )
                     }
                     _changedCartProducts[productId] = updatedQuantity
                     updateRecommendedProducts(productId, updatedQuantity)
@@ -169,7 +173,10 @@ class CartViewModel(
         viewModelScope.launch {
             cartRepository.updateCartItemQuantity(selectedCartId, updatedQuantity)
                 .onSuccess {
-                    updateCartItems(selectedCartId, updatedCartItem = selectedItem.copy(quantity = updatedQuantity))
+                    updateCartItems(
+                        selectedCartId,
+                        updatedCartItem = selectedItem.updateQuantity(updatedQuantity),
+                    )
                     _changedCartProducts[productId] = updatedQuantity
                     updateRecommendedProducts(productId, updatedQuantity)
                 }
