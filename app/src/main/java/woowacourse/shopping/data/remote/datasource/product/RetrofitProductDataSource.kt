@@ -6,7 +6,7 @@ import woowacourse.shopping.data.remote.dto.response.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.ProductsResponse
 import woowacourse.shopping.data.remote.service.ProductApi
 
-class DefaultProductDataSource(
+class RetrofitProductDataSource(
     private val productApi: ProductApi = ProductApi.service(),
 ) : ProductDataSource {
     override suspend fun getAllByPaging(

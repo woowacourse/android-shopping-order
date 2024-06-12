@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.remote.repository
 
 import woowacourse.shopping.data.remote.datasource.cartItem.CartItemDataSource
-import woowacourse.shopping.data.remote.datasource.cartItem.DefaultCartItemDataSource
+import woowacourse.shopping.data.remote.datasource.cartItem.RetrofitCartItemDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.utils.toIdOrNull
 
 class CartItemRepositoryImpl(
-    private val cartItemDataSource: CartItemDataSource = DefaultCartItemDataSource(),
+    private val cartItemDataSource: CartItemDataSource = RetrofitCartItemDataSource(),
 ) : CartItemRepository {
     override suspend fun getAllByPaging(
         page: Int,

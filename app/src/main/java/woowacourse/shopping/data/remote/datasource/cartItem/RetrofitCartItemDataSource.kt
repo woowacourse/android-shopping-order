@@ -7,7 +7,7 @@ import woowacourse.shopping.data.remote.dto.response.CartsResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 import woowacourse.shopping.data.remote.service.CartItemApi
 
-class DefaultCartItemDataSource(
+class RetrofitCartItemDataSource(
     private val cartItemApi: CartItemApi = CartItemApi.service(),
 ) : CartItemDataSource {
     override suspend fun getAllByPaging(

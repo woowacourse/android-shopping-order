@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.repository
 
-import woowacourse.shopping.data.remote.datasource.product.DefaultProductDataSource
+import woowacourse.shopping.data.remote.datasource.product.RetrofitProductDataSource
 import woowacourse.shopping.data.remote.datasource.product.ProductDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.paging.LoadResult
@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
-    private val productDataSource: ProductDataSource = DefaultProductDataSource(),
+    private val productDataSource: ProductDataSource = RetrofitProductDataSource(),
 ) : ProductRepository {
     private val productPagingSource = ProductPagingSource(productDataSource)
 

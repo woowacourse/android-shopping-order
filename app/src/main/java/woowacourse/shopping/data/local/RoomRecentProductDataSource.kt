@@ -3,7 +3,7 @@ package woowacourse.shopping.data.local
 import woowacourse.shopping.data.local.dao.RecentProductDao
 import woowacourse.shopping.data.local.entity.RecentProductEntity
 
-class DefaultRecentProductDataSource(private val recentProductDao: RecentProductDao) : RecentProductDataSource {
+class RoomRecentProductDataSource(private val recentProductDao: RecentProductDao) : RecentProductDataSource {
     override suspend fun findAllByLimit(limit: Int): List<RecentProductEntity> {
         return recentProductDao.findAllByLimit(limit)
     }
