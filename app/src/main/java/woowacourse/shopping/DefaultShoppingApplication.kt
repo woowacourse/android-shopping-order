@@ -36,39 +36,9 @@ class DefaultShoppingApplication : ShoppingApplication() {
         ShoppingPreferencesManager(this)
     }
 
-    private val username by lazy {
-        when (
-            val name =
-                shoppingPreferencesManager.getString(ShoppingPreferencesManager.KEY_USERNAME)
-        ) {
-            null ->
-                shoppingPreferencesManager.setString(
-                    ShoppingPreferencesManager.KEY_USERNAME,
-                    BuildConfig.USER_NAME,
-                )
-
-            else -> name
-        }
-    }
-
-    private val password by lazy {
-        when (
-            val pwd =
-                shoppingPreferencesManager.getString(ShoppingPreferencesManager.KEY_PASSWORD)
-        ) {
-            null ->
-                shoppingPreferencesManager.setString(
-                    ShoppingPreferencesManager.KEY_PASSWORD,
-                    BuildConfig.PASSWORD,
-                )
-
-            else -> pwd
-        }
-    }
-
     private val client by lazy {
         OkHttpClient.Builder()
-            .addInterceptor(BasicAuthInterceptor(username = username, password = password))
+            .addInterceptor(BasicAuthInterceptor(shoppingPreferencesManager))
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY
