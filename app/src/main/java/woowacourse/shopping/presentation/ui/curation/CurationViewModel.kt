@@ -45,11 +45,14 @@ class CurationViewModel(
     }
 
     private suspend fun orderProducts() {
-        repository.getCartItems(0, 1000)
+        repository.getCartItemsCounts()
             .onSuccess {
-                val filteredCartItems =
-                    it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
-                _orderProducts.value = UiState.Success(filteredCartItems)
+                repository.getCartItems(0, it)
+                    .onSuccess {
+                        val filteredCartItems =
+                            it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
+                        _orderProducts.value = UiState.Success(filteredCartItems)
+                    }
             }
     }
 
