@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.domain.model.coupon.CouponState
@@ -13,7 +12,6 @@ class RemoteCouponRepositoryImpl : CouponRepository {
         runCatching {
             val response = service.getCoupons()
             if (response.isSuccessful) {
-                Log.d("crong", "getCoupons: ${response.body()}")
                 response.body()?.map { it.toDomainModel() } ?: emptyList()
             } else {
                 emptyList()

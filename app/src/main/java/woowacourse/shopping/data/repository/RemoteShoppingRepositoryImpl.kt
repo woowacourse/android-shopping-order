@@ -9,19 +9,6 @@ import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
     private val service = ProductClient.service
     private var productData: ProductResponseDto? = null
-    private var products: List<Product>? = null
-
-    override suspend fun initializeProducts(): Result<Unit> =
-        runCatching {
-            val data = service.requestProducts()
-            if (data.isSuccessful) {
-                productData = data.body()
-                products = productData?.content?.map { it.toDomainModel() }
-            } else {
-                throw Exception("Failed to fetch products: ${data.errorBody()?.string()}")
-            }
-            products = productData?.content?.map { it.toDomainModel() }
-        }
 
     override suspend fun fetchProductsSize(): Result<Int> =
         runCatching {

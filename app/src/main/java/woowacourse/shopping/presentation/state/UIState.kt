@@ -6,9 +6,4 @@ sealed class UIState<out T> {
     data object Empty : UIState<Nothing>()
 
     data class Error(val exception: Throwable) : UIState<Nothing>()
-
-    /*data class Loading<T>(val data: T) : UIState<T>() {
-        init {
-        }
-    }*/
 }

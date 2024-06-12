@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.ui.detail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,8 +45,6 @@ class DetailViewModel(
         get() = _addCartItem
 
     init {
-        Log.d("crong", "DetailViewModel: init")
-        Log.d("crong", "DetailViewModel: productId $productId")
         viewModelScope.launch {
             loadShoppingProductData()
             loadRecentProductData()
@@ -60,28 +57,13 @@ class DetailViewModel(
             viewModelScope.async {
                 shoppingRepository.findProductItem(productId)
             }
-        // Log.d("crong", "loadShoppingProductData: ${loadedData.await()}")
         loadedData.await().onSuccess {
-            Log.d("crong", "loadShoppingProductData1: $it")
             _shoppingProduct.value =
                 ShoppingProduct(
                     product = it ?: return@onSuccess,
                     quantity = fetchQuantity(),
                 )
         }
-        Log.d("crong", "loadShoppingProductData2: ${_shoppingProduct.value}")
-
-        /*viewModelScope.launch {
-            val product = shoppingRepository.findProductItem(productId)
-            product.onSuccess {
-                val shoppingProduct =
-                    ShoppingProduct(
-                        product = it ?: return@onSuccess,
-                        quantity = fetchQuantity(),
-                    )
-                _shoppingProduct.value = shoppingProduct
-            }
-        }*/
     }
 
     private suspend fun fetchQuantity(): Int {
@@ -93,14 +75,12 @@ class DetailViewModel(
         transaction.await().onSuccess {
             quantity = it?.quantity ?: 1
         }
-        Log.d("crong", "fetchQuantity: $quantity")
         return quantity
     }
 
     private fun loadRecentProductData() {
         viewModelScope.launch {
             val recentProduct = recentProductRepository.loadSecondLatest()
-            Log.d("crong", "loadRecentProductData: $recentProduct")
             recentProduct.onSuccess {
                 _recentProduct.value = it
                 checkRecentProductVisibility()
@@ -114,7 +94,6 @@ class DetailViewModel(
         viewModelScope.launch {
             cartRepository.insert(product = product, quantity = quantity)
         }
-        // cartRepository.insert(product = product, quantity = quantity)
     }
 
     private fun checkRecentProductVisibility() {

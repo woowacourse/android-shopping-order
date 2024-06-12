@@ -3,8 +3,6 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface ShoppingItemsRepository {
-    suspend fun initializeProducts(): Result<Unit>
-
     suspend fun fetchProductsSize(): Result<Int>
 
     suspend fun fetchProductsWithIndex(

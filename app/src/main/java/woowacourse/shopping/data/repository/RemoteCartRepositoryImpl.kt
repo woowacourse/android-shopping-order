@@ -19,8 +19,6 @@ class RemoteCartRepositoryImpl : CartRepository {
 
     override suspend fun updateCartItems(): Result<Unit> =
         runCatching {
-            // var response: Response<CartItemDto>? = null
-            // response = service.requestCartItems().execute()
             val response = service.requestCartItems()
             if (response.isSuccessful) {
                 cartItemData = (response as Response<CartItemDto>).body()
@@ -150,11 +148,6 @@ class RemoteCartRepositoryImpl : CartRepository {
 
     override suspend fun findOrNullWithProductId(productId: Long): Result<CartItem?> =
         runCatching {
-            /*var contentDto: ContentDto? = null
-            contentDto =
-                service.requestCartItems().execute().body()?.content?.find {
-                    it.product.id == productId
-                }*/
             val response = service.requestCartItems()
             if (response.isSuccessful) {
                 val contentDto =

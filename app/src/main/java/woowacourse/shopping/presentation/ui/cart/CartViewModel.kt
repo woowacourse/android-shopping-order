@@ -162,12 +162,6 @@ class CartViewModel(
         loadPage()
     }
 
-    /*override fun increaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        cartRepository.updateQuantityWithProductId(productId, currentQuantity + 1)
-        loadPage()
-    }*/
-
     override fun decreaseCount(productId: Long) {
         viewModelScope.launch {
             val currentQuantity = cartRepository.findQuantityWithProductId(productId)
@@ -179,14 +173,6 @@ class CartViewModel(
         }
         loadPage()
     }
-
-    /*override fun decreaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        if (currentQuantity > 1) {
-            cartRepository.updateQuantityWithProductId(productId, currentQuantity - 1)
-        }
-        loadPage()
-    }*/
 
     companion object {
         private const val PAGE_SIZE = 5

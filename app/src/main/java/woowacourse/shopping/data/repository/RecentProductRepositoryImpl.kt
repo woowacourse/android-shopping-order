@@ -21,31 +21,14 @@ class RecentProductRepositoryImpl(context: Context) : RecentProductRepository {
         runCatching {
             dao.loadLatest()?.toDomainModel()
         }
-        /*{
-        var recentProduct: RecentProduct? = null
-        recentProduct = dao.loadLatest()?.toDomainModel()
-        return recentProduct
-    }*/
 
     override suspend fun loadSecondLatest(): Result<RecentProduct?> =
         runCatching {
             dao.loadSecondLatest()?.toDomainModel()
         }
 
-    /*{
-        var secondRecentProduct: RecentProduct? = null
-        secondRecentProduct = dao.loadSecondLatest()?.toDomainModel()
-        return secondRecentProduct
-    }*/
-
     override suspend fun loadLatestList(): Result<List<RecentProduct>> =
         runCatching {
             dao.loadLatestList().map { it.toDomainModel() }
         }
-
-    /*{
-        var recentProducts: List<RecentProduct> = emptyList()
-        recentProducts = dao.loadLatestList().map { it.toDomainModel() }
-        return recentProducts
-    }*/
 }
