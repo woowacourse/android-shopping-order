@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.coupon.remote.dto
 
 import woowacourse.shopping.data.coupon.remote.dto.AvailableTimeDto.Companion.toDomain
-import woowacourse.shopping.domain.model.coupon.AvailableTime
 import woowacourse.shopping.domain.model.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedDiscountCoupon
@@ -23,8 +22,18 @@ data class CouponDto(
 ) {
     companion object {
         private const val FAILED_TO_GET_VALUE_FROM_SERVER = "서버에서 %s 값을 받지 못했습니다."
+        private const val UNKNOWN_DISCOUNT_TYPE = "정의되지 않은 할인 유형 입니다."
 
-        fun CouponDto.toBuyXGetYCoupon(): Coupon =
+        fun CouponDto.toDomain(): Coupon =
+            when (discountType) {
+                BuyXGetYCoupon.TYPE -> toBuyXGetYCoupon()
+                FixedDiscountCoupon.TYPE -> toFixedDiscountCoupon()
+                FreeShippingCoupon.TYPE -> toFreeShippingCoupon()
+                PercentageDiscountCoupon.TYPE -> toPercentageDiscountCoupon()
+                else -> throw IllegalArgumentException(UNKNOWN_DISCOUNT_TYPE)
+            }
+
+        private fun CouponDto.toBuyXGetYCoupon(): Coupon =
             BuyXGetYCoupon(
                 id = id,
                 code = code,
@@ -35,7 +44,7 @@ data class CouponDto(
                 getQuantity = getQuantity ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("getQuantity")),
             )
 
-        fun CouponDto.toFixedDiscountCoupon(): Coupon =
+        private fun CouponDto.toFixedDiscountCoupon(): Coupon =
             FixedDiscountCoupon(
                 id = id,
                 code = code,
@@ -46,7 +55,7 @@ data class CouponDto(
                 minimumAmount = minimumAmount ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("minimumAmount")),
             )
 
-        fun CouponDto.toFreeShippingCoupon(): Coupon =
+        private fun CouponDto.toFreeShippingCoupon(): Coupon =
             FreeShippingCoupon(
                 id = id,
                 code = code,
@@ -56,7 +65,7 @@ data class CouponDto(
                 minimumAmount = minimumAmount ?: throw IllegalStateException(FAILED_TO_GET_VALUE_FROM_SERVER.format("minimumAmount")),
             )
 
-        fun CouponDto.toPercentageDiscountCoupon(): Coupon =
+        private fun CouponDto.toPercentageDiscountCoupon(): Coupon =
             PercentageDiscountCoupon(
                 id = id,
                 code = code,

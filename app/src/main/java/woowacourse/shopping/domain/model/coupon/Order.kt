@@ -34,7 +34,7 @@ class Order(coupons: List<Coupon>) {
 
     fun calculateDeliveryFee(selectedCouponId: Long, isChecked: Boolean): Int {
         val selectedCoupon = coupons.find { it.id == selectedCouponId } ?: throw NoSuchElementException(INVALID_COUPON.format(selectedCouponId))
-        return if (isChecked && selectedCoupon.discountType == CouponType.FREE_SHIPPING.discountType) {
+        return if (isChecked && selectedCoupon.discountType == FreeShippingCoupon.TYPE) {
                 FREE_SHIPPING_FEE
             } else {
                 SHIPPING_FEE

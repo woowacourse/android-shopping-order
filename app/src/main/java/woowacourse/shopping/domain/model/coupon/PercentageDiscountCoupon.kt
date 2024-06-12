@@ -38,6 +38,7 @@ data class PercentageDiscountCoupon(
 
     companion object {
         const val PERCENTAGE = 100
+        const val TYPE = "percentage"
 
         fun PercentageDiscountCoupon.toUiModel() =
             CouponUiModel(

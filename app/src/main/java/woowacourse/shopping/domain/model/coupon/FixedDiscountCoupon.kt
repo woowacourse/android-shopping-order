@@ -33,6 +33,8 @@ data class FixedDiscountCoupon(
         )
 
     companion object {
+        const val TYPE = "fixed"
+
         fun FixedDiscountCoupon.toUiModel() =
             CouponUiModel(
                 id = id,
