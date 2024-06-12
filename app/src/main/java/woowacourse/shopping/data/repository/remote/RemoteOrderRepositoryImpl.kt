@@ -8,29 +8,23 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class RemoteOrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
 ) : OrderRepository {
-    override suspend fun orderShoppingCart(ids: List<Long>): Result<Unit> {
-        return try {
+    override suspend fun orderShoppingCart(ids: List<Long>): Result<Unit> =
+        runCatching {
             val response = orderDataSource.orderItems(ids = ids)
             if (response.isSuccessful) {
-                Result.success(Unit)
+                Unit
             } else {
                 throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun getCoupons(): Result<List<Coupon>> {
-        return try {
+    override suspend fun getCoupons(): Result<List<Coupon>> =
+        runCatching {
             val response = orderDataSource.getCoupons()
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body() ?: emptyList())
+                response.body() ?: emptyList()
             } else {
-                Result.failure(RuntimeException(response.code().toString()))
+                throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 }

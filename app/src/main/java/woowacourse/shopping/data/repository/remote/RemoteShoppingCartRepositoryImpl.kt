@@ -17,45 +17,34 @@ class RemoteShoppingCartRepositoryImpl(
     override suspend fun loadPagingCartItems(
         offset: Int,
         pagingSize: Int,
-    ): Result<List<CartItem>> {
-        return try {
+    ): Result<List<CartItem>> =
+        runCatching {
             val page = (offset + 1) / LOAD_SHOPPING_ITEM_SIZE
             val response = cartItemDataSource.loadCartItems(page = page, size = pagingSize)
             if (response.isSuccessful && response.body() != null) {
-                val cartItems =
-                    response.body()?.cartItemDto?.map { it.toCartItem() } ?: emptyList()
-                Result.success(cartItems)
+                response.body()?.cartItemDto?.map { it.toCartItem() } ?: emptyList()
             } else {
-                Result.failure(RuntimeException(response.code().toString()))
+                throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
-        return try {
+    override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> =
+        runCatching {
             val response = cartItemDataSource.loadCartItems()
             if (response.isSuccessful && response.body() != null) {
                 val cartItem =
-                    response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }
-                        ?.toCartItem()
-                val cartItemResult =
-                    CartItemResult(
-                        cartItemId = cartItem?.id ?: CartItem.DEFAULT_CART_ITEM_ID,
-                        counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
-                    )
-                Result.success(cartItemResult)
+                    response.body()?.cartItemDto?.find { it.product.id.toLong() == productId }?.toCartItem()
+                CartItemResult(
+                    cartItemId = cartItem?.id ?: CartItem.DEFAULT_CART_ITEM_ID,
+                    counter = cartItem?.product?.cartItemCounter ?: CartItemCounter(),
+                )
             } else {
-                Result.failure(RuntimeException(response.code().toString()))
+                throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun increaseCartItem(product: Product): Result<Unit> {
-        return try {
+    override suspend fun increaseCartItem(product: Product): Result<Unit> =
+        runCatching {
             val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
 
             if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
@@ -66,31 +55,22 @@ class RemoteShoppingCartRepositoryImpl(
                 product.updateCartItemCount(cartItemResult.counter.itemCount)
                 updateCartCount(cartItemResult).getOrThrow()
             }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun insertCartItem(product: Product): Result<Unit> {
-        return try {
+    override suspend fun insertCartItem(product: Product): Result<Unit> =
+        runCatching {
             val response =
                 cartItemDataSource.addCartItem(
                     productId = product.id,
                     quantity = product.cartItemCounter.itemCount,
                 )
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(RuntimeException(response.code().toString()))
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun decreaseCartItem(product: Product): Result<Unit> {
-        return try {
+    override suspend fun decreaseCartItem(product: Product): Result<Unit> =
+        runCatching {
             val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
 
             if (cartItemResult.cartItemId == CartItem.DEFAULT_CART_ITEM_ID) {
@@ -102,56 +82,39 @@ class RemoteShoppingCartRepositoryImpl(
                     updateCartCount(cartItemResult).getOrThrow()
                 }
             }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun deleteCartItem(itemId: Long): Result<Unit> {
-        return try {
+    override suspend fun deleteCartItem(itemId: Long): Result<Unit> =
+        runCatching {
             val response = cartItemDataSource.deleteCartItem(id = itemId)
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(NoSuchDataException())
+            if (!response.isSuccessful) {
+                throw NoSuchDataException()
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun updateCartCount(cartItemResult: CartItemResult): Result<Unit> {
-        return try {
+    override suspend fun updateCartCount(cartItemResult: CartItemResult): Result<Unit> =
+        runCatching {
             val response =
                 cartItemDataSource.updateCartItem(
                     id = cartItemResult.cartItemId,
                     quantity = cartItemResult.counter.itemCount,
                 )
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(RuntimeException(response.code().toString()))
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
-    override suspend fun getTotalCartItemCount(): Result<Int> {
-        return try {
+    override suspend fun getTotalCartItemCount(): Result<Int> =
+        runCatching {
             val response = cartItemDataSource.loadCartItemCount()
             if (response.isSuccessful && response.body() != null) {
                 val quantity = response.body()?.quantity ?: ERROR_QUANTITY_SIZE
                 if (quantity == ERROR_QUANTITY_SIZE) throw NoSuchDataException()
-                Result.success(quantity)
+                quantity
             } else {
-                Result.failure(RuntimeException(response.code().toString()))
+                throw RuntimeException(response.code().toString())
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
     companion object {
         private const val ERROR_QUANTITY_SIZE = -1
