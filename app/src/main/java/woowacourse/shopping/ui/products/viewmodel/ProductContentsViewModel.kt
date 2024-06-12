@@ -101,7 +101,7 @@ class ProductContentsViewModel(
             productRepository.getProducts(currentOffset++, 20).onSuccess {
                 items.addAll(it)
                 products.value = items
-                delay(1000)
+                shimmerLoading()
                 productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
             }
         }
@@ -111,7 +111,7 @@ class ProductContentsViewModel(
         viewModelScope.launch(coroutineExceptionHandler) {
             cartRepository.getAllCartItems().onSuccess {
                 cart.value = it
-                delay(1000)
+                shimmerLoading()
                 productWithQuantity.value = productWithQuantity.value?.copy(isLoading = false)
             }
         }
@@ -155,6 +155,10 @@ class ProductContentsViewModel(
     private fun findCartItemQuantityByProductId(productId: Long): Quantity {
         return cart.value?.firstOrNull { it.productId == productId }?.quantity
             ?: error("일치하는 장바구니 아이템이 없습니다.")
+    }
+
+    private suspend fun shimmerLoading() {
+        delay(1000)
     }
 
     companion object {

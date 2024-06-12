@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.delay
 import woowacourse.shopping.data.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.OrderRemoteDataSource
 import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
@@ -46,7 +45,6 @@ class CartRepositoryImpl(
 
     override suspend fun getAllCartItemsWithProduct(): Result<List<CartWithProduct>> {
         val size = getCartItemCounts()
-        delay(1000)
         return cartRemoteDataSource.getCartItems(0, size.getOrThrow()).mapCatching { dto ->
             dto.content.map { content ->
                 CartWithProduct(
