@@ -10,7 +10,7 @@ fun Coupon.toUiModel(formatter: DateTimeFormatter): CouponModel {
         description = description,
         expiredDate = expirationDate.format(formatter),
         minimumAmount = minimumOrderedAmount,
-        discountAmount = discountAmount,
+        discountAmount = this.calculateDiscountAmount(),
         isChecked = false,
     )
 }

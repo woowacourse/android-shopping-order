@@ -10,7 +10,9 @@ data class Coupon(
     val discountStrategy: DiscountStrategy,
     val minimumOrderedAmount: Int = 0,
 ) {
-    val discountAmount: Int = discountStrategy.calculateDiscountAmount()
+    fun calculateDiscountAmount(): Int {
+        return discountStrategy.calculateDiscountAmount()
+    }
 
     fun isValid(currentDate: LocalDate): Boolean {
         return currentDate <= expirationDate && discountStrategy.isApplicable()

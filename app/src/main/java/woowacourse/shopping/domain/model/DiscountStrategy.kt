@@ -33,7 +33,11 @@ class BuyXGetYDiscountStrategy(
 
     override fun calculateDiscountAmount(): Int {
         val applicableItems = orderedItems.filter { it.quantity >= (buyQuantity + getQuantity) }
-        return applicableItems.maxOf { it.product.price }.toInt()
+        return if (applicableItems.isNotEmpty()) {
+            applicableItems.maxOf { it.product.price }.toInt()
+        } else {
+            0
+        }
     }
 }
 
