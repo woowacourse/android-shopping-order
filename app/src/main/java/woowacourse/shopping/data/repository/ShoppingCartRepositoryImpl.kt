@@ -51,8 +51,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
 
     override suspend fun getCartItemResultFromProductId(productId: Long): Result<CartItemResult> {
         return try {
-            var cartItem: CartItem? = null
-            cartItem = cartItemDao.findCartItemByProductId(productId)?.toCartItem()
+            val cartItem: CartItem? = cartItemDao.findCartItemByProductId(productId)?.toCartItem()
             Result.success(
                 CartItemResult(
                     cartItemId = cartItem?.id ?: DEFAULT_CART_ITEM_ID,
