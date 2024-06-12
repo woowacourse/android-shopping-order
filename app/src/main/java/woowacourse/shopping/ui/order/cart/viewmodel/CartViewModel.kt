@@ -98,7 +98,8 @@ class CartViewModel(
                     orderViewModel.updateCartViewItems(newCartViewItems)
                     _cartUiState.value =
                         UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
-                }.onFailure { _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyError) }
+                }
+                .onFailure { _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyError) }
         }
     }
 
@@ -109,7 +110,10 @@ class CartViewModel(
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
-        val updatedCartItem = orderViewModel.getCartViewItemByProductId(productId) ?: return
+        val updatedCartItem =
+            orderViewModel.cartViewItems.value?.firstOrNull { cartViewItem ->
+                cartViewItem.cartItem.product.productId == productId
+            } ?: return
         if (updatedCartItem.cartItem.quantity > 1) {
             orderViewModel.onQuantityMinusButtonClick(productId)
 

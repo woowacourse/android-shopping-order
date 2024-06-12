@@ -65,7 +65,7 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
         _cartViewItems.value = newCartViewItems
     }
 
-    fun getCartViewItemByProductId(productId: Int): CartViewItem? {
+    private fun getCartViewItemByProductId(productId: Int): CartViewItem? {
         return cartViewItems.value?.firstOrNull { cartViewItem ->
             cartViewItem.cartItem.product.productId == productId
         }
@@ -95,7 +95,7 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
                 .onSuccess {
                     val deletedCartViewItem =
                         getCartViewItemByCartItemId(cartItemId) ?: return@onSuccess
-                    val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return@onSuccess
+                    val newCartViewItems = cartViewItems.value?.toMutableList() ?: return@onSuccess
                     newCartViewItems.remove(deletedCartViewItem)
                     _cartViewItems.value = newCartViewItems
                 }.onFailure {
@@ -116,7 +116,7 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
                 val position =
                     getCartViewItemPosition(updatedCartItem.cartItem.cartItemId)
                         ?: return@onSuccess
-                val newCartViewItems = _cartViewItems.value?.toMutableList() ?: return@onSuccess
+                val newCartViewItems = cartViewItems.value?.toMutableList() ?: return@onSuccess
                 newCartViewItems[position] = updatedCartItem
                 _cartViewItems.value = newCartViewItems
             }.onFailure { _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyError) }

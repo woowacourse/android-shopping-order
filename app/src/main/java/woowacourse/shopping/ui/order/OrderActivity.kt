@@ -41,11 +41,6 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        cartFragment.onResume()
-    }
-
     private fun setUpDataBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = orderViewModel

@@ -18,11 +18,15 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
 import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.NavigateToDetail
 import woowacourse.shopping.ui.order.recommend.action.RecommendNotifyingActions
+import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.MinusCartViewItemQuantity
+import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.PlusCartViewItemQuantity
+import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.ShareCartViewItems
+import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.UpdateNewCartViewItems
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
+import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModelFactory
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
 
@@ -38,7 +42,6 @@ class RecommendFragment : Fragment() {
             recentProductRepository = RecentProductRepositoryImpl(localRecentDataSource),
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
             cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            orderViewModel = orderViewModel,
         )
     }
 
@@ -74,7 +77,6 @@ class RecommendFragment : Fragment() {
     private fun setUpAdapter() {
         adapter = RecommendAdapter(recommendViewModel)
         binding.rvRecommend.adapter = adapter
-//        recommendViewModel.generateRecommendProductViewItems()
     }
 
     private fun setUpDataBinding() {
@@ -93,6 +95,23 @@ class RecommendFragment : Fragment() {
             }
         }
 
+        recommendViewModel.recommendShareActions.observe(viewLifecycleOwner) { recommendShareActions ->
+            recommendShareActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is ShareCartViewItems ->
+                        recommendViewModel.updateSharedCartViewItems(
+                            orderViewModel.cartViewItems.value ?: emptyList(),
+                        )
+
+                    is UpdateNewCartViewItems -> orderViewModel.updateCartViewItems(action.newCartViewItems)
+
+                    is PlusCartViewItemQuantity -> orderViewModel.onQuantityPlusButtonClick(action.productId)
+
+                    is MinusCartViewItemQuantity -> orderViewModel.onQuantityMinusButtonClick(action.productId)
+                }
+            }
+        }
+
         recommendViewModel.recommendNavigationActions.observe(viewLifecycleOwner) { recommendNavigationActions ->
             recommendNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
@@ -107,6 +126,10 @@ class RecommendFragment : Fragment() {
                     is RecommendNotifyingActions.NotifyError -> showError(getString(R.string.unknown_error))
                 }
             }
+        }
+
+        orderViewModel.cartViewItems.observe(viewLifecycleOwner) { cartViewItems ->
+            recommendViewModel.updateSharedCartViewItems(cartViewItems)
         }
     }
 
