@@ -127,26 +127,11 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         shoppingCartViewModel.shoppingCartEvent.observe(viewLifecycleOwner) { cartState ->
             when (cartState) {
                 is ShoppingCartEvent.UpdateProductEvent.Success -> {
-                    adapter.updateCartItem(cartState.productId)
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        cartState.count,
-                    )
+                    updateCartItem(cartState)
                 }
 
                 is ShoppingCartEvent.UpdateProductEvent.DELETE -> {
-                    adapter.deleteCartItem(cartState.productId)
-
-                    mainActivityListener?.saveUpdateProduct(
-                        cartState.productId,
-                        DEFAULT_ITEM_COUNT,
-                    )
-
-                    requireContext().makeToast(
-                        getString(
-                            R.string.delete_cart_item,
-                        ),
-                    )
+                    deleteCartItem(cartState)
                 }
 
                 ShoppingCartEvent.UpdateCheckItem.Success -> adapter.notifyDataSetChanged()
@@ -154,47 +139,78 @@ class ShoppingCartFragment : Fragment(), OnClickShoppingCart, OnClickCartItemCou
         }
 
         shoppingCartViewModel.loadingEvent.observe(viewLifecycleOwner) { loadingState ->
-            when (loadingState) {
-                ShoppingCartEvent.LoadCartItemList.Loading -> adapter.setShowSkeleton(true)
-                ShoppingCartEvent.LoadCartItemList.Success -> adapter.setShowSkeleton(false)
-                ShoppingCartEvent.LoadCartItemList.Fail -> {
-                    adapter.setShowSkeleton(false)
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-                }
-            }
+            loadingProcessing(loadingState)
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            when (errorState) {
-                ShoppingCartEvent.DeleteShoppingCart.Fail ->
-                    requireContext().makeToast(
-                        getString(
-                            R.string.error_delete_data,
-                        ),
-                    )
-
-                ShoppingCartEvent.LoadCartItemList.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.max_paging_data),
-                    )
-
-                ShoppingCartEvent.ErrorState.NotKnownError ->
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
-
-                ShoppingCartEvent.UpdateProductEvent.Fail ->
-                    requireContext().makeToast(
-                        getString(R.string.error_update_cart_item),
-                    )
-            }
+            processError(errorState)
         }
 
         mainActivityListener?.observeCartItem {
             shoppingCartViewModel.loadPagingCartItemList()
         }
+    }
+
+    private fun processError(errorState: ShoppingCartEvent.ErrorState) {
+        when (errorState) {
+            ShoppingCartEvent.DeleteShoppingCart.Fail ->
+                requireContext().makeToast(
+                    getString(
+                        R.string.error_delete_data,
+                    ),
+                )
+
+            ShoppingCartEvent.LoadCartItemList.Fail ->
+                requireContext().makeToast(
+                    getString(R.string.max_paging_data),
+                )
+
+            ShoppingCartEvent.ErrorState.NotKnownError ->
+                requireContext().makeToast(
+                    getString(R.string.error_default),
+                )
+
+            ShoppingCartEvent.UpdateProductEvent.Fail ->
+                requireContext().makeToast(
+                    getString(R.string.error_update_cart_item),
+                )
+        }
+    }
+
+    private fun loadingProcessing(loadingState: ShoppingCartEvent.LoadCartItemList) {
+        when (loadingState) {
+            ShoppingCartEvent.LoadCartItemList.Loading -> adapter.setShowSkeleton(true)
+            ShoppingCartEvent.LoadCartItemList.Success -> adapter.setShowSkeleton(false)
+            ShoppingCartEvent.LoadCartItemList.Fail -> {
+                adapter.setShowSkeleton(false)
+                requireContext().makeToast(
+                    getString(R.string.error_default),
+                )
+            }
+        }
+    }
+
+    private fun deleteCartItem(cartState: ShoppingCartEvent.UpdateProductEvent.DELETE) {
+        adapter.deleteCartItem(cartState.productId)
+
+        mainActivityListener?.saveUpdateProduct(
+            cartState.productId,
+            DEFAULT_ITEM_COUNT,
+        )
+
+        requireContext().makeToast(
+            getString(
+                R.string.delete_cart_item,
+            ),
+        )
+    }
+
+    private fun updateCartItem(cartState: ShoppingCartEvent.UpdateProductEvent.Success) {
+        adapter.updateCartItem(cartState.productId)
+        mainActivityListener?.saveUpdateProduct(
+            cartState.productId,
+            cartState.count,
+        )
     }
 
     private fun initView() {
