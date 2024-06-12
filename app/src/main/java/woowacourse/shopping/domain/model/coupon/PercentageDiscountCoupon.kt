@@ -39,14 +39,5 @@ data class PercentageDiscountCoupon(
     companion object {
         const val PERCENTAGE = 100
         const val TYPE = "percentage"
-
-        fun PercentageDiscountCoupon.toUiModel() =
-            CouponUiModel(
-                id = id,
-                description = description,
-                expirationDate = expirationDate,
-                minimumAmount = null,
-                discountType = discountType,
-            )
     }
 }

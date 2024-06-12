@@ -33,14 +33,5 @@ data class FreeShippingCoupon(
 
     companion object {
         const val TYPE = "freeShipping"
-
-        fun FreeShippingCoupon.toUiModel() =
-            CouponUiModel(
-                id = id,
-                description = description,
-                expirationDate = expirationDate,
-                minimumAmount = minimumAmount,
-                discountType = discountType,
-            )
     }
 }

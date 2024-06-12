@@ -19,6 +19,7 @@ import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
+import woowacourse.shopping.ui.mapper.CouponMapper
 import woowacourse.shopping.ui.model.CouponUiModel
 import woowacourse.shopping.ui.model.OrderInformation
 
@@ -67,7 +68,7 @@ class PaymentViewModel(
             handleResponseResult(couponRepository.loadCoupons(), _errorMessage) { coupons ->
                 order = Order(coupons)
                 val applicableCoupon = order.findAvailableCoupons(selectedCartItems)
-                _couponsUiModel.value = applicableCoupon.map { CouponUiModel.toUiModel(it) }
+                _couponsUiModel.value = applicableCoupon.map { CouponMapper.toUiModel(it) }
             }
             _totalPaymentAmount.value = orderInformation.orderAmount + SHIPPING_FEE
         }

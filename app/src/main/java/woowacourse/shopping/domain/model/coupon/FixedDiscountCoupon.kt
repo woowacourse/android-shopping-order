@@ -34,14 +34,5 @@ data class FixedDiscountCoupon(
 
     companion object {
         const val TYPE = "fixed"
-
-        fun FixedDiscountCoupon.toUiModel() =
-            CouponUiModel(
-                id = id,
-                description = description,
-                expirationDate = expirationDate,
-                minimumAmount = minimumAmount,
-                discountType = discountType,
-            )
     }
 }

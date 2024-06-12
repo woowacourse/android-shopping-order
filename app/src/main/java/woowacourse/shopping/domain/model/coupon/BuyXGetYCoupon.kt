@@ -37,14 +37,5 @@ data class BuyXGetYCoupon(
 
     companion object {
         const val TYPE = "buyXgetY"
-
-        fun BuyXGetYCoupon.toUiModel() =
-            CouponUiModel(
-                id = id,
-                description = description,
-                expirationDate = expirationDate,
-                minimumAmount = null,
-                discountType = discountType,
-            )
     }
 }
