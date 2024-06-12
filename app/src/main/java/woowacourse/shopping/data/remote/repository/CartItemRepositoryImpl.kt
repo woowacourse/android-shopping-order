@@ -15,53 +15,36 @@ class CartItemRepositoryImpl(
     override suspend fun getAllByPaging(
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            val response = cartItemDataSource.getAllByPaging(page, size)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.content?.map { it.toDomain() } ?: emptyList())
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    ): Result<List<CartProduct>> {
+        return cartItemDataSource.getAllByPaging(page, size).mapCatching { it ->
+            it.body?.content?.map { it.toDomain() } ?: emptyList()
         }
+    }
 
-    override suspend fun post(cartItemRequest: CartItemRequest): Result<Int> =
-        runCatching {
-            val response = cartItemDataSource.post(cartItemRequest)
-            if (response.isSuccessful) {
-                return Result.success(
-                    response.toIdOrNull() ?: 0,
-                )
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    override suspend fun post(cartItemRequest: CartItemRequest): Result<Int> {
+        return cartItemDataSource.post(cartItemRequest).mapCatching {
+            it.body ?: 0
         }
+    }
 
     override suspend fun patch(
         id: Int,
         quantityRequestDto: QuantityRequest,
-    ): Result<Unit> =
-        runCatching {
-            val response = cartItemDataSource.patch(id, quantityRequestDto)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    ): Result<Unit> {
+        return cartItemDataSource.patch(id, quantityRequestDto).mapCatching {
+            it.body
         }
+    }
 
-    override suspend fun delete(id: Int): Result<Unit> =
-        runCatching {
-            val response = cartItemDataSource.delete(id)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    override suspend fun delete(id: Int): Result<Unit> {
+        return cartItemDataSource.delete(id).mapCatching {
+            it.body
         }
+    }
 
-    override suspend fun getCount(): Result<Int> =
-        runCatching {
-            val response = cartItemDataSource.getCount()
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.quantity ?: 0)
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    override suspend fun getCount(): Result<Int> {
+        return cartItemDataSource.getCount().mapCatching {
+            it.body?.quantity ?: 0
         }
+    }
 }
