@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
@@ -29,15 +30,16 @@ class CurationViewModel(
     private val _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val orderProducts: LiveData<UiState<List<CartProduct>>> get() = _orderProducts
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        _errorHandler.value = EventState(CURATION_ERROR)
+    }
+
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             repository.getCuration()
                 .onSuccess {
-                    _cartProducts.value = UiState.Success(it ?: emptyList())
+                    _cartProducts.value = UiState.Success(it)
                     orderProducts()
-                }
-                .onFailure {
-                    _errorHandler.value = EventState(LOAD_ERROR)
                 }
         }
     }
@@ -48,9 +50,6 @@ class CurationViewModel(
                 val filteredCartItems =
                     it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
                 _orderProducts.value = UiState.Success(filteredCartItems)
-            }
-            .onFailure {
-                _errorHandler.value = EventState(LOAD_ERROR)
             }
     }
 
@@ -75,7 +74,7 @@ class CurationViewModel(
     }
 
     override fun onPlus(cartProduct: CartProduct) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].plusQuantity()
@@ -91,8 +90,6 @@ class CurationViewModel(
                     _cartProducts.value = UiState.Success(cartProducts)
                     _orderProducts.value =
                         UiState.Success((_orderProducts.value as UiState.Success).data + cartProducts[index])
-                }.onFailure {
-                    _errorHandler.value = EventState("아이템 증가 오류")
                 }
             } else {
                 repository.updateCartItem(
@@ -110,15 +107,13 @@ class CurationViewModel(
                                 }
                             },
                         )
-                }.onFailure {
-                    _errorHandler.value = EventState("아이템 증가 오류")
                 }
             }
         }
     }
 
     override fun onMinus(cartProduct: CartProduct) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].minusQuantity()
@@ -141,22 +136,17 @@ class CurationViewModel(
                                 },
                             )
                     }
-                    .onFailure {
-                        _errorHandler.value = EventState("아이템 감소 오류")
-                    }
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
                     _cartProducts.value = UiState.Success(cartProducts)
                     _orderProducts.value =
                         UiState.Success((_orderProducts.value as UiState.Success).data - cartProduct)
-                }.onFailure {
-                    _errorHandler.value = EventState("아이템 감소 오류")
                 }
             }
         }
     }
 
     companion object {
-        const val LOAD_ERROR = "큐레이션 로드 에러입니다"
+        const val CURATION_ERROR = "상품 추천 에러입니다."
     }
 }
