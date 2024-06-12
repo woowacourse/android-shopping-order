@@ -12,4 +12,10 @@ interface RemoteProductDataSource {
     ): ProductResponse
 
     suspend fun getProductById(id: Int): Product
+
+    suspend fun getRecommendedProducts(
+        category: String?,
+        maxSize: Int,
+        sort: String
+    ): ProductResponse
 }

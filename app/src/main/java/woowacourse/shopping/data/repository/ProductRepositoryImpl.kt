@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
 import woowacourse.shopping.domain.repository.ProductRepository
+import kotlin.math.max
 
 class ProductRepositoryImpl(
     private val remoteProductDataSource: RemoteProductDataSource,
@@ -45,29 +46,13 @@ class ProductRepositoryImpl(
         return runCatching {
             val lastlyViewedProduct = recentProductDao.findMostRecentProduct()
             val cartData = getEntireCartItems()
-            val orderableProducts = mutableListOf<OrderableProduct>()
-            var page = 0
-            do {
-                val products =
-                    remoteProductDataSource.getProducts(
-                        category = lastlyViewedProduct?.category,
-                        page = page++,
-                        size = requiredSize,
-                        sort = SORT_CART_ITEMS,
-                    ).toProductDomain(
-                        cartData,
-                    ).orderableProducts.filter {
-                        it.cartData == null
-                    }
-                products.forEach {
-                    if (orderableProducts.size < requiredSize) {
-                        orderableProducts.add(it)
-                    } else {
-                        return@forEach
-                    }
-                }
-            } while (orderableProducts.size >= requiredSize || products.isEmpty())
-            orderableProducts
+            remoteProductDataSource.getRecommendedProducts(
+                category = lastlyViewedProduct?.category,
+                maxSize = requiredSize,
+                sort = SORT_RECOMMENDED_ITEMS
+            ).toProductDomain(cartData = cartData)
+                .orderableProducts
+                .filter { it.cartData == null }
         }
     }
 
@@ -85,5 +70,6 @@ class ProductRepositoryImpl(
     companion object {
         private const val PAGE_CART_ITEMS = 0
         private const val SORT_CART_ITEMS = "asc"
+        private const val SORT_RECOMMENDED_ITEMS = "asc"
     }
 }
