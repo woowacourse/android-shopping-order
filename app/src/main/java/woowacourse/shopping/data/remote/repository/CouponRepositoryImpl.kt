@@ -8,12 +8,9 @@ import woowacourse.shopping.domain.repository.CouponRepository
 class CouponRepositoryImpl(
     private val couponDataSource: CouponDataSource,
 ) : CouponRepository {
-    override suspend fun getAll(): Result<List<Coupon>> =
-        runCatching {
-            val response = couponDataSource.getAll()
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    override suspend fun getAll(): Result<List<Coupon>> {
+        return couponDataSource.getAll().mapCatching {
+            it.body?.map { it.toDomain() } ?: emptyList()
         }
+    }
 }
