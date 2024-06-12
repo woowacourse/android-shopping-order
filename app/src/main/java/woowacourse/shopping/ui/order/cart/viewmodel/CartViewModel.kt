@@ -98,7 +98,7 @@ class CartViewModel(
                     orderViewModel.updateCartViewItems(newCartViewItems)
                     _cartUiState.value =
                         UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
-                }
+                }.onFailure { _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyError) }
         }
     }
 

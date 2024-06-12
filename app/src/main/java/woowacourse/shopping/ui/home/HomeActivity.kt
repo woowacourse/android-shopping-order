@@ -17,6 +17,7 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.action.HomeNavigationActions
+import woowacourse.shopping.ui.home.action.HomeNotifyingActions.NotifyError
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.Companion.LOAD_MORE_BUTTON_VIEW_TYPE
 import woowacourse.shopping.ui.home.adapter.product.ProductAdapter
@@ -93,6 +94,14 @@ class HomeActivity : AppCompatActivity() {
                 when (action) {
                     is HomeNavigationActions.NavigateToDetail -> navigateToDetail(action.productId)
                     is HomeNavigationActions.NavigateToCart -> navigateToCart()
+                }
+            }
+        }
+
+        viewModel.homeNotifyingActions.observe(this) { homeNotifyingActions ->
+            homeNotifyingActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is NotifyError -> showError(getString(R.string.unknown_error))
                 }
             }
         }

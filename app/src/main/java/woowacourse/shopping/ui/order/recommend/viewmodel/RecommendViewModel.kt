@@ -16,6 +16,7 @@ import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.viewmodel.HomeViewModel
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions
+import woowacourse.shopping.ui.order.recommend.action.RecommendNotifyingActions
 import woowacourse.shopping.ui.order.recommend.listener.RecommendClickListener
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
 import woowacourse.shopping.ui.state.UiState
@@ -39,6 +40,10 @@ class RecommendViewModel(
     private val _recommendNavigationActions = MutableLiveData<Event<RecommendNavigationActions>>()
     val recommendNavigationActions: LiveData<Event<RecommendNavigationActions>>
         get() = _recommendNavigationActions
+
+    private val _recommendNotifyingActions = MutableLiveData<Event<RecommendNotifyingActions>>()
+    val recommendNotifyingActions: LiveData<Event<RecommendNotifyingActions>>
+        get() = _recommendNotifyingActions
 
     fun updateRecommendProductViewItems() {
         if (recommendUiState.value is UiState.Success) {
@@ -80,6 +85,9 @@ class RecommendViewModel(
                         _recommendProductViewItems.value = newRecommendProductViewItems
                         _recommendUiState.value =
                             UiState.Success(recommendProductViewItems.value ?: emptyList())
+                    }.onFailure {
+                        _recommendNotifyingActions.value =
+                            Event(RecommendNotifyingActions.NotifyError)
                     }
             }
         }
@@ -112,6 +120,9 @@ class RecommendViewModel(
                         .map(HomeViewItem::ProductViewItem)
                 _recommendUiState.value =
                     UiState.Success(recommendProductViewItems.value ?: emptyList())
+            }.onFailure {
+                _recommendNotifyingActions.value =
+                    Event(RecommendNotifyingActions.NotifyError)
             }
         }
     }
@@ -150,6 +161,9 @@ class RecommendViewModel(
                         newRecommendProductViewItems[recommendPosition] =
                             ProductViewItem(product, 1)
                         _recommendUiState.value = UiState.Success(newRecommendProductViewItems)
+                    }.onFailure {
+                        _recommendNotifyingActions.value =
+                            Event(RecommendNotifyingActions.NotifyError)
                     }
             }
         }

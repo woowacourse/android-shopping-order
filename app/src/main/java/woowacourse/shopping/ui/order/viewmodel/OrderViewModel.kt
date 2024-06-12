@@ -121,7 +121,7 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
                         newSelectedCatViewItems.removeAt(selectedPosition)
                         _selectedCartViewItems.value = newSelectedCatViewItems
                     }
-                }
+                }.onFailure { _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyError) }
         }
     }
 
@@ -151,7 +151,7 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
                     newSelectedCatViewItems[selectedPosition] = updatedCartItem
                     _selectedCartViewItems.value = newSelectedCatViewItems
                 }
-            }
+            }.onFailure { _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyError) }
         }
     }
 
@@ -188,7 +188,7 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
                         newSelectedCatViewItems[selectedPosition] = updatedCartItem
                         _selectedCartViewItems.value = newSelectedCatViewItems
                     }
-                }
+                }.onFailure { _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyError) }
         }
     }
 

@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.home.action.HomeNavigationActions
+import woowacourse.shopping.ui.home.action.HomeNotifyingActions
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.home.listener.HomeClickListener
 import woowacourse.shopping.ui.home.listener.ProductClickListener
@@ -55,6 +56,10 @@ class HomeViewModel(
     val homeNavigationActions: LiveData<Event<HomeNavigationActions>>
         get() = _homeNavigationActions
 
+    private val _homeNotifyingActions = MutableLiveData<Event<HomeNotifyingActions>>()
+    val homeNotifyingActions: LiveData<Event<HomeNotifyingActions>>
+        get() = _homeNotifyingActions
+
     private var page = 0
 
     init {
@@ -79,7 +84,7 @@ class HomeViewModel(
         recentProductRepository.findAll(RECENT_PRODUCTS_LIMIT)
             .onSuccess { recentProducts ->
                 _recentProducts.value = recentProducts
-            }
+            }.onFailure { _homeNotifyingActions.value = Event(HomeNotifyingActions.NotifyError) }
     }
 
     private suspend fun loadProductViewItems() {
@@ -104,14 +109,16 @@ class HomeViewModel(
         }
     }
 
-    private fun loadCartItems() = viewModelScope.launch {
-        cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
-            .onSuccess {
-                cartItems.clear()
-                cartItems.addAll(it)
-                _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
-            }
-    }
+    private fun loadCartItems() =
+        viewModelScope.launch {
+            cartRepository.getCartItems(0, (cartTotalQuantity.value ?: 0), DESCENDING_SORT_ORDER)
+                .onSuccess {
+                    cartItems.clear()
+                    cartItems.addAll(it)
+                    _cartTotalQuantity.value = cartRepository.getCartTotalQuantity().getOrNull()
+                }
+                .onFailure { _homeNotifyingActions.value = Event(HomeNotifyingActions.NotifyError) }
+        }
 
     private fun getCartItemByProductId(productId: Int): CartItem? {
         return cartItems.firstOrNull { cartItem -> cartItem.product.productId == productId }
@@ -181,6 +188,7 @@ class HomeViewModel(
                     cartItems.add(CartItem(cartItemId, 1, product))
                     _cartTotalQuantity.value = cartTotalQuantity.value?.plus(1)
                 }
+                .onFailure { _homeNotifyingActions.value = Event(HomeNotifyingActions.NotifyError) }
         }
     }
 
@@ -192,6 +200,7 @@ class HomeViewModel(
                     updateProductViewItemQuantity(cartItem.product, cartItem.quantity + 1)
                     loadCartItems()
                 }
+                .onFailure { _homeNotifyingActions.value = Event(HomeNotifyingActions.NotifyError) }
         }
     }
 
@@ -208,6 +217,7 @@ class HomeViewModel(
                     updateProductViewItemQuantity(cartItem.product, cartItem.quantity - 1)
                     loadCartItems()
                 }
+                .onFailure { _homeNotifyingActions.value = Event(HomeNotifyingActions.NotifyError) }
         }
     }
 

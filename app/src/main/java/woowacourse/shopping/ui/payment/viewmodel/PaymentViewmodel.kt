@@ -107,16 +107,17 @@ class PaymentViewmodel(
         }
     }
 
-    private fun loadCartItems() = viewModelScope.launch {
-        val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
-        cartRepository.getCartItems(0, totalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
-            .onSuccess {
-                _cartItems.value =
-                    it.filter { cartItem -> cartItemIds.contains(cartItem.cartItemId) }
-                _orderPrice.value = cartItems.value?.sumOf { cartItem -> cartItem.totalPrice }
-                _deliveryPrice.value = DEFAULT_DELIVERY_PRICE
-            }
-    }
+    private fun loadCartItems() =
+        viewModelScope.launch {
+            val totalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
+            cartRepository.getCartItems(0, totalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
+                .onSuccess {
+                    _cartItems.value =
+                        it.filter { cartItem -> cartItemIds.contains(cartItem.cartItemId) }
+                    _orderPrice.value = cartItems.value?.sumOf { cartItem -> cartItem.totalPrice }
+                    _deliveryPrice.value = DEFAULT_DELIVERY_PRICE
+                }
+        }
 
     override fun onBackButtonClick() {
         _paymentNavigationActions.value = Event(PaymentNavigationActions.NavigateToBack)

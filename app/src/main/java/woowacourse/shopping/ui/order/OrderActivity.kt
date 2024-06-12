@@ -74,9 +74,9 @@ class OrderActivity : AppCompatActivity() {
         orderViewModel.orderNotifyingActions.observe(this) { orderNotifyingActions ->
             orderNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is OrderNotifyingActions.NotifyCanNotOrder -> {
-                        notifyCanNotOrder()
-                    }
+                    is OrderNotifyingActions.NotifyCanNotOrder -> notifyCanNotOrder()
+                    is OrderNotifyingActions.NotifyError -> showError(getString(R.string.unknown_error))
+
                 }
             }
         }
@@ -88,6 +88,10 @@ class OrderActivity : AppCompatActivity() {
             replace(R.id.fragment_cart, fragment)
             addToBackStack(null)
         }
+    }
+
+    private fun showError(errorMessage: String) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToHome() {

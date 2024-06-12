@@ -14,7 +14,8 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
-import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
+import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions.NotifyCartItemDeleted
+import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions.NotifyError
 import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
@@ -97,7 +98,8 @@ class CartFragment : Fragment() {
         cartViewModel.cartNotifyingActions.observe(viewLifecycleOwner) { cartNotifyingActions ->
             cartNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is CartNotifyingActions.NotifyCartItemDeleted -> notifyCartItemDeleted()
+                    is NotifyCartItemDeleted -> notifyCartItemDeleted()
+                    is NotifyError -> showError(getString(R.string.unknown_error))
                 }
             }
         }
@@ -120,7 +122,8 @@ class CartFragment : Fragment() {
     }
 
     private fun notifyCartItemDeleted() {
-        Toast.makeText(requireContext(), getString(R.string.deleted_cart_item), Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.deleted_cart_item), Toast.LENGTH_SHORT)
+            .show()
     }
 
     companion object {

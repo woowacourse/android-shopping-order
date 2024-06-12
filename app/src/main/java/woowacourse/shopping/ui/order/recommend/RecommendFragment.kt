@@ -20,6 +20,7 @@ import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.home.adapter.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.RecommendViewModelFactory
 import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions.NavigateToDetail
+import woowacourse.shopping.ui.order.recommend.action.RecommendNotifyingActions
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -96,6 +97,14 @@ class RecommendFragment : Fragment() {
             recommendNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is NavigateToDetail -> navigateToDetail(action.productId)
+                }
+            }
+        }
+
+        recommendViewModel.recommendNotifyingActions.observe(viewLifecycleOwner) { recommendNotifyingActions ->
+            recommendNotifyingActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is RecommendNotifyingActions.NotifyError -> showError(getString(R.string.unknown_error))
                 }
             }
         }

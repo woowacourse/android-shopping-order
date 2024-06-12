@@ -70,7 +70,9 @@ class DetailViewModel(
                     val currentProduct = product.value ?: return@onSuccess
                     recentProductRepository.save(currentProduct)
                     updateRecentProductVisible(isMostRecentProductClicked)
-                }.onFailure { throw IllegalArgumentException() }
+                }.onFailure {
+                    _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyError)
+                }
         }
     }
 
@@ -116,8 +118,13 @@ class DetailViewModel(
                             cartRepository.updateCartItem(
                                 cartItem.cartItemId,
                                 quantity + currentQuantity,
-                            ).onFailure { throw IllegalArgumentException() }
+                            ).onFailure {
+                                _detailNotifyingActions.value =
+                                    Event(DetailNotifyingActions.NotifyError)
+                            }
                         }
+                    }.onFailure {
+                        _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyError)
                     }
             }
         }

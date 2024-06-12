@@ -17,6 +17,7 @@ import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.ui.detail.action.DetailNavigationActions.NavigateToBack
 import woowacourse.shopping.ui.detail.action.DetailNavigationActions.NavigateToRecentDetail
 import woowacourse.shopping.ui.detail.action.DetailNotifyingActions
+import woowacourse.shopping.ui.detail.action.DetailNotifyingActions.*
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModelFactory
 import woowacourse.shopping.ui.state.UiState
@@ -85,7 +86,8 @@ class DetailActivity : AppCompatActivity() {
         viewModel.detailNotifyingActions.observe(this) { detailNotifyingActions ->
             detailNotifyingActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is DetailNotifyingActions.NotifyPutInCartItem -> notifyPutInCartItem()
+                    is NotifyPutInCartItem -> notifyPutInCartItem()
+                    is NotifyError -> showError(getString(R.string.unknown_error))
                 }
             }
         }
