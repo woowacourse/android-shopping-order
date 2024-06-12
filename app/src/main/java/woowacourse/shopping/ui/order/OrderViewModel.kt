@@ -54,8 +54,8 @@ class OrderViewModel(
                 _navigationPaymentEvent.setValue(
                     OrderInformation(
                         cartItemIds = orderInformation.cartItemIds + cartItemIds,
-                        orderAmount = orderAmount.value ?: 0,
-                        ordersCount = ordersCount.value ?: 0,
+                        orderAmount = orderAmount.value ?: DEFAULT_ORDER_AMOUNT,
+                        ordersCount = ordersCount.value ?: DEFAULT_ORDERS_COUNT,
                     )
                 )
             }
@@ -89,39 +89,43 @@ class OrderViewModel(
         variation: Int,
         priceConvert: (price: Int) -> Int
     ) {
-        viewModelScope.launch {
-            cartItemRepository.updateProductQuantity(productQuantity.productId, productQuantity.quantity)
-            updateProductQuantity(productQuantity.productId, variation)
-            updateOrderAmount(productQuantity.productId, priceConvert)
-            updateOrdersCount(variation)
-        }
+        updateProductQuantity(productQuantity, variation)
+        updateOrderAmount(productQuantity.productId, priceConvert)
+        updateOrdersCount(variation)
     }
 
     private fun updateProductQuantity(
-        productId: Long,
+        productQuantity: ProductIdsCount,
         variation: Int,
     ) {
+        viewModelScope.launch {
+            cartItemRepository.updateProductQuantity(productQuantity.productId, productQuantity.quantity)
+        }
         _recommendProducts.value =
             recommendProducts.value?.map { product ->
                 val quantity: Int = product.quantity + variation
-                product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
+                product.takeIf { it.id == productQuantity.productId }?.copy(quantity = quantity) ?: product
             }
     }
 
-    private suspend fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
-        handleResponseResult(productRepository.loadProduct(productId), _errorMessage) { product ->
-            val currentOrderAmount = orderAmount.value ?: 0
-            _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+    private fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
+        viewModelScope.launch {
+            handleResponseResult(productRepository.loadProduct(productId), _errorMessage) { product ->
+                val currentOrderAmount = orderAmount.value ?: DEFAULT_ORDER_AMOUNT
+                _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+            }
         }
     }
 
     private fun updateOrdersCount(countVariation: Int) {
-        val currentOrdersCount = ordersCount.value ?: 0
+        val currentOrdersCount = ordersCount.value ?: DEFAULT_ORDERS_COUNT
         _ordersCount.value = currentOrdersCount + countVariation
     }
 
     companion object {
         private const val TAG = "ProductDetailViewModel"
+        private const val DEFAULT_ORDERS_COUNT = 0
+        private const val DEFAULT_ORDER_AMOUNT = 0
 
         fun factory(
             orderInformation: OrderInformation,
