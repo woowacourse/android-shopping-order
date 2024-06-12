@@ -71,39 +71,39 @@ class RealShoppingCartRepositoryImpl(
     ): Result<UpdateCartItemResult> {
         return runCatching {
             val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
-            val result = when (updateCartItemType) {
-                UpdateCartItemType.INCREASE -> {
-                    if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
-                        increaseItem(cartItemResult, product)
-                        addCartItem(product)
-                        UpdateCartItemResult.ADD
-                    } else {
-                        increaseItem(cartItemResult, product)
-                        UpdateCartItemResult.UPDATED(cartItemResult)
+            val result =
+                when (updateCartItemType) {
+                    UpdateCartItemType.INCREASE -> {
+                        if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
+                            increaseItem(cartItemResult, product)
+                            addCartItem(product)
+                            UpdateCartItemResult.ADD
+                        } else {
+                            increaseItem(cartItemResult, product)
+                            UpdateCartItemResult.UPDATED(cartItemResult)
+                        }
                     }
-                }
 
-                UpdateCartItemType.DECREASE -> {
-                    val changeCartItemResult = cartItemResult.decreaseCount()
-                    if (changeCartItemResult == ChangeCartItemResultState.Fail) {
-                        deleteCartItem(cartItemResult.cartItemId)
-                        UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
-                    } else {
+                    UpdateCartItemType.DECREASE -> {
+                        val changeCartItemResult = cartItemResult.decreaseCount()
+                        if (changeCartItemResult == ChangeCartItemResultState.Fail) {
+                            deleteCartItem(cartItemResult.cartItemId)
+                            UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
+                        } else {
+                            updateCartCount(cartItemResult)
+                            UpdateCartItemResult.UPDATED(cartItemResult)
+                        }
+                    }
+
+                    is UpdateCartItemType.UPDATE -> {
+                        cartItemResult.updateCount(updateCartItemType.count)
                         updateCartCount(cartItemResult)
                         UpdateCartItemResult.UPDATED(cartItemResult)
                     }
                 }
-
-                is UpdateCartItemType.UPDATE -> {
-                    cartItemResult.updateCount(updateCartItemType.count)
-                    updateCartCount(cartItemResult)
-                    UpdateCartItemResult.UPDATED(cartItemResult)
-                }
-            }
             result
         }
     }
-
 
     private suspend fun increaseItem(
         cartItemResult: CartItemResult,

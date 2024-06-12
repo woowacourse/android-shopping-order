@@ -91,16 +91,17 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                 }
             }
 
-            val updateResult = runCatching {
-                withContext(Dispatchers.IO) {
-                    cartItemDao.updateCartItemCount(
-                        cartItemResult.cartItemId,
-                        cartItemResult.counter.itemCount,
-                    )
+            val updateResult =
+                runCatching {
+                    withContext(Dispatchers.IO) {
+                        cartItemDao.updateCartItemCount(
+                            cartItemResult.cartItemId,
+                            cartItemResult.counter.itemCount,
+                        )
+                    }
+                }.getOrElse {
+                    throw NoSuchDataException()
                 }
-            }.getOrElse {
-                throw NoSuchDataException()
-            }
 
             if (updateResult == ERROR_UPDATE_DATA_ID) {
                 throw NoSuchDataException()
@@ -111,7 +112,6 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
             Result.failure(e)
         }
     }
-
 
     override suspend fun getTotalCartItemCount(): Result<Int> {
         return Result.runCatching { cartItemDao.getTotalItemCount() }
