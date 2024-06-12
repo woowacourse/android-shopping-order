@@ -68,12 +68,13 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
         product: Product,
         updateCartItemType: UpdateCartItemType,
     ): Result<UpdateCartItemResult> {
-        return runCatching {
+        return try {
             val cartItemResult = getCartItemResultFromProductId(product.id).getOrThrow()
+
             when (updateCartItemType) {
                 UpdateCartItemType.INCREASE -> {
                     if (cartItemResult.cartItemId == DEFAULT_CART_ITEM_ID) {
-                        return@runCatching UpdateCartItemResult.ADD
+                        return Result.success(UpdateCartItemResult.ADD)
                     } else {
                         cartItemResult.increaseCount()
                     }
@@ -82,7 +83,7 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                 UpdateCartItemType.DECREASE -> {
                     if (cartItemResult.decreaseCount() == ChangeCartItemResultState.Fail) {
                         deleteCartItem(cartItemResult.cartItemId)
-                        return@runCatching UpdateCartItemResult.DELETE(cartItemResult.cartItemId)
+                        return Result.success(UpdateCartItemResult.DELETE(cartItemResult.cartItemId))
                     }
                 }
 
@@ -90,19 +91,28 @@ class ShoppingCartRepositoryImpl(context: Context) : ShoppingCartRepository {
                     cartItemResult.updateCount(updateCartItemType.count)
                 }
             }
-            val updateDataId =
+
+            val updateResult = runCatching {
                 withContext(Dispatchers.IO) {
                     cartItemDao.updateCartItemCount(
                         cartItemResult.cartItemId,
                         cartItemResult.counter.itemCount,
                     )
                 }
-            if (updateDataId == ERROR_UPDATE_DATA_ID) {
+            }.getOrElse {
                 throw NoSuchDataException()
             }
-            UpdateCartItemResult.UPDATED(cartItemResult)
+
+            if (updateResult == ERROR_UPDATE_DATA_ID) {
+                throw NoSuchDataException()
+            }
+
+            Result.success(UpdateCartItemResult.UPDATED(cartItemResult))
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
+
 
     override suspend fun getTotalCartItemCount(): Result<Int> {
         return Result.runCatching { cartItemDao.getTotalItemCount() }
