@@ -97,11 +97,9 @@ class CartActivity : AppCompatActivity() {
 
     private fun observeData() {
         viewModel.changedCartEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
             setResult(Activity.RESULT_OK)
         }
         viewModel.orderEvent.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
             if (isVisibleCartSelectionFragment()) {
                 addFragment(cartRecommendFragment)
             } else {
@@ -115,16 +113,13 @@ class CartActivity : AppCompatActivity() {
 
     private fun observeErrorEvent() {
         viewModel.productsLoadError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showCartErrorToast(throwable, R.string.product_load_error)
+            showCartErrorToast(it, R.string.product_load_error)
         }
         viewModel.cartItemAddError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showCartErrorToast(throwable, R.string.cart_item_add_error)
+            showCartErrorToast(it, R.string.cart_item_add_error)
         }
         viewModel.cartItemDeleteError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showCartErrorToast(throwable, R.string.cart_item_delete_error)
+            showCartErrorToast(it, R.string.cart_item_delete_error)
         }
     }
 

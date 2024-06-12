@@ -78,13 +78,12 @@ class ProductDetailActivity : AppCompatActivity() {
             viewModel.addCartProduct()
         }
 
-        viewModel.isSuccessAddCart.observe(this) { isSuccessEvent ->
-            val isSuccess = isSuccessEvent.getContentIfNotHandled() ?: return@observe
+        viewModel.isSuccessAddCart.observe(this) { isSuccess ->
             if (isSuccess) {
                 showAddCartSuccessDialog()
-            } else {
-                showToast(R.string.cart_item_add_error)
+                return@observe
             }
+            showToast(R.string.cart_item_add_error)
         }
     }
 
@@ -109,8 +108,7 @@ class ProductDetailActivity : AppCompatActivity() {
 
     private fun observeProductLoadErrorEvent() {
         viewModel.productLoadError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showProductLoadError(throwable)
+            showProductLoadError(it)
         }
     }
 

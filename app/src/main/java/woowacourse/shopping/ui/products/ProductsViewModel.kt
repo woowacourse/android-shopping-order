@@ -7,7 +7,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import woowacourse.shopping.common.Event
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -41,14 +42,14 @@ class ProductsViewModel(
     private val _recentProductUiModels = MutableLiveData<List<RecentProductUiModel>?>()
     val recentProductUiModels: LiveData<List<RecentProductUiModel>?> get() = _recentProductUiModels
 
-    private val _productsLoadError = MutableLiveData<Event<Throwable>>()
-    val productsLoadError: LiveData<Event<Throwable>> get() = _productsLoadError
+    private val _productsLoadError = MutableSingleLiveData<Throwable>()
+    val productsLoadError: SingleLiveData<Throwable> get() = _productsLoadError
 
-    private val _cartItemAddError = MutableLiveData<Event<Throwable>>()
-    val cartItemAddError: LiveData<Event<Throwable>> get() = _cartItemAddError
+    private val _cartItemAddError = MutableSingleLiveData<Throwable>()
+    val cartItemAddError: SingleLiveData<Throwable> get() = _cartItemAddError
 
-    private val _cartItemDeleteError = MutableLiveData<Event<Throwable>>()
-    val cartItemDeleteError: LiveData<Event<Throwable>> get() = _cartItemDeleteError
+    private val _cartItemDeleteError = MutableSingleLiveData<Throwable>()
+    val cartItemDeleteError: SingleLiveData<Throwable> get() = _cartItemDeleteError
 
     init {
         loadPage()
@@ -159,7 +160,7 @@ class ProductsViewModel(
 
     private fun updateCartQuantity(
         productUiModel: ProductUiModel,
-        errorEvent: MutableLiveData<Event<Throwable>>,
+        errorEvent: MutableSingleLiveData<Throwable>,
     ) = viewModelScope.launch {
         val cartItem = cartRepository.findByProductId(productUiModel.productId).getOrNull()
         if (cartItem == null) {
@@ -210,8 +211,8 @@ class ProductsViewModel(
                 .onFailure { _cartItemDeleteError.setError(it) }
         }
 
-    private fun MutableLiveData<Event<Throwable>>.setError(throwable: Throwable) {
-        this.value = Event(throwable)
+    private fun MutableSingleLiveData<Throwable>.setError(throwable: Throwable) {
+        this.setValue(throwable)
     }
 
     private fun productUiModels(): List<ProductUiModel> = _productUiModels.value ?: emptyList()

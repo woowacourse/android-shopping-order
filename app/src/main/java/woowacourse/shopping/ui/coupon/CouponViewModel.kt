@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import woowacourse.shopping.common.Event
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CartRepository
@@ -38,18 +39,18 @@ class CouponViewModel(
     private val _totalOrderPrice = MutableLiveData<Int>(0)
     val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
 
-    private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
-    val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
+    private val _isSuccessCreateOrder = MutableSingleLiveData<Boolean>()
+    val isSuccessCreateOrder: SingleLiveData<Boolean> get() = _isSuccessCreateOrder
 
-    private val _couponLoadError = MutableLiveData<Event<Throwable>>()
-    val couponLoadError: LiveData<Event<Throwable>> get() = _couponLoadError
+    private val _couponLoadError = MutableSingleLiveData<Throwable>()
+    val couponLoadError: SingleLiveData<Throwable> get() = _couponLoadError
 
-    private val _orderPossibleError = MutableLiveData<Event<Unit>>()
-    val orderPossibleError: LiveData<Event<Unit>> get() = _orderPossibleError
+    private val _orderPossibleError = MutableSingleLiveData<Unit>()
+    val orderPossibleError: SingleLiveData<Unit> get() = _orderPossibleError
 
     init {
         if (selectedCartItemIds.isEmpty()) {
-            _orderPossibleError.value = Event(Unit)
+            _orderPossibleError.setValue(Unit)
         }
         loadCoupons()
         observePrice()
@@ -66,7 +67,7 @@ class CouponViewModel(
                     coupons.value = availableCoupons
                     _couponUiModels.value = availableCoupons.toCouponUiModels()
                 }
-                .onFailure { _couponLoadError.value = Event(it) }
+                .onFailure { _couponLoadError.setValue(it) }
         }
 
     private suspend fun List<Int>.toCartItems(scope: CoroutineScope): List<CartItem> {
@@ -99,9 +100,9 @@ class CouponViewModel(
         viewModelScope.launch {
             orderRepository.createOrder(selectedCartItemIds)
                 .onSuccess {
-                    _isSuccessCreateOrder.value = Event(true)
+                    _isSuccessCreateOrder.setValue(true)
                 }.onFailure {
-                    _isSuccessCreateOrder.value = Event(false)
+                    _isSuccessCreateOrder.setValue(false)
                 }
         }
 

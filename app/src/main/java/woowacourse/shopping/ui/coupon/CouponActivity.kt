@@ -59,14 +59,13 @@ class CouponActivity : AppCompatActivity() {
     }
 
     private fun observeData() {
-        viewModel.isSuccessCreateOrder.observe(this) {
-            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
-            if (isSuccessCreateOrder) {
+        viewModel.isSuccessCreateOrder.observe(this) { isSuccess ->
+            if (isSuccess) {
                 showToast(R.string.create_order_success)
                 navigateProductsView()
-            } else {
-                showToast(R.string.create_order_failure)
+                return@observe
             }
+            showToast(R.string.create_order_failure)
         }
     }
 
@@ -78,11 +77,9 @@ class CouponActivity : AppCompatActivity() {
 
     private fun observeCouponErrorEvent() {
         viewModel.couponLoadError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showCouponLoadErrorToast(throwable, R.string.coupon_load_error)
+            showCouponLoadErrorToast(it, R.string.coupon_load_error)
         }
         viewModel.orderPossibleError.observe(this) {
-            it.getContentIfNotHandled() ?: return@observe
             showToast(R.string.create_order_possible_error)
         }
     }

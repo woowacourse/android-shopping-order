@@ -133,16 +133,13 @@ class ProductsActivity : AppCompatActivity() {
 
     private fun observeErrorEvent() {
         viewModel.productsLoadError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showProductsErrorToast(throwable, R.string.product_load_error)
+            showProductsErrorToast(it, R.string.product_load_error)
         }
         viewModel.cartItemAddError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showProductsErrorToast(throwable, R.string.cart_item_add_error)
+            showProductsErrorToast(it, R.string.cart_item_add_error)
         }
         viewModel.cartItemDeleteError.observe(this) {
-            val throwable = it.getContentIfNotHandled() ?: return@observe
-            showProductsErrorToast(throwable, R.string.cart_item_delete_error)
+            showProductsErrorToast(it, R.string.cart_item_delete_error)
         }
     }
 

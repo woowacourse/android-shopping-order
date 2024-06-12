@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.common.Event
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
@@ -26,8 +27,8 @@ class CartViewModel(
     private val _isLoadingCart = MutableLiveData<Boolean>()
     val isLoadingCart: LiveData<Boolean> get() = _isLoadingCart
 
-    private val _changedCartEvent = MutableLiveData<Event<Unit>>()
-    val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
+    private val _changedCartEvent = MutableSingleLiveData<Unit>()
+    val changedCartEvent: SingleLiveData<Unit> get() = _changedCartEvent
 
     val totalPrice: LiveData<Int> = _cartUiModels.map { it.selectedTotalPrice() }
     val isEnabledOrder: LiveData<Boolean> = totalPrice.map { it != 0 }
@@ -40,9 +41,9 @@ class CartViewModel(
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
 
-    private val _orderEvent = MutableLiveData<Event<Unit>>()
+    private val _orderEvent = MutableSingleLiveData<Unit>()
+    val orderEvent: SingleLiveData<Unit> get() = _orderEvent
 
-    val orderEvent: LiveData<Event<Unit>> get() = _orderEvent
     private val _visibleAllToggleView = MutableLiveData(true)
 
     val visibleAllToggleView: LiveData<Boolean> get() = _visibleAllToggleView
@@ -50,14 +51,14 @@ class CartViewModel(
     private val _selectedCartItemIds = MutableLiveData<List<Int>>()
     val selectedCartItemIds: LiveData<List<Int>> get() = _selectedCartItemIds
 
-    private val _productsLoadError = MutableLiveData<Event<Throwable>>()
-    val productsLoadError: LiveData<Event<Throwable>> get() = _productsLoadError
+    private val _productsLoadError = MutableSingleLiveData<Throwable>()
+    val productsLoadError: SingleLiveData<Throwable> get() = _productsLoadError
 
-    private val _cartItemAddError = MutableLiveData<Event<Throwable>>()
-    val cartItemAddError: LiveData<Event<Throwable>> get() = _cartItemAddError
+    private val _cartItemAddError = MutableSingleLiveData<Throwable>()
+    val cartItemAddError: SingleLiveData<Throwable> get() = _cartItemAddError
 
-    private val _cartItemDeleteError = MutableLiveData<Event<Throwable>>()
-    val cartItemDeleteError: LiveData<Event<Throwable>> get() = _cartItemDeleteError
+    private val _cartItemDeleteError = MutableSingleLiveData<Throwable>()
+    val cartItemDeleteError: SingleLiveData<Throwable> get() = _cartItemDeleteError
 
     fun loadAllCartItems() =
         viewModelScope.launch {
@@ -115,7 +116,7 @@ class CartViewModel(
         viewModelScope.launch {
             cartRepository.add(productId)
                 .onSuccess {
-                    _changedCartEvent.value = Event(Unit)
+                    _changedCartEvent.setValue(Unit)
                     loadAllCartItems()
                     if (isRecommendProduct(productId)) {
                         updateRecommendProducts(productId)
@@ -141,7 +142,7 @@ class CartViewModel(
             val cartUiModel = cartUiModels().find(cartItemId) ?: return@launch
             cartRepository.delete(cartUiModel.cartItemId)
                 .onSuccess {
-                    _changedCartEvent.value = Event(Unit)
+                    _changedCartEvent.setValue(Unit)
                     updateDeletedCart(cartUiModel)
                     if (isRecommendProduct(cartUiModel.productId)) {
                         updateRecommendProducts(cartUiModel.productId, Quantity())
@@ -179,11 +180,11 @@ class CartViewModel(
     private fun changeQuantity(
         cartUiModel: CartUiModel,
         quantity: Quantity,
-        errorEvent: MutableLiveData<Event<Throwable>>,
+        errorEvent: MutableSingleLiveData<Throwable>,
     ) = viewModelScope.launch {
         cartRepository.changeQuantity(cartUiModel.cartItemId, quantity)
             .onSuccess {
-                _changedCartEvent.value = Event(Unit)
+                _changedCartEvent.setValue(Unit)
                 loadProduct(cartUiModel.copy(quantity = quantity).toCartItem())
                 if (isRecommendProduct(cartUiModel.productId)) {
                     updateRecommendProducts(cartUiModel.productId, quantity)
@@ -210,7 +211,7 @@ class CartViewModel(
     }
 
     fun order() {
-        _orderEvent.value = Event(Unit)
+        _orderEvent.setValue(Unit)
     }
 
     fun navigateCartRecommend() {
@@ -242,8 +243,8 @@ class CartViewModel(
         _selectedCartItemIds.value = cartItemIds
     }
 
-    private fun MutableLiveData<Event<Throwable>>.setError(throwable: Throwable) {
-        this.value = Event(throwable)
+    private fun MutableSingleLiveData<Throwable>.setError(throwable: Throwable) {
+        this.setValue(throwable)
     }
 
     private fun cartUiModels(): CartUiModels {

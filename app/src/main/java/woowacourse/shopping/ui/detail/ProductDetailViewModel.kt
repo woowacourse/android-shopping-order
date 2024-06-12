@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import woowacourse.shopping.common.Event
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -26,11 +27,11 @@ class ProductDetailViewModel(
     private val _productUiModel = MutableLiveData<ProductUiModel>()
     val productUiModel: LiveData<ProductUiModel> get() = _productUiModel
 
-    private val _productLoadError = MutableLiveData<Event<Throwable>>()
-    val productLoadError: LiveData<Event<Throwable>> get() = _productLoadError
+    private val _productLoadError = MutableSingleLiveData<Throwable>()
+    val productLoadError: SingleLiveData<Throwable> get() = _productLoadError
 
-    private val _isSuccessAddCart = MutableLiveData<Event<Boolean>>()
-    val isSuccessAddCart: LiveData<Event<Boolean>> get() = _isSuccessAddCart
+    private val _isSuccessAddCart = MutableSingleLiveData<Boolean>()
+    val isSuccessAddCart: SingleLiveData<Boolean> get() = _isSuccessAddCart
 
     val addCartQuantityBundle: LiveData<AddCartQuantityBundle> =
         _productUiModel.map {
@@ -101,12 +102,12 @@ class ProductDetailViewModel(
                 }
 
             addCartResult
-                .onSuccess { _isSuccessAddCart.value = Event(true) }
-                .onFailure { _isSuccessAddCart.value = Event(false) }
+                .onSuccess { _isSuccessAddCart.setValue(true) }
+                .onFailure { _isSuccessAddCart.setValue(false) }
         }
 
     private fun setProductLoadError(throwable: Throwable) {
-        _productLoadError.value = Event(throwable)
+        _productLoadError.setValue(throwable)
     }
 
     override fun onCleared() {
