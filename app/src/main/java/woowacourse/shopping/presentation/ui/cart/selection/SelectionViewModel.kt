@@ -1,16 +1,16 @@
 package woowacourse.shopping.presentation.ui.cart.selection
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.database.OrderDatabase
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
@@ -18,40 +18,29 @@ import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class SelectionViewModel(
     private val cartRepository: CartRepository,
+    private val orderDatabase: OrderDatabase,
 ) : ViewModel(),
     SelectionEventHandler,
     CounterHandler {
-    private val pageSize = PAGE_SIZE
+    private val _isLoading = MutableLiveData<Boolean>(true)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
 
-    private val _currentPage = MutableLiveData(DEFAULT_PAGE)
-    val currentPage: LiveData<Int> = _currentPage
+    private var _cartItems: MutableLiveData<ShoppingCart> =
+        MutableLiveData<ShoppingCart>().apply {
+            viewModelScope.launch {
+                value = ShoppingCart(fetchCartItems())
+            }
+        }
+    val cartItems: LiveData<ShoppingCart>
+        get() = _cartItems
 
-    private val _loading = MutableLiveData<Boolean>(true)
-    val loading: LiveData<Boolean>
-        get() = _loading
-
-    private val _order = MutableLiveData<Order>(OrderDatabase.getOrder())
-    val order: LiveData<Order>
-        get() = _order
-
-    private val _totalItemSize = MutableLiveData<Int>()
-    val totalItemSize: LiveData<Int>
-        get() = _totalItemSize
-
-    private var lastPage: Int = DEFAULT_PAGE
-
-    val cartItemsState: LiveData<UIState<List<CartItem>>> =
-        currentPage.switchMap { page ->
-            MutableLiveData<UIState<List<CartItem>>>().apply {
-                viewModelScope.launch {
-                    value =
-                        try {
-                            setUpUIState(page)
-                        } catch (e: Exception) {
-                            UIState.Error(e)
-                            setUpUIState(page)
-                        }
-                }
+    val cartItemsState: LiveData<UIState<ShoppingCart>> =
+        cartItems.switchMap { shoppingCart ->
+            if (shoppingCart.items.isEmpty()) {
+                MutableLiveData(UIState.Empty)
+            } else {
+                MutableLiveData(UIState.Success(shoppingCart))
             }
         }
 
@@ -69,55 +58,35 @@ class SelectionViewModel(
     val deleteCartItem: LiveData<Event<Long>>
         get() = _deleteCartItem
 
-    private val _totalPrice = MutableLiveData<Long>(order.value?.getTotalPrice() ?: 0L)
+    private val _totalPrice = MutableLiveData<Long>(cartItems.value?.getTotalPrice() ?: 0L)
     val totalPrice: LiveData<Long>
         get() = _totalPrice
 
-    private val _totalQuantity = MutableLiveData<Int>(order.value?.getTotalQuantity() ?: 0)
+    private val _totalQuantity = MutableLiveData<Int>(cartItems.value?.getTotalQuantity() ?: 0)
     val totalQuantity: LiveData<Int>
         get() = _totalQuantity
 
-    init {
-        loadPage()
+    fun updateCartItems() {
+        viewModelScope.launch {
+            _cartItems.value = ShoppingCart(fetchCartItems())
+        }
     }
 
-    private suspend fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
-        var state: UIState<List<CartItem>> = UIState.Empty
+    private suspend fun fetchCartItems(): List<CartItem> {
+        var items = emptyList<CartItem>()
         val transaction =
             viewModelScope.async {
                 cartRepository.findAll()
-            }
-        transaction.await().onSuccess {
-            if (it.items.isEmpty()) {
-                state = UIState.Empty
-            } else {
-                state = UIState.Success(it.items)
-            }
-        }
-        Log.d("crong", "setUpUIState: $state")
-        return state
-    }
+            }.await()
 
-    private fun loadPage() {
-        _currentPage.value = currentPage.value?.coerceIn(DEFAULT_PAGE, lastPage)
-        updatePageControlVisibility()
-    }
+        transaction.onSuccess {
+            items = it.items
 
-    private fun updatePageControlVisibility() {
-        viewModelScope.launch {
-            val size = cartRepository.size()
-            size.onSuccess {
-                _totalItemSize.postValue(it)
-                lastPage = ((totalItemSize.value ?: 0) - PAGE_STEP) / pageSize
-            }
+            // To check the shimmer UI is working properly
+            delay(1000)
         }
-    }
-
-    fun deleteItem(itemId: Long) {
-        viewModelScope.launch {
-            cartRepository.delete(itemId)
-        }
-        loadPage()
+        onLoaded()
+        return items
     }
 
     fun isCartEmpty() {
@@ -125,48 +94,56 @@ class SelectionViewModel(
     }
 
     fun onLoading() {
-        _loading.postValue(true)
+        _isLoading.value = (true)
     }
 
     fun onLoaded() {
-        _loading.postValue(false)
+        _isLoading.value = (false)
     }
 
-    override fun onCheckItem(itemId: Long) {
+    override fun onItemClicked(itemId: Long) {
+        val shoppingCart = cartItems.value ?: return
         viewModelScope.launch {
-            val cartItem = cartRepository.findWithCartItemId(itemId)
-            cartItem.onSuccess {
-                if (it.isChecked) {
-                    removeFromOrder(it)
-                } else {
-                    addToOrder(it)
-                }
+            if (shoppingCart.items.find { it.id == itemId }?.isChecked == true) {
+                removeFromOrder(shoppingCart.items.find { it.id == itemId }!!)
+            } else {
+                addToOrder(shoppingCart.items.find { it.id == itemId }!!)
             }
+
             // To notify the change of order
-            _order.value = _order.value
+            _cartItems.value = _cartItems.value
         }
         updatePriceAndQuantity()
     }
 
     private fun updatePriceAndQuantity() {
-        _totalPrice.value = _order.value?.getTotalPrice() ?: 0L
-        _totalQuantity.value = _order.value?.getTotalQuantity() ?: 0
+        _totalPrice.value = cartItems.value?.getTotalPrice() ?: 0L
+        _totalQuantity.value = cartItems.value?.getTotalQuantity() ?: 0
     }
 
     private fun removeFromOrder(cartItem: CartItem) {
-        _order.value?.removeCartItem(cartItem)
+        val shoppingCart = cartItems.value?.copy() ?: return
+        shoppingCart.items.find { it.id == cartItem.id }?.isChecked = false
     }
 
     private fun addToOrder(cartItem: CartItem) {
-        _order.value?.addCartItem(cartItem)
-    }
-
-    override fun navigateToDetail(productId: Long) {
-        _navigateToDetail.postValue(Event(productId))
+        val shoppingCart = cartItems.value?.copy() ?: return
+        shoppingCart.items.find { it.id == cartItem.id }?.isChecked = true
     }
 
     override fun deleteCartItem(itemId: Long) {
         _deleteCartItem.postValue(Event(itemId))
+    }
+
+    fun deleteItem(itemId: Long) {
+        val shoppingCart = cartItems.value?.copy() ?: return
+        val items = shoppingCart.items.toMutableList()
+        items.removeIf { it.id == itemId }
+        _cartItems.value = ShoppingCart(items)
+
+        viewModelScope.launch {
+            cartRepository.delete(itemId)
+        }
     }
 
     override fun increaseCount(productId: Long) {
@@ -175,8 +152,16 @@ class SelectionViewModel(
             currentQuantity.onSuccess {
                 cartRepository.updateQuantityWithProductId(productId, it + 1)
             }
+            val shoppingCart = cartItems.value ?: return@launch
+            val index = shoppingCart.items.indexOfFirst { it.productId == productId } ?: return@launch
+            val newItem = shoppingCart.items[index].copy(quantity = shoppingCart.items[index].quantity.plus(1))
+            val currentCartItems = shoppingCart.items.toMutableList() ?: return@launch
+            currentCartItems.removeIf { it.productId == productId }
+            currentCartItems.add(index, newItem ?: return@launch)
+
+            _cartItems.value = ShoppingCart(currentCartItems)
+            updatePriceAndQuantity()
         }
-        loadPage()
     }
 
     override fun decreaseCount(productId: Long) {
@@ -185,45 +170,52 @@ class SelectionViewModel(
             currentQuantity.onSuccess {
                 if (it > 1) {
                     cartRepository.updateQuantityWithProductId(productId, it - 1)
+
+                    val shoppingCart = cartItems.value ?: return@launch
+                    val index = shoppingCart.items.indexOfFirst { it.productId == productId } ?: return@launch
+                    val newItem = shoppingCart.items[index].copy(quantity = shoppingCart.items[index].quantity.minus(1))
+                    val currentCartItems = shoppingCart.items.toMutableList() ?: return@launch
+                    currentCartItems.removeIf { it.productId == productId }
+                    currentCartItems.add(index, newItem ?: return@launch)
+
+                    _cartItems.value = ShoppingCart(currentCartItems)
                 }
+                updatePriceAndQuantity()
             }
         }
-        loadPage()
     }
 
     fun selectAllByCondition() {
-        viewModelScope.launch {
-            val size = cartRepository.size()
-            size.onSuccess {
-                if (_order.value?.list?.size == it) {
-                    unSelectAll()
-                } else {
-                    selectAll()
-                }
-            }
+        val shoppingCart = cartItems.value?.copy() ?: return
+        val size = shoppingCart.items.size
+        val checkedCount = shoppingCart.items.filter { it.isChecked }.size
+
+        if (size == checkedCount) {
+            unSelectAll()
+        } else {
+            selectAll()
         }
     }
 
     private fun unSelectAll() {
-        _order.value?.clearOrder()
-        _order.value = _order.value
+        val shoppingCart = cartItems.value?.copy() ?: return
+        shoppingCart.unSelectAll()
+        _cartItems.value = shoppingCart
+
         updatePriceAndQuantity()
     }
 
     private fun selectAll() {
-        viewModelScope.launch {
-            val items = cartRepository.findAll()
-            items.onSuccess {
-                _order.value?.selectAllCartItems(it.items)
-                _order.value = _order.value
-            }
-        }
+        val shoppingCart = cartItems.value?.copy() ?: return
+        shoppingCart.selectAll()
+        _cartItems.value = shoppingCart
+
         updatePriceAndQuantity()
     }
 
-    companion object {
-        private const val PAGE_SIZE = 5
-        private const val DEFAULT_PAGE = 0
-        private const val PAGE_STEP = 1
+    fun postOrder() {
+        val shoppingCart = cartItems.value ?: return
+        val order = shoppingCart.toOrder()
+        orderDatabase.postOrder(order)
     }
 }

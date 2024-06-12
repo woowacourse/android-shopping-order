@@ -2,10 +2,12 @@ package woowacourse.shopping.domain.model
 
 import java.io.Serializable
 
-data class Order(val cartItems: List<CartItem>) : Serializable {
+class Order(cartItems: List<CartItem> = emptyList()) : Serializable {
     private val _list = cartItems.toMutableList()
     val list: List<CartItem>
-        get() = _list
+        get() = _list.toList()
+
+    fun size(): Int = _list.size
 
     fun addCartItem(cartItem: CartItem) {
         cartItem.isChecked = true
