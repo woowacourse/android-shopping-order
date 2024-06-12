@@ -24,6 +24,7 @@ class DetailViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productId: Int,
+    private val isMostRecentProductClicked: Boolean,
 ) : ViewModel(), DetailClickListener, QuantityClickListener {
     private val _detailUiState = MutableLiveData<UiState<Product>>(UiState.Loading)
     val detailUiState: LiveData<UiState<Product>>
@@ -59,21 +60,22 @@ class DetailViewModel(
         get() = _detailNotifyingActions
 
     init {
-        loadProduct()
+        viewModelScope.launch {
+            loadProduct().join()
+            saveRecentProduct(isMostRecentProductClicked)
+        }
     }
 
-    fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
-        viewModelScope.launch {
-            recentProductRepository.findMostRecentProduct()
-                .onSuccess { mostRecentProduct ->
-                    _mostRecentProduct.value = mostRecentProduct
-                    val currentProduct = product.value ?: return@onSuccess
-                    recentProductRepository.save(currentProduct)
-                    updateRecentProductVisible(isMostRecentProductClicked)
-                }.onFailure {
-                    _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyError)
-                }
-        }
+    suspend fun saveRecentProduct(isMostRecentProductClicked: Boolean) {
+        recentProductRepository.findMostRecentProduct()
+            .onSuccess { mostRecentProduct ->
+                _mostRecentProduct.value = mostRecentProduct
+                val currentProduct = product.value ?: return@onSuccess
+                recentProductRepository.save(currentProduct)
+                updateRecentProductVisible(isMostRecentProductClicked)
+            }.onFailure {
+                _detailNotifyingActions.value = Event(DetailNotifyingActions.NotifyError)
+            }
     }
 
     fun updateRecentProductVisible(isMostRecentProductClicked: Boolean) {
@@ -85,7 +87,7 @@ class DetailViewModel(
             }
     }
 
-    private fun loadProduct() {
+    private fun loadProduct() =
         viewModelScope.launch {
             productRepository.getProductById(productId)
                 .onSuccess { product ->
@@ -96,7 +98,6 @@ class DetailViewModel(
                     _detailUiState.value = UiState.Error(it)
                 }
         }
-    }
 
     private fun saveCartItem() {
         if (detailUiState.value is UiState.Success) {

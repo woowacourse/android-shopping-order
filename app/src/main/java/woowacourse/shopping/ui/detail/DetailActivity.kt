@@ -16,8 +16,8 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.ui.detail.action.DetailNavigationActions.NavigateToBack
 import woowacourse.shopping.ui.detail.action.DetailNavigationActions.NavigateToRecentDetail
-import woowacourse.shopping.ui.detail.action.DetailNotifyingActions
-import woowacourse.shopping.ui.detail.action.DetailNotifyingActions.*
+import woowacourse.shopping.ui.detail.action.DetailNotifyingActions.NotifyError
+import woowacourse.shopping.ui.detail.action.DetailNotifyingActions.NotifyPutInCartItem
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.DetailViewModelFactory
 import woowacourse.shopping.ui.state.UiState
@@ -37,6 +37,7 @@ class DetailActivity : AppCompatActivity() {
             productRepository = ProductRepositoryImpl(remoteProductDataSource),
             recentProductRepository = RecentProductRepositoryImpl(localRecentDataSource),
             productId = productId,
+            isMostRecentProductClicked = isMostRecentProductClicked,
         )
     }
 
@@ -59,10 +60,6 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.product.observe(this) {
-            viewModel.saveRecentProduct(isMostRecentProductClicked)
-        }
-
         viewModel.detailUiState.observe(this) { state ->
             when (state) {
                 is UiState.Error ->

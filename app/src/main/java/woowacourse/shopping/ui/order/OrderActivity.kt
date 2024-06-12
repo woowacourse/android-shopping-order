@@ -76,7 +76,6 @@ class OrderActivity : AppCompatActivity() {
                 when (action) {
                     is OrderNotifyingActions.NotifyCanNotOrder -> notifyCanNotOrder()
                     is OrderNotifyingActions.NotifyError -> showError(getString(R.string.unknown_error))
-
                 }
             }
         }

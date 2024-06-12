@@ -11,6 +11,7 @@ class DetailViewModelFactory(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productId: Int,
+    private val isMostRecentProductClicked: Boolean,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
@@ -20,6 +21,7 @@ class DetailViewModelFactory(
                 productRepository = productRepository,
                 recentProductRepository = recentProductRepository,
                 productId = productId,
+                isMostRecentProductClicked = isMostRecentProductClicked,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
