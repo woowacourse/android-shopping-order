@@ -63,7 +63,7 @@ class CartSelectViewModelTest {
     fun `첫 번째 페이지에 장바구니를 불러온다`() {
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.cartList).isEqualTo(
+        assertThat(actual.pagingCartProduct.carts).isEqualTo(
             CARTS_PULL.content.subList(0, 5),
         )
     }
@@ -75,7 +75,7 @@ class CartSelectViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.cartList).isEqualTo(
+        assertThat(actual.pagingCartProduct.carts).isEqualTo(
             CARTS_PULL.content.subList(5, 10),
         )
     }
@@ -90,7 +90,7 @@ class CartSelectViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.cartList).isEqualTo(
+        assertThat(actual.pagingCartProduct.carts).isEqualTo(
             CARTS_PULL.content.subList(0, 5),
         )
     }
@@ -127,7 +127,7 @@ class CartSelectViewModelTest {
         assertThat(productIdSlot.captured).isEqualTo(CARTS_PULL.content.first().id)
 
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCartProduct.cartList).isEqualTo(CARTS_PULL.content.subList(1, 6))
+        assertThat(actual.pagingCartProduct.carts).isEqualTo(CARTS_PULL.content.subList(1, 6))
     }
 
     @Test
@@ -138,7 +138,7 @@ class CartSelectViewModelTest {
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
 
-        assertThat(listOf(actual.orderCartList.values.first().id)).isEqualTo(
+        assertThat(listOf(actual.orderCarts.values.first().id)).isEqualTo(
             listOf(CARTS_PULL.content.first().id),
         )
     }
@@ -150,6 +150,6 @@ class CartSelectViewModelTest {
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.orderCartList.values.toList()).isEqualTo(CARTS_PULL.content)
+        assertThat(actual.orderCarts.values.toList()).isEqualTo(CARTS_PULL.content)
     }
 }
