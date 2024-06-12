@@ -11,13 +11,13 @@ import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
-import woowacourse.shopping.domain.model.CartItem.Companion.toUiModel
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
+import woowacourse.shopping.ui.mapper.CartItemMapper.toUiModel
 import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.OrderInformation
 
