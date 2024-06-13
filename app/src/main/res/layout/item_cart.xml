@@ -7,18 +7,18 @@
 
         <variable
             name="cartViewItem"
-            type="woowacourse.shopping.view.order.adapter.cart.ShoppingCartViewItem.CartViewItem" />
+            type="woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem" />
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
+            type="woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:background="@drawable/shopping_cart_item_gridview"
+        android:background="@drawable/item_gridview"
         android:onClick="@{() -> viewModel.onCartItemClick(cartViewItem.cartItem.product.productId)}">
 
         <CheckBox

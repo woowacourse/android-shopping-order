@@ -1,16 +1,15 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.remote.dto.ProductDto
+import woowacourse.shopping.remote.dto.ProductResponse
 
 interface ProductDataSource {
-    fun getProducts(
+    suspend fun getProductResponse(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Call<ProductResponse>
+    ): Result<ProductResponse>
 
-    fun getProductById(id: Int): Call<Product>
+    suspend fun getProductById(productId: Int): Result<ProductDto>
 }

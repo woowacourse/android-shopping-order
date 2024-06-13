@@ -1,8 +1,7 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
-import woowacourse.shopping.data.model.CartItemIds
+import woowacourse.shopping.remote.dto.OrderRequest
 
 interface OrderDataSource {
-    fun postOrder(cartItemIds: CartItemIds): Call<Unit>
+    suspend fun postOrder(orderRequest: OrderRequest): Result<Unit>
 }

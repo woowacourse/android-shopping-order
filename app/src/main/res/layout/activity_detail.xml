@@ -7,14 +7,14 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.detail.viewmodel.DetailViewModel" />
+            type="woowacourse.shopping.ui.detail.viewmodel.DetailViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.home.HomeActivity">
+        tools:context=".ui.home.HomeActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbar_detail"
@@ -114,7 +114,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:onClick="@{() -> viewModel.onPutCartButtonClick()}"
+            android:onClick="@{() -> viewModel.onPutInCartButtonClick()}"
             android:text="장바구니 담기"
             android:textColor="@color/white"
             android:textSize="20dp"
@@ -128,7 +128,7 @@
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_marginBottom="35dp"
-            android:background="@drawable/shopping_cart_item_gridview"
+            android:background="@drawable/item_gridview"
             android:onClick="@{() -> viewModel.onRecentProductClick()}"
             app:layout_constraintBottom_toTopOf="@id/btn_put_cart"
             app:layout_constraintLeft_toLeftOf="@id/tv_detail_price"

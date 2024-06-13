@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="woowacourse.shopping.view.order.viewmodel.OrderViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -24,11 +17,11 @@
             android:textColor="@color/black"
             android:textSize="24dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/tv_recomment_information"
+            app:layout_constraintBottom_toTopOf="@id/tv_recommend_information"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/tv_recomment_information"
+            android:id="@+id/tv_recommend_information"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="29dp"

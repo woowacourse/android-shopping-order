@@ -7,7 +7,7 @@
 
         <variable
             name="clickListener"
-            type="woowacourse.shopping.view.home.listener.HomeClickListener" />
+            type="woowacourse.shopping.ui.home.listener.HomeClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

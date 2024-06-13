@@ -1,15 +1,15 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.domain.model.HomeInfo
+import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun getProductResponse(
+    suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Result<ProductResponse>
+    ): Result<HomeInfo>
 
-    fun getProductById(id: Int): Result<Product>
+    suspend fun getProductById(id: Int): Result<Product>
 }

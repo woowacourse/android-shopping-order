@@ -1,67 +1,49 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.db.recent.RecentProductDatabase
-import woowacourse.shopping.data.db.recent.RecentProductEntity
-import woowacourse.shopping.data.db.recent.toRecentProduct
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.toRecentProductEntity
+import woowacourse.shopping.data.mapper.toRecentProduct
+import woowacourse.shopping.data.mapper.toRecentProductEntity
+import woowacourse.shopping.data.mapper.toRecentProducts
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.local.datasource.LocalRecentDataSource
 import java.time.LocalDateTime
 
-class RecentProductRepositoryImpl(recentProductDatabase: RecentProductDatabase) :
+class RecentProductRepositoryImpl(private val localRecentDataSource: LocalRecentDataSource) :
     RecentProductRepository {
-    private val dao = recentProductDatabase.recentProductDao()
-
-    override fun save(product: Product) {
-        if (findOrNullByProductId(product.productId) != null) {
-            update(product.productId)
-        } else {
-            threadAction {
-                dao.save(product.toRecentProductEntity())
+    override suspend fun save(product: Product): Result<Unit> {
+        return findOrNullByProductId(product.productId).mapCatching { recentProduct ->
+            if (recentProduct != null) {
+                update(product.productId)
+            } else {
+                localRecentDataSource.save(product.toRecentProductEntity())
             }
         }
     }
 
-    override fun update(productId: Int) {
-        threadAction {
-            dao.update(productId, LocalDateTime.now().toString())
+    override suspend fun update(productId: Int): Result<Unit> {
+        return localRecentDataSource.update(productId, LocalDateTime.now().toString())
+    }
+
+    override suspend fun findOrNullByProductId(productId: Int): Result<RecentProduct?> {
+        return localRecentDataSource.findByProductId(productId).mapCatching { recentProductEntity ->
+            recentProductEntity?.toRecentProduct()
         }
     }
 
-    override fun findOrNullByProductId(productId: Int): RecentProduct? {
-        var recentProductEntity: RecentProductEntity? = null
-        threadAction {
-            recentProductEntity = dao.findByProductId(productId)
-        }
-        return recentProductEntity?.toRecentProduct()
-    }
-
-    override fun findMostRecentProduct(): RecentProduct? {
-        var recentProduct: RecentProductEntity? = null
-        threadAction {
-            recentProduct = dao.findMostRecentProduct()
-        }
-        return recentProduct?.toRecentProduct()
-    }
-
-    override fun findAll(limit: Int): List<RecentProduct> {
-        var recentProducts: List<RecentProduct> = emptyList()
-        threadAction {
-            recentProducts = dao.findAll(limit).map { it.toRecentProduct() }
-        }
-        return recentProducts
-    }
-
-    override fun deleteAll() {
-        threadAction {
-            dao.deleteAll()
+    override suspend fun findMostRecentProduct(): Result<RecentProduct?> {
+        return localRecentDataSource.findMostRecentProduct().mapCatching { recentProductEntity ->
+            recentProductEntity?.toRecentProduct()
         }
     }
 
-    private fun threadAction(action: () -> Unit) {
-        val thread = Thread(action)
-        thread.start()
-        thread.join()
+    override suspend fun findAll(limit: Int): Result<List<RecentProduct>> {
+        return localRecentDataSource.findAll(limit).mapCatching { recentProductEntities ->
+            recentProductEntities.toRecentProducts()
+        }
+    }
+
+    override suspend fun deleteAll(): Result<Unit> {
+        return localRecentDataSource.deleteAll()
     }
 }
