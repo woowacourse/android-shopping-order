@@ -16,3 +16,5 @@ fun CartItemData.toDomain(): CartItem {
         checked = false,
     )
 }
+
+fun List<CartItemData>.toDomain(): List<CartItem> = map(CartItemData::toDomain)
