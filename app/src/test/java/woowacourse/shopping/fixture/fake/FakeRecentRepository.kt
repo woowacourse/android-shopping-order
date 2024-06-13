@@ -10,8 +10,7 @@ class FakeRecentRepository(initRecentItems: List<RecentProduct> = recentProducts
     RecentProductRepository {
     private val recentStubs: MutableList<RecentProduct> = initRecentItems.toMutableList()
 
-    override suspend fun insert(productId: Long): Result<Long, DataError> =
-        Result.Success(productId)
+    override suspend fun insert(productId: Long): Result<Long, DataError> = Result.Success(productId)
 
     override suspend fun getMostRecentProduct(): Result<RecentProduct, DataError> {
         val recent =
@@ -19,8 +18,7 @@ class FakeRecentRepository(initRecentItems: List<RecentProduct> = recentProducts
         return Result.Success(recent)
     }
 
-    override suspend fun getAllRecentProducts(): Result<List<RecentProduct>, DataError> =
-        Result.Success(recentProducts)
+    override suspend fun getAllRecentProducts(): Result<List<RecentProduct>, DataError> = Result.Success(recentProducts)
 
     override suspend fun deleteAll(): Result<Unit, DataError> = Result.Success(Unit)
 

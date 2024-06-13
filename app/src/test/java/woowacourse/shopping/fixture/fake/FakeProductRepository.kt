@@ -17,8 +17,8 @@ class FakeProductRepository(private val cartRepository: CartRepository = FakeCar
         return Result.Success(
             productStubs.subList(
                 startIndex,
-                min(startIndex + size, productStubs.size)
-            )
+                min(startIndex + size, productStubs.size),
+            ),
         )
     }
 
@@ -34,8 +34,9 @@ class FakeProductRepository(private val cartRepository: CartRepository = FakeCar
                 is Result.Success -> carts.data.map { it.product.id }
                 is Result.Error -> return Result.Error(carts.error)
             }
-        val recommend = productStubs.filter { it.category == category }
-            .filterNot { cartProductIds.contains(it.id) }
+        val recommend =
+            productStubs.filter { it.category == category }
+                .filterNot { cartProductIds.contains(it.id) }
         return Result.Success(recommend)
     }
 

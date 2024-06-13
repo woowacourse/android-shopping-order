@@ -64,8 +64,7 @@ class ProductContentsViewModel(
     private val _errorScope: MutableSingleLiveData<ProductContentError> = MutableSingleLiveData()
     val errorScope: SingleLiveData<ProductContentError> get() = _errorScope
 
-    private fun currentProduct(): ProductWithQuantityUiState =
-        productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
+    private fun currentProduct(): ProductWithQuantityUiState = productWithQuantity.value ?: ProductWithQuantityUiState.DEFAULT
 
     init {
         loadProducts()

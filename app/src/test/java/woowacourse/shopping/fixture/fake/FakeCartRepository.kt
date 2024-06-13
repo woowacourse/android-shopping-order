@@ -17,8 +17,7 @@ class FakeCartRepository(initCartItems: List<CartWithProduct> = cartItems) : Car
         return Result.Success(cartItem)
     }
 
-    override suspend fun getAllCartItems(): Result<List<CartWithProduct>, DataError> =
-        Result.Success(cartStubs)
+    override suspend fun getAllCartItems(): Result<List<CartWithProduct>, DataError> = Result.Success(cartStubs)
 
     override suspend fun postCartItems(
         productId: Long,
@@ -44,8 +43,7 @@ class FakeCartRepository(initCartItems: List<CartWithProduct> = cartItems) : Car
         return Result.Success(Unit)
     }
 
-    override suspend fun getCartItemsCount(): Result<Int, DataError> =
-        Result.Success(cartStubs.size)
+    override suspend fun getCartItemsCount(): Result<Int, DataError> = Result.Success(cartStubs.size)
 
     override suspend fun patchCartItem(
         id: Long,

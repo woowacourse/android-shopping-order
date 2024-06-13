@@ -36,14 +36,11 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
     override suspend fun postCartItems(
         productId: Long,
         quantity: Int,
-    ): Result<Unit, DataError> =
-        dataSource.postCartItems(RequestCartItemPostDto(productId, quantity))
+    ): Result<Unit, DataError> = dataSource.postCartItems(RequestCartItemPostDto(productId, quantity))
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit, DataError> =
-        dataSource.deleteCartItems(id)
+    override suspend fun deleteCartItem(id: Long): Result<Unit, DataError> = dataSource.deleteCartItems(id)
 
-    override suspend fun getCartItemsCount(): Result<Int, DataError> =
-        dataSource.getCartItemCounts().transForm { it.quantity }
+    override suspend fun getCartItemsCount(): Result<Int, DataError> = dataSource.getCartItemCounts().transForm { it.quantity }
 
     override suspend fun patchCartItem(
         id: Long,

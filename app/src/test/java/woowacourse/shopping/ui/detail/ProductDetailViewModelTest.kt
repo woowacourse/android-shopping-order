@@ -32,7 +32,7 @@ class ProductDetailViewModelTest {
                 PRODUCT_ID,
                 productRepository,
                 recentProductRepository,
-                cartRepository
+                cartRepository,
             )
     }
 

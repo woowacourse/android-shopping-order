@@ -4,8 +4,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.DiscountType
 
 class Order(val coupons: List<Coupon>) {
-    fun canUseCoupons(products: List<CartWithProduct>): List<Coupon> =
-        coupons.filter { it.canUse(products) }
+    fun canUseCoupons(products: List<CartWithProduct>): List<Coupon> = coupons.filter { it.canUse(products) }
 
     fun discountPrice(
         products: List<CartWithProduct>,
@@ -38,10 +37,10 @@ class Order(val coupons: List<Coupon>) {
             "$selectedCouponId 에 해당하는 쿠폰을 사용할 수 없습니다."
         }
         return products.sumOf { it.product.price * it.quantity.value } -
-                discountPrice(
-                    products,
-                    selectedCouponId,
-                ) + shippingPrice(products, selectedCouponId)
+            discountPrice(
+                products,
+                selectedCouponId,
+            ) + shippingPrice(products, selectedCouponId)
     }
 
     companion object {

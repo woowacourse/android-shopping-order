@@ -67,8 +67,7 @@ class CartViewModel(
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private fun currentCartState(): CartItemsUiState =
-        _cart.value ?: CartItemsUiState(emptyList(), true)
+    private fun currentCartState(): CartItemsUiState = _cart.value ?: CartItemsUiState(emptyList(), true)
 
     init {
         loadCartItems()

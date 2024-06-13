@@ -45,8 +45,7 @@ class ProductDetailViewModel(
     private val _addCartComplete = MutableSingleLiveData<Unit>()
     val addCartComplete: SingleLiveData<Unit> get() = _addCartComplete
 
-    private fun currentCount(): ProductWithQuantity =
-        _productWithQuantity.value ?: error("상품 데이터를 초기화 해주세요")
+    private fun currentCount(): ProductWithQuantity = _productWithQuantity.value ?: error("상품 데이터를 초기화 해주세요")
 
     init {
         loadProduct()

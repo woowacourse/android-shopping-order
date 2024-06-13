@@ -9,6 +9,5 @@ import woowacourse.shopping.domain.result.Result
 
 class OrderRepositoryImpl(private val dataSource: OrderDataSource = RemoteOrderDataSource()) :
     OrderRepository {
-    override suspend fun order(cartIds: List<Long>): Result<Unit, DataError> =
-        dataSource.postOrder(RequestOrderPostDto(cartIds))
+    override suspend fun order(cartIds: List<Long>): Result<Unit, DataError> = dataSource.postOrder(RequestOrderPostDto(cartIds))
 }
