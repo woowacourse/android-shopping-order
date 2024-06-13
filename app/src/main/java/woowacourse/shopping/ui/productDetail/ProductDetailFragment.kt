@@ -2,17 +2,13 @@ package woowacourse.shopping.ui.productDetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.productDetail.event.ProductDetailEvent
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class ProductDetailFragment : Fragment() {
@@ -56,17 +52,20 @@ class ProductDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         showSkeletonUi()
-        lifecycleScope.launch {
-            delay(1000)
-            viewModel.loadAll()
-        }
+        viewModel.loadAll()
+
         observeCurrentProduct()
-        viewModel.detailProductDestinationId.observe(viewLifecycleOwner) {
-            navigateToProductDetail(it)
+        viewModel.event.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is ProductDetailEvent.NavigateToProductDetail ->
+                    (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(productId = event.productId)
+
+                is ProductDetailEvent.AddProductToCart -> Unit
+                is ProductDetailEvent.SaveProductInHistory -> Unit
+                is ProductDetailEvent.Finish -> (requireActivity() as? FragmentNavigator)?.popBackStack()
+            }
         }
-        binding.productDetailToolbar.setOnMenuItemClickListener {
-            navigateToMenuItem(it)
-        }
+
     }
 
     private fun observeCurrentProduct() {
@@ -76,18 +75,6 @@ class ProductDetailFragment : Fragment() {
             binding.layoutProductDetail.visibility = View.VISIBLE
         }
     }
-
-    private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
-
-    private fun navigateToMenuItem(it: MenuItem) =
-        when (it.itemId) {
-            R.id.action_x -> {
-                (requireActivity() as? FragmentNavigator)?.popBackStack()
-                true
-            }
-
-            else -> false
-        }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -36,9 +36,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/product_detail_toolbar_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <ImageView
+                android:id="@+id/product_detail_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:importantForAccessibility="no"
+                android:onClick="@{() -> vm.onFinish()}"
+                android:src="@drawable/ic_x" />
+
+        </androidx.appcompat.widget.Toolbar>
 
         <include
             android:id="@+id/include_product_detail_shimmer"

@@ -37,8 +37,6 @@ class ProductDetailViewModel(
     private val _latestProduct: MutableLiveData<Product> = MutableLiveData()
     val latestProduct: LiveData<Product> get() = _latestProduct
 
-    private var _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
-    val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
 
     private var _event: MutableSingleLiveData<ProductDetailEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductDetailEvent> get() = _event
@@ -102,6 +100,10 @@ class ProductDetailViewModel(
         }
     }
 
+    fun onFinish() {
+        _event.setValue(ProductDetailEvent.Finish)
+    }
+
     override fun onIncrease(
         productId: Long,
         quantity: Int,
@@ -120,7 +122,7 @@ class ProductDetailViewModel(
     }
 
     override fun navigateToProductDetail(productId: Long) {
-        _detailProductDestinationId.setValue(productId)
+        _event.setValue(ProductDetailEvent.NavigateToProductDetail(productId))
     }
 
     companion object {
