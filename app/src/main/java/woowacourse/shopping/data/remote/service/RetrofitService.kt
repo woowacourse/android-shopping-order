@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.service
+package woowacourse.shopping.data.remote.service
 
 import retrofit2.Response
 import retrofit2.http.Body
@@ -8,13 +8,13 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.model.dto.CartItemDto
-import woowacourse.shopping.data.model.dto.CartItemsDto
-import woowacourse.shopping.data.model.dto.ProductDto
-import woowacourse.shopping.data.model.dto.ProductResponseDto
-import woowacourse.shopping.data.model.dto.QuantityDto
-import woowacourse.shopping.data.model.dto.ShoppingProductDto
-import woowacourse.shopping.data.model.dto.coupon.CouponDto
+import woowacourse.shopping.data.remote.model.dto.CartItemDto
+import woowacourse.shopping.data.remote.model.dto.CartItemsDto
+import woowacourse.shopping.data.remote.model.dto.ProductDto
+import woowacourse.shopping.data.remote.model.dto.ProductResponseDto
+import woowacourse.shopping.data.remote.model.dto.QuantityDto
+import woowacourse.shopping.data.remote.model.dto.ShoppingProductDto
+import woowacourse.shopping.data.remote.model.dto.coupon.CouponDto
 
 interface RetrofitService {
     @GET("/products")

@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.database.OrderDatabase
+import woowacourse.shopping.data.database.order.OrderDatabase
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingProduct

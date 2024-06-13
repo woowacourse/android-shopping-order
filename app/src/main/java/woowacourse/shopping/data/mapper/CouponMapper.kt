@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.dto.coupon.BuyXGetYCouponDto
-import woowacourse.shopping.data.model.dto.coupon.CouponDto
-import woowacourse.shopping.data.model.dto.coupon.FixedDiscountCouponDto
-import woowacourse.shopping.data.model.dto.coupon.FreeShippingCouponDto
-import woowacourse.shopping.data.model.dto.coupon.PercentageDiscountCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.BuyXGetYCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.CouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.FixedDiscountCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.FreeShippingCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.PercentageDiscountCouponDto
 import woowacourse.shopping.domain.model.coupon.AvailableTime
 import woowacourse.shopping.domain.model.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.model.coupon.Coupon

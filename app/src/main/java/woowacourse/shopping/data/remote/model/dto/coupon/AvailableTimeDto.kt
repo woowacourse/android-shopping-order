@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model.dto.coupon
+package woowacourse.shopping.data.remote.model.dto.coupon
 
 import com.google.gson.annotations.SerializedName
 

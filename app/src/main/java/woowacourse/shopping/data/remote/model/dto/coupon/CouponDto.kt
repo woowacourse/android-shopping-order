@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model.dto.coupon
+package woowacourse.shopping.data.remote.model.dto.coupon
 
 sealed class CouponDto {
     abstract val id: Long

@@ -3,7 +3,7 @@ package woowacourse.shopping.data.database.recent
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import woowacourse.shopping.data.model.entity.RecentProductEntity
+import woowacourse.shopping.data.database.entity.RecentProductEntity
 
 @Dao
 interface RecentProductDao {

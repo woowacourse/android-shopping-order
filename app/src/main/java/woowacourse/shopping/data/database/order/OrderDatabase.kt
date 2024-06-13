@@ -1,13 +1,13 @@
-package woowacourse.shopping.data.database
+package woowacourse.shopping.data.database.order
 
-import woowacourse.shopping.data.model.dto.CartItemsDto
+import woowacourse.shopping.data.remote.model.dto.CartItemsDto
 import woowacourse.shopping.domain.model.Order
 
 object OrderDatabase {
     private var order = Order()
 
     fun postOrder(order: Order) {
-        this.order = order
+        OrderDatabase.order = order
     }
 
     fun getOrder(): Order {

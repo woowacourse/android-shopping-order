@@ -1,14 +1,14 @@
-package woowacourse.shopping.data.database.client
+package woowacourse.shopping.data.remote.client
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
-import woowacourse.shopping.data.model.dto.coupon.BuyXGetYCouponDto
-import woowacourse.shopping.data.model.dto.coupon.CouponDto
-import woowacourse.shopping.data.model.dto.coupon.FixedDiscountCouponDto
-import woowacourse.shopping.data.model.dto.coupon.FreeShippingCouponDto
-import woowacourse.shopping.data.model.dto.coupon.PercentageDiscountCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.BuyXGetYCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.CouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.FixedDiscountCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.FreeShippingCouponDto
+import woowacourse.shopping.data.remote.model.dto.coupon.PercentageDiscountCouponDto
 import java.lang.reflect.Type
 
 class CouponDeserializer : JsonDeserializer<CouponDto> {

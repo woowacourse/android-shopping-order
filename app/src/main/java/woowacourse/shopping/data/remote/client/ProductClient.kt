@@ -1,12 +1,12 @@
-package woowacourse.shopping.data.database.client
+package woowacourse.shopping.data.remote.client
 
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.model.dto.coupon.CouponDto
-import woowacourse.shopping.domain.service.RetrofitService
+import woowacourse.shopping.data.remote.model.dto.coupon.CouponDto
+import woowacourse.shopping.data.remote.service.RetrofitService
 
 object ProductClient {
     private const val BASE_URL = BuildConfig.BASE_URL

@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.database.client.ProductClient
+import woowacourse.shopping.data.remote.client.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
-import woowacourse.shopping.data.model.dto.CartItemsDto
-import woowacourse.shopping.data.model.dto.ShoppingProductDto
+import woowacourse.shopping.data.remote.model.dto.CartItemsDto
+import woowacourse.shopping.data.remote.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.UpdatedQuantity

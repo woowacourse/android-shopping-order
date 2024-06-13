@@ -2,14 +2,13 @@ package woowacourse.shopping.presentation.ui.cart.selection
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
-import woowacourse.shopping.data.database.OrderDatabase
+import woowacourse.shopping.data.database.order.OrderDatabase
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.Order

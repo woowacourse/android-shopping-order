@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.database.client.ProductClient
+import woowacourse.shopping.data.remote.client.ProductClient
 import woowacourse.shopping.data.mapper.extractPageInfo
 import woowacourse.shopping.data.mapper.toDomainModel
-import woowacourse.shopping.data.model.dto.ProductDto
+import woowacourse.shopping.data.remote.model.dto.ProductDto
 import woowacourse.shopping.domain.model.PageInfo
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductListInfo
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
-import woowacourse.shopping.domain.service.RetrofitService
+import woowacourse.shopping.data.remote.service.RetrofitService
 
 class RemoteShoppingRepositoryImpl(private val service: RetrofitService = ProductClient.service) :
     ShoppingItemsRepository {

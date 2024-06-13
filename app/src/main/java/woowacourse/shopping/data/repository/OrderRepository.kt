@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.database.OrderDatabase
-import woowacourse.shopping.data.database.client.ProductClient
+import woowacourse.shopping.data.database.order.OrderDatabase
+import woowacourse.shopping.data.remote.client.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
-import woowacourse.shopping.data.model.dto.CartItemsDto
+import woowacourse.shopping.data.remote.model.dto.CartItemsDto
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.service.RetrofitService
+import woowacourse.shopping.data.remote.service.RetrofitService
 
 class OrderRepository(private val service: RetrofitService = ProductClient.service) :
     OrderRepository {
