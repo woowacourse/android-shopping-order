@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.model.coupon.PercentageDiscountCoupon
-import woowacourse.shopping.util.convertLocalDateToFormatString
-import woowacourse.shopping.util.convertLocalTimeToFormatString
+import woowacourse.shopping.presentation.converter.convertLocalDateToFormatString
+import woowacourse.shopping.presentation.converter.convertLocalTimeToFormatString
 
 fun Coupon.toUiModel(): CouponUiModel {
         return when (this) {
