@@ -92,7 +92,7 @@ class ProductDetailViewModel(
                 } else {
                     _mostRecentProduct.value =
                         productRepository.getProductById(it.productId).getOrThrow()
-                    setMostRecentVisibility(it.id, productId)
+                    setMostRecentVisibility(it.productId, productId)
                 }
             }.onError {
                 setError(it, ProductDetailError.Recent)
