@@ -58,6 +58,7 @@ class RecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        orderViewModel.updateCurrentFragmentName(this::class.java.simpleName)
         setUpAdapter()
         setUpDataBinding()
         observeViewModel()

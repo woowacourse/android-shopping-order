@@ -53,6 +53,7 @@ class CartFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        orderViewModel.updateCurrentFragmentName(this::class.java.simpleName)
         setUpAdapter()
         setUpDataBinding()
         observeViewmodel()

@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.ui.state.OrderState
+import woowacourse.shopping.ui.order.cart.CartFragment
 import woowacourse.shopping.ui.state.UiState
 
 @BindingAdapter("app:isCartEmpty", "app:cartUiState", requireAll = true)
@@ -30,7 +30,8 @@ fun <T> setCartVisibility(
 @BindingAdapter("app:allCheckBoxVisibility")
 fun setAllCheckBoxVisibility(
     view: View,
-    state: OrderState,
+    fragmentName: String,
 ) {
-    view.visibility = if (state is OrderState.Cart) View.VISIBLE else View.GONE
+    view.visibility =
+        if (fragmentName == CartFragment::class.java.simpleName) View.VISIBLE else View.GONE
 }

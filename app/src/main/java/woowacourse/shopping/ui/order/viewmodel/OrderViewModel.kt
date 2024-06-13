@@ -10,14 +10,15 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
 import woowacourse.shopping.ui.order.action.OrderNotifyingActions
+import woowacourse.shopping.ui.order.cart.CartFragment
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.listener.OrderClickListener
-import woowacourse.shopping.ui.state.OrderState
+import woowacourse.shopping.ui.order.recommend.RecommendFragment
 
 class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), OrderClickListener {
-    private val _orderState = MutableLiveData<OrderState>(OrderState.Cart)
-    val orderState: LiveData<OrderState>
-        get() = _orderState
+    private val _currentFragmentName = MutableLiveData<String>()
+    val currentFragmentName: LiveData<String>
+        get() = _currentFragmentName
 
     private val _cartViewItems = MutableLiveData<List<CartViewItem>>(emptyList())
     val cartViewItems: LiveData<List<CartViewItem>>
@@ -77,6 +78,10 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
 
     private fun getCartViewItemPosition(cartItemId: Int): Int? {
         return cartViewItems.value?.indexOfFirst { cartViewItem -> cartViewItem.cartItem.cartItemId == cartItemId }
+    }
+
+    fun updateCurrentFragmentName(fragmentName: String) {
+        _currentFragmentName.value = fragmentName
     }
 
     fun onCheckBoxClick(cartItemId: Int) {
@@ -173,17 +178,12 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
         if (selectedCartViewItemSize.value == 0) {
             _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyCanNotOrder)
         } else {
-            val orderState = orderState.value ?: return
-            when (orderState) {
-                is OrderState.Cart -> {
-                    _orderState.value = OrderState.Recommend
-                    _orderNavigationActions.value =
-                        Event(OrderNavigationActions.NavigateToRecommend)
-                }
+            when (currentFragmentName.value) {
+                CartFragment::class.java.simpleName -> _orderNavigationActions.value =
+                    Event(OrderNavigationActions.NavigateToRecommend)
 
-                is OrderState.Recommend -> {
-                    _orderNavigationActions.value = Event(OrderNavigationActions.NavigateToPayment)
-                }
+                RecommendFragment::class.java.simpleName -> _orderNavigationActions.value =
+                    Event(OrderNavigationActions.NavigateToPayment)
             }
         }
     }

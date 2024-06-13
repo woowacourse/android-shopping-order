@@ -1,9 +1,9 @@
 package woowacourse.shopping.app
 
 import android.app.Application
+import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.local.datasource.LocalRecentDataSource
 import woowacourse.shopping.local.db.RecentProductDatabase
-import woowacourse.shopping.data.client.RetrofitClient
 import woowacourse.shopping.remote.datasource.RemoteCartDataSource
 import woowacourse.shopping.remote.datasource.RemoteOrderDataSource
 import woowacourse.shopping.remote.datasource.RemotePaymentDataSource

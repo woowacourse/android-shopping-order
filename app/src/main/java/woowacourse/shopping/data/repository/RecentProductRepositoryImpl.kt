@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.local.datasource.LocalRecentDataSource
 import woowacourse.shopping.data.mapper.toRecentProduct
 import woowacourse.shopping.data.mapper.toRecentProductEntity
 import woowacourse.shopping.data.mapper.toRecentProducts
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.local.datasource.LocalRecentDataSource
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl(private val localRecentDataSource: LocalRecentDataSource) :
