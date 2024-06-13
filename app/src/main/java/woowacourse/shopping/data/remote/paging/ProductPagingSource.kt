@@ -11,18 +11,22 @@ class ProductPagingSource(
         defaultOffset: Int = 0,
         defaultPageSize: Int = 20,
     ): LoadResult<CartProduct> {
-        val response = productDataSource.getAllByPaging(page = defaultOffset, size = defaultPageSize)
-
-        if (!response.isSuccessful) {
-            return LoadResult.Error(LoadErrorType.UNKNOWN)
-        }
-
-        val body = response.body() ?: return LoadResult.Error(LoadErrorType.EMPTY_BODY)
-
-        return LoadResult.Page(
-            offset = body.number,
-            data = body.content.map { it.toDomain() },
-            last = body.last,
+        productDataSource.getAllByPaging(page = defaultOffset, size = defaultPageSize).mapCatching {
+            it.body
+        }.fold(
+            onSuccess = {
+                return if(it == null)
+                    LoadResult.Error(LoadErrorType.EMPTY_BODY)
+                else
+                    LoadResult.Page(
+                        offset = it.number,
+                        data = it.content.map { it.toDomain() },
+                        last = it.last,
+                    )
+            },
+            onFailure = {
+                return LoadResult.Error(LoadErrorType.UNKNOWN)
+            }
         )
     }
 }

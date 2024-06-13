@@ -17,14 +17,11 @@ class ProductRepositoryImpl(
         category: String,
         page: Int,
         size: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            val response = productDataSource.getAllByPaging(category, page, size)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.content?.map { it.toDomain() } ?: emptyList())
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    ): Result<List<CartProduct>> {
+        return productDataSource.getAllByPaging(category, page, size).mapCatching {
+            it.body?.content?.map { it.toDomain() } ?: emptyList()
         }
+    }
 
     override suspend fun getAllByPaging(
         offset: Int,
@@ -40,12 +37,9 @@ class ProductRepositoryImpl(
         }
     }
 
-    override suspend fun getById(id: Int): Result<CartProduct?> =
-        runCatching {
-            val response = productDataSource.getById(id = id)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.toDomain())
-            }
-            return Result.failure(Throwable(response.errorBody().toString()))
+    override suspend fun getById(id: Int): Result<CartProduct?> {
+        return productDataSource.getById(id).mapCatching {
+            it.body?.toDomain()
         }
+    }
 }
