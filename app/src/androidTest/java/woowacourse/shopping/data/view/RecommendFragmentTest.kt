@@ -60,7 +60,7 @@ class RecommendFragmentTest {
 
     @Test
     fun `구매_버튼을_보여준다`() {
-        onView(withId(R.id.btn_order))
+        onView(withId(R.id.button_pay))
             .check(matches(isDisplayed()))
     }
 }

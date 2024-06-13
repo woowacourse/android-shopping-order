@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
-import woowacourse.shopping.data.repository.real.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.real.RealProductRepositoryImpl
 import woowacourse.shopping.data.repository.real.RealShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
@@ -22,6 +21,7 @@ import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
+import woowacourse.shopping.view.coupon.CouponFragment
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.products.OnClickProducts
 
@@ -33,7 +33,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         val viewModelFactory =
             ViewModelFactory {
                 RecommendViewModel(
-                    orderRepository = OrderRepositoryImpl(),
                     productRepository = RealProductRepositoryImpl(),
                     shoppingCartRepository = RealShoppingCartRepositoryImpl(),
                     recentlyRepository = RecentlyProductRepositoryImpl(requireContext()),
@@ -136,7 +135,14 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     override fun clickOrder() {
-        recommendViewModel.orderItems()
+        val couponFragment =
+            CouponFragment().apply {
+                arguments =
+                    CouponFragment.createBundle(
+                        recommendViewModel.checkedShoppingCart,
+                    )
+            }
+        mainActivityListener?.changeFragment(couponFragment)
     }
 
     override fun clickBack() {
@@ -182,6 +188,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
             }
         }
 
-        private const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
+        const val CHECKED_SHOPPING_CART = "checkedShoppingCart"
     }
 }

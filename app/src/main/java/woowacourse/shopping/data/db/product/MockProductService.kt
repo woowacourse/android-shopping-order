@@ -21,12 +21,12 @@ class MockProductService : ProductService {
         return Gson().fromJson(responseBody, productType)
     }
 
-    override fun findProductById(productId: Long): Product? {
+    override fun findProductById(productId: Long): Product {
         val product = ProductDatabase.products.find { it.id == productId }
         val body = Gson().toJson(product)
         val serverRequest = makeServerRequest(body, productId.toString())
         val response: Response = client.newCall(serverRequest).execute()
-        val responseBody = response.body?.string() ?: return null
+        val responseBody = response.body?.string()
         return Gson().fromJson(responseBody, Product::class.java)
     }
 

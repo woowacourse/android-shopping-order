@@ -41,6 +41,4 @@ object NetworkManager {
     }
 
     fun getApiClient(): ApiClient = RetrofitClient(getRetrofit())
-
-    fun orderService(): OrderApiService = getRetrofit().create(OrderApiService::class.java)
 }

@@ -18,23 +18,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <View
-            android:id="@+id/vw_cart_top_bar"
+            android:id="@+id/pay_top_bar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@color/gray_5"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/btn_back"
+            android:id="@+id/button_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="27dp"
             android:background="@android:color/transparent"
             android:onClick="@{() -> onClickRecommend.clickBack()}"
             android:src="@drawable/ic_arrow_back"
-            app:layout_constraintBottom_toBottomOf="@id/vw_cart_top_bar"
-            app:layout_constraintStart_toStartOf="@id/vw_cart_top_bar"
-            app:layout_constraintTop_toTopOf="@id/vw_cart_top_bar" />
+            app:layout_constraintBottom_toBottomOf="@id/pay_top_bar"
+            app:layout_constraintStart_toStartOf="@id/pay_top_bar"
+            app:layout_constraintTop_toTopOf="@id/pay_top_bar" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -44,9 +44,9 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/btn_back"
-            app:layout_constraintStart_toEndOf="@id/btn_back"
-            app:layout_constraintTop_toTopOf="@id/btn_back" />
+            app:layout_constraintBottom_toBottomOf="@id/button_back"
+            app:layout_constraintStart_toEndOf="@id/button_back"
+            app:layout_constraintTop_toTopOf="@id/button_back" />
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
@@ -93,7 +93,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/btn_order"
+            android:id="@+id/button_pay"
             android:layout_width="122dp"
             android:layout_height="78dp"
             android:onClick="@{()->onClickRecommend.clickOrder()}"
@@ -117,7 +117,7 @@
             android:textSize="18dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_order"
+            app:layout_constraintEnd_toStartOf="@+id/button_pay"
             app:layout_constraintTop_toTopOf="@+id/view2"
             tools:text="12,000원" />
 

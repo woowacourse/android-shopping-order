@@ -1,53 +1,50 @@
 package woowacourse.shopping.data.repository
 
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProduct
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProductEntity
 import woowacourse.shopping.utils.exception.NoSuchDataException
-import kotlin.concurrent.thread
 
 class RecentlyProductRepositoryImpl(context: Context) : RecentlyProductRepository {
     private val recentlyProductDao =
         RecentlyProductDatabase.getInstance(context).recentlyProductDao()
 
-    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {
-        thread {
+    override suspend fun addRecentlyProduct(recentlyProduct: RecentlyProduct) {
+        withContext(Dispatchers.IO) {
             recentlyProductDao.addRecentlyProduct(
                 recentlyProduct.toRecentlyProductEntity(),
             )
         }
     }
 
-    override fun getMostRecentlyProduct(): RecentlyProduct {
-        var recentlyProduct = RecentlyProduct.defaultRecentlyProduct
-        thread {
-            val firstProduct = recentlyProductDao.getMostRecentlyProduct()?.toRecentlyProduct()
-            if (firstProduct != null) {
-                recentlyProduct = firstProduct
+    override suspend fun getMostRecentlyProduct(): Result<RecentlyProduct> {
+        return withContext(Dispatchers.IO) {
+            Result.runCatching {
+                val entity = recentlyProductDao.getMostRecentlyProduct()
+                entity.toRecentlyProduct()
             }
-        }.join()
-        return recentlyProduct
+        }
     }
 
-    override fun getRecentlyProductList(): List<RecentlyProduct> {
-        var pagingData = emptyList<RecentlyProduct>()
-        thread {
-            pagingData =
+    override suspend fun getRecentlyProductList(): Result<List<RecentlyProduct>> {
+        return withContext(Dispatchers.IO) {
+            Result.runCatching {
                 recentlyProductDao.findPagingRecentlyProduct(CURRENT_CART_ITEM_LOAD_PAGING_SIZE)
                     .map { it.toRecentlyProduct() }
-        }.join()
-        return pagingData
+            }
+        }
     }
 
-    override fun deleteRecentlyProduct(id: Long) {
-        var deleteId = ERROR_DELETE_DATA_ID
-        thread {
-            deleteId = recentlyProductDao.deleteRecentlyProductById(id)
-        }.join()
-        if (deleteId == ERROR_DELETE_DATA_ID) throw NoSuchDataException()
+    override suspend fun deleteRecentlyProduct(id: Long) {
+        withContext(Dispatchers.IO) {
+            val deleteId = recentlyProductDao.deleteRecentlyProductById(id)
+            if (deleteId == ERROR_DELETE_DATA_ID) throw NoSuchDataException()
+        }
     }
 
     companion object {
