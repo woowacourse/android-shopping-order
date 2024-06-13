@@ -16,6 +16,10 @@
             type="int" />
 
         <variable
+            name="changeAmountPerEach"
+            type="int" />
+
+        <variable
             name="onItemChargeListener"
             type="woowacourse.shopping.ui.OnItemQuantityChangeListener" />
     </data>
@@ -29,7 +33,7 @@
             android:id="@+id/btn_decrease"
             style="@style/QuantityButtonStyle"
             android:background="@drawable/shape_minus_quantity"
-            android:onClick="@{() -> onItemChargeListener.onDecrease(itemId, quantity - 1)}"
+            android:onClick="@{() -> onItemChargeListener.onDecrease(itemId, quantity - changeAmountPerEach)}"
             android:text="@string/minus"
             android:visibility="@{quantity > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toStartOf="@id/tv_quantity"
@@ -60,7 +64,7 @@
             android:id="@+id/btn_increase"
             style="@style/QuantityButtonStyle"
             android:background="@drawable/shape_plus_quantity"
-            android:onClick="@{() -> onItemChargeListener.onIncrease(itemId, quantity + 1)}"
+            android:onClick="@{() -> onItemChargeListener.onIncrease(itemId, quantity + changeAmountPerEach)}"
             android:text="@string/plus"
             android:visibility="@{quantity > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -73,7 +77,7 @@
             android:layout_height="48dp"
             android:background="@android:color/transparent"
             android:importantForAccessibility="no"
-            android:onClick="@{() -> onItemChargeListener.onIncrease(itemId, quantity + 1)}"
+            android:onClick="@{() -> onItemChargeListener.onIncrease(itemId, quantity + changeAmountPerEach)}"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_plus"
             android:visibility="@{quantity == 0 ? View.VISIBLE : View.GONE}"

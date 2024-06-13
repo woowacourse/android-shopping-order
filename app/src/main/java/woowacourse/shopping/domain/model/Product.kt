@@ -11,6 +11,8 @@ data class Product(
     val category: String = "",
 ) {
     companion object {
+        const val CHANGE_AMOUNT_PER_EACH = 1
+
         val NULL =
             Product(
                 id = -1,

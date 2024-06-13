@@ -86,7 +86,8 @@
             app:layout_constraintTop_toTopOf="@id/cart_product_image"
             bind:itemId="@{cartItem.product.id}"
             bind:onItemChargeListener="@{listener}"
-            bind:quantity="@{cartItem.quantity}" />
+            bind:quantity="@{cartItem.quantity}"
+            bind:changeAmountPerEach = "@{cartItem.CHANGE_AMOUNT_PER_EACH}"/>
 
         <TextView
             android:id="@+id/cart_product_price"
