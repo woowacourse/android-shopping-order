@@ -44,14 +44,12 @@ class ShoppingCartViewModel(
                     LOAD_SHOPPING_ITEM_OFFSET,
                     LOAD_SHOPPING_ITEM_SIZE,
                 ).getOrThrow()
+            }.onSuccess { pagingData ->
+                shoppingCart.addProducts(synchronizeLoadingData(pagingData))
+                setAllCheck()
+            }.onFailure {
+                handleException(it)
             }
-                .onSuccess { pagingData ->
-                    shoppingCart.addProducts(synchronizeLoadingData(pagingData))
-                    setAllCheck()
-                }
-                .onFailure {
-                    handleException(it)
-                }
         }
     }
 

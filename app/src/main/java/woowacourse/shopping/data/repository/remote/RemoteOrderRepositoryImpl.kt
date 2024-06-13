@@ -4,6 +4,7 @@ import woowacourse.shopping.data.remote.source.OrderDataSourceImpl
 import woowacourse.shopping.data.source.OrderDataSource
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.utils.exception.OrderItemsException
 
 class RemoteOrderRepositoryImpl(
     private val orderDataSource: OrderDataSource = OrderDataSourceImpl(),
@@ -14,7 +15,7 @@ class RemoteOrderRepositoryImpl(
             if (response.isSuccessful) {
                 Unit
             } else {
-                throw RuntimeException(response.code().toString())
+                throw OrderItemsException()
             }
         }
 
