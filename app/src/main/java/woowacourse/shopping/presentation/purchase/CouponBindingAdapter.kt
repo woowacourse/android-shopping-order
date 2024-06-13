@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.purchase
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.example.domain.model.Coupon
+import com.example.domain.model.coupon.Coupon
 import woowacourse.shopping.R
 import java.time.LocalDate
 

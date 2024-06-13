@@ -1,11 +1,10 @@
 package com.example.data.datasource.remote
 
-import com.example.data.datasource.remote.model.response.coupon.toCoupon
 import com.example.data.datasource.remote.service.CouponService
 import com.example.domain.datasource.CouponDataSource
 import com.example.domain.datasource.DataResponse
 import com.example.domain.datasource.map
-import com.example.domain.model.Coupon
+import com.example.domain.model.coupon.Coupon
 
 class RemoteCouponDataSource(
     private val couponService: CouponService,

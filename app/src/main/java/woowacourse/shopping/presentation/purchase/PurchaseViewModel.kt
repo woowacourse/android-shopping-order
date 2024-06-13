@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.datasource.map
 import com.example.domain.datasource.onSuccess
 import com.example.domain.model.CartItem
-import com.example.domain.model.Coupon
+import com.example.domain.model.coupon.Coupon
 import com.example.domain.repository.CartRepository
 import com.example.domain.repository.CouponRepository
 import com.example.domain.repository.OrderRepository

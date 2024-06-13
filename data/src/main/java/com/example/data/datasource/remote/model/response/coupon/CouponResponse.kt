@@ -14,4 +14,11 @@ data class CouponResponse(
     val availableTime: AvailableTime = AvailableTime(),
     val getQuantity: Int = 0,
     val minimumAmount: Int = 0,
-)
+) {
+    companion object {
+        const val FIXED_COUPON_TYPE_STRING = "fixed"
+        const val BUY_X_GET_Y_COUPON_TYPE_STRING = "buyXgetY"
+        const val FREE_SHIPPING_COUPON_TYPE_STRING = "freeShipping"
+        const val PERCENTAGE_COUPON_TYPE_STRING = "percentage"
+    }
+}
