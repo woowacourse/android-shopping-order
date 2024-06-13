@@ -1,5 +1,8 @@
 package woowacourse.shopping.domain.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -12,26 +15,31 @@ import woowacourse.shopping.source.FakeShoppingCartDataSource
 import woowacourse.shopping.ui.model.CartItem
 
 class DefaultShoppingCartRepositoryTest {
-    private lateinit var castSource: ShoppingCartDataSource
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+    private lateinit var cartSource: ShoppingCartDataSource
     private lateinit var repository: ShoppingCartRepository
 
     @BeforeEach
     fun setUp() {
-        castSource = FakeShoppingCartDataSource()
-        repository = DefaultShoppingCartRepository(castSource)
+        cartSource = FakeShoppingCartDataSource(dispatcher = dispatcher)
+        repository = DefaultShoppingCartRepository(cartSource)
     }
 
     @Test
     fun `모든 장바구니 상품 불러오기 성공`() =
         runTest {
             // given
-            castSource =
+            cartSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(10, cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) }),
+                    cartItemResponses = cartItemDtosTestFixture(
+                        10,
+                        cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) }),
+                    dispatcher = dispatcher,
                 )
             repository =
                 DefaultShoppingCartRepository(
-                    castSource,
+                    cartSource,
                 )
 
             // when
@@ -47,14 +55,15 @@ class DefaultShoppingCartRepositoryTest {
     fun `장바구니에 있는 상품의 개수를 구한다`() =
         runTest {
             // given
-            castSource =
+            cartSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(10) + cartItemDtoTestFixture(id = 10, quantity = 9),
+                    cartItemResponses = cartItemDtosTestFixture(10) + cartItemDtoTestFixture(id = 10, quantity = 9),
+                    dispatcher = dispatcher,
                 )
 
             repository =
                 DefaultShoppingCartRepository(
-                    castSource,
+                    cartSource,
                 )
 
             // when
@@ -68,22 +77,23 @@ class DefaultShoppingCartRepositoryTest {
     fun `장바구니에 있는 상품 중 id 에 해당하는 값의 수량을 업데이트한다`() =
         runTest {
             // given
-            castSource =
+            cartSource =
                 FakeShoppingCartDataSource(
-                    cartItemDtosTestFixture(
+                    cartItemResponses = cartItemDtosTestFixture(
                         10,
                         cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) },
                     ),
+                    dispatcher = dispatcher,
                 )
             repository =
                 DefaultShoppingCartRepository(
-                    castSource,
+                    cartSource,
                 )
 
             // when
             repository.updateProductQuantity(1, 10).getOrThrow()
             val actual =
-                castSource.loadAllCartItems().getOrThrow().find { it.id == 1L }?.quantity
+                cartSource.loadAllCartItems().getOrThrow().find { it.id == 1L }?.quantity
                     ?: throw NoSuchElementException("there is no product")
 
             // then
@@ -94,15 +104,15 @@ class DefaultShoppingCartRepositoryTest {
     fun `장바구니에 상품을 추가 담는다`() =
         runTest {
             // given
-            castSource = FakeShoppingCartDataSource()
-            repository = DefaultShoppingCartRepository(castSource)
+            cartSource = FakeShoppingCartDataSource(dispatcher = dispatcher)
+            repository = DefaultShoppingCartRepository(cartSource)
 
             // when
             repository.addShoppingCartProduct(1, 5).getOrThrow()
 
             // then
             val actual =
-                castSource.loadAllCartItems().getOrThrow().find { it.id == 1L }?.quantity
+                cartSource.loadAllCartItems().getOrThrow().find { it.id == 1L }?.quantity
                     ?: throw NoSuchElementException("there is no product")
 
             assertThat(actual).isEqualTo(5)
@@ -112,14 +122,17 @@ class DefaultShoppingCartRepositoryTest {
     fun `장바구니에 있는 상품 중 장바구니 id 값을 가진 상품을 제거한다`() =
         runTest {
             // given
-            castSource = FakeShoppingCartDataSource(cartItemDtosTestFixture(10))
-            repository = DefaultShoppingCartRepository(castSource)
+            cartSource = FakeShoppingCartDataSource(
+                cartItemResponses = cartItemDtosTestFixture(10),
+                dispatcher = dispatcher,
+            )
+            repository = DefaultShoppingCartRepository(cartSource)
 
             // when
             repository.removeShoppingCartProduct(1).getOrThrow()
 
             // then
-            val actual = castSource.loadAllCartItems().getOrThrow()
+            val actual = cartSource.loadAllCartItems().getOrThrow()
             assertThat(actual).hasSize(9)
         }
 }
