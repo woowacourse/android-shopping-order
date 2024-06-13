@@ -118,13 +118,15 @@ class ProductDetailViewModel(
         }
     }
 
-    private suspend fun deletePrevRecentlyProduct(recentlyProductId: Long): Result<Unit> {
-        return recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
+    private fun deletePrevRecentlyProduct(recentlyProductId: Long) {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            recentlyProductRepository.deleteRecentlyProduct(recentlyProductId)
+        }
     }
 
     fun updateRecentlyProduct(recentlyProduct: RecentlyProduct) {
         viewModelScope.launch(coroutineExceptionHandler) {
-            deletePrevRecentlyProduct(recentlyProduct.id).getOrThrow()
+            deletePrevRecentlyProduct(recentlyProduct.id)
             val loadItemCounter = loadProductItemCount(recentlyProduct.productId).getOrThrow()
             val product = productRepository.getProduct(recentlyProduct.productId).getOrThrow()
             product.updateItemSelector(true)
