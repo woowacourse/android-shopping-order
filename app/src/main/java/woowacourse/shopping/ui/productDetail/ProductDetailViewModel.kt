@@ -1,13 +1,10 @@
 package woowacourse.shopping.ui.productDetail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
@@ -36,7 +33,6 @@ class ProductDetailViewModel(
 
     private val _latestProduct: MutableLiveData<Product> = MutableLiveData()
     val latestProduct: LiveData<Product> get() = _latestProduct
-
 
     private var _event: MutableSingleLiveData<ProductDetailEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductDetailEvent> get() = _event
