@@ -11,6 +11,10 @@ import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.ItemSelector
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.coupon.BogoDiscountStrategy
+import woowacourse.shopping.domain.model.coupon.FixedDiscountStrategy
+import woowacourse.shopping.domain.model.coupon.FreeShippingStrategy
+import woowacourse.shopping.domain.model.coupon.TimeBasedDiscountStrategy
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -47,49 +51,25 @@ object DtoMapper {
     }
 
     fun CouponDto.toDomainModel(): Coupon {
-        return when (this.code) {
-            "FIXED5000" ->
-                Coupon.FixedDiscountCoupon(
-                    id = this.id,
-                    code = this.code,
-                    description = this.description,
-                    expirationDate = this.expirationDate.toLocalDate(),
-                    discountType = this.discountType,
-                    discount = this.discount ?: throw IllegalArgumentException("Discount가 필요합니다"),
-                    minimumAmount = this.minimumAmount ?: throw IllegalArgumentException("Minimum amount가 필요합니다"),
-                )
-            "BOGO" ->
-                Coupon.BogoCoupon(
-                    id = this.id,
-                    code = this.code,
-                    description = this.description,
-                    expirationDate = this.expirationDate.toLocalDate(),
-                    discountType = this.discountType,
-                    buyQuantity = this.buyQuantity ?: throw IllegalArgumentException("Buy quantity가 필요합니다"),
-                    getQuantity = this.getQuantity ?: throw IllegalArgumentException("Get quantity가 필요합니다"),
-                )
-            "FREESHIPPING" ->
-                Coupon.FreeShippingCoupon(
-                    id = this.id,
-                    code = this.code,
-                    description = this.description,
-                    expirationDate = this.expirationDate.toLocalDate(),
-                    discountType = this.discountType,
-                    minimumAmount = this.minimumAmount ?: throw IllegalArgumentException("Minimum amount가 필요합니다"),
-                )
-            "MIRACLESALE" ->
-                Coupon.TimeBasedDiscountCoupon(
-                    id = this.id,
-                    code = this.code,
-                    description = this.description,
-                    expirationDate = this.expirationDate.toLocalDate(),
-                    discountType = this.discountType,
-                    discount = this.discount ?: 0,
-                    availableTimeStart = this.availableTime?.start?.toLocalTime() ?: LocalTime.MIN,
-                    availableTimeEnd = this.availableTime?.end?.toLocalTime() ?: LocalTime.MAX,
-                )
-            else -> throw IllegalArgumentException("모르는 쿠폰 타입: ${this.discountType}")
-        }
+        return Coupon(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = expirationDate.toLocalDate(),
+            discountType = discountType,
+            minimumAmount = minimumAmount ?: 0,
+            discount = discount,
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity,
+            availableTime =
+                availableTime?.let {
+                    Coupon.AvailableTime(
+                        start = it.start.toLocalTime(),
+                        end = it.end.toLocalTime(),
+                    )
+                },
+            discountStrategy = toDiscountStrategy(),
+        )
     }
 
     private fun String.toLocalDate(): LocalDate {
@@ -99,4 +79,17 @@ object DtoMapper {
     private fun String.toLocalTime(): LocalTime {
         return LocalTime.parse(this)
     }
+
+    private fun CouponDto.toDiscountStrategy() =
+        when {
+            discount != null && availableTime == null -> FixedDiscountStrategy(discount)
+            buyQuantity != null && getQuantity != null -> BogoDiscountStrategy(buyQuantity, getQuantity)
+            discount == null && minimumAmount != null -> FreeShippingStrategy(3000)
+            discount != null && availableTime != null -> {
+                val startTime = availableTime.start.toLocalTime()
+                val endTime = availableTime.end.toLocalTime()
+                TimeBasedDiscountStrategy(discount, startTime, endTime)
+            }
+            else -> throw IllegalArgumentException("알 수 없는 쿠폰 정보")
+        }
 }
