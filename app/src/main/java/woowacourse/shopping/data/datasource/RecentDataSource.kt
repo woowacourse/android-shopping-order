@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.local.entity.RecentProductEntity
+import woowacourse.shopping.local.entity.RecentProductEntity
 
 interface RecentDataSource {
     suspend fun save(recentProductEntity: RecentProductEntity): Result<Unit>

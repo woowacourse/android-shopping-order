@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.dto.OrderRequest
-import woowacourse.shopping.data.remote.datasource.RemoteOrderDataSource
+import woowacourse.shopping.remote.dto.OrderRequest
+import woowacourse.shopping.remote.datasource.RemoteOrderDataSource
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderRepositoryImpl(

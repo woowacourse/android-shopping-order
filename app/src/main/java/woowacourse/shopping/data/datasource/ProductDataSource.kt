@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.dto.ProductDto
-import woowacourse.shopping.data.dto.ProductResponse
+import woowacourse.shopping.remote.dto.ProductDto
+import woowacourse.shopping.remote.dto.ProductResponse
 
 interface ProductDataSource {
     suspend fun getProductResponse(

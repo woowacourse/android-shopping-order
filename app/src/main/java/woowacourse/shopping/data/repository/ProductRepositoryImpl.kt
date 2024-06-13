@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.mapper.toProduct
-import woowacourse.shopping.data.remote.datasource.RemoteProductDataSource
+import woowacourse.shopping.remote.datasource.RemoteProductDataSource
 import woowacourse.shopping.domain.model.HomeInfo
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository

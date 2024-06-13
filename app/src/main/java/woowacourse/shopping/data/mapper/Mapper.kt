@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.dto.AvailableTimeDto
-import woowacourse.shopping.data.dto.CartItemDto
-import woowacourse.shopping.data.dto.CartResponse
-import woowacourse.shopping.data.dto.CouponDto
-import woowacourse.shopping.data.dto.ProductDto
-import woowacourse.shopping.data.local.entity.RecentProductEntity
+import woowacourse.shopping.remote.dto.AvailableTimeDto
+import woowacourse.shopping.remote.dto.CartItemDto
+import woowacourse.shopping.remote.dto.CartResponse
+import woowacourse.shopping.remote.dto.CouponDto
+import woowacourse.shopping.remote.dto.ProductDto
+import woowacourse.shopping.local.entity.RecentProductEntity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct

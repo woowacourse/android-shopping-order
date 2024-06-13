@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.local.datasource.LocalRecentDataSource
+import woowacourse.shopping.local.datasource.LocalRecentDataSource
 import woowacourse.shopping.data.mapper.toRecentProduct
 import woowacourse.shopping.data.mapper.toRecentProductEntity
 import woowacourse.shopping.data.mapper.toRecentProducts
