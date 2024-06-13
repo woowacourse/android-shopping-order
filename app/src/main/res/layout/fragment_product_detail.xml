@@ -111,7 +111,9 @@
                 app:layout_constraintTop_toTopOf="@id/product_detail_price_style"
                 bind:itemId="@{vm.currentProduct.id}"
                 bind:onItemChargeListener="@{listener}"
-                bind:quantity="@{vm.productCount}" />
+                bind:quantity="@{vm.productCount}"
+                bind:changeAmountPerEach = "@{1}"
+                />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/product_detail_latest_product_container"
