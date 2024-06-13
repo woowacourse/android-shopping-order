@@ -33,7 +33,12 @@ class FakeCartRepository(initCartItems: List<CartWithProduct> = cartItems) : Car
         return Result.Success(Unit)
     }
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit, DataError> = Result.Success(Unit)
+    override suspend fun deleteCartItem(id: Long): Result<Unit, DataError> {
+        cartStubs.firstOrNull { it.id == id } ?: return Result.Error(DataError.NotFound)
+
+        cartStubs.removeIf { it.id == id }
+        return Result.Success(Unit)
+    }
 
     override suspend fun getCartItemsCount(): Result<Int, DataError> =
         Result.Success(cartStubs.size)
