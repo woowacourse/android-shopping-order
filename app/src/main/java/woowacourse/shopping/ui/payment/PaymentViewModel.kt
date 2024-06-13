@@ -11,8 +11,7 @@ import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.coupon.remote.CouponRemoteRepository
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.coupon.Order
+import woowacourse.shopping.domain.model.coupon.DiscountCalculator
 import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
@@ -25,8 +24,7 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ): ViewModel(), OnCouponClickListener {
-    private var order: Order = Order(orderInformation, emptyList())
-    private var selectedCartItems = listOf<CartItem>()
+    private var discountCalculator: DiscountCalculator = DiscountCalculator(orderInformation, emptyList())
 
     private val _couponsUiModel = MutableLiveData<List<CouponUiModel>>(emptyList())
     val couponsUiModel: LiveData<List<CouponUiModel>> get() = _couponsUiModel
@@ -59,8 +57,8 @@ class PaymentViewModel(
     fun loadCoupons() {
         viewModelScope.launch {
             handleResponseResult(couponRepository.loadCoupons(), _errorMessage) { coupons ->
-                order = Order(orderInformation, coupons)
-                val applicableCoupon = order.findAvailableCoupons(orderInformation.cartItems)
+                discountCalculator = DiscountCalculator(orderInformation, coupons)
+                val applicableCoupon = discountCalculator.findAvailableCoupons(orderInformation.cartItems)
                 _couponsUiModel.value = applicableCoupon.map { CouponMapper.toUiModel(it) }
             }
         }
@@ -80,9 +78,9 @@ class PaymentViewModel(
         }
 
         val isChecked = !couponsUiModel.first { it.id == couponId }.checked
-        _discountAmount.value = order.calculateDiscountAmount(couponId, isChecked)
-        _shippingFee.value = order.calculateShippingFee(couponId, isChecked)
-        _totalPaymentAmount.value = order.calculateTotalAmount(couponId, isChecked)
+        _discountAmount.value = discountCalculator.calculateDiscountAmount(couponId, isChecked)
+        _shippingFee.value = discountCalculator.calculateShippingFee(couponId, isChecked)
+        _totalPaymentAmount.value = discountCalculator.calculateTotalAmount(couponId, isChecked)
     }
 
     companion object {

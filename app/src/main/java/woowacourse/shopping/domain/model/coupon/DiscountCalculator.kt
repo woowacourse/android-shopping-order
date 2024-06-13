@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.model.OrderInformation.Companion.SHIPPING_FEE
 
-class Order(
+class DiscountCalculator(
     private val orderInformation: OrderInformation,
     coupons: List<Coupon>,
 ) {
