@@ -43,7 +43,5 @@ interface CartRepository {
 
     suspend fun deleteAllItems(): Result<Unit>
 
-    suspend fun makeOrder(order: Order): Result<Unit>
-
     suspend fun getCartItemsQuantities(productIds: Set<Long>): Result<List<UpdatedQuantity>>
 }

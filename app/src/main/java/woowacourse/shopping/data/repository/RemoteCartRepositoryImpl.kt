@@ -177,16 +177,6 @@ class RemoteCartRepositoryImpl : CartRepository {
         return result
     }
 
-    override suspend fun makeOrder(order: Order): Result<Unit> {
-        val cartItemIds = order.map.keys.toList()
-        val response = service.makeOrder(CartItemsDto(cartItemIds))
-        return if (response.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(RuntimeException("Failed to make order. Check Item Ids. code: ${response.code()}"))
-        }
-    }
-
     override suspend fun getCartItemsQuantities(productIds: Set<Long>): Result<List<UpdatedQuantity>> {
         val result = fetchCartItemsInfo()
         var updatedQuantities: List<UpdatedQuantity> = emptyList()
