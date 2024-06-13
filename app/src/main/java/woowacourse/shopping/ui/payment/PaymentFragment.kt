@@ -2,11 +2,11 @@ package woowacourse.shopping.ui.payment
 
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
@@ -40,15 +40,19 @@ class PaymentFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentPaymentBinding.inflate(inflater)
         initBinding()
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initToolbar()
         observeIsPaymentSuccess()
@@ -71,7 +75,7 @@ class PaymentFragment : Fragment() {
             val orderInformation =
                 bundle.bundleSerializable(
                     OrderFragment.ORDER_INFORMATION,
-                    OrderInformation::class.java
+                    OrderInformation::class.java,
                 ) ?: throw NoSuchElementException()
             factory = PaymentViewModel.factory(orderInformation)
         }

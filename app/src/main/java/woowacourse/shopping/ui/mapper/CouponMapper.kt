@@ -9,7 +9,7 @@ import woowacourse.shopping.ui.model.CouponUiModel
 
 object CouponMapper {
     fun toUiModel(coupon: Coupon): CouponUiModel =
-        when(coupon) {
+        when (coupon) {
             is FixedDiscountCoupon -> coupon.toUiModel()
             is BuyXGetYCoupon -> coupon.toUiModel()
             is FreeShippingCoupon -> coupon.toUiModel()

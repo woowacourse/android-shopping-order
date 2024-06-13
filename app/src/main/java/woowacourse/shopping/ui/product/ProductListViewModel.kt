@@ -118,12 +118,12 @@ class ProductListViewModel(
     }
 
     private suspend fun loadProductsHistory() {
-       productHistoryRepository.loadProductsHistory()
+        productHistoryRepository.loadProductsHistory()
             .onSuccess { productHistory ->
                 _productsHistory.value = productHistory
             }.onFailure {
-               _errorMessage.value = it.message
-           }
+                _errorMessage.value = it.message
+            }
     }
 
     private suspend fun updateCartItemsCount() {

@@ -5,8 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.common.MutableSingleLiveData
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.OnProductItemClickListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
@@ -16,8 +18,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.history.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.common.OnItemQuantityChangeListener
-import woowacourse.shopping.common.OnProductItemClickListener
 import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 
 class ProductDetailViewModel(

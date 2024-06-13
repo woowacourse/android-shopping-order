@@ -22,7 +22,7 @@ class PaymentViewModel(
     private val orderInformation: OrderInformation,
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
-): ViewModel(), OnCouponClickListener {
+) : ViewModel(), OnCouponClickListener {
     private val _couponsUiModel = MutableLiveData<List<CouponUiModel>>(emptyList())
     val couponsUiModel: LiveData<List<CouponUiModel>> get() = _couponsUiModel
 
@@ -76,10 +76,14 @@ class PaymentViewModel(
 
     override fun onCouponSelected(couponId: Long) {
         val couponsUiModel = couponsUiModel.value ?: return
-        _couponsUiModel.value = couponsUiModel.map {
-            if (it.id == couponId) { it.copy(checked = !it.checked) }
-            else it.copy(checked = false)
-        }
+        _couponsUiModel.value =
+            couponsUiModel.map {
+                if (it.id == couponId) {
+                    it.copy(checked = !it.checked)
+                } else {
+                    it.copy(checked = false)
+                }
+            }
 
         val isChecked = !couponsUiModel.first { it.id == couponId }.checked
         _discountAmount.value = couponRepository.calculateDiscountAmount(orderInformation, couponId, isChecked)
@@ -88,23 +92,23 @@ class PaymentViewModel(
     }
 
     companion object {
-        fun factory(
-           orderInformation: OrderInformation,
-       ): UniversalViewModelFactory {
-           return UniversalViewModelFactory {
-               PaymentViewModel(
-                   orderInformation,
-                   orderRepository = OrderRemoteRepository(
-                       ShoppingApp.orderSource,
-                       ShoppingApp.productSource,
-                       ShoppingApp.historySource,
-                       ShoppingApp.cartSource,
-                   ),
-                   couponRepository = CouponRemoteRepository(
-                       ShoppingApp.couponSource,
-                   ),
-               )
-           }
-       }
+        fun factory(orderInformation: OrderInformation): UniversalViewModelFactory {
+            return UniversalViewModelFactory {
+                PaymentViewModel(
+                    orderInformation,
+                    orderRepository =
+                        OrderRemoteRepository(
+                            ShoppingApp.orderSource,
+                            ShoppingApp.productSource,
+                            ShoppingApp.historySource,
+                            ShoppingApp.cartSource,
+                        ),
+                    couponRepository =
+                        CouponRemoteRepository(
+                            ShoppingApp.couponSource,
+                        ),
+                )
+            }
+        }
     }
 }

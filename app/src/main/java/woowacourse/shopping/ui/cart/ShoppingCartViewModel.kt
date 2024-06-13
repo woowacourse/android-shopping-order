@@ -70,7 +70,7 @@ class ShoppingCartViewModel(
     }
 
     fun deleteItem(cartItemId: Long) {
-        viewModelScope.launch  {
+        viewModelScope.launch {
             handleResponseResult(cartItemRepository.delete(cartItemId), { }, { })
             handleResponseResult(
                 responseResult = cartItemRepository.loadCartItems(),
@@ -108,7 +108,7 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         quantity: Int,
     ) {
-        viewModelScope.launch  {
+        viewModelScope.launch {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             updateCartItems()
             updateTotalPrice()
@@ -119,7 +119,7 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         quantity: Int,
     ) {
-        viewModelScope.launch  {
+        viewModelScope.launch {
             cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
             updateCartItems()
             updateTotalPrice()
@@ -131,7 +131,7 @@ class ShoppingCartViewModel(
         val cartItems = cartItems.value ?: return
         handleResponseResult(
             responseResult = cartItemRepository.loadCartItems(),
-            onSuccess =  { currentItems ->
+            onSuccess = { currentItems ->
                 _cartItems.value =
                     currentItems.map { cartItem ->
                         cartItem.toUiModel().copy(checked = cartItems.first { it.id == cartItem.id }.checked)

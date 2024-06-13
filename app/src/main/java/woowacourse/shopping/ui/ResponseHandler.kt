@@ -6,7 +6,7 @@ import woowacourse.shopping.data.common.ApiResponseHandler.onSuccess
 import woowacourse.shopping.data.common.ResponseResult
 
 object ResponseHandler {
-    suspend fun <T: Any> handleResponseResult(
+    suspend fun <T : Any> handleResponseResult(
         responseResult: ResponseResult<T>,
         onSuccess: (T) -> Unit,
         onError: (String) -> Unit,

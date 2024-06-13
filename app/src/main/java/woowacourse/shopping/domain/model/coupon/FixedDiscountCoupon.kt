@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.ui.model.CouponUiModel
 import java.time.LocalDate
 
 data class FixedDiscountCoupon(
@@ -12,7 +11,7 @@ data class FixedDiscountCoupon(
     override val discountType: String,
     val discount: Int,
     val minimumAmount: Int,
-): Coupon {
+) : Coupon {
     override fun isAvailability(cartItems: List<CartItem>): Boolean {
         val isAmountThreshold = cartItems.sumOf { it.product.price * it.quantity } >= minimumAmount
         val isExpirationDate = LocalDate.now() <= expirationDate

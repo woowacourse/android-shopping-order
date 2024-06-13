@@ -8,7 +8,7 @@ import woowacourse.shopping.ui.payment.OnCouponClickListener
 class CouponViewHolder(
     private val binding: ItemCouponBinding,
     private val onCouponClickListener: OnCouponClickListener,
-): ViewHolder(binding.root) {
+) : ViewHolder(binding.root) {
     fun bind(coupon: CouponUiModel) {
         binding.coupon = coupon
         binding.onCouponClickListener = onCouponClickListener

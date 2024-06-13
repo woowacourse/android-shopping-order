@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.model.Product
 class ProductHistoryAdapter(
     private val onProductItemClickListener: OnProductItemClickListener,
 ) : ListAdapter<Product, ProductHistoryViewHolder>(diffUtil) {
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -33,17 +32,21 @@ class ProductHistoryAdapter(
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<Product>() {
-            override fun areItemsTheSame(
-                oldItem: Product,
-                newItem: Product,
-            ): Boolean {
-                return oldItem.id == newItem.id
-            }
+        val diffUtil =
+            object : DiffUtil.ItemCallback<Product>() {
+                override fun areItemsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean {
+                    return oldItem.id == newItem.id
+                }
 
-            override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
-                return oldItem == newItem
+                override fun areContentsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean {
+                    return oldItem == newItem
+                }
             }
-        }
     }
 }

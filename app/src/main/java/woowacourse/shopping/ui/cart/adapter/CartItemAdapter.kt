@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.databinding.HolderCartBinding
 import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.databinding.HolderCartBinding
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.model.CartItemUiModel
@@ -36,20 +36,21 @@ class CartItemAdapter(
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<CartItemUiModel>() {
-            override fun areItemsTheSame(
-                oldItem: CartItemUiModel,
-                newItem: CartItemUiModel,
-            ): Boolean {
-                return oldItem.id == newItem.id
-            }
+        val diffUtil =
+            object : DiffUtil.ItemCallback<CartItemUiModel>() {
+                override fun areItemsTheSame(
+                    oldItem: CartItemUiModel,
+                    newItem: CartItemUiModel,
+                ): Boolean {
+                    return oldItem.id == newItem.id
+                }
 
-            override fun areContentsTheSame(
-                oldItem: CartItemUiModel,
-                newItem: CartItemUiModel,
-            ): Boolean {
-                return oldItem == newItem
+                override fun areContentsTheSame(
+                    oldItem: CartItemUiModel,
+                    newItem: CartItemUiModel,
+                ): Boolean {
+                    return oldItem == newItem
+                }
             }
-        }
     }
 }

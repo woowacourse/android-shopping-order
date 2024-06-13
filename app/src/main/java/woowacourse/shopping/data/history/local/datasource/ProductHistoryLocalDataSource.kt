@@ -6,7 +6,9 @@ import woowacourse.shopping.data.model.HistoryProduct
 class ProductHistoryLocalDataSource(private val dao: HistoryProductDao) : ProductHistoryDataSource {
     override suspend fun saveProductHistory(productId: Long): Result<Long> {
         val id = dao.findById(productId)
-        if (id != null) { dao.delete(id) }
+        if (id != null) {
+            dao.delete(id)
+        }
 
         return runCatching {
             dao.insert(HistoryProduct(productId))

@@ -29,38 +29,35 @@ object ApiResponseHandler {
     }
 
     // TODO: handleResponse를 제거하고 handleResponseResult 만 사용할 방법 생각해보기
-    fun <T: Any, R: Any> handleResponseResult(
+    fun <T : Any, R : Any> handleResponseResult(
         responseResult: ResponseResult<T>,
-        onSuccess: (T) -> ResponseResult<R>
+        onSuccess: (T) -> ResponseResult<R>,
     ): ResponseResult<R> {
-        return when(responseResult) {
+        return when (responseResult) {
             is ResponseResult.Exception -> ResponseResult.Exception(responseResult.e, "예기치 않은 오류가 발생했습니다")
             is ResponseResult.ServerError -> ResponseResult.ServerError(responseResult.code, "서버와 통신 중에 오류가 발생했습니다.")
             is ResponseResult.Success -> onSuccess(responseResult.data)
         }
     }
 
-    suspend fun <T : Any> ResponseResult<T>.onSuccess(
-        executable: suspend (T) -> Unit
-    ): ResponseResult<T> = apply {
-        if (this is ResponseResult.Success<T>) {
-            executable(data)
+    suspend fun <T : Any> ResponseResult<T>.onSuccess(executable: suspend (T) -> Unit): ResponseResult<T> =
+        apply {
+            if (this is ResponseResult.Success<T>) {
+                executable(data)
+            }
         }
-    }
 
-    suspend fun <T : Any> ResponseResult<T>.onServerError(
-        executable: suspend (code: Int, message: String) -> Unit
-    ): ResponseResult<T> = apply {
-        if (this is ResponseResult.ServerError<T>) {
-            executable(code, message)
+    suspend fun <T : Any> ResponseResult<T>.onServerError(executable: suspend (code: Int, message: String) -> Unit): ResponseResult<T> =
+        apply {
+            if (this is ResponseResult.ServerError<T>) {
+                executable(code, message)
+            }
         }
-    }
 
-    suspend fun <T : Any> ResponseResult<T>.onException(
-        executable: suspend (e: Throwable, message: String) -> Unit
-    ): ResponseResult<T> = apply {
-        if (this is ResponseResult.Exception<T>) {
-            executable(e, message)
+    suspend fun <T : Any> ResponseResult<T>.onException(executable: suspend (e: Throwable, message: String) -> Unit): ResponseResult<T> =
+        apply {
+            if (this is ResponseResult.Exception<T>) {
+                executable(e, message)
+            }
         }
-    }
 }

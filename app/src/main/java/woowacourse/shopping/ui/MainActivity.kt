@@ -6,9 +6,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.ShoppingCartFragment
+import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.order.OrderFragment
 import woowacourse.shopping.ui.order.OrderFragment.Companion.ORDER_INFORMATION
-import woowacourse.shopping.ui.model.OrderInformation
 import woowacourse.shopping.ui.payment.PaymentFragment
 import woowacourse.shopping.ui.product.ProductListFragment
 import woowacourse.shopping.ui.productDetail.ProductDetailFragment

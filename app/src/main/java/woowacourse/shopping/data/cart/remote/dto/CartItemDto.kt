@@ -3,7 +3,6 @@ package woowacourse.shopping.data.cart.remote.dto
 import woowacourse.shopping.data.product.remote.dto.ProductDto
 import woowacourse.shopping.data.product.remote.dto.ProductDto.Companion.toDomain
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.ui.model.CartItemUiModel
 
 data class CartItemDto(
     val id: Long,

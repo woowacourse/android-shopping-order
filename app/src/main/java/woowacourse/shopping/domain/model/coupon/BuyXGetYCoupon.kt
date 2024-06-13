@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.ui.model.CouponUiModel
 import java.time.LocalDate
 
 data class BuyXGetYCoupon(
@@ -12,7 +11,7 @@ data class BuyXGetYCoupon(
     override val discountType: String,
     val buyQuantity: Int,
     val getQuantity: Int,
-): Coupon {
+) : Coupon {
     override fun isAvailability(cartItems: List<CartItem>): Boolean {
         val hasQuantityOfTwo = cartItems.any { it.quantity == buyQuantity }
         val isExpirationDate = LocalDate.now() <= expirationDate

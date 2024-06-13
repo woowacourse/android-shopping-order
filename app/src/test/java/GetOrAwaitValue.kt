@@ -17,7 +17,7 @@ fun <T> LiveData<T>.getOrAwaitValue(
                 latch.countDown()
                 this@getOrAwaitValue.removeObserver(this)
             }
-    }
+        }
 
     this.observeForever(observer)
 

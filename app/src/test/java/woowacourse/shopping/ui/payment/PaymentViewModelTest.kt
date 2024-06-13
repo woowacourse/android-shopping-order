@@ -2,6 +2,10 @@ package woowacourse.shopping.ui.payment
 
 import CoroutinesTestExtension
 import InstantTaskExecutorExtension
+import TestFixture.buyXGetYCoupon
+import TestFixture.fixedDiscountCoupon
+import TestFixture.freeShippingCoupon
+import TestFixture.orderInformation
 import getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.every
@@ -19,10 +23,6 @@ import woowacourse.shopping.domain.model.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
-import TestFixture.buyXGetYCoupon
-import TestFixture.fixedDiscountCoupon
-import TestFixture.freeShippingCoupon
-import TestFixture.orderInformation
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
@@ -52,17 +52,18 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `주문이_완료되면_결제_성공_여부는_true이다`() = runTest {
-        // given
-        coEvery { orderRepository.orderCartItems(orderInformation.getCartItemIds()) } returns ResponseResult.Success(Unit)
+    fun `주문이_완료되면_결제_성공_여부는_true이다`() =
+        runTest {
+            // given
+            coEvery { orderRepository.orderCartItems(orderInformation.getCartItemIds()) } returns ResponseResult.Success(Unit)
 
-        // when
-        viewModel.createOrder()
+            // when
+            viewModel.createOrder()
 
-        // then
-        val actual = viewModel.isPaymentSuccess.getValue()
-        assertThat(actual).isTrue()
-    }
+            // then
+            val actual = viewModel.isPaymentSuccess.getValue()
+            assertThat(actual).isTrue()
+        }
 
     @Test
     fun `가격이 20만원인 상품 3개와 가격이 5만원인 상품 2개를 주문한다면 주문 금액은 70만원이다`() {
@@ -102,46 +103,51 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `장바구니 상품 중 갯수가 2인 항목이 있다면 2개 구매 시 1개 무료 쿠폰을 불러온다`() = runTest {
-        // given
-        coEvery { couponRepository.loadCoupons(orderInformation) } returns ResponseResult.Success(
-            listOf(buyXGetYCoupon)
-        )
+    fun `장바구니 상품 중 갯수가 2인 항목이 있다면 2개 구매 시 1개 무료 쿠폰을 불러온다`() =
+        runTest {
+            // given
+            coEvery { couponRepository.loadCoupons(orderInformation) } returns
+                ResponseResult.Success(
+                    listOf(buyXGetYCoupon),
+                )
 
-        // when
-        viewModel.loadCoupons()
+            // when
+            viewModel.loadCoupons()
 
-        // then
-        val actual = viewModel.couponsUiModel.getOrAwaitValue().map { it.discountType }
-        assertThat(actual).contains(BuyXGetYCoupon.TYPE)
-    }
+            // then
+            val actual = viewModel.couponsUiModel.getOrAwaitValue().map { it.discountType }
+            assertThat(actual).contains(BuyXGetYCoupon.TYPE)
+        }
 
     @Test
-    fun `주문 금액이 10만원 이상이라면 5,000원 할인, 배송비 할인 쿠폰을 불러온다`() = runTest {
-        // given
-        coEvery { couponRepository.loadCoupons(orderInformation) } returns ResponseResult.Success(
-            listOf(fixedDiscountCoupon, freeShippingCoupon)
-        )
+    fun `주문 금액이 10만원 이상이라면 5,000원 할인, 배송비 할인 쿠폰을 불러온다`() =
+        runTest {
+            // given
+            coEvery { couponRepository.loadCoupons(orderInformation) } returns
+                ResponseResult.Success(
+                    listOf(fixedDiscountCoupon, freeShippingCoupon),
+                )
 
-        // when
-        viewModel.loadCoupons()
+            // when
+            viewModel.loadCoupons()
 
-        // then
-        val actual = viewModel.couponsUiModel.getOrAwaitValue().map { it.discountType }
-        assertAll(
-            { assertThat(actual).contains(FixedDiscountCoupon.TYPE) },
-            { assertThat(actual).contains(FreeShippingCoupon.TYPE) },
-        )
-    }
+            // then
+            val actual = viewModel.couponsUiModel.getOrAwaitValue().map { it.discountType }
+            assertAll(
+                { assertThat(actual).contains(FixedDiscountCoupon.TYPE) },
+                { assertThat(actual).contains(FreeShippingCoupon.TYPE) },
+            )
+        }
 
     @Test
     fun `5,000원 할인 쿠폰이 선택되었다면 할인 금액은 -5천원이고, 총 결제 금액은 69만 8천원이다 `() {
         // given
         val selectedCouponId: Long = 1
         val isChecked = true
-        coEvery { couponRepository.loadCoupons(orderInformation) } returns ResponseResult.Success(
-            listOf(fixedDiscountCoupon, freeShippingCoupon, buyXGetYCoupon)
-        )
+        coEvery { couponRepository.loadCoupons(orderInformation) } returns
+            ResponseResult.Success(
+                listOf(fixedDiscountCoupon, freeShippingCoupon, buyXGetYCoupon),
+            )
         every { couponRepository.calculateDiscountAmount(orderInformation, selectedCouponId, isChecked) } returns -5_000
         every { couponRepository.calculateShippingFee(orderInformation, selectedCouponId, isChecked) } returns 3_000
         every { couponRepository.calculateTotalAmount(orderInformation, selectedCouponId, isChecked) } returns 698_000
@@ -164,9 +170,10 @@ class PaymentViewModelTest {
         // given
         val selectedCouponId: Long = 2
         val isChecked = true
-        coEvery { couponRepository.loadCoupons(orderInformation) } returns ResponseResult.Success(
-            listOf(fixedDiscountCoupon, freeShippingCoupon, buyXGetYCoupon)
-        )
+        coEvery { couponRepository.loadCoupons(orderInformation) } returns
+            ResponseResult.Success(
+                listOf(fixedDiscountCoupon, freeShippingCoupon, buyXGetYCoupon),
+            )
         every { couponRepository.calculateDiscountAmount(orderInformation, selectedCouponId, isChecked) } returns -50_000
         every { couponRepository.calculateShippingFee(orderInformation, selectedCouponId, isChecked) } returns 3_000
         every { couponRepository.calculateTotalAmount(orderInformation, selectedCouponId, isChecked) } returns 653_000
@@ -189,9 +196,10 @@ class PaymentViewModelTest {
         // given
         val selectedCouponId: Long = 3
         val isChecked = true
-        coEvery { couponRepository.loadCoupons(orderInformation) } returns ResponseResult.Success(
-            listOf(fixedDiscountCoupon, freeShippingCoupon, buyXGetYCoupon)
-        )
+        coEvery { couponRepository.loadCoupons(orderInformation) } returns
+            ResponseResult.Success(
+                listOf(fixedDiscountCoupon, freeShippingCoupon, buyXGetYCoupon),
+            )
         every { couponRepository.calculateDiscountAmount(orderInformation, selectedCouponId, isChecked) } returns -3_000
         every { couponRepository.calculateShippingFee(orderInformation, selectedCouponId, isChecked) } returns 0
         every { couponRepository.calculateTotalAmount(orderInformation, selectedCouponId, isChecked) } returns 700_000

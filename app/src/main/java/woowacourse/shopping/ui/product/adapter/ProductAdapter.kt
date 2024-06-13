@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.databinding.HolderProductBinding
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.OnProductItemClickListener
+import woowacourse.shopping.databinding.HolderProductBinding
+import woowacourse.shopping.domain.model.Product
 
 class ProductAdapter(
     private val onProductItemClickListener: OnProductItemClickListener,
@@ -37,20 +37,21 @@ class ProductAdapter(
     companion object {
         private const val TAG = "ProductRecyclerViewAdapter"
 
-        val diffUtil = object : DiffUtil.ItemCallback<Product>() {
-            override fun areItemsTheSame(
-                oldItem: Product,
-                newItem: Product,
-            ): Boolean {
-                return (oldItem.id == newItem.id)
-            }
+        val diffUtil =
+            object : DiffUtil.ItemCallback<Product>() {
+                override fun areItemsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean {
+                    return (oldItem.id == newItem.id)
+                }
 
-            override fun areContentsTheSame(
-                oldItem: Product,
-                newItem: Product,
-            ): Boolean {
-                return oldItem == newItem
+                override fun areContentsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean {
+                    return oldItem == newItem
+                }
             }
-        }
     }
 }

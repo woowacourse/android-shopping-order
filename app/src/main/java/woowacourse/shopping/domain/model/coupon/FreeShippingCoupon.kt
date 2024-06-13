@@ -11,7 +11,7 @@ data class FreeShippingCoupon(
     override val expirationDate: LocalDate,
     override val discountType: String,
     val minimumAmount: Int,
-): Coupon {
+) : Coupon {
     override fun isAvailability(cartItems: List<CartItem>): Boolean {
         val isAmountThreshold = cartItems.sumOf { it.product.price * it.quantity } >= minimumAmount
         val isExpirationDate = LocalDate.now() <= expirationDate

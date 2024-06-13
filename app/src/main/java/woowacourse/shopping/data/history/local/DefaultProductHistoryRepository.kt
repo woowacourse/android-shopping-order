@@ -13,36 +13,40 @@ class DefaultProductHistoryRepository(
 ) : ProductHistoryRepository {
     override suspend fun saveProductHistory(productId: Long): Result<Long> {
         return runCatching {
-            val id = productHistoryDataSource.saveProductHistory(productId).getOrElse {
-                throw NoSuchElementException()
-            }
+            val id =
+                productHistoryDataSource.saveProductHistory(productId).getOrElse {
+                    throw NoSuchElementException()
+                }
             id
         }
     }
 
     override suspend fun loadProductsHistory(): Result<List<Product>> {
         return runCatching {
-            val productIds = productHistoryDataSource.fetchProductsHistory().getOrElse {
-                throw NoSuchElementException()
-            }
+            val productIds =
+                productHistoryDataSource.fetchProductsHistory().getOrElse {
+                    throw NoSuchElementException()
+                }
             productIds.map { loadProduct(it) }
         }
     }
 
     override suspend fun loadProductHistory(productId: Long): Result<Product> {
         return runCatching {
-            val id = productHistoryDataSource.fetchProductHistory(productId).getOrElse {
-                throw NoSuchElementException()
-            } ?: throw NoSuchElementException("there is no product history with id $productId")
+            val id =
+                productHistoryDataSource.fetchProductHistory(productId).getOrElse {
+                    throw NoSuchElementException()
+                } ?: throw NoSuchElementException("there is no product history with id $productId")
             loadProduct(id)
         }
     }
 
     override suspend fun loadLatestProduct(): Result<Product> {
         return runCatching {
-            val productId = productHistoryDataSource.fetchLatestProduct().getOrElse {
-                throw NoSuchElementException("No product history available")
-            }
+            val productId =
+                productHistoryDataSource.fetchLatestProduct().getOrElse {
+                    throw NoSuchElementException("No product history available")
+                }
             loadProduct(productId)
         }
     }

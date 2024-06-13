@@ -9,8 +9,7 @@ import woowacourse.shopping.domain.model.ProductIdsCount
 
 class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiService) :
     CartItemDataSource {
-    override suspend fun fetchCartItems(): ResponseResult<CartItemResponse> =
-        handleApiResponse { cartItemApiService.requestCartItems() }
+    override suspend fun fetchCartItems(): ResponseResult<CartItemResponse> = handleApiResponse { cartItemApiService.requestCartItems() }
 
     override suspend fun saveCartItem(productIdsCount: ProductIdsCount): ResponseResult<Unit> =
         handleApiResponse {

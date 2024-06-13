@@ -14,8 +14,7 @@ data class OrderInformation(
 
     fun calculateDefaultTotalAmount(): Int = cartItems.sumOf { it.product.price * it.quantity } + SHIPPING_FEE
 
-    fun determineShippingFee(isSelected: Boolean): Int =
-        if (isSelected) FREE_SHIPPING_FEE else SHIPPING_FEE
+    fun determineShippingFee(isSelected: Boolean): Int = if (isSelected) FREE_SHIPPING_FEE else SHIPPING_FEE
 
     companion object {
         const val FREE_SHIPPING_FEE = 0

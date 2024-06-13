@@ -10,8 +10,8 @@ import woowacourse.shopping.domain.repository.coupon.CouponRepository
 import woowacourse.shopping.ui.model.OrderInformation
 
 class CouponRemoteRepository(
-    private val couponDataSource: CouponDataSource
-): CouponRepository {
+    private val couponDataSource: CouponDataSource,
+) : CouponRepository {
     private var validCoupons: List<Coupon> = emptyList()
 
     override suspend fun loadCoupons(orderInformation: OrderInformation): ResponseResult<List<Coupon>> =
@@ -25,7 +25,10 @@ class CouponRemoteRepository(
         selectedCouponId: Long,
         isChecked: Boolean,
     ): Int {
-        val selectedCoupon = validCoupons.find { it.id == selectedCouponId } ?: throw NoSuchElementException(INVALID_COUPON.format(selectedCouponId))
+        val selectedCoupon =
+            validCoupons.find {
+                it.id == selectedCouponId
+            } ?: throw NoSuchElementException(INVALID_COUPON.format(selectedCouponId))
         return if (isChecked) {
             selectedCoupon.calculateDiscountAmount(orderInformation.cartItems)
         } else {
@@ -48,7 +51,10 @@ class CouponRemoteRepository(
         selectedCouponId: Long,
         isChecked: Boolean,
     ): Int {
-        val selectedCoupon = validCoupons.find { it.id == selectedCouponId } ?: throw NoSuchElementException(INVALID_COUPON.format(selectedCouponId))
+        val selectedCoupon =
+            validCoupons.find {
+                it.id == selectedCouponId
+            } ?: throw NoSuchElementException(INVALID_COUPON.format(selectedCouponId))
         val isSelectedFreeShipping = selectedCoupon.discountType == FreeShippingCoupon.TYPE
         return if (isSelectedFreeShipping) orderInformation.determineShippingFee(isChecked) else OrderInformation.SHIPPING_FEE
     }

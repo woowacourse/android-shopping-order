@@ -16,9 +16,10 @@ class DefaultProductRepository(
     override suspend fun loadProducts(page: Int): ResponseResult<ProductsPage> {
         return when (val response = productDataSource.loadByPaged(page)) {
             is ResponseResult.Success -> {
-                val products = response.data.content.map { productDto ->
-                    productDto.toDomain(findCartItemQuantity(productDto.id))
-                }
+                val products =
+                    response.data.content.map { productDto ->
+                        productDto.toDomain(findCartItemQuantity(productDto.id))
+                    }
                 val isFinalPage: Boolean = (page + 1) == response.data.totalPages
                 ResponseResult.Success(ProductsPage(products, isFinalPage))
             }
@@ -28,7 +29,7 @@ class DefaultProductRepository(
     }
 
     override suspend fun loadProduct(id: Long): ResponseResult<Product> {
-        return when(val response = productDataSource.loadById(id)) {
+        return when (val response = productDataSource.loadById(id)) {
             is ResponseResult.Success -> {
                 val data = response.data.toDomain(findCartItemQuantity(id))
                 ResponseResult.Success(data)

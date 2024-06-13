@@ -7,7 +7,6 @@ import woowacourse.shopping.data.coupon.remote.dto.CouponDto
 
 class CouponRemoteDataSource(
     private val couponApiService: CouponApiService,
-): CouponDataSource {
-    override suspend fun loadCoupons(): ResponseResult<List<CouponDto>> =
-        handleApiResponse { couponApiService.requestCoupons() }
+) : CouponDataSource {
+    override suspend fun loadCoupons(): ResponseResult<List<CouponDto>> = handleApiResponse { couponApiService.requestCoupons() }
 }

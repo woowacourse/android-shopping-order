@@ -1,22 +1,22 @@
-//package woowacourse.shopping.data.common
+// package woowacourse.shopping.data.common
 //
-//import com.google.android.gms.common.api.ApiException
-//import kotlinx.coroutines.DelicateCoroutinesApi
-//import kotlinx.coroutines.Dispatchers
-//import kotlinx.coroutines.GlobalScope
-//import kotlinx.coroutines.launch
-//import kotlinx.coroutines.withContext
-//import okhttp3.Request
-//import okio.Timeout
-//import retrofit2.Call
-//import retrofit2.Callback
-//import retrofit2.HttpException
-//import retrofit2.Response
-//import woowacourse.shopping.data.common.ApiResponseHandler.handleApiResponse
+// import com.google.android.gms.common.api.ApiException
+// import kotlinx.coroutines.DelicateCoroutinesApi
+// import kotlinx.coroutines.Dispatchers
+// import kotlinx.coroutines.GlobalScope
+// import kotlinx.coroutines.launch
+// import kotlinx.coroutines.withContext
+// import okhttp3.Request
+// import okio.Timeout
+// import retrofit2.Call
+// import retrofit2.Callback
+// import retrofit2.HttpException
+// import retrofit2.Response
+// import woowacourse.shopping.data.common.ApiResponseHandler.handleApiResponse
 //
-//class NetworkResultCall<T : Any>(
+// class NetworkResultCall<T : Any>(
 //    private val proxy: Call<T>
-//) : Call<ResponseResult<T>> {
+// ) : Call<ResponseResult<T>> {
 //    @OptIn(DelicateCoroutinesApi::class)
 //    override fun enqueue(callback: Callback<ResponseResult<T>>) {
 //        proxy.enqueue(object : Callback<T> {
@@ -47,4 +47,4 @@
 //    override fun isExecuted(): Boolean = proxy.isExecuted
 //    override fun isCanceled(): Boolean = proxy.isCanceled
 //    override fun cancel() { proxy.cancel() }
-//}
+// }

@@ -58,7 +58,7 @@ class OrderViewModel(
                     _navigationPaymentEvent.setValue(
                         OrderInformation(
                             cartItems = orderInformation.cartItems + newCartItems,
-                        )
+                        ),
                     )
                 },
                 onError = { message ->
@@ -99,7 +99,7 @@ class OrderViewModel(
     private fun updateQuantity(
         productQuantity: ProductIdsCount,
         variation: Int,
-        priceConvert: (price: Int) -> Int
+        priceConvert: (price: Int) -> Int,
     ) {
         updateProductQuantity(productQuantity, variation)
         updateOrderAmount(productQuantity.productId, priceConvert)
@@ -120,7 +120,10 @@ class OrderViewModel(
             }
     }
 
-    private fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
+    private fun updateOrderAmount(
+        productId: Long,
+        priceConvert: (price: Int) -> Int,
+    ) {
         viewModelScope.launch {
             handleResponseResult(
                 responseResult = productRepository.loadProduct(productId),
