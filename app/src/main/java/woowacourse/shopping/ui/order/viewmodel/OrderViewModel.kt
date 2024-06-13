@@ -179,11 +179,13 @@ class OrderViewModel(private val cartRepository: CartRepository) : ViewModel(), 
             _orderNotifyingActions.value = Event(OrderNotifyingActions.NotifyCanNotOrder)
         } else {
             when (currentFragmentName.value) {
-                CartFragment::class.java.simpleName -> _orderNavigationActions.value =
-                    Event(OrderNavigationActions.NavigateToRecommend)
+                CartFragment::class.java.simpleName ->
+                    _orderNavigationActions.value =
+                        Event(OrderNavigationActions.NavigateToRecommend)
 
-                RecommendFragment::class.java.simpleName -> _orderNavigationActions.value =
-                    Event(OrderNavigationActions.NavigateToPayment)
+                RecommendFragment::class.java.simpleName ->
+                    _orderNavigationActions.value =
+                        Event(OrderNavigationActions.NavigateToPayment)
             }
         }
     }

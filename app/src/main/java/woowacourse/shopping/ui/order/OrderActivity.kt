@@ -50,10 +50,18 @@ class OrderActivity : AppCompatActivity() {
             orderNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is OrderNavigationActions.NavigateToBack -> {
-                        finish()
+                        if (orderViewModel.currentFragmentName.value == RecommendFragment::class.java.simpleName) {
+                            replaceFragment(cartFragment)
+                        } else {
+                            finish()
+                        }
                     }
 
-                    is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
+                    is OrderNavigationActions.NavigateToRecommend ->
+                        replaceFragment(
+                            recommendFragment,
+                        )
+
                     is OrderNavigationActions.NavigateToPayment -> {
                         val cartItemIds =
                             orderViewModel.cartViewItems.value?.filter { cartViewItem -> cartViewItem.isChecked }
@@ -78,8 +86,16 @@ class OrderActivity : AppCompatActivity() {
     private fun addFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
+            add(R.id.fragment_cart, fragment)
+            addToBackStack(fragment.tag)
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
             replace(R.id.fragment_cart, fragment)
-            addToBackStack(null)
+            addToBackStack(fragment.tag)
         }
     }
 
