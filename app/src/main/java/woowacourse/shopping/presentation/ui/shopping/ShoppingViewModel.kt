@@ -39,10 +39,10 @@ class ShoppingViewModel(private val repository: Repository) :
 
     val cartProducts = MediatorLiveData<UiState<List<CartProduct>>>(UiState.Loading)
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        _errorHandler.value = EventState(SHOPPING_ERROR)
-    }
-
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            _errorHandler.value = EventState(SHOPPING_ERROR)
+        }
 
     init {
         cartProducts.addSource(_products) {

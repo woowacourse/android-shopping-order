@@ -30,9 +30,10 @@ class CurationViewModel(
     private val _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val orderProducts: LiveData<UiState<List<CartProduct>>> get() = _orderProducts
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        _errorHandler.value = EventState(CURATION_ERROR)
-    }
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            _errorHandler.value = EventState(CURATION_ERROR)
+        }
 
     init {
         viewModelScope.launch(exceptionHandler) {

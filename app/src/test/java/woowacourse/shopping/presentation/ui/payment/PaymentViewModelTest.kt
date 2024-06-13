@@ -35,24 +35,27 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `viewModel이 초기화되면 쿠폰을 불러온다`() = runTest {
-        // given
-        coEvery { repository.getCoupons() } returns Result.success(coupons)
-        // when
-        viewModel.getCoupons()
-        // then
-        coVerify { repository.getCoupons() }
-    }
+    fun `viewModel이 초기화되면 쿠폰을 불러온다`() =
+        runTest {
+            // given
+            coEvery { repository.getCoupons() } returns Result.success(coupons)
+            // when
+            viewModel.getCoupons()
+            // then
+            coVerify { repository.getCoupons() }
+        }
 
     @Test
-    fun `주문을 하면 성공적으로 주문이 완료된다`() = runTest {
-        // given
-        coEvery { repository.submitOrders(OrderRequest(ids.map { it.toInt() })) } returns Result.success(
-            Unit
-        )
-        // when
-        viewModel.order()
-        // then
-        coVerify { repository.submitOrders(OrderRequest(ids.map { it.toInt() })) }
-    }
+    fun `주문을 하면 성공적으로 주문이 완료된다`() =
+        runTest {
+            // given
+            coEvery { repository.submitOrders(OrderRequest(ids.map { it.toInt() })) } returns
+                Result.success(
+                    Unit,
+                )
+            // when
+            viewModel.order()
+            // then
+            coVerify { repository.submitOrders(OrderRequest(ids.map { it.toInt() })) }
+        }
 }

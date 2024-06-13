@@ -35,16 +35,18 @@ class ProductDetailViewModelTest {
     }
 
     @Test
-    fun `saveCartItem으로 상품을 장바구니에 저장한다`() = runTest {
-        // given
-        val detailProduct = DetailCartProduct(
-            isNew = true,
-            cartProduct = cartProduct,
-        )
-        coEvery { repository.postCartItem(any()) } returns Result.success(1)
-        // when
-        viewModel.onAddToCart(detailProduct)
-        // then
-        coVerify(exactly = 1) { repository.postCartItem(any()) }
-    }
+    fun `saveCartItem으로 상품을 장바구니에 저장한다`() =
+        runTest {
+            // given
+            val detailProduct =
+                DetailCartProduct(
+                    isNew = true,
+                    cartProduct = cartProduct,
+                )
+            coEvery { repository.postCartItem(any()) } returns Result.success(1)
+            // when
+            viewModel.onAddToCart(detailProduct)
+            // then
+            coVerify(exactly = 1) { repository.postCartItem(any()) }
+        }
 }

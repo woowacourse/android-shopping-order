@@ -50,29 +50,31 @@ class PaymentViewModel(
         viewModelScope.launch {
             repository.getCoupons()
                 .onSuccess {
-                    val applyCoupon = it.filter {
-                        it.discountPrice(
-                            totalPrice.value ?: 0,
-                            (_orderProducts.value as UiState.Success).data
-                        ) > 0
-                    }
+                    val applyCoupon =
+                        it.filter {
+                            it.discountPrice(
+                                totalPrice.value ?: 0,
+                                (_orderProducts.value as UiState.Success).data,
+                            ) > 0
+                        }
                     _coupons.value = UiState.Success(applyCoupon)
                 }.onFailure {
                     _errorHandler.value = EventState(COUPON_LOAD_ERROR)
                 }
         }
 
-    private fun orderProducts() = viewModelScope.launch {
-        repository.getCartItems(0, 1000)
-            .onSuccess {
-                val filteredCartItems =
-                    it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
-                _orderProducts.value = UiState.Success(filteredCartItems)
-            }
-            .onFailure {
-                _errorHandler.value = EventState(COUPON_LOAD_ERROR)
-            }
-    }
+    private fun orderProducts() =
+        viewModelScope.launch {
+            repository.getCartItems(0, 1000)
+                .onSuccess {
+                    val filteredCartItems =
+                        it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
+                    _orderProducts.value = UiState.Success(filteredCartItems)
+                }
+                .onFailure {
+                    _errorHandler.value = EventState(COUPON_LOAD_ERROR)
+                }
+        }
 
     private fun calculateTotalPrice() {
         if (_orderProducts.value is UiState.Success) {

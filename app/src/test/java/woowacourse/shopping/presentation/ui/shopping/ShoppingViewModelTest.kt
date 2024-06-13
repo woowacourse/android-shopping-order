@@ -21,7 +21,6 @@ import woowacourse.shopping.presentation.ui.UiState
 @ExtendWith(InstantTaskExecutorExtension::class)
 @ExtendWith(MockKExtension::class)
 class ShoppingViewModelTest {
-
     private lateinit var viewModel: ShoppingViewModel
     private lateinit var repository: Repository
 
@@ -33,22 +32,24 @@ class ShoppingViewModelTest {
     }
 
     @Test
-    fun `장바구니에 담긴 상품을 불러올 수 있다`() = runTest {
-        // given
-        coEvery { repository.getCartItems(any(), any()) } returns Result.success(cartProducts)
-        // when
-        viewModel.loadCartByOffset()
-        // then
-        assertEquals(UiState.Success(cartProducts), viewModel.carts.getOrAwaitValue())
-    }
+    fun `장바구니에 담긴 상품을 불러올 수 있다`() =
+        runTest {
+            // given
+            coEvery { repository.getCartItems(any(), any()) } returns Result.success(cartProducts)
+            // when
+            viewModel.loadCartByOffset()
+            // then
+            assertEquals(UiState.Success(cartProducts), viewModel.carts.getOrAwaitValue())
+        }
 
     @Test
-    fun `상품 목록을 불러올 수 있다`() = runTest {
-        // given
-        coEvery { repository.getProductsByPaging() } returns Result.success(cartProducts)
-        // when
-        viewModel.loadProductByOffset()
-        // then
-        assertEquals(UiState.Success(cartProducts), viewModel.products.getOrAwaitValue())
-    }
+    fun `상품 목록을 불러올 수 있다`() =
+        runTest {
+            // given
+            coEvery { repository.getProductsByPaging() } returns Result.success(cartProducts)
+            // when
+            viewModel.loadProductByOffset()
+            // then
+            assertEquals(UiState.Success(cartProducts), viewModel.products.getOrAwaitValue())
+        }
 }

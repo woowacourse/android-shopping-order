@@ -19,21 +19,20 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
     private val orderItemsId: List<Long> by lazy {
         intent.getIntegerArrayListExtra(EXTRA_CART_PRODUCT)?.map { it.toLong() } ?: emptyList()
     }
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            CartActivity.createIntent(this@CurationActivity).apply {
-                putExtra(CartActivity.EXTRA_BACK_FROM_CURATION, true)
-                startActivity(this)
-                finish()
+    private val onBackPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                CartActivity.createIntent(this@CurationActivity).apply {
+                    putExtra(CartActivity.EXTRA_BACK_FROM_CURATION, true)
+                    startActivity(this)
+                    finish()
+                }
             }
         }
-    }
-
 
     private val viewModel: CurationViewModel by viewModels { ViewModelFactory(orderItemsId) }
 
     private val curationAdapter: CurationAdapter by lazy { CurationAdapter(viewModel) }
-
 
     override fun initStartView() {
         title = "Curation"
