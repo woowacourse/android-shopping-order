@@ -19,10 +19,8 @@ import woowacourse.shopping.domain.result.transForm
 
 class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
     CouponRepository {
-
     override suspend fun getAllCoupons(): Result<List<Coupon>, DataError> =
         dataSource.getCoupons().transForm { it.map { it.toDomain() } }
-
 
     private fun CouponDto.toDomain(): Coupon =
         when (this) {

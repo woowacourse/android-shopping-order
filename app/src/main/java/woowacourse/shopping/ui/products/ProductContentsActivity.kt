@@ -117,8 +117,8 @@ class ProductContentsActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.errorScope.observe(this) {error ->
-            when(error){
+        viewModel.errorScope.observe(this) { error ->
+            when (error) {
                 ProductContentError.Cart -> showToastMessage(R.string.cart_error)
                 ProductContentError.Product -> showToastMessage(R.string.product_error)
                 ProductContentError.RecentProduct -> recentProductVisibility(false)

@@ -20,9 +20,12 @@ class CouponAdapter(
         fun onBind(item: CouponUiModel) {
             with(binding) {
                 tvCouponItemTitle.text = item.title
-                tvCouponItemExpireDate.text = itemView.context.getString(R.string.coupon_expire).format(item.expireDate)
-                    .format(item.availableStartTime, item.availableEndTime)
-                tvCouponItemMinimumOrderPrice.text = itemView.context.getString(R.string.coupon_minimum_amount).format(item.minimumAmount)
+                tvCouponItemExpireDate.text =
+                    itemView.context.getString(R.string.coupon_expire).format(item.expireDate)
+                        .format(item.availableStartTime, item.availableEndTime)
+                tvCouponItemMinimumOrderPrice.text =
+                    itemView.context.getString(R.string.coupon_minimum_amount)
+                        .format(item.minimumAmount)
                 isChecked = item.isChecked
                 couponClickListener = onClick
                 couponId = item.id

@@ -10,9 +10,7 @@ interface ProductRepository {
         size: Int,
     ): Result<List<Product>, DataError>
 
-
     suspend fun getProductById(id: Long): Result<Product, DataError>
-
 
     suspend fun getAllRecommendProducts(category: String): Result<List<Product>, DataError>
 }

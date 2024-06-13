@@ -94,8 +94,8 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
             }
         }
 
-        viewModel.errorScope.observe(this) {error ->
-            when(error){
+        viewModel.errorScope.observe(this) { error ->
+            when (error) {
                 CouponError.LoadCoupon -> showToastMessage(R.string.coupon_error)
                 CouponError.Order -> showToastMessage(R.string.order_error)
             }

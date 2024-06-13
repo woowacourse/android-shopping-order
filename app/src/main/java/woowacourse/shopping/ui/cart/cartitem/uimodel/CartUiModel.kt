@@ -22,7 +22,7 @@ data class CartUiModel(
     fun toCartWithProduct(): CartWithProduct =
         CartWithProduct(
             id,
-            Product(productId, imageUrl, name, price, ""), Quantity(this.quantity),
+            Product(productId, imageUrl, name, price, ""),
+            Quantity(this.quantity),
         )
-
 }

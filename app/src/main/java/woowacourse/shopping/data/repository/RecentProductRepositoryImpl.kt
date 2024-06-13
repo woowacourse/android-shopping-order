@@ -9,21 +9,21 @@ import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :
     RecentProductRepository {
-
     override suspend fun insert(productId: Long): Result<Long, DataError> {
-        val productId = recentProductDao.insert(
-            RecentProduct(
-                productId = productId,
-                recentTime = LocalDateTime.now(),
-            ),
-        )
+        val productId =
+            recentProductDao.insert(
+                RecentProduct(
+                    productId = productId,
+                    recentTime = LocalDateTime.now(),
+                ),
+            )
         return Result.Success(productId)
     }
 
-
     override suspend fun getMostRecentProduct(): Result<RecentProduct, DataError> {
-        val result = recentProductDao.findMostRecentProduct()
-            ?: return Result.Error(DataError.NotFound)
+        val result =
+            recentProductDao.findMostRecentProduct()
+                ?: return Result.Error(DataError.NotFound)
         return Result.Success(result)
     }
 

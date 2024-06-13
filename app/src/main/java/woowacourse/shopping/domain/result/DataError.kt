@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.result
 
 sealed interface DataError : Error {
-
     data object UNKNOWN : DataError, ShowError
 
     data object NotFound : DataError
@@ -10,7 +9,7 @@ sealed interface DataError : Error {
         REQUEST_TIMEOUT,
         NO_INTERNET,
         SERVER,
-        INVALID_AUTHORIZATION
+        INVALID_AUTHORIZATION,
     }
 
     enum class Local : DataError {
@@ -23,5 +22,3 @@ inline fun <T, E : DataError, S> Result<T, E>.transForm(executable: (T) -> S): R
         is Result.Success -> Result.Success(executable(data))
         is Result.Error -> Result.Error(this.error)
     }
-
-

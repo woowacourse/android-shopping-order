@@ -22,12 +22,10 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
                 } else {
                     Result.Error(DataError.NotFound)
                 }
-
             }
 
             is Result.Error -> Result.Error(carts.error)
         }
-
 
     override suspend fun getAllCartItems(): Result<List<CartWithProduct>, DataError> {
         val count =
@@ -50,10 +48,11 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
     override suspend fun patchCartItem(
         id: Long,
         quantity: Int,
-    ): Result<Unit, DataError> = dataSource.patchCartItems(
-        id = id,
-        request = RequestCartItemsPatchDto(quantity),
-    )
+    ): Result<Unit, DataError> =
+        dataSource.patchCartItems(
+            id = id,
+            request = RequestCartItemsPatchDto(quantity),
+        )
 
     override suspend fun addProductToCart(
         productId: Long,
@@ -67,7 +66,7 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
     private suspend fun CartRepositoryImpl.updateCart(
         carts: List<CartWithProduct>,
         productId: Long,
-        quantity: Int
+        quantity: Int,
     ): Result<Unit, DataError> {
         val cart: CartWithProduct? = carts.firstOrNull { it.product.id == productId }
         return if (cart == null) {
@@ -76,7 +75,6 @@ class CartRepositoryImpl(private val dataSource: CartDataSource = RemoteCartData
             patchCartItem(cart.id, cart.quantity.value + quantity)
         }
     }
-
 
     companion object {
         private const val DEFAULT_CART_COUNT = 300

@@ -7,5 +7,5 @@ sealed interface ProductDetailError {
 
     data object AddCart : ProductDetailError
 
-    data object Recent:ProductDetailError
+    data object Recent : ProductDetailError
 }

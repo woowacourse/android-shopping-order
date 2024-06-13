@@ -226,7 +226,6 @@ class CartViewModel(
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
-
     private fun CartWithProduct.toUiModel(isChecked: Boolean) =
         CartUiModel(
             this.id,
@@ -243,9 +242,12 @@ class CartViewModel(
             it.productId == productId
         }?.isChecked ?: false || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 
-    private fun setError(dataError: DataError, errorScope: CartError) {
+    private fun setError(
+        dataError: DataError,
+        errorScope: CartError,
+    ) {
         if (dataError is ShowError) {
-            _dataError.setValue(dataError)
+            mutableDataError.setValue(dataError)
         } else {
             _errorScope.setValue(errorScope)
         }

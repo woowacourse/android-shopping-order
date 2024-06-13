@@ -102,12 +102,11 @@ class CartActivity : AppCompatActivity() {
         }
 
         viewModel.errorScope.observe(this) { error ->
-            when(error){
+            when (error) {
                 CartError.LoadCart -> noRecommendPage()
                 CartError.LoadRecommend -> showToastMessage(R.string.cart_error)
                 CartError.UpdateCart -> showToastMessage(R.string.cart_error)
             }
-
         }
     }
 

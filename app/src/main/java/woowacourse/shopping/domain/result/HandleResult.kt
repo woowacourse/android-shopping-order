@@ -7,7 +7,7 @@ inline fun <T : Any?, E : Error> Result<T, E>.onSuccess(executable: (T) -> Unit)
         }
     }
 
-inline fun <T: Any?, E : Error> Result<T, E>.onError(executable: (E) -> Unit): Result<T, E> =
+inline fun <T : Any?, E : Error> Result<T, E>.onError(executable: (E) -> Unit): Result<T, E> =
     apply {
         if (this is Result.Error) {
             executable(error)

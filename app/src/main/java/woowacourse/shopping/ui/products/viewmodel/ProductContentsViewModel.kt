@@ -18,8 +18,8 @@ import woowacourse.shopping.domain.result.onError
 import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.products.toUiModel
-import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
 import woowacourse.shopping.ui.products.uimodel.ProductContentError
+import woowacourse.shopping.ui.products.uimodel.ProductItemClickListener
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
 import woowacourse.shopping.ui.utils.BaseViewModel
@@ -188,14 +188,16 @@ class ProductContentsViewModel(
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
-    private fun setError(dataError: DataError, errorScope: ProductContentError) {
+    private fun setError(
+        dataError: DataError,
+        errorScope: ProductContentError,
+    ) {
         if (dataError is ShowError) {
-            _dataError.setValue(dataError)
+            mutableDataError.setValue(dataError)
         } else {
             _errorScope.setValue(errorScope)
         }
     }
-
 
     companion object {
         private const val DEFAULT_CART_ITEMS_COUNT = 0

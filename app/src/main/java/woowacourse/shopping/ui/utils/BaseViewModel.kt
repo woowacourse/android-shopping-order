@@ -13,14 +13,13 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 abstract class BaseViewModel : ViewModel() {
-    protected val _dataError: MutableSingleLiveData<ShowError> = MutableSingleLiveData()
-    val dataError: SingleLiveData<ShowError> get() = _dataError
-
+    protected val mutableDataError: MutableSingleLiveData<ShowError> = MutableSingleLiveData()
+    val dataError: SingleLiveData<ShowError> get() = mutableDataError
 
     fun ViewModel.viewModelLaunch(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
-        block: suspend CoroutineScope.() -> Unit
+        block: suspend CoroutineScope.() -> Unit,
     ): Job {
         return viewModelScope.launch(
             context = context + exceptionHandler,
@@ -31,6 +30,6 @@ abstract class BaseViewModel : ViewModel() {
 
     private val exceptionHandler: CoroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
-            _dataError.setValue(DataError.UNKNOWN)
+            mutableDataError.setValue(DataError.UNKNOWN)
         }
 }

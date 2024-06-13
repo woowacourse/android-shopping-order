@@ -6,5 +6,4 @@ sealed interface CartError {
     data object LoadCart : CartError
 
     data object LoadRecommend : CartError
-
 }

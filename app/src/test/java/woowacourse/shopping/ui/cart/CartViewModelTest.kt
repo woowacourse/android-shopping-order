@@ -34,48 +34,49 @@ class CartViewModelTest {
     }
 
     @Test
-    fun `장바구니에 아이템이 4개 있을 때, 삭제 버튼을 누르면 아이템이 3개가 된다`() = runTest {
-        // when
-        val before = viewModel.cart.getOrAwaitValue()
-        assertThat(before.cartItems).hasSize(4)
+    fun `장바구니에 아이템이 4개 있을 때, 삭제 버튼을 누르면 아이템이 3개가 된다`() =
+        runTest {
+            // when
+            val before = viewModel.cart.getOrAwaitValue()
+            assertThat(before.cartItems).hasSize(4)
 
-        // given
-        viewModel.removeCartItem(DELETED_CART_ID)
+            // given
+            viewModel.removeCartItem(DELETED_CART_ID)
 
-        // then
-        advanceUntilIdle()
-        val actual = viewModel.cart.getOrAwaitValue()
-        assertThat(actual.cartItems.size).isEqualTo(3)
-    }
+            // then
+            advanceUntilIdle()
+            val actual = viewModel.cart.getOrAwaitValue()
+            assertThat(actual.cartItems.size).isEqualTo(3)
+        }
 
     @Test
-    fun `장바구니의 상품 개수가 2개일 때, 개수를 증가시키면 3개가 된다`() = runTest {
-        // when
-        val before =
-            viewModel.cart.getOrAwaitValue().cartItems.first { it.id == UPDATE_COUNT_CART_ID }
-        assertThat(before.quantity).isEqualTo(2)
+    fun `장바구니의 상품 개수가 2개일 때, 개수를 증가시키면 3개가 된다`() =
+        runTest {
+            // when
+            val before =
+                viewModel.cart.getOrAwaitValue().cartItems.first { it.id == UPDATE_COUNT_CART_ID }
+            assertThat(before.quantity).isEqualTo(2)
 
-        // given
-        viewModel.plusCount(UPDATE_COUNT_CART_ID)
+            // given
+            viewModel.plusCount(UPDATE_COUNT_CART_ID)
 
-        // then
-        advanceUntilIdle()
-        val actual =
-            viewModel.cart.getOrAwaitValue().cartItems.first { it.id == UPDATE_COUNT_CART_ID }
-        assertThat(actual.quantity).isEqualTo(3)
-    }
-
+            // then
+            advanceUntilIdle()
+            val actual =
+                viewModel.cart.getOrAwaitValue().cartItems.first { it.id == UPDATE_COUNT_CART_ID }
+            assertThat(actual.quantity).isEqualTo(3)
+        }
 
     companion object {
         val CART_STUB =
             (1..4).toList().map { id ->
                 CartWithProduct(
-                    id.toLong(), FakeProductRepository.productStubs.first { it.id == id.toLong() },
-                    Quantity(id)
+                    id.toLong(),
+                    FakeProductRepository.productStubs.first { it.id == id.toLong() },
+                    Quantity(id),
                 )
             }
         const val DELETED_CART_ID = 3L
         const val UPDATE_COUNT_CART_ID = 2L
-
     }
 }

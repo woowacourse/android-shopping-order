@@ -8,7 +8,8 @@ import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.domain.result.Result
 
 class RemoteCouponDataSource : CouponDataSource {
-    override suspend fun getCoupons(): Result<List<CouponDto>, DataError> = handleApi {
-        ShoppingRetrofit.couponService.getCoupons()
-    }
+    override suspend fun getCoupons(): Result<List<CouponDto>, DataError> =
+        handleApi {
+            ShoppingRetrofit.couponService.getCoupons()
+        }
 }

@@ -6,7 +6,6 @@ import woowacourse.shopping.data.remote.api.handleApi
 import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
 import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
 import woowacourse.shopping.domain.result.DataError
-import woowacourse.shopping.domain.result.Error
 import woowacourse.shopping.domain.result.Result
 
 class RemoteProductDataSource : ProductDataSource {

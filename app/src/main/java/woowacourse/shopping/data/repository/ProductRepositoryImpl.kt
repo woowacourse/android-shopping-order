@@ -21,13 +21,11 @@ class ProductRepositoryImpl(
     override suspend fun getProductById(id: Long): Result<Product, DataError> =
         productDataSource.getProductsById(id).transForm { it.toProduct() }
 
-
     override suspend fun getAllProducts(
         page: Int,
         size: Int,
     ): Result<List<Product>, DataError> =
         productDataSource.getProductsByOffset(page, size).transForm { it.toProductList() }
-
 
     override suspend fun getAllRecommendProducts(category: String): Result<List<Product>, DataError> {
         val carts: List<CartWithProduct> = cartWithProducts()
@@ -39,8 +37,9 @@ class ProductRepositoryImpl(
             val productResponse =
                 productDataSource.getProductsByOffset(page, LOAD_PRODUCT_INTERVAL)
             when (productResponse) {
-                is Result.Success -> loadedProducts =
-                    productResponse.data.toProductList()
+                is Result.Success ->
+                    loadedProducts =
+                        productResponse.data.toProductList()
 
                 is Result.Error -> return Result.Error(productResponse.error)
             }

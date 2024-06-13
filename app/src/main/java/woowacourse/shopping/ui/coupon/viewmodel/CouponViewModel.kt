@@ -122,9 +122,12 @@ class CouponViewModel(
     private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean =
         this?.firstOrNull { it.id == couponId }?.isChecked ?: false
 
-    private fun setError(dataError: DataError, errorScope: CouponError) {
+    private fun setError(
+        dataError: DataError,
+        errorScope: CouponError,
+    ) {
         if (dataError is ShowError) {
-            _dataError.setValue(dataError)
+            mutableDataError.setValue(dataError)
         } else {
             _errorScope.setValue(errorScope)
         }

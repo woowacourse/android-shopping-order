@@ -5,7 +5,6 @@ import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.domain.result.Result
 
 interface RecentProductRepository {
-
     suspend fun insert(productId: Long): Result<Long, DataError>
 
     suspend fun getMostRecentProduct(): Result<RecentProduct, DataError>

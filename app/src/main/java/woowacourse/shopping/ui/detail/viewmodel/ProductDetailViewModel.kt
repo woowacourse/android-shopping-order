@@ -99,7 +99,6 @@ class ProductDetailViewModel(
             }
 
             recentProductRepository.insert(productId)
-
         }
     }
 
@@ -110,12 +109,14 @@ class ProductDetailViewModel(
         _mostRecentProductVisibility.value = (mostRecentProductId != currentProductId)
     }
 
-    private fun setError(dataError: DataError, errorScope: ProductDetailError) {
+    private fun setError(
+        dataError: DataError,
+        errorScope: ProductDetailError,
+    ) {
         if (dataError is ShowError) {
-            _dataError.setValue(dataError)
+            mutableDataError.setValue(dataError)
         } else {
             _errorScope.setValue(errorScope)
         }
     }
-
 }
