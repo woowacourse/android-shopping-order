@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.fixture.fake
 
 import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDao

@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui
+package woowacourse.shopping.fixture.fake
 
 import woowacourse.shopping.data.local.room.cart.Cart
 import woowacourse.shopping.data.local.room.cart.CartDao
