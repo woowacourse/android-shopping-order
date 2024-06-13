@@ -1,8 +1,9 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.remote.api.ApiResponse
 import woowacourse.shopping.data.remote.dto.response.CouponDto
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.domain.result.Result
 
 interface CouponDataSource {
-    suspend fun getCoupons(): ApiResponse<List<CouponDto>>
+    suspend fun getCoupons(): Result<List<CouponDto>, DataError>
 }
