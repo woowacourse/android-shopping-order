@@ -3,62 +3,43 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.local.room.recentproduct.RecentProduct
 import woowacourse.shopping.data.local.room.recentproduct.RecentProductDao
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.domain.result.Result
 import java.time.LocalDateTime
 
 class RecentProductRepositoryImpl private constructor(private val recentProductDao: RecentProductDao) :
     RecentProductRepository {
 
-        override suspend fun insert(productId: Long): Result<Long> {
-            return try {
-                val productId =
-                    recentProductDao.insert(
-                        RecentProduct(
-                            productId = productId,
-                            recentTime = LocalDateTime.now(),
-                        ),
-                    )
-                Result.Success(productId)
-            } catch (e: Exception) {
-                Result.Exception(e)
-            }
-        }
+    override suspend fun insert(productId: Long): Result<Long, DataError> {
+        val productId = recentProductDao.insert(
+            RecentProduct(
+                productId = productId,
+                recentTime = LocalDateTime.now(),
+            ),
+        )
+        return Result.Success(productId)
+    }
 
 
-        override suspend fun getMostRecentProduct(): Result<RecentProduct> {
-            return try {
-                val result =
-                    recentProductDao.findMostRecentProduct() ?: return Fail.NotFound("최근 상품이 없습니다.")
-                Result.Success(result)
-            } catch (e: Exception) {
-                Result.Exception(e)
-            }
-        }
+    override suspend fun getMostRecentProduct(): Result<RecentProduct, DataError> {
+        val result = recentProductDao.findMostRecentProduct()
+            ?: return Result.Error(DataError.NotFound)
+        return Result.Success(result)
+    }
 
-        override suspend fun getAllRecentProducts(): Result<List<RecentProduct>> {
-            return try {
-                Result.Success(recentProductDao.findAll())
-            } catch (e: Exception) {
-                Result.Exception(e)
-            }
-        }
+    override suspend fun getAllRecentProducts(): Result<List<RecentProduct>, DataError> =
+        Result.Success(recentProductDao.findAll())
 
-        override suspend fun deleteAll(): Result<Unit> {
-            return try {
-                Result.Success(recentProductDao.deleteAll())
-            } catch (e: Exception) {
-                Result.Exception(e)
-            }
-        }
+    override suspend fun deleteAll(): Result<Unit, DataError> =
+        Result.Success(recentProductDao.deleteAll())
 
-        companion object {
-            private var instance: RecentProductRepository? = null
+    companion object {
+        private var instance: RecentProductRepository? = null
 
-            fun get(recentProductDao: RecentProductDao): RecentProductRepository {
-                return instance ?: synchronized(this) {
-                    instance ?: RecentProductRepositoryImpl(recentProductDao).also { instance = it }
-                }
+        fun get(recentProductDao: RecentProductDao): RecentProductRepository {
+            return instance ?: synchronized(this) {
+                instance ?: RecentProductRepositoryImpl(recentProductDao).also { instance = it }
             }
         }
     }
+}

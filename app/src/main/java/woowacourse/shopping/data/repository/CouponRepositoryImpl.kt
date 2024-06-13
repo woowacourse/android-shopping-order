@@ -13,19 +13,16 @@ import woowacourse.shopping.domain.model.coupon.FixedCoupon
 import woowacourse.shopping.domain.model.coupon.PercentageCoupon
 import woowacourse.shopping.domain.model.coupon.ShippingCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.domain.result.Fail
+import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.domain.result.Result
-import woowacourse.shopping.domain.result.handleApiResult
-import woowacourse.shopping.domain.result.resultOrThrow
+import woowacourse.shopping.domain.result.transForm
 
 class CouponRepositoryImpl(private val dataSource: CouponDataSource = RemoteCouponDataSource()) :
     CouponRepository {
 
-    override suspend fun getAllCoupons(): Result<List<Coupon>> =
-        handleApiResult(
-            result = dataSource.getCoupons(),
-            transform = { it.map { it.toDomain() } },
-        )
+    override suspend fun getAllCoupons(): Result<List<Coupon>, DataError> =
+        dataSource.getCoupons().transForm { it.map { it.toDomain() } }
+
 
     private fun CouponDto.toDomain(): Coupon =
         when (this) {

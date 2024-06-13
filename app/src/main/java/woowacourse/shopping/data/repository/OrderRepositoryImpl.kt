@@ -4,13 +4,11 @@ import woowacourse.shopping.data.datasource.OrderDataSource
 import woowacourse.shopping.data.datasource.impl.RemoteOrderDataSource
 import woowacourse.shopping.data.remote.dto.request.RequestOrderPostDto
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.domain.result.Result
-import woowacourse.shopping.domain.result.handleApiResult
 
 class OrderRepositoryImpl(private val dataSource: OrderDataSource = RemoteOrderDataSource()) :
     OrderRepository {
-    override suspend fun order(cartIds: List<Long>): Result<Unit> =
-        handleApiResult(
-            dataSource.postOrder(RequestOrderPostDto(cartIds)),
-        )
+    override suspend fun order(cartIds: List<Long>): Result<Unit, DataError> =
+        dataSource.postOrder(RequestOrderPostDto(cartIds))
 }
