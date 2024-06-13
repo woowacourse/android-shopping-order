@@ -47,8 +47,8 @@ class OrderViewModel(
 
     private suspend fun loadRecommendProducts() {
         productsRecommendationRepository.recommendedProducts()
-            .onSuccess {
-                _recommendedProducts.setValue(it)
+            .onSuccess { products ->
+                _recommendedProducts.setValue(products)
             }
             .onFailure {
                 _error.setValue(OrderError.LoadRecommendedProducts)
@@ -57,8 +57,8 @@ class OrderViewModel(
 
     private suspend fun countOrderItemsQuantity() {
         orderRepository.allOrderItemsQuantity()
-            .onSuccess {
-                _addedProductQuantity.value = it
+            .onSuccess { allOrderItemsQuantity ->
+                _addedProductQuantity.value = allOrderItemsQuantity
             }
             .onFailure {
                 _error.setValue(OrderError.CalculateOrderItemsQuantity)
@@ -67,8 +67,8 @@ class OrderViewModel(
 
     private suspend fun calculateOrderItemsTotalPrice() {
         orderRepository.orderItemsTotalPrice()
-            .onSuccess {
-                _totalPrice.value = it
+            .onSuccess { calculatedTotalPrice ->
+                _totalPrice.value = calculatedTotalPrice
             }
             .onFailure {
                 _error.setValue(OrderError.CalculateOrderItemsTotalPrice)
@@ -92,7 +92,7 @@ class OrderViewModel(
         orderRepository.updateOrderItem(productId, quantity)
             .onSuccess {
                 updateRecommendProductsQuantity(productId, changeAmount)
-                updateTotalQuantity(productId, changeAmount)
+                updateTotalPrice(productId, changeAmount)
                 _addedProductQuantity.value = addedProductQuantity.value?.plus(changeAmount)
             }
             .onFailure {
@@ -109,15 +109,15 @@ class OrderViewModel(
         }
     }
 
-    private fun updateTotalQuantity(
+    private fun updateTotalPrice(
         productId: Long,
         changeAmount: Int,
     ) {
-        _totalPrice.value = totalPrice.value?.plus(productQuantity(productId) * changeAmount)
+        _totalPrice.value = totalPrice.value?.plus(productPrice(productId) * changeAmount)
     }
 
-    private fun productQuantity(productId: Long) =
-        _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+    private fun productPrice(productId: Long) =
+        _recommendedProducts.getValue()?.find { product -> product.id == productId }?.price ?: 0
 
     private fun updateRecommendProductsQuantity(
         productId: Long,
