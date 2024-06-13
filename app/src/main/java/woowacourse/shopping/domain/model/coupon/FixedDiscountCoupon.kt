@@ -21,17 +21,6 @@ data class FixedDiscountCoupon(
 
     override fun calculateDiscountAmount(cartItems: List<CartItem>): Int = -discount
 
-    override fun copy(): Coupon =
-        FixedDiscountCoupon(
-            id = id,
-            code = code,
-            description = description,
-            expirationDate = expirationDate,
-            discountType = discountType,
-            discount = discount,
-            minimumAmount = minimumAmount,
-        )
-
     companion object {
         const val TYPE = "fixed"
     }

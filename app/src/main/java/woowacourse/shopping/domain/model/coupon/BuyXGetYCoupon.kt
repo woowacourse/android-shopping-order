@@ -24,17 +24,6 @@ data class BuyXGetYCoupon(
         return -discountTarget.product.price
     }
 
-    override fun copy(): Coupon =
-        BuyXGetYCoupon(
-            id = id,
-            code = code,
-            description = description,
-            expirationDate = expirationDate,
-            discountType = discountType,
-            buyQuantity = buyQuantity,
-            getQuantity = getQuantity,
-        )
-
     companion object {
         const val TYPE = "buyXgetY"
     }

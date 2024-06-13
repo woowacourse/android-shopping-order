@@ -25,17 +25,6 @@ data class PercentageDiscountCoupon(
         return -(orderAmount / PERCENTAGE) * discount
     }
 
-    override fun copy(): Coupon =
-        PercentageDiscountCoupon(
-            id = id,
-            code = code,
-            description = description,
-            expirationDate = expirationDate,
-            discountType = discountType,
-            discount = discount,
-            availableTime = availableTime,
-        )
-
     companion object {
         const val PERCENTAGE = 100
         const val TYPE = "percentage"

@@ -20,16 +20,6 @@ data class FreeShippingCoupon(
 
     override fun calculateDiscountAmount(cartItems: List<CartItem>): Int = -SHIPPING_FEE
 
-    override fun copy(): Coupon =
-        FreeShippingCoupon(
-            id = id,
-            code = code,
-            description = description,
-            expirationDate = expirationDate,
-            discountType = discountType,
-            minimumAmount = minimumAmount,
-        )
-
     companion object {
         const val TYPE = "freeShipping"
     }

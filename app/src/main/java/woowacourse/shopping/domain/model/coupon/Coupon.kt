@@ -13,6 +13,4 @@ sealed interface Coupon {
     fun isAvailability(cartItems: List<CartItem>): Boolean
 
     fun calculateDiscountAmount(cartItems: List<CartItem>): Int
-
-    fun copy(): Coupon
 }
