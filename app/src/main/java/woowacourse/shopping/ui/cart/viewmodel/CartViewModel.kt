@@ -1,45 +1,41 @@
 package woowacourse.shopping.ui.cart.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.domain.model.CartWithProduct
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductWithQuantity
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Result
-import woowacourse.shopping.domain.result.onException
-import woowacourse.shopping.domain.result.onFail
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.domain.result.ShowError
+import woowacourse.shopping.domain.result.getOrNull
+import woowacourse.shopping.domain.result.getOrThrow
+import woowacourse.shopping.domain.result.onError
 import woowacourse.shopping.domain.result.onSuccess
-import woowacourse.shopping.domain.result.resultOrNull
-import woowacourse.shopping.domain.result.resultOrThrow
 import woowacourse.shopping.ui.CountButtonClickListener
-import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
+import woowacourse.shopping.ui.cart.CartError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartItemsUiState
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiState
 import woowacourse.shopping.ui.utils.AddCartClickListener
+import woowacourse.shopping.ui.utils.BaseViewModel
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
-import woowacourse.shopping.ui.utils.viewModelLaunch
 
 class CartViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(), CountButtonClickListener, AddCartClickListener {
+) : BaseViewModel(), CountButtonClickListener, AddCartClickListener {
     private val _recommendProducts: MutableLiveData<List<ProductWithQuantity>> = MutableLiveData()
     val recommendProducts: LiveData<List<ProductWithQuantity>> = _recommendProducts
 
-    private val _error: MutableSingleLiveData<CartError> = MutableSingleLiveData()
-    val error: SingleLiveData<CartError> get() = _error
+    private val _errorScope: MutableSingleLiveData<CartError> = MutableSingleLiveData()
+    val errorScope: SingleLiveData<CartError> get() = _errorScope
 
     val cartOfRecommendProductCount: LiveData<Int> =
         _recommendProducts.map {
@@ -71,14 +67,15 @@ class CartViewModel(
 
     val noRecommendProductState: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private fun currentCartState(): CartItemsUiState = _cart.value ?: CartItemsUiState(emptyList(), true)
+    private fun currentCartState(): CartItemsUiState =
+        _cart.value ?: CartItemsUiState(emptyList(), true)
 
     init {
         loadCartItems()
     }
 
     private fun loadCartItems() {
-        viewModelLaunch(::cartExceptionHandler) {
+        viewModelLaunch {
             _cart.value = currentCartState().copy(isLoading = true)
             cartRepository.getAllCartItems().onSuccess { carts ->
                 _cart.value =
@@ -86,24 +83,25 @@ class CartViewModel(
                         cartItems = carts.map { it.toUiModel(isAlreadyChecked(it.product.id)) },
                         isLoading = false,
                     )
-            }.checkError { _error.setValue(it) }
+            }.onError {
+                setError(it, CartError.LoadCart)
+            }
         }
     }
 
     fun loadRecommendProducts() {
-        viewModelLaunch(::recommendExceptionHandler) {
+        viewModelLaunch {
             val recentProductId: Long =
-                recentProductRepository.getMostRecentProduct().resultOrNull()?.productId
+                recentProductRepository.getMostRecentProduct().getOrNull()?.productId
                     ?: DEFAULT_RECENT_PRODUCT_ID
             val category =
-                productRepository.getProductById(recentProductId).resultOrNull()?.category
+                productRepository.getProductById(recentProductId).getOrNull()?.category
                     ?: DEFAULT_RECOMMEND_CATEGORY
             productRepository.getAllRecommendProducts(category).onSuccess {
                 _recommendProducts.value = it.map { ProductWithQuantity(product = it) }
                 noRecommendProductState.value = false
-            }.checkError {
-                _error.setValue(it)
-                noRecommendProductState.value = true
+            }.onError {
+                setError(it, CartError.LoadRecommend)
             }
         }
     }
@@ -119,10 +117,12 @@ class CartViewModel(
     }
 
     fun removeCartItem(productId: Long) {
-        viewModelLaunch(::updateCartExceptionHandler) {
+        viewModelLaunch {
             cartRepository.deleteCartItem(findCartIdByProductId(productId)).onSuccess {
                 loadCartItems()
-            }.checkError { _error.setValue(it) }
+            }.onError {
+                setError(it, CartError.UpdateCart)
+            }
         }
     }
 
@@ -148,17 +148,19 @@ class CartViewModel(
     }
 
     override fun addCart(productId: Long) {
-        viewModelLaunch(::updateCartExceptionHandler) {
+        viewModelLaunch {
             cartRepository.postCartItems(productId, INITIAL_CART_COUNT).onSuccess {
                 changeRecommendProductCount(productId)
                 loadCartItems()
-            }.checkError { _error.setValue(it) }
+            }.onError {
+                setError(it, CartError.UpdateCart)
+            }
         }
     }
 
     override fun plusCount(productId: Long) {
-        viewModelLaunch(::updateCartExceptionHandler) {
-            val cartItem = cartRepository.getCartItem(productId).resultOrThrow()
+        viewModelLaunch {
+            val cartItem = cartRepository.getCartItem(productId).getOrThrow()
             cartRepository.patchCartItem(
                 cartItem.id,
                 cartItem.quantity.value.inc(),
@@ -167,15 +169,15 @@ class CartViewModel(
                     changeRecommendProductCount(productId)
                 }
                 loadCartItems()
-            }.checkError {
-                _error.setValue(it)
+            }.onError {
+                setError(it, CartError.UpdateCart)
             }
         }
     }
 
     override fun minusCount(productId: Long) {
-        viewModelLaunch(::updateCartExceptionHandler) {
-            val cartItem = cartRepository.getCartItem(productId).resultOrThrow()
+        viewModelLaunch {
+            val cartItem = cartRepository.getCartItem(productId).getOrThrow()
             if (cartItem.quantity.value <= 0) return@viewModelLaunch
             cartRepository.patchCartItem(
                 cartItem.id,
@@ -185,29 +187,24 @@ class CartViewModel(
                     changeRecommendProductCount(productId)
                 }
                 loadCartItems()
-            }.checkError {
-                _error.setValue(it)
+            }.onError {
+                setError(it, CartError.UpdateCart)
             }
         }
     }
 
     private fun changeRecommendProductCount(productId: Long) {
-        viewModelLaunch(::cartExceptionHandler) {
+        viewModelLaunch {
             cartRepository.getCartItem(productId).onSuccess { cartItem ->
                 val current = productWithQuantities(productId, cartItem.quantity)
                 _recommendProducts.value = current
-            }.onSuccess {
-                val current = productWithQuantities(productId, it.quantity)
-                _recommendProducts.value = current
-            }.onFail { error ->
-                if (error is Fail.NotFound) {
+            }.onError { error ->
+                if (error is DataError.NotFound) {
                     val current = productWithQuantities(productId, Quantity())
                     _recommendProducts.value = current
                 } else {
-                    _error.setValue(error.toUiError())
+                    setError(error, CartError.UpdateCart)
                 }
-            }.onException {
-                _error.setValue(CartError.UnKnown)
             }
         }
     }
@@ -229,17 +226,6 @@ class CartViewModel(
             ?: error("일치하는 장바구니 아이템이 없습니다.")
     }
 
-    private fun cartExceptionHandler(throwable: Throwable) {
-        _error.setValue(CartError.LoadCart)
-    }
-
-    private fun recommendExceptionHandler(throwable: Throwable) {
-        _error.setValue(CartError.LoadRecommend)
-    }
-
-    private fun updateCartExceptionHandler(throwable: Throwable) {
-        _error.setValue(CartError.UpdateCart)
-    }
 
     private fun CartWithProduct.toUiModel(isChecked: Boolean) =
         CartUiModel(
@@ -257,39 +243,13 @@ class CartViewModel(
             it.productId == productId
         }?.isChecked ?: false || _recommendProducts.value?.any { it.product.id == productId && it.quantity.value > 0 } ?: false
 
-    private inline fun <reified T : Any?> Result<T>.checkError(excute: (CartError) -> Unit) =
-        apply {
-            when (this) {
-                is Result.Success -> {}
-                is Fail.InvalidAuthorized -> excute(CartError.InvalidAuthorized)
-                is Fail.Network -> excute(CartError.Network)
-                is Fail.NotFound -> {
-                    when (T::class) {
-                        Product::class -> excute(CartError.LoadRecommend)
-                        CartWithProduct::class -> excute(CartError.LoadCart)
-                        else -> excute(CartError.UnKnown)
-                    }
-                }
-
-                is Result.Exception -> {
-                    Log.d(this.javaClass.simpleName, "${this.e}")
-                    excute(CartError.UnKnown)
-                }
-            }
+    private fun setError(dataError: DataError, errorScope: CartError) {
+        if (dataError is ShowError) {
+            _dataError.setValue(dataError)
+        } else {
+            _errorScope.setValue(errorScope)
         }
-
-    private inline fun <reified T : Any?> Fail<T>.toUiError() =
-        when (this) {
-            is Fail.InvalidAuthorized -> CartError.InvalidAuthorized
-            is Fail.Network -> CartError.Network
-            is Fail.NotFound -> {
-                when (T::class) {
-                    Product::class -> CartError.LoadRecommend
-                    CartWithProduct::class -> CartError.LoadCart
-                    else -> CartError.UnKnown
-                }
-            }
-        }
+    }
 
     companion object {
         private const val DEFAULT_RECENT_PRODUCT_ID = 0L

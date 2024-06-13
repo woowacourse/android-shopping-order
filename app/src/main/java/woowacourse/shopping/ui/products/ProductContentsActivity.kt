@@ -11,16 +11,18 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductContentsBinding
+import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductAdapter
 import woowacourse.shopping.ui.products.adapter.RecentProductAdapter
 import woowacourse.shopping.ui.products.uimodel.LoadingUiModel
-import woowacourse.shopping.ui.products.uimodel.ProductListError
+import woowacourse.shopping.ui.products.uimodel.ProductContentError
 import woowacourse.shopping.ui.products.uimodel.ProductUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModelFactory
 import woowacourse.shopping.ui.utils.showToastMessage
+import woowacourse.shopping.ui.utils.toUiText
 
 class ProductContentsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProductContentsBinding
@@ -102,15 +104,24 @@ class ProductContentsActivity : AppCompatActivity() {
     }
 
     private fun observeError() {
-        viewModel.error.observe(this) { error ->
+        viewModel.dataError.observe(this) { error ->
             when (error) {
-                ProductListError.AddCart -> showToastMessage(R.string.cart_error)
-                ProductListError.InvalidAuthorized -> showToastMessage(R.string.unauthorized_error)
-                ProductListError.Network -> showToastMessage(R.string.server_error)
-                ProductListError.LoadProduct -> showToastMessage(R.string.product_list_error)
-                ProductListError.LoadRecentProduct -> recentProductVisibility(false)
-                ProductListError.UnKnown -> showToastMessage(R.string.server_error)
-                ProductListError.UpdateCount -> showToastMessage(R.string.cart_error)
+                DataError.Network.REQUEST_TIMEOUT -> showToastMessage(error.toUiText())
+                DataError.Network.NO_INTERNET -> showToastMessage(error.toUiText())
+                DataError.Network.SERVER -> showToastMessage(error.toUiText())
+                DataError.Network.INVALID_AUTHORIZATION -> showToastMessage(error.toUiText())
+                DataError.UNKNOWN -> {
+                    showToastMessage(error.toUiText())
+                    finish()
+                }
+            }
+        }
+
+        viewModel.errorScope.observe(this) {error ->
+            when(error){
+                ProductContentError.Cart -> showToastMessage(R.string.cart_error)
+                ProductContentError.Product -> showToastMessage(R.string.product_error)
+                ProductContentError.RecentProduct -> recentProductVisibility(false)
             }
         }
     }

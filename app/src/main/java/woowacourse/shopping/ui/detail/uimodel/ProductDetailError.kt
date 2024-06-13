@@ -7,9 +7,5 @@ sealed interface ProductDetailError {
 
     data object AddCart : ProductDetailError
 
-    data object InvalidAuthorized : ProductDetailError
-
-    data object Network : ProductDetailError
-
-    data object UnKnown : ProductDetailError
+    data object Recent:ProductDetailError
 }

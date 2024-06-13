@@ -9,6 +9,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCouponBinding
+import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.uimodel.CouponClickListener
 import woowacourse.shopping.ui.coupon.uimodel.CouponError
@@ -17,6 +18,7 @@ import woowacourse.shopping.ui.coupon.viewmodel.CouponViewModelFactory
 import woowacourse.shopping.ui.products.ProductContentsActivity
 import woowacourse.shopping.ui.utils.parcelableList
 import woowacourse.shopping.ui.utils.showToastMessage
+import woowacourse.shopping.ui.utils.toUiText
 
 class CouponActivity : AppCompatActivity(), CouponClickListener {
     private lateinit var binding: ActivityCouponBinding
@@ -79,15 +81,24 @@ class CouponActivity : AppCompatActivity(), CouponClickListener {
     }
 
     private fun observeErrorMessage() {
-        viewModel.error.observe(this) { error ->
+        viewModel.dataError.observe(this) { error ->
             when (error) {
-                CouponError.InvalidAuthorized -> showToastMessage(R.string.unauthorized_error)
-                CouponError.LoadCoupon -> showToastMessage(R.string.coupon_error)
-                CouponError.Network -> showToastMessage(R.string.server_error)
-                CouponError.Order -> showToastMessage(R.string.order_error)
-                CouponError.UnKnown -> showToastMessage(R.string.unknown_error)
+                DataError.Network.REQUEST_TIMEOUT -> showToastMessage(error.toUiText())
+                DataError.Network.NO_INTERNET -> showToastMessage(error.toUiText())
+                DataError.Network.SERVER -> showToastMessage(error.toUiText())
+                DataError.Network.INVALID_AUTHORIZATION -> showToastMessage(error.toUiText())
+                DataError.UNKNOWN -> {
+                    showToastMessage(error.toUiText())
+                    finish()
+                }
             }
-            finishOrderPage()
+        }
+
+        viewModel.errorScope.observe(this) {error ->
+            when(error){
+                CouponError.LoadCoupon -> showToastMessage(R.string.coupon_error)
+                CouponError.Order -> showToastMessage(R.string.order_error)
+            }
         }
     }
 

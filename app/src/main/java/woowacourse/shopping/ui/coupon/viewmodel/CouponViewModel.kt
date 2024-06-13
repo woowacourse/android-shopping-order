@@ -1,32 +1,30 @@
 package woowacourse.shopping.ui.coupon.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.result.Fail
-import woowacourse.shopping.domain.result.Result
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.domain.result.ShowError
+import woowacourse.shopping.domain.result.onError
 import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel
 import woowacourse.shopping.ui.coupon.toUiModel
 import woowacourse.shopping.ui.coupon.uimodel.CouponError
 import woowacourse.shopping.ui.coupon.uimodel.CouponUiModel
 import woowacourse.shopping.ui.coupon.uimodel.PaymentInfoUiModel
+import woowacourse.shopping.ui.utils.BaseViewModel
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
-import woowacourse.shopping.ui.utils.viewModelAsync
-import woowacourse.shopping.ui.utils.viewModelLaunch
 
 class CouponViewModel(
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-) : ViewModel() {
+) : BaseViewModel() {
     private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
     val coupons: LiveData<List<CouponUiModel>> get() = _coupons
 
@@ -41,13 +39,17 @@ class CouponViewModel(
     private val _error: MutableSingleLiveData<CouponError> = MutableSingleLiveData()
     val error: SingleLiveData<CouponError> get() = _error
 
+    private val _errorScope: MutableSingleLiveData<CouponError> = MutableSingleLiveData()
+    val errorScope: SingleLiveData<CouponError> get() = _errorScope
+
     fun loadAvailableCoupons(carts: List<CartUiModel>) {
-        viewModelLaunch(::couponExceptionHandler) {
+        viewModelLaunch {
             couponRepository.getAllCoupons().onSuccess { coupons ->
                 order.value = Order(coupons)
                 _coupons.value =
-                    order?.value?.canUseCoupons(carts.map { it.toCartWithProduct() })?.map { it.toUiModel() }
-            }.checkError { _error.setValue(it) }
+                    order?.value?.canUseCoupons(carts.map { it.toCartWithProduct() })
+                        ?.map { it.toUiModel() }
+            }.onError { setError(it, CouponError.LoadCoupon) }
         }
     }
 
@@ -67,8 +69,8 @@ class CouponViewModel(
         selectedCouponId: Long,
     ) {
         viewModelScope.launch {
-            val cartsJob = viewModelAsync { cartsUiModel.map { it.toCartWithProduct() } }
-            val orderJob = viewModelAsync { order?.value ?: Order(emptyList()) }
+            val cartsJob = async { cartsUiModel.map { it.toCartWithProduct() } }
+            val orderJob = async { order?.value ?: Order(emptyList()) }
 
             _coupons.value = _coupons.value?.reverseCheck(couponId = selectedCouponId)
 
@@ -83,7 +85,7 @@ class CouponViewModel(
                         order.paymentPrice(carts, selectedCouponId),
                     )
             } else {
-                viewModelLaunch {
+                launch {
                     loadInitialPaymentInfo(cartsUiModel)
                 }
             }
@@ -91,12 +93,11 @@ class CouponViewModel(
     }
 
     fun order(carts: List<CartUiModel>) {
-        viewModelLaunch(::orderExceptionHandler) {
+        viewModelLaunch {
             orderRepository.order(carts.map { it.id }).onSuccess {
                 _isOrderSuccess.setValue(true)
-            }.checkError {
-                _isOrderSuccess.setValue(false)
-                _error.setValue(it)
+            }.onError {
+                setError(it, CouponError.Order)
             }
         }
     }
@@ -118,34 +119,14 @@ class CouponViewModel(
         }
     }
 
-    private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean = this?.firstOrNull { it.id == couponId }?.isChecked ?: false
+    private fun List<CouponUiModel>?.isChecked(couponId: Long): Boolean =
+        this?.firstOrNull { it.id == couponId }?.isChecked ?: false
 
-    private fun couponExceptionHandler(throwable: Throwable) {
-        _error.setValue(CouponError.LoadCoupon)
-    }
-
-    private fun orderExceptionHandler(throwable: Throwable) {
-        _error.setValue(CouponError.Order)
-    }
-
-    private inline fun <reified T : Any?> Result<T>.checkError(execute: (CouponError) -> Unit) =
-        apply {
-            when (this) {
-                is Result.Success -> {}
-                is Fail.InvalidAuthorized -> execute(CouponError.InvalidAuthorized)
-                is Fail.Network -> execute(CouponError.Network)
-                is Fail.NotFound -> {
-                    when (T::class) {
-                        Coupon::class -> execute(CouponError.LoadCoupon)
-                        Order::class -> execute(CouponError.Order)
-                        else -> execute(CouponError.UnKnown)
-                    }
-                }
-
-                is Result.Exception -> {
-                    Log.d(this.javaClass.simpleName, "${this.e}")
-                    execute(CouponError.UnKnown)
-                }
-            }
+    private fun setError(dataError: DataError, errorScope: CouponError) {
+        if (dataError is ShowError) {
+            _dataError.setValue(dataError)
+        } else {
+            _errorScope.setValue(errorScope)
         }
+    }
 }

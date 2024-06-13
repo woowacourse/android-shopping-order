@@ -14,13 +14,14 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.result.DataError
 import woowacourse.shopping.ui.cart.cartitem.CartItemFragment
-import woowacourse.shopping.ui.cart.cartitem.uimodel.CartError
 import woowacourse.shopping.ui.cart.recommend.RecommendFragment
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.coupon.CouponActivity
 import woowacourse.shopping.ui.utils.showToastMessage
+import woowacourse.shopping.ui.utils.toUiText
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -41,7 +42,7 @@ class CartActivity : AppCompatActivity() {
 
         onClickOrderBtn()
         onClickTotalCheckBox()
-        observeErrorMessage()
+        observeError()
     }
 
     private fun initFragment() {
@@ -86,16 +87,27 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeErrorMessage() {
-        viewModel.error.observe(this) { error ->
+    private fun observeError() {
+        viewModel.dataError.observe(this) { error ->
             when (error) {
-                CartError.InvalidAuthorized -> showToastMessage(R.string.unauthorized_error)
-                CartError.LoadCart -> showToastMessage(R.string.cart_error)
-                CartError.LoadRecommend -> noRecommendPage()
-                CartError.Network -> showToastMessage(R.string.server_error)
-                CartError.UnKnown -> showToastMessage(R.string.unknown_error)
+                DataError.Network.REQUEST_TIMEOUT -> showToastMessage(error.toUiText())
+                DataError.Network.NO_INTERNET -> showToastMessage(error.toUiText())
+                DataError.Network.SERVER -> showToastMessage(error.toUiText())
+                DataError.Network.INVALID_AUTHORIZATION -> showToastMessage(error.toUiText())
+                DataError.UNKNOWN -> {
+                    showToastMessage(error.toUiText())
+                    finish()
+                }
+            }
+        }
+
+        viewModel.errorScope.observe(this) { error ->
+            when(error){
+                CartError.LoadCart -> noRecommendPage()
+                CartError.LoadRecommend -> showToastMessage(R.string.cart_error)
                 CartError.UpdateCart -> showToastMessage(R.string.cart_error)
             }
+
         }
     }
 
