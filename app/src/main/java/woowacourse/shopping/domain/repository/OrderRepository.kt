@@ -8,6 +8,8 @@ interface OrderRepository {
 
     suspend fun save(orderItem: OrderItem): Result<Unit>
 
+    suspend fun save(orderItems: List<OrderItem>): Result<Unit>
+
     suspend fun updateOrderItem(
         productId: Long,
         quantity: Int,
@@ -18,6 +20,4 @@ interface OrderRepository {
     suspend fun allOrderItemsQuantity(): Result<Int>
 
     suspend fun orderItemsTotalPrice(): Result<Int>
-
-    suspend fun clear(): Result<Unit>
 }
