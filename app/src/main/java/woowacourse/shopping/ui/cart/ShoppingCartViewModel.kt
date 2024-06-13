@@ -56,19 +56,31 @@ class ShoppingCartViewModel(
 
     fun loadAll() {
         viewModelScope.launch {
-            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
-                _cartItems.value = cartItems.map { it.toUiModel() }
-                _isLoading.value = false
-            }
+            handleResponseResult(
+                responseResult = cartItemRepository.loadCartItems(),
+                onSuccess = { cartItems ->
+                    _cartItems.value = cartItems.map { it.toUiModel() }
+                    _isLoading.value = false
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
     fun deleteItem(cartItemId: Long) {
         viewModelScope.launch  {
-            handleResponseResult(cartItemRepository.delete(cartItemId), _errorMessage) { }
-            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
-                _cartItems.value = cartItems.map { it.toUiModel() }
-            }
+            handleResponseResult(cartItemRepository.delete(cartItemId), { }, { })
+            handleResponseResult(
+                responseResult = cartItemRepository.loadCartItems(),
+                onSuccess = { cartItems ->
+                    _cartItems.value = cartItems.map { it.toUiModel() }
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
         updateSelectedCartItemsCount()
     }
@@ -117,12 +129,18 @@ class ShoppingCartViewModel(
 
     private suspend fun updateCartItems() {
         val cartItems = cartItems.value ?: return
-        handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { currentItems ->
-            _cartItems.value =
-                currentItems.map { cartItem ->
-                    cartItem.toUiModel().copy(checked = cartItems.first { it.id == cartItem.id }.checked)
-                }
-        }
+        handleResponseResult(
+            responseResult = cartItemRepository.loadCartItems(),
+            onSuccess =  { currentItems ->
+                _cartItems.value =
+                    currentItems.map { cartItem ->
+                        cartItem.toUiModel().copy(checked = cartItems.first { it.id == cartItem.id }.checked)
+                    }
+            },
+            onError = { message ->
+                _errorMessage.value = message
+            },
+        )
     }
 
     override fun selected(cartItemId: Long) {

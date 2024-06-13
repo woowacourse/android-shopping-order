@@ -53,9 +53,15 @@ class PaymentViewModel(
 
     fun loadCoupons() {
         viewModelScope.launch {
-            handleResponseResult(couponRepository.loadCoupons(orderInformation), _errorMessage) { coupons ->
-                _couponsUiModel.value = coupons.map { CouponMapper.toUiModel(it) }
-            }
+            handleResponseResult(
+                responseResult = couponRepository.loadCoupons(orderInformation),
+                onSuccess = { coupons ->
+                    _couponsUiModel.value = coupons.map { CouponMapper.toUiModel(it) }
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 

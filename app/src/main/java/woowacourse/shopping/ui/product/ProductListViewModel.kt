@@ -77,11 +77,17 @@ class ProductListViewModel(
     fun loadAll() {
         viewModelScope.launch {
             val page = currentPage.value ?: currentPageIsNullException()
-            handleResponseResult(productsRepository.loadProducts(page), _errorMessage) { productsPage ->
-                _loadedProducts.value = productsPage.products
-                _isLoading.value = false
-                _isLastPage.postValue(productsPage.isLastPage)
-            }
+            handleResponseResult(
+                responseResult = productsRepository.loadProducts(page),
+                onSuccess = { productsPage ->
+                    _loadedProducts.value = productsPage.products
+                    _isLoading.value = false
+                    _isLastPage.postValue(productsPage.isLastPage)
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
             updateCartItemsCount()
             loadProductsHistory()
         }
@@ -91,11 +97,17 @@ class ProductListViewModel(
         viewModelScope.launch {
             if (isLastPage.value == true) return@launch
             val nextPage = _currentPage.value?.plus(PAGE_MOVE_COUNT) ?: currentPageIsNullException()
-            handleResponseResult(productsRepository.loadProducts(nextPage), _errorMessage) { productsPage ->
-                val oldProducts = loadedProducts.value ?: emptyList()
-                _loadedProducts.value = oldProducts + productsPage.products
-                _isLastPage.postValue(productsPage.isLastPage)
-            }
+            handleResponseResult(
+                responseResult = productsRepository.loadProducts(nextPage),
+                onSuccess = { productsPage ->
+                    val oldProducts = loadedProducts.value ?: emptyList()
+                    _loadedProducts.value = oldProducts + productsPage.products
+                    _isLastPage.postValue(productsPage.isLastPage)
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
             updateCartItemsCount()
             _currentPage.postValue(nextPage)
         }
@@ -115,9 +127,15 @@ class ProductListViewModel(
     }
 
     private suspend fun updateCartItemsCount() {
-        handleResponseResult(cartItemRepository.calculateCartItemsCount(), _errorMessage) { totalCount ->
-            _cartProductTotalCount.value = totalCount
-        }
+        handleResponseResult(
+            responseResult = cartItemRepository.calculateCartItemsCount(),
+            onSuccess = { totalCount ->
+                _cartProductTotalCount.value = totalCount
+            },
+            onError = { message ->
+                _errorMessage.value = message
+            },
+        )
     }
 
     private fun updateQuantity(
@@ -126,9 +144,15 @@ class ProductListViewModel(
     ) {
         viewModelScope.launch {
             cartItemRepository.updateProductQuantity(productIdsCount.productId, productIdsCount.quantity)
-            handleResponseResult(cartItemRepository.calculateCartItemsCount(), _errorMessage) { totalCount ->
-                updateProductQuantity(productIdsCount.productId, variation, totalCount)
-            }
+            handleResponseResult(
+                responseResult = cartItemRepository.calculateCartItemsCount(),
+                onSuccess = { totalCount ->
+                    updateProductQuantity(productIdsCount.productId, variation, totalCount)
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 

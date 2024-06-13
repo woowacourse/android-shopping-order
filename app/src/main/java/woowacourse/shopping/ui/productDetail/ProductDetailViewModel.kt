@@ -79,11 +79,17 @@ class ProductDetailViewModel(
     }
 
     private suspend fun loadProduct() {
-        handleResponseResult(shoppingProductsRepository.loadProduct(id = productId), _errorMessage) { product ->
-            _currentProduct.value = product
-            _productCount.value = product.quantity
-            _isLoading.value = false
-        }
+        handleResponseResult(
+            responseResult = shoppingProductsRepository.loadProduct(id = productId),
+            onSuccess = { product ->
+                _currentProduct.value = product
+                _productCount.value = product.quantity
+                _isLoading.value = false
+            },
+            onError = { message ->
+                _errorMessage.value = message
+            },
+        )
     }
 
     private suspend fun loadLatestProduct() {

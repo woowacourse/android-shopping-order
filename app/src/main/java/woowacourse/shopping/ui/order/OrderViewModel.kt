@@ -50,14 +50,21 @@ class OrderViewModel(
         viewModelScope.launch {
             val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
-            handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
-                val newCartItems: List<CartItem> = cartItems.filter { it.product.id in addedProductIds }
-                _navigationPaymentEvent.setValue(
-                    OrderInformation(
-                        cartItems = orderInformation.cartItems + newCartItems,
+            handleResponseResult(
+                responseResult = cartItemRepository.loadCartItems(),
+                onSuccess = { cartItems ->
+                    val newCartItems: List<CartItem> =
+                        cartItems.filter { it.product.id in addedProductIds }
+                    _navigationPaymentEvent.setValue(
+                        OrderInformation(
+                            cartItems = orderInformation.cartItems + newCartItems,
+                        )
                     )
-                )
-            }
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
@@ -77,9 +84,15 @@ class OrderViewModel(
 
     fun loadRecommendedProducts() {
         viewModelScope.launch {
-            handleResponseResult(orderRepository.loadRecommendedProducts(), _errorMessage) { products ->
-                _recommendProducts.value = products
-            }
+            handleResponseResult(
+                responseResult = orderRepository.loadRecommendedProducts(),
+                onSuccess = { products ->
+                    _recommendProducts.value = products
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
@@ -109,10 +122,16 @@ class OrderViewModel(
 
     private fun updateOrderAmount(productId: Long, priceConvert: (price: Int) -> Int) {
         viewModelScope.launch {
-            handleResponseResult(productRepository.loadProduct(productId), _errorMessage) { product ->
-                val currentOrderAmount = orderAmount.value ?: DEFAULT_ORDER_AMOUNT
-                _orderAmount.value = currentOrderAmount + priceConvert(product.price)
-            }
+            handleResponseResult(
+                responseResult = productRepository.loadProduct(productId),
+                onSuccess = { product ->
+                    val currentOrderAmount = orderAmount.value ?: DEFAULT_ORDER_AMOUNT
+                    _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
