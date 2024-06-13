@@ -1,17 +1,17 @@
 package woowacourse.shopping.data.source
 
-import woowacourse.shopping.domain.model.OrderItem
+import woowacourse.shopping.data.model.OrderItemData
 
 interface OrderDataSource {
     suspend fun order(): Result<Unit>
 
-    suspend fun saveOrderItem(orderItem: OrderItem): Result<Unit>
+    suspend fun saveOrderItem(orderItemData: OrderItemData): Result<Unit>
 
-    suspend fun removeOrderItem(orderItem: OrderItem): Result<Unit>
+    suspend fun saveOrderItems(orderItemsData: List<OrderItemData>): Result<Unit>
 
     suspend fun removeOrderItem(cartItemId: Long): Result<Unit>
 
-    suspend fun loadAllOrders(): Result<List<OrderItem>>
+    suspend fun loadAllOrderItems(): Result<List<OrderItemData>>
 
     suspend fun clear(): Result<Unit>
 }
