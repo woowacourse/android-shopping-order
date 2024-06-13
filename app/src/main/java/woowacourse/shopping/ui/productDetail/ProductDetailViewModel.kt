@@ -16,6 +16,8 @@ import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
+import woowacourse.shopping.ui.productDetail.event.ProductDetailError
+import woowacourse.shopping.ui.productDetail.event.ProductDetailEvent
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
@@ -38,6 +40,12 @@ class ProductDetailViewModel(
     private var _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
 
+    private var _event: MutableSingleLiveData<ProductDetailEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ProductDetailEvent> get() = _event
+
+    private var _error: MutableSingleLiveData<ProductDetailError> = MutableSingleLiveData()
+    val error: SingleLiveData<ProductDetailError> get() = _error
+
     fun loadAll() {
         loadProduct()
         loadLatestProduct()
@@ -45,59 +53,51 @@ class ProductDetailViewModel(
     }
 
     private fun loadProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             shoppingProductsRepository.loadProduct(id = productId)
-                .onSuccess {
-                    withContext(Dispatchers.Main) {
-                        _currentProduct.postValue(it)
-                    }
+                .onSuccess { loadedProduct ->
+                    _currentProduct.value = loadedProduct
                 }
                 .onFailure {
-                    // TODO : handle error
-                    Log.e(TAG, "loadProduct: failure: it")
-                    throw it
+                    _error.setValue(ProductDetailError.LoadProduct)
                 }
         }
+
     }
 
     private fun loadLatestProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productHistoryRepository.loadLatestProduct()
-                .onSuccess {
-                    withContext(Dispatchers.Main) {
-                        _latestProduct.postValue(it)
-                    }
+                .onSuccess { loadedLatestProduct ->
+                    _latestProduct.value = loadedLatestProduct
                 }
                 .onFailure {
-                    withContext(Dispatchers.Main) {
-                        _latestProduct.postValue(Product.NULL)
-                    }
+                    _error.setValue(ProductDetailError.LoadLatestProduct)
                 }
         }
     }
 
     private fun saveProductHistory() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productHistoryRepository.saveProductHistory(productId)
+                .onSuccess {
+                    _event.setValue(ProductDetailEvent.SaveProductInHistory)
+                }
                 .onFailure {
-                    // TODO : handle error
-                    Log.e(TAG, "saveProductHistory: failure: it")
-                    throw it
+                    _error.setValue(ProductDetailError.SaveProductInHistory)
                 }
         }
     }
 
     fun addProductToCart() {
         val productCount = productCount.value ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             cartRepository.addShoppingCartProduct(productId, productCount)
                 .onSuccess {
-                    // TODO : handle success
+                    _event.setValue(ProductDetailEvent.AddProductToCart)
                 }
                 .onFailure {
-                    // TODO : handle error
-                    Log.e(TAG, "addProductToCart: failure: it")
-                    throw it
+                    _error.setValue(ProductDetailError.AddProductToCart)
                 }
         }
     }
