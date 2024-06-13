@@ -30,14 +30,16 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+        initData()
         initObserver()
     }
 
-    override fun onResume() {
-        super.onResume()
-        initData()
+   override fun onResume() {
+       if (intent.getBooleanExtra(EXTRA_BACK_FROM_CURATION, false)) {
+           initData()
+       }
+       super.onResume()
     }
-
     private fun initData() {
         viewModel.findCartByOffset()
     }
@@ -128,6 +130,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     companion object {
+        const val EXTRA_BACK_FROM_CURATION = "backFromCuration"
         fun createIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

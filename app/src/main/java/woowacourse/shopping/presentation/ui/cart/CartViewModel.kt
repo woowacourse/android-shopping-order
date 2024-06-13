@@ -69,9 +69,7 @@ class CartViewModel(private val repository: Repository) : ViewModel(), CartActio
                 .onSuccess {
                     val updatedData = (_carts.value as UiState.Success).data.toMutableList()
                     updatedData.remove(cartProductUiModel)
-                    _carts.postValue(
-                        UiState.Success(updatedData.toList()),
-                    )
+                    _carts.value = UiState.Success(updatedData.toList())
                     updateRecentProduct(cartProductUiModel.cartProduct.productId, 0, 0)
                 }
         }
