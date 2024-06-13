@@ -5,11 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.PageInfo
 import woowacourse.shopping.domain.model.Product
@@ -65,44 +62,40 @@ class ShoppingViewModel(
     fun loadProducts() {
         setLoadingStart()
         viewModelScope.launch {
-            val totalProducts: List<Product> =
-                async { asyncGetProductListWithSettingPageInfo() }.await()
-            val cartItems: List<CartItem> =
-                async { asyncLoadCartItems() }.await()
-            combineProductsWithCartItems(totalProducts, cartItems)
-            updateTotalCartItemsQuantity()
+            val totalProductsDeferred =
+                async { asyncGetProductListWithSettingPageInfo() }
+            val cartItemsDeferred =
+                async { asyncLoadCartItems() }
             loadRecentProducts()
+            updateTotalCartItemsQuantity()
+            combineProductsWithCartItems(totalProductsDeferred.await(), cartItemsDeferred.await())
         }
     }
 
-    private suspend fun asyncGetProductListWithSettingPageInfo(): List<Product> = coroutineScope {
+    private suspend fun asyncGetProductListWithSettingPageInfo(): List<Product> {
         var products: List<Product> = shoppingProducts.value?.map { it.product }.orEmpty()
-        withContext(Dispatchers.IO) {
-            val result = shoppingItemsRepository.fetchProductsWithPage(nextPage, PAGE_SIZE)
-            result.onSuccess { productListInfo ->
-                products = products + productListInfo.products
-                withContext(Dispatchers.Main) { _pageInfo.value = productListInfo.pageInfo }
-                nextPage = productListInfo.pageInfo.currentPage + 1
-            }.onFailure {
-                withContext(Dispatchers.Main) { setLoadingEnd() }
-                Log.d(this::class.java.simpleName, "$it")
-            }
+        val result = shoppingItemsRepository.fetchProductsWithPage(nextPage, PAGE_SIZE)
+        result.onSuccess { productListInfo ->
+            products = products + productListInfo.products
+            _pageInfo.value = productListInfo.pageInfo
+            nextPage = productListInfo.pageInfo.currentPage + 1
+        }.onFailure {
+            setLoadingEnd()
+            Log.d(this::class.java.simpleName, "$it")
         }
-        products
+        return products
     }
 
-    private suspend fun asyncLoadCartItems(): List<CartItem> = coroutineScope {
+    private suspend fun asyncLoadCartItems(): List<CartItem> {
         var cartItems: List<CartItem> = emptyList()
-        withContext(Dispatchers.IO) {
-            val result = cartItemsRepository.fetchCartItemsInfo()
-            result.onSuccess { items ->
-                cartItems = items
-            }.onFailure {
-                withContext(Dispatchers.Main) { setLoadingEnd() }
-                Log.d(this::class.java.simpleName, "$it")
-            }
+        val result = cartItemsRepository.fetchCartItemsInfo()
+        result.onSuccess { items ->
+            cartItems = items
+        }.onFailure {
+            setLoadingEnd()
+            Log.d(this::class.java.simpleName, "$it")
         }
-        cartItems
+        return cartItems
     }
 
     private fun combineProductsWithCartItems(
