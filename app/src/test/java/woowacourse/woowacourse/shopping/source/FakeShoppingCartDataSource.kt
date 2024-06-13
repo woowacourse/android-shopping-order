@@ -2,6 +2,8 @@ package woowacourse.shopping.source
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.model.CartItemData
 import woowacourse.shopping.data.model.ProductIdsCountData
@@ -10,9 +12,10 @@ import woowacourse.shopping.remote.model.response.CartItemResponse
 import woowacourse.shopping.remote.model.response.ProductResponse
 import woowacourse.shopping.remote.model.response.toData
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class FakeShoppingCartDataSource(
     private var cartItemResponses: List<CartItemResponse> = listOf(),
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
+    private val dispatcher: CoroutineDispatcher  = UnconfinedTestDispatcher(),
 ) : ShoppingCartDataSource {
     constructor(vararg cartItemResponses: CartItemResponse) : this(cartItemResponses.toList())
 
