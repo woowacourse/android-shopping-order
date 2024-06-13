@@ -4,17 +4,17 @@ import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 
 class TestRecentlyProductRepository : RecentlyProductRepository {
-    override fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Long> = Result.success(0L)
+    override suspend fun addRecentlyProduct(recentlyProduct: RecentlyProduct): Result<Long> = Result.success(0L)
 
-    override fun getMostRecentlyProduct(): Result<RecentlyProduct> {
+    override suspend fun getMostRecentlyProduct(): Result<RecentlyProduct> {
         return Result.success(RecentlyProduct.defaultRecentlyProduct)
     }
 
-    override fun getRecentlyProductList(): Result<List<RecentlyProduct>> {
+    override suspend fun getRecentlyProductList(): Result<List<RecentlyProduct>> {
         return Result.success(listOf(RecentlyProduct.defaultRecentlyProduct))
     }
 
-    override fun deleteRecentlyProduct(id: Long): Result<Unit> {
+    override suspend fun deleteRecentlyProduct(id: Long): Result<Unit> {
         return Result.success(Unit)
     }
 }

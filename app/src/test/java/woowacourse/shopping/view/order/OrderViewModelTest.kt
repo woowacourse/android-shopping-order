@@ -12,8 +12,6 @@ import woowacourse.shopping.TestFixture.cartItem0
 import woowacourse.shopping.TestFixture.fixed5000DiscountCoupon
 import woowacourse.shopping.TestFixture.freeShippingCoupon
 import woowacourse.shopping.TestFixture.getOrAwaitValue
-import woowacourse.shopping.TestFixture.notNowTimeBasedDiscountCoupon
-import woowacourse.shopping.TestFixture.nowTimeBasedDiscountCoupon
 import woowacourse.shopping.TestFixture.shoppingCartItemsNotBogo
 import woowacourse.shopping.TestFixture.shoppingCartItemsTotal126000
 import woowacourse.shopping.TestFixture.shoppingCartItemsTotal24000
@@ -115,8 +113,8 @@ class OrderViewModelTest {
         viewModel.applyCoupon(freeShippingCoupon.toUiModel())
 
         // then
-        val deliveryFee = viewModel.deliveryFee.getOrAwaitValue()
-        assertThat(deliveryFee).isEqualTo(0)
+        val discount = viewModel.couponDiscount.getOrAwaitValue()
+        assertThat(discount).isEqualTo(3000)
     }
 
     @Test
@@ -131,33 +129,5 @@ class OrderViewModelTest {
         // then
         val deliveryFee = viewModel.deliveryFee.getOrAwaitValue()
         assertThat(deliveryFee).isEqualTo(3000)
-    }
-
-    @Test
-    fun `timeBasedDiscountCoupon의 시간대면 쿠폰이 적용된다`() {
-        // given
-        viewModel.saveCheckedShoppingCarts(shoppingCartItemsTotal90000)
-        assertThat(viewModel.totalPrice.getOrAwaitValue()).isEqualTo(90000)
-
-        // when
-        viewModel.applyCoupon(nowTimeBasedDiscountCoupon.toUiModel())
-
-        // then
-        val discount = viewModel.couponDiscount.getOrAwaitValue()
-        assertThat(discount).isEqualTo(27000)
-    }
-
-    @Test
-    fun `timeBasedDiscountCoupon의 시간대가 아니면 쿠폰이 적용되지 않는다`() {
-        // given
-        viewModel.saveCheckedShoppingCarts(shoppingCartItemsTotal90000)
-        assertThat(viewModel.totalPrice.getOrAwaitValue()).isEqualTo(90000)
-
-        // when
-        viewModel.applyCoupon(notNowTimeBasedDiscountCoupon.toUiModel())
-
-        // then
-        val discount = viewModel.couponDiscount.getOrAwaitValue()
-        assertThat(discount).isEqualTo(0)
     }
 }

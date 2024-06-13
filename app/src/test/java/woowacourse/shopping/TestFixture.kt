@@ -6,6 +6,10 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemCounter
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.coupon.BogoDiscountStrategy
+import woowacourse.shopping.domain.model.coupon.FixedDiscountStrategy
+import woowacourse.shopping.domain.model.coupon.FreeShippingStrategy
+import woowacourse.shopping.domain.model.coupon.TimeBasedDiscountStrategy
 import woowacourse.shopping.view.cart.model.ShoppingCart
 import java.time.LocalDate
 import java.time.LocalTime
@@ -135,7 +139,7 @@ object TestFixture {
             }
 
     val fixed5000DiscountCoupon =
-        Coupon.FixedDiscountCoupon(
+        Coupon(
             id = 0L,
             code = "FIXED5000",
             description = "5000원 할인 쿠폰",
@@ -143,10 +147,11 @@ object TestFixture {
             discountType = "FIXED",
             discount = 5000,
             minimumAmount = 100000,
+            discountStrategy = FixedDiscountStrategy(5000),
         )
 
     val bogoCoupon =
-        Coupon.BogoCoupon(
+        Coupon(
             id = 1L,
             code = "BOGO",
             description = "2+1 쿠폰",
@@ -154,39 +159,49 @@ object TestFixture {
             discountType = "BOGO",
             buyQuantity = 2,
             getQuantity = 1,
+            discountStrategy = BogoDiscountStrategy(2, 1),
         )
 
     val freeShippingCoupon =
-        Coupon.FreeShippingCoupon(
+        Coupon(
             id = 2L,
             code = "FREESHIPPING",
             description = "무료배송 쿠폰",
             expirationDate = LocalDate.now().plusDays(7),
             discountType = "FREESHIPPING",
             minimumAmount = 50000,
+            discountStrategy = FreeShippingStrategy(3000),
         )
 
     val notNowTimeBasedDiscountCoupon =
-        Coupon.TimeBasedDiscountCoupon(
+        Coupon(
             id = 3L,
             code = "TIMEBASED",
             description = "시간대별 할인 쿠폰",
             expirationDate = LocalDate.now().plusDays(7),
             discountType = "TIMEBASED",
             discount = 30,
-            availableTimeStart = LocalTime.MIN,
-            availableTimeEnd = LocalTime.now().minusHours(3),
+            discountStrategy =
+                TimeBasedDiscountStrategy(
+                    discount = 30,
+                    startTime = LocalTime.MIN,
+                    endTime = LocalTime.now().minusHours(3),
+                ),
         )
 
     val nowTimeBasedDiscountCoupon =
-        Coupon.TimeBasedDiscountCoupon(
+        Coupon(
             id = 3L,
             code = "TIMEBASED",
             description = "시간대별 할인 쿠폰",
             expirationDate = LocalDate.now().plusDays(7),
             discountType = "TIMEBASED",
             discount = 30,
-            availableTimeStart = LocalTime.MIN,
-            availableTimeEnd = LocalTime.now().plusHours(3),
+            discountStrategy =
+                TimeBasedDiscountStrategy(
+                    discount = 30,
+                    startTime = LocalTime.MIN,
+                    endTime = LocalTime.now().plusHours(3),
+                ),
         )
 }
