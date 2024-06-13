@@ -2,16 +2,15 @@ package woowacourse.shopping.presentation.ui.cart.recommendation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
 class RecommendAdapter(
     private val recommendItemCountHandler: CounterHandler,
-) : RecyclerView.Adapter<RecommendViewHolder>() {
-    private var recommendItems: List<ShoppingProduct> = emptyList()
-
+) : ListAdapter<ShoppingProduct, RecommendViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -24,13 +23,25 @@ class RecommendAdapter(
         holder: RecommendViewHolder,
         position: Int,
     ) {
-        holder.bind(recommendItems[position], recommendItemCountHandler)
+        holder.bind(getItem(position), recommendItemCountHandler)
     }
 
-    override fun getItemCount(): Int = recommendItems.size
+    companion object {
+        val diffCallback =
+            object : DiffUtil.ItemCallback<ShoppingProduct>() {
+                override fun areItemsTheSame(
+                    oldItem: ShoppingProduct,
+                    newItem: ShoppingProduct,
+                ): Boolean {
+                    return oldItem.product.id == newItem.product.id
+                }
 
-    fun loadData(recommendItems: List<ShoppingProduct>) {
-        this.recommendItems = recommendItems
-        notifyItemRangeChanged(0, recommendItems.size)
+                override fun areContentsTheSame(
+                    oldItem: ShoppingProduct,
+                    newItem: ShoppingProduct,
+                ): Boolean {
+                    return oldItem == newItem
+                }
+            }
     }
 }

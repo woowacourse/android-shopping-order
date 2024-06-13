@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.model
 
+import java.io.Serializable
+
 data class CartItem(
     val id: Long,
     val productId: Long,
@@ -8,4 +10,7 @@ data class CartItem(
     val imgUrl: String,
     val quantity: Int,
     var isChecked: Boolean = false,
-)
+) : Serializable {
+    val totalPrice: Long
+        get() = price * quantity
+}

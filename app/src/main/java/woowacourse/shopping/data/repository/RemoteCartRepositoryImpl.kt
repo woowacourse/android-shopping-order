@@ -1,192 +1,239 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import retrofit2.Response
 import woowacourse.shopping.data.database.ProductClient
 import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.CartItemDto
 import woowacourse.shopping.data.model.dto.CartItemsDto
-import woowacourse.shopping.data.model.dto.ContentDto
 import woowacourse.shopping.data.model.dto.ShoppingProductDto
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 class RemoteCartRepositoryImpl : CartRepository {
     private val service = ProductClient.service
     private var cartItemData: CartItemDto? = null
     private var cartItems: List<CartItem>? = null
 
-    init {
-        updateCartItems()
-    }
-
-    override fun updateCartItems() {
-        var response: Response<CartItemDto>? = null
-        threadAction {
-            response = service.requestCartItems().execute()
-            cartItemData = (response as Response<CartItemDto>).body()
-            cartItems = cartItemData?.content?.map { it.toDomainModel() }
-            Log.d("crong", "Repository cartItems: $cartItems")
+    override suspend fun updateCartItems(): Result<Unit> =
+        runCatching {
+            val response = service.requestCartItems()
+            if (response.isSuccessful) {
+                cartItemData = (response as Response<CartItemDto>).body()
+                cartItems = cartItemData?.content?.map { it.toDomainModel() }
+            } else {
+                throw IllegalStateException("Failed to update cart items")
+            }
         }
-    }
 
-    override fun insert(
+    override suspend fun insert(
         product: Product,
         quantity: Int,
-    ) {
-        threadAction {
+    ): Result<Unit> =
+        runCatching {
             val cartId = findCartItemIdWithProductId(product.id)
-            if (cartId == -1L) {
-                service.addCartItem(ShoppingProductDto(product.id, quantity)).execute()
-            } else {
-                service.updateCartItemQuantity(cartId, quantity).execute()
+            cartId.onSuccess {
+                if (it == -1L) {
+                    val response = service.addCartItem(ShoppingProductDto(product.id, quantity))
+                    if (response.isSuccessful) {
+                        response.body()
+                    } else {
+                        throw IllegalStateException("Failed to add cart item")
+                    }
+                } else {
+                    val response = service.updateCartItemQuantity(it, quantity)
+                    if (response.isSuccessful) {
+                        response.body()
+                    } else {
+                        throw IllegalStateException("Failed to update cart item")
+                    }
+                }
             }
+            updateCartItems()
         }
-        updateCartItems()
-    }
 
-    override fun update(
+    override suspend fun update(
         productId: Long,
         quantity: Int,
-    ) {
-        threadAction {
-            service.updateCartItemQuantity(productId, quantity).execute()
-        }
-        updateCartItems()
-    }
+    ): Result<Unit> =
+        runCatching {
+            val response = service.updateCartItemQuantity(productId, quantity)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                throw IllegalStateException("Failed to update cart item")
+            }
 
-    override fun updateQuantity(
+            updateCartItems()
+        }
+
+    override suspend fun updateQuantity(
         cartItemId: Long,
         quantity: Int,
-    ) {
-        threadAction {
-            service.updateCartItemQuantity(cartItemId, quantity).execute()
+    ): Result<Unit> =
+        runCatching {
+            val response = service.updateCartItemQuantity(cartItemId, quantity)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                throw IllegalStateException("Failed to update cart item")
+            }
+            updateCartItems()
         }
-        updateCartItems()
-    }
 
-    override fun updateQuantityWithProductId(
+    override suspend fun updateQuantityWithProductId(
         productId: Long,
         quantity: Int,
-    ) {
-        val contentId = findCartItemIdWithProductId(productId)
-        updateQuantity(contentId, quantity)
-    }
-
-    private fun findCartItemIdWithProductId(productId: Long): Long {
-        return cartItems?.find { it.productId == productId }?.id ?: -1L
-    }
-
-    override fun findQuantityWithProductId(productId: Long): Int {
-        val contentId = findCartItemIdWithProductId(productId)
-        return cartItems?.find { it.id == contentId }?.quantity ?: 0
-    }
-
-    override fun makeOrder(order: Order) {
-        val cartItemIds = order.list.map { it.id }
-        service.makeOrder(CartItemsDto(cartItemIds)).execute()
-    }
-
-    override fun size(): Int {
-        return cartItemData?.totalElements ?: 0
-    }
-
-    override fun sumOfQuantity(): Int {
-        var quantity: Int = 0
-        var responseCode: Int = -1
-
-        threadAction {
-            val response = service.requestCartItemsCount().execute()
-            responseCode = response.code()
-            quantity = response.body()?.quantity ?: -1
-        }
-        while (true) {
-            Thread.sleep(1000)
-            if (quantity != -1 || responseCode != -1) {
-                break
+    ): Result<Unit> =
+        runCatching {
+            val contentId = findCartItemIdWithProductId(productId)
+            contentId.onSuccess {
+                updateQuantity(it, quantity)
             }
         }
-        // if (quantity != -1 || responseCode != -1) throw IllegalStateException("Failed to get quantity")
 
-        return quantity
-    }
-
-    override fun findOrNullWithProductId(productId: Long): CartItem? {
-        var contentDto: ContentDto? = null
-        threadAction {
-            contentDto =
-                service.requestCartItems().execute().body()?.content?.find {
-                    it.product.id == productId
-                }
+    private suspend fun findCartItemIdWithProductId(productId: Long): Result<Long> =
+        runCatching {
+            val response = service.requestCartItems()
+            if (response.isSuccessful) {
+                val contentId =
+                    response.body()?.content?.find { it.product.id == productId }?.id ?: -1L
+                contentId
+            } else {
+                throw IllegalStateException("Failed to get cart items")
+            }
         }
-        return contentDto?.toDomainModel()
-    }
 
-    override fun findWithCartItemId(cartItemId: Long): CartItem {
-        return cartItems?.find { it.id == cartItemId } ?: throw NoSuchElementException()
-    }
+    override suspend fun findQuantityWithProductId(productId: Long): Result<Int> =
+        runCatching {
+            val cartItems = service.requestCartItems()
+            if (cartItems.isSuccessful) {
+                val quantity = cartItems.body()?.content?.find { it.product.id == productId }?.quantity ?: 0
+                quantity
+            } else {
+                throw IllegalStateException("Failed to get cart items")
+            }
+        }
 
-    override fun findAll(): ShoppingCart {
-        return ShoppingCart(cartItems ?: emptyList())
-    }
+    override suspend fun makeOrder(order: Order): Result<Unit> =
+        runCatching {
+            val cartItemIds = order.list.map { it.id }
+            val response = service.makeOrder(CartItemsDto(cartItemIds))
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                throw IllegalStateException("Failed to make order")
+            }
+        }
 
-    override fun findAllPagedItems(
+    override suspend fun size(): Result<Int> =
+        runCatching {
+            cartItemData?.totalElements ?: 0
+        }
+
+    override suspend fun sumOfQuantity(): Result<Int> =
+        runCatching {
+            var quantity: Int = 0
+
+            val response = service.requestCartItemsCount()
+            if (response.isSuccessful) {
+                quantity = response.body()?.quantity ?: -1
+            } else {
+                throw IllegalStateException("Failed to get quantity")
+            }
+            quantity
+        }
+
+    override suspend fun findOrNullWithProductId(productId: Long): Result<CartItem?> =
+        runCatching {
+            val response = service.requestCartItems()
+            if (response.isSuccessful) {
+                val contentDto =
+                    response.body()?.content?.find {
+                        it.product.id == productId
+                    }
+                contentDto?.toDomainModel()
+            } else {
+                throw IllegalStateException("Failed to get cart items")
+            }
+        }
+
+    override suspend fun findWithCartItemId(cartItemId: Long): Result<CartItem> =
+        runCatching {
+            cartItems?.find { it.id == cartItemId } ?: throw NoSuchElementException()
+        }
+
+    override suspend fun findAll(): Result<ShoppingCart> =
+        runCatching {
+            val response = service.requestCartItems()
+            if (response.isSuccessful) {
+                val cartItems =
+                    response.body()?.content?.map {
+                        it.toDomainModel()
+                    } ?: emptyList()
+                ShoppingCart(cartItems ?: emptyList())
+            } else {
+                throw IllegalStateException("Failed to get cart items")
+            }
+        }
+
+    override suspend fun findAllPagedItems(
         page: Int,
         pageSize: Int,
-    ): ShoppingCart {
-        var cartItems: List<CartItem> = emptyList()
-        var response: Int = -1
-        threadAction {
-            cartItems = service.requestCartItems(page, pageSize).execute().body()?.content?.map {
-                it.toDomainModel()
-            } ?: emptyList()
-            response = service.requestCartItems(page, pageSize).execute().code()
+    ): Result<ShoppingCart> =
+        runCatching {
+            var cartItems: List<CartItem> = emptyList()
+
+            val response = service.requestCartItems(page, pageSize)
+            if (response.isSuccessful) {
+                cartItems = response.body()?.content?.map {
+                    it.toDomainModel()
+                } ?: emptyList()
+            } else {
+                throw IllegalStateException("Failed to get cart items")
+            }
+            ShoppingCart(cartItems)
         }
 
-        if (cartItems.isEmpty() && response == -1) throw IllegalStateException("Failed to get cart items")
-
-        return ShoppingCart(cartItems)
-    }
-
-    override fun delete(cartItemId: Long) {
-        threadAction {
-            service.deleteCartItem(cartItemId).execute()
+    override suspend fun delete(cartItemId: Long): Result<Unit> =
+        runCatching {
+            val response = service.deleteCartItem(cartItemId)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                throw IllegalStateException("Failed to delete cart item")
+            }
+            updateCartItems()
         }
-        updateCartItems()
-    }
 
-    override fun deleteWithProductId(productId: Long) {
-        val contentId = findCartItemIdWithProductId(productId)
-        threadAction {
-            service.deleteCartItem(contentId).execute()
-        }
-        updateCartItems()
-    }
-
-    override fun deleteAll() {
-        if (cartItems.isNullOrEmpty()) {
-            return
-        } else {
-            cartItems!!.forEach {
-                threadAction {
-                    service.deleteCartItem(it.id).execute()
+    override suspend fun deleteWithProductId(productId: Long): Result<Unit> =
+        runCatching {
+            val contentId = findCartItemIdWithProductId(productId)
+            contentId.onSuccess {
+                val response = service.deleteCartItem(it)
+                if (response.isSuccessful) {
+                    response.body()
+                } else {
+                    throw IllegalStateException("Failed to delete cart item")
                 }
             }
+            updateCartItems()
         }
-        updateCartItems()
-    }
 
-    private fun threadAction(action: () -> Unit) {
-        val latch = CountDownLatch(1)
-        thread {
-            action()
-            latch.countDown()
+    override suspend fun deleteAll(): Result<Unit> =
+        runCatching {
+            if (cartItems != null && cartItems!!.isNotEmpty()) {
+                cartItems!!.forEach {
+                    val response = service.deleteCartItem(it.id)
+                    if (response.isSuccessful) {
+                        response.body()
+                    } else {
+                        throw IllegalStateException("Failed to delete cart item")
+                    }
+                }
+            }
+            updateCartItems()
         }
-        latch.await()
-    }
 }

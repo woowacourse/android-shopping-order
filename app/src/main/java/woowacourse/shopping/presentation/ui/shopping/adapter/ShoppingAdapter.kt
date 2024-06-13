@@ -30,8 +30,8 @@ class ShoppingAdapter(
         holder: ShoppingViewHolder,
         position: Int,
     ) {
-        val shoppingProduct = shoppingProducts[position]
-        return holder.bind(shoppingProduct, shoppingEventHandler, shoppingItemCountHandler)
+        // val shoppingProduct = shoppingProducts[position]
+        return holder.bind(getItem(position), shoppingEventHandler, shoppingItemCountHandler)
     }
 
     override fun getItemCount(): Int {

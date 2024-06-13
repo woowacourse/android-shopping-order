@@ -5,17 +5,17 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.databinding.ActivityCartTempBinding
+import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.ui.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.ui.cart.selection.SelectionFragment
 
 class CartActivity : AppCompatActivity(), CartClickListener {
-    private lateinit var binding: ActivityCartTempBinding
+    private lateinit var binding: ActivityCartBinding
     private val selectionFragment by lazy { SelectionFragment() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCartTempBinding.inflate(layoutInflater)
+        binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.clickListener = this

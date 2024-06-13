@@ -3,18 +3,18 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface ShoppingItemsRepository {
-    fun fetchProductsSize(): Int
+    suspend fun fetchProductsSize(): Result<Int>
 
-    fun fetchProductsWithIndex(
+    suspend fun fetchProductsWithIndex(
         start: Int = 0,
         end: Int,
-    ): List<Product>
+    ): Result<List<Product>>
 
-    fun findProductItem(id: Long): Product?
+    suspend fun findProductItem(id: Long): Result<Product?>
 
-    fun recommendProducts(
+    suspend fun recommendProducts(
         category: String,
         count: Int,
         cartItemIds: List<Long>,
-    ): List<Product>
+    ): Result<List<Product>>
 }

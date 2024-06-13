@@ -5,76 +5,81 @@ import woowacourse.shopping.data.mapper.toDomainModel
 import woowacourse.shopping.data.model.dto.ProductResponseDto
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 class RemoteShoppingRepositoryImpl : ShoppingItemsRepository {
     private val service = ProductClient.service
     private var productData: ProductResponseDto? = null
-    private var products: List<Product>? = null
 
-    init {
-        threadAction {
-            productData = service.requestProducts().execute().body()
-            products = productData?.content?.map { it.toDomainModel() }
+    override suspend fun fetchProductsSize(): Result<Int> =
+        runCatching {
+            val response = service.requestProducts()
+            if (response.isSuccessful) {
+                val productData = response.body()
+                productData?.totalElements ?: 0
+            } else {
+                throw Exception("Failed to fetch products: ${response.errorBody()?.string()}")
+            }
         }
-    }
 
-    override fun fetchProductsSize(): Int {
-        return productData?.totalElements ?: 0
-    }
-
-    override fun fetchProductsWithIndex(
+    override suspend fun fetchProductsWithIndex(
         start: Int,
         end: Int,
-    ): List<Product> {
-        return products?.subList(start, end) ?: emptyList()
-    }
-
-    override fun findProductItem(id: Long): Product? {
-        var product: Product? = null
-        threadAction {
-            product = service.requestProduct(id).execute().body()?.toDomainModel()
+    ): Result<List<Product>> =
+        runCatching {
+            val response = service.requestProducts()
+            var products: List<Product> = emptyList<Product>()
+            if (response.isSuccessful) {
+                val productData = response.body()
+                products = productData?.content?.map { it.toDomainModel() } ?: emptyList()
+                products.subList(start, end)
+            } else {
+                throw Exception("Failed to fetch products: ${response.errorBody()?.string()}")
+            }
         }
 
-        return product
-    }
-
-    private fun threadAction(action: () -> Unit) {
-        val latch = CountDownLatch(1)
-        thread {
-            action()
-            latch.countDown()
+    override suspend fun findProductItem(id: Long): Result<Product?> =
+        runCatching {
+            val response = service.requestProduct(id)
+            if (response.isSuccessful) {
+                response.body()?.toDomainModel()
+            } else {
+                throw Exception("Failed to fetch product: ${response.errorBody()?.string()}")
+            }
         }
-        latch.await()
-    }
 
-    override fun recommendProducts(
+    override suspend fun recommendProducts(
         category: String,
         count: Int,
-        cartItemIds: List<Long>,
-    ): List<Product> {
-        var categoryProducts: MutableList<Product> = mutableListOf()
-        threadAction {
-            productData =
+        productIds: List<Long>,
+    ): Result<List<Product>> =
+        runCatching {
+            var categoryProducts: MutableList<Product> = mutableListOf()
+
+            val response =
                 service.requestProductWithCategory(
                     category = category,
-                    size = count + cartItemIds.size,
-                ).execute().body()
+                    size = count + productIds.size,
+                )
+
+            if (response.isSuccessful) {
+                productData = response.body()
+            } else {
+                throw Exception("Failed to fetch products: ${response.errorBody()?.string()}")
+            }
+
+            categoryProducts =
+                productData?.content?.map { it.toDomainModel() }.orEmpty().toMutableList()
+            removeDuplicateItemsFromCart(categoryProducts, productIds)
+            categoryProducts.take(count)
         }
-        categoryProducts =
-            productData?.content?.map { it.toDomainModel() }.orEmpty().toMutableList()
-        removeDuplicateItemsFromCart(categoryProducts, cartItemIds)
-        return categoryProducts.take(count)
-    }
 
     private fun removeDuplicateItemsFromCart(
         categoryProducts: MutableList<Product>,
-        cartItemIds: List<Long>,
+        productIds: List<Long>,
     ) {
         if (categoryProducts.isNotEmpty()) {
-            cartItemIds.forEach { cartItemId ->
-                categoryProducts.removeIf { it.id == cartItemId }
+            productIds.forEach { productId ->
+                categoryProducts.removeIf { it.id == productId }
             }
         }
     }

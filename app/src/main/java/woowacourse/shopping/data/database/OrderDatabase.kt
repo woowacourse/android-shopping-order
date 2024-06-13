@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 
 object OrderDatabase {
-    private var order = Order()
+    private var order = Order(emptyList())
 
     fun postOrder(order: Order) {
         this.order = order

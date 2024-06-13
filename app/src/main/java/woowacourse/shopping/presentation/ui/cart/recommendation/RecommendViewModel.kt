@@ -3,14 +3,18 @@ package woowacourse.shopping.presentation.ui.cart.recommendation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.database.OrderDatabase
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
-import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.state.UIState
 import woowacourse.shopping.presentation.ui.counter.CounterHandler
 
@@ -18,15 +22,24 @@ class RecommendViewModel(
     private val cartRepository: CartRepository,
     private val shoppingRepository: ShoppingItemsRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val orderDatabase: OrderDatabase,
 ) : ViewModel(), CounterHandler {
     private val _order: MutableLiveData<Order> = MutableLiveData()
     val order: LiveData<Order>
         get() = _order
 
-    private val _recommendItemsState: MutableLiveData<UIState<List<ShoppingProduct>>> =
-        MutableLiveData()
-    val recommendItemsState: LiveData<UIState<List<ShoppingProduct>>>
-        get() = _recommendItemsState
+    private val _shoppingProducts = MutableLiveData<List<ShoppingProduct>>()
+    val shoppingProducts: LiveData<List<ShoppingProduct>>
+        get() = _shoppingProducts
+
+    val recommendItemsState: LiveData<UIState<List<ShoppingProduct>>> =
+        shoppingProducts.switchMap { products ->
+            if (products.isEmpty()) {
+                MutableLiveData(UIState.Empty)
+            } else {
+                MutableLiveData(UIState.Success(products))
+            }
+        }
 
     private val _totalOrderPrice: MutableLiveData<Long> = MutableLiveData(DEFAULT_TOTAL_PRICE)
     val totalOrderPrice: LiveData<Long>
@@ -36,17 +49,9 @@ class RecommendViewModel(
     val totalOrderQuantity: LiveData<Int>
         get() = _totalOrderQuantity
 
-    private val _loading = MutableLiveData<Boolean>(true)
-    val loading: LiveData<Boolean>
-        get() = _loading
-
-    private val _isEmpty = MutableLiveData<Boolean>(false)
-    val isEmpty: LiveData<Boolean>
-        get() = _isEmpty
-
-    private val _deleteCartItem = MutableLiveData<Event<Long>>()
-    val deleteCartItem: LiveData<Event<Long>>
-        get() = _deleteCartItem
+    private val _isLoading = MutableLiveData<Boolean>(true)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
 
     init {
         fetchOrder()
@@ -58,44 +63,56 @@ class RecommendViewModel(
         updatePriceAndQuantity()
     }
 
-    private fun setUpUIState() {
-        _recommendItemsState.value =
-            try {
-                loadRecommendationProducts()
-            } catch (e: Exception) {
-                UIState.Error(e)
-                loadRecommendationProducts()
-            }
-    }
-
     private fun updatePriceAndQuantity() {
-        _totalOrderPrice.value = _order.value?.getTotalPrice() ?: 0L
-        _totalOrderQuantity.value = _order.value?.getTotalQuantity() ?: 0
+        _totalOrderPrice.value = order.value?.getTotalPrice() ?: 0L
+        _totalOrderQuantity.value = order.value?.getTotalQuantity() ?: 0
     }
 
-    private fun loadRecommendationProducts(): UIState<List<ShoppingProduct>> {
-        val recentProduct = recentProductRepository.loadLatest() ?: return UIState.Empty
-        cartRepository.updateCartItems()
-        val cartItemIds = cartRepository.findAll().items.map { it.productId }
-        val items =
-            shoppingRepository.recommendProducts(
-                recentProduct.category,
-                DEFAULT_RECOMMEND_ITEM_COUNTS,
-                cartItemIds,
-            ).mapperToShoppingProductList()
-        return if (items.isEmpty()) {
-            UIState.Empty
-        } else {
-            UIState.Success(items)
+    private fun setUpUIState() {
+        loadRecommendationProducts()
+    }
+
+    private fun loadRecommendationProducts() {
+        viewModelScope.launch {
+            val recentProduct = recentProductRepository.loadLatest()
+            val cartItems = asyncLoadCartItems()
+
+            recentProduct.onSuccess {
+                if (it != null) {
+                    val recommendCandidates =
+                        shoppingRepository.recommendProducts(
+                            it.category,
+                            DEFAULT_RECOMMEND_ITEM_COUNTS,
+                            cartItems.map { it.productId },
+                        )
+
+                    recommendCandidates.onSuccess {
+                        _shoppingProducts.value = it.mapperToShoppingProductList()
+                    }
+                }
+            }
+            onLoaded()
         }
     }
 
+    private suspend fun asyncLoadCartItems(): List<CartItem> {
+        var cartItems: List<CartItem> = listOf()
+        val transaction =
+            viewModelScope.async {
+                cartRepository.findAll()
+            }.await()
+        transaction.onSuccess {
+            cartItems = it.items
+        }
+        return cartItems
+    }
+
     fun onLoading() {
-        _loading.postValue(true)
+        _isLoading.postValue(true)
     }
 
     fun onLoaded() {
-        _loading.postValue(false)
+        _isLoading.postValue(false)
     }
 
     private fun List<Product>.mapperToShoppingProductList(): List<ShoppingProduct> {
@@ -103,36 +120,78 @@ class RecommendViewModel(
     }
 
     fun deleteItem(itemId: Long) {
-        cartRepository.delete(itemId)
-        loadRecommendationProducts()
-    }
-
-    fun completeOrder() {
-        val currentOrder = _order.value ?: return
-        cartRepository.makeOrder(currentOrder)
+        viewModelScope.launch {
+            val deleteTransaction = cartRepository.delete(itemId)
+            deleteTransaction.onSuccess {
+                loadRecommendationProducts()
+            }
+        }
     }
 
     override fun increaseCount(productId: Long) {
-        val shoppingProduct =
-            (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
-        shoppingProduct?.increase()
-        val product = shoppingRepository.findProductItem(productId) ?: return
-        cartRepository.insert(product, shoppingProduct?.quantity() ?: 1)
-        loadRecommendationProducts()
+        val shoppingProducts = _shoppingProducts.value?.map { it.copy() } ?: return
+        val shoppingProduct = shoppingProducts.find { it.product.id == productId } ?: return
+        val index = shoppingProducts.indexOf(shoppingProduct) ?: return
+        shoppingProduct.increase()
+
+        viewModelScope.launch {
+            val insertion =
+                cartRepository.insert(shoppingProduct.product, shoppingProduct.quantity())
+            insertion.onSuccess {
+                _shoppingProducts.value =
+                    shoppingProducts.toMutableList().apply {
+                        set(index, shoppingProduct)
+                    }
+
+                val find = cartRepository.findOrNullWithProductId(productId)
+                find.onSuccess {
+                    val cartItem = it ?: return@onSuccess
+                    val currentOrder = _order.value ?: return@onSuccess
+
+                    currentOrder.addCount(cartItem)
+                    _order.value = currentOrder
+
+                    updatePriceAndQuantity()
+                }
+            }
+        }
     }
 
+    // TODO : decreaseCount 함수 구현
     override fun decreaseCount(productId: Long) {
-        val shoppingProduct =
-            (recommendItemsState.value as UIState.Success).data.find { it.product.id == productId }
-        shoppingProduct?.decrease()
-        val quantity = shoppingProduct?.quantity() ?: 0
+        val shoppingProducts = _shoppingProducts.value?.map { it.copy() } ?: return
+        val shoppingProduct = shoppingProducts.find { it.product.id == productId } ?: return
+        val index = shoppingProducts.indexOf(shoppingProduct) ?: return
+        shoppingProduct.decrease()
 
-        if (quantity > 0) {
-            cartRepository.updateQuantity(productId, shoppingProduct?.quantity() ?: 1)
-        } else {
-            cartRepository.deleteWithProductId(productId)
+        val quantity = shoppingProduct.quantity() ?: 0
+
+        viewModelScope.launch {
+            val transaction: Result<Unit> =
+                if (quantity > 0) {
+                    cartRepository.updateQuantity(productId, quantity)
+                } else {
+                    cartRepository.deleteWithProductId(productId)
+                }
+            transaction.onSuccess {
+                _shoppingProducts.value =
+                    shoppingProducts.toMutableList().apply {
+                        set(index, shoppingProduct)
+                    }
+
+                val currentOrder = _order.value ?: return@onSuccess
+                val cartItem = currentOrder.list.find { it.productId == productId } ?: return@onSuccess
+
+                currentOrder.subCount(cartItem)
+                _order.value = currentOrder
+
+                updatePriceAndQuantity()
+            }
         }
-        loadRecommendationProducts()
+    }
+
+    fun postOrder() {
+        orderDatabase.postOrder(order = order.value ?: return)
     }
 
     companion object {

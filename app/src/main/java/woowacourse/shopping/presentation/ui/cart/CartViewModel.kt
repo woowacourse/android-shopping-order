@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.event.Event
@@ -29,7 +31,7 @@ class CartViewModel(
         currentPage.map { page ->
             page == lastPage
         }
-    private val _totalItemSize = MutableLiveData<Int>(cartRepository.size())
+    private val _totalItemSize = MutableLiveData<Int>()
 
     val totalItemSize: LiveData<Int> = _totalItemSize
     private val _isPageControlVisible =
@@ -76,21 +78,33 @@ class CartViewModel(
     val totalQuantity: LiveData<Int>
         get() = _totalQuantity
 
-    private fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
-        val items = cartRepository.findAllPagedItems(page, pageSize).items
-        return if (items.isEmpty()) {
-            UIState.Empty
-        } else {
-            UIState.Success(items)
-        }
-    }
-
     init {
         loadPage()
     }
 
+    private fun setUpUIState(page: @JvmSuppressWildcards Int): UIState<List<CartItem>> {
+        var state: UIState<List<CartItem>> = UIState.Empty
+        viewModelScope.launch {
+            val items = cartRepository.findAllPagedItems(page, pageSize)
+            items.onSuccess {
+                state =
+                    if (it.items.isEmpty()) {
+                        UIState.Empty
+                    } else {
+                        UIState.Success(it.items)
+                    }
+            }
+        }
+        return state
+    }
+
     private fun updatePageControlVisibility() {
-        _totalItemSize.postValue(cartRepository.size())
+        viewModelScope.launch {
+            val size = cartRepository.size()
+            size.onSuccess {
+                _totalItemSize.postValue(it)
+            }
+        }
         lastPage = ((totalItemSize.value ?: 0) - PAGE_STEP) / pageSize
         _isPageControlVisible.postValue((totalItemSize.value ?: 0) > pageSize)
     }
@@ -113,8 +127,12 @@ class CartViewModel(
     }
 
     fun deleteItem(itemId: Long) {
-        cartRepository.delete(itemId)
-        loadPage()
+        viewModelScope.launch {
+            val deleteTransaction = cartRepository.delete(itemId)
+            deleteTransaction.onSuccess {
+                loadPage()
+            }
+        }
     }
 
     fun isCartEmpty() {
@@ -134,15 +152,24 @@ class CartViewModel(
     }
 
     override fun increaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        cartRepository.updateQuantityWithProductId(productId, currentQuantity + 1)
+        viewModelScope.launch {
+            val currentQuantity = cartRepository.findQuantityWithProductId(productId)
+            currentQuantity.onSuccess {
+                cartRepository.updateQuantityWithProductId(productId, it + 1)
+            }
+        }
+
         loadPage()
     }
 
     override fun decreaseCount(productId: Long) {
-        val currentQuantity = cartRepository.findQuantityWithProductId(productId)
-        if (currentQuantity > 1) {
-            cartRepository.updateQuantityWithProductId(productId, currentQuantity - 1)
+        viewModelScope.launch {
+            val currentQuantity = cartRepository.findQuantityWithProductId(productId)
+            currentQuantity.onSuccess {
+                if (it > 1) {
+                    cartRepository.updateQuantityWithProductId(productId, it - 1)
+                }
+            }
         }
         loadPage()
     }

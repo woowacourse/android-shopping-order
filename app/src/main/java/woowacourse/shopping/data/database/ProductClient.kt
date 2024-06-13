@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.service.RetrofitService
 object ProductClient {
     private const val BASE_URL = BuildConfig.base_url
 
-    val client: Retrofit =
+    private val client: Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

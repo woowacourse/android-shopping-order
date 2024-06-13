@@ -10,4 +10,18 @@
     <string name="make_order_with_total_quantity">주문하기(%1$d)</string>
     <string name="recommendation_explanation">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="recommendation_title">이런 상품은 어떠세요?</string>
+    <string name="tv_coupon_title">적용 가능한 쿠폰</string>
+    <string name="tv_coupon_description_title">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="empty_coupon_title">적용 가능한 쿠폰이 없습니다.</string>
+    <string name="tv_payment_title">결제하기</string>
+    <string name="order_amount_title">주문 금액</string>
+    <string name="discount_amount_title">쿠폰 할인 금액</string>
+    <string name="delivery_fee_amount_title">배송비</string>
+    <string name="total_amount_title">총 결제 금액</string>
+    <string name="bogo_coupon_description">%d개 제품을 구매하면 %d개 제품을 무료로 제공합니다.</string>
+    <string name="fixed5000_coupon_description">최소 주문 금액 : %s</string>
+    <string name="free_shipping_coupon_description">배송비 무료 쿠폰은 도서 및 산간 지역인 경우에도 무료 배송이 가능합니다.</string>
+    <string name="miracle_sale_coupon_description">오전 %d시부터 오후 %d시까지</string>
+    <string name="payment_title">결제하기</string>
+    <string name="message_order_complete">주문이 완료되었습니다.</string>
 </resources>

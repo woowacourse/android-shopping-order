@@ -7,49 +7,28 @@ import woowacourse.shopping.data.model.entity.mapper
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 class RecentProductRepositoryImpl(context: Context) : RecentProductRepository {
     private val dao = ShoppingDatabase.getInstance(context).recentProductDao()
 
-    override fun save(product: Product) {
-        threadAction {
+    override suspend fun save(product: Product) =
+        runCatching {
             dao.deleteWithProductId(product.id)
             dao.save(product.mapper())
         }
-    }
 
-    override fun loadLatest(): RecentProduct? {
-        var recentProduct: RecentProduct? = null
-        threadAction {
-            recentProduct = dao.loadLatest()?.toDomainModel()
+    override suspend fun loadLatest(): Result<RecentProduct?> =
+        runCatching {
+            dao.loadLatest()?.toDomainModel()
         }
-        return recentProduct
-    }
 
-    override fun loadSecondLatest(): RecentProduct? {
-        var secondRecentProduct: RecentProduct? = null
-        threadAction {
-            secondRecentProduct = dao.loadSecondLatest()?.toDomainModel()
+    override suspend fun loadSecondLatest(): Result<RecentProduct?> =
+        runCatching {
+            dao.loadSecondLatest()?.toDomainModel()
         }
-        return secondRecentProduct
-    }
 
-    override fun loadLatestList(): List<RecentProduct> {
-        var recentProducts: List<RecentProduct> = emptyList()
-        threadAction {
-            recentProducts = dao.loadLatestList().map { it.toDomainModel() }
+    override suspend fun loadLatestList(): Result<List<RecentProduct>> =
+        runCatching {
+            dao.loadLatestList().map { it.toDomainModel() }
         }
-        return recentProducts
-    }
-
-    private fun threadAction(action: () -> Unit) {
-        val latch = CountDownLatch(1)
-        thread {
-            action()
-            latch.countDown()
-        }
-        latch.await()
-    }
 }
