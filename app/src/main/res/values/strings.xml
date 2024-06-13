@@ -14,4 +14,15 @@
     <string name="recent_product_comment">최근 본 상품</string>
     <string name="last_seen_product_comment">마지막으로 본 상품</string>
     <string name="order">주문하기(%d)</string>
+    <string name="payment_page">결제하기</string>
+    <string name="applicable_coupon">적용 가능한 쿠폰</string>
+    <string name="coupon_guide_comment">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_amount_comment">주문 금액</string>
+    <string name="coupon_discount_comment">쿠폰 할인 금액</string>
+    <string name="delivery_amount_comment">배송비</string>
+    <string name="total_amount_comment">총 결제 금액</string>
+    <string name="payment_comment">결제하기</string>
+    <string name="coupon_expiration_date">만료일: yyyy년 MM월 dd일</string>
+    <string name="no_available_coupon_comment">사용 가능한 쿠폰이 없습니다.</string>
+    <string name="paying_complete_comment">주문 완료!</string>
 </resources>

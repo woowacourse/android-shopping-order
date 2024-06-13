@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui
 
-import woowacourse.shopping.data.cart.Cart
-import woowacourse.shopping.data.cart.CartDao
+import woowacourse.shopping.data.local.db.cart.CartDao
+import woowacourse.shopping.domain.model.cart.Cart
 import kotlin.math.min
 
 object FakeCartDao : CartDao {

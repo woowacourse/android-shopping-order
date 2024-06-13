@@ -2,9 +2,9 @@ package woowacourse.shopping.ui.cart.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.ui.CountButtonClickListener
 import woowacourse.shopping.ui.cart.CartItemClickListener
 import woowacourse.shopping.ui.cart.CartUiModel
+import woowacourse.shopping.ui.listener.CountButtonClickListener
 
 class CartViewHolder(
     val binding: ItemCartBinding,

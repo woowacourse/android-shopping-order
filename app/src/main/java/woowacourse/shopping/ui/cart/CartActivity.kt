@@ -8,21 +8,21 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.RecentProductLocalDataSourceImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.NetworkModule
+import woowacourse.shopping.data.local.db.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.remote.service.NetworkModule
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.cart.adapter.RecommendProductAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
+import woowacourse.shopping.ui.payment.PaymentActivity
 import woowacourse.shopping.ui.products.toUiModel
 
 class CartActivity : AppCompatActivity() {
@@ -59,8 +59,8 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun observeOrder() {
-        viewModel.order.observe(this) {
-            finish()
+        viewModel.order.observe(this) { ids ->
+            PaymentActivity.startActivity(this, ids)
         }
     }
 
@@ -72,8 +72,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun observeError() {
         viewModel.error.observe(this) {
-            val errMsg = handleError(it)
-            toast = Toast.makeText(this, errMsg, Toast.LENGTH_SHORT)
+            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
             toast?.show()
         }
     }

@@ -1,19 +1,23 @@
 package woowacourse.shopping.ui.detail
 
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
@@ -26,15 +30,21 @@ class ProductDetailViewModelTest {
         productRepository = mockk<ProductRepositoryImpl>()
         recentProductRepository = mockk<RecentProductRepository>()
         cartRepository = mockk<CartRepositoryImpl>()
-        every { productRepository.find(1L).getOrThrow() } returns PRODUCT_STUB
+        coEvery { productRepository.find(1L).getOrThrow() } returns PRODUCT_STUB
         viewModel =
-            ProductDetailViewModel(1L, productRepository, recentProductRepository, cartRepository)
+            ProductDetailViewModel(
+                1L,
+                false,
+                productRepository,
+                recentProductRepository,
+                cartRepository,
+            )
     }
 
     @Test
     fun `선택한 상품이 불러와진다`() {
         // given
-        every { productRepository.find(1L).getOrThrow() } returns PRODUCT_STUB
+        coEvery { productRepository.find(1L).getOrThrow() } returns PRODUCT_STUB
 
         // when
         viewModel.loadProduct()

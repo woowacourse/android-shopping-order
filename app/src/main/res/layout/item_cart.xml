@@ -12,7 +12,7 @@
 
         <variable
             name="countButtonClickListener"
-            type="woowacourse.shopping.ui.CountButtonClickListener" />
+            type="woowacourse.shopping.ui.listener.CountButtonClickListener" />
 
         <variable
             name="cartItemClickListener"

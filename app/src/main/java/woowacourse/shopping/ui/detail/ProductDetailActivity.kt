@@ -9,15 +9,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.RecentProductLocalDataSourceImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.NetworkModule
+import woowacourse.shopping.data.local.db.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.remote.service.NetworkModule
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModelFactory
@@ -91,7 +91,6 @@ class ProductDetailActivity :
 
     private fun observeErrorMessage() {
         viewModel.errorMsg.observe(this) {
-//            val errMsg = handleError(it)
             toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
             toast?.show()
         }

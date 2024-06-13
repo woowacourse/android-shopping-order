@@ -1,22 +1,23 @@
 package woowacourse.shopping.ui.products
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepositoryImpl
 import woowacourse.shopping.data.datasource.impl.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.impl.RecentProductLocalDataSourceImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.NetworkModule
+import woowacourse.shopping.data.local.db.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.remote.service.NetworkModule
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductContentsBinding
-import woowacourse.shopping.exception.handleError
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.detail.ProductDetailActivity
 import woowacourse.shopping.ui.products.adapter.ProductAdapter
@@ -64,8 +65,7 @@ class ProductContentsActivity : AppCompatActivity() {
 
     private fun observeError() {
         viewModel.error.observe(this) {
-            val errMsg = handleError(it)
-            toast = Toast.makeText(this, errMsg, Toast.LENGTH_SHORT)
+            toast = Toast.makeText(this, it.message, Toast.LENGTH_SHORT)
             toast?.show()
         }
     }
@@ -116,6 +116,12 @@ class ProductContentsActivity : AppCompatActivity() {
             ProductDetailActivity.startActivity(this, it, true)
         }
     }
-}
 
-fun List<ProductUiModel>.isLoading() = this + LoadingUiModel + LoadingUiModel
+    companion object {
+        fun startActivity(context: Context) =
+            Intent(context, ProductContentsActivity::class.java).run {
+                setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                context.startActivity(this)
+            }
+    }
+}

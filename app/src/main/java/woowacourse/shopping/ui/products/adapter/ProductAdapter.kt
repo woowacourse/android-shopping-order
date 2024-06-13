@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.databinding.ItemProductSkeletonBinding
-import woowacourse.shopping.ui.CountButtonClickListener
+import woowacourse.shopping.ui.listener.AddCartClickListener
+import woowacourse.shopping.ui.listener.CountButtonClickListener
 import woowacourse.shopping.ui.products.LoadingUiModel
 import woowacourse.shopping.ui.products.ProductItemClickListener
 import woowacourse.shopping.ui.products.ProductUiModel
 import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
-import woowacourse.shopping.ui.utils.AddCartClickListener
 
 class ProductAdapter(
     private val countButtonClickListener: CountButtonClickListener,

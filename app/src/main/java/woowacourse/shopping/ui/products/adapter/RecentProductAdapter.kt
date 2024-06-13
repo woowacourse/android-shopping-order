@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemRecentProductBinding
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.ui.products.ProductItemClickListener
 
 class RecentProductAdapter(

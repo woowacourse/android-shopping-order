@@ -92,6 +92,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // room
+    implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
@@ -105,7 +106,7 @@ dependencies {
     // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
 
     // serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")

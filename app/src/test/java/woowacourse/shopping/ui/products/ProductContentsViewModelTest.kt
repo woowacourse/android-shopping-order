@@ -1,23 +1,27 @@
 package woowacourse.shopping.ui.products
 
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.data.cart.Cart
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recentproduct.RecentProduct
-import woowacourse.shopping.data.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.model.RecentProduct
+import woowacourse.shopping.domain.model.cart.Cart
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Quantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Quantity
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 import java.time.LocalDateTime
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductContentsViewModelTest {
     private lateinit var viewModel: ProductContentsViewModel
@@ -31,7 +35,7 @@ class ProductContentsViewModelTest {
         productRepository = mockk<ProductRepository>()
         recentProductRepository = mockk<RecentProductRepository>()
         cartRepository = mockk<CartRepository>()
-        every { productRepository.getProducts(0, 20).getOrThrow() } returns
+        coEvery { productRepository.getProducts(0, 20).getOrThrow() } returns
             PRODUCT_STUB.subList(
                 0,
                 20,
@@ -43,7 +47,7 @@ class ProductContentsViewModelTest {
     @Test
     fun `상품을 가져올 때, 20개씩 가져온다`() {
         // given
-        every { productRepository.getProducts(1, 20).getOrThrow() } returns
+        coEvery { productRepository.getProducts(1, 20).getOrThrow() } returns
             PRODUCT_STUB.subList(
                 20,
                 40,
@@ -60,8 +64,8 @@ class ProductContentsViewModelTest {
     @Test
     fun `장바구니에 상품을 추가하면, 해당 상품의 quantity가 1이 된다`() {
         // given
-        every { cartRepository.postCartItems(0L, 1).getOrThrow() } returns mockk()
-        every { cartRepository.getAllCartItems().getOrThrow() } returns
+        coEvery { cartRepository.postCartItems(0L, 1).getOrThrow() } returns mockk()
+        coEvery { cartRepository.getAllCartItems().getOrThrow() } returns
             listOf(
                 Cart(
                     0L,
@@ -95,8 +99,8 @@ class ProductContentsViewModelTest {
     @Test
     fun `최근 본 상품을 불러온다`() {
         // given
-        every { recentProductRepository.findAll().getOrThrow() } returns listOf(RECENT_PRODUCT_STUB)
-        every { productRepository.find(0L).getOrThrow() } returns PRODUCT_STUB[0]
+        coEvery { recentProductRepository.findAll().getOrThrow() } returns listOf(RECENT_PRODUCT_STUB)
+        coEvery { productRepository.find(0L).getOrThrow() } returns PRODUCT_STUB[0]
 
         // when
         viewModel.loadRecentProducts()

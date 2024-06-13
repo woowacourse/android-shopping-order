@@ -4,12 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recentproduct.RecentProductRepository
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductWithQuantity
-import woowacourse.shopping.ui.CountButtonClickListener
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductWithQuantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.listener.CountButtonClickListener
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 
@@ -42,6 +45,11 @@ class ProductDetailViewModel(
 
     private val _addCartComplete = MutableSingleLiveData<Unit>()
     val addCartComplete: SingleLiveData<Unit> get() = _addCartComplete
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            _error.value = true
+            _errorMsg.setValue(throwable.message.toString())
+        }
 
     init {
         loadProduct()
@@ -49,12 +57,11 @@ class ProductDetailViewModel(
     }
 
     fun loadProduct() {
-        productRepository.find(productId).onSuccess {
-            _error.value = false
-            _productWithQuantity.value = ProductWithQuantity(product = it)
-        }.onFailure {
-            _error.value = true
-            _errorMsg.setValue(it.toString())
+        viewModelScope.launch(coroutineExceptionHandler) {
+            productRepository.find(productId).onSuccess {
+                _error.value = false
+                _productWithQuantity.value = ProductWithQuantity(product = it)
+            }
         }
     }
 
@@ -71,11 +78,14 @@ class ProductDetailViewModel(
     }
 
     fun addProductToCart() {
-        _productWithQuantity.value?.let { productWithQuantity ->
-            with(productWithQuantity) {
-                cartRepository.addProductToCart(this.product.id, this.quantity.value).onSuccess {
-                    loadProduct()
-                    _addCartComplete.setValue(Unit)
+        viewModelScope.launch {
+            _productWithQuantity.value?.let { productWithQuantity ->
+                with(productWithQuantity) {
+                    cartRepository.addProductToCart(this.product.id, this.quantity.value)
+                        .onSuccess {
+                            loadProduct()
+                            _addCartComplete.setValue(Unit)
+                        }
                 }
             }
         }
@@ -83,20 +93,24 @@ class ProductDetailViewModel(
 
     private fun addToRecentProduct() {
         loadMostRecentProduct(productId)
-        recentProductRepository.insert(productId)
+        viewModelScope.launch {
+            recentProductRepository.insert(productId)
+        }
     }
 
     private fun loadMostRecentProduct(productId: Long) {
-        recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
-            productRepository.find(recentProduct.productId).onSuccess { product ->
-                _error.value = false
-                _mostRecentProduct.value = product
-                if (!lastSeenProductState) return
-                setMostRecentVisibility(product.id, productId)
-            }.onFailure {
-                _error.value = true
-                _mostRecentProductVisibility.value = false
-                _errorMsg.setValue(it.toString())
+        viewModelScope.launch {
+            recentProductRepository.findMostRecentProduct().onSuccess { recentProduct ->
+                productRepository.find(recentProduct.productId).onSuccess { product ->
+                    _error.value = false
+                    _mostRecentProduct.value = product
+                    if (!lastSeenProductState) return@launch
+                    setMostRecentVisibility(product.id, productId)
+                }.onFailure {
+                    _error.value = true
+                    _mostRecentProductVisibility.value = false
+                    _errorMsg.setValue(it.toString())
+                }
             }
         }
     }
