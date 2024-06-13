@@ -2,11 +2,11 @@ package woowacourse.shopping
 
 import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.FixedCoupon
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.model.RecentProduct
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.CartUiModels

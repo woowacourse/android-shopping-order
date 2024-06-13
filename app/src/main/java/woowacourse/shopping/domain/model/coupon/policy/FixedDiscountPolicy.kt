@@ -1,4 +1,8 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.coupon.policy
+
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.condition.DiscountCondition
 
 class FixedDiscountPolicy(
     override val discountConditions: List<DiscountCondition>,

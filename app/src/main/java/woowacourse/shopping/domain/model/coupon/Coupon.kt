@@ -1,5 +1,7 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.coupon
 
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.coupon.policy.DiscountPolicy
 import java.time.LocalDate
 
 class Coupon(

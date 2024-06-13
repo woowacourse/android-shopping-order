@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.coupon.remote
 
 import woowacourse.shopping.data.remote.RetrofitClient.couponApi
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 object RemoteCouponRepository : CouponRepository {

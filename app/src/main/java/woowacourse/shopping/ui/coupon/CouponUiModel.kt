@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.coupon
 
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.Coupon
 import java.time.LocalDate
 
 data class CouponUiModel(

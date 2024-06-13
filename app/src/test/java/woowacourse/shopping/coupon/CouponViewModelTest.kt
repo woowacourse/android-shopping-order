@@ -11,7 +11,7 @@ import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartItemsBySize
 import woowacourse.shopping.cartItemsByTotalPrice
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository

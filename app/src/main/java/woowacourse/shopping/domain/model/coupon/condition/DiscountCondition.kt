@@ -1,5 +1,7 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.coupon.condition
 
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.coupon.Coupon
 import java.time.LocalDate
 
 sealed class DiscountCondition {

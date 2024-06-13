@@ -3,6 +3,7 @@ package woowacourse.shopping.domain.model
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.cartItemsByTotalPrice
+import woowacourse.shopping.domain.model.coupon.Coupon
 import java.time.LocalDate
 
 class FreeShippingCouponTest {

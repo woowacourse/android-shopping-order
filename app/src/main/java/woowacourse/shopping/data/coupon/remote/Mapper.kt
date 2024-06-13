@@ -2,18 +2,18 @@ package woowacourse.shopping.data.coupon.remote
 
 import woowacourse.shopping.data.util.toLocalDate
 import woowacourse.shopping.data.util.toLocalTime
-import woowacourse.shopping.domain.model.AmountDiscountCondition
 import woowacourse.shopping.domain.model.AvailableTime
-import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.model.DiscountCondition
-import woowacourse.shopping.domain.model.DiscountPolicy
-import woowacourse.shopping.domain.model.FixedDiscountPolicy
-import woowacourse.shopping.domain.model.FreeQuantityDiscountPolicy
-import woowacourse.shopping.domain.model.FreeShippingDiscountPolicy
-import woowacourse.shopping.domain.model.PercentDiscountPolicy
 import woowacourse.shopping.domain.model.Quantity
-import woowacourse.shopping.domain.model.QuantityDiscountCondition
-import woowacourse.shopping.domain.model.TimeDiscountCondition
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.condition.AmountDiscountCondition
+import woowacourse.shopping.domain.model.coupon.condition.DiscountCondition
+import woowacourse.shopping.domain.model.coupon.condition.QuantityDiscountCondition
+import woowacourse.shopping.domain.model.coupon.condition.TimeDiscountCondition
+import woowacourse.shopping.domain.model.coupon.policy.DiscountPolicy
+import woowacourse.shopping.domain.model.coupon.policy.FixedDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.policy.FreeQuantityDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.policy.FreeShippingDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.policy.PercentDiscountPolicy
 import java.lang.IllegalArgumentException
 
 private const val INVALID_DISCOUNT_PARAMETER = "CouponDto의 discount 파라미터가 null 입니다."
