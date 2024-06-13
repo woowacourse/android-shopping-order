@@ -11,15 +11,12 @@ sealed class DiscountCondition {
         return currentDate.isAfter(expirationDate)
     }
 
-    abstract fun isSatisfied(
-        coupon: Coupon,
-        cartItems: List<CartItem>,
-    ): Boolean
+    abstract fun isSatisfied(cartItems: List<CartItem>): Boolean
 
     fun available(
         coupon: Coupon,
         cartItems: List<CartItem>,
     ): Boolean {
-        return !isExpired(coupon.expirationDate) && isSatisfied(coupon, cartItems)
+        return !isExpired(coupon.expirationDate) && isSatisfied(cartItems)
     }
 }
