@@ -14,8 +14,8 @@ import woowacourse.shopping.data.cart.remote.dto.CartItemResponse
 interface CartItemApiService {
     @GET("/cart-items")
     suspend fun requestCartItems(
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int? = null,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = MAX_CART_ITEMS,
     ): Response<CartItemResponse>
 
     @POST("/cart-items")
@@ -33,4 +33,8 @@ interface CartItemApiService {
     suspend fun removeCartItem(
         @Path("id") id: Long,
     ): Response<Unit>
+
+    companion object {
+        const val MAX_CART_ITEMS = 50
+    }
 }

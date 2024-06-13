@@ -11,4 +11,11 @@ object CartItemMapper {
             product = product,
             checked = false,
         )
+
+    fun CartItemUiModel.toDomain() =
+        CartItem(
+            id = id,
+            quantity = quantity,
+            product = product,
+        )
 }

@@ -1,8 +1,7 @@
 package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.coupon.Order.Companion.SHIPPING_FEE
-import woowacourse.shopping.ui.model.CouponUiModel
+import woowacourse.shopping.ui.model.OrderInformation.Companion.SHIPPING_FEE
 import java.time.LocalDate
 
 data class FreeShippingCoupon(

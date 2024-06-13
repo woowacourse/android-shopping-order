@@ -35,6 +35,7 @@ class PaymentFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.loadCoupons()
+        viewModel.loadInitialPaymentInformation()
     }
 
     override fun onCreateView(

@@ -13,6 +13,7 @@ import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.data.order.remote.OrderRemoteRepository
 import woowacourse.shopping.data.product.remote.DefaultProductRepository
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductIdsCount
 import woowacourse.shopping.domain.model.ProductIdsCount.Companion.DECREASE_VARIATION
@@ -33,10 +34,10 @@ class OrderViewModel(
     private val _recommendProducts = MutableLiveData<List<Product>>(emptyList())
     val recommendProducts: LiveData<List<Product>> get() = _recommendProducts
 
-    private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
+    private val _orderAmount = MutableLiveData(orderInformation.calculateOrderAmount())
     val orderAmount: LiveData<Int> get() = _orderAmount
 
-    private val _ordersCount = MutableLiveData(orderInformation.ordersCount)
+    private val _ordersCount = MutableLiveData(orderInformation.countProducts())
     val ordersCount: LiveData<Int> get() = _ordersCount
 
     private val _errorMessage: MutableLiveData<String> = MutableLiveData()
@@ -50,12 +51,10 @@ class OrderViewModel(
             val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
             handleResponseResult(cartItemRepository.loadCartItems(), _errorMessage) { cartItems ->
-                val cartItemIds = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
+                val newCartItems: List<CartItem> = cartItems.filter { it.product.id in addedProductIds }
                 _navigationPaymentEvent.setValue(
                     OrderInformation(
-                        cartItemIds = orderInformation.cartItemIds + cartItemIds,
-                        orderAmount = orderAmount.value ?: DEFAULT_ORDER_AMOUNT,
-                        ordersCount = ordersCount.value ?: DEFAULT_ORDERS_COUNT,
+                        cartItems = orderInformation.cartItems + newCartItems,
                     )
                 )
             }

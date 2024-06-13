@@ -17,6 +17,7 @@ import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
+import woowacourse.shopping.ui.mapper.CartItemMapper.toDomain
 import woowacourse.shopping.ui.mapper.CartItemMapper.toUiModel
 import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.OrderInformation
@@ -79,14 +80,10 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
-        val productIds = cartItems.value?.filter { it.checked }?.map { it.id } ?: return
-        val orderAmount = selectedCartItemsTotalPrice.value ?: return
-        val ordersCount = selectedCartItemsCount.value ?: return
+        val selectedCartItems = cartItems.value?.filter { it.checked }?.map { it.toDomain() } ?: return
         _navigationOrderEvent.setValue(
             OrderInformation(
-                productIds,
-                orderAmount,
-                ordersCount,
+                selectedCartItems,
             ),
         )
     }
