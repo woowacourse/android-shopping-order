@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.order.remote
 
 import woowacourse.shopping.data.cart.remote.datasource.CartItemDataSource
-import woowacourse.shopping.data.common.ApiResponseHandler.handleResponseResult
 import woowacourse.shopping.data.common.ApiResponseHandler.handleResponse
+import woowacourse.shopping.data.common.ApiResponseHandler.handleResponseResult
 import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.data.history.local.datasource.ProductHistoryDataSource
 import woowacourse.shopping.data.order.remote.datasource.OrderRemoteDataSource
@@ -29,7 +29,7 @@ class OrderRemoteRepository(
         return handleResponseResult(productDataSource.loadByCategory(category)) { response ->
             val recommendedProducts =
                 response.content.filterNot { cartItemsProductDto.contains(it) }
-                    .map { productDto -> productDto.toDomain() }.take(10)
+                    .map { productDto -> productDto.toDomain() }.take(RECOMMENDED_PRODUCTS_COUNT)
             ResponseResult.Success(recommendedProducts)
         }
     }
@@ -40,8 +40,12 @@ class OrderRemoteRepository(
             .onSuccess {
                 productId = it
             }.onFailure {
-                Product.NULL
+                throw IllegalStateException(it.message)
             }
         return productId
+    }
+
+    companion object {
+        private const val RECOMMENDED_PRODUCTS_COUNT = 10
     }
 }

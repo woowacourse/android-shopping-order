@@ -97,7 +97,7 @@ class ProductDetailViewModel(
             .onSuccess { latestProduct ->
                 _latestProduct.value = latestProduct
             }.onFailure {
-                _latestProduct.value = Product.NULL
+                _errorMessage.value = it.message
             }
     }
 
