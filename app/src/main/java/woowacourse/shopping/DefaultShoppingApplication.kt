@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,8 +11,10 @@ import woowacourse.shopping.data.datasource.DefaultRemoteOrderDataSource
 import woowacourse.shopping.data.datasource.DefaultRemoteProductDataSource
 import woowacourse.shopping.data.local.database.RecentProductDatabase
 import woowacourse.shopping.data.local.preferences.ShoppingPreferencesManager
+import woowacourse.shopping.data.model.coupon.CouponResponseItem
 import woowacourse.shopping.data.remote.BasicAuthInterceptor
 import woowacourse.shopping.data.remote.CartService
+import woowacourse.shopping.data.remote.CouponResponseItemDeserializer
 import woowacourse.shopping.data.remote.CouponService
 import woowacourse.shopping.data.remote.OrderService
 import woowacourse.shopping.data.remote.ProductService
@@ -47,9 +50,13 @@ class DefaultShoppingApplication : ShoppingApplication() {
             .build()
     }
 
+    private val gson = GsonBuilder()
+        .registerTypeAdapter(CouponResponseItem::class.java, CouponResponseItemDeserializer)
+        .create()
+
     private val retrofit by lazy {
         Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(client)
             .build()
     }

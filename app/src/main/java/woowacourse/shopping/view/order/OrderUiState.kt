@@ -5,6 +5,7 @@ import woowacourse.shopping.domain.model.Coupon
 import java.time.LocalDate
 import java.time.LocalTime
 
+// TODO 기타 쿠폰 사용 경우 임의로 정해놓은 할인액을 구체적으로 구현하기
 data class OrderUiState(
     val isLoading: Boolean = true,
     val cartItems: List<CartItemDomain> = emptyList(),
@@ -37,6 +38,7 @@ data class OrderUiState(
 
                     is Coupon.FreeShipping -> shippingPrice
                     is Coupon.MiracleSale -> orderPrice * (selectedCoupon.discount / 100)
+                    is Coupon.Etc -> 10
                     null -> 0
                 },
             selectedCoupon = null,
@@ -60,6 +62,7 @@ data class OrderUiState(
 
                     is Coupon.FreeShipping -> shippingPrice
                     is Coupon.MiracleSale -> orderPrice * (targetCoupon.coupon.discount / 100)
+                    is Coupon.Etc -> 10
                 },
             selectedCoupon = updatedCoupon.coupon,
         )
@@ -77,6 +80,10 @@ data class OrderUiState(
             is Coupon.FreeShipping -> if (orderPrice < minimumAmount) return false
 
             is Coupon.MiracleSale -> if (currentTime !in startTime..endTime) return false
+
+            is Coupon.Etc -> {
+
+            }
         }
         return true
     }

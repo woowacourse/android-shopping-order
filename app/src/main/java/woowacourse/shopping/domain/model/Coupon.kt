@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.model
 
+import woowacourse.shopping.data.model.coupon.AvailableTime
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -48,6 +49,20 @@ sealed interface Coupon {
         val discount: Int,
         val startTime: LocalTime,
         val endTime: LocalTime,
+    ) : Coupon
+
+    data class Etc(
+        override val id: Int,
+        override val code: String,
+        override val description: String,
+        override val expirationDate: LocalDate,
+        override val discountType: String,
+        val startTime: LocalTime?,
+        val endTime: LocalTime?,
+        val buyQuantity: Int?,
+        val discount: Int?,
+        val getQuantity: Int?,
+        val minimumAmount: Int?,
     ) : Coupon
 
     companion object {

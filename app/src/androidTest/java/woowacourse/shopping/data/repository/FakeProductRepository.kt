@@ -38,7 +38,7 @@ class FakeProductRepository(
         }
     }
 
-    override suspend fun getRecommendedProducts(): Result<List<OrderableProduct>> {
+    override suspend fun getRecommendedProducts(requiredSize: Int): Result<List<OrderableProduct>> {
         return runCatching {
             val lastlyViewedProduct = recentProductRepository.findMostRecentProduct()
             val cartData = getEntireCartItems()
@@ -55,13 +55,13 @@ class FakeProductRepository(
                         it.cartData == null
                     }
                 products.forEach {
-                    if (orderableProducts.size < 10) {
+                    if (orderableProducts.size < requiredSize) {
                         orderableProducts.add(it)
                     } else {
                         return@forEach
                     }
                 }
-            } while (orderableProducts.size >= 10 || products.isEmpty())
+            } while (orderableProducts.size >= requiredSize || products.isEmpty())
             orderableProducts
         }
     }

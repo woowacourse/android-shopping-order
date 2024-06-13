@@ -109,4 +109,5 @@ dependencies {
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
     androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.3.0")
     kapt("androidx.room:room-compiler:2.6.1")
+    implementation(kotlin("reflect"))
 }

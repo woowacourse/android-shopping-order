@@ -45,7 +45,7 @@ class CouponServiceTest {
             // then
             assertThat(response).isEqualTo(
                 listOf(
-                    CouponResponseItem(
+                    CouponResponseItem.Fixed(
                         id = 1,
                         code = "FIXED5000",
                         description = "5,000원 할인 쿠폰",
@@ -53,49 +53,36 @@ class CouponServiceTest {
                         discount = 5000,
                         minimumAmount = 100000,
                         discountType = "fixed",
-                        availableTime = null,
-                        buyQuantity = null,
-                        getQuantity = null,
                     ),
-                    CouponResponseItem(
+                    CouponResponseItem.BuyXGetY(
                         id = 2,
                         code = "BOGO",
                         description = "2개 구매 시 1개 무료 쿠폰",
                         expirationDate = "2024-05-30",
-                        discount = null,
-                        minimumAmount = null,
                         discountType = "buyXgetY",
-                        availableTime = null,
                         buyQuantity = 2,
                         getQuantity = 1,
                     ),
-                    CouponResponseItem(
+                    CouponResponseItem.FreeShipping(
                         id = 3,
                         code = "FREESHIPPING",
                         description = "5만원 이상 구매 시 무료 배송 쿠폰",
                         expirationDate = "2024-08-31",
-                        discount = null,
                         minimumAmount = 50000,
                         discountType = "freeShipping",
-                        availableTime = null,
-                        buyQuantity = null,
-                        getQuantity = null,
                     ),
-                    CouponResponseItem(
+                    CouponResponseItem.MiracleSale(
                         id = 4,
                         code = "MIRACLESALE",
                         description = "미라클모닝 30% 할인 쿠폰",
                         expirationDate = "2024-07-31",
                         discount = 30,
-                        minimumAmount = null,
                         discountType = "percentage",
                         availableTime =
                             AvailableTime(
                                 start = "04:00:00",
                                 end = "07:00:00",
                             ),
-                        buyQuantity = null,
-                        getQuantity = null,
                     ),
                 ),
             )
