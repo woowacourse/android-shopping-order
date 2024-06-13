@@ -115,7 +115,6 @@ class RecommendViewModel(
                 Int.MAX_VALUE,
                 HomeViewModel.ASCENDING_SORT_ORDER,
             ).onSuccess {
-                _recommendShareActions.value = Event(RecommendShareActions.ShareCartViewItems)
                 val selectedProducts =
                     sharedCartViewItems.filter { cartViewItem -> cartViewItem.isChecked }
                         .map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
@@ -172,8 +171,6 @@ class RecommendViewModel(
                         var updatedCartViewItem = CartViewItem(CartItem(cartItemId, 1, product))
                         updatedCartViewItem = updatedCartViewItem.check()
 
-                        _recommendShareActions.value =
-                            Event(RecommendShareActions.ShareCartViewItems)
                         val newCartViewItems = sharedCartViewItems.toMutableList()
                         newCartViewItems.add(updatedCartViewItem)
                         _recommendShareActions.value =

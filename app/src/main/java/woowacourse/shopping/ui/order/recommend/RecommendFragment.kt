@@ -22,7 +22,6 @@ import woowacourse.shopping.ui.order.recommend.action.RecommendNavigationActions
 import woowacourse.shopping.ui.order.recommend.action.RecommendNotifyingActions
 import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.MinusCartViewItemQuantity
 import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.PlusCartViewItemQuantity
-import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.ShareCartViewItems
 import woowacourse.shopping.ui.order.recommend.action.RecommendShareActions.UpdateNewCartViewItems
 import woowacourse.shopping.ui.order.recommend.adapter.RecommendAdapter
 import woowacourse.shopping.ui.order.recommend.viewmodel.RecommendViewModel
@@ -98,11 +97,6 @@ class RecommendFragment : Fragment() {
         recommendViewModel.recommendShareActions.observe(viewLifecycleOwner) { recommendShareActions ->
             recommendShareActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
-                    is ShareCartViewItems ->
-                        recommendViewModel.updateSharedCartViewItems(
-                            orderViewModel.cartViewItems.value ?: emptyList(),
-                        )
-
                     is UpdateNewCartViewItems -> orderViewModel.updateCartViewItems(action.newCartViewItems)
 
                     is PlusCartViewItemQuantity -> orderViewModel.onQuantityPlusButtonClick(action.productId)

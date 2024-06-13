@@ -16,6 +16,11 @@ import woowacourse.shopping.ui.detail.DetailActivity
 import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
 import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions.NotifyCartItemDeleted
 import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions.NotifyError
+import woowacourse.shopping.ui.order.cart.action.CartShareActions.CheckCartViewItem
+import woowacourse.shopping.ui.order.cart.action.CartShareActions.DeleteCartViewItem
+import woowacourse.shopping.ui.order.cart.action.CartShareActions.MinusCartViewItemQuantity
+import woowacourse.shopping.ui.order.cart.action.CartShareActions.PlusCartViewItemQuantity
+import woowacourse.shopping.ui.order.cart.action.CartShareActions.UpdateNewCartViewItems
 import woowacourse.shopping.ui.order.cart.adapter.CartAdapter
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem
 import woowacourse.shopping.ui.order.cart.viewmodel.CartViewModel
@@ -31,10 +36,7 @@ class CartFragment : Fragment() {
     private lateinit var adapter: CartAdapter
     private val orderViewModel by activityViewModels<OrderViewModel>()
     private val cartViewModel by viewModels<CartViewModel> {
-        CartViewModelFactory(
-            cartRepository = CartRepositoryImpl(remoteCartDataSource),
-            orderViewModel = orderViewModel,
-        )
+        CartViewModelFactory(cartRepository = CartRepositoryImpl(remoteCartDataSource))
     }
 
     override fun onCreateView(
@@ -87,6 +89,26 @@ class CartFragment : Fragment() {
                     )
             }
         }
+
+        cartViewModel.cartShareActions.observe(viewLifecycleOwner) { cartShareActions ->
+            cartShareActions.getContentIfNotHandled()?.let { action ->
+                when (action) {
+                    is UpdateNewCartViewItems -> orderViewModel.updateCartViewItems(action.newCartViewItems)
+
+                    is CheckCartViewItem -> orderViewModel.onCheckBoxClick(action.cartItemId)
+
+                    is DeleteCartViewItem ->
+                        orderViewModel.onDeleteButtonClick(
+                            action.cartItemId,
+                        )
+
+                    is PlusCartViewItemQuantity -> orderViewModel.onQuantityPlusButtonClick(action.productId)
+
+                    is MinusCartViewItemQuantity -> orderViewModel.onQuantityMinusButtonClick(action.productId)
+                }
+            }
+        }
+
         cartViewModel.cartNavigationActions.observe(viewLifecycleOwner) { cartNavigationActions ->
             cartNavigationActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
@@ -102,6 +124,14 @@ class CartFragment : Fragment() {
                     is NotifyError -> showError(getString(R.string.unknown_error))
                 }
             }
+        }
+
+        orderViewModel.cartViewItems.observe(viewLifecycleOwner) { cartViewItems ->
+            cartViewModel.updateSharedCartViewItems(cartViewItems)
+        }
+
+        orderViewModel.cartViewItems.observe(viewLifecycleOwner) { cartViewItems ->
+            cartViewModel.updateIsCartEmpty(cartViewItems.isEmpty())
         }
 
         orderViewModel.allCheckBoxChecked.observe(viewLifecycleOwner) {

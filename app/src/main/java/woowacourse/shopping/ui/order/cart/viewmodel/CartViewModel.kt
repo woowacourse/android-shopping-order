@@ -5,7 +5,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
@@ -14,6 +13,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.event.Event
 import woowacourse.shopping.ui.order.cart.action.CartNavigationActions
 import woowacourse.shopping.ui.order.cart.action.CartNotifyingActions
+import woowacourse.shopping.ui.order.cart.action.CartShareActions
 import woowacourse.shopping.ui.order.cart.adapter.ShoppingCartViewItem.CartViewItem
 import woowacourse.shopping.ui.order.cart.listener.CartClickListener
 import woowacourse.shopping.ui.order.viewmodel.OrderViewModel
@@ -21,18 +21,21 @@ import woowacourse.shopping.ui.state.UiState
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val orderViewModel: OrderViewModel,
 ) : ViewModel(), CartClickListener {
     private val _cartUiState =
         MutableLiveData<UiState<List<CartViewItem>>>(UiState.Loading)
     val cartUiState: LiveData<UiState<List<CartViewItem>>>
         get() = _cartUiState
 
+    private var sharedCartViewItems: List<CartViewItem> = emptyList()
+
+    private val _isCartEmpty = MutableLiveData<Boolean>()
     val isCartEmpty: LiveData<Boolean>
-        get() =
-            orderViewModel.cartViewItems.map { cartViewItemsValue ->
-                cartViewItemsValue.isEmpty()
-            }
+        get() = _isCartEmpty
+
+    private val _cartShareActions = MutableLiveData<Event<CartShareActions>>()
+    val cartShareActions: LiveData<Event<CartShareActions>>
+        get() = _cartShareActions
 
     private val _cartNavigationActions = MutableLiveData<Event<CartNavigationActions>>()
     val cartNavigationActions: LiveData<Event<CartNavigationActions>>
@@ -51,7 +54,7 @@ class CartViewModel(
     fun updateCartUiState() {
         if (cartUiState.value is UiState.Success) {
             _cartUiState.value =
-                UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+                UiState.Success(sharedCartViewItems)
         }
     }
 
@@ -61,18 +64,27 @@ class CartViewModel(
             cartRepository.getCartItems(0, cartTotalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
                 .onSuccess { cartItems ->
                     val cartViewItems = cartItems.map(::CartViewItem)
-                    orderViewModel.updateCartViewItems(cartViewItems)
-                    _cartUiState.value = UiState.Success(cartViewItems)
+                    _cartShareActions.value =
+                        Event(CartShareActions.UpdateNewCartViewItems(cartViewItems))
+                    _cartUiState.value = UiState.Success(sharedCartViewItems)
                 }.onFailure {
                     _cartUiState.value = UiState.Error(it)
                 }
         }
     }
 
-    override fun onCheckBoxClick(cartItemId: Int) {
-        orderViewModel.onCheckBoxClick(cartItemId)
+    fun updateSharedCartViewItems(cartViewItems: List<CartViewItem>) {
+        this.sharedCartViewItems = cartViewItems
+    }
 
-        _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+    fun updateIsCartEmpty(isCartEmpty: Boolean) {
+        _isCartEmpty.value = isCartEmpty
+    }
+
+    override fun onCheckBoxClick(cartItemId: Int) {
+        _cartShareActions.value = Event(CartShareActions.CheckCartViewItem(cartItemId))
+
+        _cartUiState.value = UiState.Success(sharedCartViewItems)
     }
 
     override fun onCartItemClick(productId: Int) {
@@ -80,9 +92,8 @@ class CartViewModel(
     }
 
     override fun onDeleteButtonClick(cartItemId: Int) {
-        orderViewModel.onDeleteButtonClick(cartItemId)
-
-        _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+        _cartShareActions.value = Event(CartShareActions.DeleteCartViewItem(cartItemId))
+        _cartUiState.value = UiState.Success(sharedCartViewItems)
         _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyCartItemDeleted)
     }
 
@@ -90,34 +101,34 @@ class CartViewModel(
         viewModelScope.launch {
             cartRepository.addCartItem(product.productId, 1)
                 .onSuccess { cartItemId ->
-                    val updatedCartItem = CartViewItem(CartItem(cartItemId, 1, product))
-                    val newCartViewItems =
-                        orderViewModel.cartViewItems.value?.plus(updatedCartItem)
-                            ?: return@onSuccess
+                    val updatedCartViewItem = CartViewItem(CartItem(cartItemId, 1, product))
+                    val newCartViewItems = sharedCartViewItems.toMutableList()
+                    newCartViewItems.add(updatedCartViewItem)
 
-                    orderViewModel.updateCartViewItems(newCartViewItems)
-                    _cartUiState.value =
-                        UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+                    _cartShareActions.value =
+                        Event(CartShareActions.UpdateNewCartViewItems(newCartViewItems))
+                    _cartUiState.value = UiState.Success(sharedCartViewItems)
                 }
                 .onFailure { _cartNotifyingActions.value = Event(CartNotifyingActions.NotifyError) }
         }
     }
 
     override fun onQuantityPlusButtonClick(productId: Int) {
-        orderViewModel.onQuantityPlusButtonClick(productId)
+        _cartShareActions.value = Event(CartShareActions.PlusCartViewItemQuantity(productId))
 
-        _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+        _cartUiState.value = UiState.Success(sharedCartViewItems)
     }
 
     override fun onQuantityMinusButtonClick(productId: Int) {
         val updatedCartItem =
-            orderViewModel.cartViewItems.value?.firstOrNull { cartViewItem ->
+            sharedCartViewItems.firstOrNull { cartViewItem ->
                 cartViewItem.cartItem.product.productId == productId
             } ?: return
-        if (updatedCartItem.cartItem.quantity > 1) {
-            orderViewModel.onQuantityMinusButtonClick(productId)
 
-            _cartUiState.value = UiState.Success(orderViewModel.cartViewItems.value ?: emptyList())
+        if (updatedCartItem.cartItem.quantity > 1) {
+            _cartShareActions.value =
+                Event(CartShareActions.MinusCartViewItemQuantity(productId))
         }
+        _cartUiState.value = UiState.Success(sharedCartViewItems)
     }
 }

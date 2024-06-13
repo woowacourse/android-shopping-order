@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.order.cart.action
 
-sealed class CartNotifyingActions {
-    data object NotifyCartItemDeleted : CartNotifyingActions()
+sealed interface CartNotifyingActions {
+    data object NotifyCartItemDeleted : CartNotifyingActions
 
-    data object NotifyError : CartNotifyingActions()
+    data object NotifyError : CartNotifyingActions
 }
