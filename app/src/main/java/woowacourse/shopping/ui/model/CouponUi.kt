@@ -50,3 +50,5 @@ fun Coupon.toUi(): CouponUi =
                 minimumAmount = null,
             )
     }
+
+fun List<Coupon>.toUi(): List<CouponUi> = this.map(Coupon::toUi)
