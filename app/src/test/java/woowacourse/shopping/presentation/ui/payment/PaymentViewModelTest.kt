@@ -2,23 +2,19 @@ package woowacourse.shopping.presentation.ui.payment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.impl.annotations.OverrideMockKs
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.bogoCoupon
 import woowacourse.shopping.cartProduct
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -27,8 +23,6 @@ import woowacourse.shopping.freeShippingCoupon
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.miracleSale
 import woowacourse.shopping.presentation.CoroutinesTestExtension
-import woowacourse.shopping.presentation.common.ErrorType
-import woowacourse.shopping.presentation.common.EventState
 import woowacourse.shopping.presentation.common.UpdateUiModel
 import woowacourse.shopping.presentation.ui.payment.model.PaymentNavigation
 import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
@@ -56,11 +50,13 @@ class PaymentViewModelTest {
     @Test
     fun `같은 상품을 세개 이상 구입하면 Bogo 쿠폰을 사용할 수 있다`() =
         runTest {
-            _uiState.value = PaymentUiState().copy(
-                cartProducts = listOf(
-                    cartProduct.copy(quantity = 3)
+            _uiState.value =
+                PaymentUiState().copy(
+                    cartProducts =
+                        listOf(
+                            cartProduct.copy(quantity = 3),
+                        ),
                 )
-            )
             coEvery { couponRepository.getAll() } returns Result.success(listOf(bogoCoupon))
             viewModel.loadCoupons()
 
@@ -72,15 +68,16 @@ class PaymentViewModelTest {
             }
         }
 
-
     @Test
     fun `10만원 이상 구입하면 5천원 할인 쿠폰을 사용할 수 있다`() =
         runTest {
-            _uiState.value = PaymentUiState().copy(
-                cartProducts = listOf(
-                    cartProduct.copy(price = 100000)
+            _uiState.value =
+                PaymentUiState().copy(
+                    cartProducts =
+                        listOf(
+                            cartProduct.copy(price = 100000),
+                        ),
                 )
-            )
             coEvery { couponRepository.getAll() } returns Result.success(listOf(fixedCoupon))
             viewModel.loadCoupons()
 
@@ -95,11 +92,13 @@ class PaymentViewModelTest {
     @Test
     fun `5만원 이상 구입하면 무료배송 쿠폰을 사용할 수 있다`() =
         runTest {
-            _uiState.value = PaymentUiState().copy(
-                cartProducts = listOf(
-                    cartProduct.copy(price =  50000)
+            _uiState.value =
+                PaymentUiState().copy(
+                    cartProducts =
+                        listOf(
+                            cartProduct.copy(price = 50000),
+                        ),
                 )
-            )
 
             coEvery { couponRepository.getAll() } returns Result.success(listOf(freeShippingCoupon))
             viewModel.loadCoupons()
@@ -112,15 +111,16 @@ class PaymentViewModelTest {
             }
         }
 
-
     @Test
     fun `정해진 시간에 구입하면 미라클 쿠폰을 사용할 수 있다`() =
         runTest {
-            _uiState.value = PaymentUiState().copy(
-                cartProducts = listOf(
-                    cartProduct.copy(price =  50000)
+            _uiState.value =
+                PaymentUiState().copy(
+                    cartProducts =
+                        listOf(
+                            cartProduct.copy(price = 50000),
+                        ),
                 )
-            )
 
             coEvery { couponRepository.getAll() } returns Result.success(listOf(miracleSale))
             viewModel.loadCoupons()
@@ -133,24 +133,26 @@ class PaymentViewModelTest {
             }
         }
 
-
     @Test
-    fun `장바구니에 담은 상품을 주문에 성공하면 화면 이동 이벤트가 전달된다`() = runTest {
-        _uiState.value = PaymentUiState().copy(
-            cartProducts = listOf(
-                cartProduct
-            )
-        )
-        coEvery {
-            orderRepository.post(any())
-        } returns Result.success(Unit)
+    fun `장바구니에 담은 상품을 주문에 성공하면 화면 이동 이벤트가 전달된다`() =
+        runTest {
+            _uiState.value =
+                PaymentUiState().copy(
+                    cartProducts =
+                        listOf(
+                            cartProduct,
+                        ),
+                )
+            coEvery {
+                orderRepository.post(any())
+            } returns Result.success(Unit)
 
-        viewModel.pay()
+            viewModel.pay()
 
-        val state = viewModel.navigateHandler.getOrAwaitValue().getContentIfNotHandled()
+            val state = viewModel.navigateHandler.getOrAwaitValue().getContentIfNotHandled()
 
-        assertSoftly {
-            state shouldBe PaymentNavigation.ToShopping(updateUiModel)
+            assertSoftly {
+                state shouldBe PaymentNavigation.ToShopping(updateUiModel)
+            }
         }
-    }
 }

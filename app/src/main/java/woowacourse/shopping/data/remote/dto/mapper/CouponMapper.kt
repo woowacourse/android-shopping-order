@@ -15,9 +15,35 @@ import woowacourse.shopping.domain.coupon.Unknown
 
 fun CouponResponse.toDomain(): Coupon {
     return when (CouponType.fromCode(code)) {
-        CouponType.FIXED5000 -> Fixed(id, code, description, discountType, expirationDate, discount ?: DEFAULT_DISCOUNT, minimumAmount ?: DEFAULT_MINIMUM_AMOUNT)
-        CouponType.BOGO -> Bogo(id, code, description, expirationDate, buyQuantity ?: DEFAULT_BUY_QUANTITY, getQuantity ?: DEFAULT_GET_QUANTITY, discountType)
-        CouponType.FREESHIPPING -> FreeShipping(id, code, description, expirationDate, minimumAmount ?: DEFAULT_MINIMUM_AMOUNT, discountType)
+        CouponType.FIXED5000 ->
+            Fixed(
+                id,
+                code,
+                description,
+                discountType,
+                expirationDate,
+                discount ?: DEFAULT_DISCOUNT,
+                minimumAmount ?: DEFAULT_MINIMUM_AMOUNT,
+            )
+        CouponType.BOGO ->
+            Bogo(
+                id,
+                code,
+                description,
+                expirationDate,
+                buyQuantity ?: DEFAULT_BUY_QUANTITY,
+                getQuantity ?: DEFAULT_GET_QUANTITY,
+                discountType,
+            )
+        CouponType.FREESHIPPING ->
+            FreeShipping(
+                id,
+                code,
+                description,
+                expirationDate,
+                minimumAmount ?: DEFAULT_MINIMUM_AMOUNT,
+                discountType,
+            )
         CouponType.MIRACLESALE ->
             MiracleSale(
                 id,
@@ -49,6 +75,7 @@ enum class CouponType(val code: String) {
         const val DEFAULT_BUY_QUANTITY = 0
         const val DEFAULT_GET_QUANTITY = 0
         const val DEFAULT_TIME = "2024-06-13"
+
         fun fromCode(code: String): CouponType {
             return entries.find { couponType -> couponType.code == code } ?: UNKNOWN
         }

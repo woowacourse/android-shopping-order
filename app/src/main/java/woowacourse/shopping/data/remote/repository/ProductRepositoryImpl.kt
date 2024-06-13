@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.remote.repository
 
-import woowacourse.shopping.data.remote.datasource.product.RetrofitProductDataSource
 import woowacourse.shopping.data.remote.datasource.product.ProductDataSource
+import woowacourse.shopping.data.remote.datasource.product.RetrofitProductDataSource
 import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.paging.LoadResult
 import woowacourse.shopping.data.remote.paging.ProductPagingSource

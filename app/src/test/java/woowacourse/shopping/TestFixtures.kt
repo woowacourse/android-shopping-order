@@ -52,7 +52,7 @@ val freeShippingCoupon =
         "5만원 이상 구매 시 무료 배송 쿠폰",
         expirationDate = "5000-05-30",
         minimumAmount = 50000,
-        discountType = "freeShipping"
+        discountType = "freeShipping",
     )
 
 val miracleSale =
@@ -64,8 +64,7 @@ val miracleSale =
         discount = 3000,
         availableTimeStart = "00:00:00",
         availableTimeEnd = "23:59:59",
-        discountType = "percentage"
+        discountType = "percentage",
     )
 
 val fixedAndBogo = listOf(fixedCoupon, bogoCoupon)
-

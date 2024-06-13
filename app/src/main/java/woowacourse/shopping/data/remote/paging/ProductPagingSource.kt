@@ -15,18 +15,19 @@ class ProductPagingSource(
             it.body
         }.fold(
             onSuccess = {
-                return if(it == null)
+                return if (it == null) {
                     LoadResult.Error(LoadErrorType.EMPTY_BODY)
-                else
+                } else {
                     LoadResult.Page(
                         offset = it.number,
                         data = it.content.map { it.toDomain() },
                         last = it.last,
                     )
+                }
             },
             onFailure = {
                 return LoadResult.Error(LoadErrorType.UNKNOWN)
-            }
+            },
         )
     }
 }

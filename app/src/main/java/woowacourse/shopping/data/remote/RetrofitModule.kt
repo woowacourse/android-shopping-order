@@ -6,7 +6,6 @@ import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import java.io.IOException
@@ -30,7 +29,7 @@ object RetrofitModule {
     private val defaultExceptionInterceptor =
         Interceptor { chain ->
             val response = chain.proceed(chain.request())
-            if(!response.isSuccessful) {
+            if (!response.isSuccessful) {
                 when (response.code) {
                     400 -> throw IllegalArgumentException("Bad Request (400)")
                     401 -> throw SecurityException("Unauthorized (401)")
@@ -42,8 +41,6 @@ object RetrofitModule {
             }
             response
         }
-
-
 
     private val defaultOkHttpClient =
         OkHttpClient.Builder()

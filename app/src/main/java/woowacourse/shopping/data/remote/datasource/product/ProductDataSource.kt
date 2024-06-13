@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.datasource.product
 
-import retrofit2.Response
 import woowacourse.shopping.data.remote.dto.Message
 import woowacourse.shopping.data.remote.dto.request.ProductRequest
 import woowacourse.shopping.data.remote.dto.response.ProductResponse

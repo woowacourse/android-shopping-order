@@ -7,7 +7,6 @@ import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.repository.CartItemRepository
-import woowacourse.shopping.utils.toIdOrNull
 
 class CartItemRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource = RetrofitCartItemDataSource(),
@@ -17,7 +16,9 @@ class CartItemRepositoryImpl(
         size: Int,
     ): Result<List<CartProduct>> {
         return cartItemDataSource.getAllByPaging(page, size).mapCatching { it ->
-            it.body?.content?.map { it.toDomain() } ?: emptyList()
+            it.body?.content
+                ?.map { it.toDomain() }
+                ?: emptyList()
         }
     }
 
