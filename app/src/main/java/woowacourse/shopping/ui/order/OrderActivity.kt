@@ -12,7 +12,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication.Companion.remoteCartDataSource
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.ui.home.HomeActivity
 import woowacourse.shopping.ui.order.action.OrderNavigationActions
 import woowacourse.shopping.ui.order.action.OrderNotifyingActions
 import woowacourse.shopping.ui.order.cart.CartFragment
@@ -52,7 +51,6 @@ class OrderActivity : AppCompatActivity() {
                 when (action) {
                     is OrderNavigationActions.NavigateToBack -> {
                         finish()
-                        navigateToHome()
                     }
 
                     is OrderNavigationActions.NavigateToRecommend -> addFragment(recommendFragment)
@@ -87,10 +85,6 @@ class OrderActivity : AppCompatActivity() {
 
     private fun showError(errorMessage: String) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun navigateToHome() {
-        startActivity(HomeActivity.createIntent(this))
     }
 
     private fun navigateToPayment(cartItemIds: List<Int>) {

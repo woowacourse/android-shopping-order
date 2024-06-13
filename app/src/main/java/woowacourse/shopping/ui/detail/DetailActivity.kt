@@ -66,7 +66,6 @@ class DetailActivity : AppCompatActivity() {
                     showError(
                         state.exception.message ?: getString(R.string.unknown_error),
                     )
-
                 else -> return@observe
             }
         }

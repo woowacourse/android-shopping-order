@@ -99,9 +99,7 @@ class RecommendFragment : Fragment() {
             recommendShareActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is UpdateNewCartViewItems -> orderViewModel.updateCartViewItems(action.newCartViewItems)
-
                     is PlusCartViewItemQuantity -> orderViewModel.onQuantityPlusButtonClick(action.productId)
-
                     is MinusCartViewItemQuantity -> orderViewModel.onQuantityMinusButtonClick(action.productId)
                 }
             }

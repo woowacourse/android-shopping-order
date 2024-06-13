@@ -95,16 +95,12 @@ class CartFragment : Fragment() {
             cartShareActions.getContentIfNotHandled()?.let { action ->
                 when (action) {
                     is UpdateNewCartViewItems -> orderViewModel.updateCartViewItems(action.newCartViewItems)
-
                     is CheckCartViewItem -> orderViewModel.onCheckBoxClick(action.cartItemId)
-
                     is DeleteCartViewItem ->
                         orderViewModel.onDeleteButtonClick(
                             action.cartItemId,
                         )
-
                     is PlusCartViewItemQuantity -> orderViewModel.onQuantityPlusButtonClick(action.productId)
-
                     is MinusCartViewItemQuantity -> orderViewModel.onQuantityMinusButtonClick(action.productId)
                 }
             }
