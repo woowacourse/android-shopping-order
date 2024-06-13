@@ -57,10 +57,6 @@ class CartAdapter(
         }
     }
 
-    fun submitCartViewItems(cartItems: List<ShoppingCartViewItem>) {
-        super.submitList(cartItems)
-    }
-
     companion object {
         val diffUtil =
             object : DiffUtil.ItemCallback<ShoppingCartViewItem>() {

@@ -61,7 +61,7 @@ class CartFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        cartViewModel.loadCartViewItems()
+        cartViewModel.updateCartViewItems()
     }
 
     override fun onDestroyView() {
@@ -100,6 +100,7 @@ class CartFragment : Fragment() {
                         orderViewModel.onDeleteButtonClick(
                             action.cartItemId,
                         )
+
                     is PlusCartViewItemQuantity -> orderViewModel.onQuantityPlusButtonClick(action.productId)
                     is MinusCartViewItemQuantity -> orderViewModel.onQuantityMinusButtonClick(action.productId)
                 }
@@ -137,7 +138,7 @@ class CartFragment : Fragment() {
     }
 
     private fun showData(cartViewItems: List<ShoppingCartViewItem>) {
-        adapter.submitCartViewItems(cartViewItems)
+        adapter.submitList(cartViewItems)
     }
 
     private fun showError(errorMessage: String) {

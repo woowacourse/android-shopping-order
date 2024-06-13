@@ -104,11 +104,10 @@ class RecommendViewModel(
         this.sharedCartViewItems = cartViewItems
     }
 
-    private fun generateRecommendProductViewItems() {
+    fun generateRecommendProductViewItems() {
         viewModelScope.launch {
             val mostRecentProductCategory =
                 recentProductRepository.findMostRecentProduct().getOrNull()?.category
-                    ?: return@launch
             productRepository.getProducts(
                 mostRecentProductCategory,
                 0,
@@ -116,8 +115,7 @@ class RecommendViewModel(
                 HomeViewModel.ASCENDING_SORT_ORDER,
             ).onSuccess {
                 val selectedProducts =
-                    sharedCartViewItems.filter { cartViewItem -> cartViewItem.isChecked }
-                        .map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
+                    sharedCartViewItems.map { selectedCartViewItem -> selectedCartViewItem.cartItem.product }
 
                 var sameCategoryProducts = it.products
                 sameCategoryProducts =

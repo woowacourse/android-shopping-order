@@ -58,18 +58,62 @@ class CartViewModel(
         }
     }
 
-    fun loadCartViewItems() {
+    private fun loadCartViewItems() {
         viewModelScope.launch {
             val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
             cartRepository.getCartItems(0, cartTotalQuantity, OrderViewModel.DESCENDING_SORT_ORDER)
                 .onSuccess { cartItems ->
-                    val cartViewItems = cartItems.map(::CartViewItem)
+                    val cartViewItems =
+                        cartItems.map { cartItem ->
+                            CartViewItem(cartItem).check()
+                        }
                     _cartShareActions.value =
                         Event(CartShareActions.UpdateNewCartViewItems(cartViewItems))
                     _cartUiState.value = UiState.Success(sharedCartViewItems)
                 }.onFailure {
                     _cartUiState.value = UiState.Error(it)
                 }
+        }
+    }
+
+    fun updateCartViewItems() {
+        if (cartUiState.value is UiState.Success) {
+            viewModelScope.launch {
+                val cartTotalQuantity = cartRepository.getCartTotalQuantity().getOrNull() ?: 0
+                cartRepository.getCartItems(
+                    0,
+                    cartTotalQuantity,
+                    OrderViewModel.DESCENDING_SORT_ORDER,
+                )
+                    .onSuccess { cartItems ->
+                        val loadedCartItems = sharedCartViewItems.map { it.cartItem }
+
+                        val updatedCartViewItems =
+                            cartItems.filter { cartItem ->
+                                !loadedCartItems.contains(cartItem)
+                            }
+
+                        val newCartViewItems = sharedCartViewItems.toMutableList()
+                        updatedCartViewItems.forEach { updatedCartViewItem ->
+                            val updatePosition =
+                                newCartViewItems.indexOfFirst { cartViewItem ->
+                                    cartViewItem.cartItem.cartItemId == updatedCartViewItem.cartItemId
+                                }
+
+                            if (updatePosition != -1) {
+                                newCartViewItems[updatePosition] = CartViewItem(updatedCartViewItem)
+                            } else {
+                                newCartViewItems.add(CartViewItem(updatedCartViewItem))
+                            }
+                        }
+
+                        _cartShareActions.value =
+                            Event(CartShareActions.UpdateNewCartViewItems(newCartViewItems))
+                        _cartUiState.value = UiState.Success(sharedCartViewItems)
+                    }.onFailure {
+                        _cartUiState.value = UiState.Error(it)
+                    }
+            }
         }
     }
 

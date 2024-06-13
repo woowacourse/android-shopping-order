@@ -22,8 +22,6 @@ import woowacourse.shopping.ui.payment.PaymentActivity
 
 class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
-    private val cartFragment by lazy { CartFragment.newInstance() }
-    private val recommendFragment by lazy { RecommendFragment.newInstance() }
     private val orderViewModel: OrderViewModel by viewModels {
         OrderViewModelFactory(cartRepository = CartRepositoryImpl(remoteCartDataSource))
     }
@@ -34,9 +32,8 @@ class OrderActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpDataBinding()
         observeViewModel()
-
-        if (savedInstanceState == null) {
-            addFragment(cartFragment)
+        if (savedInstanceState != null) {
+            replaceFragment(CartFragment.newInstance())
         }
     }
 
@@ -51,16 +48,15 @@ class OrderActivity : AppCompatActivity() {
                 when (action) {
                     is OrderNavigationActions.NavigateToBack -> {
                         if (orderViewModel.currentFragmentName.value == RecommendFragment::class.java.simpleName) {
-                            replaceFragment(cartFragment)
+                            supportFragmentManager.popBackStack()
                         } else {
                             finish()
                         }
                     }
 
-                    is OrderNavigationActions.NavigateToRecommend ->
-                        replaceFragment(
-                            recommendFragment,
-                        )
+                    is OrderNavigationActions.NavigateToRecommend -> replaceFragment(
+                        RecommendFragment.newInstance()
+                    )
 
                     is OrderNavigationActions.NavigateToPayment -> {
                         val cartItemIds =
@@ -83,19 +79,11 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-    private fun addFragment(fragment: Fragment) {
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            add(R.id.fragment_cart, fragment)
-            addToBackStack(fragment.tag)
-        }
-    }
-
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             replace(R.id.fragment_cart, fragment)
-            addToBackStack(fragment.tag)
+            addToBackStack(null)
         }
     }
 
