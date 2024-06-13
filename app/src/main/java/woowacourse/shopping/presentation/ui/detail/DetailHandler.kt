@@ -3,9 +3,9 @@ package woowacourse.shopping.presentation.ui.detail
 import woowacourse.shopping.presentation.ui.QuantityHandler
 
 interface DetailHandler : QuantityHandler {
-    fun onAddCartClick()
+    fun addProductToCart()
 
-    fun onLastProductClick(productId: Long)
+    fun navigateToDetailWithRecentViewed(productId: Long)
 
-    fun onCloseClick()
+    fun navigateToBack()
 }

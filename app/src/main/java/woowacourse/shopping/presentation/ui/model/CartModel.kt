@@ -1,7 +1,5 @@
 package woowacourse.shopping.presentation.ui.model
 
-import woowacourse.shopping.domain.Cart
-
 data class CartModel(
     val cartId: Long,
     val productId: Long,
@@ -10,10 +8,9 @@ data class CartModel(
     val price: Long,
     val quantity: Int,
     val isChecked: Boolean,
-) {
-    val calculatedPrice: Int
-        get() = (price * quantity).toInt()
-}
+    val calculatedPrice: Int,
+)
 
-fun Cart.toUiModel(isChecked: Boolean = false) =
-    CartModel(cartId, product.id, product.name, product.imgUrl, product.price, quantity, isChecked)
+fun CartModel.updateQuantity(updatedQuantity: Int): CartModel {
+    return this.copy(quantity = updatedQuantity, calculatedPrice = (this.price * updatedQuantity).toInt())
+}

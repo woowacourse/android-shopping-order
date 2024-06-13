@@ -3,11 +3,11 @@ package woowacourse.shopping.presentation.ui.shopping
 import woowacourse.shopping.presentation.ui.QuantityHandler
 
 interface ShoppingHandler : QuantityHandler {
-    fun onProductItemClick(productId: Long)
+    fun navigateToDetail(productId: Long)
 
-    fun onLoadMoreClick()
+    fun onLoadMoreProducts()
 
-    fun onCartMenuItemClick()
+    fun navigateToCart()
 
-    fun onPlusButtonClick(productId: Long)
+    fun addProductToCart(productId: Long)
 }

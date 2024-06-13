@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@color/teal_200"
-            android:onClick="@{()->cartHandler.onOrderClicked()}"
+            android:onClick="@{()->cartHandler.handleOrderState()}"
             android:paddingHorizontal="16dp"
             android:paddingVertical="28dp"
             android:text="@{@string/order_text(viewModel.totalCount)}"

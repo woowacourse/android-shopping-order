@@ -1,36 +1,24 @@
 package woowacourse.shopping.presentation.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
-import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
-import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
-import woowacourse.shopping.data.local.AppDatabase
-import woowacourse.shopping.data.order.OrderRepositoryImpl
-import woowacourse.shopping.data.order.RemoteOrderDataSource
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.mapper.toUiModel
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentRepository
+import woowacourse.shopping.domain.repository.RecommendRepository
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.model.CartModel
 import woowacourse.shopping.presentation.ui.model.ProductModel
-import woowacourse.shopping.presentation.ui.model.toUiModel
+import woowacourse.shopping.presentation.ui.model.updateQuantity
 import woowacourse.shopping.presentation.util.Event
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
-    private val recentRepository: RecentRepository,
-    private val orderRepository: OrderRepository,
+    private val recommendRepository: RecommendRepository,
     initialTotalCartItemCount: Int,
 ) : ViewModel(), CartHandler {
     private val _error = MutableLiveData<Event<CartError>>()
@@ -79,48 +67,46 @@ class CartViewModel(
     }
 
     private fun loadAllCartItems(pageSize: Int) {
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            cartRepository.load(0, pageSize) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        val loadedCarts = result.data.map { it.toUiModel() }
-                        val currentCartItems = cartItemsData.associateBy { it.cartId }
-                        val newCartItems =
-                            loadedCarts.map { cartModel ->
-                                val find = currentCartItems[cartModel.cartId]
-                                if (find == null) {
-                                    cartModel.copy(isChecked = true)
-                                } else {
-                                    cartModel.copy(isChecked = find.isChecked)
-                                }
-                            }
-                        _cartItems.value = UiState.Success(newCartItems)
-                    }
-                    is NetworkResult.Error -> {
-                        _error.value = Event(CartError.CartItemsNotFound)
-                    }
+        viewModelScope.launch {
+            cartRepository.load(0, pageSize)
+                .map { carts -> carts.map { it.toUiModel() } }
+                .onSuccess { loadedCarts ->
+                    val newCartItems = processLoadedCarts(loadedCarts)
+                    _cartItems.value = UiState.Success(newCartItems)
                 }
-            }
-        }, 500)
+                .onFailure {
+                    _error.value = Event(CartError.CartItemsNotFound)
+                }
+        }
     }
 
-    override fun onDeleteClick(cartId: Long) {
-        cartRepository.deleteCartItem(cartId) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val deletedItem = cartItemsData.find { it.cartId == cartId } ?: return@deleteCartItem
-                    _changedCartProducts[deletedItem.productId] = 0
-                    updateDeletedCartItem(cartId)
-                }
-                is NetworkResult.Error -> {
-                    _error.value = Event(CartError.CartItemNotDeleted)
-                }
+    private fun processLoadedCarts(loadedCarts: List<CartModel>): List<CartModel> {
+        val currentCartItems = cartItemsData.associateBy { it.cartId }
+        return loadedCarts.map { cartModel ->
+            val find = currentCartItems[cartModel.cartId]
+            if (find == null) {
+                cartModel.copy(isChecked = INITIAL_CHECK_VALUE)
+            } else {
+                cartModel.copy(isChecked = find.isChecked)
             }
         }
     }
 
-    override fun onCheckBoxClicked(cartId: Long) {
+    override fun deleteCartItem(cartId: Long) {
+        viewModelScope.launch {
+            cartRepository.deleteCartItem(cartId)
+                .onSuccess {
+                    val deletedItem = cartItemsData.find { it.cartId == cartId } ?: return@launch
+                    _changedCartProducts[deletedItem.productId] = 0
+                    updateDeletedCartItem(cartId)
+                }
+                .onFailure {
+                    _error.value = Event(CartError.CartItemNotDeleted)
+                }
+        }
+    }
+
+    override fun selectCartItem(cartId: Long) {
         val checkedCartItems =
             cartItemsData.map { cartItem ->
                 if (cartItem.cartId == cartId) {
@@ -132,12 +118,12 @@ class CartViewModel(
         _cartItems.value = UiState.Success(checkedCartItems)
     }
 
-    override fun onTotalCheckBoxClicked(isChecked: Boolean) {
+    override fun selectAllCartItems(isChecked: Boolean) {
         val updatedItems = cartItemsData.map { it.copy(isChecked = isChecked) }
         _cartItems.value = UiState.Success(updatedItems)
     }
 
-    override fun onOrderClicked() {
+    override fun handleOrderState() {
         when (orderState.value ?: return) {
             OrderState.CartList -> {
                 if (totalCount.value == 0) return
@@ -146,62 +132,55 @@ class CartViewModel(
 
             OrderState.Recommend -> {
                 val cartItemIds = selectedCartItems.value?.map { it.cartId } ?: emptyList()
-                if (cartItemIds.isNotEmpty()) {
-                    orderRepository.completeOrder(cartItemIds) { result ->
-                        when (result) {
-                            is NetworkResult.Success -> {
-                                selectedCartItems.value?.forEach { cartModel -> _changedCartProducts[cartModel.productId] = 0 }
-                                _orderEvent.value = Event(OrderEvent.CompleteOrder)
-                            }
-                            is NetworkResult.Error -> {
-                            }
-                        }
-                    }
-                }
+                val totalPrice = totalPrice.value ?: 0
+                if (cartItemIds.isEmpty()) return
+                _orderEvent.value = Event(OrderEvent.MoveToPayment(cartItemIds, totalPrice))
             }
         }
     }
 
-    override fun onDecreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Long) {
         val selectedItem = cartItemsData.find { it.productId == productId } ?: return
         val updatedQuantity = selectedItem.quantity - 1
         if (orderState.value is OrderState.CartList && updatedQuantity < 1) return
         val selectedCartId = selectedItem.cartId
 
-        cartRepository.updateCartItemQuantity(selectedCartId, updatedQuantity) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
+        viewModelScope.launch {
+            cartRepository.updateCartItemQuantity(selectedCartId, updatedQuantity)
+                .onSuccess {
                     if (updatedQuantity == 0) {
                         updateDeletedCartItem(selectedCartId)
                     } else {
-                        updateCartItems(selectedCartId, updatedCartItem = selectedItem.copy(quantity = updatedQuantity))
+                        updateCartItems(
+                            selectedCartId,
+                            updatedCartItem = selectedItem.updateQuantity(updatedQuantity),
+                        )
                     }
                     _changedCartProducts[productId] = updatedQuantity
                     updateRecommendedProducts(productId, updatedQuantity)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(CartError.CartItemsNotModified)
                 }
-            }
         }
     }
 
-    override fun onIncreaseQuantity(productId: Long) {
+    override fun increaseQuantity(productId: Long) {
         val selectedItem = cartItemsData.find { it.productId == productId } ?: return
         val updatedQuantity = selectedItem.quantity + 1
         val selectedCartId = selectedItem.cartId
 
-        cartRepository.updateCartItemQuantity(selectedCartId, updatedQuantity) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    updateCartItems(selectedCartId, updatedCartItem = selectedItem.copy(quantity = updatedQuantity))
+        viewModelScope.launch {
+            cartRepository.updateCartItemQuantity(selectedCartId, updatedQuantity)
+                .onSuccess {
+                    updateCartItems(
+                        selectedCartId,
+                        updatedCartItem = selectedItem.updateQuantity(updatedQuantity),
+                    )
                     _changedCartProducts[productId] = updatedQuantity
                     updateRecommendedProducts(productId, updatedQuantity)
                 }
-                is NetworkResult.Error -> {
-                    _error.value = Event(CartError.CartItemsNotModified)
-                }
-            }
+                .onFailure { _error.value = Event(CartError.CartItemsNotModified) }
         }
     }
 
@@ -238,37 +217,29 @@ class CartViewModel(
             }
     }
 
-    fun buildRecommendProducts() {
-        recentRepository.loadMostRecent().onSuccess { product ->
-            val recentViewedCategory = product?.category ?: return
-            productRepository.loadWithCategory(recentViewedCategory, 0, 20) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        val recommendedProducts = result.data
-                        val existingCartItem = cartItemsData.groupBy { it.productId }
-                        _recommendedProduct.value =
-                            recommendedProducts.asSequence().filter { existingCartItem[it.id] == null }
-                                .map { it.toUiModel() }.associateBy { it.id }
-                    }
-                    is NetworkResult.Error -> {}
+    fun loadRecommendProducts() {
+        viewModelScope.launch {
+            val existingProductIds = cartItemsData.map { it.productId }
+            recommendRepository.generateRecommendProducts(existingProductIds)
+                .map { recommend -> recommend.map { it.toUiModel() } }
+                .onSuccess { recommendModel ->
+                    _recommendedProduct.value = recommendModel.associateBy { it.id }
                 }
-            }
+                .onFailure {
+                    _error.value = Event(CartError.RecommendItemsNotFound)
+                }
         }
     }
 
-    override fun onPlusButtonClick(productId: Long) {
-        val initialCount = 1
-        cartRepository.saveNewCartItem(productId, initialCount) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    updateRecommendedProducts(productId, initialCount)
-                    loadAllCartItems(cartItemsData.sumOf { it.quantity } + initialCount)
-                    _changedCartProducts[productId] = initialCount
+    override fun addProductToCart(productId: Long) {
+        viewModelScope.launch {
+            cartRepository.saveNewCartItem(productId, INITIAL_COUNT)
+                .onSuccess {
+                    updateRecommendedProducts(productId, INITIAL_COUNT)
+                    loadAllCartItems(cartItemsData.sumOf { it.quantity } + INITIAL_COUNT)
+                    _changedCartProducts[productId] = INITIAL_COUNT
                 }
-                is NetworkResult.Error -> {
-                    _error.value = Event(CartError.CartItemsNotModified)
-                }
-            }
+                .onFailure { _error.value = Event(CartError.CartItemsNotModified) }
         }
     }
 
@@ -277,19 +248,18 @@ class CartViewModel(
     }
 
     companion object {
-        class Factory(private val initialTotalCartItemCount: Int) : ViewModelProvider.Factory {
+        const val INITIAL_CHECK_VALUE = true
+        const val INITIAL_COUNT = 1
+
+        class Factory(
+            private val cartRepository: CartRepository,
+            private val recommendRepository: RecommendRepository,
+            private val initialTotalCartItemCount: Int,
+        ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 return CartViewModel(
-                    cartRepository =
-                        CartRepositoryImpl(
-                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
-                            remoteCartDataSource = RemoteCartDataSource(),
-                        ),
-                    productRepository = ProductRepositoryImpl(),
-                    recentRepository = RecentProductRepositoryImpl(recentDao),
-                    orderRepository = OrderRepositoryImpl(RemoteOrderDataSource()),
+                    cartRepository,
+                    recommendRepository,
                     initialTotalCartItemCount,
                 ) as T
             }

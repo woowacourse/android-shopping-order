@@ -24,9 +24,9 @@ android {
 
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
-        buildConfigField("String", "base_url", properties.getProperty("base.url"))
-        buildConfigField("String", "authorization_username", properties.getProperty("authorization.username"))
-        buildConfigField("String", "authorization_password", properties.getProperty("authorization.password"))
+        buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL"))
+        buildConfigField("String", "USERNAME", properties.getProperty("USERNAME"))
+        buildConfigField("String", "PASSWORD", properties.getProperty("PASSWORD"))
     }
 
     buildTypes {
@@ -67,7 +67,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.databinding:databinding-runtime:8.4.0")
     implementation("androidx.activity:activity:1.8.0")
-    implementation("androidx.test.espresso:espresso-contrib:3.5.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
@@ -89,4 +88,6 @@ dependencies {
     androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.3.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("androidx.room:room-ktx:2.6.1")
 }

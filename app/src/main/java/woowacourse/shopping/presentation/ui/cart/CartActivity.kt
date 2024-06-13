@@ -7,21 +7,35 @@ import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.RecommendRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.cart.cartList.CartListFragment
 import woowacourse.shopping.presentation.ui.cart.recommend.RecommendFragment
 import woowacourse.shopping.presentation.ui.model.UpdatedProductData
+import woowacourse.shopping.presentation.ui.order.OrderActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class CartActivity : BindingActivity<ActivityCartBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_cart
 
     private val viewModel: CartViewModel by viewModels {
+        val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
+        val recommendRepository =
+            RecommendRepositoryImpl(
+                LocalRecentViewedDataSourceImpl(AppDatabase.instanceOrNull.recentProductDao()),
+                RemoteProductDataSourceImpl(),
+            )
         val initialItemQuantity = intent.getIntExtra(EXTRA_CART_ITEM_QUANTITY, 0)
-        CartViewModel.Companion.Factory(initialItemQuantity)
+
+        CartViewModel.Companion.Factory(cartRepository, recommendRepository, initialItemQuantity)
     }
 
     override fun initStartView(savedInstanceState: Bundle?) {
@@ -48,11 +62,8 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             this,
             EventObserver {
                 when (it) {
-                    OrderEvent.CompleteOrder -> {
-                        showToast("상품이 성공적으로 주문되었습니다!")
-                        val updatedProducts = generateUpdateProducts()
-                        ShoppingActivity.startWithNewProductQuantities(this, updatedProducts)
-                        finish()
+                    is OrderEvent.MoveToPayment -> {
+                        OrderActivity.start(this, it.selectedCartIds, it.totalPrice)
                     }
 
                     OrderEvent.MoveToRecommend -> {
@@ -85,7 +96,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
         viewModel.error.observe(
             this,
             EventObserver {
-                showToast(it.message)
+                showToast(it.messageResId)
             },
         )
     }

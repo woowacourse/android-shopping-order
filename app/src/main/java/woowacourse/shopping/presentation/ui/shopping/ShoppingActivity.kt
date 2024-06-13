@@ -9,7 +9,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityShoppingBinding
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.cart.CartActivity
@@ -19,12 +24,22 @@ import woowacourse.shopping.presentation.ui.model.UpdatedProductData
 import woowacourse.shopping.presentation.ui.shopping.adapter.ProductListAdapter
 import woowacourse.shopping.presentation.ui.shopping.adapter.ShoppingViewType
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_shopping
 
-    private val viewModel: ShoppingViewModel by viewModels { ShoppingViewModel.Companion.Factory() }
+    private val viewModel: ShoppingViewModel by viewModels {
+        val productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl())
+        val recentDao = AppDatabase.instanceOrNull.recentProductDao()
+        val recentRepository =
+            RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(recentDao))
+        val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
+
+        ShoppingViewModel.Companion.Factory(productRepository, recentRepository, cartRepository)
+    }
 
     private val adapter: ProductListAdapter by lazy {
         ProductListAdapter(viewModel)
@@ -41,12 +56,12 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         }
 
     private fun updateSingleProductQuantity(intent: Intent) {
-        val modifiedProductId = intent.getLongExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, -1L)
-        val newQuantity = intent.getIntExtra(ProductDetailActivity.EXTRA_NEW_PRODUCT_QUANTITY, -1)
+        val productId = intent.getLongExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, INVALID_ID)
+        val newQuantity = intent.getIntExtra(ProductDetailActivity.EXTRA_NEW_PRODUCT_QUANTITY, INVALID_COUNT)
 
         viewModel.fetchRecentProducts()
-        if (modifiedProductId != -1L && newQuantity != -1) {
-            viewModel.updateProductQuantity(modifiedProductId, newQuantity)
+        if (productId != INVALID_ID && newQuantity != INVALID_COUNT) {
+            viewModel.updateProductQuantity(productId, newQuantity)
         }
     }
 
@@ -124,7 +139,7 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         viewModel.error.observe(
             this,
             EventObserver {
-                showToast(it.message)
+                showToast(it.messageResId)
             },
         )
     }
@@ -158,6 +173,8 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
         private const val EXTRA_PRODUCT_ID = "productId"
         private const val EXTRA_NEW_PRODUCT_QUANTITY = "productQuantity"
         private const val EXTRA_UPDATED_PRODUCTS = "updatedProductsData"
+        private const val INVALID_ID = -1L
+        private const val INVALID_COUNT = -1
 
         fun startWithNewProductQuantity(
             context: Context,
@@ -190,6 +207,10 @@ class ShoppingActivity : BindingActivity<ActivityShoppingBinding>() {
             } else {
                 throw IllegalAccessError("해당 메서드는 액티비티에서 호출해야 합니다")
             }
+        }
+
+        fun createIntent(context: Context): Intent {
+            return Intent(context, ShoppingActivity::class.java)
         }
     }
 }

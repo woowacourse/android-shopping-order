@@ -6,17 +6,32 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.local.database.AppDatabase
+import woowacourse.shopping.local.datasource.LocalRecentViewedDataSourceImpl
 import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
+import woowacourse.shopping.remote.datasource.RemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.RemoteProductDataSourceImpl
 
 class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_product_detail
 
     private val viewModel: ProductDetailViewModel by viewModels {
+        val productRepository = ProductRepositoryImpl(RemoteProductDataSourceImpl())
+        val cartRepository = CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSourceImpl())
+        val recentRepository =
+            RecentProductRepositoryImpl(LocalRecentViewedDataSourceImpl(AppDatabase.instanceOrNull.recentProductDao()))
+
         ProductDetailViewModel.Companion.Factory(
+            productRepository,
+            cartRepository,
+            recentRepository,
             getProductId(),
             checkIsLastViewedProduct(),
         )
@@ -39,21 +54,23 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
     private fun observeErrorEventUpdates() {
         viewModel.error.observe(
             this,
-            EventObserver { showToast(it.message) },
+            EventObserver { showToast(it.messageResId) },
         )
     }
 
     private fun observeMoveEvent() {
-        viewModel.moveEvent.observe(
+        viewModel.navigationEvent.observe(
             this,
             EventObserver {
                 when (it) {
                     is FromDetailToScreen.ProductDetail -> {
+                        ShoppingActivity.startWithNewProductQuantity(this)
                         startWithIsLastViewed(this, it.productId)
+                        finish()
                     }
 
                     is FromDetailToScreen.ShoppingWithUpdated -> {
-                        showToast("장바구니에 성공적으로 저장되었습니다!")
+                        showToast(R.string.cart_complete_success_message)
                         ShoppingActivity.startWithNewProductQuantity(this, it.productId, it.quantity)
                         finish()
                     }
@@ -77,7 +94,6 @@ class ProductDetailActivity : BindingActivity<ActivityProductDetailBinding>() {
             productId: Long,
         ) {
             Intent(context, ProductDetailActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra(EXTRA_PRODUCT_ID, productId)
                 putExtra(EXTRA_IS_LAST_VIEWED_PRODUCT, true)
                 context.startActivity(this)

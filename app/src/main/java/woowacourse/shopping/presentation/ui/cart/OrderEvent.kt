@@ -1,7 +1,7 @@
 package woowacourse.shopping.presentation.ui.cart
 
 sealed interface OrderEvent {
-    data object CompleteOrder : OrderEvent
+    data class MoveToPayment(val selectedCartIds: List<Long>, val totalPrice: Long) : OrderEvent
 
     data object MoveToRecommend : OrderEvent
 }

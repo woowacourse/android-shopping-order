@@ -1,24 +1,18 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun loadWithCategory(
+    suspend fun loadWithCategory(
         category: String,
         startPage: Int,
         pageSize: Int,
-        callBack: (result: NetworkResult<List<Product>>) -> Unit,
-    )
+    ): Result<List<Product>>
 
-    fun load(
+    suspend fun load(
         startPage: Int,
         pageSize: Int,
-        callBack: (result: NetworkResult<List<Product>>) -> Unit,
-    )
+    ): Result<List<Product>>
 
-    fun loadById(
-        id: Long,
-        callback: (result: NetworkResult<Product>) -> Unit,
-    )
+    suspend fun loadById(id: Long): Result<Product>
 }

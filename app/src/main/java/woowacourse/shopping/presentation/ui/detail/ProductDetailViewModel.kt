@@ -5,22 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
-import woowacourse.shopping.data.NetworkResult
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
-import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
-import woowacourse.shopping.data.local.AppDatabase
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
-import woowacourse.shopping.domain.Cart
-import woowacourse.shopping.domain.Product
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.mapper.toUiModel
+import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.presentation.ui.model.ProductModel
-import woowacourse.shopping.presentation.ui.model.toUiModel
 import woowacourse.shopping.presentation.util.Event
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
@@ -38,8 +32,8 @@ class ProductDetailViewModel(
     private val _error = MutableLiveData<Event<DetailError>>()
     val error: LiveData<Event<DetailError>> get() = _error
 
-    private val _moveEvent = MutableLiveData<Event<FromDetailToScreen>>()
-    val moveEvent: LiveData<Event<FromDetailToScreen>> get() = _moveEvent
+    private val _navigationEvent = MutableLiveData<Event<FromDetailToScreen>>()
+    val navigationEvent: LiveData<Event<FromDetailToScreen>> get() = _navigationEvent
 
     val showLastProduct: LiveData<Boolean> = lastProduct.map { it != ProductModel.INVALID_PRODUCT_MODEL && it.id != productId }
 
@@ -49,107 +43,97 @@ class ProductDetailViewModel(
     }
 
     private fun fetchInitialData() {
-        productRepository.loadById(productId) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val product = result.data
+        viewModelScope.launch {
+            productRepository.loadById(productId)
+                .onSuccess { product ->
                     _product.value = product.toUiModel(DEFAULT_PRODUCT_COUNT)
                     saveRecentProduct(product)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(DetailError.ProductItemsNotFound)
                 }
-            }
         }
     }
 
     private fun saveRecentProduct(product: Product) {
-        thread { recentRepository.add(product) }.join()
+        viewModelScope.launch {
+            recentRepository.add(product)
+        }
     }
 
     private fun loadLastProduct() {
-        recentRepository.loadMostRecent()
-            .onSuccess { product ->
-                product?.let {
-                    _lastProduct.value = it.toUiModel()
+        viewModelScope.launch {
+            recentRepository.loadMostRecent()
+                .map { it?.toUiModel() }
+                .onSuccess { product ->
+                    product?.let { _lastProduct.value = it }
+                }.onFailure {
+                    _error.value = Event(DetailError.RecentItemNotFound)
                 }
-            }.onFailure {
-                _error.value = Event(DetailError.RecentItemNotFound)
-            }
-    }
-
-    override fun onAddCartClick() {
-        cartRepository.getCount { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val count = result.data
-                    findCartItem(count)
-                }
-                is NetworkResult.Error -> {
-                    _error.value = Event(DetailError.CartItemNotFound)
-                }
-            }
         }
     }
 
-    private fun findCartItem(pageSize: Int) {
-        cartRepository.load(0, pageSize) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    val carts = result.data
+    override fun addProductToCart() {
+        viewModelScope.launch {
+            cartRepository.loadAll()
+                .onSuccess { carts ->
                     val cartItem = carts.find { it.product.id == productId }
-                    saveCartItem(cartItem)
+                    addCartItem(cartItem)
                 }
-                is NetworkResult.Error -> {
+                .onFailure {
                     _error.value = Event(DetailError.CartItemNotFound)
                 }
-            }
         }
     }
 
-    private fun saveCartItem(cartItem: Cart?) {
+    private fun addCartItem(cartItem: Cart?) {
         val product = product.value ?: return
 
         if (cartItem == null) {
-            cartRepository.saveNewCartItem(productId, product.quantity) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
-                    }
-                    is NetworkResult.Error -> {
-                        _error.value = Event(DetailError.CartItemNotFound)
-                    }
-                }
-            }
+            saveNewCartItem(product)
         } else {
-            val newQuantity = cartItem.quantity + product.quantity
-            cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity) { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _moveEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity))
-                    }
-                    is NetworkResult.Error -> {
-                        _error.value = Event(DetailError.CartItemNotFound)
-                    }
-                }
-            }
+            updateExistCartItem(cartItem, product)
         }
     }
 
-    override fun onLastProductClick(productId: Long) {
-        _moveEvent.value = Event(FromDetailToScreen.ProductDetail(productId))
+    private fun saveNewCartItem(product: ProductModel) {
+        viewModelScope.launch {
+            cartRepository.saveNewCartItem(productId, product.quantity)
+                .onSuccess {
+                    _navigationEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, product.quantity))
+                }
+                .onFailure {
+                    _error.value = Event(DetailError.CartItemNotFound)
+                }
+        }
     }
 
-    override fun onCloseClick() {
-        _moveEvent.value = Event(FromDetailToScreen.Shopping)
+    private fun updateExistCartItem(
+        cartItem: Cart,
+        product: ProductModel,
+    ) {
+        val newQuantity = cartItem.quantity + product.quantity
+        viewModelScope.launch {
+            cartRepository.updateCartItemQuantity(cartItem.cartId, newQuantity)
+                .onSuccess { _navigationEvent.value = Event(FromDetailToScreen.ShoppingWithUpdated(productId, newQuantity)) }
+                .onFailure { _error.value = Event(DetailError.CartItemNotFound) }
+        }
     }
 
-    override fun onIncreaseQuantity(productId: Long) {
+    override fun navigateToDetailWithRecentViewed(productId: Long) {
+        _navigationEvent.value = Event(FromDetailToScreen.ProductDetail(productId))
+    }
+
+    override fun navigateToBack() {
+        _navigationEvent.value = Event(FromDetailToScreen.Shopping)
+    }
+
+    override fun increaseQuantity(productId: Long) {
         val updatedQuantity = product.value?.quantity?.plus(1) ?: 1
         _product.value = product.value?.copy(quantity = updatedQuantity)
     }
 
-    override fun onDecreaseQuantity(productId: Long) {
+    override fun decreaseQuantity(productId: Long) {
         val updatedQuantity = product.value?.quantity?.minus(1) ?: 1
         if (updatedQuantity < 1) return
         _product.value = product.value?.copy(quantity = updatedQuantity)
@@ -158,17 +142,18 @@ class ProductDetailViewModel(
     companion object {
         const val DEFAULT_PRODUCT_COUNT = 1
 
-        class Factory(private val productId: Long, private val isLastViewedItem: Boolean) : ViewModelProvider.Factory {
+        class Factory(
+            private val productRepository: ProductRepository,
+            private val cartRepository: CartRepository,
+            private val recentRepository: RecentRepository,
+            private val productId: Long,
+            private val isLastViewedItem: Boolean,
+        ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 return ProductDetailViewModel(
-                    ProductRepositoryImpl(),
-                    CartRepositoryImpl(
-                        localCartDataSource = LocalCartDataSourceImpl(cartDao),
-                        remoteCartDataSource = RemoteCartDataSource(),
-                    ),
-                    RecentProductRepositoryImpl(recentDao),
+                    productRepository,
+                    cartRepository,
+                    recentRepository,
                     productId,
                     isLastViewedItem,
                 ) as T

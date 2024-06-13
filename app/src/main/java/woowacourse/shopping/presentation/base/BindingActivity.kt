@@ -20,8 +20,8 @@ abstract class BindingActivity<T : ViewDataBinding> : AppCompatActivity() {
 
     abstract fun initStartView(savedInstanceState: Bundle?)
 
-    protected fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT)
+    protected fun showToast(messageResId: Int) {
+        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT)
             .show()
     }
 

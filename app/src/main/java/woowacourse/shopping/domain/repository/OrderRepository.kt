@@ -1,10 +1,9 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.NetworkResult
-
 interface OrderRepository {
-    fun completeOrder(
-        cartItemIds: List<Long>,
-        callBack: (result: NetworkResult<Unit>) -> Unit,
-    )
+    suspend fun completeOrder(cartItemIds: List<Long>): Result<Unit>
+
+    companion object {
+        const val SHIPPING_FEE = 3_000
+    }
 }

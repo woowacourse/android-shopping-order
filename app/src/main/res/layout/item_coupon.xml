@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="orderHandler"
+            type="woowacourse.shopping.presentation.ui.order.OrderHandler" />
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.presentation.ui.model.CouponModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_coupon"
+        android:paddingHorizontal="12dp"
+        android:layout_marginBottom="12dp"
+        android:paddingVertical="18dp">
+
+        <CheckBox
+            android:id="@+id/check_box_coupon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:checked="@{coupon.isChecked}"
+            android:onClick="@{() -> orderHandler.selectCoupon(coupon.id)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/dark_grey"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="@{coupon.description}"
+            app:layout_constraintBottom_toBottomOf="@id/check_box_coupon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/check_box_coupon"
+            app:layout_constraintTop_toTopOf="@id/check_box_coupon"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/tv_coupon_info_1_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/dark_grey"
+            android:textSize="12sp"
+            android:text="@string/coupon_item_info_1_head"
+            app:layout_constraintEnd_toStartOf="@id/tv_coupon_info_1"
+            app:layout_constraintStart_toStartOf="@id/check_box_coupon"
+            app:layout_constraintTop_toBottomOf="@id/check_box_coupon" />
+
+        <TextView
+            android:id="@+id/tv_coupon_info_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/dark_grey"
+            android:textSize="12sp"
+            android:text="@{coupon.expiredDate}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_coupon_info_1_head"
+            app:layout_constraintTop_toTopOf="@id/tv_coupon_info_1_head"
+            app:layout_constraintBottom_toBottomOf="@id/tv_coupon_info_1_head"
+            tools:text="2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/tv_coupon_info_2_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/dark_grey"
+            android:textSize="12sp"
+            android:text="@string/coupon_item_info_2_head"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_coupon_info_2"
+            app:layout_constraintStart_toStartOf="@id/check_box_coupon"
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_info_1_head"/>
+
+        <TextView
+            android:id="@+id/tv_coupon_info_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/dark_grey"
+            android:textSize="12sp"
+            bindTextFormattedCurrency="@{coupon.minimumAmount}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_coupon_info_2_head"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_coupon_info_2_head"
+            app:layout_constraintTop_toTopOf="@id/tv_coupon_info_2_head"
+            tools:text="100,000원" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
