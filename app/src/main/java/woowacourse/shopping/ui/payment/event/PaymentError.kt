@@ -8,8 +8,4 @@ sealed interface PaymentError {
     data object DiscountAmount : PaymentError
 
     data object Order: PaymentError
-
-    object LoadDiscountedPrice : PaymentError
-    object Pay : PaymentError
-
 }
