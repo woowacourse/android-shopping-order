@@ -1,4 +1,4 @@
-package woowacourse.shopping.cart
+package woowacourse.shopping.ui.cart
 
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -27,7 +27,6 @@ import woowacourse.shopping.product
 import woowacourse.shopping.products
 import woowacourse.shopping.recentProducts
 import woowacourse.shopping.toCartUiModels
-import woowacourse.shopping.ui.cart.CartViewModel
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)

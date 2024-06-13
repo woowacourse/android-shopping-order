@@ -50,7 +50,7 @@ private fun CouponDto.toDiscountConditions(): List<DiscountCondition> {
         discountConditions.add(AmountDiscountCondition(minimumAmount))
     }
     if (buyQuantity != null && getQuantity != null) {
-        discountConditions.add(QuantityDiscountCondition(Quantity(buyQuantity + getQuantity)))
+        discountConditions.add(QuantityDiscountCondition(buyQuantity + getQuantity))
     }
     if (availableTime != null) {
         discountConditions.add(TimeDiscountCondition(availableTime.toAvailableTime()))

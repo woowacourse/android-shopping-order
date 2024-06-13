@@ -1,4 +1,4 @@
-package woowacourse.shopping.coupon
+package woowacourse.shopping.ui.coupon
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -10,18 +10,20 @@ import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.cartItemsBySize
 import woowacourse.shopping.cartItemsByTotalPrice
+import woowacourse.shopping.coupon
+import woowacourse.shopping.coupons
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.condition.AmountDiscountCondition
+import woowacourse.shopping.domain.model.coupon.policy.FixedDiscountPolicy
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.fake.FakeCartRepository
 import woowacourse.shopping.fake.FakeCouponRepository
 import woowacourse.shopping.fake.FakeOrderRepository
-import woowacourse.shopping.fixedCoupon
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.toCouponUiModels
-import woowacourse.shopping.ui.coupon.CouponViewModel
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
@@ -44,7 +46,7 @@ class CouponViewModelTest {
             // given
             val cartItems = cartItemsBySize(5)
             val selectedCartItemIds = cartItems.map { it.id }
-            val coupons = List(5) { fixedCoupon(id = it, discount = 1_000) }
+            val coupons = coupons(5)
             setUpViewModel(selectedCartItemIds, cartItems, coupons)
 
             // when
@@ -76,7 +78,13 @@ class CouponViewModelTest {
         runBlocking {
             // given
             val cartItems = cartItemsByTotalPrice(60_000)
-            val coupon = fixedCoupon(id = 0, discount = 3_000)
+            val amountDiscountCondition = AmountDiscountCondition(minimumPrice = 50_000)
+            val fixedDiscountPolicy =
+                FixedDiscountPolicy(
+                    discountConditions = listOf(amountDiscountCondition),
+                    discount = 3_000,
+                )
+            val coupon = coupon(id = 0, discountPolicy = fixedDiscountPolicy)
             setUpViewModel(
                 selectedCartItemIds = listOf(0),
                 cartItems,
@@ -96,7 +104,13 @@ class CouponViewModelTest {
         runBlocking {
             // given
             val cartItems = cartItemsByTotalPrice(60_000)
-            val coupon = fixedCoupon(id = 0, discount = 3_000)
+            val amountDiscountCondition = AmountDiscountCondition(minimumPrice = 50_000)
+            val fixedDiscountPolicy =
+                FixedDiscountPolicy(
+                    discountConditions = listOf(amountDiscountCondition),
+                    discount = 3_000,
+                )
+            val coupon = coupon(id = 0, discountPolicy = fixedDiscountPolicy)
             setUpViewModel(
                 selectedCartItemIds = listOf(0),
                 cartItems,
@@ -124,7 +138,7 @@ class CouponViewModelTest {
             viewModel.createOrder()
 
             // then
-            assertThat(viewModel.isSuccessCreateOrder.isInitialized).isTrue
+            assertThat(viewModel.isSuccessCreateOrder.getValue()).isTrue
         }
 
     private fun setUpViewModel(

@@ -11,11 +11,8 @@ sealed interface DiscountPolicy {
         coupon: Coupon,
         cartItems: List<CartItem>,
     ): Boolean {
-        return discountConditions.all { it.available(coupon, cartItems) }
+        return discountConditions.all { it.available(expirationDate = coupon.expirationDate, cartItems = cartItems) }
     }
 
-    fun discountPrice(
-        coupon: Coupon,
-        cartItems: List<CartItem>,
-    ): Int
+    fun discountPrice(cartItems: List<CartItem>): Int
 }

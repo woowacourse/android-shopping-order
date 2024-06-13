@@ -2,11 +2,12 @@ package woowacourse.shopping
 
 import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.FixedCoupon
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.policy.DiscountPolicy
+import woowacourse.shopping.domain.model.coupon.policy.FreeShippingDiscountPolicy
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.cart.CartUiModel
 import woowacourse.shopping.ui.cart.CartUiModels
@@ -38,7 +39,21 @@ fun cartItem(
 fun cartItemsBySize(size: Int) = List(size) { cartItem(it, 1) }
 
 fun cartItemsByTotalPrice(totalPrice: Int): List<CartItem> {
-    return listOf(CartItem(id = 0, product = Product(0, "", totalPrice, "", ""), quantity = Quantity(1)))
+    return listOf(
+        CartItem(
+            id = 0,
+            product = Product(0, "", totalPrice, "", ""),
+            quantity = Quantity(1),
+        ),
+    )
+}
+
+fun cartItemsByProductQuantity(vararg productQuantities: Int): List<CartItem> {
+    val cartItems = mutableListOf<CartItem>()
+    productQuantities.forEachIndexed { index, quantity ->
+        cartItems.add(CartItem(index, product(id = index), Quantity(quantity)))
+    }
+    return cartItems
 }
 
 suspend fun List<Product>.toProductUiModels(cartRepository: CartRepository): List<ProductUiModel> {
@@ -66,15 +81,6 @@ fun List<CartItem>.toCartUiModels(products: List<Product>): CartUiModels {
     return CartUiModels(uiModels)
 }
 
-fun fixedCoupon(
-    id: Int,
-    expirationDate: LocalDate = LocalDate.of(3000, 10, 10),
-    discount: Int,
-    minimumPrice: Int = 0,
-): FixedCoupon {
-    return FixedCoupon(id, "", "", expirationDate, discount, minimumPrice)
-}
-
 fun List<Coupon>.toCouponUiModels(): List<CouponUiModel> {
     return map { CouponUiModel.from(it) }
 }
@@ -87,3 +93,10 @@ fun availableTime(
     val end = LocalTime.of(endHour, 0)
     return AvailableTime(start, end)
 }
+
+fun coupon(
+    id: Int,
+    discountPolicy: DiscountPolicy = FreeShippingDiscountPolicy(listOf()),
+) = Coupon(id, "", LocalDate.MAX, 0, discountPolicy)
+
+fun coupons(size: Int): List<Coupon> = List(size) { coupon(it) }

@@ -1,4 +1,4 @@
-package woowacourse.shopping.detail
+package woowacourse.shopping.ui.detail
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -19,7 +19,6 @@ import woowacourse.shopping.fake.FakeRecentProductRepository
 import woowacourse.shopping.getOrAwaitValue
 import woowacourse.shopping.product
 import woowacourse.shopping.recentProduct
-import woowacourse.shopping.ui.detail.ProductDetailViewModel
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
@@ -89,8 +88,7 @@ class ProductDetailViewModelTest {
             viewModel.loadProduct()
 
             // then
-            assertThat(viewModel.productLoadError.isInitialized).isTrue
-            assertThat(viewModel.productLoadError.getOrAwaitValue().peekContent()).isNotNull
+            assertThat(viewModel.productLoadError.getValue()).isNotNull
         }
 
     @Test
@@ -111,7 +109,7 @@ class ProductDetailViewModelTest {
                 }.onFailure {
                     assertThat(true).isFalse
                 }
-            assertThat(viewModel.isSuccessAddCart.getOrAwaitValue().peekContent()).isTrue
+            assertThat(viewModel.isSuccessAddCart.getValue()).isTrue
         }
 
     @Test

@@ -1,4 +1,4 @@
-package woowacourse.shopping.products
+package woowacourse.shopping.ui.products
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -23,7 +23,6 @@ import woowacourse.shopping.products
 import woowacourse.shopping.recentProducts
 import woowacourse.shopping.toProductUiModels
 import woowacourse.shopping.toRecentProductUiModels
-import woowacourse.shopping.ui.products.ProductsViewModel
 
 @ExperimentalCoroutinesApi
 @ExtendWith(CoroutinesTestExtension::class)
