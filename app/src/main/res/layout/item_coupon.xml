@@ -70,7 +70,7 @@
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@id/checkBox"
             app:layout_constraintTop_toBottomOf="@id/textview_coupon_expiration_date"
-            app:visibilityUponNullData="@{coupon.minimumAmount}"
+            app:setViewVisibility="@{coupon.minimumAmount != null}"
             tools:text="최소 주문 금액: 100,000원" />
 
         <TextView
@@ -82,7 +82,7 @@
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@id/checkBox"
             app:layout_constraintTop_toBottomOf="@id/textview_coupon_minimum_amount"
-            app:visibilityUponNullData="@{coupon.availableTime}"
+            app:setViewVisibility="@{coupon.availableTime != null}"
             tools:text="사용 가능 시간: 04:00 ~ 07:00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
