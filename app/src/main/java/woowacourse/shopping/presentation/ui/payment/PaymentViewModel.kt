@@ -39,9 +39,7 @@ class PaymentViewModel(
     val totalPrice: LiveData<Int> get() = _totalPrice
 
     init {
-        viewModelScope.launch {
-            orderProducts()
-        }
+        orderProducts()
 
         _totalPrice.addSource(_orderProducts) { calculateTotalPrice() }
         _totalPrice.addSource(_couponPrice) { calculateTotalPrice() }
@@ -64,7 +62,7 @@ class PaymentViewModel(
                 }
         }
 
-    private suspend fun orderProducts() {
+    private fun orderProducts() = viewModelScope.launch {
         repository.getCartItems(0, 1000)
             .onSuccess {
                 val filteredCartItems =
