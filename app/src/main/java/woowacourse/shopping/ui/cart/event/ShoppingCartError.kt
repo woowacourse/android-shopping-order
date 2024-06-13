@@ -10,4 +10,6 @@ sealed interface ShoppingCartError {
     data object EmptyOrderProduct : ShoppingCartError
 
     data object SaveOrderItems: ShoppingCartError
+
+    // TODO 네트워크 에러 추가?
 }

@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.cart.event.ShoppingCartError
 import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 
 class ShoppingCartFragment : Fragment() {
@@ -54,13 +58,14 @@ class ShoppingCartFragment : Fragment() {
         showSkeletonUi()
         observeDeletedItem()
         observeItemsInCurrentPage()
-        observeOrderNavigation()
+        observeEvent()
+        observeError()
     }
 
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            delay(1000)
+            delay(300)
             viewModel.loadAll()
         }
     }
@@ -91,15 +96,40 @@ class ShoppingCartFragment : Fragment() {
         }
     }
 
-    private fun observeOrderNavigation() {
+    private fun observeEvent() {
         viewModel.event.observe(viewLifecycleOwner) { event ->
             when (event) {
                 is ShoppingCartEvent.NavigationOrder -> (requireActivity() as? FragmentNavigator)?.navigateToOrder()
 
                 is ShoppingCartEvent.PopBackStack -> (requireActivity() as? FragmentNavigator)?.popBackStack()
+
+                is ShoppingCartEvent.DeleteCartItem -> Unit
             }
         }
     }
+
+    private fun observeError() {
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            when (error) {
+                is ShoppingCartError.DeleteCartItem -> showToast(R.string.error_message_shopping_cart_delete_item)
+                is ShoppingCartError.EmptyOrderProduct -> showToast(R.string.error_message_empty_order_product)
+                is ShoppingCartError.LoadCartProducts -> showToast(R.string.error_message_shopping_cart_products)
+                is ShoppingCartError.SaveOrderItems -> showToast(R.string.error_message_save_order_items)
+                is ShoppingCartError.UpdateCartItems -> showToast(R.string.error_message_update_cart_items)
+            }
+        }
+    }
+
+    private fun showToast(
+        @StringRes stringId: Int,
+    ) {
+        Toast.makeText(
+            requireContext(),
+            stringId,
+            Toast.LENGTH_SHORT,
+        ).show()
+    }
+
 
     companion object {
         const val TAG = "ShoppingCartFragment"
