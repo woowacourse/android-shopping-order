@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.data.model.coupon.AvailableTime
 import java.time.LocalDate
 import java.time.LocalTime
 

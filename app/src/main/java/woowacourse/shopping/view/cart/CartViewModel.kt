@@ -96,7 +96,7 @@ class CartViewModel(
             cartUiState.value?.copy(
                 isEntireCheckboxSelected = isSelected,
                 totalPrice =
-                updatedCartViewItems.sumOf { if (it.isSelected) it.cartItem.totalPrice() else 0 },
+                    updatedCartViewItems.sumOf { if (it.isSelected) it.cartItem.totalPrice() else 0 },
             )
     }
 
@@ -130,9 +130,9 @@ class CartViewModel(
             _cartListUiState.value =
                 cartListUiState.value?.copy(
                     cartViewItems =
-                    cartListUiState.value?.cartViewItems?.filter {
-                        it.cartItem.cartItemId != itemId
-                    } ?: return@launch,
+                        cartListUiState.value?.cartViewItems?.filter {
+                            it.cartItem.cartItemId != itemId
+                        } ?: return@launch,
                 )
 
             _cartUiState.value =
@@ -163,17 +163,17 @@ class CartViewModel(
             _cartUiState.value =
                 cartUiState.value?.copy(
                     selectedCartItems =
-                    cartUiState.value?.selectedCartItems?.plus(
-                        cartItem.cartItem,
-                    ) ?: return,
+                        cartUiState.value?.selectedCartItems?.plus(
+                            cartItem.cartItem,
+                        ) ?: return,
                 )
         } else {
             _cartUiState.value =
                 cartUiState.value?.copy(
                     selectedCartItems =
-                    cartUiState.value?.selectedCartItems?.filter {
-                        it.cartItemId != cartItem.cartItem.cartItemId
-                    } ?: return,
+                        cartUiState.value?.selectedCartItems?.filter {
+                            it.cartItemId != cartItem.cartItem.cartItemId
+                        } ?: return,
                 )
         }
         setTotalPrice()
@@ -209,9 +209,9 @@ class CartViewModel(
                 uiState.copy(
                     isLoading = false,
                     recommendedProducts =
-                    recommendedProducts.map {
-                        ProductViewItem(it)
-                    },
+                        recommendedProducts.map {
+                            ProductViewItem(it)
+                        },
                 )
         }
     }
@@ -229,13 +229,13 @@ class CartViewModel(
                     cartListUiState.copy(
                         isLoading = false,
                         cartViewItems =
-                        cartItems.cartItems.map { cartItem ->
-                            CartViewItem(
-                                cartItem,
-                                cartUiState.isEntireCheckboxSelected ||
+                            cartItems.cartItems.map { cartItem ->
+                                CartViewItem(
+                                    cartItem,
+                                    cartUiState.isEntireCheckboxSelected ||
                                         cartItem.cartItemId in (cartUiState.selectedCartItems.map { it.cartItemId }),
-                            )
-                        },
+                                )
+                            },
                     )
             }
         }
@@ -257,14 +257,14 @@ class CartViewModel(
                     if (it.orderableProduct.productItemDomain.id == changedItem.product.id) {
                         it.copy(
                             orderableProduct =
-                            it.orderableProduct.copy(
-                                cartData =
-                                CartData(
-                                    changedItem.cartItemId,
-                                    changedItem.product.id,
-                                    quantity = changedItem.quantity,
+                                it.orderableProduct.copy(
+                                    cartData =
+                                        CartData(
+                                            changedItem.cartItemId,
+                                            changedItem.product.id,
+                                            quantity = changedItem.quantity,
+                                        ),
                                 ),
-                            ),
                         )
                     } else {
                         it
@@ -277,9 +277,9 @@ class CartViewModel(
             _cartUiState.value =
                 cartUiState.value?.copy(
                     selectedCartItems =
-                    cartUiState.value?.selectedCartItems?.plus(
-                        changedItem,
-                    ) ?: return@launch,
+                        cartUiState.value?.selectedCartItems?.plus(
+                            changedItem,
+                        ) ?: return@launch,
                 )
         }
     }
@@ -323,9 +323,9 @@ class CartViewModel(
         val updatedCartItem =
             targetCartItem.copy(
                 orderableProduct =
-                targetCartItem.orderableProduct.copy(
-                    cartData = targetCartItem.orderableProduct.cartData?.increaseQuantity(),
-                ),
+                    targetCartItem.orderableProduct.copy(
+                        cartData = targetCartItem.orderableProduct.cartData?.increaseQuantity(),
+                    ),
             )
         updateQuantity(updatedCartItem.orderableProduct.cartData ?: return)
     }
@@ -337,9 +337,9 @@ class CartViewModel(
         val updatedCartItem =
             targetCartItem.copy(
                 orderableProduct =
-                targetCartItem.orderableProduct.copy(
-                    cartData = targetCartItem.orderableProduct.cartData?.decreaseQuantity(),
-                ),
+                    targetCartItem.orderableProduct.copy(
+                        cartData = targetCartItem.orderableProduct.cartData?.decreaseQuantity(),
+                    ),
             )
         if (updatedCartItem.orderableProduct.cartData?.quantity == 0) {
             removeRecommendedCartItem(updatedCartItem.orderableProduct.cartData)
@@ -370,7 +370,7 @@ class CartViewModel(
             _cartUiState.value =
                 uiState.copy(
                     totalPrice =
-                    uiState.totalPrice +
+                        uiState.totalPrice +
                             updatedItems.sumOf {
                                 it.orderableProduct.cartData?.totalPrice(it.orderableProduct.productItemDomain.price)
                                     ?: 0
@@ -415,14 +415,14 @@ class CartViewModel(
                 recommendListUiState.recommendedProducts.map {
                     it.copy(
                         orderableProduct =
-                        it.orderableProduct.copy(
-                            cartData =
-                            if (it.orderableProduct.productItemDomain.id == updatedCartItem.productId) {
-                                null
-                            } else {
-                                it.orderableProduct.cartData
-                            },
-                        ),
+                            it.orderableProduct.copy(
+                                cartData =
+                                    if (it.orderableProduct.productItemDomain.id == updatedCartItem.productId) {
+                                        null
+                                    } else {
+                                        it.orderableProduct.cartData
+                                    },
+                            ),
                     )
                 }
 
@@ -432,7 +432,7 @@ class CartViewModel(
             _cartUiState.value =
                 cartUiState.value?.copy(
                     totalPrice =
-                    uiState.totalPrice +
+                        uiState.totalPrice +
                             leftItems.sumOf {
                                 it.orderableProduct.cartData?.totalPrice(it.orderableProduct.productItemDomain.price)
                                     ?: 0

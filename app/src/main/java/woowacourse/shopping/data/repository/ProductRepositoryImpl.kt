@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
 import woowacourse.shopping.domain.repository.ProductRepository
-import kotlin.math.max
 
 class ProductRepositoryImpl(
     private val remoteProductDataSource: RemoteProductDataSource,
@@ -49,7 +48,7 @@ class ProductRepositoryImpl(
             remoteProductDataSource.getRecommendedProducts(
                 category = lastlyViewedProduct?.category,
                 maxSize = requiredSize,
-                sort = SORT_RECOMMENDED_ITEMS
+                sort = SORT_RECOMMENDED_ITEMS,
             ).toProductDomain(cartData = cartData)
                 .orderableProducts
                 .filter { it.cartData == null }

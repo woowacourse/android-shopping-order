@@ -50,9 +50,10 @@ class DefaultShoppingApplication : ShoppingApplication() {
             .build()
     }
 
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(CouponResponseItem::class.java, CouponResponseItemDeserializer)
-        .create()
+    private val gson =
+        GsonBuilder()
+            .registerTypeAdapter(CouponResponseItem::class.java, CouponResponseItemDeserializer)
+            .create()
 
     private val retrofit by lazy {
         Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)

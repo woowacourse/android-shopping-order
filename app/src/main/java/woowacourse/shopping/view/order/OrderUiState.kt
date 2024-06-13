@@ -5,7 +5,6 @@ import woowacourse.shopping.domain.model.Coupon
 import java.time.LocalDate
 import java.time.LocalTime
 
-// TODO 기타 쿠폰 사용 경우 임의로 정해놓은 할인액을 구체적으로 구현하기
 data class OrderUiState(
     val isLoading: Boolean = true,
     val cartItems: List<CartItemDomain> = emptyList(),
@@ -29,19 +28,8 @@ data class OrderUiState(
                 coupons.map {
                     if (it.coupon.id == updatedCoupon.coupon.id) updatedCoupon else it
                 },
-            discount =
-                when (selectedCoupon) {
-                    is Coupon.Fixed -> selectedCoupon.discount
-                    is Coupon.BuyXGetY ->
-                        cartItems.filter { it.quantity >= selectedCoupon.buyQuantity }
-                            .maxOf { it.product.price } * selectedCoupon.getQuantity
-
-                    is Coupon.FreeShipping -> shippingPrice
-                    is Coupon.MiracleSale -> orderPrice * (selectedCoupon.discount / 100)
-                    is Coupon.Etc -> 10
-                    null -> 0
-                },
             selectedCoupon = null,
+            discount = if (couponId == selectedCoupon?.id) 0 else discount,
         )
     }
 
@@ -62,11 +50,33 @@ data class OrderUiState(
 
                     is Coupon.FreeShipping -> shippingPrice
                     is Coupon.MiracleSale -> orderPrice * (targetCoupon.coupon.discount / 100)
-                    is Coupon.Etc -> 10
+                    is Coupon.Etc -> discountPriceForEtcCoupon(targetCoupon.coupon)
                 },
             selectedCoupon = updatedCoupon.coupon,
         )
     }
+
+    private fun discountPriceForEtcCoupon(coupon: Coupon.Etc) =
+        when {
+            coupon.discount != null && coupon.minimumAmount != null -> {
+                coupon.discount
+            }
+
+            coupon.discount != null && coupon.startTime != null && coupon.endTime != null -> {
+                orderPrice * (discount / 100)
+            }
+
+            coupon.buyQuantity != null && coupon.getQuantity != null -> {
+                cartItems.filter { it.quantity >= coupon.buyQuantity }
+                    .maxOf { it.product.price } * coupon.getQuantity
+            }
+
+            coupon.minimumAmount != null -> {
+                shippingPrice
+            }
+
+            else -> 0
+        }
 
     private fun Coupon.isAvailable(): Boolean {
         val currentDate = LocalDate.now()
@@ -74,16 +84,14 @@ data class OrderUiState(
         if (currentDate > expirationDate) return false
         when (this) {
             is Coupon.Fixed -> if (orderPrice < minimumAmount) return false
-
             is Coupon.BuyXGetY -> if (cartItems.none { it.quantity >= buyQuantity }) return false
-
             is Coupon.FreeShipping -> if (orderPrice < minimumAmount) return false
-
             is Coupon.MiracleSale -> if (currentTime !in startTime..endTime) return false
-
-            is Coupon.Etc -> {
-
-            }
+            is Coupon.Etc ->
+                discount != null && minimumAmount != null ||
+                    discount != null && startTime != null && endTime != null ||
+                    buyQuantity != null && getQuantity != null ||
+                    minimumAmount != null
         }
         return true
     }

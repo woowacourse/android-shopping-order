@@ -16,6 +16,6 @@ interface RemoteProductDataSource {
     suspend fun getRecommendedProducts(
         category: String?,
         maxSize: Int,
-        sort: String
+        sort: String,
     ): ProductResponse
 }

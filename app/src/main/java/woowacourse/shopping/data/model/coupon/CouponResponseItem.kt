@@ -62,8 +62,7 @@ sealed class CouponResponseItem {
     ) : CouponResponseItem()
 
     companion object {
-        fun parseNullableLocalTime(time: String?): LocalTime? =
-            if (time != null) LocalTime.parse(time) else null
+        fun parseNullableLocalTime(time: String?): LocalTime? = if (time != null) LocalTime.parse(time) else null
     }
 }
 
@@ -85,7 +84,7 @@ fun CouponResponseItem.Fixed.toFixedCoupon(): Coupon.Fixed {
         expirationDate = LocalDate.parse(expirationDate),
         discountType = discountType,
         discount = discount,
-        minimumAmount = minimumAmount
+        minimumAmount = minimumAmount,
     )
 }
 
@@ -97,7 +96,7 @@ fun CouponResponseItem.BuyXGetY.toBuyXGetXCoupon(): Coupon.BuyXGetY {
         expirationDate = LocalDate.parse(expirationDate),
         discountType = discountType,
         buyQuantity = buyQuantity,
-        getQuantity = getQuantity
+        getQuantity = getQuantity,
     )
 }
 
@@ -108,7 +107,7 @@ fun CouponResponseItem.FreeShipping.toFreeShippingCoupon(): Coupon.FreeShipping 
         description = description,
         expirationDate = LocalDate.parse(expirationDate),
         discountType = discountType,
-        minimumAmount = minimumAmount
+        minimumAmount = minimumAmount,
     )
 }
 
