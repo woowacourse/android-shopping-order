@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.model.HistoryProduct
+import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
 import woowacourse.shopping.data.source.ProductHistoryDataSource
@@ -16,7 +18,7 @@ class CategoryBasedProductRecommendationRepository(
         runCatching {
             val latestProductId =
                 historySource.loadLatestProduct()
-                    .map { it.id }
+                    .map(HistoryProduct::id)
                     .recover {
                         productsSource.findByPaged(1).getOrThrow().random().id
                     }.getOrThrow()
@@ -34,9 +36,7 @@ class CategoryBasedProductRecommendationRepository(
 
             val minimumCount = min(filteredProducts.size, 10)
 
-            filteredProducts.subList(0, minimumCount).map { productData ->
-                productData.toDomain()
-            }
+            filteredProducts.subList(0, minimumCount).map(ProductData::toDomain)
         }
 
     companion object {
