@@ -143,7 +143,7 @@ class OrderViewModel(
         fun factory(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
-                    ShoppingApp.orderSource2,
+                    ShoppingApp.orderSource,
                     ShoppingApp.cartSource,
                 ),
             productRecommendationRepository: ProductsRecommendationRepository =

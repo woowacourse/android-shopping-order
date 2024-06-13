@@ -124,7 +124,7 @@ class PaymentViewModel(
                         ),
                     orderRepository =
                         DefaultOrderRepository(
-                            ShoppingApp.orderSource2,
+                            ShoppingApp.orderSource,
                             ShoppingApp.cartSource,
                         ),
                 )
