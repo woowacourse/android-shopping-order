@@ -10,13 +10,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Orders
-import woowacourse.shopping.domain.model.toUi
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.DefaultCouponRepository
 import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.model.CouponUi
+import woowacourse.shopping.ui.model.toUi
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
@@ -50,9 +51,7 @@ class PaymentViewModel(
                         .onSuccess { coupons ->
                             withContext(Dispatchers.Main) {
                                 _loadedCoupons.postValue(
-                                    coupons.map { coupon ->
-                                        coupon.toUi()
-                                    },
+                                    coupons.map(Coupon::toUi)
                                 )
                             }
                         }
@@ -78,13 +77,13 @@ class PaymentViewModel(
                         _discountedPrice.postValue(it)
                         _loadedCoupons.postValue(
                             value =
-                                loadedCoupons.getValue()?.map { couponUi ->
-                                    if (couponUi.id == coupon.id) {
-                                        couponUi.copy(isChecked = true)
-                                    } else {
-                                        couponUi.copy(isChecked = false)
-                                    }
-                                } ?: emptyList(),
+                            loadedCoupons.getValue()?.map { couponUi ->
+                                if (couponUi.id == coupon.id) {
+                                    couponUi.copy(isChecked = true)
+                                } else {
+                                    couponUi.copy(isChecked = false)
+                                }
+                            } ?: emptyList(),
                         )
                     }
                 }
@@ -119,14 +118,14 @@ class PaymentViewModel(
             UniversalViewModelFactory {
                 PaymentViewModel(
                     couponRepository =
-                        DefaultCouponRepository(
-                            ShoppingApp.couponSource,
-                        ),
+                    DefaultCouponRepository(
+                        ShoppingApp.couponSource,
+                    ),
                     orderRepository =
-                        DefaultOrderRepository(
-                            ShoppingApp.orderSource,
-                            ShoppingApp.cartSource,
-                        ),
+                    DefaultOrderRepository(
+                        ShoppingApp.orderSource,
+                        ShoppingApp.cartSource,
+                    ),
                 )
             }
     }

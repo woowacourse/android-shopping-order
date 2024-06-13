@@ -1,5 +1,10 @@
 package woowacourse.shopping.ui.model
 
+import woowacourse.shopping.domain.model.BoGoCoupon
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.FixedAmountCoupon
+import woowacourse.shopping.domain.model.FreeShippingCoupon
+import woowacourse.shopping.domain.model.PercentageCoupon
 import java.time.LocalDate
 
 data class CouponUi(
@@ -10,3 +15,38 @@ data class CouponUi(
     val minimumAmount: Int? = null,
     val isSelected: Boolean = false,
 )
+
+fun Coupon.toUi(): CouponUi =
+    when (this) {
+        is FixedAmountCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = minimumAmount,
+            )
+
+        is FreeShippingCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = minimumAmount,
+            )
+
+        is BoGoCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = null,
+            )
+
+        is PercentageCoupon ->
+            CouponUi(
+                id = id,
+                description = description,
+                expirationDate = expirationDate,
+                minimumAmount = null,
+            )
+    }
