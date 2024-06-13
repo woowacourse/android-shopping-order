@@ -3,10 +3,7 @@ package woowacourse.shopping.fake
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class FakeOrderRepository : OrderRepository {
-    override fun createOrder(
-        cartItemIds: List<Int>,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        callback(Result.success(Unit))
+    override suspend fun createOrder(cartItemIds: List<Int>): Result<Unit> {
+        return Result.success(Unit)
     }
 }

@@ -4,12 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.common.Event
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.products.adapter.type.ProductUiModel
@@ -18,7 +20,6 @@ class CartViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartListener {
     private val _cartUiModels = MutableLiveData<CartUiModels>()
     val cartUiModels: LiveData<CartUiModels> get() = _cartUiModels
@@ -26,63 +27,65 @@ class CartViewModel(
     private val _isLoadingCart = MutableLiveData<Boolean>()
     val isLoadingCart: LiveData<Boolean> get() = _isLoadingCart
 
-    private val _cartErrorEvent = MutableLiveData<Event<Unit>>()
-    val cartErrorEvent: LiveData<Event<Unit>> get() = _cartErrorEvent
+    private val _changedCartEvent = MutableSingleLiveData<Unit>()
+    val changedCartEvent: SingleLiveData<Unit> get() = _changedCartEvent
 
-    private val _totalPrice = MutableLiveData<Int>(0)
-    val totalPrice: LiveData<Int> get() = _totalPrice
+    val totalPrice: LiveData<Int> = _cartUiModels.map { it.selectedTotalPrice() }
+    val isEnabledOrder: LiveData<Boolean> = totalPrice.map { it != 0 }
 
-    val isEnabledOrder: LiveData<Boolean> = _totalPrice.map { it != 0 }
+    val totalQuantity: LiveData<Int> = _cartUiModels.map { it.selectedTotalQuantity() }
 
-    private val _changedCartEvent = MutableLiveData<Event<Unit>>()
-    val changedCartEvent: LiveData<Event<Unit>> get() = _changedCartEvent
-
-    private val cartItemSelectedCount = MutableLiveData<Int>(0)
-    val cartItemAllSelected: LiveData<Boolean> =
-        cartItemSelectedCount.map { it > 0 && it == cartUiModels().size }
+    private val cartItemSelectedCount: LiveData<Int> = _cartUiModels.map { it.selectedTotalCount() }
+    val cartItemAllSelected: LiveData<Boolean> = cartItemSelectedCount.map { it > 0 && it == cartUiModels().size }
 
     private val _recommendProductUiModels = MutableLiveData<List<ProductUiModel>>()
     val recommendProductUiModels: LiveData<List<ProductUiModel>> get() = _recommendProductUiModels
 
-    private val _isSuccessCreateOrder = MutableLiveData<Event<Boolean>>()
-    val isSuccessCreateOrder: LiveData<Event<Boolean>> get() = _isSuccessCreateOrder
-
-    private val _orderEvent = MutableLiveData<Event<Unit>>()
-    val orderEvent: LiveData<Event<Unit>> get() = _orderEvent
+    private val _orderEvent = MutableSingleLiveData<Unit>()
+    val orderEvent: SingleLiveData<Unit> get() = _orderEvent
 
     private val _visibleAllToggleView = MutableLiveData(true)
+
     val visibleAllToggleView: LiveData<Boolean> get() = _visibleAllToggleView
 
-    private val _totalQuantity = MutableLiveData<Int>(0)
-    val totalQuantity: LiveData<Int> get() = _totalQuantity
+    private val _selectedCartItemIds = MutableLiveData<List<Int>>()
+    val selectedCartItemIds: LiveData<List<Int>> get() = _selectedCartItemIds
 
-    fun loadAllCartItems() {
-        _isLoadingCart.value = true
-        cartRepository.findAll {
-            it.onSuccess { cartItems ->
-                _isLoadingCart.value = false
-                if (cartItems.isEmpty()) {
-                    _cartUiModels.value = CartUiModels()
-                    return@onSuccess
+    private val _productsLoadError = MutableSingleLiveData<Throwable>()
+    val productsLoadError: SingleLiveData<Throwable> get() = _productsLoadError
+
+    private val _cartItemAddError = MutableSingleLiveData<Throwable>()
+    val cartItemAddError: SingleLiveData<Throwable> get() = _cartItemAddError
+
+    private val _cartItemDeleteError = MutableSingleLiveData<Throwable>()
+    val cartItemDeleteError: SingleLiveData<Throwable> get() = _cartItemDeleteError
+
+    fun loadAllCartItems() =
+        viewModelScope.launch {
+            _isLoadingCart.value = true
+            cartRepository.findAll()
+                .onSuccess { cartItems ->
+                    if (cartItems.isEmpty()) {
+                        _cartUiModels.value = CartUiModels()
+                        return@onSuccess
+                    }
+                    cartItems.forEach { cartItem -> loadProduct(cartItem) }
                 }
-                cartItems.forEach { cartItem -> loadProduct(cartItem) }
-            }.onFailure {
-                _isLoadingCart.value = false
-                setError()
-            }
+                .onFailure {
+                    _productsLoadError.setError(it)
+                }
+            _isLoadingCart.value = false
         }
-    }
 
-    private fun loadProduct(cartItem: CartItem) {
-        productRepository.find(cartItem.productId) {
-            it.onSuccess { product ->
-                updateCartUiModels(product, cartItem)
-                updateCart()
-            }.onFailure {
-                setError()
-            }
+    private fun loadProduct(cartItem: CartItem) =
+        viewModelScope.launch {
+            productRepository.find(cartItem.product.id)
+                .onSuccess { product ->
+                    updateCartUiModels(product, cartItem)
+                }.onFailure {
+                    _productsLoadError.setError(it)
+                }
         }
-    }
 
     private fun updateCartUiModels(
         product: Product,
@@ -99,85 +102,61 @@ class CartViewModel(
         _cartUiModels.value = newCartUiModels
     }
 
-    private fun updateCart() {
-        updateTotalQuantity()
-        updateTotalPrice()
-        updateCartSelectedCount()
-    }
-
-    private fun updateCartSelectedCount() {
-        val cartSelectedCount = cartUiModels().selectedTotalCount()
-        this.cartItemSelectedCount.value = cartSelectedCount
-    }
-
-    private fun updateTotalQuantity() {
-        val cartUiModels = cartUiModels()
-        val totalQuantity = cartUiModels.selectedTotalQuantity()
-        _totalQuantity.value = totalQuantity
-    }
-
-    private fun updateTotalPrice() {
-        val uiModels = cartUiModels()
-        val totalPrice = uiModels.selectedTotalPrice()
-        _totalPrice.value = totalPrice
-    }
-
     override fun increaseQuantity(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
         val cartUiModel = cartUiModels().findByProductId(productId)
         if (cartUiModel == null) {
             addCartItem(productId)
             return
         }
         var newQuantity = cartUiModel.quantity
-        changeQuantity(cartUiModel, ++newQuantity)
+        changeQuantity(cartUiModel, ++newQuantity, _cartItemAddError)
     }
 
-    private fun addCartItem(productId: Int) {
-        cartRepository.add(productId) {
-            it.onSuccess {
-                loadAllCartItems()
-                if (isRecommendProduct(productId)) {
-                    updateRecommendProducts(productId)
+    private fun addCartItem(productId: Int) =
+        viewModelScope.launch {
+            cartRepository.add(productId)
+                .onSuccess {
+                    _changedCartEvent.setValue(Unit)
+                    loadAllCartItems()
+                    if (isRecommendProduct(productId)) {
+                        updateRecommendProducts(productId)
+                    }
                 }
-            }.onFailure {
-                setError()
-            }
+                .onFailure {
+                    _cartItemAddError.setError(it)
+                }
         }
-    }
 
     override fun decreaseQuantity(productId: Int) {
-        _changedCartEvent.value = Event(Unit)
-
         val cartUiModel = cartUiModels().findByProductId(productId) ?: return
         if (cartUiModel.quantity.count == 1) {
             deleteCartItem(cartUiModel.cartItemId)
             return
         }
         var newQuantity = cartUiModel.quantity
-        changeQuantity(cartUiModel, --newQuantity)
+        changeQuantity(cartUiModel, --newQuantity, _cartItemDeleteError)
     }
 
     override fun deleteCartItem(cartItemId: Int) {
-        _changedCartEvent.value = Event(Unit)
-        val cartUiModel = cartUiModels().find(cartItemId) ?: return
-
-        cartRepository.delete(cartUiModel.cartItemId) {
-            it.onSuccess {
-                updateDeletedCart(cartUiModel)
-                if (isRecommendProduct(cartUiModel.productId)) {
-                    updateRecommendProducts(cartUiModel.productId, Quantity())
+        viewModelScope.launch {
+            val cartUiModel = cartUiModels().find(cartItemId) ?: return@launch
+            cartRepository.delete(cartUiModel.cartItemId)
+                .onSuccess {
+                    _changedCartEvent.setValue(Unit)
+                    updateDeletedCart(cartUiModel)
+                    if (isRecommendProduct(cartUiModel.productId)) {
+                        updateRecommendProducts(cartUiModel.productId, Quantity())
+                    }
                 }
-            }.onFailure {
-                setError()
-            }
+                .onFailure {
+                    _cartItemDeleteError.setError(it)
+                }
         }
     }
 
     private fun updateDeletedCart(deletedCartUiModel: CartUiModel) {
         val newCartUiModels = cartUiModels().remove(deletedCartUiModel)
         _cartUiModels.value = newCartUiModels
-        updateCart()
     }
 
     private fun isRecommendProduct(productId: Int): Boolean {
@@ -201,17 +180,19 @@ class CartViewModel(
     private fun changeQuantity(
         cartUiModel: CartUiModel,
         quantity: Quantity,
-    ) {
-        cartRepository.changeQuantity(cartUiModel.cartItemId, quantity) {
-            it.onSuccess {
+        errorEvent: MutableSingleLiveData<Throwable>,
+    ) = viewModelScope.launch {
+        cartRepository.changeQuantity(cartUiModel.cartItemId, quantity)
+            .onSuccess {
+                _changedCartEvent.setValue(Unit)
                 loadProduct(cartUiModel.copy(quantity = quantity).toCartItem())
                 if (isRecommendProduct(cartUiModel.productId)) {
                     updateRecommendProducts(cartUiModel.productId, quantity)
                 }
-            }.onFailure {
-                setError()
             }
-        }
+            .onFailure {
+                errorEvent.setError(it)
+            }
     }
 
     override fun toggleAllCartItem(isSelected: Boolean) {
@@ -227,11 +208,10 @@ class CartViewModel(
     ) {
         val newCartUiModels = cartUiModels().select(productId, isSelected)
         _cartUiModels.value = newCartUiModels
-        updateCart()
     }
 
     fun order() {
-        _orderEvent.value = Event(Unit)
+        _orderEvent.setValue(Unit)
     }
 
     fun navigateCartRecommend() {
@@ -242,47 +222,29 @@ class CartViewModel(
         _visibleAllToggleView.value = true
     }
 
-    fun loadRecommendProducts() {
-        val recentProductCategory =
-            recentProductRepository.findLastOrNull()?.product?.category ?: return
-        val cartItems = cartUiModels().toCartItems()
+    fun loadRecommendProducts() =
+        viewModelScope.launch {
+            val recentProduct =
+                recentProductRepository.findLastOrNull().getOrNull() ?: return@launch
+            val recentProductCategory = recentProduct.product.category
+            val cartItems = cartUiModels().toCartItems()
 
-        productRepository.findRecommendProducts(recentProductCategory, cartItems) {
-            it.onSuccess { recommendProducts ->
-                _recommendProductUiModels.value = recommendProducts.map { ProductUiModel.from(it) }
-            }.onFailure {
-                setError()
-            }
-        }
-    }
-
-    fun createOrder() {
-        val cartItemIds = cartUiModels().selectedCartItemIds()
-        orderRepository.createOrder(cartItemIds) {
-            it.onSuccess {
-                _isSuccessCreateOrder.value = Event(true)
-                deleteCartItems(cartItemIds)
-            }.onFailure {
-                _isSuccessCreateOrder.value = Event(false)
-            }
-        }
-    }
-
-    private fun deleteCartItems(cartItemIds: List<Int>) {
-        _changedCartEvent.value = Event(Unit)
-        cartItemIds.forEach { cartItemId ->
-            cartRepository.delete(cartItemId) {
-                it.onSuccess {
-                    deleteCartItem(cartItemId)
+            productRepository.findRecommendProducts(recentProductCategory, cartItems)
+                .onSuccess { recommendProducts ->
+                    _recommendProductUiModels.value =
+                        recommendProducts.map { ProductUiModel.from(it) }
                 }.onFailure {
-                    setError()
+                    _productsLoadError.setError(it)
                 }
-            }
         }
+
+    fun updateSelectedCartItemIds() {
+        val cartItemIds = cartUiModels().selectedCartItemIds()
+        _selectedCartItemIds.value = cartItemIds
     }
 
-    private fun setError() {
-        _cartErrorEvent.value = Event(Unit)
+    private fun MutableSingleLiveData<Throwable>.setError(throwable: Throwable) {
+        this.setValue(throwable)
     }
 
     private fun cartUiModels(): CartUiModels {

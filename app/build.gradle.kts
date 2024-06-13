@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -9,6 +12,11 @@ android {
     namespace = "woowacourse.shopping"
     compileSdk = 34
 
+    val properties =
+        Properties().apply {
+            load(FileInputStream(rootProject.file("local.properties")))
+        }
+
     defaultConfig {
         applicationId = "woowacourse.shopping"
         minSdk = 26
@@ -19,8 +27,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
-    }
 
+        buildConfigField("String", "BASE_URL", properties["base_url"] as String)
+        buildConfigField("String", "USER_NAME", properties["user_name"] as String)
+        buildConfigField("String", "PASSWORD", properties["password"] as String)
+    }
+    buildFeatures {
+        buildConfig = true
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -80,6 +94,7 @@ dependencies {
 
     // room
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
     // okhttp
@@ -88,4 +103,7 @@ dependencies {
 
     // gson
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // mockk
+    testImplementation("io.mockk:mockk:1.13.10")
 }

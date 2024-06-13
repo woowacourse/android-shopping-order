@@ -5,7 +5,7 @@ import woowacourse.shopping.data.recent.local.entity.RecentProductEntity
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 
-fun RecentProductEntity.toRecentProduct() = RecentProduct(id, product.toProduct(), seenDateTime)
+fun RecentProductEntity.toRecentProduct() = RecentProduct(id, product.toProduct())
 
 fun List<RecentProductEntity>.toRecentProducts() = map { it.toRecentProduct() }
 

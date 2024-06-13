@@ -4,7 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.common.Event
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -22,11 +27,11 @@ class ProductDetailViewModel(
     private val _productUiModel = MutableLiveData<ProductUiModel>()
     val productUiModel: LiveData<ProductUiModel> get() = _productUiModel
 
-    private val _productLoadError = MutableLiveData<Event<Unit>>()
-    val productLoadError: LiveData<Event<Unit>> get() = _productLoadError
+    private val _productLoadError = MutableSingleLiveData<Throwable>()
+    val productLoadError: SingleLiveData<Throwable> get() = _productLoadError
 
-    private val _isSuccessAddCart = MutableLiveData<Event<Boolean>>()
-    val isSuccessAddCart: LiveData<Event<Boolean>> get() = _isSuccessAddCart
+    private val _isSuccessAddCart = MutableSingleLiveData<Boolean>()
+    val isSuccessAddCart: SingleLiveData<Boolean> get() = _isSuccessAddCart
 
     val addCartQuantityBundle: LiveData<AddCartQuantityBundle> =
         _productUiModel.map {
@@ -42,40 +47,37 @@ class ProductDetailViewModel(
     val lastRecentProduct: LiveData<LastRecentProductUiModel> get() = _lastRecentProduct
 
     val isVisibleLastRecentProduct: LiveData<Boolean> =
-        _lastRecentProduct.map { !lastSeenProductVisible && it.productId != _productUiModel.value?.productId }
+        _lastRecentProduct.map { !lastSeenProductVisible && it.productId != productId }
 
     init {
         loadLastRecentProduct()
     }
 
-    fun loadProduct() {
-        productRepository.find(productId) {
-            it.onSuccess { product ->
-                _productUiModel.value = product.toProductUiModel()
-                saveRecentProduct()
-            }.onFailure {
-                setError()
-            }
+    fun loadProduct() =
+        viewModelScope.launch {
+            productRepository.find(productId)
+                .onSuccess { product ->
+                    _productUiModel.value = product.toProductUiModel(this)
+                    saveRecentProduct()
+                }.onFailure {
+                    setProductLoadError(it)
+                }
         }
-    }
 
-    private fun Product.toProductUiModel(): ProductUiModel {
-        val cartItem =
-            cartRepository.syncFindByProductId(id)
-                ?: return ProductUiModel.from(this)
+    private suspend fun Product.toProductUiModel(scope: CoroutineScope): ProductUiModel {
+        val cartItemDeferred = scope.async { cartRepository.findByProductId(id) }
+        val cartItem = cartItemDeferred.await().getOrNull() ?: return ProductUiModel.from(this)
         return ProductUiModel.from(this, cartItem.quantity)
     }
 
-    private fun loadLastRecentProduct() {
-        val lastRecentProduct = recentProductRepository.findLastOrNull() ?: return
-        productRepository.find(lastRecentProduct.product.id) {
-            it.onSuccess { product ->
-                _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
-            }.onFailure {
-                setError()
-            }
+    private fun loadLastRecentProduct() =
+        viewModelScope.launch {
+            val lastRecentProduct = recentProductRepository.findLastOrNull().getOrNull() ?: return@launch
+            productRepository.find(lastRecentProduct.product.id)
+                .onSuccess { product ->
+                    _lastRecentProduct.value = LastRecentProductUiModel(product.id, product.name)
+                }
         }
-    }
 
     private fun increaseQuantity() {
         var quantity = _productUiModel.value?.quantity ?: return
@@ -87,27 +89,25 @@ class ProductDetailViewModel(
         _productUiModel.value = _productUiModel.value?.copy(quantity = --quantity)
     }
 
-    fun addCartProduct() {
-        val productUiModel = _productUiModel.value ?: return
-        val cartItem = cartRepository.syncFindByProductId(productUiModel.productId)
+    fun addCartProduct() =
+        viewModelScope.launch {
+            val productUiModel = _productUiModel.value ?: return@launch
+            val cartItem = cartRepository.findByProductId(productUiModel.productId).getOrNull()
 
-        val addCartCallback: (Result<Unit>) -> Unit = {
-            it.onSuccess {
-                _isSuccessAddCart.value = Event(true)
-            }.onFailure {
-                _isSuccessAddCart.value = Event(false)
-            }
+            val addCartResult =
+                if (cartItem == null) {
+                    cartRepository.add(productId, productUiModel.quantity)
+                } else {
+                    cartRepository.changeQuantity(cartItem.id, productUiModel.quantity)
+                }
+
+            addCartResult
+                .onSuccess { _isSuccessAddCart.setValue(true) }
+                .onFailure { _isSuccessAddCart.setValue(false) }
         }
 
-        if (cartItem == null) {
-            cartRepository.add(productId, productUiModel.quantity, addCartCallback)
-            return
-        }
-        cartRepository.changeQuantity(cartItem.id, productUiModel.quantity, addCartCallback)
-    }
-
-    private fun setError() {
-        _productLoadError.value = Event(Unit)
+    private fun setProductLoadError(throwable: Throwable) {
+        _productLoadError.setValue(throwable)
     }
 
     override fun onCleared() {
@@ -115,8 +115,9 @@ class ProductDetailViewModel(
         saveRecentProduct()
     }
 
-    private fun saveRecentProduct() {
-        val product = productRepository.syncFind(productId) ?: return
-        recentProductRepository.save(product)
-    }
+    private fun saveRecentProduct() =
+        viewModelScope.launch {
+            val product = productRepository.find(productId).getOrNull() ?: return@launch
+            recentProductRepository.save(product)
+        }
 }

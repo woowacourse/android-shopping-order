@@ -4,28 +4,20 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun find(
-        id: Int,
-        callback: (Result<Product>) -> Unit,
-    )
+    suspend fun find(id: Int): Result<Product>
 
-    fun syncFind(id: Int): Product?
-
-    fun findPage(
+    suspend fun findPage(
         page: Int,
         pageSize: Int,
-        callback: (Result<List<Product>>) -> Unit,
-    )
+    ): Result<List<Product>>
 
-    fun isLastPage(
+    suspend fun isLastPage(
         page: Int,
         pageSize: Int,
-        callback: (Result<Boolean>) -> Unit,
-    )
+    ): Result<Boolean>
 
-    fun findRecommendProducts(
+    suspend fun findRecommendProducts(
         category: String,
         cartItems: List<CartItem>,
-        callback: (Result<List<Product>>) -> Unit,
-    )
+    ): Result<List<Product>>
 }
