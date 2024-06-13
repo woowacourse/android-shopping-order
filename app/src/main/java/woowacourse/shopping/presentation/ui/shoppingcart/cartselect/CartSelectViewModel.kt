@@ -20,8 +20,8 @@ class CartSelectViewModel(
     private val shoppingRepository: ShoppingCartRepository,
 ) :
     BaseViewModel(),
-    CartSelectActionHandler,
-    ProductCountHandler {
+        CartSelectActionHandler,
+        ProductCountHandler {
     private val _uiState: MutableLiveData<CartSelectUiState> = MutableLiveData(CartSelectUiState())
     val uiState: LiveData<CartSelectUiState> get() = _uiState
 
@@ -118,28 +118,32 @@ class CartSelectViewModel(
                 if (carts.totalElements == _uiState.value?.orderCarts?.size) {
                     _uiState.value?.let { state ->
 
-                        val newPagingCartProduct = state.pagingCartProduct.carts.map { cart ->
-                            cart.copy(isChecked = false)
-                        }
+                        val newPagingCartProduct =
+                            state.pagingCartProduct.carts.map { cart ->
+                                cart.copy(isChecked = false)
+                            }
 
-                        _uiState.value = state.copy(
-                            orderCarts = hashMapOf(),
-                            pagingCartProduct = state.pagingCartProduct.copy(carts = newPagingCartProduct),
-                        )
+                        _uiState.value =
+                            state.copy(
+                                orderCarts = hashMapOf(),
+                                pagingCartProduct = state.pagingCartProduct.copy(carts = newPagingCartProduct),
+                            )
                     }
                 } else {
                     _uiState.value?.let { state ->
-                        val newPagingCarts = state.pagingCartProduct.carts.map { cart ->
-                            cart.copy(isChecked = true)
-                        }
+                        val newPagingCarts =
+                            state.pagingCartProduct.carts.map { cart ->
+                                cart.copy(isChecked = true)
+                            }
 
                         val orderCarts =
                             carts.content.associateBy { cart -> cart.id }.toMutableMap()
 
-                        _uiState.value = state.copy(
-                            orderCarts = orderCarts,
-                            pagingCartProduct = state.pagingCartProduct.copy(carts = newPagingCarts),
-                        )
+                        _uiState.value =
+                            state.copy(
+                                orderCarts = orderCarts,
+                                pagingCartProduct = state.pagingCartProduct.copy(carts = newPagingCarts),
+                            )
                     }
                 }
             }.onFailure { e ->

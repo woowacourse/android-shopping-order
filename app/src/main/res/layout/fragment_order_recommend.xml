@@ -9,6 +9,10 @@
             name="vm"
             type="woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderRecommendViewModel" />
 
+        <variable
+            name="orderCartsUiState"
+            type="woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.OrderCartsUiState" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,7 +62,7 @@
 
             <TextView
                 android:id="@+id/tv_total_order_price"
-                priceToCurrency="@{vm.uiState.orderTotalPrice}"
+                castToPriceToCurrency="@{vm.orderCartsUiState}"
                 android:layout_width="0dp"
                 android:layout_height="78dp"
                 android:layout_weight="2"
@@ -72,13 +76,13 @@
 
             <TextView
                 android:id="@+id/tv_order"
+                orderQuantity="@{vm.orderCartsUiState}"
                 android:layout_width="0dp"
                 android:layout_height="78dp"
                 android:layout_weight="1"
                 android:background="@color/green"
                 android:gravity="center"
                 android:onClick="@{() -> vm.navigateToPayment()}"
-                android:text="@{@string/tv_order(vm.uiState.totalQuantity)}"
                 android:textColor="@color/white"
                 android:textSize="20dp"
                 android:textStyle="bold"

@@ -50,8 +50,20 @@ class OrderRecommendFragment :
     }
 
     private fun initObserve() {
-        viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.recommendCarts)
+        viewModel.recommendCartsUiState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is RecommendCartsUiState.Success -> {
+                    adapter.submitList(state.recommendCarts)
+                }
+
+                RecommendCartsUiState.Loading -> {
+                    showToastMessage("로딩중!")
+                }
+
+                is RecommendCartsUiState.Error -> {
+                    state.message?.let { showToastMessage(it) }
+                }
+            }
         }
 
         viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->
