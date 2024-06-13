@@ -91,21 +91,20 @@ class RecommendViewModel(
                 _recommendItemsState.value = UIState.Empty
                 setLoadingState(false)
                 return@launch
-            } else {
-                val result = cartRepository.fetchCartItemsInfo()
-                result.onSuccess { items ->
-                    val cartItemIds = items.map { it.productId }
-                    val recommendItems =
-                        shoppingRepository.recommendProducts(
-                            recentProduct.category,
-                            DEFAULT_RECOMMEND_ITEM_COUNTS,
-                            cartItemIds,
-                        ).mapperToShoppingProductList()
-                    setUpUIState(recommendItems)
-                }.onFailure {
-                    setLoadingState(false)
-                    Log.d(this::class.java.simpleName, "$it")
-                }
+            }
+            val result = cartRepository.fetchCartItemsInfo()
+            result.onSuccess { items ->
+                val cartItemIds = items.map { it.productId }
+                val recommendItems =
+                    shoppingRepository.recommendProducts(
+                        recentProduct.category,
+                        DEFAULT_RECOMMEND_ITEM_COUNTS,
+                        cartItemIds,
+                    ).mapperToShoppingProductList()
+                setUpUIState(recommendItems)
+            }.onFailure {
+                setLoadingState(false)
+                Log.d(this::class.java.simpleName, "$it")
             }
         }
     }

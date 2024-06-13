@@ -141,18 +141,17 @@ class PaymentViewModel(private val orderRepository: OrderRepository) : ViewModel
     }
 
     override fun onMakePaymentClick() {
-        val paymentAmount = totalPaymentAmount.value
-        if (paymentAmount != null) {
-            viewModelScope.launch {
-                val orderResult = orderRepository.makeOrder(paymentAmount)
-                orderResult.onSuccess {
-                    _isOrderSuccess.value = true
-                    _toastMessage.value = MESSAGE_ORDER_SUCCESS
-                    SharedChangedIdsDB.addChangedProductsId(order.map.values.map { it.productId }.toSet())
-                }.onFailure {
-                    _toastMessage.value = MESSAGE_ORDER_FAILURE
-                    Log.d(this::class.java.simpleName, "$it")
-                }
+        val paymentAmount = totalPaymentAmount.value ?: return
+        viewModelScope.launch {
+            val orderResult = orderRepository.makeOrder(paymentAmount)
+            orderResult.onSuccess {
+                _isOrderSuccess.value = true
+                _toastMessage.value = MESSAGE_ORDER_SUCCESS
+                SharedChangedIdsDB.addChangedProductsId(order.map.values.map { it.productId }
+                    .toSet())
+            }.onFailure {
+                _toastMessage.value = MESSAGE_ORDER_FAILURE
+                Log.d(this::class.java.simpleName, "$it")
             }
         }
     }
