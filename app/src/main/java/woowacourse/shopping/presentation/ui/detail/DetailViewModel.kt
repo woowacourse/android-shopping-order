@@ -66,12 +66,8 @@ class DetailViewModel(
         }
     }
 
-    private fun fetchQuantity(): Int {
-        var quantity = 1
-        viewModelScope.launch {
-            quantity = cartRepository.findCartItemWithProductId(productId)?.quantity ?: 1
-        }
-        return quantity
+    private suspend fun fetchQuantity(): Int {
+        return cartRepository.findCartItemWithProductId(productId)?.quantity ?: DEFAULT_QUANTITY
     }
 
     private fun loadRecentProductData() {
@@ -127,5 +123,9 @@ class DetailViewModel(
     ) {
         val shoppingProduct = _shoppingProduct.value?.copy(quantity = quantity.dec())
         _shoppingProduct.value = shoppingProduct ?: _shoppingProduct.value
+    }
+
+    companion object {
+        private const val DEFAULT_QUANTITY = 1
     }
 }
