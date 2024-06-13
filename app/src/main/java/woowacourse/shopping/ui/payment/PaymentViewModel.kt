@@ -39,23 +39,29 @@ class PaymentViewModel(
 
     fun loadOrders() {
         viewModelScope.launch {
-            orderRepository.loadAllOrders()
-                .onSuccess { loadedOrders ->
-                    _orders.value = loadedOrders
-                }
-                .onFailure {
-                    _error.setValue(PaymentError.LoadOrders)
-                }
-            couponRepository.availableCoupons(orders = orders.value ?: Orders.DEFAULT)
-                .onSuccess { coupons ->
-                    _loadedCoupons.setValue(coupons.toUi())
-                }
-                .onFailure {
-                    _error.setValue(PaymentError.LoadCoupons)
-                }
+            loadOrderItems()
+            loadCoupons()
         }
+    }
 
+    private suspend fun loadCoupons() {
+        couponRepository.availableCoupons(orders = orders.value ?: Orders.DEFAULT)
+            .onSuccess { coupons ->
+                _loadedCoupons.setValue(coupons.toUi())
+            }
+            .onFailure {
+                _error.setValue(PaymentError.LoadCoupons)
+            }
+    }
 
+    private suspend fun loadOrderItems() {
+        orderRepository.loadAllOrders()
+            .onSuccess { loadedOrders ->
+                _orders.value = loadedOrders
+            }
+            .onFailure {
+                _error.setValue(PaymentError.LoadOrders)
+            }
     }
 
     override fun onCheck(coupon: CouponUi) {
@@ -63,19 +69,23 @@ class PaymentViewModel(
             couponRepository.discountAmount(coupon.id, orders = orders.value ?: Orders.DEFAULT)
                 .onSuccess { discountAmount ->
                     _discountedPrice.value = discountAmount
-                    _loadedCoupons.setValue(
-                        loadedCoupons.getValue().orEmpty().map { couponUi ->
-                            if (couponUi.id == coupon.id) {
-                                couponUi.copy(isChecked = true)
-                            } else {
-                                couponUi.copy(isChecked = false)
-                            }
-                        }
-                    )
+                    changeCheckedCoupons(coupon)
                 }.onFailure {
                     _error.setValue(PaymentError.DiscountAmount)
                 }
         }
+    }
+
+    private fun changeCheckedCoupons(coupon: CouponUi) {
+        _loadedCoupons.setValue(
+            loadedCoupons.getValue().orEmpty().map { couponUi ->
+                if (couponUi.id == coupon.id) {
+                    couponUi.copy(isChecked = true)
+                } else {
+                    couponUi.copy(isChecked = false)
+                }
+            }
+        )
     }
 
     fun pay() {
