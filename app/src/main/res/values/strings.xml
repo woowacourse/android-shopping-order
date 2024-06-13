@@ -43,4 +43,9 @@
     <string name="error_message_save_order_items">주문 상품 정보를 저장하지 못했습니다.</string>
     <string name="error_message_update_cart_items">장바구니 상품을 저장하지 못했습니다. </string>
 
+    <string name="error_load_recommended_products">추천 상품 목록을 불러오지 못했습니다</string>
+    <string name="error_calculate_order_items_quantity">주문 상품들의 개수를 계산하는 데 실패했습니다.</string>
+    <string name="error_calculate_order_items_total_price">주문 상품들의 가격을 계산하는 데 실패했습니다.</string>
+    <string name="error_update_order_item">주문 상품의 개수를 변경하는 데 실패했습니다.</string>
+
 </resources>
