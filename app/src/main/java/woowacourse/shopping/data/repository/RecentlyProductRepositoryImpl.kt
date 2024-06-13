@@ -2,7 +2,6 @@ package woowacourse.shopping.data.repository
 
 import android.content.Context
 import woowacourse.shopping.data.db.recently.RecentlyProductDatabase
-import woowacourse.shopping.data.repository.ShoppingCartRepositoryImpl.Companion.ERROR_DELETE_DATA_ID
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.utils.EntityMapper.toRecentlyProduct

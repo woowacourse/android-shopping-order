@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.ProductRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
 import woowacourse.shopping.domain.model.Product
@@ -14,6 +15,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.base.ErrorEvent
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductListViewModel(
@@ -36,9 +38,13 @@ class ProductListViewModel(
     private val _loadingEvent: MutableSingleLiveData<ProductListEvent.LoadProductEvent> =
         MutableSingleLiveData()
     val loadingEvent: SingleLiveData<ProductListEvent.LoadProductEvent> get() = _loadingEvent
-    private val _errorEvent: MutableSingleLiveData<ProductListEvent.ErrorEvent> =
-        MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ProductListEvent.ErrorEvent> get() = _errorEvent
+    private val _errorEvent: MutableSingleLiveData<ErrorEvent> = MutableSingleLiveData()
+    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
+
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            handleException(exception)
+        }
 
     init {
         updateTotalCartItemCount()
@@ -46,7 +52,7 @@ class ProductListViewModel(
     }
 
     fun loadPagingProduct() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
             val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
             productRepository.loadPagingProducts(itemSize)
@@ -62,7 +68,7 @@ class ProductListViewModel(
     }
 
     fun loadPagingRecentlyProduct() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             recentlyProductRepository.getRecentlyProductList()
                 .onSuccess { pagingData ->
                     _recentlyProducts.value = pagingData
@@ -73,7 +79,7 @@ class ProductListViewModel(
     }
 
     private fun updateTotalCartItemCount() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             shoppingCartRepository.getTotalCartItemCount()
                 .onSuccess { totalItemCount ->
                     _cartItemCount.value = totalItemCount
@@ -84,11 +90,12 @@ class ProductListViewModel(
     }
 
     private fun handleException(exception: Throwable) {
-        // TODO: 에러 핸들링
-        when (exception) {
-            is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
-            else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
-        }
+        val errorEvent =
+            when (exception) {
+                is NoSuchDataException -> ErrorEvent.LoadDataEvent()
+                else -> ErrorEvent.NotKnownError()
+            }
+        _errorEvent.setValue(errorEvent)
     }
 
     fun updateProducts(items: Map<Long, Int>) {
@@ -103,7 +110,7 @@ class ProductListViewModel(
     }
 
     override fun clickIncrease(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             shoppingCartRepository.increaseCartItem(product)
                 .onSuccess {
                     _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
@@ -115,7 +122,7 @@ class ProductListViewModel(
     }
 
     override fun clickDecrease(product: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             shoppingCartRepository.decreaseCartItem(product)
                 .onSuccess {
                     _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
