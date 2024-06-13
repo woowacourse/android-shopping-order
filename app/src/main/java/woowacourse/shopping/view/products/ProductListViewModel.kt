@@ -2,7 +2,6 @@ package woowacourse.shopping.view.products
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -12,17 +11,16 @@ import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
-import woowacourse.shopping.view.base.ErrorEvent
+import woowacourse.shopping.view.base.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter {
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
     private val _cartItemCount: MutableLiveData<Int> = MutableLiveData(0)
@@ -38,8 +36,6 @@ class ProductListViewModel(
     private val _loadingEvent: MutableSingleLiveData<ProductListEvent.LoadProductEvent> =
         MutableSingleLiveData()
     val loadingEvent: SingleLiveData<ProductListEvent.LoadProductEvent> get() = _loadingEvent
-    private val _errorEvent: MutableSingleLiveData<ErrorEvent> = MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ErrorEvent> get() = _errorEvent
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
@@ -87,15 +83,6 @@ class ProductListViewModel(
                     handleException(exception)
                 }
         }
-    }
-
-    private fun handleException(exception: Throwable) {
-        val errorEvent =
-            when (exception) {
-                is NoSuchDataException -> ErrorEvent.LoadDataEvent()
-                else -> ErrorEvent.NotKnownError()
-            }
-        _errorEvent.setValue(errorEvent)
     }
 
     fun updateProducts(items: Map<Long, Int>) {
