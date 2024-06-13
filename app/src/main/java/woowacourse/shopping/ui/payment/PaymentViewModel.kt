@@ -46,9 +46,12 @@ class PaymentViewModel(
 
     fun createOrder() {
         viewModelScope.launch {
-            orderRepository.orderCartItems(orderInformation.getCartItemIds())
+            handleResponseResult(
+                responseResult = orderRepository.orderCartItems(orderInformation.getCartItemIds()),
+                onSuccess = { _isPaymentSuccess.setValue(true) },
+                onError = { message -> _errorMessage.value = message },
+            )
         }
-        _isPaymentSuccess.setValue(true)
     }
 
     fun loadCoupons() {
