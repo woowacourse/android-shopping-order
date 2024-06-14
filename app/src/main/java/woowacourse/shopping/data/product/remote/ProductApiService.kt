@@ -1,31 +1,30 @@
 package woowacourse.shopping.data.product.remote
 
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.dto.response.ProductDto
+import woowacourse.shopping.data.dto.response.ProductItemResponse
 import woowacourse.shopping.data.dto.response.ProductResponse
 
 interface ProductApiService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ProductResponse>
+    ): ProductResponse
 
     @GET("/products")
-    fun requestProductsWithCategory(
+    suspend fun requestProductsWithCategory(
         @Header("accept") accept: String = "*/*",
         @Query("category") category: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<ProductResponse>
+    ): ProductResponse
 
     @GET("/products/{id}")
-    fun requestProductDetail(
+    suspend fun requestProductDetail(
         @Path(value = "id") productId: Int,
-    ): Call<ProductDto>
+    ): ProductItemResponse
 }

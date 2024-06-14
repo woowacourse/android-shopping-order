@@ -9,7 +9,6 @@ data class Product(
 ) {
     fun toInitialShoppingItem() =
         ProductListItem.ShoppingProductItem(
-            cartId = -1,
             id = id,
             name = name,
             imgUrl = imgUrl,

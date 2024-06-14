@@ -1,26 +1,19 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.PagedProducts
 import woowacourse.shopping.domain.Product
 
 interface ProductRepository {
-    fun loadWithCategory(
+    suspend fun loadWithCategory(
         category: String,
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
-    )
+    ): Result<List<Product>>
 
-    fun load(
+    suspend fun load(
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Product>) -> Unit,
-        onFailure: () -> Unit,
-    )
+    ): Result<PagedProducts>
 
-    fun loadById(
-        id: Long,
-        onSuccess: (Product) -> Unit,
-        onFailure: () -> Unit,
-    )
+    suspend fun loadById(id: Long): Result<Product>
 }

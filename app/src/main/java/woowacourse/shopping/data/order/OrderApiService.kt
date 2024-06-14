@@ -1,13 +1,12 @@
 package woowacourse.shopping.data.order
 
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
-import woowacourse.shopping.data.dto.request.OrderRequest
+import woowacourse.shopping.data.dto.request.OrderRequestBody
 
 interface OrderApiService {
     @POST("/orders")
-    fun requestOrder(
-        @Body orderRequest: OrderRequest,
-    ): Call<Unit>
+    suspend fun requestOrder(
+        @Body orderRequestBody: OrderRequestBody,
+    )
 }

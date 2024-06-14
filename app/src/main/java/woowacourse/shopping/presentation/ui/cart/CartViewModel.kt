@@ -6,10 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.ProductListItem
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentRepository
 import woowacourse.shopping.presentation.ui.UiState
@@ -19,7 +20,6 @@ class CartViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentRepository: RecentRepository,
-    private val orderRepository: OrderRepository,
 ) : ViewModel(), CartHandler {
     private val _error = MutableLiveData<Event<CartError>>()
 
@@ -57,10 +57,10 @@ class CartViewModel(
         }
 
     private val selectedCartItems: LiveData<List<ProductListItem.ShoppingProductItem>> =
-        shoppingProducts.switchMap {
+        shoppingProducts.switchMap { state ->
             MutableLiveData(
-                if (it is UiState.Success) {
-                    it.data.filter { it.isChecked }
+                if (state is UiState.Success) {
+                    state.data.filter { it.isChecked }
                 } else {
                     emptyList()
                 },
@@ -68,16 +68,16 @@ class CartViewModel(
         }
 
     val totalPrice: LiveData<Long> =
-        selectedCartItems.switchMap {
+        selectedCartItems.switchMap { state ->
             MutableLiveData(
-                it.sumOf { it.price * it.quantity },
+                state.sumOf { it.price * it.quantity },
             )
         }
 
     val totalCount: LiveData<Int> =
-        selectedCartItems.switchMap {
+        selectedCartItems.switchMap { productItems ->
             MutableLiveData(
-                it.sumOf { it.quantity },
+                productItems.sumOf { it.quantity },
             )
         }
 
@@ -88,21 +88,27 @@ class CartViewModel(
     fun loadAllCartItems(pageSize: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
-            cartRepository.load(0, pageSize, onSuccess = { carts, _ ->
-                _shoppingProducts.value = UiState.Success(carts.map { it.toShoppingProduct() })
-            }, onFailure = { _error.value = Event(CartError.CartItemsNotFound) })
+            viewModelScope.launch {
+                cartRepository.load(0, pageSize).onSuccess { carts ->
+                    _shoppingProducts.value = UiState.Success(carts.map { it.toShoppingProduct() })
+                }.onFailure { _error.value = Event(CartError.CartItemsNotFound) }
+            }
         }, 500)
     }
 
     override fun onDeleteClick(product: ProductListItem.ShoppingProductItem) {
-        cartRepository.deleteExistCartItem(product.cartId, onSuccess = { cartId, newQuantity ->
-            val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
-            _changedCartProducts.value =
-                originalChangedCartProducts.plus(Cart(cartId, product.toProduct(), newQuantity))
-            val newShoppingProduct =
-                (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.filter { it.id != product.id }
-            _shoppingProducts.value = UiState.Success(newShoppingProduct)
-        }, onFailure = { _error.value = Event(CartError.CartItemNotDeleted) })
+        val shoppingProductState = shoppingProducts.value
+        if (shoppingProductState !is UiState.Success) return
+        viewModelScope.launch {
+            cartRepository.deleteExistCartItem(product.id).onSuccess {
+                addChangedCartProducts(product.id, product, 0)
+                val updatedShoppingProducts =
+                    shoppingProductState.data.filter { it.id != product.id }
+                _shoppingProducts.value = UiState.Success(updatedShoppingProducts)
+            }.onFailure {
+                _error.value = Event(CartError.CartItemNotDeleted)
+            }
+        }
     }
 
     override fun onCheckBoxClicked(product: ProductListItem.ShoppingProductItem) {
@@ -140,7 +146,8 @@ class CartViewModel(
             }
 
             is OrderState.Recommend -> {
-                _orderEvent.value = Event(OrderEvent.CompleteOrder)
+                val selectedCartItems = selectedCartItems.value ?: return
+                _orderEvent.value = Event(OrderEvent.MoveToPayment(selectedCartItems))
             }
 
             null -> throw IllegalAccessError()
@@ -153,7 +160,7 @@ class CartViewModel(
     ) {
         val newShoppingProducts =
             (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.map {
-                if (it.cartId == cartItem.cartId) {
+                if (it.id == cartItem.id) {
                     it.copy(quantity = resultQuantity, isChecked = cartItem.isChecked)
                 } else {
                     it
@@ -163,64 +170,76 @@ class CartViewModel(
     }
 
     fun buildRecommendProducts() {
-        recentRepository.loadMostRecent().onSuccess {
-            val recentViewedCategory = it?.category ?: "최근 본 아이템 없음"
-            productRepository.loadWithCategory(
-                recentViewedCategory,
-                0,
-                20,
-                onSuccess = { products ->
-                    val existCarts =
-                        (shoppingProducts.value as UiState.Success<List<ProductListItem.ShoppingProductItem>>).data.map { it.toProduct() }
-                    _recommendedProduct.value =
-                        (products - existCarts.toSet()).take(10).map { it.toInitialShoppingItem() }
-                },
-                onFailure = {},
-            )
-        }
-    }
-
-    override fun onDecreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        val updatedQuantity = item?.let { it.quantity - 1 } ?: 1
-        if (updatedQuantity > 0) {
-            item?.let { item ->
-                cartRepository.updateDecrementQuantity(
-                    item.cartId,
-                    item.id,
-                    1,
-                    item.quantity,
-                    onSuccess = { cartId, resultQuantity ->
-//                        modifyShoppingProductQuantity(item, resultQuantity)
-                        val orderState = orderState.value ?: throw IllegalStateException()
-                        handleQuantity(orderState, item, resultQuantity, cartId)
-                    },
-                    onFailure = {},
-                )
+        viewModelScope.launch {
+            recentRepository.loadMostRecent().onSuccess { recentProduct ->
+                val recentViewedCategory = recentProduct?.category ?: "최근 본 아이템 없음"
+                viewModelScope.launch { // TODO
+                    fetchProductByCategory(recentViewedCategory)
+                }
             }
         }
     }
 
-    override fun onIncreaseQuantity(item: ProductListItem.ShoppingProductItem?) {
-        item?.let { item ->
-            cartRepository.updateIncrementQuantity(
-                item.cartId,
-                item.id,
-                1,
-                item.quantity,
-                onSuccess = { cartId, resultQuantity ->
-                    val orderState = orderState.value ?: throw IllegalStateException()
-                    handleQuantity(orderState, item, resultQuantity, cartId)
-                },
-                onFailure = {},
-            )
+    private suspend fun fetchProductByCategory(recentViewedCategory: String) {
+        productRepository.loadWithCategory(
+            recentViewedCategory,
+            0,
+            20,
+        ).onSuccess { products ->
+            val shoppingProducts = shoppingProducts.value
+            if (shoppingProducts !is UiState.Success) return
+            val existCarts = shoppingProducts.data.map { it.toProduct() }
+            _recommendedProduct.value =
+                (products - existCarts.toSet()).take(10)
+                    .map { it.toInitialShoppingItem() }
+        }.onFailure {}
+    }
+
+    override fun onDecreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        viewModelScope.launch {
+            val updatedQuantity = product?.let { it.quantity - 1 } ?: 1
+            if (updatedQuantity > 0) {
+                product?.let {
+                    cartRepository.applyDeltaToCartQuantity(
+                        productId = it.id,
+                        quantityDelta = -1,
+                    ).onSuccess { resultQuantity ->
+                        addChangedCartProducts(it.id, it, resultQuantity)
+                        val orderState = orderState.value ?: throw IllegalStateException()
+                        handleQuantity(orderState, it, resultQuantity)
+                    }.onFailure {}
+                }
+            }
         }
+    }
+
+    override fun onIncreaseQuantity(product: ProductListItem.ShoppingProductItem?) {
+        product?.let {
+            viewModelScope.launch {
+                cartRepository.applyDeltaToCartQuantity(productId = it.id, quantityDelta = 1)
+                    .onSuccess { resultQuantity ->
+                        addChangedCartProducts(it.id, it, resultQuantity)
+                        val orderState = orderState.value ?: throw IllegalStateException()
+                        handleQuantity(orderState, it, resultQuantity)
+                    }
+            }
+        }
+    }
+
+    private fun addChangedCartProducts(
+        productId: Long,
+        item: ProductListItem.ShoppingProductItem,
+        resultQuantity: Int,
+    ) {
+        val originalChangedCartProducts = changedCartProducts.value ?: emptyList()
+        _changedCartProducts.value =
+            originalChangedCartProducts.plus(Cart(productId, item.toProduct(), resultQuantity))
     }
 
     private fun handleQuantity(
         orderState: OrderState,
         item: ProductListItem.ShoppingProductItem,
         resultQuantity: Int,
-        cartId: Long,
     ) {
         when (orderState) {
             OrderState.CartList -> {
@@ -228,34 +247,34 @@ class CartViewModel(
             }
 
             OrderState.Recommend -> {
-                modifyRecentProductQuantity(cartId, item, resultQuantity)
+                modifyRecommendProductQuantity(item, resultQuantity)
             }
         }
     }
 
-    private fun modifyRecentProductQuantity(
-        cartId: Long,
+    private fun modifyRecommendProductQuantity(
         selectedItem: ProductListItem.ShoppingProductItem,
         resultQuantity: Int,
     ) {
+        val originCartProducts = (_shoppingProducts.value as UiState.Success).data.toMutableList()
+        val targetIndex = originCartProducts.indexOfFirst { it.id == selectedItem.id }
+        if (targetIndex != -1) {
+            originCartProducts[targetIndex] =
+                selectedItem.copy(quantity = resultQuantity, isChecked = true)
+        } else {
+            originCartProducts.add(selectedItem.copy(quantity = resultQuantity, isChecked = true))
+        }
+        _shoppingProducts.value = UiState.Success(originCartProducts)
+
         val recommended = recommendedProduct.value ?: emptyList()
         val updated =
             recommended.map {
                 if (it.id == selectedItem.id) {
-                    it.copy(cartId = cartId, quantity = resultQuantity)
+                    it.copy(quantity = resultQuantity)
                 } else {
                     it
                 }
             }
         _recommendedProduct.value = updated
-    }
-
-    fun completeOrder() {
-        val cartItemIds = selectedCartItems.value?.map { it.cartId } ?: emptyList()
-        if (cartItemIds.isNotEmpty()) {
-            orderRepository.completeOrder(cartItemIds, onSuccess = {
-                _orderEvent.value = Event(OrderEvent.FinishOrder)
-            }, onFailure = {})
-        }
     }
 }

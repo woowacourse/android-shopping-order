@@ -1,201 +1,131 @@
 package woowacourse.shopping.data.cart
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
-import woowacourse.shopping.data.dto.response.CartQuantityResponse
-import woowacourse.shopping.data.dto.response.CartResponse
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.LocalCartDataSource
 
 class CartRepositoryImpl(
     private val remoteCartDataSource: RemoteCartDataSource = RemoteCartDataSource(),
-    private val localCartDataSource: LocalCartDataSource,
 ) : CartRepository {
-    override fun load(
+    override suspend fun loadAll(): Result<List<Cart>> {
+        return runCatching {
+            val maxCount = getTotalCartItemCount().getOrElse { MAXIMUM_CART_ITEM_COUNT }
+            return load(
+                0,
+                maxCount,
+            )
+        }
+    }
+
+    override suspend fun getTotalCartItemCount(): Result<Int> {
+        return runCatching {
+            remoteCartDataSource.getTotalCartItemCount().quantity
+        }
+    }
+
+    override suspend fun load(
         startPage: Int,
         pageSize: Int,
-        onSuccess: (List<Cart>, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.load(startPage, pageSize).enqueue(
-            object :
-                Callback<CartResponse> {
-                override fun onResponse(
-                    call: Call<CartResponse>,
-                    response: Response<CartResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val cartData =
-                            response.body() ?: run {
-                                onFailure()
-                                return
-                            }
-                        val carts = cartData.cartDto.map { it.toCart() }
-                        onSuccess(carts, cartData.totalPages)
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<CartResponse>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    ): Result<List<Cart>> {
+        return runCatching {
+            remoteCartDataSource.load(startPage, pageSize).cartItemResponse.map { it.toCart() }
+        }
     }
 
-    override fun updateIncrementQuantity(
-        cartId: Long,
-        productId: Long,
-        incrementAmount: Int,
-        quantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        if (cartId == -1L) {
-            saveNewCartItem(productId, incrementAmount, onSuccess, onFailure)
+    override suspend fun loadById(productId: Long): Result<Cart> {
+        val currentCartItems = loadAll().getOrElse { emptyList() }
+        val foundCart = currentCartItems.firstOrNull { it.product.id == productId }
+        return if (foundCart != null) {
+            Result.success(foundCart)
         } else {
-            updateExistCartItem(cartId, quantity + incrementAmount, onSuccess, onFailure)
+            Result.failure(NoSuchElementException(EXCEPTION_NO_SUCH_PRODUCT))
         }
     }
 
-    override fun updateDecrementQuantity(
-        cartId: Long,
+    override suspend fun deleteExistCartItem(productId: Long): Result<Unit> {
+        return runCatching {
+            loadById(productId).onSuccess { cart ->
+                remoteCartDataSource.delete(cart.cartId)
+            }
+        }
+    }
+
+    override suspend fun applyDeltaToCartQuantity(
         productId: Long,
-        decrementAmount: Int,
+        quantityDelta: Int,
+    ): Result<Int> {
+        return runCatching {
+            var resultQuantity = quantityDelta
+            loadById(productId).onSuccess { targetCart ->
+                resultQuantity = targetCart.quantity + quantityDelta
+                handleCartItemByQuantity(targetCart, resultQuantity)
+            }.onFailure { e ->
+                if (e.message == EXCEPTION_NO_SUCH_PRODUCT) {
+                    saveNewCartItem(
+                        productId,
+                        resultQuantity,
+                    )
+                }
+            }
+            resultQuantity
+        }
+    }
+
+    override suspend fun setNewCartQuantity(
+        productId: Long,
+        newQuantity: Int,
+    ): Result<Unit> {
+        return runCatching {
+            loadById(productId).onSuccess { targetCart ->
+                handleCartItemByQuantity(targetCart, newQuantity)
+            }.onFailure { e ->
+                if (e.message == EXCEPTION_NO_SUCH_PRODUCT) {
+                    saveNewCartItem(
+                        productId,
+                        newQuantity,
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun handleCartItemByQuantity(
+        targetCart: Cart,
         quantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
     ) {
-        if (cartId == -1L) {
-            throw IllegalArgumentException()
-        }
-        val resultQuantity = quantity - decrementAmount
-        if (resultQuantity == 0) {
-            deleteExistCartItem(
-                cartId,
-                onSuccess,
-                onFailure,
-            )
-        } else {
-            updateExistCartItem(cartId, quantity - decrementAmount, onSuccess, onFailure)
+        when {
+            (0 < quantity) ->
+                updateExistCartItem(
+                    targetCart.cartId,
+                    quantity,
+                )
+
+            (0 == quantity) -> deleteExistCartItem(targetCart.product.id)
+
+            else -> throw IllegalArgumentException("newQuantity는 0보다 작을 수 없습니다")
         }
     }
 
-    override fun deleteExistCartItem(
-        cartId: Long,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.delete(cartId).enqueue(
-            object :
-                Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.isSuccessful) {
-                        onSuccess(cartId, 0)
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    private suspend fun saveNewCartItem(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit> {
+        return runCatching {
+            remoteCartDataSource.save(productId, quantity)
+        }
     }
 
-    private fun updateExistCartItem(
+    private suspend fun updateExistCartItem(
         cartId: Long,
         resultQuantity: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.update(cartId, resultQuantity).enqueue(
-            object :
-                Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.isSuccessful) onSuccess(cartId, resultQuantity)
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    ): Result<Unit> {
+        return runCatching {
+            remoteCartDataSource.update(cartId, resultQuantity)
+        }
     }
 
-    private fun saveNewCartItem(
-        productId: Long,
-        incrementAmount: Int,
-        onSuccess: (Long, Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.save(productId, incrementAmount).enqueue(
-            object :
-                Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.isSuccessful) {
-                        val location = response.headers()["Location"]
-                        if (location != null) {
-                            val segments = location.split("/")
-                            val cartId = segments.last().toLong()
-                            onSuccess(cartId, incrementAmount)
-                        }
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
-    }
-
-    override fun getCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteCartDataSource.getCount().enqueue(
-            object :
-                Callback<CartQuantityResponse> {
-                override fun onResponse(
-                    call: Call<CartQuantityResponse>,
-                    response: Response<CartQuantityResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val count = response.body()?.quantity ?: 0
-                        onSuccess(count)
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<CartQuantityResponse>,
-                    t: Throwable,
-                ) {
-                    onFailure()
-                }
-            },
-        )
+    companion object {
+        private const val EXCEPTION_NO_SUCH_PRODUCT = "상품을 장바구니에서 찾을 수 없습니다."
+        const val MAXIMUM_CART_ITEM_COUNT = 999
     }
 }

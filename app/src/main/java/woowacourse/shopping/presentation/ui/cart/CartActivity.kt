@@ -12,6 +12,7 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.ViewModelFactory
 import woowacourse.shopping.presentation.ui.cart.fragment.CartListFragment
 import woowacourse.shopping.presentation.ui.cart.fragment.RecommendFragment
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 import woowacourse.shopping.presentation.util.EventObserver
 
@@ -43,8 +44,11 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             this,
             EventObserver {
                 when (it) {
-                    OrderEvent.CompleteOrder -> {
-                        viewModel.completeOrder()
+                    is OrderEvent.MoveToPayment -> {
+                        PaymentActivity.startWithSelectedProducts(
+                            this,
+                            it.selectedCartItems,
+                        )
                     }
 
                     OrderEvent.MoveToRecommend -> {
@@ -52,11 +56,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                             R.id.fragment_container,
                             RecommendFragment(),
                         ).addToBackStack(null).commit()
-                    }
-
-                    OrderEvent.FinishOrder -> {
-                        showToast("상품 주문 성공")
-                        finish()
                     }
                 }
             },

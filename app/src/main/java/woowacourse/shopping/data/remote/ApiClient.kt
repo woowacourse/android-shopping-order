@@ -6,14 +6,13 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.BuildConfig
 import java.io.IOException
 
 object ApiClient {
-    private const val BASE_URL = "http://54.180.95.212:8080"
-
     fun getApiClient(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(provideOkHttpClient(AppInterceptor()))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -31,7 +30,10 @@ object ApiClient {
             with(chain) {
                 val newRequest =
                     request().newBuilder()
-                        .addHeader("Authorization", Credentials.basic("s6m1n", "password"))
+                        .addHeader(
+                            "Authorization",
+                            Credentials.basic(BuildConfig.USER_NAME, BuildConfig.PASSWORD),
+                        )
                         .build()
                 proceed(newRequest)
             }

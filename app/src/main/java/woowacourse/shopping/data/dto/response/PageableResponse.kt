@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.dto.response
 
-data class PageableDto(
-    val sort: SortDto,
+data class PageableResponse(
+    val sort: SortResponse,
     val pageNumber: Int,
     val pageSize: Int,
     val offset: Int,

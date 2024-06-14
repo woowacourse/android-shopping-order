@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.cart.remote
 
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -9,35 +8,35 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.dto.request.CartSaveRequest
-import woowacourse.shopping.data.dto.request.CartUpdateRequest
+import woowacourse.shopping.data.dto.request.AddCartRequestBody
+import woowacourse.shopping.data.dto.request.UpdateCartRequestBody
 import woowacourse.shopping.data.dto.response.CartQuantityResponse
 import woowacourse.shopping.data.dto.response.CartResponse
 
 interface CartApiService {
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Call<CartResponse>
+    ): CartResponse
 
     @POST("/cart-items")
-    fun requestAddCartItems(
-        @Body cartRequest: CartSaveRequest,
-    ): Call<Unit>
+    suspend fun requestAddCartItems(
+        @Body addCartRequestBody: AddCartRequestBody,
+    )
 
     @PATCH("/cart-items/{id}")
-    fun requestUpdateCartItems(
-        @Path(value = "id") cartId: Int,
-        @Body request: CartUpdateRequest,
-    ): Call<Unit>
+    suspend fun requestUpdateCartItems(
+        @Path(value = "id") cartId: Long,
+        @Body updateCartRequestBody: UpdateCartRequestBody,
+    )
 
     @DELETE("/cart-items/{id}")
-    fun requestDeleteCartItems(
-        @Path(value = "id") cartId: Int,
-    ): Call<Unit>
+    suspend fun requestDeleteCartItems(
+        @Path(value = "id") cartId: Long,
+    )
 
     @GET("/cart-items/counts")
-    fun requestGetCartItemsCount(): Call<CartQuantityResponse>
+    suspend fun requestGetTotalCartItemCount(): CartQuantityResponse
 }

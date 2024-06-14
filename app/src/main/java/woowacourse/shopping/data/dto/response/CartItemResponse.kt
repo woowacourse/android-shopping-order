@@ -2,10 +2,10 @@ package woowacourse.shopping.data.dto.response
 
 import woowacourse.shopping.domain.Cart
 
-data class CartDto(
+data class CartItemResponse(
     val id: Int,
     val quantity: Int,
-    val product: ProductDto,
+    val product: ProductItemResponse,
 ) {
     fun toCart(): Cart =
         Cart(

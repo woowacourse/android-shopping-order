@@ -3,8 +3,9 @@ package woowacourse.shopping.presentation.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.cart.local.LocalCartDataSourceImpl
 import woowacourse.shopping.data.cart.remote.RemoteCartDataSource
+import woowacourse.shopping.data.coupon.CouponRepositoryImpl
+import woowacourse.shopping.data.coupon.remote.RemoteCouponDataSource
 import woowacourse.shopping.data.local.AppDatabase
 import woowacourse.shopping.data.order.OrderRepositoryImpl
 import woowacourse.shopping.data.order.RemoteOrderDataSource
@@ -12,6 +13,7 @@ import woowacourse.shopping.data.product.ProductRepositoryImpl
 import woowacourse.shopping.data.recent.RecentProductRepositoryImpl
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
+import woowacourse.shopping.presentation.ui.payment.PaymentViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
 class ViewModelFactory() : ViewModelProvider.Factory {
@@ -19,11 +21,9 @@ class ViewModelFactory() : ViewModelProvider.Factory {
         return when {
             modelClass.isAssignableFrom(ProductDetailViewModel::class.java) -> {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 ProductDetailViewModel(
                     ProductRepositoryImpl(),
                     CartRepositoryImpl(
-                        localCartDataSource = LocalCartDataSourceImpl(cartDao),
                         remoteCartDataSource = RemoteCartDataSource(),
                     ),
                     RecentProductRepositoryImpl(recentDao),
@@ -32,13 +32,11 @@ class ViewModelFactory() : ViewModelProvider.Factory {
 
             modelClass.isAssignableFrom(ShoppingViewModel::class.java) -> {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 ShoppingViewModel(
                     productRepository = ProductRepositoryImpl(),
                     recentRepository = RecentProductRepositoryImpl(recentDao),
                     cartRepository =
                         CartRepositoryImpl(
-                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
                             remoteCartDataSource = RemoteCartDataSource(),
                         ),
                 ) as T
@@ -46,16 +44,27 @@ class ViewModelFactory() : ViewModelProvider.Factory {
 
             modelClass.isAssignableFrom(CartViewModel::class.java) -> {
                 val recentDao = AppDatabase.instanceOrNull.recentProductDao()
-                val cartDao = AppDatabase.instanceOrNull.cartDao()
                 CartViewModel(
                     cartRepository =
                         CartRepositoryImpl(
-                            localCartDataSource = LocalCartDataSourceImpl(cartDao),
                             remoteCartDataSource = RemoteCartDataSource(),
                         ),
                     productRepository = ProductRepositoryImpl(),
                     recentRepository = RecentProductRepositoryImpl(recentDao),
-                    orderRepository = OrderRepositoryImpl(RemoteOrderDataSource()),
+                ) as T
+            }
+
+            modelClass.isAssignableFrom(PaymentViewModel::class.java) -> {
+                val cartRepositoryImpl =
+                    CartRepositoryImpl(remoteCartDataSource = RemoteCartDataSource())
+                PaymentViewModel(
+                    cartRepository = cartRepositoryImpl,
+                    orderRepository =
+                        OrderRepositoryImpl(
+                            RemoteOrderDataSource(),
+                            cartRepositoryImpl,
+                        ),
+                    couponRepository = CouponRepositoryImpl(remoteCouponDataSource = RemoteCouponDataSource()),
                 ) as T
             }
 

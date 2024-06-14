@@ -1,8 +1,7 @@
 package woowacourse.shopping.data.cart.remote
 
-import retrofit2.Call
-import woowacourse.shopping.data.dto.request.CartSaveRequest
-import woowacourse.shopping.data.dto.request.CartUpdateRequest
+import woowacourse.shopping.data.dto.request.AddCartRequestBody
+import woowacourse.shopping.data.dto.request.UpdateCartRequestBody
 import woowacourse.shopping.data.dto.response.CartQuantityResponse
 import woowacourse.shopping.data.dto.response.CartResponse
 import woowacourse.shopping.data.remote.ApiClient
@@ -11,43 +10,41 @@ class RemoteCartDataSource {
     private val cartApiService: CartApiService =
         ApiClient.getApiClient().create(CartApiService::class.java)
 
-    fun load(
+    suspend fun load(
         startPage: Int,
         pageSize: Int,
-    ): Call<CartResponse> {
+    ): CartResponse {
         return cartApiService.requestCartItems(page = startPage, size = pageSize)
     }
 
-    fun save(
+    suspend fun save(
         productId: Long,
         quantity: Int,
-    ): Call<Unit> {
+    ) {
         return cartApiService.requestAddCartItems(
-            cartRequest =
-                CartSaveRequest(
+            addCartRequestBody =
+                AddCartRequestBody(
                     productId = productId,
                     quantity = quantity,
                 ),
         )
     }
 
-    fun update(
+    suspend fun update(
         cartId: Long,
         quantity: Int,
-    ): Call<Unit> {
+    ) {
         return cartApiService.requestUpdateCartItems(
-            cartId = cartId.toInt(),
-            request = CartUpdateRequest(quantity),
+            cartId = cartId,
+            updateCartRequestBody = UpdateCartRequestBody(quantity),
         )
     }
 
-    fun delete(cartId: Long): Call<Unit> {
-        return cartApiService.requestDeleteCartItems(
-            cartId = cartId.toInt(),
-        )
+    suspend fun delete(cartId: Long) {
+        return cartApiService.requestDeleteCartItems(cartId = cartId)
     }
 
-    fun getCount(): Call<CartQuantityResponse> {
-        return cartApiService.requestGetCartItemsCount()
+    suspend fun getTotalCartItemCount(): CartQuantityResponse {
+        return cartApiService.requestGetTotalCartItemCount()
     }
 }

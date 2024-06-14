@@ -2,7 +2,7 @@ package woowacourse.shopping.data.dto.response
 
 import woowacourse.shopping.domain.Product
 
-data class ProductDto(
+data class ProductItemResponse(
     val id: Int,
     val name: String,
     val price: Int,
