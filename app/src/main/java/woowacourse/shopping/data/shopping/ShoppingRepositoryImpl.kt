@@ -17,7 +17,7 @@ class ShoppingRepositoryImpl(
     private val cachedProductsById = ConcurrentHashMap<Long, Product>()
     private var cachedPageData: ProductPageData? = null
 
-    override fun products(
+    override suspend fun products(
         currentPage: Int,
         size: Int,
     ): Result<List<Product>> {
@@ -34,7 +34,7 @@ class ShoppingRepositoryImpl(
             }
     }
 
-    override fun products(
+    override suspend fun products(
         category: String,
         currentPage: Int,
         size: Int,
@@ -43,7 +43,7 @@ class ShoppingRepositoryImpl(
             .mapCatching { it.products }
     }
 
-    override fun productById(id: Long): Result<Product> {
+    override suspend fun productById(id: Long): Result<Product> {
         val cachedProduct = cachedProductsById[id] ?: return productDataSource.fetchProductById(id)
         return Result.success(cachedProduct)
     }
@@ -58,7 +58,7 @@ class ShoppingRepositoryImpl(
         return Result.success(canLoadMore)
     }
 
-    override fun recentProducts(size: Int): Result<List<Product>> {
+    override suspend fun recentProducts(size: Int): Result<List<Product>> {
         val result = recentProductDataSource.recentProducts(size)
         return result.mapCatching {
             it.map { product ->
@@ -71,7 +71,7 @@ class ShoppingRepositoryImpl(
         }
     }
 
-    override fun saveRecentProduct(id: Long): Result<Long> {
+    override suspend fun saveRecentProduct(id: Long): Result<Long> {
         return recentProductDataSource.saveRecentProduct(RecentProductData(id, LocalDateTime.now()))
     }
 }

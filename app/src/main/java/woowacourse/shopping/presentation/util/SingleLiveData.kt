@@ -3,24 +3,8 @@ package woowacourse.shopping.presentation.util
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 
-class MutableSingleLiveData<T> : SingleLiveData<T>() {
-    public override fun postValue(value: T) {
-        super.postValue(value)
-    }
-
-    public override fun setValue(value: T) {
-        super.setValue(value)
-    }
-}
-
-abstract class SingleLiveData<T> {
+abstract class SingleLiveData<T> protected constructor() {
     private val liveData = MutableLiveData<Event<T>>()
-
-    protected constructor()
-
-    protected constructor(value: T) {
-        liveData.value = Event(value)
-    }
 
     protected open fun setValue(value: T) {
         liveData.value = Event(value)

@@ -22,6 +22,7 @@ object RetrofitModule {
         Json {
             ignoreUnknownKeys = true
         }
+
     private val INSTANCE: Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)

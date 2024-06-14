@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ShoppingRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
@@ -37,22 +39,24 @@ class ProductDetailViewModel(
     }
 
     private fun loadRecentProduct() {
-        shoppingRepository.recentProducts(1)
-            .onSuccess { recentProducts ->
-                if (recentProducts.isEmpty()) return
-                _uiState.value = uiState.value?.updateRecentProductWithFirstOf(recentProducts)
-            }.onFailure {
-                _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
-            }
+        viewModelScope.launch {
+            shoppingRepository.recentProducts(1)
+                .onSuccess { recentProducts ->
+                    if (recentProducts.isEmpty()) return@launch
+                    _uiState.value = uiState.value?.updateRecentProductWithFirstOf(recentProducts)
+                }.onFailure {
+                    _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
+                }
+        }
     }
 
-    fun refreshDetailProduct() {
+    suspend fun refreshDetailProduct() {
         val id = _uiState.value?.cartProduct?.product?.id ?: return
         loadCartProduct(id)
         shoppingRepository.saveRecentProduct(id)
     }
 
-    fun loadCartProduct(id: Long) {
+    suspend fun loadCartProduct(id: Long) {
         cartRepository.filterCartProducts(listOf(id))
             .onSuccess {
                 if (it.isEmpty()) return loadProduct(id)
@@ -76,29 +80,35 @@ class ProductDetailViewModel(
     }
 
     override fun addCartProduct() {
-        val cartProduct = uiState.value?.cartProduct ?: return
-        cartRepository.updateCartProduct(cartProduct.product.id, cartProduct.count).onSuccess {
-            _addCartEvent.setValue(Unit)
-            _updateCartEvent.setValue(Unit)
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.AddCartProduct)
+        viewModelScope.launch {
+            val cartProduct = uiState.value?.cartProduct ?: return@launch
+            cartRepository.updateCartProduct(cartProduct.product.id, cartProduct.count).onSuccess {
+                _addCartEvent.setValue(Unit)
+                _updateCartEvent.setValue(Unit)
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.AddCartProduct)
+            }
         }
     }
 
     fun navigateToRecentProduct() {
         val recentId = _uiState.value?.recentProduct?.id ?: return
-        shoppingRepository.saveRecentProduct(recentId).onSuccess {
-            _recentProductEvent.setValue(recentId)
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
+        viewModelScope.launch {
+            shoppingRepository.saveRecentProduct(recentId).onSuccess {
+                _recentProductEvent.setValue(recentId)
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.SaveRecentProduct)
+            }
         }
     }
 
     private fun loadProduct(id: Long) {
-        shoppingRepository.productById(id).onSuccess {
-            _uiState.value = uiState.value?.copy(cartProduct = it.toCartUiModel())
-        }.onFailure {
-            _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
+        viewModelScope.launch {
+            shoppingRepository.productById(id).onSuccess {
+                _uiState.value = uiState.value?.copy(cartProduct = it.toCartUiModel())
+            }.onFailure {
+                _errorEvent.setValue(ProductDetailErrorEvent.LoadCartProduct)
+            }
         }
     }
 

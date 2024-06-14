@@ -9,8 +9,8 @@ import woowacourse.shopping.local.entity.RecentProductEntity
 @Dao
 interface RecentProductDao {
     @Query("SELECT * FROM RecentProduct ORDER BY createdTime DESC LIMIT :size")
-    fun loadProducts(size: Int): List<RecentProductEntity>
+    suspend fun loadProducts(size: Int): List<RecentProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveProduct(product: RecentProductEntity): Long
+    suspend fun saveProduct(product: RecentProductEntity): Long
 }

@@ -3,78 +3,52 @@ package woowacourse.shopping.data.cart.datasource
 import retrofit2.Response
 import woowacourse.shopping.data.cart.model.CartPageData
 import woowacourse.shopping.data.cart.toData
-import woowacourse.shopping.data.util.executeAsResult
+import woowacourse.shopping.data.util.handleResponse
 import woowacourse.shopping.remote.dto.request.CartItemRequest
 import woowacourse.shopping.remote.dto.request.UpdateCartCountRequest
 import woowacourse.shopping.remote.service.CartService
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
 
 class CartDataSourceImpl(
-    private val ioExecutors: ExecutorService,
     private val cartService: CartService,
 ) : CartDataSource {
-    override fun loadCarts(
+    override suspend fun loadCarts(
         currentPage: Int,
         productSize: Int,
     ): Result<CartPageData> {
-        return ioExecutors.submit(
-            Callable {
-                cartService.fetchCartItems(currentPage, productSize).executeAsResult()
-                    .mapCatching { it.toData() }
-            },
-        ).get()
+        val response = cartService.fetchCartItems(currentPage, productSize)
+        val cartPageData = response.body()?.toData() ?: throw Exception("Empty body")
+        return handleResponse(response, cartPageData)
     }
 
-    override fun loadTotalCarts(): Result<CartPageData> {
-        return ioExecutors.submit(
-            Callable {
-                val totalCountResult = cartService.fetchCartItemCount().executeAsResult()
-                if (totalCountResult.isSuccess) {
-                    val totalCount = totalCountResult.getOrThrow().quantity
-                    cartService.fetchCartItems(0, totalCount)
-                        .executeAsResult()
-                        .mapCatching { it.toData() }
-                } else {
-                    error("Failed to fetch total cart count")
-                }
-            },
-        ).get()
+    override suspend fun loadTotalCarts(): Result<CartPageData> {
+        val totalCountResponse = cartService.fetchCartItemCount()
+        val totalCount = totalCountResponse.body()?.quantity ?: throw Exception("Empty body")
+        val cartItemsResponse = cartService.fetchCartItems(0, totalCount)
+        val cartPageData = cartItemsResponse.body()?.toData() ?: throw Exception("Empty body")
+        return handleResponse(totalCountResponse, cartPageData)
     }
 
-    override fun createCartProduct(
+    override suspend fun createCartProduct(
         productId: Long,
         count: Int,
     ): Result<Long> {
-        return runCatching {
-            ioExecutors.submit(
-                Callable {
-                    val request = CartItemRequest(productId, count)
-                    val response = cartService.createCartItems(request).execute()
-                    val id = response.toIdOrNull() ?: error("Failed to create cart product")
-                    id
-                },
-            ).get()
-        }
+        val request = CartItemRequest(productId, count)
+        val response = cartService.createCartItems(request)
+        val id = response.toIdOrNull() ?: error("Failed to create cart product")
+        return handleResponse(response, id)
     }
 
-    override fun updateCartCount(
+    override suspend fun updateCartCount(
         cartId: Long,
         count: Int,
     ): Result<Unit> {
-        return ioExecutors.submit(
-            Callable {
-                cartService.patchCartItem(cartId, UpdateCartCountRequest(count)).executeAsResult()
-            },
-        ).get()
+        val response = cartService.patchCartItem(cartId, UpdateCartCountRequest(count))
+        return handleResponse(response, Unit)
     }
 
-    override fun deleteCartProduct(cartId: Long): Result<Unit> {
-        return ioExecutors.submit(
-            Callable {
-                cartService.deleteCartItem(cartId).executeAsResult()
-            },
-        ).get()
+    override suspend fun deleteCartProduct(cartId: Long): Result<Unit> {
+        val response = cartService.deleteCartItem(cartId)
+        return handleResponse(response, Unit)
     }
 
     private fun <T> Response<T>.toIdOrNull(): Long? {

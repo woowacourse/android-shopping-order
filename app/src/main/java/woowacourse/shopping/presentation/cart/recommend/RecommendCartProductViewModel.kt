@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.RecommendProductsUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.base.BaseViewModelFactory
@@ -27,60 +29,67 @@ class RecommendCartProductViewModel(
     private val _finishOrderEvent = MutableSingleLiveData<Unit>()
     val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
 
+    private val _navigateToRecommendEvent: MutableSingleLiveData<List<CartProductUi>> =
+        MutableSingleLiveData()
+    val navigateToRecommendEvent: SingleLiveData<List<CartProductUi>> get() = _navigateToRecommendEvent
+
     init {
         val uiState = _uiState.value
-        val recommendProducts = recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
-        if (uiState != null) {
-            _uiState.value = uiState.copy(recommendProducts = recommendProducts)
-        } else {
-            _uiState.value = RecommendOrderUiState(orders, recommendProducts)
+        viewModelScope.launch {
+            val recommendProducts =
+                recommendProductsUseCase().map { it.toCartUiModel(initCount = 0) }
+            if (uiState != null) {
+                _uiState.value = uiState.copy(recommendProducts = recommendProducts)
+            } else {
+                _uiState.value = RecommendOrderUiState(orders, recommendProducts)
+            }
         }
     }
 
     fun startOrder() {
-        _showOrderDialogEvent.setValue(Unit)
-    }
-
-    fun orderProducts() {
-        val uiState = _uiState.value ?: return
-        cartRepository.orderCartProducts(uiState.totalOrderIds)
-            .onSuccess {
-                _updateCartEvent.setValue(Unit)
-                _finishOrderEvent.setValue(Unit)
-            }
+        navigateToPayment()
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT)
-            .onSuccess {
-                _uiState.value =
-                    uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-                _updateCartEvent.setValue(Unit)
-            }
+        viewModelScope.launch {
+            var uiState = _uiState.value ?: return@launch
+            val product = uiState.findProduct(id) ?: return@launch
+            cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT)
+                .onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+                    _updateCartEvent.setValue(Unit)
+                }
+        }
+    }
+
+    fun navigateToPayment() {
+        val orderedProductIds = _uiState.value?.orderedProducts ?: return
+        if (orderedProductIds.isEmpty()) return
+        _navigateToRecommendEvent.setValue(orderedProductIds)
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        if (uiState.shouldDeleteFromCart(id)) {
-            cartRepository.deleteCartProduct(id).onSuccess {
-                _uiState.value =
-                    uiState.decreaseProductCount(
-                        id,
-                        INCREMENT_AMOUNT,
-                    )
-                _updateCartEvent.setValue(Unit)
+        var uiState = _uiState.value ?: return
+        viewModelScope.launch {
+            if (uiState.shouldDeleteFromCart(id)) {
+                cartRepository.deleteCartProduct(id).onSuccess {
+                    _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+                    _updateCartEvent.setValue(Unit)
+                }
+                return@launch
             }
-            return
         }
+
         val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)
-            .onSuccess {
-                _uiState.value =
-                    uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-                _updateCartEvent.setValue(Unit)
-            }
+        viewModelScope.launch {
+            cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT)
+                .onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+                    _updateCartEvent.setValue(Unit)
+                }
+        }
     }
 
     companion object {
@@ -92,11 +101,7 @@ class RecommendCartProductViewModel(
             recommendProductsUseCase: RecommendProductsUseCase,
         ): ViewModelProvider.Factory {
             return BaseViewModelFactory {
-                RecommendCartProductViewModel(
-                    orders,
-                    cartRepository,
-                    recommendProductsUseCase,
-                )
+                RecommendCartProductViewModel(orders, cartRepository, recommendProductsUseCase)
             }
         }
     }

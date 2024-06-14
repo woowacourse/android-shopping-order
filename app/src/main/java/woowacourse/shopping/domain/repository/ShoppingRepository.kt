@@ -3,25 +3,25 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.entity.Product
 
 interface ShoppingRepository {
-    fun products(
+    suspend fun products(
         currentPage: Int,
         size: Int,
     ): Result<List<Product>>
 
-    fun products(
+    suspend fun products(
         category: String,
         currentPage: Int,
         size: Int,
     ): Result<List<Product>>
 
-    fun productById(id: Long): Result<Product>
+    suspend fun productById(id: Long): Result<Product>
 
     fun canLoadMore(
         page: Int,
         size: Int,
     ): Result<Boolean>
 
-    fun recentProducts(size: Int): Result<List<Product>>
+    suspend fun recentProducts(size: Int): Result<List<Product>>
 
-    fun saveRecentProduct(id: Long): Result<Long>
+    suspend fun saveRecentProduct(id: Long): Result<Long>
 }

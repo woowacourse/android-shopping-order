@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.core.view.MenuHost
@@ -52,18 +51,6 @@ class RecommendCartProductFragment :
     private val eventBusViewModel by activityViewModels<ShoppingEventBusViewModel>()
     private val navigator by lazy { requireActivity() as ShoppingNavigator }
     private lateinit var adapter: RecommendProductsAdapter
-    private val orderDialog by lazy {
-        AlertDialog.Builder(requireContext())
-            .setTitle("주문하기")
-            .setMessage("상품 주문 하시겠습니까?")
-            .setPositiveButton("네") { _, _ ->
-                viewModel.orderProducts()
-            }
-            .setNegativeButton("아니요") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-    }
 
     override fun onViewCreated(
         view: View,
@@ -121,8 +108,8 @@ class RecommendCartProductFragment :
             val destination = ProductListFragment.TAG ?: return@observe
             navigator.popBackStack(destination, inclusive = false)
         }
-        viewModel.showOrderDialogEvent.observe(viewLifecycleOwner) {
-            orderDialog.show()
+        viewModel.navigateToRecommendEvent.observe(viewLifecycleOwner) {
+            navigator.navigateToPayment(it, true, TAG)
         }
     }
 

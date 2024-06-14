@@ -27,4 +27,6 @@
     <string name="all_product_description">전체</string>
     <string name="recommend_cart_product_title">이런 상품은 어떠세요?</string>
     <string name="recommend_cart_product_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+    <string name="payment_success">결제 성공!</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

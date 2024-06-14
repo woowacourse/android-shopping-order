@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.entity.CartProduct
 import woowacourse.shopping.domain.entity.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -35,66 +37,85 @@ class ProductListViewModel(
     }
 
     override fun loadProducts() {
-        val uiState = _uiState.value ?: return
+        println("load products start")
+        var uiState = _uiState.value ?: return
         val currentPage = uiState.currentPage
-        shoppingRepository.products(currentPage - 1, PAGE_SIZE)
-            .onSuccess {
-                val newProducts = it.map(Product::toShoppingUiModel)
-                _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
-            }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadProducts)
-            }
+        println("current page : ${uiState.currentPage}")
+        viewModelScope.launch {
+            println("this : ${Thread.currentThread().name}")
+            shoppingRepository.products(currentPage - 1, PAGE_SIZE)
+                .onSuccess {
+                    println("type : ${it.javaClass.name}")
+                    uiState = _uiState.value ?: return@launch
+                    val newProducts = it.map(Product::toShoppingUiModel)
+                    _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
+                }.onFailure {
+                    println(it.localizedMessage)
+                    _errorEvent.setValue(ProductListErrorEvent.LoadProducts)
+                }
+        }
     }
 
     fun loadCartProducts() {
-        val uiState = uiState.value ?: return
+        var uiState = _uiState.value ?: return
         val ids = uiState.products.map { it.id }
-        cartRepository.filterCartProducts(ids)
-            .onSuccess { newCartProducts ->
-                val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
-                _uiState.value = uiState.updateProducts(newProducts)
+        viewModelScope.launch {
+            cartRepository.filterCartProducts(ids)
+                .onSuccess { newCartProducts ->
+                    uiState = _uiState.value ?: return@launch
+                    val newProducts = newCartProducts.map(CartProduct::toShoppingUiModel)
+                    _uiState.value = uiState.updateProducts(newProducts)
+                }.onFailure {
+                    _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
+                }
+        }
+    }
+
+    fun loadRecentProducts() {
+        viewModelScope.launch {
+            shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
+                val uiState = _uiState.value ?: return@launch
+                _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
             }.onFailure {
-                _errorEvent.setValue(ProductListErrorEvent.LoadCartProducts)
+                _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
             }
+        }
     }
 
     override fun increaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
-            _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+        viewModelScope.launch {
+            var uiState = _uiState.value ?: return@launch
+            val product = uiState.findProduct(id) ?: return@launch
+            cartRepository.updateCartProduct(id, product.count + INCREMENT_AMOUNT).onSuccess {
+                uiState = _uiState.value ?: return@launch
+                _uiState.value = uiState.increaseProductCount(id, INCREMENT_AMOUNT)
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+            }
         }
     }
 
     override fun decreaseProductCount(id: Long) {
-        val uiState = _uiState.value ?: return
-        if (uiState.shouldDeleteFromCart(id)) {
-            cartRepository.deleteCartProduct(id).onSuccess {
-                _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+        var uiState = _uiState.value ?: return
+        viewModelScope.launch {
+            if (uiState.shouldDeleteFromCart(id)) {
+                cartRepository.deleteCartProduct(id).onSuccess {
+                    uiState = _uiState.value ?: return@launch
+                    _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+                }
+                return@launch
             }
-            return
-        }
-        val product = uiState.findProduct(id) ?: return
-        cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
-            _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+            val product = uiState.findProduct(id) ?: return@launch
+            cartRepository.updateCartProduct(id, product.count - INCREMENT_AMOUNT).onSuccess {
+                _uiState.value = uiState.decreaseProductCount(id, INCREMENT_AMOUNT)
+            }.onFailure {
+                _errorEvent.setValue(ProductListErrorEvent.DecreaseCartCount)
+            }
         }
     }
 
     override fun navigateToDetail(id: Long) {
         _navigateToDetailEvent.setValue(id)
-    }
-
-    fun loadRecentProducts() {
-        val uiState = _uiState.value ?: return
-        shoppingRepository.recentProducts(RECENT_PRODUCT_COUNT).onSuccess {
-            _uiState.value = uiState.copy(recentProducts = it.map(Product::toUiModel))
-        }.onFailure {
-            _errorEvent.setValue(ProductListErrorEvent.LoadRecentProducts)
-        }
     }
 
     private fun getLoadMore(page: Int): List<ShoppingUiModel.LoadMore> {

@@ -10,6 +10,9 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.cart.CartRepositoryInjector
 import woowacourse.shopping.data.shopping.ShoppingRepositoryInjector
@@ -42,7 +45,9 @@ class ProductDetailFragment :
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             val id = arguments?.getLong(PRODUCT_ID, -1) ?: return
-            viewModel.loadCartProduct(id)
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.loadCartProduct(id)
+            }
         }
     }
 
@@ -59,6 +64,9 @@ class ProductDetailFragment :
         initListeners()
         initObservers()
         initErrorEvent()
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.refreshDetailProduct()
+        }
     }
 
     private fun initListeners() {
@@ -76,9 +84,6 @@ class ProductDetailFragment :
         }
         viewModel.updateCartEvent.observe(viewLifecycleOwner) {
             eventBusViewModel.sendUpdateCartEvent()
-        }
-        eventBusViewModel.updateCartEvent.observe(viewLifecycleOwner) {
-            viewModel.refreshDetailProduct()
         }
     }
 

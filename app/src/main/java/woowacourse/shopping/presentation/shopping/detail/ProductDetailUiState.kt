@@ -10,13 +10,19 @@ data class ProductDetailUiState(
     val isRecentProductVisible: Boolean
         get() = (recentProduct != null) && (cartProduct.product.id != recentProduct.id)
 
-    fun increaseProductCount(amount: Int): ProductDetailUiState = copy(cartProduct = cartProduct.copy(count = cartProduct.count + amount))
+    fun increaseProductCount(amount: Int): ProductDetailUiState {
+        return copy(cartProduct = cartProduct.copy(count = cartProduct.count + amount))
+    }
 
-    fun decreaseProductCount(amount: Int): ProductDetailUiState = copy(cartProduct = cartProduct.copy(count = cartProduct.count - amount))
+    fun decreaseProductCount(amount: Int): ProductDetailUiState {
+        return copy(cartProduct = cartProduct.copy(count = cartProduct.count - amount))
+    }
 
     fun canDecreaseProductCount(): Boolean = cartProduct.count > 1
 
-    fun updateRecentProductWithFirstOf(products: List<Product>) = copy(recentProduct = products.first())
+    fun updateRecentProductWithFirstOf(products: List<Product>): ProductDetailUiState {
+        return copy(recentProduct = products.first())
+    }
 
     companion object {
         fun init(): ProductDetailUiState =
