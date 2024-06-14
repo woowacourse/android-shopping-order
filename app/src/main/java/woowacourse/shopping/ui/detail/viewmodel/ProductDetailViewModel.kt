@@ -2,15 +2,20 @@ package woowacourse.shopping.ui.detail.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.cart.CartRepository
-import woowacourse.shopping.data.product.ProductRepository
-import woowacourse.shopping.data.recentproduct.RecentProductRepository
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductWithQuantity
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductWithQuantity
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.domain.result.ShowError
+import woowacourse.shopping.domain.result.getOrThrow
+import woowacourse.shopping.domain.result.onError
+import woowacourse.shopping.domain.result.onSuccess
 import woowacourse.shopping.ui.CountButtonClickListener
-import woowacourse.shopping.ui.utils.Event
+import woowacourse.shopping.ui.detail.uimodel.ProductDetailError
+import woowacourse.shopping.ui.utils.BaseViewModel
 import woowacourse.shopping.ui.utils.MutableSingleLiveData
 import woowacourse.shopping.ui.utils.SingleLiveData
 
@@ -19,12 +24,9 @@ class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel(), CountButtonClickListener {
-    private val _error: MutableLiveData<Boolean> = MutableLiveData(false)
-    val error: LiveData<Boolean> get() = _error
-
-    private val _errorMsg: MutableLiveData<Event<String>> = MutableLiveData(Event(""))
-    val errorMsg: LiveData<Event<String>> get() = _errorMsg
+) : BaseViewModel(), CountButtonClickListener {
+    private val _errorScope: MutableSingleLiveData<ProductDetailError> = MutableSingleLiveData()
+    val errorScope: SingleLiveData<ProductDetailError> get() = _errorScope
 
     private val _productWithQuantity: MutableLiveData<ProductWithQuantity> = MutableLiveData()
     val productWithQuantity: LiveData<ProductWithQuantity> get() = _productWithQuantity
@@ -43,66 +45,59 @@ class ProductDetailViewModel(
     private val _addCartComplete = MutableSingleLiveData<Unit>()
     val addCartComplete: SingleLiveData<Unit> get() = _addCartComplete
 
+    private fun currentCount(): ProductWithQuantity = _productWithQuantity.value ?: error("상품 데이터를 초기화 해주세요")
+
     init {
         loadProduct()
     }
 
-    fun loadProduct() {
-        runCatching {
-            productRepository.find(productId)
-        }.onSuccess {
-            _error.value = false
-            _productWithQuantity.value = ProductWithQuantity(product = it)
-        }.onFailure {
-            _error.value = true
-            _errorMsg.setErrorHandled(it.message.toString())
+    private fun loadProduct() {
+        viewModelLaunch {
+            productRepository.getProductById(productId).onSuccess {
+                _productWithQuantity.value = ProductWithQuantity(product = it)
+            }.onError {
+                setError(it, ProductDetailError.LoadProduct)
+            }
         }
     }
 
     override fun plusCount(productId: Long) {
-        _productWithQuantity.value?.let {
-            _productWithQuantity.value = it.inc()
-        }
+        _productWithQuantity.value = currentCount().inc()
     }
 
     override fun minusCount(productId: Long) {
-        _productWithQuantity.value?.let {
-            _productWithQuantity.value = it.dec()
-        }
+        _productWithQuantity.value = currentCount().dec()
     }
 
     fun addProductToCart() {
-        _productWithQuantity.value?.let { productWithQuantity ->
-            with(productWithQuantity) {
-                cartRepository.addProductToCart(this.product.id, this.quantity.value)
+        viewModelLaunch {
+            cartRepository.addProductToCart(
+                currentCount().product.id,
+                currentCount().quantity.value,
+            ).onSuccess {
+                loadProduct()
+                _addCartComplete.setValue(Unit)
+            }.onError {
+                setError(it, ProductDetailError.AddCart)
             }
-            loadProduct()
         }
-        _addCartComplete.setValue(Unit)
     }
 
     fun addToRecentProduct(lastSeenProductState: Boolean) {
-        loadMostRecentProduct(productId, lastSeenProductState)
-        recentProductRepository.insert(productId)
-    }
-
-    private fun loadMostRecentProduct(
-        productId: Long,
-        lastSeenProductState: Boolean,
-    ) {
-        recentProductRepository.findMostRecentProduct()?.let {
-            runCatching {
-                productRepository.find(it.productId)
-            }.onSuccess {
-                _error.value = false
-                _mostRecentProduct.value = it
-                if (!lastSeenProductState) return
-                setMostRecentVisibility(it.id, productId)
-            }.onFailure {
-                _error.value = true
-                _mostRecentProductVisibility.value = false
-                _errorMsg.setErrorHandled(it.message.toString())
+        viewModelLaunch {
+            recentProductRepository.getMostRecentProduct().onSuccess {
+                if (!lastSeenProductState) {
+                    _mostRecentProductVisibility.value = false
+                } else {
+                    _mostRecentProduct.value =
+                        productRepository.getProductById(it.productId).getOrThrow()
+                    setMostRecentVisibility(it.productId, productId)
+                }
+            }.onError {
+                setError(it, ProductDetailError.Recent)
             }
+
+            recentProductRepository.insert(productId)
         }
     }
 
@@ -113,9 +108,14 @@ class ProductDetailViewModel(
         _mostRecentProductVisibility.value = (mostRecentProductId != currentProductId)
     }
 
-    private fun <T> MutableLiveData<Event<T>>.setErrorHandled(value: T?) {
-        if (this.value?.hasBeenHandled == false) {
-            value?.let { this.value = Event(it) }
+    private fun setError(
+        dataError: DataError,
+        errorScope: ProductDetailError,
+    ) {
+        if (dataError is ShowError) {
+            mutableDataError.setValue(dataError)
+        } else {
+            _errorScope.setValue(errorScope)
         }
     }
 }

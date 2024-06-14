@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.order.OrderRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendProductBinding
+import woowacourse.shopping.ui.cart.recommend.adapter.RecommendProductAdapter
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModel
 import woowacourse.shopping.ui.cart.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.products.toUiModel
@@ -28,7 +28,6 @@ class RecommendFragment : Fragment() {
             ProductRepositoryImpl(),
             CartRepositoryImpl(),
             RecentProductRepositoryImpl.get(RecentProductDatabase.database().recentProductDao()),
-            OrderRepositoryImpl(),
         )
     }
 
@@ -59,7 +58,7 @@ class RecommendFragment : Fragment() {
 
     private fun setRecommendProduct() {
         viewModel.loadRecommendProducts()
-        viewModel.products.observe(viewLifecycleOwner) {
+        viewModel.recommendProducts.observe(viewLifecycleOwner) {
             recommendProductAdapter.submitList(it.map { it.toUiModel() })
         }
     }

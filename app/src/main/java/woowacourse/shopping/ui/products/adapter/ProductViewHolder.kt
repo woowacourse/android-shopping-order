@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.products.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
-import woowacourse.shopping.ui.products.ProductWithQuantityUiModel
+import woowacourse.shopping.ui.products.uimodel.ProductWithQuantityUiModel
 import woowacourse.shopping.ui.products.viewmodel.ProductContentsViewModel
 
 class ProductViewHolder(

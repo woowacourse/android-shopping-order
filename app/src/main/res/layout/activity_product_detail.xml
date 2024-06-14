@@ -12,7 +12,7 @@
 
         <variable
             name="mostRecentProductClickListener"
-            type="woowacourse.shopping.ui.detail.MostRecentProductClickListener" />
+            type="woowacourse.shopping.ui.detail.uimodel.MostRecentProductClickListener" />
 
     </data>
 
@@ -134,7 +134,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/selector_add_product_button"
-            android:enabled="@{!vm.error &amp;&amp; !vm.isInvalidCount}"
+            android:enabled="@{!vm.isInvalidCount}"
             android:onClick="@{() -> vm.addProductToCart()}"
             android:text="@string/add_product_to_cart"
             android:textColor="@color/white"

@@ -1,13 +1,15 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.dto.response.ResponseProductIdGetDto
-import woowacourse.shopping.data.dto.response.ResponseProductsGetDto
+import woowacourse.shopping.data.remote.dto.response.ResponseProductIdGetDto
+import woowacourse.shopping.data.remote.dto.response.ResponseProductsGetDto
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.domain.result.Result
 
 interface ProductDataSource {
-    fun getProductsByOffset(
+    suspend fun getProductsByOffset(
         page: Int,
         size: Int,
-    ): ResponseProductsGetDto?
+    ): Result<ResponseProductsGetDto, DataError>
 
-    fun getProductsById(id: Long): ResponseProductIdGetDto?
+    suspend fun getProductsById(id: Long): Result<ResponseProductIdGetDto, DataError>
 }

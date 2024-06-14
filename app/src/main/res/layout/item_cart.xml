@@ -8,7 +8,7 @@
 
         <variable
             name="cartUiModel"
-            type="woowacourse.shopping.ui.cart.item.CartUiModel" />
+            type="woowacourse.shopping.ui.cart.cartitem.uimodel.CartUiModel" />
 
         <variable
             name="vm"
@@ -27,11 +27,11 @@
             android:id="@+id/cb_cart_item_check"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:checked="@{cartUiModel.checked}"
             android:layout_marginStart="12dp"
             android:layout_marginTop="23dp"
             android:background="@drawable/checkbox"
             android:button="@android:color/transparent"
+            android:checked="@{cartUiModel.checked}"
             android:onClick="@{() -> vm.clickCheckBox(cartUiModel.productId)}"
             app:layout_constraintEnd_toStartOf="@id/tv_product_name"
             app:layout_constraintStart_toStartOf="parent"
@@ -87,7 +87,7 @@
             android:layout_marginBottom="6dp"
             app:layout_constraintBottom_toTopOf="@id/tv_product_price"
             app:layout_constraintEnd_toEndOf="parent"
-            bind:count="@{String.valueOf(cartUiModel.quantity.value)}"
+            bind:count="@{String.valueOf(cartUiModel.quantity)}"
             bind:countButtonClickListener="@{vm}"
             bind:productId="@{cartUiModel.productId}" />
 

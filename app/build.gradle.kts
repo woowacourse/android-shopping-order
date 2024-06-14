@@ -7,6 +7,7 @@ plugins {
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
     id("kotlin-kapt")
     kotlin("plugin.serialization")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -94,6 +95,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     // okhttp
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
@@ -108,4 +110,7 @@ dependencies {
 
     // serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
+    // coroutine
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0-RC")
 }

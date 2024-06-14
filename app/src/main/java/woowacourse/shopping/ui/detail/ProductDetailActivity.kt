@@ -4,24 +4,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
-import woowacourse.shopping.data.cart.CartRepositoryImpl
-import woowacourse.shopping.data.product.ProductRepositoryImpl
-import woowacourse.shopping.data.recentproduct.RecentProductDatabase
-import woowacourse.shopping.data.recentproduct.RecentProductRepositoryImpl
+import woowacourse.shopping.data.local.room.recentproduct.RecentProductDatabase
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.ui.detail.uimodel.MostRecentProductClickListener
+import woowacourse.shopping.ui.detail.uimodel.ProductDetailError
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.ui.detail.viewmodel.ProductDetailViewModelFactory
+import woowacourse.shopping.ui.utils.showToastMessage
+import woowacourse.shopping.ui.utils.toUiText
 
 class ProductDetailActivity :
     AppCompatActivity(),
     MostRecentProductClickListener {
     private lateinit var binding: ActivityProductDetailBinding
-    private var toast: Toast? = null
+
     private val productId by lazy { productId() }
     private val viewModel: ProductDetailViewModel by viewModels {
         ProductDetailViewModelFactory(
@@ -52,9 +57,8 @@ class ProductDetailActivity :
 
     private fun observeAddCart() {
         viewModel.addCartComplete.observe(this) {
-            toast?.cancel()
-            toast = Toast.makeText(this, getString(R.string.add_cart_complete), Toast.LENGTH_SHORT)
-            toast?.show()
+            showToastMessage(R.string.add_cart_complete)
+            finish()
         }
     }
 
@@ -82,11 +86,24 @@ class ProductDetailActivity :
     }
 
     private fun observeErrorMessage() {
-        viewModel.errorMsg.observe(this) { event ->
-            event.getContentIfNotHandled()?.let {
-                if (it.isNotEmpty()) {
-                    toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
-                    toast?.show()
+        viewModel.errorScope.observe(this) { error ->
+            when (error) {
+                ProductDetailError.AddCart -> showToastMessage(R.string.cart_error)
+                ProductDetailError.ChangeCount -> showToastMessage(R.string.cart_error)
+                ProductDetailError.LoadProduct -> showToastMessage(R.string.product_error)
+                ProductDetailError.Recent -> binding.layoutLastSeen.isVisible = false
+            }
+        }
+
+        viewModel.dataError.observe(this) { error ->
+            when (error) {
+                DataError.Network.REQUEST_TIMEOUT -> showToastMessage(error.toUiText())
+                DataError.Network.NO_INTERNET -> showToastMessage(error.toUiText())
+                DataError.Network.SERVER -> showToastMessage(error.toUiText())
+                DataError.Network.INVALID_AUTHORIZATION -> showToastMessage(error.toUiText())
+                DataError.UNKNOWN -> {
+                    showToastMessage(error.toUiText())
+                    finish()
                 }
             }
         }

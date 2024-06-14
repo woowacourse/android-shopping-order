@@ -1,24 +1,26 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.dto.request.RequestCartItemPostDto
-import woowacourse.shopping.data.dto.request.RequestCartItemsPatchDto
-import woowacourse.shopping.data.dto.response.ResponseCartItemCountsGetDto
-import woowacourse.shopping.data.dto.response.ResponseCartItemsGetDto
+import woowacourse.shopping.data.remote.dto.request.RequestCartItemPostDto
+import woowacourse.shopping.data.remote.dto.request.RequestCartItemsPatchDto
+import woowacourse.shopping.data.remote.dto.response.ResponseCartItemCountsGetDto
+import woowacourse.shopping.data.remote.dto.response.ResponseCartItemsGetDto
+import woowacourse.shopping.domain.result.DataError
+import woowacourse.shopping.domain.result.Result
 
 interface CartDataSource {
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): ResponseCartItemsGetDto?
+    ): Result<ResponseCartItemsGetDto, DataError>
 
-    fun postCartItems(request: RequestCartItemPostDto)
+    suspend fun postCartItems(request: RequestCartItemPostDto): Result<Unit, DataError>
 
-    fun deleteCartItems(id: Long)
+    suspend fun deleteCartItems(id: Long): Result<Unit, DataError>
 
-    fun patchCartItems(
+    suspend fun patchCartItems(
         id: Long,
         request: RequestCartItemsPatchDto,
-    )
+    ): Result<Unit, DataError>
 
-    fun getCartItemCounts(): ResponseCartItemCountsGetDto?
+    suspend fun getCartItemCounts(): Result<ResponseCartItemCountsGetDto, DataError>
 }

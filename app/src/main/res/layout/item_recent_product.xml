@@ -11,11 +11,11 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.model.Product" />
+            type="woowacourse.shopping.domain.model.Product" />
 
         <variable
             name="productItemClickListener"
-            type="woowacourse.shopping.ui.products.ProductItemClickListener" />
+            type="woowacourse.shopping.ui.products.uimodel.ProductItemClickListener" />
 
     </data>
 
