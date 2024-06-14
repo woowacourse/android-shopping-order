@@ -6,7 +6,7 @@ import woowacourse.shopping.remote.model.request.OrderRequest
 
 interface OrderApiService {
     @POST("/orders")
-    suspend fun createOrder2(
+    suspend fun createOrder(
         @Body cartItemIds: OrderRequest,
     )
 }

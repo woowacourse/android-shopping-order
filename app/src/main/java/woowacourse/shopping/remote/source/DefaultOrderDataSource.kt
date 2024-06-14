@@ -10,7 +10,7 @@ class DefaultOrderDataSource(
 ) : OrderDataSource {
     override suspend fun order(): Result<Unit> =
         runCatching {
-            orderApiService.createOrder2(
+            orderApiService.createOrder(
                 OrderRequest(orderItems.map(OrderItemData::cartItemId)),
             )
         }

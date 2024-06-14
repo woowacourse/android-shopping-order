@@ -7,7 +7,7 @@ import woowacourse.shopping.remote.service.ProductsApiService
 class ProductRemoteDataSource(private val productsApiService: ProductsApiService) : ProductDataSource {
     override suspend fun findByPaged(page: Int): Result<List<ProductData>> =
         runCatching {
-            productsApiService.requestProducts2(page = page).content.map {
+            productsApiService.requestProducts(page = page).content.map {
                 ProductData(
                     id = it.id,
                     imgUrl = it.imageUrl,
@@ -19,7 +19,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
 
     override suspend fun findAllUntilPage(page: Int): Result<List<ProductData>> =
         runCatching {
-            productsApiService.requestProducts2(size = page * 20).content.map {
+            productsApiService.requestProducts(size = page * 20).content.map {
                 ProductData(
                     id = it.id,
                     imgUrl = it.imageUrl,
@@ -31,7 +31,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
 
     override suspend fun findById(id: Long): Result<ProductData> =
         runCatching {
-            productsApiService.requestProduct2(id.toInt()).let {
+            productsApiService.requestProduct(id.toInt()).let {
                 ProductData(
                     id = it.id,
                     imgUrl = it.imageUrl,
@@ -44,7 +44,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
 
     override suspend fun findByCategory(category: String): Result<List<ProductData>> =
         runCatching {
-            productsApiService.requestProducts2(category = category).content.map {
+            productsApiService.requestProducts(category = category).content.map {
                 ProductData(
                     id = it.id,
                     imgUrl = it.imageUrl,
@@ -57,7 +57,7 @@ class ProductRemoteDataSource(private val productsApiService: ProductsApiService
 
     override suspend fun isFinalPage(page: Int): Result<Boolean> =
         runCatching {
-            val totalPage = productsApiService.requestProducts2(page = page).totalPages
+            val totalPage = productsApiService.requestProducts(page = page).totalPages
             (page + 1) == totalPage
         }
 

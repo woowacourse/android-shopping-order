@@ -12,24 +12,24 @@ import woowacourse.shopping.remote.model.response.CartItemListResponse
 
 interface CartItemApiService {
     @GET("/cart-items")
-    suspend fun requestCartItems2(
+    suspend fun requestCartItems(
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
     ): CartItemListResponse
 
     @POST("/cart-items")
-    suspend fun addCartItem2(
+    suspend fun addCartItem(
         @Body cartItemRequest: CartItemRequest,
     )
 
     @PATCH("/cart-items/{id}")
-    suspend fun updateCartItemQuantity2(
+    suspend fun updateCartItemQuantity(
         @Path("id") id: Long,
         @Body quantity: Int,
     )
 
     @DELETE("/cart-items/{id}")
-    suspend fun removeCartItem2(
+    suspend fun removeCartItem(
         @Path("id") id: Long,
     )
 }

@@ -11,7 +11,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
     ShoppingCartDataSource {
     override suspend fun findByProductId(productId: Long): Result<ProductIdsCountData> =
         runCatching {
-            val allCartItems = cartItemApiService.requestCartItems2().content
+            val allCartItems = cartItemApiService.requestCartItems().content
             val find =
                 allCartItems.find { it.product.id == productId }
                     ?: throw NoSuchElementException("there is no product with id $productId")
@@ -20,7 +20,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
 
     override suspend fun findCartItemByProductId(productId: Long): Result<CartItemData> =
         runCatching {
-            val allCartItems = cartItemApiService.requestCartItems2().content
+            val allCartItems = cartItemApiService.requestCartItems().content
             val find =
                 allCartItems.find { it.product.id == productId }
                     ?: throw NoSuchElementException("there is no product with id $productId")
@@ -29,7 +29,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
 
     override suspend fun loadAllCartItems(): Result<List<CartItemData>> =
         runCatching {
-            val response = cartItemApiService.requestCartItems2().content
+            val response = cartItemApiService.requestCartItems().content
             response.map {
                 CartItemData(
                     id = it.id,
@@ -41,7 +41,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
 
     override suspend fun addNewProduct(productIdsCountData: ProductIdsCountData): Result<Unit> =
         runCatching {
-            cartItemApiService.addCartItem2(
+            cartItemApiService.addCartItem(
                 CartItemRequest(
                     productIdsCountData.productId,
                     productIdsCountData.quantity,
@@ -51,7 +51,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
 
     override suspend fun removeCartItem(cartItemId: Long): Result<Unit> =
         runCatching {
-            cartItemApiService.removeCartItem2(cartItemId)
+            cartItemApiService.removeCartItem(cartItemId)
         }
 
     override suspend fun updateProductsCount(
@@ -59,7 +59,7 @@ class CartItemRemoteDataSource(private val cartItemApiService: CartItemApiServic
         newQuantity: Int,
     ): Result<Unit> =
         runCatching {
-            cartItemApiService.updateCartItemQuantity2(cartItemId, newQuantity)
+            cartItemApiService.updateCartItemQuantity(cartItemId, newQuantity)
         }
 
     companion object {
