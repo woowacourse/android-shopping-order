@@ -56,7 +56,6 @@ class ProductDetailViewModel(
                     _error.setValue(ProductDetailError.LoadProduct)
                 }
         }
-
     }
 
     private fun loadLatestProduct() {

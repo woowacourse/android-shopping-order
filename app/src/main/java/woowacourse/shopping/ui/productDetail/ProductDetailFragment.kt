@@ -86,7 +86,7 @@ class ProductDetailFragment : Fragment() {
 
     private fun observeError() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            when(error) {
+            when (error) {
                 is ProductDetailError.AddProductToCart -> showToast(R.string.error_add_product_to_cart)
                 is ProductDetailError.LoadLatestProduct -> showToast(R.string.error_load_latest_product)
                 is ProductDetailError.LoadProduct -> showToast(R.string.error_load_product)
@@ -95,14 +95,15 @@ class ProductDetailFragment : Fragment() {
         }
     }
 
-    private fun showToast(@StringRes stringId: Int) {
+    private fun showToast(
+        @StringRes stringId: Int,
+    ) {
         Toast.makeText(
             requireContext(),
             stringId,
             Toast.LENGTH_SHORT,
         ).show()
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

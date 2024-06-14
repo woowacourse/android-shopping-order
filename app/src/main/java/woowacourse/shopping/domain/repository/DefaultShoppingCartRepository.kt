@@ -25,10 +25,11 @@ class DefaultShoppingCartRepository(
         quantity: Int,
     ): Result<Unit> {
         return runCatching {
-            val cartItem = findCartItemByProductId(productId)
-                .map { it }
-                .recover { null }
-                .getOrThrow()
+            val cartItem =
+                findCartItemByProductId(productId)
+                    .map { it }
+                    .recover { null }
+                    .getOrThrow()
 
             if (cartItem != null) {
                 cartSource.updateProductsCount(cartItem.id, cartItem.quantity + quantity)
@@ -38,8 +39,7 @@ class DefaultShoppingCartRepository(
         }
     }
 
-    override suspend fun removeShoppingCartProduct(cartItemId: Long): Result<Unit> =
-        cartSource.removeCartItem(cartItemId)
+    override suspend fun removeShoppingCartProduct(cartItemId: Long): Result<Unit> = cartSource.removeCartItem(cartItemId)
 
     override suspend fun findCartItemByProductId(productId: Long): Result<CartItem> =
         cartSource.loadAllCartItems().mapCatching { cartItems ->

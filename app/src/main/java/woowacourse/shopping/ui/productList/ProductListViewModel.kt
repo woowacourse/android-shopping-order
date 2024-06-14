@@ -61,7 +61,6 @@ class ProductListViewModel(
             calculateFinalPage(page)
             loadProductHistory()
             loadCartProducts()
-
         }
     }
 
@@ -73,7 +72,6 @@ class ProductListViewModel(
             .onFailure {
                 _error.setValue(ProductListError.LoadProducts)
             }
-
     }
 
     private suspend fun calculateCartProductTotalCount() {
@@ -132,7 +130,6 @@ class ProductListViewModel(
         viewModelScope.launch {
             calculateFinalPage(nextPage)
             loadPagedProducts(nextPage)
-
         }
         _currentPage.value = nextPage
     }
@@ -162,8 +159,7 @@ class ProductListViewModel(
         }
     }
 
-    private fun findCartItemOrNull(productId: Long): CartItem? =
-        cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
+    private fun findCartItemOrNull(productId: Long): CartItem? = cartProducts.value?.find { cartItem -> cartItem.product.id == productId }
 
     private fun updateLoadedProduct(
         productId: Long,

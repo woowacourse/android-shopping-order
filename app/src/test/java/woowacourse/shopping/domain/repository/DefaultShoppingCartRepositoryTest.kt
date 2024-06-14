@@ -32,9 +32,11 @@ class DefaultShoppingCartRepositoryTest {
             // given
             cartSource =
                 FakeShoppingCartDataSource(
-                    cartItemResponses = cartItemDtosTestFixture(
-                        10,
-                        cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) }),
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) },
+                        ),
                     dispatcher = dispatcher,
                 )
             repository =
@@ -79,10 +81,11 @@ class DefaultShoppingCartRepositoryTest {
             // given
             cartSource =
                 FakeShoppingCartDataSource(
-                    cartItemResponses = cartItemDtosTestFixture(
-                        10,
-                        cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) },
-                    ),
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index -> cartItemDtoTestFixture(index, 1) },
+                        ),
                     dispatcher = dispatcher,
                 )
             repository =
@@ -122,10 +125,11 @@ class DefaultShoppingCartRepositoryTest {
     fun `장바구니에 있는 상품 중 장바구니 id 값을 가진 상품을 제거한다`() =
         runTest {
             // given
-            cartSource = FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(10),
-                dispatcher = dispatcher,
-            )
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses = cartItemDtosTestFixture(10),
+                    dispatcher = dispatcher,
+                )
             repository = DefaultShoppingCartRepository(cartSource)
 
             // when

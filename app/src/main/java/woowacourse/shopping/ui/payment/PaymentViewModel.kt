@@ -84,7 +84,7 @@ class PaymentViewModel(
                 } else {
                     couponUi.copy(isChecked = false)
                 }
-            }
+            },
         )
     }
 
@@ -107,14 +107,14 @@ class PaymentViewModel(
             UniversalViewModelFactory {
                 PaymentViewModel(
                     couponRepository =
-                    DefaultCouponRepository(
-                        ShoppingApp.couponSource,
-                    ),
+                        DefaultCouponRepository(
+                            ShoppingApp.couponSource,
+                        ),
                     orderRepository =
-                    DefaultOrderRepository(
-                        ShoppingApp.orderSource,
-                        ShoppingApp.cartSource,
-                    ),
+                        DefaultOrderRepository(
+                            ShoppingApp.orderSource,
+                            ShoppingApp.cartSource,
+                        ),
                 )
             }
     }

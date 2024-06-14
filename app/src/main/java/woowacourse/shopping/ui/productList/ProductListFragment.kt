@@ -96,7 +96,9 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun showToast(@StringRes stringId: Int) {
+    private fun showToast(
+        @StringRes stringId: Int,
+    ) {
         Toast.makeText(
             requireContext(),
             stringId,

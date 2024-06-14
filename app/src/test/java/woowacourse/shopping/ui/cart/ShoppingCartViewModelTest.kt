@@ -58,296 +58,315 @@ class ShoppingCartViewModelTest {
     }
 
     @Test
-    fun `모든 카트 아이템을 로드하면 ui 상태로 장바구니 아이템이 업데이트된다`() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    10,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            index,
-                            1,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
+    fun `모든 카트 아이템을 로드하면 ui 상태로 장바구니 아이템이 업데이트된다`() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    1,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
 
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
 
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
 
-        // when
-        viewModel.loadAll()
+            // when
+            viewModel.loadAll()
 
-        // then
-        val cartItems = viewModel.cartItems.value.orEmpty()
-        assertThat(cartItems.size).isEqualTo(10)
-    }
-
-    @Test
-    fun `장바구니 상품 id 에 해당하는 장바구니 상품을 제거하면 장바구니에 있는 상품의 총 개수가 감소한다`() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    10,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            index,
-                            1,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
-        orderSource = FakeOrderDataSource(dispatcher = dispatcher)
-
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
-
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
-        viewModel.loadAll()
-        // when
-        viewModel.deleteItem(1)
-
-        // then
-        val actual = viewModel.cartItems.value.orEmpty()
-        assertThat(actual.size).isEqualTo(9)
-    }
+            // then
+            val cartItems = viewModel.cartItems.value.orEmpty()
+            assertThat(cartItems.size).isEqualTo(10)
+        }
 
     @Test
-    fun `장바구니 상품의 개수를 증가시킨다 `() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    3,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            index,
-                            1,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
+    fun `장바구니 상품 id 에 해당하는 장바구니 상품을 제거하면 장바구니에 있는 상품의 총 개수가 감소한다`() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    1,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
+            orderSource = FakeOrderDataSource(dispatcher = dispatcher)
 
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
 
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
-        viewModel.loadAll()
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel.loadAll()
+            // when
+            viewModel.deleteItem(1)
 
-        // when
-        viewModel.onIncrease(productId = 1, quantity = 2)
-
-        // then
-        val actual = viewModel.cartItems.value.orEmpty().find { it.id == 1L }
-        assertThat(actual?.quantity).isEqualTo(2)
-    }
+            // then
+            val actual = viewModel.cartItems.value.orEmpty()
+            assertThat(actual.size).isEqualTo(9)
+        }
 
     @Test
-    fun `장바구니 상품의 개수를 줄인다`() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    10,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            index,
+    fun `장바구니 상품의 개수를 증가시킨다 `() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
                             3,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    1,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
 
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
 
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
-        viewModel.loadAll()
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel.loadAll()
 
-        // when
-        viewModel.onDecrease(productId = 1, quantity = 2)
+            // when
+            viewModel.onIncrease(productId = 1, quantity = 2)
 
-        // then
-        val actual = viewModel.cartItems.value.orEmpty().find { it.id == 1L }
-        assertThat(actual?.quantity).isEqualTo(2)
-    }
+            // then
+            val actual = viewModel.cartItems.value.orEmpty().find { it.id == 1L }
+            assertThat(actual?.quantity).isEqualTo(2)
+        }
 
     @Test
-    fun `장바구니 상품 하나를 선택된 상태로 변경한다 `() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    10,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            index,
+    fun `장바구니 상품의 개수를 줄인다`() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    3,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
+
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
+
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel.loadAll()
+
+            // when
+            viewModel.onDecrease(productId = 1, quantity = 2)
+
+            // then
+            val actual = viewModel.cartItems.value.orEmpty().find { it.id == 1L }
+            assertThat(actual?.quantity).isEqualTo(2)
+        }
+
+    @Test
+    fun `장바구니 상품 하나를 선택된 상태로 변경한다 `() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    3,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
+
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
+
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel.loadAll()
+
+            // when
+            viewModel.selected(cartItemId = 1)
+
+            // then
+            val actual = viewModel.cartItems.value.orEmpty().find { it.id == 1L }
+            assertThat(actual?.checked).isTrue()
+        }
+
+    @Test
+    fun `모두 선택 버튼을 누르면 모든 장바구니 상품을 모두 선택한 상태로 변경한다`() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    3,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
+
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
+
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel.loadAll()
+
+            // when
+            viewModel.selectedAll()
+
+            // then
+            val actual = viewModel.cartItems.value.orEmpty()
+            assertThat(actual.all(CartItem::checked)).isTrue
+        }
+
+    @Test
+    fun `모든 상품을 선택한 후 하나의 상품을 제거해도 남아 있는 선택된 샆움의 개수와 가격을 보여준다`() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
                             3,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    id = index,
+                                    quantity = 3,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
 
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
 
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
-        viewModel.loadAll()
+            viewModel.loadAll()
+            viewModel.selectedAll()
 
-        // when
-        viewModel.selected(cartItemId = 1)
+            // when
+            viewModel.deleteItem(1)
 
-        // then
-        val actual = viewModel.cartItems.value.orEmpty().find { it.id == 1L }
-        assertThat(actual?.checked).isTrue()
-    }
+            // then
+            val actualSelectedItemsCount = viewModel.selectedCartItemsCount.value
+            assertThat(actualSelectedItemsCount).isEqualTo(6)
 
-
-    @Test
-    fun `모두 선택 버튼을 누르면 모든 장바구니 상품을 모두 선택한 상태로 변경한다`() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    10,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            index,
-                            3,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
-
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
-
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
-        viewModel.loadAll()
-
-        // when
-        viewModel.selectedAll()
-
-        // then
-        val actual = viewModel.cartItems.value.orEmpty()
-        assertThat(actual.all(CartItem::checked)).isTrue
-    }
+            val actualSelectedItemsTotalPrice = viewModel.selectedCartItemsTotalPrice.value
+            assertThat(actualSelectedItemsTotalPrice).isEqualTo(6000)
+        }
 
     @Test
-    fun `모든 상품을 선택한 후 하나의 상품을 제거해도 남아 있는 선택된 샆움의 개수와 가격을 보여준다`() = runTest {
-        // given
-        cartSource =
-            FakeShoppingCartDataSource(
-                cartItemResponses = cartItemDtosTestFixture(
-                    3,
-                    cartItemFixture = { index ->
-                        cartItemDtoTestFixture(
-                            id = index,
-                            quantity = 3,
-                            productResponseTestFixture(index.toLong())
-                        )
-                    }),
-                dispatcher = dispatcher,
-            )
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
+    fun `성택된 상품이 없을 때 주문하려고 하면 비어 있는 주문 에러이다`() =
+        runTest {
+            // given setup empty
 
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            // when
+            viewModel.navigateToOrder()
 
-        viewModel.loadAll()
-        viewModel.selectedAll()
-
-        // when
-        viewModel.deleteItem(1)
-
-        // then
-        val actualSelectedItemsCount = viewModel.selectedCartItemsCount.value
-        assertThat(actualSelectedItemsCount).isEqualTo(6)
-
-        val actualSelectedItemsTotalPrice = viewModel.selectedCartItemsTotalPrice.value
-        assertThat(actualSelectedItemsTotalPrice).isEqualTo(6000)
-    }
-
+            // then
+            val actual = viewModel.error.getValue()
+            assertThat(actual).isEqualTo(ShoppingCartError.EmptyOrderProduct)
+        }
 
     @Test
-    fun `성택된 상품이 없을 때 주문하려고 하면 비어 있는 주문 에러이다`() = runTest {
-        // given setup empty
+    fun `장바구니에 없는 상품을 제거하려고 할 때 error 가 설정된다`() =
+        runTest {
+            // given setup empty
 
-        // when
-        viewModel.navigateToOrder()
+            // when
+            viewModel.deleteItem(cartItemId = 101)
 
-        // then
-        val actual = viewModel.error.getValue()
-        assertThat(actual).isEqualTo(ShoppingCartError.EmptyOrderProduct)
-    }
-
-    @Test
-    fun `장바구니에 없는 상품을 제거하려고 할 때 error 가 설정된다`() = runTest {
-        // given setup empty
-
-        // when
-        viewModel.deleteItem(cartItemId = 101)
-
-        // then
-        val actual = viewModel.error.getValue()
-        assertThat(actual).isEqualTo(ShoppingCartError.DeleteCartItem)
-    }
+            // then
+            val actual = viewModel.error.getValue()
+            assertThat(actual).isEqualTo(ShoppingCartError.DeleteCartItem)
+        }
 
     @Test
-    fun `주문하기 화면으로 넘어가면 order 저장소에 저장된다`() = runTest {
-        // given
-        cartSource = FakeShoppingCartDataSource(
-            cartItemResponses = cartItemDtosTestFixture(
-                10,
-                cartItemFixture = { index ->
-                    cartItemDtoTestFixture(
-                        index,
-                        3,
-                        productResponseTestFixture(index.toLong())
-                    )
-                }),
-            dispatcher = dispatcher,
-        )
+    fun `주문하기 화면으로 넘어가면 order 저장소에 저장된다`() =
+        runTest {
+            // given
+            cartSource =
+                FakeShoppingCartDataSource(
+                    cartItemResponses =
+                        cartItemDtosTestFixture(
+                            10,
+                            cartItemFixture = { index ->
+                                cartItemDtoTestFixture(
+                                    index,
+                                    3,
+                                    productResponseTestFixture(index.toLong()),
+                                )
+                            },
+                        ),
+                    dispatcher = dispatcher,
+                )
 
-        cartRepository = DefaultShoppingCartRepository(cartSource)
-        orderRepository = DefaultOrderRepository(orderSource, cartSource)
+            cartRepository = DefaultShoppingCartRepository(cartSource)
+            orderRepository = DefaultOrderRepository(orderSource, cartSource)
 
-        viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
-        viewModel.loadAll()
-        viewModel.selectedAll()
+            viewModel = ShoppingCartViewModel(cartRepository, orderRepository)
+            viewModel.loadAll()
+            viewModel.selectedAll()
 
-        // when
-        viewModel.navigateToOrder()
+            // when
+            viewModel.navigateToOrder()
 
-        // then
-        val actualEvent = viewModel.event.getValue()
-        assertThat(actualEvent).isEqualTo(ShoppingCartEvent.NavigationOrder)
+            // then
+            val actualEvent = viewModel.event.getValue()
+            assertThat(actualEvent).isEqualTo(ShoppingCartEvent.NavigationOrder)
 
-        val actualOrders = orderRepository.loadAllOrders().getOrThrow()
-        assertThat(actualOrders.orderItems.size).isEqualTo(10)
-    }
-
-
-
-
+            val actualOrders = orderRepository.loadAllOrders().getOrThrow()
+            assertThat(actualOrders.orderItems.size).isEqualTo(10)
+        }
 }
-
 
 @ExperimentalCoroutinesApi
 class CoroutinesTestExtension(
-    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
+    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : BeforeEachCallback, AfterEachCallback {
-
     override fun beforeEach(context: ExtensionContext?) {
         Dispatchers.setMain(dispatcher)
     }

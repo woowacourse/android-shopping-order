@@ -65,9 +65,10 @@ class ShoppingCartViewModel(
     }
 
     private fun updateSelectedCartItemsCount() {
-        _selectedCartItemsCount.value = cartItems.value.orEmpty().asSequence()
-            .filter(CartItem::checked)
-            .sumOf(CartItem::quantity)
+        _selectedCartItemsCount.value =
+            cartItems.value.orEmpty().asSequence()
+                .filter(CartItem::checked)
+                .sumOf(CartItem::quantity)
 
         if (cartItems.value.isNullOrEmpty()) {
             _isAllSelected.value = false
@@ -80,10 +81,11 @@ class ShoppingCartViewModel(
             return
         }
 
-        val orderItems = cartItems.value.orEmpty()
-            .asSequence()
-            .filter(CartItem::checked)
-            .map(CartItem::toOrderItem)
+        val orderItems =
+            cartItems.value.orEmpty()
+                .asSequence()
+                .filter(CartItem::checked)
+                .map(CartItem::toOrderItem)
 
         viewModelScope.launch {
             orderRepository.save(orderItems.toList())
@@ -113,7 +115,6 @@ class ShoppingCartViewModel(
                     _error.setValue(ShoppingCartError.UpdateCartItems)
                 }
         }
-
     }
 
     private suspend fun updateCartItems() {
@@ -132,9 +133,10 @@ class ShoppingCartViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val cart = cartItems.value.orEmpty().find { cartItem ->
-            cartItem.product.id == productId
-        } ?: return
+        val cart =
+            cartItems.value.orEmpty().find { cartItem ->
+                cartItem.product.id == productId
+            } ?: return
 
         viewModelScope.launch {
             cartRepository.updateProductQuantity(cart.id, quantity)
@@ -150,17 +152,19 @@ class ShoppingCartViewModel(
     private fun updateCartItems(currentItems: List<CartItem>) {
         val existingCartItems = _cartItems.value.orEmpty()
 
-        _cartItems.value = currentItems.map { cartItem ->
-            cartItem.copy(checked = existingCartItems.find { it.id == cartItem.id }?.checked ?: false)
-        }
+        _cartItems.value =
+            currentItems.map { cartItem ->
+                cartItem.copy(checked = existingCartItems.find { it.id == cartItem.id }?.checked ?: false)
+            }
     }
 
     override fun selected(cartItemId: Long) {
-        _cartItems.value = cartItems.value.orEmpty().map { cartItem ->
-            cartItem.takeIf { it.id == cartItemId }
-                ?.run { copy(checked = !checked) }
-                ?: cartItem
-        }
+        _cartItems.value =
+            cartItems.value.orEmpty().map { cartItem ->
+                cartItem.takeIf { it.id == cartItemId }
+                    ?.run { copy(checked = !checked) }
+                    ?: cartItem
+            }
 
         updateTotalPrice()
         updateSelectedCartItemsCount()
@@ -168,9 +172,10 @@ class ShoppingCartViewModel(
     }
 
     private fun updateTotalPrice() {
-        _selectedCartItemsTotalPrice.value = cartItems.value.orEmpty()
-            .filter(CartItem::checked)
-            .sumOf(CartItem::price)
+        _selectedCartItemsTotalPrice.value =
+            cartItems.value.orEmpty()
+                .filter(CartItem::checked)
+                .sumOf(CartItem::price)
     }
 
     fun onBackClick() {

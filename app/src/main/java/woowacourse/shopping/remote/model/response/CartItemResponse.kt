@@ -8,10 +8,11 @@ data class CartItemResponse(
     val product: ProductResponse,
 )
 
-fun CartItemResponse.toData(): CartItemData = CartItemData(
-    id = id,
-    quantity = quantity,
-    product = product.toData(),
-)
+fun CartItemResponse.toData(): CartItemData =
+    CartItemData(
+        id = id,
+        quantity = quantity,
+        product = product.toData(),
+    )
 
 fun List<CartItemResponse>.toData(): List<CartItemData> = map(CartItemResponse::toData)

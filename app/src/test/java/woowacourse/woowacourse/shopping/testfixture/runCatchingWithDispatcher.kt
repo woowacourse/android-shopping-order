@@ -8,9 +8,10 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun <T> runCatchingWithDispatcher(
     dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
-    block: suspend () -> T
-): Result<T> = runCatching {
-    withContext(dispatcher) {
-        block()
+    block: suspend () -> T,
+): Result<T> =
+    runCatching {
+        withContext(dispatcher) {
+            block()
+        }
     }
-}

@@ -50,7 +50,10 @@ class OrderFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         observeRecommendedProducts()
@@ -85,7 +88,9 @@ class OrderFragment : Fragment() {
         }
     }
 
-    private fun showToast(@StringRes stringId: Int) {
+    private fun showToast(
+        @StringRes stringId: Int,
+    ) {
         Toast.makeText(
             requireContext(),
             stringId,

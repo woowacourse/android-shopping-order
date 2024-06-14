@@ -8,5 +8,4 @@ sealed interface OrderError {
     data object CalculateOrderItemsTotalPrice : OrderError
 
     data object UpdateOrderItem : OrderError
-
 }

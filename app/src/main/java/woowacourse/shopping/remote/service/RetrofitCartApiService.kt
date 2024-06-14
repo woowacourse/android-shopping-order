@@ -14,7 +14,7 @@ interface RetrofitCartApiService : CartApiService {
     @GET("/cart-items")
     override suspend fun requestCartItems(
         @Query("page") page: Int?,
-        @Query("size") size: Int?
+        @Query("size") size: Int?,
     ): CartItemListResponse
 
     @POST("/cart-items")
@@ -32,5 +32,4 @@ interface RetrofitCartApiService : CartApiService {
     override suspend fun removeCartItem(
         @Path("id") id: Long,
     )
-
 }

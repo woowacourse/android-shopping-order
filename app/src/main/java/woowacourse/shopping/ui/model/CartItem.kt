@@ -23,4 +23,3 @@ fun CartItem.toOrderItem(): OrderItem {
         product = product,
     )
 }
-

@@ -14,5 +14,4 @@ class LoadBasedOrderDateTime : OrderDateTime {
 
 class FakeOrderDateTime : OrderDateTime {
     override fun dateTime(): LocalDateTime = LocalDateTime.of(2021, 1, 1, 0, 0)
-
 }

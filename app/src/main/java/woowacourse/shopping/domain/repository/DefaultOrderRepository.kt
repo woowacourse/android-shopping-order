@@ -18,8 +18,7 @@ class DefaultOrderRepository(
 
     override suspend fun save(orderItem: OrderItem): Result<Unit> = orderSource.saveOrderItem(orderItem.toData())
 
-    override suspend fun save(orderItems: List<OrderItem>): Result<Unit> =
-        orderSource.saveOrderItems(orderItems.toData())
+    override suspend fun save(orderItems: List<OrderItem>): Result<Unit> = orderSource.saveOrderItems(orderItems.toData())
 
     override suspend fun updateOrderItem(
         productId: Long,
@@ -31,11 +30,12 @@ class DefaultOrderRepository(
             cartSource.addNewProduct(ProductIdsCountData(productId, quantity)).getOrThrow()
             val addedCartItem = cartSource.findCartItemByProductId(productId).getOrThrow()
             return orderSource.saveOrderItem(
-                orderItemData = OrderItemData(
-                    cartItemId = addedCartItem.id,
-                    quantity = 1,
-                    product = addedCartItem.product
-                ),
+                orderItemData =
+                    OrderItemData(
+                        cartItemId = addedCartItem.id,
+                        quantity = 1,
+                        product = addedCartItem.product,
+                    ),
             )
         }
 
@@ -46,11 +46,12 @@ class DefaultOrderRepository(
 
         cartSource.updateProductsCount(cartItem.id, quantity).getOrThrow()
         return orderSource.saveOrderItem(
-            orderItemData = OrderItemData(
-                cartItemId = cartItem.id,
-                quantity = quantity,
-                product = cartItem.product
-            ),
+            orderItemData =
+                OrderItemData(
+                    cartItemId = cartItem.id,
+                    quantity = quantity,
+                    product = cartItem.product,
+                ),
         )
     }
 
@@ -73,7 +74,6 @@ class DefaultOrderRepository(
         orderSource.loadAllOrderItems().map { orderItems ->
             orderItems.sumOf { orderItem -> orderItem.product.price * orderItem.quantity }
         }
-
 
     companion object {
         private const val TAG = "OrderRepository2"

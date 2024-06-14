@@ -7,7 +7,8 @@ data class CartItemRequest(
     val quantity: Int,
 )
 
-fun ProductIdsCountData.toRequest(): CartItemRequest = CartItemRequest(
-    productId = productId,
-    quantity = quantity,
-)
+fun ProductIdsCountData.toRequest(): CartItemRequest =
+    CartItemRequest(
+        productId = productId,
+        quantity = quantity,
+    )

@@ -88,7 +88,11 @@ class OrderViewModel(
         }
     }
 
-    private suspend fun updateItemQuantity(productId: Long, quantity: Int, changeAmount: Int) {
+    private suspend fun updateItemQuantity(
+        productId: Long,
+        quantity: Int,
+        changeAmount: Int,
+    ) {
         orderRepository.updateOrderItem(productId, quantity)
             .onSuccess {
                 updateRecommendProductsQuantity(productId, changeAmount)
@@ -116,8 +120,7 @@ class OrderViewModel(
         _totalPrice.value = totalPrice.value?.plus(productPrice(productId) * changeAmount)
     }
 
-    private fun productPrice(productId: Long) =
-        _recommendedProducts.getValue()?.find { product -> product.id == productId }?.price ?: 0
+    private fun productPrice(productId: Long) = _recommendedProducts.getValue()?.find { product -> product.id == productId }?.price ?: 0
 
     private fun updateRecommendProductsQuantity(
         productId: Long,
@@ -130,7 +133,7 @@ class OrderViewModel(
                 } else {
                     product
                 }
-            }
+            },
         )
     }
 

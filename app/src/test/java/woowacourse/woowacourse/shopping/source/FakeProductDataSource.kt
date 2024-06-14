@@ -18,11 +18,12 @@ class FakeProductDataSource(
         return true
     }
 
-    override suspend fun findByPaged(page: Int): Result<List<ProductData>> = runCatchingWithDispatcher(dispatcher) {
-        val endIndex = min(page * 20, allProducts.size)
+    override suspend fun findByPaged(page: Int): Result<List<ProductData>> =
+        runCatchingWithDispatcher(dispatcher) {
+            val endIndex = min(page * 20, allProducts.size)
 
-        allProducts.subList(fromIndex = (page - 1) * 20, toIndex = endIndex)
-    }
+            allProducts.subList(fromIndex = (page - 1) * 20, toIndex = endIndex)
+        }
 
     override suspend fun findAllUntilPage(page: Int): Result<List<ProductData>> =
         runCatchingWithDispatcher(dispatcher) {
@@ -31,17 +32,19 @@ class FakeProductDataSource(
             allProducts.subList(fromIndex = 0, toIndex = endIndex)
         }
 
-    override suspend fun findById(id: Long): Result<ProductData> = runCatchingWithDispatcher(dispatcher) {
-        allProducts.find { it.id == id }
-            ?: throw NoSuchElementException("there is no product with id: $id")
-    }
+    override suspend fun findById(id: Long): Result<ProductData> =
+        runCatchingWithDispatcher(dispatcher) {
+            allProducts.find { it.id == id }
+                ?: throw NoSuchElementException("there is no product with id: $id")
+        }
 
     override suspend fun findByCategory(category: String): Result<List<ProductData>> =
         runCatchingWithDispatcher(dispatcher) {
             allProducts.filter { it.category == category }
         }
 
-    override suspend fun isFinalPage(page: Int): Result<Boolean> = runCatchingWithDispatcher(dispatcher) {
-        allProducts.size <= page * 20
-    }
+    override suspend fun isFinalPage(page: Int): Result<Boolean> =
+        runCatchingWithDispatcher(dispatcher) {
+            allProducts.size <= page * 20
+        }
 }

@@ -7,5 +7,5 @@ sealed interface PaymentError {
 
     data object DiscountAmount : PaymentError
 
-    data object Order: PaymentError
+    data object Order : PaymentError
 }

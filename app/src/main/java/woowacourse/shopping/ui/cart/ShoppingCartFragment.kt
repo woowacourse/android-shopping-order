@@ -130,7 +130,6 @@ class ShoppingCartFragment : Fragment() {
         ).show()
     }
 
-
     companion object {
         const val TAG = "ShoppingCartFragment"
     }

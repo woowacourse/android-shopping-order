@@ -10,12 +10,12 @@ import woowacourse.woowacourse.shopping.testfixture.runCatchingWithDispatcher
 @OptIn(ExperimentalCoroutinesApi::class)
 class FakeOrderDataSource(
     private val orderItems: MutableList<OrderItemData> = mutableListOf(),
-    private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+    private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
 ) : OrderDataSource {
-    override suspend fun order(): Result<Unit> = runCatchingWithDispatcher(dispatcher) {
-        orderItems.clear()
-
-    }
+    override suspend fun order(): Result<Unit> =
+        runCatchingWithDispatcher(dispatcher) {
+            orderItems.clear()
+        }
 
     override suspend fun saveOrderItem(orderItemData: OrderItemData): Result<Unit> =
         runCatchingWithDispatcher(dispatcher) {
@@ -36,16 +36,18 @@ class FakeOrderDataSource(
             }
         }
 
-    override suspend fun removeOrderItem(cartItemId: Long): Result<Unit> = runCatchingWithDispatcher(dispatcher) {
-        orderItems.removeAll { it.cartItemId == cartItemId }
-    }
+    override suspend fun removeOrderItem(cartItemId: Long): Result<Unit> =
+        runCatchingWithDispatcher(dispatcher) {
+            orderItems.removeAll { it.cartItemId == cartItemId }
+        }
 
-    override suspend fun loadAllOrderItems(): Result<List<OrderItemData>> = runCatchingWithDispatcher(dispatcher) {
-        orderItems
-    }
+    override suspend fun loadAllOrderItems(): Result<List<OrderItemData>> =
+        runCatchingWithDispatcher(dispatcher) {
+            orderItems
+        }
 
-    override suspend fun clear(): Result<Unit> = runCatchingWithDispatcher(dispatcher) {
-        orderItems.clear()
-    }
-
+    override suspend fun clear(): Result<Unit> =
+        runCatchingWithDispatcher(dispatcher) {
+            orderItems.clear()
+        }
 }
