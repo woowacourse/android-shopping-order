@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
@@ -12,9 +13,9 @@ import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
+import woowacourse.shopping.view.base.ErrorEvent
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.detail.ProductDetailFragment
 import woowacourse.shopping.view.products.adapter.ProductAdapter
@@ -99,9 +100,7 @@ class ProductsListFragment : Fragment(), OnClickProducts {
         productListViewModel.productListEvent.observe(viewLifecycleOwner) { productListEvent ->
             when (productListEvent) {
                 is ProductListEvent.DeleteProductEvent.Success -> {
-                    requireContext().makeToast(
-                        getString(R.string.delete_cart_item),
-                    )
+                    showToast(getString(R.string.delete_cart_item))
                     productAdapter.updateProduct(productListEvent.productId)
                 }
 
@@ -116,26 +115,23 @@ class ProductsListFragment : Fragment(), OnClickProducts {
         }
         productListViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
             when (errorState) {
-                ProductListEvent.LoadProductEvent.Fail -> {
-                    requireContext().makeToast(
-                        getString(R.string.max_paging_data),
-                    )
+                is ErrorEvent.LoadDataEvent -> {
+                    showToast(getString(R.string.max_paging_data))
                     binding.btnMoreProduct.visibility = View.GONE
                     productAdapter.setShowSkeleton(false)
                 }
 
-                ProductListEvent.ErrorEvent.NotKnownError ->
-                    requireContext().makeToast(
-                        getString(R.string.error_default),
-                    )
+                is ErrorEvent.NotKnownError ->
+                    showToast(getString(R.string.error_default))
 
-                ProductListEvent.UpdateProductEvent.Fail,
-                ProductListEvent.DeleteProductEvent.Fail,
+                is ErrorEvent.UpdateCartEvent,
+                is ErrorEvent.DeleteCartEvent,
                 ->
-                    requireContext()
-                        .makeToast(
-                            getString(R.string.error_update_cart_item),
-                        )
+                    showToast(getString(R.string.error_update_cart_item))
+
+                else -> {
+                    showToast(getString(R.string.error_default))
+                }
             }
         }
         mainActivityListener?.observeProductList { updatedProducts ->
@@ -180,5 +176,11 @@ class ProductsListFragment : Fragment(), OnClickProducts {
 
     private fun loadPagingData() {
         productListViewModel.loadPagingProduct()
+    }
+
+    private fun showToast(message: String) {
+        context?.let {
+            Toast.makeText(it, message, Toast.LENGTH_SHORT)
+        }
     }
 }

@@ -2,27 +2,25 @@ package woowacourse.shopping.view.products
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.model.CartItemEntity.Companion.DEFAULT_CART_ITEM_COUNT
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.ProductRepositoryImpl.Companion.DEFAULT_ITEM_SIZE
-import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
-import woowacourse.shopping.domain.model.UpdateCartItemResult
-import woowacourse.shopping.domain.model.UpdateCartItemType
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.utils.livedata.MutableSingleLiveData
 import woowacourse.shopping.utils.livedata.SingleLiveData
+import woowacourse.shopping.view.base.BaseViewModel
 import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val recentlyProductRepository: RecentlyProductRepository,
-) : ViewModel(), OnClickCartItemCounter {
+) : BaseViewModel(), OnClickCartItemCounter {
     private val _products: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
     val products: LiveData<List<Product>> get() = _products
     private val _cartItemCount: MutableLiveData<Int> = MutableLiveData(0)
@@ -38,9 +36,11 @@ class ProductListViewModel(
     private val _loadingEvent: MutableSingleLiveData<ProductListEvent.LoadProductEvent> =
         MutableSingleLiveData()
     val loadingEvent: SingleLiveData<ProductListEvent.LoadProductEvent> get() = _loadingEvent
-    private val _errorEvent: MutableSingleLiveData<ProductListEvent.ErrorEvent> =
-        MutableSingleLiveData()
-    val errorEvent: SingleLiveData<ProductListEvent.ErrorEvent> get() = _errorEvent
+
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            handleException(exception)
+        }
 
     init {
         updateTotalCartItemCount()
@@ -48,93 +48,40 @@ class ProductListViewModel(
     }
 
     fun loadPagingProduct() {
-        _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
-        val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
-        productRepository.loadPagingProducts(itemSize)
-            .onSuccess { pagingData ->
-                _products.value = _products.value?.plus(pagingData)
-                _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
-                _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
-            }
-            .onFailure { exception ->
-                handleException(exception)
-            }
-    }
-
-    fun loadPagingRecentlyProduct() {
-        recentlyProductRepository.getRecentlyProductList()
-            .onSuccess { pagingData ->
-                _recentlyProducts.value = pagingData
-            }
-            .onFailure { _ ->
-                _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
-            }
-    }
-
-    private fun updateCartItem(
-        product: Product,
-        updateCartItemType: UpdateCartItemType,
-    ) {
-        shoppingCartRepository.updateCartItem(product, updateCartItemType)
-            .onSuccess { updateCartItemResult ->
-                handleCartItemUpdate(updateCartItemResult, product, updateCartItemType)
-            }
-            .onFailure { exception ->
-                handleException(exception)
-            }
-    }
-
-    private fun handleCartItemUpdate(
-        updateCartItemResult: UpdateCartItemResult,
-        product: Product,
-        updateCartItemType: UpdateCartItemType,
-    ) {
-        when (updateCartItemResult) {
-            UpdateCartItemResult.ADD -> addCartItem(product)
-            is UpdateCartItemResult.DELETE -> deleteCartItem(product)
-            is UpdateCartItemResult.UPDATED -> {
-                product.updateCartItemCount(updateCartItemResult.cartItemResult.counter.itemCount)
-                when (updateCartItemType) {
-                    UpdateCartItemType.DECREASE -> updateTotalCartItemCount()
-                    UpdateCartItemType.INCREASE -> {
-                        product.updateItemSelector(true)
-                        updateTotalCartItemCount()
-                    }
-
-                    is UpdateCartItemType.UPDATE -> {}
+        viewModelScope.launch(coroutineExceptionHandler) {
+            _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Loading)
+            val itemSize = products.value?.size ?: DEFAULT_ITEM_SIZE
+            productRepository.loadPagingProducts(itemSize)
+                .onSuccess { pagingData ->
+                    _products.value = _products.value?.plus(pagingData)
+                    _loadingEvent.setValue(ProductListEvent.LoadProductEvent.Success)
+                    _productListEvent.setValue(ProductListEvent.LoadProductEvent.Success)
                 }
-                _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
-            }
+                .onFailure { exception ->
+                    handleException(exception)
+                }
         }
     }
 
-    private fun addCartItem(product: Product) {
-        product.updateCartItemCount(DEFAULT_CART_ITEM_COUNT)
-        product.updateItemSelector(true)
-        updateTotalCartItemCount()
-        _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
-    }
-
-    private fun deleteCartItem(product: Product) {
-        product.updateItemSelector(false)
-        updateTotalCartItemCount()
-        _productListEvent.setValue(ProductListEvent.DeleteProductEvent.Success(product.id))
+    fun loadPagingRecentlyProduct() {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            recentlyProductRepository.getRecentlyProductList()
+                .onSuccess { pagingData ->
+                    _recentlyProducts.value = pagingData
+                }.onFailure { exception ->
+                    handleException(exception)
+                }
+        }
     }
 
     private fun updateTotalCartItemCount() {
-        shoppingCartRepository.getTotalCartItemCount()
-            .onSuccess { totalItemCount ->
-                _cartItemCount.value = totalItemCount
-            }
-            .onFailure { _ ->
-                _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
-            }
-    }
-
-    private fun handleException(exception: Throwable) {
-        when (exception) {
-            is NoSuchDataException -> _errorEvent.setValue(ProductListEvent.LoadProductEvent.Fail)
-            else -> _errorEvent.setValue(ProductListEvent.ErrorEvent.NotKnownError)
+        viewModelScope.launch(coroutineExceptionHandler) {
+            shoppingCartRepository.getTotalCartItemCount()
+                .onSuccess { totalItemCount ->
+                    _cartItemCount.value = totalItemCount
+                }.onFailure { exception ->
+                    handleException(exception)
+                }
         }
     }
 
@@ -142,11 +89,6 @@ class ProductListViewModel(
         products.value?.forEach { product ->
             val count = items[product.id]
             if (count != null) {
-                if (count == DEFAULT_ITEM_COUNT) {
-                    product.updateItemSelector(false)
-                } else {
-                    product.updateItemSelector(true)
-                }
                 product.updateCartItemCount(count)
                 _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
             }
@@ -155,10 +97,27 @@ class ProductListViewModel(
     }
 
     override fun clickIncrease(product: Product) {
-        updateCartItem(product, UpdateCartItemType.INCREASE)
+        viewModelScope.launch(coroutineExceptionHandler) {
+            shoppingCartRepository.increaseCartItem(product)
+                .onSuccess {
+                    _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
+                    updateTotalCartItemCount()
+                }.onFailure {
+                    handleException(it)
+                }
+        }
     }
 
     override fun clickDecrease(product: Product) {
-        updateCartItem(product, UpdateCartItemType.DECREASE)
+        viewModelScope.launch(coroutineExceptionHandler) {
+            shoppingCartRepository.decreaseCartItem(product)
+                .onSuccess {
+                    _productListEvent.setValue(ProductListEvent.UpdateProductEvent.Success(product.id))
+                    product.cartItemCounter.decrease()
+                    updateTotalCartItemCount()
+                }.onFailure {
+                    handleException(it)
+                }
+        }
     }
 }

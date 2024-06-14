@@ -5,7 +5,7 @@ import woowacourse.shopping.data.remote.dto.product.ProductDto
 
 data class CartItemDto(
     @SerializedName("id")
-    val id: Int,
+    val id: Long,
     @SerializedName("product")
     val product: ProductDto,
     @SerializedName("quantity")

@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentShoppingCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.CartItemCounter.Companion.DEFAULT_ITEM_COUNT
-import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
 import woowacourse.shopping.view.cart.adapter.ShoppingCartAdapter
@@ -101,11 +101,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
                         DEFAULT_ITEM_COUNT,
                     )
 
-                    requireContext().makeToast(
-                        getString(
-                            R.string.delete_cart_item,
-                        ),
-                    )
+                    showToast(getString(R.string.delete_cart_item))
                 }
                 is ShoppingCartEvent.SendCartItem.Success -> {
                     navigateOrder(cartState.shoppingCart)
@@ -114,9 +110,7 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
         }
 
         shoppingCartViewModel.errorEvent.observe(viewLifecycleOwner) { errorState ->
-            requireContext().makeToast(
-                errorState.receiveErrorMessage(),
-            )
+            showToast(errorState.receiveErrorMessage())
         }
 
         mainActivityListener?.observeCartItem {
@@ -153,5 +147,11 @@ class ShoppingCartFragment : Fragment(), OnClickNavigateShoppingCart {
 
     private fun updateRecyclerView(cartItems: List<CartItem>) {
         adapter.updateCartItems(cartItems)
+    }
+
+    private fun showToast(message: String) {
+        context?.let {
+            Toast.makeText(it, message, Toast.LENGTH_SHORT).show()
+        }
     }
 }

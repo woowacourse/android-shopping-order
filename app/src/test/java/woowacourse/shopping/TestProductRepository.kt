@@ -1,11 +1,9 @@
 package woowacourse.shopping
 
-import woowacourse.shopping.data.db.product.ProductDatabase.products
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Product.Companion.defaultProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class MockProductRepository : ProductRepository {
+class TestProductRepository : ProductRepository {
     val products =
         arrayListOf(
             Product(
@@ -40,30 +38,6 @@ class MockProductRepository : ProductRepository {
             ),
         )
 
-    override fun loadPagingProducts(offset: Int): List<Product> {
-        val products =
-            listOf(
-                Product(id = 1, name = "Product 1", price = 1000, imageUrl = "", category = ""),
-                Product(id = 2, name = "Product 2", price = 2000, imageUrl = "", category = ""),
-                Product(id = 3, name = "Product 3", price = 3000, imageUrl = "", category = ""),
-            )
-        return products.subList(0, 3)
-    }
-
-    override fun loadCategoryProducts(
-        size: Int,
-        category: String,
-    ): List<Product> {
-        repeat(5) {
-            products.addAll(products)
-        }
-        return products.subList(size, 3)
-    }
-
-    override fun getProduct(productId: Long): Product {
-        return products.firstOrNull { it.id == productId } ?: defaultProduct
-    }
-
     companion object {
         private const val DEFAULT_ID = -1L
         private val defaultProduct =
@@ -74,5 +48,20 @@ class MockProductRepository : ProductRepository {
                 imageUrl = "",
                 category = "",
             )
+    }
+
+    override suspend fun loadPagingProducts(offset: Int): Result<List<Product>> {
+        return Result.success(products.subList(offset, offset + 3))
+    }
+
+    override suspend fun loadCategoryProducts(
+        size: Int,
+        category: String,
+    ): Result<List<Product>> {
+        return Result.success(products.subList(size, 3))
+    }
+
+    override suspend fun getProduct(productId: Long): Result<Product> {
+        return Result.success(products.firstOrNull { it.id == productId } ?: defaultProduct)
     }
 }

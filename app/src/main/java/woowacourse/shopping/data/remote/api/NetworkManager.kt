@@ -14,7 +14,7 @@ object NetworkManager {
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()
-                    .addInterceptor(BasicAuthInterceptor("jinuemong", "password"))
+                    .addInterceptor(BasicAuthInterceptor("chaehyuns", "password"))
                     .build(),
             )
             .build()

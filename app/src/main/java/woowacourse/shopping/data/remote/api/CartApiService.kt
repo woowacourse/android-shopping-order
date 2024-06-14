@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.api
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -15,33 +15,33 @@ import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 
 interface CartApiService {
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int,
-    ): Call<CartItemResponse>
+    ): Response<CartItemResponse>
 
     @POST("/cart-items")
-    fun insertCartItem(
+    suspend fun insertCartItem(
         @Header("accept") accept: String = "*/*",
         @Body cartItemRequest: CartItemRequest,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
-    ): Call<Unit>
+        @Path("id") id: Long,
+    ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun updateCartItem(
+    suspend fun updateCartItem(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
+        @Path("id") id: Long,
         @Body quantity: CartItemQuantityDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @GET("/cart-items/counts")
-    fun requestCartItemCount(
+    suspend fun requestCartItemCount(
         @Header("accept") accept: String = "*/*",
-    ): Call<CartItemQuantityDto>
+    ): Response<CartItemQuantityDto>
 }

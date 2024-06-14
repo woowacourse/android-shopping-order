@@ -9,23 +9,22 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
 import woowacourse.shopping.data.repository.RecentlyProductRepositoryImpl
-import woowacourse.shopping.data.repository.remote.RemoteOrderRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.RemoteShoppingCartRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentlyProduct
 import woowacourse.shopping.utils.ShoppingUtils.makeToast
 import woowacourse.shopping.utils.exception.NoSuchDataException
 import woowacourse.shopping.view.MainActivityListener
 import woowacourse.shopping.view.ViewModelFactory
+import woowacourse.shopping.view.base.UiState
 import woowacourse.shopping.view.cart.ShoppingCartFragment
 import woowacourse.shopping.view.cart.model.ShoppingCart
-import woowacourse.shopping.view.cartcounter.OnClickCartItemCounter
 import woowacourse.shopping.view.detail.ProductDetailFragment
+import woowacourse.shopping.view.order.OrderFragment
 import woowacourse.shopping.view.products.OnClickProducts
 
-class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, OnClickProducts {
+class RecommendFragment : Fragment(), OnClickRecommend, OnClickProducts {
     private var mainActivityListener: MainActivityListener? = null
     private var _binding: FragmentRecommendBinding? = null
     val binding: FragmentRecommendBinding get() = _binding!!
@@ -33,7 +32,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         val viewModelFactory =
             ViewModelFactory {
                 RecommendViewModel(
-                    orderRepository = RemoteOrderRepositoryImpl(),
                     productRepository = RemoteProductRepositoryImpl(),
                     shoppingCartRepository = RemoteShoppingCartRepositoryImpl(),
                     recentlyRepository = RecentlyProductRepositoryImpl(requireContext()),
@@ -76,7 +74,7 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         adapter =
             RecommendAdapter(
                 onClickProducts = this,
-                onClickCartItemCounter = this,
+                onClickCartItemCounter = recommendViewModel,
             )
         binding.recyclerView.adapter = adapter
         observeData()
@@ -84,8 +82,14 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     private fun observeData() {
-        recommendViewModel.products.observe(viewLifecycleOwner) { products ->
-            adapter.submitList(products)
+        recommendViewModel.products.observe(viewLifecycleOwner) { recommendState ->
+            when (recommendState) {
+                is UiState.Success -> adapter.submitList(recommendState.data)
+                else ->
+                    requireContext().makeToast(
+                        getString(R.string.error_default),
+                    )
+            }
         }
         recommendViewModel.recommendEvent.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -110,14 +114,6 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
         }
     }
 
-    override fun clickIncrease(product: Product) {
-        recommendViewModel.increaseShoppingCart(product)
-    }
-
-    override fun clickDecrease(product: Product) {
-        recommendViewModel.decreaseShoppingCart(product)
-    }
-
     override fun clickLoadPagingData() {}
 
     override fun clickProductItem(productId: Long) {
@@ -136,7 +132,13 @@ class RecommendFragment : Fragment(), OnClickRecommend, OnClickCartItemCounter, 
     }
 
     override fun clickOrder() {
-        recommendViewModel.orderItems()
+        val checkedShoppingCart = recommendViewModel.checkedShoppingCart
+        val orderFragment =
+            OrderFragment().apply {
+                arguments =
+                    OrderFragment.createBundle(checkedShoppingCart)
+            }
+        mainActivityListener?.changeFragment(orderFragment)
     }
 
     override fun clickBack() {

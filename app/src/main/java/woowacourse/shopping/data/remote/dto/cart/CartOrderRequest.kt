@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class CartOrderRequest(
     @SerializedName("cartItemIds")
-    val cartItemIds: List<Int>,
+    val cartItemIds: List<Long>,
 )

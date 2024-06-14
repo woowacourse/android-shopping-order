@@ -7,7 +7,7 @@ interface OnClickShoppingCart {
 
     fun clickCheckBox(cartItem: CartItem)
 
-    fun clickCheckAll()
+    fun clickToggleAll()
 
     fun clickOrder()
 }

@@ -1,20 +1,24 @@
 package woowacourse.shopping.view.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
-import woowacourse.shopping.MockProductRepository
-import woowacourse.shopping.MockRecentlyProductRepository
-import woowacourse.shopping.MockShoppingCartRepository
 import woowacourse.shopping.TestFixture.getOrAwaitValue
+import woowacourse.shopping.TestProductRepository
+import woowacourse.shopping.TestRecentlyProductRepository
+import woowacourse.shopping.TestShoppingCartRepository
 import woowacourse.shopping.view.products.ProductListViewModel
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductListViewModelTest {
     @get:Rule
@@ -24,9 +28,9 @@ class ProductListViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        val productRepository = MockProductRepository()
-        val shoppingCartRepository = MockShoppingCartRepository()
-        val recentlyProductRepository = MockRecentlyProductRepository()
+        val productRepository = TestProductRepository()
+        val shoppingCartRepository = TestShoppingCartRepository()
+        val recentlyProductRepository = TestRecentlyProductRepository()
         viewModel =
             ProductListViewModel(
                 productRepository = productRepository,

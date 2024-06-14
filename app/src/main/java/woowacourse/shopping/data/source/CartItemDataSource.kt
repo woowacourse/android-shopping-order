@@ -1,28 +1,28 @@
 package woowacourse.shopping.data.source
 
-import retrofit2.Call
+import retrofit2.Response
 import woowacourse.shopping.data.remote.dto.cart.CartItemQuantityDto
 import woowacourse.shopping.data.remote.dto.cart.CartItemResponse
 
 interface CartItemDataSource {
-    fun loadCartItems(): Call<CartItemResponse>
+    suspend fun loadCartItems(): Response<CartItemResponse>
 
-    fun loadCartItems(
+    suspend fun loadCartItems(
         page: Int,
         size: Int,
-    ): Call<CartItemResponse>
+    ): Response<CartItemResponse>
 
-    fun addCartItem(
-        productId: Int,
+    suspend fun addCartItem(
+        productId: Long,
         quantity: Int,
-    ): Call<Unit>
+    ): Response<Unit>
 
-    fun deleteCartItem(id: Int): Call<Unit>
+    suspend fun deleteCartItem(id: Long): Response<Unit>
 
-    fun updateCartItem(
-        id: Int,
+    suspend fun updateCartItem(
+        id: Long,
         quantity: Int,
-    ): Call<Unit>
+    ): Response<Unit>
 
-    fun loadCartItemCount(): Call<CartItemQuantityDto>
+    suspend fun loadCartItemCount(): Response<CartItemQuantityDto>
 }
