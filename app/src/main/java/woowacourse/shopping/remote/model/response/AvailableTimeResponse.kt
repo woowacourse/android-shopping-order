@@ -7,7 +7,7 @@ data class AvailableTimeResponse(
     val end: String,
 )
 
-fun AvailableTimeResponse?.toData2(): AvailableTimeData? {
+fun AvailableTimeResponse?.toData(): AvailableTimeData? {
     if (this == null) {
         return null
     }

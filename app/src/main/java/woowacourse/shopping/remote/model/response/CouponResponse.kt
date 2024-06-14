@@ -26,5 +26,5 @@ fun CouponResponse.toData(): CouponData =
         minimumAmount = minimumAmount,
         buyQuantity = buyQuantity,
         getQuantity = getQuantity,
-        availableTime = this.availableTime?.toData2(),
+        availableTime = this.availableTime?.toData(),
     )
