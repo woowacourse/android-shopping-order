@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.productList.event.ProductListEvent
 
 class ProductListFragment : Fragment() {
     private var _binding: FragmentProductListBinding? = null
@@ -56,10 +57,9 @@ class ProductListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         showSkeletonUi()
-        observeNavigationShoppingCart()
-        observeDetailProductDestination()
         observeLoadedProducts()
         observeProductHistory()
+        observeEvent()
     }
 
     private fun observeProductHistory() {
@@ -68,9 +68,13 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun observeNavigationShoppingCart() {
-        viewModel.shoppingCartDestination.observe(viewLifecycleOwner) {
-            (requireActivity() as FragmentNavigator).navigateToShoppingCart()
+    private fun observeEvent() {
+        viewModel.event.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is ProductListEvent.NavigateToCart -> (requireActivity() as FragmentNavigator).navigateToShoppingCart()
+                is ProductListEvent.NavigateToProductDetail ->
+                    (requireActivity() as FragmentNavigator).navigateToProductDetail(event.productId)
+            }
         }
     }
 
@@ -82,12 +86,6 @@ class ProductListFragment : Fragment() {
                 binding.shimmerProductList.visibility = View.GONE
                 binding.shimmerProductList.stopShimmer()
             }
-        }
-    }
-
-    private fun observeDetailProductDestination() {
-        viewModel.detailProductDestinationId.observe(viewLifecycleOwner) { productId ->
-            (requireActivity() as FragmentNavigator).navigateToProductDetail(productId)
         }
     }
 

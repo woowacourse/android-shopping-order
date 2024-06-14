@@ -18,6 +18,7 @@ import woowacourse.shopping.ui.OnItemQuantityChangeListener
 import woowacourse.shopping.ui.OnProductItemClickListener
 import woowacourse.shopping.ui.model.CartItem
 import woowacourse.shopping.ui.productList.event.ProductListError
+import woowacourse.shopping.ui.productList.event.ProductListEvent
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
@@ -42,17 +43,14 @@ class ProductListViewModel(
     private val _isLastPage: MutableLiveData<Boolean> = MutableLiveData()
     val isLastPage: LiveData<Boolean> get() = _isLastPage
 
-    private val _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
-    val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
-
-    private val _shoppingCartDestination: MutableSingleLiveData<Boolean> = MutableSingleLiveData()
-    val shoppingCartDestination: SingleLiveData<Boolean> get() = _shoppingCartDestination
-
     private val _cartProducts: MutableLiveData<List<CartItem>> = MutableLiveData()
     private val cartProducts: LiveData<List<CartItem>> get() = _cartProducts
 
     private val _error: MutableSingleLiveData<ProductListError> = MutableSingleLiveData()
     val error: SingleLiveData<ProductListError> get() = _error
+
+    private val _event: MutableSingleLiveData<ProductListEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ProductListEvent> get() = _event
 
     fun loadAll() {
         val page = currentPage.value ?: currentPageIsNullException()
@@ -140,11 +138,11 @@ class ProductListViewModel(
     }
 
     fun navigateToShoppingCart() {
-        _shoppingCartDestination.setValue(true)
+        _event.setValue(ProductListEvent.NavigateToCart)
     }
 
     override fun onClick(productId: Long) {
-        _detailProductDestinationId.setValue(productId)
+        _event.setValue(ProductListEvent.NavigateToProductDetail(productId))
     }
 
     override fun onIncrease(
