@@ -23,7 +23,7 @@ sealed class DataResponse<out T : Any> {
     }
 }
 
-fun <T : Any, R : Any> DataResponse<T>.map(functor: (T) -> R?): DataResponse<R> {
+suspend fun <T : Any, R : Any> DataResponse<T>.map(functor: suspend (T) -> R?): DataResponse<R> {
     val body =
         when (this) {
             is DataResponse.Success ->
@@ -45,7 +45,7 @@ fun <T : Any, R : Any> DataResponse<T>.map(functor: (T) -> R?): DataResponse<R> 
     return DataResponse.Success(ret)
 }
 
-fun <T : Any, P : DataResponse<T>, R : Any> DataResponse<P>.chain(functor: (T) -> R?): DataResponse<R> {
+suspend fun <T : Any, P : DataResponse<T>, R : Any> DataResponse<P>.chain(functor: suspend (T) -> R?): DataResponse<R> {
     val response =
         when (this) {
             is DataResponse.Success ->
@@ -73,14 +73,13 @@ fun <T : Any, P : DataResponse<T>, R : Any> DataResponse<P>.chain(functor: (T) -
     return DataResponse.Success(functor(body))
 }
 
-fun <S : Any, T : Any, R : Any> zip(
+suspend fun <S : Any, T : Any, R : Any> zip(
     first: DataResponse<S>,
     second: DataResponse<T>,
-    functor: (S, T) -> R,
+    functor: suspend (S, T) -> R,
 ): DataResponse<R> {
     if (
-        first is DataResponse.Success &&
-        second is DataResponse.Success
+        first is DataResponse.Success && second is DataResponse.Success
     ) {
         if (first.body == null || second.body == null) {
             return DataResponse.Failure(
@@ -94,12 +93,12 @@ fun <S : Any, T : Any, R : Any> zip(
     return DataResponse.Failure(ZIP_FAILURE_CODE, ZIP_FAILURE_STRING)
 }
 
-fun <T : Any> DataResponse<T>.onSuccess(func: (body: T) -> Unit): DataResponse<T> {
+suspend fun <T : Any> DataResponse<T>.onSuccess(func: suspend (body: T) -> Unit): DataResponse<T> {
     if (this is DataResponse.Success && this.body != null) func(body)
     return this
 }
 
-fun <T : Any> DataResponse<T>.onFailure(func: (code: Int, error: String?) -> Unit): DataResponse<T> {
+suspend fun <T : Any> DataResponse<T>.onFailure(func: suspend (code: Int, error: String?) -> Unit): DataResponse<T> {
     if (this is DataResponse.Failure) func(code, error)
     return this
 }

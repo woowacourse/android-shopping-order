@@ -2,6 +2,7 @@ package com.example.data.datasource.remote
 
 import com.example.data.BuildConfig
 import com.example.data.datasource.remote.service.CartItemService
+import com.example.data.datasource.remote.service.CouponService
 import com.example.data.datasource.remote.service.OrderService
 import com.example.data.datasource.remote.service.ProductService
 import kotlinx.serialization.json.Json
@@ -45,6 +46,9 @@ class RetrofitClient(
 
     val orderService: OrderService =
         retrofitBuilder.create(OrderService::class.java)
+
+    val couponService: CouponService =
+        retrofitBuilder.create(CouponService::class.java)
 
     companion object {
         private const val BASE_URL = "http://54.180.95.212:8080"

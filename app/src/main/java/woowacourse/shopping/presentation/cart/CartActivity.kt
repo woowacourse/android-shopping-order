@@ -4,9 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -15,6 +13,7 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.common.observeEvent
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.detail.ProductDetailActivity
+import woowacourse.shopping.presentation.purchase.PurchaseActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var cartSelectionFragment: Fragment
@@ -39,7 +38,6 @@ class CartActivity : AppCompatActivity() {
                 classLoader,
                 CartRecommendFragment::class.java.name,
             )
-        // binding = DataBindingUtil.setContentView(this, layoutId)
 
         changeFragment(cartSelectionFragment)
 
@@ -55,37 +53,6 @@ class CartActivity : AppCompatActivity() {
         viewModel.changedCartEvent.observe(this) {
             setResult(Activity.RESULT_OK)
         }
-        viewModel.isSuccessCreateOrder.observe(this) {
-            /*
-            val isSuccessCreateOrder = it.getContentIfNotHandled() ?: return@observe
-            if (isSuccessCreateOrder) {
-                showDialogSuccessCreateOrder()
-            } else {
-                showToastFailureCreateOrder()
-            }
-             */
-        }
-    }
-
-    private fun showDialogSuccessCreateOrder() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.create_order_success_title))
-            .setMessage(getString(R.string.create_order_success))
-            .setPositiveButton(getString(R.string.common_confirm)) { _, _ ->
-                navigateToProductsView()
-            }
-            .setCancelable(false)
-            .show()
-    }
-
-    private fun navigateToProductsView() {
-        val intent = Intent(this, CartActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
-    private fun showToastFailureCreateOrder() {
-        Toast.makeText(this, R.string.create_order_failure, Toast.LENGTH_SHORT).show()
     }
 
     private fun initializeToolbar() {
@@ -120,6 +87,9 @@ class CartActivity : AppCompatActivity() {
                             productId = cartNavigationAction.productId,
                         )
                     startActivity(intent)
+                }
+                is CartNavigateAction.PurchaseProductNavigateAction -> {
+                    PurchaseActivity.startActivity(this, cartNavigationAction.cartItems)
                 }
             }
         }

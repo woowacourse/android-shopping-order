@@ -14,5 +14,9 @@ interface CartActionHandler {
 
     fun selectAllCartItem(isChecked: Boolean)
 
+    fun onClickOrderButton()
+
     fun navigateCartRecommend()
+
+    fun navigatePurchase()
 }

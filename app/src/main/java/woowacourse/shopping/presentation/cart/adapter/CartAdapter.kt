@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.cart.CartActionHandler
-import woowacourse.shopping.presentation.cart.CartUiModel
+import woowacourse.shopping.presentation.cart.model.CartUiModel
 
 class CartAdapter(private val cartActionHandler: CartActionHandler) : ListAdapter<CartUiModel, CartViewHolder>(diffCallback) {
     override fun onCreateViewHolder(

@@ -9,30 +9,30 @@ import com.example.domain.repository.CartRepository
 class DefaultCartRepository(
     private val dataSource: CartDataSource,
 ) : CartRepository {
-    override fun findAll(): DataResponse<List<CartItem>> = dataSource.findAll()
+    override suspend fun findAll(): DataResponse<List<CartItem>> = dataSource.findAll()
 
-    override fun postCartItem(
+    override suspend fun postCartItem(
         productId: Int,
         quantity: Quantity,
     ): DataResponse<Unit> = dataSource.postCartItem(productId, quantity)
 
-    override fun increaseQuantity(productId: Int) = dataSource.increaseQuantity(productId)
+    override suspend fun increaseQuantity(productId: Int) = dataSource.increaseQuantity(productId)
 
-    override fun decreaseQuantity(productId: Int) = dataSource.decreaseQuantity(productId)
+    override suspend fun decreaseQuantity(productId: Int) = dataSource.decreaseQuantity(productId)
 
-    override fun changeQuantity(
+    override suspend fun changeQuantity(
         productId: Int,
         quantity: Quantity,
     ) = dataSource.changeQuantity(productId, quantity)
 
-    override fun deleteCartItem(cartItemId: Int) = dataSource.deleteCartItem(cartItemId)
+    override suspend fun deleteCartItem(cartItemId: Int) = dataSource.deleteCartItem(cartItemId)
 
-    override fun find(productId: Int): DataResponse<CartItem> = dataSource.findByProductId(productId)
+    override suspend fun find(productId: Int): DataResponse<CartItem> = dataSource.findByProductId(productId)
 
-    override fun findRange(
+    override suspend fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<CartItem>> = dataSource.findRange(page, pageSize)
 
-    override fun totalCartItemCount(): DataResponse<Int> = dataSource.totalCartItemCount()
+    override suspend fun totalCartItemCount(): DataResponse<Int> = dataSource.totalCartItemCount()
 }

@@ -47,7 +47,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                setVisibility="@{viewModel.checkboxVisibility}"
+                setVisibility="@{!viewModel.isOnCartRecommend}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -98,7 +98,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:onClick="@{() ->actionHandler.navigateCartRecommend()}"
+                android:onClick="@{() ->actionHandler.onClickOrderButton()}"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="주문하기(4)" />
 

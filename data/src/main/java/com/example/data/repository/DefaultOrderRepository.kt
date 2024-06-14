@@ -6,7 +6,7 @@ import com.example.domain.repository.OrderRepository
 class DefaultOrderRepository(
     private val orderDataSource: RemoteOrderDataSource,
 ) : OrderRepository {
-    override fun createOrder(cartItemIds: List<Int>) {
+    override suspend fun createOrder(cartItemIds: List<Int>) {
         orderDataSource.createOrder(cartItemIds)
     }
 }

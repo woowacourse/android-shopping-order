@@ -16,62 +16,62 @@ import com.example.domain.model.Quantity
 class RemoteCartDataSource(
     private val cartItemService: CartItemService,
 ) : CartDataSource {
-    override fun findAll(): DataResponse<List<CartItem>> =
-        cartItemService.requestCartQuantityCount().executeForDataResponse().map {
-            cartItemService.requestCartItems(page = 0, size = it.quantity).executeForDataResponse()
+    override suspend fun findAll(): DataResponse<List<CartItem>> =
+        cartItemService.requestCartQuantityCount().map {
+            cartItemService.requestCartItems(page = 0, size = it.quantity)
         }.chain {
             it.toCartItems()
         }
 
-    override fun postCartItem(
+    override suspend fun postCartItem(
         productId: Int,
         quantity: Quantity,
     ): DataResponse<Unit> {
         val request = AddCartItemRequest(productId, quantity.count)
-        return cartItemService.postCartItem(addCartItemRequest = request).executeForDataResponse()
+        return cartItemService.postCartItem(addCartItemRequest = request)
     }
 
-    override fun increaseQuantity(productId: Int) =
+    override suspend fun increaseQuantity(productId: Int) =
         findByProductId(productId).map { cartItem ->
             changeQuantity(cartItem.id, cartItem.quantity.inc())
         }.onFailure { code, error ->
             if (code == NULL_BODY_ERROR_CODE || code == 400) {
                 val request = AddCartItemRequest(productId, 1)
-                cartItemService.postCartItem(addCartItemRequest = request).execute()
+                cartItemService.postCartItem(addCartItemRequest = request)
             }
         }.chain { it }
 
-    override fun decreaseQuantity(productId: Int) =
+    override suspend fun decreaseQuantity(productId: Int) =
         findByProductId(productId).map { cartItem ->
             changeQuantity(cartItem.id, cartItem.quantity.dec())
         }.chain { it }
 
-    override fun changeQuantity(
+    override suspend fun changeQuantity(
         cartItemId: Int,
         quantity: Quantity,
     ) = cartItemService.patchCartItemQuantity(
         id = cartItemId,
         quantity = CartItemQuantityRequest(quantity.count),
-    ).executeForDataResponse()
+    )
 
-    override fun deleteCartItem(cartItemId: Int) = cartItemService.deleteCartItem(id = cartItemId).executeForDataResponse()
+    override suspend fun deleteCartItem(cartItemId: Int) = cartItemService.deleteCartItem(id = cartItemId)
 
-    override fun findByProductId(productId: Int): DataResponse<CartItem> =
+    override suspend fun findByProductId(productId: Int): DataResponse<CartItem> =
         findAll().map { wholeList ->
             wholeList.find { it.product.id == productId }
         }
 
-    override fun findRange(
+    override suspend fun findRange(
         page: Int,
         pageSize: Int,
     ): DataResponse<List<CartItem>> =
-        cartItemService.requestCartItems(page = page, size = pageSize).executeForDataResponse()
+        cartItemService.requestCartItems(page = page, size = pageSize)
             .map { cartResponse ->
                 cartResponse.toCartItems()
             }
 
-    override fun totalCartItemCount(): DataResponse<Int> =
-        cartItemService.requestCartQuantityCount().executeForDataResponse().map {
+    override suspend fun totalCartItemCount(): DataResponse<Int> =
+        cartItemService.requestCartQuantityCount().map {
             it.quantity
         }
 }
