@@ -3,24 +3,24 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Carts
 
 interface ShoppingCartRepository {
-    fun insertCartProduct(
+    suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,
     ): Result<Int>
 
-    fun updateCartProduct(
+    suspend fun updateCartProduct(
         cartId: Int,
         quantity: Int,
     ): Result<Unit>
 
-    fun getCartProductsPaged(
+    suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
     ): Result<Carts>
 
-    fun getCartProductsQuantity(): Result<Int>
+    suspend fun getCartProductsQuantity(): Result<Int>
 
-    fun deleteCartProductById(cartId: Int): Result<Unit>
+    suspend fun deleteCartProductById(cartId: Int): Result<Unit>
 
-    fun getAllCarts(): Result<Carts>
+    suspend fun getAllCarts(): Result<Carts>
 }

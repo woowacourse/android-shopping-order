@@ -12,7 +12,7 @@ class ProductListPagingSource(
     private var currentPage = INIT_PAGE_NUM
     private var last = false
 
-    fun load(): Result<PagingCart> {
+    suspend fun load(): Result<PagingCart> {
         if (last) return Result.failure(NoSuchElementException())
 
         val result =

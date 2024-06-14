@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend
 
 import android.os.Build
+import android.os.Bundle
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.app.ShoppingApplication
@@ -9,6 +11,7 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.base.observeEvent
 import woowacourse.shopping.presentation.ui.shoppingcart.orderrecommend.adapter.RecommendAdapter
+import woowacourse.shopping.presentation.ui.shoppingcart.payment.PaymentFragment
 
 class OrderRecommendFragment :
     BaseFragment<FragmentOrderRecommendBinding>(R.layout.fragment_order_recommend) {
@@ -16,7 +19,6 @@ class OrderRecommendFragment :
         OrderRecommendViewModel.factory(
             (requireContext().applicationContext as ShoppingApplication).productHistoryRepository,
             (requireContext().applicationContext as ShoppingApplication).shoppingCartRepository,
-            (requireContext().applicationContext as ShoppingApplication).orderRepository,
         )
     }
 
@@ -48,13 +50,39 @@ class OrderRecommendFragment :
     }
 
     private fun initObserve() {
-        viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.recommendCarts)
+        viewModel.recommendCartsUiState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is RecommendCartsUiState.Success -> {
+                    adapter.submitList(state.recommendCarts)
+                }
+
+                RecommendCartsUiState.Loading -> {
+                    showToastMessage("로딩중!")
+                }
+
+                is RecommendCartsUiState.Error -> {
+                    state.message?.let { showToastMessage(it) }
+                }
+            }
         }
 
         viewModel.navigateAction.observeEvent(viewLifecycleOwner) { navigateAction ->
             when (navigateAction) {
-                is OrderRecommendNavigateAction.NavigateToProductList -> activity?.finish()
+                is OrderRecommendNavigateAction.NavigateToPayment -> {
+                    val bundle = Bundle()
+
+                    bundle.putParcelableArray(
+                        PaymentFragment.PUT_EXTRA_CART_IDS_KEY,
+                        navigateAction.orderCarts.toTypedArray(),
+                    )
+
+                    val paymentFragment = PaymentFragment()
+                    paymentFragment.arguments = bundle
+                    parentFragmentManager.commit {
+                        replace(R.id.fragment_container_view_main, paymentFragment)
+                        addToBackStack(PaymentFragment.TAG)
+                    }
+                }
             }
         }
     }

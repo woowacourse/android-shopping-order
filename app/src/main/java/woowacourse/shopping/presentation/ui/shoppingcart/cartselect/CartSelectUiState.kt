@@ -4,18 +4,20 @@ import woowacourse.shopping.domain.model.Cart
 
 data class CartSelectUiState(
     val pagingCartProduct: PagingCartProduct = PagingCartProduct(),
-    val orderCartList: MutableMap<Int, Cart> = hashMapOf(),
-    val totalElements: Int = 0,
+    val orderCarts: MutableMap<Int, Cart> = hashMapOf(),
+    val totalElements: Int? = 0,
 ) {
-    val orderTotalPrice get() = orderCartList.values.sumOf { it.totalPrice }
+    val orderTotalPrice get() = orderCarts.values.sumOf { it.totalPrice }
 
-    val isAllChecked get() = totalElements == orderCartList.size
+    val isAllChecked get() = (totalElements == orderCarts.size)
 
-    val totalQuantity get() = orderCartList.values.sumOf { it.quantity }
+    val isAnyChecked get() = (orderCarts.values.isNotEmpty())
+
+    val totalQuantity get() = orderCarts.values.sumOf { it.quantity }
 }
 
 data class PagingCartProduct(
-    val cartList: List<Cart> = emptyList(),
+    val carts: List<Cart> = emptyList(),
     val currentPage: Int = 0,
     val last: Boolean = true,
 )

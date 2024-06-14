@@ -1,12 +1,14 @@
 package woowacourse.shopping.presentation.ui.productlist
 
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -17,7 +19,10 @@ import woowacourse.shopping.remote.api.DummyData.CARTS
 import woowacourse.shopping.remote.api.DummyData.PRODUCTS
 import woowacourse.shopping.remote.api.DummyData.PRODUCT_LIST
 
-@ExtendWith(MockKExtension::class, InstantTaskExecutorExtension::class)
+@ExperimentalCoroutinesApi
+@ExtendWith(MockKExtension::class)
+@ExtendWith(CoroutinesTestExtension::class)
+@ExtendWith(InstantTaskExecutorExtension::class)
 class ProductListViewModelTest {
     private lateinit var viewModel: ProductListViewModel
 
@@ -32,16 +37,14 @@ class ProductListViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        every { productRepository.getPagingProduct(0, 20) } returns
+        coEvery { productRepository.getPagingProduct(0, 20) } returns
             Result.success(PRODUCTS.copy(content = PRODUCTS.content.subList(0, 20)))
-        every { productRepository.getPagingProduct(1, 20) } returns
+        coEvery { productRepository.getPagingProduct(1, 20) } returns
             Result.success(PRODUCTS.copy(content = PRODUCTS.content.subList(20, 40)))
-        every { productHistoryRepository.getProductHistoriesBySize(any()) } returns
-            Result.success(
-                emptyList(),
-            )
-        every { shoppingCartRepository.getAllCarts() } returns Result.success(CARTS)
-        every { shoppingCartRepository.getCartProductsQuantity() } returns Result.success(0)
+        coEvery { productHistoryRepository.getProductHistoriesBySize(any()) } returns
+            Result.success(emptyList())
+        coEvery { shoppingCartRepository.getAllCarts() } returns Result.success(CARTS)
+        coEvery { shoppingCartRepository.getCartProductsQuantity() } returns Result.success(0)
 
         viewModel =
             ProductListViewModel(
@@ -49,8 +52,6 @@ class ProductListViewModelTest {
                 shoppingCartRepository,
                 productHistoryRepository,
             )
-
-        Thread.sleep(3000)
     }
 
     @Test
@@ -68,8 +69,6 @@ class ProductListViewModelTest {
     fun `더보기 버튼을 눌렀을 때 상품을 더 불러온다`() {
         // when
         viewModel.loadMoreProducts()
-
-        Thread.sleep(3000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue().pagingCart.cartList
@@ -107,17 +106,16 @@ class ProductListViewModelTest {
         val productList = PRODUCT_LIST.subList(0, 20)
         val cartItemId = 1
 
-        every {
+        coEvery {
             shoppingCartRepository.insertCartProduct(productList.first().id, 1)
         } returns Result.success(cartItemId)
 
         // when
         viewModel.plusProductQuantity(productList.first().id, 0)
-        Thread.sleep(3000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()
-        assertThat(actual.pagingCart.cartList.first().id).isEqualTo(cartItemId)
+        assertThat(actual.pagingCart.cartList.first().product.id).isEqualTo(productList.first().id)
     }
 
     @Test
@@ -126,17 +124,16 @@ class ProductListViewModelTest {
         val productList = PRODUCT_LIST.subList(0, 20)
         val cartItemId = 1
 
-        every {
+        coEvery {
             shoppingCartRepository.insertCartProduct(productList.first().id, 1)
         } returns Result.success(cartItemId)
-        every {
+        coEvery {
             shoppingCartRepository.deleteCartProductById(cartItemId)
         } returns Result.success(Unit)
 
         // when
         viewModel.plusProductQuantity(productList.first().id, 0)
         viewModel.minusProductQuantity(productList.first().id, 0)
-        Thread.sleep(3000)
 
         // then
         val actual = viewModel.uiState.getOrAwaitValue()

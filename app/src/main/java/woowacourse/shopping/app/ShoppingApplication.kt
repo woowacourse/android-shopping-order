@@ -3,14 +3,17 @@ package woowacourse.shopping.app
 import android.app.Application
 import androidx.preference.PreferenceManager
 import woowacourse.shopping.data.datasource.local.ProductHistoryLocalDataSource
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.data.provider.AuthProvider
+import woowacourse.shopping.data.repsoitory.CouponRepositoryImpl
 import woowacourse.shopping.data.repsoitory.OrderRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductHistoryRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ProductRepositoryImpl
 import woowacourse.shopping.data.repsoitory.ShoppingCartRepositoryImpl
+import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -19,9 +22,10 @@ import woowacourse.shopping.local.datasource.ProductHistoryLocalDataSourceImpl
 import woowacourse.shopping.local.db.ProductHistoryDatabase
 import woowacourse.shopping.local.provider.AuthProviderImpl
 import woowacourse.shopping.remote.api.NetworkModule
+import woowacourse.shopping.remote.datasource.CouponRemoteDataSourceImpl
 import woowacourse.shopping.remote.datasource.OrderRemoteDataSourceImpl
 import woowacourse.shopping.remote.datasource.ProductRemoteDataSourceImpl
-import woowacourse.shopping.remote.datasource.ShoppingRemoteCartDataSourceImpl
+import woowacourse.shopping.remote.datasource.ShoppingCartRemoteDataSourceImpl
 
 class ShoppingApplication : Application() {
     private val authProvider: AuthProvider by lazy {
@@ -30,11 +34,11 @@ class ShoppingApplication : Application() {
 
     private val networkModule by lazy { NetworkModule(authProvider = authProvider, BASE_URL) }
 
-    private val shoppingRemoteCartDataSource: ShoppingRemoteCartDataSource by lazy {
-        ShoppingRemoteCartDataSourceImpl(networkModule.cartService)
+    private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource by lazy {
+        ShoppingCartRemoteDataSourceImpl(networkModule.cartService)
     }
     val shoppingCartRepository: ShoppingCartRepository by lazy {
-        ShoppingCartRepositoryImpl(shoppingRemoteCartDataSource)
+        ShoppingCartRepositoryImpl(shoppingCartRemoteDataSource)
     }
 
     private val productHistoryLocalDataSource: ProductHistoryLocalDataSource by lazy {
@@ -43,7 +47,7 @@ class ShoppingApplication : Application() {
         )
     }
     val productHistoryRepository: ProductHistoryRepository by lazy {
-        ProductHistoryRepositoryImpl(productHistoryLocalDataSource, shoppingCartRepository)
+        ProductHistoryRepositoryImpl(productHistoryLocalDataSource, shoppingCartRemoteDataSource)
     }
 
     private val productRemoteDataSource: ProductRemoteDataSource by lazy {
@@ -54,7 +58,7 @@ class ShoppingApplication : Application() {
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
             productRemoteDataSource,
-            shoppingRemoteCartDataSource,
+            shoppingCartRemoteDataSource,
         )
     }
 
@@ -66,6 +70,18 @@ class ShoppingApplication : Application() {
     val orderRepository: OrderRepository by lazy {
         OrderRepositoryImpl(
             orderRemoteDataSource,
+        )
+    }
+
+    private val couponRemoteDataSource: CouponRemoteDataSource by lazy {
+        CouponRemoteDataSourceImpl(
+            networkModule.couponService,
+        )
+    }
+    val couponRepository: CouponRepository by lazy {
+        CouponRepositoryImpl(
+            couponRemoteDataSource,
+            shoppingCartRemoteDataSource,
         )
     }
 

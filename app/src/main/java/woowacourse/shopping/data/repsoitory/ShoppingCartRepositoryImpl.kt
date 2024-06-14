@@ -1,44 +1,53 @@
 package woowacourse.shopping.data.repsoitory
 
-import woowacourse.shopping.data.datasource.remote.ShoppingRemoteCartDataSource
+import woowacourse.shopping.data.datasource.remote.ShoppingCartRemoteDataSource
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
-class ShoppingCartRepositoryImpl(private val dataSource: ShoppingRemoteCartDataSource) :
+class ShoppingCartRepositoryImpl(private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource) :
     ShoppingCartRepository {
-    override fun insertCartProduct(
+    override suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,
     ): Result<Int> =
-        dataSource.insertCartProduct(
-            productId = productId,
-            quantity = quantity,
-        )
+        runCatching {
+            shoppingCartRemoteDataSource.insertCartProduct(
+                productId = productId,
+                quantity = quantity,
+            )
+        }
 
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         cartId: Int,
         quantity: Int,
-    ): Result<Unit> = dataSource.updateCartProduct(cartId = cartId, quantity = quantity)
+    ): Result<Unit> =
+        runCatching {
+            shoppingCartRemoteDataSource.updateCartProduct(cartId = cartId, quantity = quantity)
+        }
 
-    override fun getCartProductsPaged(
+    override suspend fun getCartProductsPaged(
         page: Int,
         size: Int,
-    ): Result<Carts> = dataSource.getCartProductsPaged(page = page, size = size)
+    ): Result<Carts> =
+        runCatching {
+            shoppingCartRemoteDataSource.getCartProductsPaged(page = page, size = size)
+        }
 
-    override fun getCartProductsQuantity(): Result<Int> = dataSource.getCartProductsQuantity()
+    override suspend fun getCartProductsQuantity(): Result<Int> =
+        runCatching {
+            shoppingCartRemoteDataSource.getCartProductsQuantity()
+        }
 
-    override fun deleteCartProductById(cartId: Int): Result<Unit> = dataSource.deleteCartProductById(cartId = cartId)
+    override suspend fun deleteCartProductById(cartId: Int): Result<Unit> =
+        runCatching {
+            shoppingCartRemoteDataSource.deleteCartProductById(cartId = cartId)
+        }
 
-    override fun getAllCarts(): Result<Carts> {
-        val totalElements =
-            dataSource.getCartProductsPaged(
-                page = ProductRepositoryImpl.FIRST_PAGE,
-                size = ProductRepositoryImpl.FIRST_SIZE,
-            ).getOrThrow().totalElements
+    override suspend fun getAllCarts(): Result<Carts> {
+        val cartTotalElement = shoppingCartRemoteDataSource.getCartsTotalElement()
 
-        return dataSource.getCartProductsPaged(
-            page = ProductRepositoryImpl.FIRST_PAGE,
-            size = totalElements,
-        )
+        return runCatching {
+            shoppingCartRemoteDataSource.getEntireCarts(cartTotalElement)
+        }
     }
 }

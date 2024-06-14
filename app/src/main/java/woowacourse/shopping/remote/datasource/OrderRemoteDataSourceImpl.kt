@@ -7,9 +7,8 @@ import woowacourse.shopping.remote.model.request.PostOrderRequest
 class OrderRemoteDataSourceImpl(
     private val service: OrderService,
 ) : OrderRemoteDataSource {
-    override fun postOrderByIds(cartItemsIds: List<Int>): Result<Unit> =
-        runCatching {
-            val body = PostOrderRequest(cartItemIds = cartItemsIds)
-            service.postOrder(body).execute()
-        }
+    override suspend fun postOrderByIds(cartItemIds: List<Int>) {
+        val body = PostOrderRequest(cartItemIds = cartItemIds)
+        service.postOrder(body)
+    }
 }

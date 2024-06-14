@@ -7,8 +7,9 @@ import woowacourse.shopping.local.mapper.toDomain
 import woowacourse.shopping.local.model.ProductHistoryEntity
 import java.time.LocalDateTime
 
-class ProductHistoryLocalDataSourceImpl(private val dao: ProductHistoryDao) : ProductHistoryLocalDataSource {
-    override fun insertProductHistory(
+class ProductHistoryLocalDataSourceImpl(private val dao: ProductHistoryDao) :
+    ProductHistoryLocalDataSource {
+    override suspend fun insertProductHistory(
         productId: Long,
         name: String,
         price: Int,
@@ -29,27 +30,27 @@ class ProductHistoryLocalDataSourceImpl(private val dao: ProductHistoryDao) : Pr
             dao.insertProductHistory(productHistoryEntity = productHistoryEntity)
         }
 
-    override fun getProductHistoryById(productId: Long): Result<Product> =
+    override suspend fun getProductHistoryById(productId: Long): Result<Product> =
         runCatching {
             dao.findProductHistory(productId = productId).toDomain()
         }
 
-    override fun getProductHistoriesByCategory(category: String): Result<List<Product>> =
+    override suspend fun getProductHistoriesByCategory(category: String): Result<List<Product>> =
         runCatching {
             dao.getProductHistoriesByCategory(category = category).map { it.toDomain() }
         }
 
-    override fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
+    override suspend fun getProductHistoriesBySize(size: Int): Result<List<Product>> =
         runCatching {
             dao.getProductHistoryPaged(size = size).map { it.toDomain() }
         }
 
-    override fun deleteProductHistoryById(productId: Long): Result<Unit> =
+    override suspend fun deleteProductHistoryById(productId: Long): Result<Unit> =
         runCatching {
             dao.deleteProductHistory(productId = -productId)
         }
 
-    override fun deleteAllProductHistories(): Result<Unit> =
+    override suspend fun deleteAllProductHistories(): Result<Unit> =
         runCatching {
             dao.deleteAllProductHistory()
         }

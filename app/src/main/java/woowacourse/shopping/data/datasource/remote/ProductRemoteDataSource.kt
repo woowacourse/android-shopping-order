@@ -4,10 +4,10 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 
 interface ProductRemoteDataSource {
-    fun findProductById(id: Long): Result<Product>
+    suspend fun findProductById(id: Long): Product
 
-    fun getPagingProduct(
+    suspend fun getPagingProduct(
         page: Int,
         pageSize: Int,
-    ): Result<Products>
+    ): Products
 }

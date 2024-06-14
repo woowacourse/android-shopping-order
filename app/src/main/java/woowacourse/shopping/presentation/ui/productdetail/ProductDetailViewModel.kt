@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
@@ -15,7 +17,6 @@ import woowacourse.shopping.presentation.base.BaseViewModelFactory
 import woowacourse.shopping.presentation.base.MessageProvider
 import woowacourse.shopping.presentation.common.ProductCountHandler
 import woowacourse.shopping.presentation.ui.productdetail.ProductDetailActivity.Companion.PUT_EXTRA_PRODUCT_ID
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -34,12 +35,12 @@ class ProductDetailViewModel(
     }
 
     fun getProduct() {
-        thread {
+        viewModelScope.launch {
             productRepository.getCartById(id).onSuccess { cart ->
                 hideError()
                 _uiState.value?.let { state ->
                     if (state.isLastProductPage) {
-                        _uiState.postValue(state.copy(cart = cart))
+                        _uiState.value = state.copy(cart = cart)
                         insertProductHistory(cart.product)
                     } else {
                         getProductHistory(cart)
@@ -56,77 +57,79 @@ class ProductDetailViewModel(
     }
 
     private fun getProductHistory(cart: Cart) {
-        productHistoryRepository.getProductHistoriesBySize(2).onSuccess { productHistories ->
-            hideError()
-            val productHistory =
-                if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
-                    if (productHistories.size >= 2) productHistories[1] else null
-                } else {
-                    productHistories.firstOrNull()
+        viewModelScope.launch {
+            productHistoryRepository.getProductHistoriesBySize(2).onSuccess { productHistories ->
+                hideError()
+                val productHistory =
+                    if (productHistories.isNotEmpty() && cart.product.id == productHistories.first().id) {
+                        if (productHistories.size >= 2) productHistories[1] else null
+                    } else {
+                        productHistories.firstOrNull()
+                    }
+
+                val isLastProductPage =
+                    when {
+                        productHistories.isEmpty() -> true
+                        cart.product.id == productHistories.first().id -> productHistories.size < 2
+                        else -> false
+                    }
+
+                uiState.value?.let { state ->
+                    _uiState.value =
+                        state.copy(
+                            cart = cart,
+                            productHistory = productHistory,
+                            isLastProductPage = isLastProductPage,
+                        )
                 }
 
-            val isLastProductPage =
-                when {
-                    productHistories.isEmpty() -> true
-                    cart.product.id == productHistories.first().id -> productHistories.size < 2
-                    else -> false
-                }
-
-            uiState.value?.let { state ->
-                _uiState.postValue(
-                    state.copy(
-                        cart = cart,
-                        productHistory = productHistory,
-                        isLastProductPage = isLastProductPage,
-                    ),
-                )
+                insertProductHistory(cart.product)
+            }.onFailure { e ->
+                showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
             }
-
-            insertProductHistory(cart.product)
-        }.onFailure { e ->
-            showError(e)
-            showMessage(MessageProvider.DefaultErrorMessage)
         }
     }
 
     fun addToCart() {
         _uiState.value?.let { state ->
             state.cart?.let { cart ->
-
-                thread {
-                    if (cart.id == Cart.EMPTY_CART_ID) {
-                        insertCart(cart)
-                    } else {
-                        updateCart(cart)
-                    }
+                if (cart.id == Cart.EMPTY_CART_ID) {
+                    insertCart(cart)
+                } else {
+                    updateCart(cart)
                 }
             }
         }
     }
 
     fun insertCart(cart: Cart) {
-        shoppingCartRepository.insertCartProduct(
-            productId = cart.product.id,
-            quantity = cart.quantity,
-        ).onSuccess {
-            hideError()
-            showMessage(ProductDetailMessage.AddToCartSuccessMessage)
-        }.onFailure { e ->
-            showError(e)
-            showMessage(MessageProvider.DefaultErrorMessage)
+        viewModelScope.launch {
+            shoppingCartRepository.insertCartProduct(
+                productId = cart.product.id,
+                quantity = cart.quantity,
+            ).onSuccess {
+                hideError()
+                showMessage(ProductDetailMessage.AddToCartSuccessMessage)
+            }.onFailure { e ->
+                showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
+            }
         }
     }
 
     fun updateCart(cart: Cart) {
-        shoppingCartRepository.updateCartProduct(
-            cartId = cart.id,
-            quantity = cart.quantity,
-        ).onSuccess {
-            hideError()
-            showMessage(ProductDetailMessage.AddToCartSuccessMessage)
-        }.onFailure { e ->
-            showError(e)
-            showMessage(MessageProvider.DefaultErrorMessage)
+        viewModelScope.launch {
+            shoppingCartRepository.updateCartProduct(
+                cartId = cart.id,
+                quantity = cart.quantity,
+            ).onSuccess {
+                hideError()
+                showMessage(ProductDetailMessage.AddToCartSuccessMessage)
+            }.onFailure { e ->
+                showError(e)
+                showMessage(MessageProvider.DefaultErrorMessage)
+            }
         }
     }
 
@@ -153,7 +156,7 @@ class ProductDetailViewModel(
     }
 
     private fun insertProductHistory(productValue: Product) {
-        thread {
+        viewModelScope.launch {
             productHistoryRepository.insertProductHistory(
                 productId = productValue.id,
                 name = productValue.name,

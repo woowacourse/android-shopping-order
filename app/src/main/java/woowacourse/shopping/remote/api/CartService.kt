@@ -1,6 +1,6 @@
 package woowacourse.shopping.remote.api
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -14,32 +14,32 @@ import woowacourse.shopping.remote.model.response.CartItemCountResponse
 import woowacourse.shopping.remote.model.response.CartsResponse
 
 interface CartService {
-    @GET(CART_BASE_URL)
-    fun getCartItems(
+    @GET(CART_RELATIVE_URL)
+    suspend fun getCartItems(
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20,
-    ): Call<CartsResponse>
+        @Query("size") size: Int = 1,
+    ): CartsResponse
 
-    @POST(CART_BASE_URL)
-    fun postCartItem(
+    @POST(CART_RELATIVE_URL)
+    suspend fun postCartItem(
         @Body body: PostCartItemRequest,
-    ): Call<Unit>
+    ): Response<Unit>
 
-    @DELETE("${CART_BASE_URL}/{id}")
-    fun deleteCartItem(
+    @DELETE("${CART_RELATIVE_URL}/{id}")
+    suspend fun deleteCartItem(
         @Path("id") id: Int,
-    ): Call<Unit>
+    )
 
-    @PATCH("${CART_BASE_URL}/{id}")
-    fun patchCartItem(
+    @PATCH("${CART_RELATIVE_URL}/{id}")
+    suspend fun patchCartItem(
         @Path("id") id: Int,
         @Body body: PatchCartItemRequest,
-    ): Call<Unit>
+    )
 
-    @GET("${CART_BASE_URL}/counts")
-    fun getCartItemsCount(): Call<CartItemCountResponse>
+    @GET("${CART_RELATIVE_URL}/counts")
+    suspend fun getCartItemsCount(): CartItemCountResponse
 
     companion object {
-        private const val CART_BASE_URL = "/cart-items"
+        private const val CART_RELATIVE_URL = "/cart-items"
     }
 }

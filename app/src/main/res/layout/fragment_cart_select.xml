@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/empty_shopping_cart_title"
-            android:visibility="@{vm.uiState.pagingCartProduct.cartList.isEmpty() &amp;&amp; !vm.loading ? View.VISIBLE : View.GONE }"
+            android:visibility="@{vm.uiState.pagingCartProduct.carts.isEmpty() &amp;&amp; !vm.loading ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toTopOf="@+id/tv_page"
             app:layout_constraintEnd_toEndOf="@+id/rv_cart_products"
             app:layout_constraintStart_toStartOf="@+id/rv_cart_products"
@@ -132,11 +132,11 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/tv_order"
-                setOrderButtonColor="@{vm.uiState.pagingCartProduct.cartList}"
-                setOrderButtonEnabled="@{vm.uiState.pagingCartProduct.cartList}"
                 android:layout_width="0dp"
                 android:layout_height="78dp"
                 android:layout_weight="1"
+                android:background="@{vm.uiState.isAnyChecked ? @color/green : @color/gray6}"
+                android:enabled="@{vm.uiState.isAnyChecked}"
                 android:gravity="center"
                 android:onClick="@{() -> vm.navigateToRecommend()}"
                 android:text="@{@string/tv_order(vm.uiState.totalQuantity)}"

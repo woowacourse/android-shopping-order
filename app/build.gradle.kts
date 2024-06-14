@@ -77,6 +77,7 @@ dependencies {
 
     // room
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
@@ -85,8 +86,10 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
-    // gson
-    implementation("com.google.code.gson:gson:2.10.1")
+    // moshi
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 
     // preference
     implementation("androidx.preference:preference-ktx:1.2.1")

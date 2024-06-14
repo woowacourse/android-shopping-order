@@ -12,6 +12,11 @@
   - [x] 해당 카테고리 상품이 10개 미만이라면 해당하는 개수만큼만 노출 
   - [x] 장바구니에 이미 추가된 상품이라면 미노출 
 - [x] 추천된 상품을 해당 화면에서 바로 추가하여 같이 주문할 수 있다.
+- [x] 결제 화면에서 적용 가능한 쿠폰을 조회하고 적용할 수 있다.
+  - [x] 적용 가능한 쿠폰만 불러온다.  
+  - [x] 쿠폰은 1개만 적용 가능하다.
+  - [x] 기본 배송비는 3000원이다.
+  - [x] 주문목록 리스트에서 주문 완료 토스트 메시지를 띄운다.
 
 ### Low Level Design 
 
@@ -23,6 +28,8 @@ classDiagram
   CartProductsAdapter <.. CartSelectFragment
   OrderRecommendViewModel <.. OrderRecommendFragment
   RecommendAdapter <.. OrderRecommendFragment
+  PaymentVieWModel <.. PaymentFragment
+  CouponListAdapter <.. PaymentFragment
   ProductListViewModel <.. ProductListActivity
   ProductListAdapter <.. ProductListActivity 
   ProductHistoryListAdapter <.. ProductListActivity
@@ -31,43 +38,37 @@ classDiagram
   ShoppingCartRepository <.. CartSelectViewModel
   ProductHistoryRepository <.. OrderRecommendViewModel
   ShoppingCartRepository <.. OrderRecommendViewModel
-  OrderRepository <.. OrderRecommendViewModel
   ProductRepository <.. ProductListViewModel
   ShoppingCartRepository <.. ProductListViewModel
   ProductHistoryRepository <.. ProductListViewModel
   ProductRepository <.. ProductDetailViewModel
   ShoppingCartRepository <.. ProductDetailViewModel
   ProductHistoryRepository <.. ProductDetailViewModel
-
-  ShoppingCartRepository <-- ShoppingCartRepositoryImpl
-  OrderRepository <-- OrderRepositoryImpl
-  ProductHistoryRepository <-- ProductHistoryRepositoryImpl
-  ProductRepository <-- ProductRepositoryImpl
+  CouponRepository <.. PaymentVieWModel
+  OrderRepository <.. PaymentViewModel
   
-  ProductHistoryLocalDataSource <-- ProductHistoryLocalDataSourceImpl
-  OrderRemoteDataSource <-- OrderRemoteDataSourceImpl
-  ProductRemoteDataSource <-- ProductRemoteDataSourceImpl
-  ShoppingRemoteCartDataSource <-- ShoppingRemoteCartDataSourceImpl
+  OrderRemoteDataSource <.. OrderRepository
+  ProductHistoryLocalDataSource <.. ProductHistoryRepository
+  ShoppingCartRepository <.. ProductHistoryRepository
+  ProductRemoteDataSource <.. ProductRepository
+  ShoppingRemoteCartDataSource <.. ProductRepository
+  CouponRemoteDataSource <.. CouponRepository
 
-  OrderRemoteDataSource <.. OrderRepositoryImpl
-  ProductHistoryLocalDataSource <.. ProductHistoryRepositoryImpl
-  ShoppingCartRepository <.. ProductHistoryRepositoryImpl
-  ProductRemoteDataSource <.. ProductRepositoryImpl
-  ShoppingRemoteCartDataSource <.. ProductRepositoryImpl
-  ShoppingCartRepositoryImpl <.. ShoppingRemoteCartDataSource
-
-  ProductHistoryDao <.. ProductHistoryLocalDataSourceImpl
-  OrderService <.. OrderRemoteDataSourceImpl
-  ProductService <.. ProductRemoteDataSourceImpl
-  CartService <.. ShoppingRemoteCartDataSourceImpl
+  ProductHistoryDao <.. ProductHistoryLocalDataSource
+  OrderService <.. OrderRemoteDataSource
+  ProductService <.. ProductRemoteDataSource
+  CartService <.. ShoppingRemoteCartDataSource
+  CouponService <.. CouponRemoteDataSource
 
   class CartSelectFragment
   class OrderRecommendFragment
+  class PaymentFragment
   class ProductListActivity
   class ProductDetailActivity
 
   class CartSelectViewModel
   class OrderRecommendViewModel
+  class PaymentVieWModel
   class ProductListViewModel
   class ProductDetailViewModel
 
@@ -75,26 +76,19 @@ classDiagram
   <<interface>> OrderRepository
   <<interface>> ProductHistoryRepository
   <<interface>> ProductRepository
-
-  class ShoppingCartRepositoryImpl
-  class OrderRepositoryImpl
-  class ProductHistoryRepositoryImpl
-  class ProductRepositoryImpl
-  
+  <<interface>> CouponRepository
+ 
   <<interface>> ProductHistoryLocalDataSource
   <<interface>> OrderRemoteDataSource
   <<interface>> ProductRemoteDataSource
   <<interface>> ShoppingRemoteCartDataSource
-
-  class ProductHistoryLocalDataSourceImpl
-  class OrderRemoteDataSourceImpl
-  class ProductRemoteDataSourceImpl
-  class ShoppingRemoteCartDataSourceImpl
+  <<interface>> CouponRemoteDataSource
 
   <<interface>> ProductHistoryDao
   <<interface>> CartService
   <<interface>> OrderService
   <<interface>> ProductService
+  <<interface>> CouponService
 ```
 
 #### Dynamic

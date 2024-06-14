@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.presentation.ui.shoppingcart.cartselect.PagingCartProduct
 
 class ShoppingCartPagingSource(private val repository: ShoppingCartRepository) {
-    fun load(page: Int): Result<PagingCartProduct> {
+    suspend fun load(page: Int): Result<PagingCartProduct> {
         val result = repository.getCartProductsPaged(page = page, size = PAGING_SIZE)
 
         return result.fold(
