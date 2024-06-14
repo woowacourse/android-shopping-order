@@ -1,7 +1,7 @@
 package woowacourse.shopping.presentation.ui.curation
 
-import woowacourse.shopping.presentation.ui.shopping.ShoppingActionHandler
+import woowacourse.shopping.presentation.common.ProductClickHandler
 
-interface CurationActionHandler : ShoppingActionHandler {
+interface CurationActionHandler : ProductClickHandler {
     fun order()
 }

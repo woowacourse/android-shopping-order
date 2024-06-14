@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.service
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -9,40 +9,49 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.remote.RetrofitModule
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.data.remote.dto.response.CartResponse
+import woowacourse.shopping.data.remote.dto.response.CartsResponse
 import woowacourse.shopping.data.remote.dto.response.QuantityResponse
 
 interface CartItemApi {
     @GET("/cart-items")
-    fun getCartItems(
+    suspend fun getCartItems(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
-    ): Call<CartResponse>
+    ): Response<CartsResponse>
 
     @POST("/cart-items")
-    fun postCartItem(
+    suspend fun postCartItem(
         @Header("accept") accept: String = "*/*",
         @Body cartItemRequest: CartItemRequest,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun patchCartItem(
+    suspend fun patchCartItem(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
-        @Body quantityRequest: QuantityRequest,
-    ): Call<Unit>
+        @Body quantityRequestDto: QuantityRequest,
+    ): Response<Unit>
 
     @GET("/cart-items/counts")
-    fun getCartItemsCounts(
+    suspend fun getCartItemsCounts(
         @Header("accept") accept: String = "*/*",
-    ): Call<QuantityResponse>
+    ): Response<QuantityResponse>
+
+    companion object {
+        private var service: CartItemApi? = null
+
+        fun service(): CartItemApi {
+            return service ?: RetrofitModule.defaultBuild.create(CartItemApi::class.java)
+        }
+    }
 }

@@ -16,7 +16,7 @@
 
             <ImageView
                 android:id="@+id/iv_product"
-                productUrl="@{detailCartProduct.cartProduct.imgUrl}"
+                productUrl="@{viewModel.uiState.cartProduct.imgUrl}"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@drawable/ic_launcher_background"
@@ -38,7 +38,7 @@
 
             <TextView
                 android:id="@+id/tv_price_value"
-                productPrice="@{detailCartProduct.cartProduct}"
+                productPrice="@{viewModel.uiState.cartProduct}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
                 android:layout_marginTop="17dp"
-                android:text="@{detailCartProduct.cartProduct.name}"
+                android:text="@{viewModel.uiState.cartProduct.name}"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +70,7 @@
                 android:layout_height="48dp"
                 android:background="#04C09E"
                 android:gravity="center"
-                android:onClick="@{() -> detailActionHandler.onAddToCart(detailCartProduct)}"
+                android:onClick="@{() -> detailActionHandler.onSaveCart(viewModel.uiState.cartProduct)}"
                 android:text="@string/add_cart"
                 android:textColor="@color/white"
                 android:textSize="20sp"
@@ -87,11 +87,12 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/background_cart"
-                android:onClick="@{() -> detailActionHandler.onNavigateToDetail(recentProduct)}"
+                android:onClick="@{() -> detailActionHandler.onNavigateToDetail(viewModel.uiState.recentProduct)}"
                 android:padding="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_price_value">
+                app:layout_constraintTop_toBottomOf="@id/tv_price_value"
+                detailRecentVisibility="@{viewModel.uiState}">
 
                 <TextView
                     android:id="@+id/tv_recent_title"
@@ -111,7 +112,7 @@
                     android:layout_marginTop="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{recentProduct.name}"
+                    android:text="@{viewModel.uiState.recentProduct.name}"
                     android:textSize="17sp"
                     app:layout_constraintTop_toBottomOf="@id/tv_recent_title"
                     tools:text="동원참치" />
@@ -134,28 +135,25 @@
                 android:layout_marginEnd="18dp"
                 android:layout_weight="1"
                 android:textSize="20sp"
-                app:cartProduct="@{detailCartProduct.cartProduct}"
+                app:cartProduct="@{viewModel.uiState.cartProduct}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/space_mid"
                 app:layout_constraintTop_toTopOf="@id/tv_price_value"
-                app:shoppingActionHandler="@{detailActionHandler}" />
+                app:cartCountHandler="@{detailActionHandler}" />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <include
             android:id="@+id/layout_shimmer"
             layout="@layout/activity_product_detail_shimmer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:visibility="@{viewModel.uiState.loading ? View.VISIBLE : View.GONE}"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <data>
-
+        <import type="android.view.View"/>
         <variable
-            name="detailCartProduct"
-            type="woowacourse.shopping.presentation.ui.detail.DetailCartProduct" />
-
-        <variable
-            name="recentProduct"
-            type="woowacourse.shopping.domain.RecentProduct" />
+            name="viewModel"
+            type="woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel" />
 
         <variable
             name="detailActionHandler"

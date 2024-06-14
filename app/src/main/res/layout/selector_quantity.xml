@@ -10,8 +10,8 @@
             type="woowacourse.shopping.domain.CartProduct" />
 
         <variable
-            name="shoppingActionHandler"
-            type="woowacourse.shopping.presentation.base.CartCountHandler" />
+            name="cartCountHandler"
+            type="woowacourse.shopping.presentation.common.ProductCountHandler" />
 
     </data>
 
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:onClick="@{() -> shoppingActionHandler.onMinus(cartProduct)}"
+            android:onClick="@{() -> cartCountHandler.onMinus(cartProduct)}"
             android:text="-"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:onClick="@{() -> shoppingActionHandler.onPlus(cartProduct)}"
+            android:onClick="@{() -> cartCountHandler.onPlus(cartProduct)}"
             android:text="+"
             android:textSize="22sp"
             android:textStyle="bold"

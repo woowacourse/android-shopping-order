@@ -8,19 +8,13 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.remote.service.CartItemApi
-import woowacourse.shopping.data.remote.service.OrderApi
-import woowacourse.shopping.data.remote.service.ProductApi
+import java.io.IOException
 
 object RetrofitModule {
+    private const val BASE_URL = BuildConfig.BASE_URL
     private val contentType = "application/json".toMediaType()
 
-    private const val BASE_URL = "http://54.180.95.212:8080"
-    private const val PRODUCT_BASE_URL = "${BASE_URL}/products/"
-    private const val CART_ITEMS_BASE_URL = "${BASE_URL}/cart-items/"
-    private const val ORDER_BASE_URL = "${BASE_URL}/orders/"
-
-    private val basicAuthInterceptor =
+    private val defaultAuthInterceptor =
         Interceptor { chain ->
             val user = BuildConfig.USER
             val password = BuildConfig.PASSWORD
@@ -32,32 +26,32 @@ object RetrofitModule {
             chain.proceed(request)
         }
 
-    private val okHttpClient =
+    private val defaultExceptionInterceptor =
+        Interceptor { chain ->
+            val response = chain.proceed(chain.request())
+            if (!response.isSuccessful) {
+                when (response.code) {
+                    400 -> throw IllegalArgumentException("Bad Request (400)")
+                    401 -> throw SecurityException("Unauthorized (401)")
+                    403 -> throw SecurityException("Forbidden (403)")
+                    404 -> throw NoSuchElementException("Not Found (404)")
+                    500 -> throw IOException("Internal Server Error (500)")
+                    else -> throw Exception("Unknown HTTP error code: $response.code")
+                }
+            }
+            response
+        }
+
+    private val defaultOkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(basicAuthInterceptor)
+            .addInterceptor(defaultAuthInterceptor)
+            .addInterceptor(defaultExceptionInterceptor)
             .build()
 
-    val productApi =
+    val defaultBuild: Retrofit =
         Retrofit.Builder()
-            .baseUrl(PRODUCT_BASE_URL)
+            .baseUrl(BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
+            .client(defaultOkHttpClient)
             .build()
-            .create(ProductApi::class.java)
-
-    val cartItemsApi =
-        Retrofit.Builder()
-            .baseUrl(CART_ITEMS_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
-            .build()
-            .create(CartItemApi::class.java)
-
-    val orderApi =
-        Retrofit.Builder()
-            .baseUrl(ORDER_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(contentType))
-            .client(okHttpClient)
-            .build()
-            .create(OrderApi::class.java)
 }

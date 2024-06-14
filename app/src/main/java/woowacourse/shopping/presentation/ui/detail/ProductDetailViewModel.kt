@@ -2,152 +2,154 @@ package woowacourse.shopping.presentation.ui.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.Repository
-import woowacourse.shopping.presentation.ui.EventState
-import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.UpdateUiModel
-import kotlin.concurrent.thread
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.toRecentProduct
+import woowacourse.shopping.presentation.base.BaseViewModel
+import woowacourse.shopping.presentation.common.ErrorType
+import woowacourse.shopping.presentation.common.EventState
+import woowacourse.shopping.presentation.common.UpdateUiModel
+import woowacourse.shopping.presentation.ui.detail.model.DetailNavigation
+import woowacourse.shopping.presentation.ui.detail.model.DetailUiState
 
 class ProductDetailViewModel(
-    private val repository: Repository,
-) : ViewModel(), DetailActionHandler {
-    private val _product = MutableLiveData<UiState<DetailCartProduct>>(UiState.Loading)
-    val product: LiveData<UiState<DetailCartProduct>> get() = _product
+    private val cartItemRepository: CartItemRepository,
+    private val recentProductRepository: RecentProductRepository,
+) : BaseViewModel(), DetailActionHandler {
+    private val _uiState = MutableLiveData<DetailUiState>(DetailUiState())
+    val uiState: LiveData<DetailUiState> get() = _uiState
 
-    private val _recentProduct = MutableLiveData<UiState<RecentProduct>>(UiState.Loading)
-    val recentProduct: LiveData<UiState<RecentProduct>> get() = _recentProduct
+    private val _navigateHandler = MutableLiveData<EventState<DetailNavigation>>()
+    val navigateHandler: LiveData<EventState<DetailNavigation>> get() = _navigateHandler
 
-    private val _errorHandler = MutableLiveData<EventState<String>>()
-    val errorHandler: LiveData<EventState<String>> get() = _errorHandler
-
-    private val _cartHandler = MutableLiveData<EventState<UpdateUiModel>>()
-    val cartHandler: LiveData<EventState<UpdateUiModel>> get() = _cartHandler
-
-    private val _navigateHandler = MutableLiveData<EventState<CartProduct>>()
-    val navigateHandler: LiveData<EventState<CartProduct>> get() = _navigateHandler
-
+    private val _updateHandler = MutableLiveData<EventState<UpdateUiModel>>()
+    val updateHandler: LiveData<EventState<UpdateUiModel>> get() = _updateHandler
     private val updateUiModel: UpdateUiModel = UpdateUiModel()
 
-    fun setCartProduct(cartProduct: CartProduct?) {
-        if (cartProduct != null) {
-            thread {
-                saveRecentProduct(cartProduct)
-            }
-            val detailCartProduct =
-                DetailCartProduct(
-                    isNew = cartProduct.quantity == 0,
-                    cartProduct =
-                        cartProduct.copy(
-                            quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
-                        ),
-                )
-            _product.value = UiState.Success(detailCartProduct)
-        }
-    }
-
-    fun findOneRecentProduct() {
-        thread {
-            repository.findOne().onSuccess {
-                if (it == null) {
-                    _recentProduct.postValue(UiState.Loading)
-                } else {
-                    _recentProduct.postValue(UiState.Success(it))
-                }
-            }.onFailure {
-                _errorHandler.postValue(EventState(PRODUCT_NOT_FOUND))
-            }
-        }
-    }
-
-    override fun onAddToCart(detailCartProduct: DetailCartProduct) {
-        thread {
-            updateUiModel.add(detailCartProduct.cartProduct.productId, detailCartProduct.cartProduct)
-
-            if (detailCartProduct.isNew) {
-                repository.postCartItem(
-                    CartItemRequest(
-                        productId = detailCartProduct.cartProduct.productId.toInt(),
-                        quantity = detailCartProduct.cartProduct.quantity,
+    fun setCartProduct(
+        cartProduct: CartProduct,
+        isLast: Boolean,
+    ) = viewModelScope.launch {
+        delay(500L) // skeleton
+        val currentState = _uiState.value ?: return@launch
+        _uiState.postValue(
+            currentState.copy(
+                isNewCartProduct = cartProduct.quantity == 0,
+                cartProduct =
+                    cartProduct.copy(
+                        quantity = if (cartProduct.quantity == 0) 1 else cartProduct.quantity,
                     ),
-                ).onSuccess {
-                    _product.postValue(UiState.Success(detailCartProduct))
-                    saveRecentProduct(detailCartProduct.cartProduct)
-                }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
-                }
-            } else {
-                repository.patchCartItem(
-                    id = detailCartProduct.cartProduct.cartId.toInt(),
-                    quantityRequest =
-                        QuantityRequest(
-                            detailCartProduct.cartProduct.quantity,
-                        ),
-                ).onSuccess {
-                    _product.postValue(UiState.Success(detailCartProduct))
-                    saveRecentProduct(detailCartProduct.cartProduct)
-                }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
-                    }
-            }
-
-            _cartHandler.postValue(EventState(updateUiModel))
-        }
+                isLast = isLast,
+                isLoading = false,
+            ),
+        )
+        saveRecentProduct(cartProduct)
     }
+
+    fun findOneRecentProduct() =
+        viewModelScope.launch {
+            recentProductRepository.findOrNull().onSuccess {
+                val currentState = _uiState.value ?: return@launch
+                _uiState.postValue(
+                    currentState.copy(
+                        recentProduct = it,
+                    ),
+                )
+            }.onFailure {
+                showError(ErrorType.ERROR_PRODUCT_LOAD)
+            }
+        }
+
+    override fun onSaveCart(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val isFirstSave = _uiState.value?.isNewCartProduct ?: return@launch
+            when (isFirstSave) {
+                true -> {
+                    cartItemRepository.post(CartItemRequest.fromCartProduct(cartProduct))
+                        .onSuccess {
+                            val currentState = _uiState.value ?: return@launch
+                            saveRecentProduct(cartProduct.copy(cartId = it.toLong()))
+                            updateUiModel.add(
+                                cartProduct.productId,
+                                cartProduct.copy(cartId = it.toLong()),
+                            )
+                            _uiState.postValue(
+                                currentState.copy(
+                                    cartProduct = cartProduct,
+                                ),
+                            )
+                        }.onFailure {
+                            showError(ErrorType.ERROR_PRODUCT_PLUS)
+                        }
+                }
+
+                false -> {
+                    cartItemRepository.patch(
+                        id = cartProduct.cartId.toInt(),
+                        quantityRequestDto =
+                            QuantityRequest(
+                                cartProduct.quantity,
+                            ),
+                    ).onSuccess {
+                        val currentState = _uiState.value ?: return@launch
+                        saveRecentProduct(cartProduct)
+                        updateUiModel.add(
+                            cartProduct.productId,
+                            cartProduct,
+                        )
+                        _uiState.postValue(
+                            currentState.copy(
+                                cartProduct = cartProduct,
+                            ),
+                        )
+                    }.onFailure {
+                        showError(ErrorType.ERROR_PRODUCT_PLUS_MINUS)
+                    }
+                }
+            }
+            _updateHandler.postValue(EventState(updateUiModel))
+        }
 
     override fun onNavigateToDetail(recentProduct: RecentProduct) {
-        _navigateHandler.value = EventState(recentProduct.toCartProduct())
+        _navigateHandler.value = EventState(DetailNavigation.ToDetail(recentProduct.toCartProduct()))
     }
 
-    override fun onPlus(cartProduct: CartProduct) {
-        thread {
+    override fun onPlus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val currentState = _uiState.value ?: return@launch
             cartProduct.plusQuantity()
-            _product.postValue(
-                UiState.Success(
-                    (_product.value as UiState.Success).data.copy(cartProduct = cartProduct),
+
+            _uiState.postValue(
+                currentState.copy(
+                    cartProduct = cartProduct,
                 ),
             )
         }
-    }
 
-    override fun onMinus(cartProduct: CartProduct) {
-        thread {
+    override fun onMinus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val currentState = _uiState.value ?: return@launch
             cartProduct.minusQuantity()
-            _product.postValue(
-                UiState.Success(
-                    (_product.value as UiState.Success).data.copy(cartProduct = cartProduct),
+
+            _uiState.postValue(
+                currentState.copy(
+                    cartProduct = cartProduct,
                 ),
             )
         }
-    }
 
-    fun saveRecentProduct(cartProduct: CartProduct) {
-        thread {
-            repository.saveRecentProduct(
-                RecentProduct(
-                    cartProduct.productId,
-                    cartProduct.name,
-                    cartProduct.imgUrl,
-                    cartProduct.quantity,
-                    cartProduct.price,
-                    System.currentTimeMillis(),
-                    category = cartProduct.category,
-                    cartId = cartProduct.cartId,
-                ),
-            ).onSuccess {
-            }.onFailure {
-                _errorHandler.postValue(EventState("최근 아이템 추가 에러"))
+    override fun saveRecentProduct(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            recentProductRepository.save(cartProduct.toRecentProduct()).onFailure {
+                showError(ErrorType.ERROR_RECENT_INSERT)
             }
         }
-    }
-
-    companion object {
-        const val PRODUCT_NOT_FOUND = "PRODUCT NOT FOUND"
-    }
 }

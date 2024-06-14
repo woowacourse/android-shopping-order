@@ -7,6 +7,9 @@
         <variable
             name="curationActionHandler"
             type="woowacourse.shopping.presentation.ui.curation.CurationActionHandler" />
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.presentation.ui.curation.CurationViewModel" />
 
     </data>
 
@@ -53,7 +56,6 @@
             tools:listitem="@layout/item_product"/>
 
 
-
         <LinearLayout
             android:id="@+id/layout_order"
             android:layout_width="match_parent"
@@ -73,7 +75,7 @@
                     android:id="@+id/tv_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="원"
+                    curationPrice="@{viewModel.uiState}"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -102,6 +104,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:text="주문하기"/>
+
                 <TextView
                     android:id="@+id/tv_order_count"
                     android:layout_width="wrap_content"
@@ -113,6 +116,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
+                    curationOrderCount="@{viewModel.uiState}"
                     tools:text="0"/>
 
 

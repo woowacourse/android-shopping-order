@@ -4,24 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.base.BindingActivity
-import woowacourse.shopping.presentation.ui.EventObserver
-import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.base.ViewModelFactory
+import woowacourse.shopping.presentation.common.EventObserver
+import woowacourse.shopping.presentation.ui.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.ui.cart.model.CartNavigation
 import woowacourse.shopping.presentation.ui.curation.CurationActivity
-import woowacourse.shopping.presentation.ui.shopping.ShoppingActionActivity
-import kotlin.concurrent.thread
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
+import woowacourse.shopping.presentation.ui.shopping.ShoppingActivity
 
-class CartActivity : BindingActivity<ActivityCartBinding>() {
-    override val layoutResourceId: Int
-        get() = R.layout.activity_cart
-
+class CartActivity : BindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
     private val viewModel: CartViewModel by viewModels { ViewModelFactory() }
     private val cartAdapter: CartAdapter by lazy { CartAdapter(viewModel) }
 
@@ -29,14 +25,14 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
 
     override fun initStartView() {
         initTitle()
-        binding.rvCarts.adapter = cartAdapter
-        binding.cartActionHandler = viewModel
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
+        initAdapter()
         initData()
         initObserver()
         initBackPressed()
+    }
+
+    private fun initAdapter() {
+        binding.rvCarts.adapter = cartAdapter
     }
 
     private fun initBackPressed() {
@@ -45,7 +41,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                 override fun handleOnBackPressed() {
                     Intent().apply {
                         putExtra(
-                            ShoppingActionActivity.EXTRA_UPDATED_PRODUCT,
+                            ShoppingActivity.EXTRA_UPDATED_PRODUCT,
                             viewModel.updateUiModel,
                         )
                     }.run {
@@ -54,7 +50,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
                     }
                 }
             }
-        // 뒤로 가기 콜백을 추가
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
@@ -63,44 +58,19 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     private fun initObserver() {
-        viewModel.carts.observe(this) {
-            when (it) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    thread {
-                        Thread.sleep(500)
-                        runOnUiThread {
-                            binding.layoutShimmer.isVisible = false
-                            binding.tvOrderCount.text =
-                                it.data.filter {
-                                    it.isChecked
-                                }.sumOf { it.cartProduct.quantity }.toString()
-                            binding.tvPrice.text =
-                                getString(
-                                    R.string.won,
-                                    it.data.sumOf {
-                                        it.cartProduct.quantity * it.cartProduct.price
-                                    },
-                                )
-                            cartAdapter.submitList(it.data)
-                        }
-                    }
-                }
-            }
-        }
+        binding.cartActionHandler = viewModel
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
-        viewModel.errorHandler.observe(this) { event ->
-            event.getContentIfNotHandled()?.let { message ->
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }
+        viewModel.uiState.observe(this) {
+            cartAdapter.submitList(it.cartProductUiModels)
         }
-
-        viewModel.eventHandler.observe(
+        viewModel.navigateHandler.observe(
             this,
             EventObserver {
                 when (it) {
-                    is CartEvent.Update -> {
-                        Toast.makeText(this, "주문이 완료되었습니다", Toast.LENGTH_SHORT).show()
+                    is CartNavigation.ToPayment -> {
+                        PaymentActivity.createIntent(this, it.paymentUiModel).apply { startActivity(this) }
                     }
                 }
             },
@@ -128,7 +98,7 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
             else -> {
                 Intent().apply {
                     putExtra(
-                        ShoppingActionActivity.EXTRA_UPDATED_PRODUCT,
+                        ShoppingActivity.EXTRA_UPDATED_PRODUCT,
                         viewModel.updateUiModel,
                     )
                 }.run {
@@ -141,8 +111,6 @@ class CartActivity : BindingActivity<ActivityCartBinding>() {
     }
 
     companion object {
-        const val OFFSET_BASE = 1
-
         fun createIntent(context: Context): Intent {
             return Intent(context, CartActivity::class.java)
         }

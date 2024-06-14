@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.remote.dto.mapper
 
-import woowacourse.shopping.data.remote.dto.response.Cart
+import woowacourse.shopping.data.remote.dto.response.CartResponse
 import woowacourse.shopping.domain.CartProduct
 
-fun Cart.toDomain(): CartProduct {
+fun CartResponse.toDomain(): CartProduct {
     return CartProduct(
         cartId = id.toLong(),
         productId = product.id.toLong(),

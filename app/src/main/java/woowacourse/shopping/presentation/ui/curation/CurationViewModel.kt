@@ -2,144 +2,143 @@ package woowacourse.shopping.presentation.ui.curation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.domain.Repository
-import woowacourse.shopping.presentation.ui.EventState
-import woowacourse.shopping.presentation.ui.UiState
-import kotlin.concurrent.thread
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.usecase.CurationUseCase
+import woowacourse.shopping.presentation.base.BaseViewModel
+import woowacourse.shopping.presentation.common.ErrorType
+import woowacourse.shopping.presentation.common.EventState
+import woowacourse.shopping.presentation.ui.curation.model.CurationNavigation
+import woowacourse.shopping.presentation.ui.curation.model.CurationUiState
+import woowacourse.shopping.presentation.ui.payment.model.PaymentUiState
 
 class CurationViewModel(
-    private val repository: Repository,
-) : ViewModel(), CurationActionHandler {
-    private val _cartProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
-    val cartProducts: LiveData<UiState<List<CartProduct>>> get() = _cartProducts
+    private val cartItemRepository: CartItemRepository,
+    private val curationUseCase: CurationUseCase,
+) : BaseViewModel(), CurationActionHandler {
+    private val _uiState = MutableLiveData<CurationUiState>(CurationUiState())
+    val uiState: LiveData<CurationUiState> get() = _uiState
 
-    private val _errorHandler = MutableLiveData<EventState<String>>()
-    val errorHandler: LiveData<EventState<String>> get() = _errorHandler
-
-    private val _eventHandler = MutableLiveData<EventState<CurationEvent>>()
-    val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
+    private val _navigateHandler = MutableLiveData<EventState<CurationNavigation>>()
+    val navigateHandler: LiveData<EventState<CurationNavigation>> get() = _navigateHandler
 
     init {
-        thread {
-            repository.getCuration().onSuccess {
-                _cartProducts.postValue(UiState.Success(it))
+        viewModelScope.launch {
+            curationUseCase(10).onSuccess {
+                val currentState = _uiState.value ?: return@launch
+                _uiState.postValue(
+                    currentState.copy(
+                        cartProducts = it,
+                        isLoading = false,
+                    ),
+                )
             }.onFailure {
-                _errorHandler.postValue(EventState(LOAD_ERROR))
+                showError(ErrorType.ERROR_CURATION_LOAD)
             }
         }
     }
 
     override fun order() {
-        thread {
-            val orderCartIds =
-                (_cartProducts.value as UiState.Success).data.filter {
-                    it.quantity > 0
-                }.map {
-                    it.cartId.toInt()
-                }
-            repository.postOrders(
-                OrderRequest(
-                    orderCartIds,
-                ),
-            ).onSuccess {
-                val cartProducts =
-                    (this.cartProducts.value as UiState.Success).data.map { it.copy() }
-
-                orderCartIds.forEach { id ->
-                    cartProducts.find { it.cartId == id.toLong() }?.quantity = 0
-                }
-                _eventHandler.postValue(EventState(CurationEvent.SuccessOrder))
-                _cartProducts.postValue(UiState.Success(cartProducts))
-            }.onFailure {
-            }
-        }
+        _navigateHandler.value = EventState(CurationNavigation.ToPayment(getPaymentUiModel()))
     }
 
     override fun onProductClick(cartProduct: CartProduct) {
-        // 인터페이스 분리 원칙 필요
+        // 상세 상품으로 갈 수 없음
     }
 
-    override fun onRecentProductClick(recentProduct: RecentProduct) {
-        // 인터페이스 분리 원칙 필요
+    private fun getPaymentUiModel(): PaymentUiState {
+        return PaymentUiState(
+            cartProducts = _uiState.value?.cartProducts?.filter { it.quantity > 0 } ?: emptyList(),
+        )
     }
 
-    override fun onCartClick() {
-        // 인터페이스 분리 원칙 필요
-    }
+    override fun onPlus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val currentCartProducts = _uiState.value?.cartProducts?.map { it.copy() } ?: return@launch
+            val index = currentCartProducts.indexOfFirst { it.productId == cartProduct.productId }
+            currentCartProducts[index].plusQuantity()
 
-    override fun loadMore() {
-        // 인터페이스 분리 원칙 필요
-    }
-
-    override fun onPlus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
-            val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
-            cartProducts[index].plusQuantity()
-
-            if (cartProducts[index].quantity == 1) {
-                repository.postCartItem(
+            if (currentCartProducts[index].quantity == FIRST_UPDATE) {
+                cartItemRepository.post(
                     CartItemRequest(
-                        productId = cartProducts[index].productId.toInt(),
-                        quantity = cartProducts[index].quantity,
+                        productId = currentCartProducts[index].productId.toInt(),
+                        quantity = currentCartProducts[index].quantity,
                     ),
                 )
                     .onSuccess {
-                        cartProducts[index].cartId = it.toLong()
-                        _cartProducts.postValue(UiState.Success(cartProducts))
+                        currentCartProducts[index].cartId = it.toLong()
+                        val currentState = _uiState.value ?: return@launch
+
+                        _uiState.postValue(
+                            currentState.copy(
+                                cartProducts = currentCartProducts,
+                            ),
+                        )
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        showError(ErrorType.ERROR_PRODUCT_PLUS)
                     }
             } else {
-                repository.patchCartItem(
-                    id = cartProducts[index].cartId.toInt(),
-                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
+                cartItemRepository.patch(
+                    id = currentCartProducts[index].cartId.toInt(),
+                    quantityRequestDto = QuantityRequest(quantity = currentCartProducts[index].quantity),
                 )
                     .onSuccess {
-                        _cartProducts.postValue(UiState.Success(cartProducts))
+                        val currentState = _uiState.value ?: return@launch
+                        _uiState.postValue(
+                            currentState.copy(
+                                cartProducts = currentCartProducts,
+                            ),
+                        )
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        showError(ErrorType.ERROR_PRODUCT_PLUS)
                     }
             }
         }
-    }
 
-    override fun onMinus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
-            val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
-            cartProducts[index].minusQuantity()
+    override fun onMinus(cartProduct: CartProduct) =
+        viewModelScope.launch {
+            val currentCartProducts = _uiState.value?.cartProducts?.map { it.copy() } ?: return@launch
 
-            if (cartProducts[index].quantity > 0) {
-                repository.patchCartItem(
-                    id = cartProducts[index].cartId.toInt(),
-                    quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
+            val index = currentCartProducts.indexOfFirst { it.productId == cartProduct.productId }
+            currentCartProducts[index].minusQuantity()
+
+            if (currentCartProducts[index].quantity > 0) {
+                cartItemRepository.patch(
+                    id = currentCartProducts[index].cartId.toInt(),
+                    quantityRequestDto = QuantityRequest(quantity = currentCartProducts[index].quantity),
                 )
                     .onSuccess {
-                        _cartProducts.postValue(UiState.Success(cartProducts))
+                        val currentState = _uiState.value ?: return@launch
+                        _uiState.postValue(
+                            currentState.copy(
+                                cartProducts = currentCartProducts,
+                            ),
+                        )
                     }
                     .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        showError(ErrorType.ERROR_PRODUCT_PLUS)
                     }
             } else {
-                repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
-                    _cartProducts.postValue(UiState.Success(cartProducts))
+                cartItemRepository.delete(cartProduct.cartId.toInt()).onSuccess {
+                    val currentState = _uiState.value ?: return@launch
+                    _uiState.postValue(
+                        currentState.copy(
+                            cartProducts = currentCartProducts,
+                        ),
+                    )
                 }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                    showError(ErrorType.ERROR_PRODUCT_PLUS)
                 }
             }
         }
-    }
 
     companion object {
-        const val LOAD_ERROR = "큐레이션 로드 에러입니다"
+        const val FIRST_UPDATE = 1
     }
 }

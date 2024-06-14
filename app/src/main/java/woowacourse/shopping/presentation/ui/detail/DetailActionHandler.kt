@@ -1,10 +1,14 @@
 package woowacourse.shopping.presentation.ui.detail
 
+import kotlinx.coroutines.Job
+import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
-import woowacourse.shopping.presentation.base.CartCountHandler
+import woowacourse.shopping.presentation.common.ProductCountHandler
 
-interface DetailActionHandler : CartCountHandler {
-    fun onAddToCart(detailCartProduct: DetailCartProduct)
+interface DetailActionHandler : ProductCountHandler {
+    fun onSaveCart(cartProduct: CartProduct): Job
 
     fun onNavigateToDetail(recentProduct: RecentProduct)
+
+    fun saveRecentProduct(cartProduct: CartProduct): Job
 }

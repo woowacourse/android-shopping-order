@@ -1,13 +1,11 @@
 package woowacourse.shopping.presentation.ui.cart
 
-import woowacourse.shopping.presentation.base.CartCountHandler
+import kotlinx.coroutines.Job
+import woowacourse.shopping.presentation.common.ProductCountHandler
+import woowacourse.shopping.presentation.ui.cart.model.CartProductUiModel
 
-interface CartActionHandler : CartCountHandler {
-    fun onDelete(cartProductUiModel: CartProductUiModel)
-
-    fun onNext()
-
-    fun onPrevious()
+interface CartActionHandler : ProductCountHandler {
+    fun onDelete(cartProductUiModel: CartProductUiModel): Job
 
     fun onCheck(
         cartProduct: CartProductUiModel,
