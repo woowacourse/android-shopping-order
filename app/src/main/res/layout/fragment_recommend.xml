@@ -5,11 +5,13 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UIState"/>
-
         <variable
             name="viewModel"
             type="woowacourse.shopping.view.cart.CartViewModel" />
+
+        <variable
+            name="adapter"
+            type="woowacourse.shopping.view.cart.recommend.RecommendProductAdapter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,6 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:orientation="horizontal"
+            android:adapter="@{adapter}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"

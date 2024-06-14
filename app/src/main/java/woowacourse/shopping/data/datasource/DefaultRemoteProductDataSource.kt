@@ -1,22 +1,41 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.model.product.Product
+import woowacourse.shopping.data.model.product.ProductResponse
 import woowacourse.shopping.data.remote.ProductService
 
 class DefaultRemoteProductDataSource(private val productService: ProductService) :
     RemoteProductDataSource {
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-    ): Call<ProductResponse> {
+    ): ProductResponse {
         return productService.getProducts(category, page, size, sort)
     }
 
-    override fun getProductById(id: Int): Call<Product> {
+    override suspend fun getProductById(id: Int): Product {
         return productService.getProductById(id)
+    }
+
+    override suspend fun getRecommendedProducts(
+        category: String?,
+        maxSize: Int,
+        sort: String,
+    ): ProductResponse {
+        var page = 0
+        var productResponse: ProductResponse? = null
+        do {
+            val currentResponse = productService.getProducts(category, page++, maxSize, sort)
+            if (currentResponse.empty) break
+            productResponse = productResponse?.copy(
+                products = productResponse.products + currentResponse.products,
+            ) ?: currentResponse
+        } while ((productResponse?.products?.size ?: 0) < maxSize)
+
+        return productResponse?.copy(
+            products = productResponse.products.shuffled().take(maxSize),
+        ) ?: throw RuntimeException("Product Response Does Not Exist")
     }
 }

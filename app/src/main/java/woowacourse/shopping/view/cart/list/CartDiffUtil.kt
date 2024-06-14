@@ -10,7 +10,7 @@ object CartDiffUtil : DiffUtil.ItemCallback<ShoppingCartViewItem>() {
         if (oldItem is ShoppingCartViewItem.CartViewItem && newItem is ShoppingCartViewItem.CartViewItem) {
             return oldItem.cartItem.cartItemId == newItem.cartItem.cartItemId
         }
-        return oldItem.hashCode() == newItem.hashCode()
+        return oldItem.viewType == newItem.viewType
     }
 
     override fun areContentsTheSame(

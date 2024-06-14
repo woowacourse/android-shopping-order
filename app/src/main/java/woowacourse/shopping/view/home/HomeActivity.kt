@@ -1,16 +1,16 @@
 package woowacourse.shopping.view.home
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import woowacourse.shopping.ShoppingApplication.Companion.recentProductDatabase
-import woowacourse.shopping.ShoppingApplication.Companion.remoteCartDataSource
-import woowacourse.shopping.ShoppingApplication.Companion.remoteProductDataSource
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityHomeBinding
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.detail.DetailActivity
@@ -18,19 +18,21 @@ import woowacourse.shopping.view.home.product.HomeViewItem.Companion.LOAD_MORE_B
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
 import woowacourse.shopping.view.home.product.ProductAdapter
 import woowacourse.shopping.view.home.recent.RecentProductAdapter
-import woowacourse.shopping.view.state.HomeUiEvent
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recentProductAdapter: RecentProductAdapter
     private val viewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory(
-            ProductRepositoryImpl(remoteProductDataSource),
-            CartRepositoryImpl(remoteCartDataSource),
-            RecentProductRepositoryImpl(recentProductDatabase),
-        )
+        (application as ShoppingApplication).homeViewModelFactory
     }
+    private val activityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            val changedIds = getChangedIdsFromActivityResult(result)
+            viewModel.updateProductQuantities(changedIds = changedIds)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,12 +88,13 @@ class HomeActivity : AppCompatActivity() {
             when (val event = homeUiEvent.getContentIfNotHandled() ?: return@observe) {
                 is HomeUiEvent.NavigateToCart -> navigateToCart()
                 is HomeUiEvent.NavigateToDetail -> navigateToDetail(event.productId)
+                is HomeUiEvent.Error -> showError(getString(R.string.unknown_error))
             }
         }
     }
 
     private fun showData(data: List<ProductViewItem>) {
-        productAdapter.loadData(data, viewModel.homeProductUiState.value?.loadMoreAvailable ?: false)
+        productAdapter.loadData(data)
     }
 
     private fun showError(errorMessage: String) {
@@ -99,10 +102,29 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun navigateToDetail(productId: Int) {
-        startActivity(DetailActivity.createIntent(this, productId))
+        activityResultLauncher.launch(DetailActivity.createIntent(this, productId))
     }
 
     private fun navigateToCart() {
-        startActivity(CartActivity.createIntent(this))
+        activityResultLauncher.launch(CartActivity.createIntent(this))
+    }
+
+    private fun getChangedIdsFromActivityResult(result: ActivityResult): IntArray =
+        if (result.resultCode == RESULT_OK) {
+            result.data?.getIntArrayExtra(EXTRA_CHANGED_IDS)
+        } else {
+            intArrayOf()
+        } ?: intArrayOf()
+
+    companion object {
+        private const val EXTRA_CHANGED_IDS = "extra_changed_ids"
+
+        fun createIntent(
+            context: Context,
+            changedIds: IntArray,
+        ): Intent {
+            return Intent(context, HomeActivity::class.java)
+                .putExtra(EXTRA_CHANGED_IDS, changedIds)
+        }
     }
 }

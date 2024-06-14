@@ -1,38 +1,33 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.CartDomain
+import woowacourse.shopping.domain.model.CartItemDomain
 
 interface CartRepository {
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int,
         size: Int,
         sort: String,
-        onSuccess: (CartDomain) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): Result<CartDomain>
 
-    fun addCartItem(
+    suspend fun addCartItem(
         productId: Int,
         quantity: Int,
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun deleteCartItem(
-        cartItemId: Int,
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun deleteCartItem(cartItemId: Int): Result<Unit>
 
-    fun updateCartItem(
+    suspend fun updateCartItem(
         cartItemId: Int,
         quantity: Int,
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun getCartTotalQuantity(
-        onSuccess: (totalQuantity: Int) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun getCartTotalQuantity(): Result<Int>
+
+    suspend fun getEntireCartData(): Result<List<CartData>>
+
+    suspend fun getEntireCartItemsForCart(): Result<CartDomain>
+
+    suspend fun getEntireCartItems(): Result<List<CartItemDomain>>
 }

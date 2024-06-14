@@ -5,13 +5,11 @@
 
     <data>
 
-        <import type="woowacourse.shopping.view.state.UIState" />
-
         <import type="java.util.List" />
 
         <import type="android.view.View" />
 
-        <import type="woowacourse.shopping.data.model.CartItem" />
+        <import type="woowacourse.shopping.data.model.cart.CartItem" />
 
         <variable
             name="viewModel"
@@ -37,52 +35,6 @@
             app:layout_constraintVertical_bias="0.0"
             tools:itemCount="5"
             tools:listitem="@layout/item_cart" />
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/ll_page_navigation"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            android:gravity="center"-->
-<!--            android:orientation="horizontal">-->
-
-<!--            <androidx.appcompat.widget.AppCompatButton-->
-<!--                android:id="@+id/btn_previous_page"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:backgroundTint="@color/teal_200"-->
-<!--                android:enabled="@{viewModel.cartListUiState.previousPageEnabled}"-->
-<!--                android:onClick="@{() -> viewModel.navigateToPreviousPage()}"-->
-<!--                android:text="@string/button_previous_page"-->
-<!--                android:textColor="@color/white"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textStyle="bold" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/tv_current_page"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginHorizontal="12dp"-->
-<!--                android:text="@{String.valueOf(viewModel.cartListUiState.currentPageIndex + 1)}"-->
-<!--                android:textColor="@color/gray_500"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textStyle="bold"-->
-<!--                tools:text="1" />-->
-
-
-<!--            <androidx.appcompat.widget.AppCompatButton-->
-<!--                android:id="@+id/btn_next_page"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:backgroundTint="@color/teal_200"-->
-<!--                android:enabled="@{viewModel.cartListUiState.nextPageEnabled}"-->
-<!--                android:onClick="@{() -> viewModel.navigateToNextPage()}"-->
-<!--                android:textColor="@color/white"-->
-<!--                android:text="@string/button_next_page"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textStyle="bold" />-->
-
-<!--        </LinearLayout>-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -3,27 +3,25 @@ package woowacourse.shopping.view.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.domain.model.CartItemDomain
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.CartData
 import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.list.CartItemClickListener
+import woowacourse.shopping.view.cart.list.CartListUiEvent
+import woowacourse.shopping.view.cart.list.CartListUiState
 import woowacourse.shopping.view.cart.list.ShoppingCartViewItem.CartViewItem
+import woowacourse.shopping.view.cart.recommend.RecommendListUiEvent
+import woowacourse.shopping.view.cart.recommend.RecommendListUiState
 import woowacourse.shopping.view.cart.recommend.RecommendProductEventListener
-import woowacourse.shopping.view.home.product.HomeViewItem
 import woowacourse.shopping.view.home.product.HomeViewItem.ProductViewItem
-import woowacourse.shopping.view.state.CartListUiEvent
-import woowacourse.shopping.view.state.CartListUiState
-import woowacourse.shopping.view.state.CartUiState
-import woowacourse.shopping.view.state.RecommendListUiEvent
-import woowacourse.shopping.view.state.RecommendListUiState
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel(),
@@ -61,32 +59,12 @@ class CartViewModel(
     val recommendListUiEvent: LiveData<Event<RecommendListUiEvent>>
         get() = _recommendListUiEvent
 
+    var alteredProductIds: Array<Int> = arrayOf()
+        private set
+
     init {
         loadCartItems()
-    }
-
-    fun loadRecommendedItems() {
-        val recentProduct = recentProductRepository.findMostRecentProduct()
-        productRepository.getProducts(
-            category = recentProduct?.category,
-            page = 0,
-            size = 100,
-            sort = "asc",
-            onSuccess = { productData ->
-                val cartItems = cartListUiState.value?.cartViewItems ?: return@getProducts
-                val products =
-                    productData.products.shuffled().take(10).filter { productItem ->
-                        productItem.id !in cartItems.map { it.cartItem.product.id }
-                    }.map(::ProductViewItem)
-                _recommendedListUiState.value =
-                    recommendedListUiState.value?.copy(
-                        isLoading = false,
-                        recommendedProducts = products,
-                    )
-            },
-            onFailure = {
-            },
-        )
+        loadRecommendedItems()
     }
 
     fun navigate() {
@@ -97,270 +75,387 @@ class CartViewModel(
             }
 
             CurrentScreen.RECOMMEND -> {
-                makeOrder()
-            }
-        }
-    }
-
-    fun navigateBackToHome() {
-        _navigateBackToHome.value = Event(Unit)
-    }
-
-    private fun makeOrder() {
-        orderRepository.postOrder(
-            cartItemIds = cartUiState.value?.selectedCartItemIds ?: return,
-            onSuccess = {
-                _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToHome)
-            },
-            onFailure = {
-            },
-        )
-    }
-
-    private fun loadCartItems() {
-        val cartListUiState = cartListUiState.value ?: return
-        _cartListUiState.value = cartListUiState.copy(isLoading = true)
-        println(cartListUiState.currentPageIndex)
-        cartRepository.getCartTotalQuantity(
-            onSuccess = { totalQuantity ->
-                cartRepository.getCartItems(
-                    page = cartListUiState.currentPageIndex,
-                    size = totalQuantity,
-                    sort = "desc",
-                    onSuccess = { cart ->
-                        _cartListUiState.value =
-                            cartListUiState.copy(
-                                isLoading = false,
-                                cartViewItems =
-                                cart.cartItems.map { cartItem ->
-                                    CartViewItem(
-                                        cartItem,
-                                        cartUiState.value?.isEntireCheckboxSelected == true || cartItem.cartItemId in (cartUiState.value?.selectedCartItemIds
-                                            ?: return@getCartItems),
-                                    )
-                                },
-                                previousPageEnabled = cart.first.not(),
-                                nextPageEnabled = cart.last.not(),
-                            )
-                    },
-                    onFailure = {
-                    },
-                )
-            },
-            onFailure = {
-
-            }
-        )
-    }
-
-    override fun onCartItemClick(productId: Int) {
-        val lastlyViewedProduct = recentProductRepository.findMostRecentProduct()?.productId
-        _cartListUiEvent.value =
-            Event(
-                CartListUiEvent.NavigateToProductDetail(
-                    productId = productId,
-                    lastlyViewed = productId == lastlyViewedProduct,
-                ),
-            )
-    }
-
-    override fun onDeleteButtonClick(itemId: Int) {
-        cartRepository.deleteCartItem(
-            cartItemId = itemId,
-            onSuccess = {
-                _cartUiState.value = cartUiState.value?.copy(
-                    selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.filter { it != itemId }
-                        ?: return@deleteCartItem
-                )
-                loadCartItems()
-            },
-            onFailure = {
-            },
-        )
-    }
-
-    override fun onSelectChanged(
-        itemId: Int,
-        isSelected: Boolean,
-    ) {
-        _cartListUiState.value =
-            cartListUiState.value?.copy(
-                cartViewItems =
-                cartListUiState.value?.cartViewItems?.map {
-                    if (it.cartItem.cartItemId == itemId) {
-                        it.copy(isSelected = isSelected)
-                    } else {
-                        it
-                    }
-                } ?: return,
-            )
-        val cartItem =
-            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == itemId }
-                ?: return
-        if (isSelected) {
-            _cartUiState.value = cartUiState.value?.copy(
-                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                    itemId
-                ) ?: return
-            )
-            // TODO 총 가격 설정하기
-//            addTotalPrice(cartItem.cartItem.totalPrice())
-        } else {
-            _cartUiState.value = cartUiState.value?.copy(
-                selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.minus(
-                    itemId
-                ) ?: return
-            )
-            // TODO 총 가격 설정하기
-//            subtractTotalPrice(cartItem.cartItem.totalPrice())
-        }
-        setTotalPrice()
-    }
-
-    private fun updateCartQuantity(
-        cartItemId: Int,
-        changedItem: CartViewItem,
-    ) {
-        cartRepository.updateCartItem(
-            cartItemId = cartItemId,
-            quantity = changedItem.cartItem.quantity,
-            onSuccess = {
-                val updatedViewItems =
-                    cartListUiState.value?.cartViewItems?.map {
-                        if (it.cartItem.cartItemId == cartItemId) changedItem else it
-                    } ?: return@updateCartItem
-                _cartListUiState.value =
-                    cartListUiState.value?.copy(
-                        cartViewItems = updatedViewItems,
+                _recommendListUiEvent.value =
+                    Event(
+                        RecommendListUiEvent.NavigateToOrder(
+                            cartUiState.value?.selectedCartItems ?: return,
+                        ),
                     )
-                setTotalPrice()
-            },
-            onFailure = {
-            },
-        )
-    }
-
-    override fun navigateToDetail(productId: Int) {
-        val lastlyViewedProduct = recentProductRepository.findMostRecentProduct()?.productId
-        _recommendListUiEvent.value =
-            Event(
-                RecommendListUiEvent.NavigateToProductDetail(
-                    productId,
-                    productId == lastlyViewedProduct,
-                ),
-            )
-    }
-
-    override fun navigateToCart() {
-        _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToCartList)
-    }
-
-    override fun addToCart(product: ProductItemDomain) {
-        cartRepository.addCartItem(
-            productId = product.id,
-            quantity = 1,
-            onSuccess = {
-                cartRepository.getCartItems(
-                    page = 0,
-                    size = cartListUiState.value?.cartViewItems?.size ?: 0,
-                    sort = "asc",
-                    onSuccess = { cartDomain ->
-                        val products = recommendedListUiState.value?.recommendedProducts
-                        val target = products?.firstOrNull {
-                            it.product.id == product.id
-                        }?.increase() ?: return@getCartItems
-                        val updatedProducts = products.map {
-                            if (it.product.id == target.product.id) target else it
-                        }
-                        _recommendedListUiState.value =
-                            recommendedListUiState.value?.copy(
-                                recommendedProducts = updatedProducts,
-                            )
-                        val cartItemId =
-                            cartDomain.cartItems.firstOrNull { it.product.id == product.id }?.cartItemId
-                                ?: return@getCartItems
-                        _cartUiState.value = cartUiState.value?.copy(
-                            selectedCartItemIds = cartUiState.value?.selectedCartItemIds?.plus(
-                                cartItemId
-                            ) ?: return@getCartItems
-                        )
-                    },
-                    onFailure = {
-                    },
-                )
-            },
-            onFailure = {
-            },
-        )
-    }
-
-    override fun addQuantity(cartItemId: Int) {
-        val cartViewItem =
-            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
-                ?: return
-        val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.plusQuantity())
-        // TODO 총 가격 설정하기
-//        addTotalPrice(changedItem.cartItem.product.price)
-        updateCartQuantity(cartItemId, changedItem)
-    }
-
-    override fun subtractQuantity(cartItemId: Int) {
-        val cartViewItem =
-            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
-                ?: return
-        val changedItem =
-            cartViewItem.copy(cartItem = cartViewItem.cartItem.minusQuantity())
-        // TODO 총 가격 설정하기
-//        subtractTotalPrice(changedItem.cartItem.product.price)
-        updateCartQuantity(cartItemId, changedItem)
+            }
+        }
     }
 
     fun updateEntireCheck(isSelected: Boolean) {
-        val updatedCartViewItems = cartListUiState.value?.cartViewItems?.map {
-            it.copy(isSelected = isSelected)
-        } ?: return
+        val updatedCartViewItems =
+            cartListUiState.value?.cartViewItems?.map {
+                it.copy(isSelected = isSelected)
+            } ?: return
         _cartListUiState.value =
             cartListUiState.value?.copy(cartViewItems = updatedCartViewItems)
         _cartUiState.value =
             cartUiState.value?.copy(
                 isEntireCheckboxSelected = isSelected,
                 totalPrice =
-                    updatedCartViewItems.sumOf {
-                        if (it.isSelected) {
-                            it.cartItem.totalPrice()
-                        } else {
-                            0
-                        }
-                    },
+                    updatedCartViewItems.sumOf { if (it.isSelected) it.cartItem.totalPrice() else 0 },
             )
+    }
+
+    fun navigateBackToHome() {
+        _navigateBackToHome.value = Event(Unit)
+    }
+
+    override fun onCartItemClick(productId: Int) {
+        viewModelScope.launch {
+            val lastlyViewedProduct = recentProductRepository.findMostRecentProduct()?.productId
+            _cartListUiEvent.value =
+                Event(
+                    CartListUiEvent.NavigateToProductDetail(
+                        productId = productId,
+                        lastlyViewed = productId == lastlyViewedProduct,
+                    ),
+                )
+        }
+    }
+
+    override fun onDeleteButtonClick(itemId: Int) {
+        viewModelScope.launch {
+            val result = cartRepository.deleteCartItem(itemId).getOrNull()
+            val uiState = cartUiState.value
+            if (result == null || uiState == null) {
+                return@launch
+            }
+            val productId =
+                cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == itemId }?.cartItem?.product?.id
+            if (productId != null) alteredProductIds += productId
+            _cartListUiState.value =
+                cartListUiState.value?.copy(
+                    cartViewItems =
+                        cartListUiState.value?.cartViewItems?.filter {
+                            it.cartItem.cartItemId != itemId
+                        } ?: return@launch,
+                )
+
+            _cartUiState.value =
+                uiState.copy(
+                    selectedCartItems = uiState.selectedCartItems.filter { it.cartItemId != itemId },
+                )
+        }
+    }
+
+    override fun onSelectChanged(
+        itemId: Int,
+        isSelected: Boolean,
+    ) {
+        val cartViewItems =
+            cartListUiState.value?.cartViewItems?.map {
+                if (it.cartItem.cartItemId == itemId) {
+                    it.copy(isSelected = isSelected)
+                } else {
+                    it
+                }
+            } ?: return
+        _cartListUiState.value =
+            cartListUiState.value?.copy(cartViewItems = cartViewItems)
+        val cartItem =
+            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == itemId }
+                ?: return
+        if (isSelected) {
+            _cartUiState.value =
+                cartUiState.value?.copy(
+                    selectedCartItems =
+                        cartUiState.value?.selectedCartItems?.plus(
+                            cartItem.cartItem,
+                        ) ?: return,
+                )
+        } else {
+            _cartUiState.value =
+                cartUiState.value?.copy(
+                    selectedCartItems =
+                        cartUiState.value?.selectedCartItems?.filter {
+                            it.cartItemId != cartItem.cartItem.cartItemId
+                        } ?: return,
+                )
+        }
+        setTotalPrice()
+    }
+
+    override fun navigateToDetail(productId: Int) {
+        viewModelScope.launch {
+            val lastlyViewedProduct = recentProductRepository.findMostRecentProduct()?.productId
+            _recommendListUiEvent.value =
+                Event(
+                    RecommendListUiEvent.NavigateToProductDetail(
+                        productId,
+                        productId == lastlyViewedProduct,
+                    ),
+                )
+        }
+    }
+
+    override fun navigateToCart() {
+        _recommendListUiEvent.value = Event(RecommendListUiEvent.NavigateBackToCartList)
+    }
+
+    private fun loadRecommendedItems() {
+        viewModelScope.launch {
+            val recommendedProducts =
+                productRepository.getRecommendedProducts(requiredSize = RECOMMENDED_ITEM_SIZE)
+                    .getOrNull()
+            val uiState = recommendedListUiState.value
+            if (recommendedProducts == null || uiState == null) {
+                return@launch
+            }
+            _recommendedListUiState.value =
+                uiState.copy(
+                    isLoading = false,
+                    recommendedProducts =
+                        recommendedProducts.map {
+                            ProductViewItem(it)
+                        },
+                )
+        }
+    }
+
+    private fun loadCartItems() {
+        viewModelScope.launch {
+            _cartListUiState.value = cartListUiState.value?.copy(isLoading = true)
+            val cartListUiState = cartListUiState.value
+            val cartUiState = cartUiState.value
+            if (cartUiState == null || cartListUiState == null) {
+                return@launch
+            }
+            cartRepository.getEntireCartItemsForCart().onSuccess { cartItems ->
+                _cartListUiState.value =
+                    cartListUiState.copy(
+                        isLoading = false,
+                        cartViewItems =
+                            cartItems.cartItems.map { cartItem ->
+                                CartViewItem(
+                                    cartItem,
+                                    cartUiState.isEntireCheckboxSelected ||
+                                        cartItem.cartItemId in (cartUiState.selectedCartItems.map { it.cartItemId }),
+                                )
+                            },
+                    )
+            }
+        }
+    }
+
+    override fun addToCart(product: ProductItemDomain) {
+        viewModelScope.launch {
+            alteredProductIds += product.id
+            val result = cartRepository.addCartItem(product.id, 1).getOrNull()
+            val entireCartItems = cartRepository.getEntireCartItems().getOrNull()
+            val uiState = recommendedListUiState.value
+            if (result == null || uiState == null || entireCartItems == null) {
+                return@launch
+            }
+            val changedItem =
+                entireCartItems.firstOrNull { it.product.id == product.id } ?: return@launch
+            val updatedProducts =
+                uiState.recommendedProducts.map {
+                    if (it.orderableProduct.productItemDomain.id == changedItem.product.id) {
+                        it.copy(
+                            orderableProduct =
+                                it.orderableProduct.copy(
+                                    cartData =
+                                        CartData(
+                                            changedItem.cartItemId,
+                                            changedItem.product.id,
+                                            quantity = changedItem.quantity,
+                                        ),
+                                ),
+                        )
+                    } else {
+                        it
+                    }
+                }
+            _recommendedListUiState.value =
+                recommendedListUiState.value?.copy(
+                    recommendedProducts = updatedProducts,
+                )
+            _cartUiState.value =
+                cartUiState.value?.copy(
+                    selectedCartItems =
+                        cartUiState.value?.selectedCartItems?.plus(
+                            changedItem,
+                        ) ?: return@launch,
+                )
+        }
+    }
+
+    override fun addQuantity(cartItemId: Int) {
+        alteredProductIds += cartItemId
+        when (currentScreen.value ?: return) {
+            CurrentScreen.CART -> addCartQuantity(cartItemId)
+            CurrentScreen.RECOMMEND -> addRecommendItemQuantity(cartItemId)
+        }
+    }
+
+    override fun subtractQuantity(cartItemId: Int) {
+        alteredProductIds += cartItemId
+        when (currentScreen.value ?: return) {
+            CurrentScreen.CART -> subtractCartQuantity(cartItemId)
+            CurrentScreen.RECOMMEND -> subtractRecommendItemQuantity(cartItemId)
+        }
+    }
+
+    private fun addCartQuantity(cartItemId: Int) {
+        val cartViewItem =
+            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
+                ?: return
+        val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.plusQuantity())
+        updateCartQuantity(cartItemId, changedItem)
+    }
+
+    private fun subtractCartQuantity(cartItemId: Int) {
+        val cartViewItem =
+            cartListUiState.value?.cartViewItems?.firstOrNull { it.cartItem.cartItemId == cartItemId }
+                ?: return
+        val changedItem = cartViewItem.copy(cartItem = cartViewItem.cartItem.minusQuantity())
+        updateCartQuantity(cartItemId, changedItem)
+    }
+
+    private fun addRecommendItemQuantity(cartItemId: Int) {
+        val targetCartItem =
+            recommendedListUiState.value?.recommendedProducts?.firstOrNull { it.orderableProduct.cartData?.cartItemId == cartItemId }
+                ?: return
+        val updatedCartItem =
+            targetCartItem.copy(
+                orderableProduct =
+                    targetCartItem.orderableProduct.copy(
+                        cartData = targetCartItem.orderableProduct.cartData?.increaseQuantity(),
+                    ),
+            )
+        updateQuantity(updatedCartItem.orderableProduct.cartData ?: return)
+    }
+
+    private fun subtractRecommendItemQuantity(cartItemId: Int) {
+        val targetCartItem =
+            recommendedListUiState.value?.recommendedProducts?.firstOrNull { it.orderableProduct.cartData?.cartItemId == cartItemId }
+                ?: return
+        val updatedCartItem =
+            targetCartItem.copy(
+                orderableProduct =
+                    targetCartItem.orderableProduct.copy(
+                        cartData = targetCartItem.orderableProduct.cartData?.decreaseQuantity(),
+                    ),
+            )
+        if (updatedCartItem.orderableProduct.cartData?.quantity == 0) {
+            removeRecommendedCartItem(updatedCartItem.orderableProduct.cartData)
+            return
+        }
+        updateQuantity(updatedCartItem.orderableProduct.cartData ?: return)
+    }
+
+    private fun updateQuantity(targetCartItem: CartData) {
+        viewModelScope.launch {
+            val result =
+                cartRepository.updateCartItem(targetCartItem.cartItemId, targetCartItem.quantity)
+                    .getOrNull()
+            val uiState = cartUiState.value
+            val recommendUiState = recommendedListUiState.value
+            if (result == null || recommendUiState == null || uiState == null) return@launch
+
+            val updatedItems =
+                recommendUiState.recommendedProducts.map {
+                    if (it.orderableProduct.productItemDomain.id == targetCartItem.productId) {
+                        it.copy(orderableProduct = it.orderableProduct.copy(cartData = targetCartItem))
+                    } else {
+                        it
+                    }
+                }
+            _recommendedListUiState.value =
+                recommendUiState.copy(recommendedProducts = updatedItems)
+            _cartUiState.value =
+                uiState.copy(
+                    totalPrice =
+                        uiState.totalPrice +
+                            updatedItems.sumOf {
+                                it.orderableProduct.cartData?.totalPrice(it.orderableProduct.productItemDomain.price)
+                                    ?: 0
+                            },
+                )
+        }
+    }
+
+    private fun updateCartQuantity(
+        cartItemId: Int,
+        changedItem: CartViewItem,
+    ) {
+        viewModelScope.launch {
+            alteredProductIds += changedItem.cartItem.product.id
+            cartRepository.updateCartItem(
+                cartItemId = cartItemId,
+                quantity = changedItem.cartItem.quantity,
+            ).onSuccess {
+                val updatedViewItems =
+                    cartListUiState.value?.cartViewItems?.map {
+                        if (it.cartItem.cartItemId == cartItemId) changedItem else it
+                    } ?: return@launch
+                _cartListUiState.value =
+                    cartListUiState.value?.copy(
+                        cartViewItems = updatedViewItems,
+                    )
+                setTotalPrice()
+            }
+        }
+    }
+
+    private fun removeRecommendedCartItem(updatedCartItem: CartData) {
+        viewModelScope.launch {
+            val result =
+                cartRepository.deleteCartItem(cartItemId = updatedCartItem.cartItemId).getOrNull()
+            val recommendListUiState = recommendedListUiState.value
+            val uiState = cartUiState.value
+
+            if (result == null || recommendListUiState == null || uiState == null) return@launch
+
+            val leftItems =
+                recommendListUiState.recommendedProducts.map {
+                    it.copy(
+                        orderableProduct =
+                            it.orderableProduct.copy(
+                                cartData =
+                                    if (it.orderableProduct.productItemDomain.id == updatedCartItem.productId) {
+                                        null
+                                    } else {
+                                        it.orderableProduct.cartData
+                                    },
+                            ),
+                    )
+                }
+
+            _recommendedListUiState.value =
+                recommendedListUiState.value?.copy(recommendedProducts = leftItems)
+
+            _cartUiState.value =
+                cartUiState.value?.copy(
+                    totalPrice =
+                        uiState.totalPrice +
+                            leftItems.sumOf {
+                                it.orderableProduct.cartData?.totalPrice(it.orderableProduct.productItemDomain.price)
+                                    ?: 0
+                            },
+                )
+        }
     }
 
     private fun setTotalPrice() {
-        val totalPrice = cartListUiState.value?.cartViewItems?.sumOf {
-            if (it.isSelected) {
-                it.cartItem.totalPrice()
-            } else 0
-        } ?: return
-        val isEntirelySelected = cartListUiState.value?.cartViewItems?.all { it.isSelected } ?: return
-        _cartUiState.value = cartUiState.value?.copy(
-            isEntireCheckboxSelected = isEntirelySelected,
-            totalPrice = totalPrice
-        )
-    }
-
-    private fun addTotalPrice(additionalPrice: Int) {
-        val cartUiState = cartUiState.value ?: return
+        val totalPrice =
+            cartListUiState.value?.cartViewItems?.sumOf {
+                if (it.isSelected) it.cartItem.totalPrice() else 0
+            } ?: return
+        val isEntirelySelected =
+            cartListUiState.value?.cartViewItems?.all { it.isSelected } ?: return
         _cartUiState.value =
-            cartUiState.copy(
-                totalPrice = cartUiState.totalPrice + additionalPrice,
+            cartUiState.value?.copy(
+                isEntireCheckboxSelected = isEntirelySelected,
+                totalPrice = totalPrice,
             )
     }
 
-    private fun subtractTotalPrice(subtractPrice: Int) {
-        val cartUiState = cartUiState.value ?: return
-        _cartUiState.value =
-            cartUiState.copy(
-                totalPrice = cartUiState.totalPrice - subtractPrice,
-            )
+    companion object {
+        private const val RECOMMENDED_ITEM_SIZE = 10
     }
 }

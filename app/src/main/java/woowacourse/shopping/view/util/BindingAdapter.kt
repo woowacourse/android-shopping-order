@@ -6,6 +6,10 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.view.order.CouponViewItem
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @BindingAdapter("app:imageUrl")
 fun loadImage(
@@ -35,4 +39,46 @@ fun setViewVisibility(
     isVisible: Boolean,
 ) {
     view.visibility = if (isVisible) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("shopping:expirationDate")
+fun setExpirationDate(
+    textView: TextView,
+    expirationDate: LocalDate?,
+) {
+    val context = textView.context
+    if (expirationDate == null) return
+    val formatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_format))
+    textView.text =
+        context.getString(R.string.order_expiration_date, expirationDate.format(formatter))
+}
+
+@BindingAdapter("shopping:minimumExpense")
+fun setExpirationDate(
+    textView: TextView,
+    couponViewItem: CouponViewItem?,
+) {
+    val context = textView.context
+    if (couponViewItem == null) return
+    if (couponViewItem !is CouponViewItem.CouponItem) {
+        textView.visibility = View.INVISIBLE
+        return
+    }
+    val minimumPrice =
+        when (couponViewItem.coupon) {
+            is Coupon.Fixed ->
+                context.getString(
+                    R.string.price_format,
+                    couponViewItem.coupon.minimumAmount,
+                )
+
+            is Coupon.FreeShipping ->
+                context.getString(
+                    R.string.price_format,
+                    couponViewItem.coupon.minimumAmount,
+                )
+
+            else -> return
+        }
+    textView.text = context.getString(R.string.order_minimum_price, minimumPrice)
 }

@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
 data class ProductDomain(
-    val products: List<ProductItemDomain>,
+    val orderableProducts: List<OrderableProduct>,
     val last: Boolean,
 )

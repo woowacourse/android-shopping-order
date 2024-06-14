@@ -7,21 +7,9 @@ sealed class ShoppingCartViewItem(open val viewType: Int) {
         val cartItem: CartItemDomain,
         val isSelected: Boolean = false,
         override val viewType: Int = CART_VIEW_TYPE,
-    ) : ShoppingCartViewItem(viewType) {
-        fun select(): CartViewItem {
-            return this.copy(isSelected = !isSelected)
-        }
+    ) : ShoppingCartViewItem(viewType)
 
-        fun increment(): CartViewItem {
-            return this.copy(cartItem = cartItem.copy(quantity = cartItem.quantity + 1))
-        }
-
-        fun decrement(): CartViewItem {
-            return this.copy(cartItem = cartItem.copy(quantity = cartItem.quantity - 1))
-        }
-    }
-
-    data class CartPlaceHolderViewItem(override val viewType: Int = CART_PLACEHOLDER_VIEW_TYPE) :
+    class CartPlaceHolderViewItem(override val viewType: Int = CART_PLACEHOLDER_VIEW_TYPE) :
         ShoppingCartViewItem(viewType)
 
     companion object {

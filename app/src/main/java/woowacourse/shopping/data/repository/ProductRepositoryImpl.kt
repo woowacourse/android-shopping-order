@@ -1,81 +1,74 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.HttpException
-import retrofit2.Response
+import woowacourse.shopping.data.datasource.RemoteCartDataSource
 import woowacourse.shopping.data.datasource.RemoteProductDataSource
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.ProductResponse
-import woowacourse.shopping.data.model.toProductDomain
-import woowacourse.shopping.data.model.toProductItemDomain
+import woowacourse.shopping.data.local.database.RecentProductDao
+import woowacourse.shopping.data.model.cart.CartItem
+import woowacourse.shopping.data.model.cart.toCartData
+import woowacourse.shopping.data.model.product.toOrderableProduct
+import woowacourse.shopping.data.model.product.toProductDomain
+import woowacourse.shopping.domain.model.CartData
+import woowacourse.shopping.domain.model.OrderableProduct
 import woowacourse.shopping.domain.model.ProductDomain
-import woowacourse.shopping.domain.model.ProductItemDomain
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val remoteProductDataSource: RemoteProductDataSource,
+    private val remoteCartDataSource: RemoteCartDataSource,
+    private val recentProductDao: RecentProductDao,
 ) : ProductRepository {
-    override fun getProducts(
+    override suspend fun getProducts(
         category: String?,
         page: Int,
         size: Int,
         sort: String,
-        onSuccess: (ProductDomain) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    ) {
-        remoteProductDataSource.getProducts(category, page, size, sort).enqueue(
-            object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>,
-                ) {
-                    onSuccess(response.body()?.toProductDomain() ?: throw HttpException(response))
-                }
-
-                override fun onFailure(
-                    call: Call<ProductResponse>,
-                    t: Throwable,
-                ) {
-                    onFailure(t)
-                }
-            },
-        )
-//        thread {
-//            runCatching {
-//                val response = remoteProductDataSource.getProducts(category, page, size, sort).execute()
-//                response.body()?.toProductDomain() ?: throw HttpException(response)
-//            }.onSuccess(onSuccess).onFailure(onFailure)
-//        }
+    ): Result<ProductDomain> {
+        return runCatching {
+            remoteProductDataSource.getProducts(category, page, size, sort)
+                .toProductDomain(getEntireCartItems())
+        }
     }
 
-    override fun getProductById(
-        id: Int,
-        onSuccess: (ProductItemDomain) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    ) {
-        remoteProductDataSource.getProductById(id).enqueue(
-            object : Callback<Product> {
-                override fun onResponse(
-                    call: Call<Product>,
-                    response: Response<Product>,
-                ) {
-                    onSuccess(response.body()?.toProductItemDomain() ?: throw HttpException(response))
+    override suspend fun getProductById(id: Int): Result<OrderableProduct> {
+        return runCatching {
+            val cartItem =
+                getEntireCartItems().firstOrNull {
+                    it.productId == id
                 }
+            remoteProductDataSource
+                .getProductById(id)
+                .toOrderableProduct(cartItem)
+        }
+    }
 
-                override fun onFailure(
-                    call: Call<Product>,
-                    t: Throwable,
-                ) {
-                    onFailure(t)
-                }
-            },
+    override suspend fun getRecommendedProducts(requiredSize: Int): Result<List<OrderableProduct>> {
+        return runCatching {
+            val lastlyViewedProduct = recentProductDao.findMostRecentProduct()
+            val cartData = getEntireCartItems()
+            remoteProductDataSource.getRecommendedProducts(
+                category = lastlyViewedProduct?.category,
+                maxSize = requiredSize,
+                sort = SORT_RECOMMENDED_ITEMS,
+            ).toProductDomain(cartData = cartData)
+                .orderableProducts
+                .filter { it.cartData == null }
+        }
+    }
+
+    private suspend fun getEntireCartItems(): List<CartData> {
+        val totalCartQuantity = remoteCartDataSource.getCartTotalQuantity().quantity
+        return remoteCartDataSource.getCartItems(
+            PAGE_CART_ITEMS,
+            totalCartQuantity,
+            SORT_CART_ITEMS,
         )
-//        thread {
-//            runCatching {
-//                val response = remoteProductDataSource.getProductById(id).execute()
-//
-//            }.onSuccess(onSuccess).onFailure(onFailure)
-//        }
+            .cartItems
+            .map(CartItem::toCartData)
+    }
+
+    companion object {
+        private const val PAGE_CART_ITEMS = 0
+        private const val SORT_CART_ITEMS = "asc"
+        private const val SORT_RECOMMENDED_ITEMS = "asc"
     }
 }

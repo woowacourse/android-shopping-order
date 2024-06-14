@@ -3,14 +3,16 @@ package woowacourse.shopping.view.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.domain.model.ProductItemDomain
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.model.product.toProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.view.cart.QuantityEventListener
-import woowacourse.shopping.view.state.DetailUiEvent
-import woowacourse.shopping.view.state.ProductDetailUiState
 
 class DetailViewModel(
     private val cartRepository: CartRepository,
@@ -27,6 +29,14 @@ class DetailViewModel(
     val detailUiEvent: LiveData<Event<DetailUiEvent>>
         get() = _detailUiEvent
 
+    val isRecentProductVisible: LiveData<Boolean> =
+        productDetailUiState.map {
+            it.lastlyViewedProduct?.productId != productId && it.lastlyViewedProduct != null
+        }.distinctUntilChanged()
+
+    var alteredProductIds: Array<Int> = arrayOf()
+        private set
+
     init {
         loadProduct()
     }
@@ -39,38 +49,37 @@ class DetailViewModel(
     }
 
     override fun subtractQuantity(cartItemId: Int) {
+        val updatedQuantity = productDetailUiState.value?.quantity?.minus(1) ?: return
+        if (updatedQuantity < 1) {
+            _detailUiEvent.value = Event(DetailUiEvent.Error)
+            return
+        }
         _productDetailUiState.value =
             productDetailUiState.value?.copy(
-                quantity = productDetailUiState.value?.quantity?.minus(1) ?: return,
+                quantity = updatedQuantity,
             )
     }
 
     override fun addToCart() {
-        val cartItems = productDetailUiState.value?.cartItems
-        val productId = productDetailUiState.value?.product?.id ?: return
-        val targetCartItem = cartItems?.firstOrNull { it.product.id == productId }
-        if (targetCartItem == null) {
-            cartRepository.addCartItem(
-                productId = productId,
-                quantity = productDetailUiState.value?.quantity ?: return,
-                onSuccess = {
-                    _detailUiEvent.value = Event(DetailUiEvent.NavigateToCart)
-                },
-                onFailure = {
-                },
-            )
-            return
+        viewModelScope.launch {
+            if (productId !in alteredProductIds) {
+                alteredProductIds += productId
+            }
+            val uiState = productDetailUiState.value ?: return@launch
+            val targetCartItem = uiState.cartItems.firstOrNull { it.productId == productId }
+            if (targetCartItem == null) {
+                cartRepository.addCartItem(productId, uiState.quantity)
+            } else {
+                val result =
+                    cartRepository.updateCartItem(targetCartItem.cartItemId, uiState.quantity)
+                        .getOrNull()
+                if (result == null) {
+                    notifyError()
+                    return@launch
+                }
+            }
+            _detailUiEvent.value = Event(DetailUiEvent.ProductAddedToCart)
         }
-
-        cartRepository.updateCartItem(
-            cartItemId = targetCartItem.cartItemId,
-            quantity = productDetailUiState.value?.quantity ?: return,
-            onSuccess = {
-                _detailUiEvent.value = Event(DetailUiEvent.NavigateToCart)
-            },
-            onFailure = {
-            },
-        )
     }
 
     override fun navigateToRecentProduct() {
@@ -86,38 +95,37 @@ class DetailViewModel(
         _detailUiEvent.value = Event(DetailUiEvent.NavigateBack)
     }
 
-    private fun loadProduct() {
-        productRepository.getProductById(
-            id = productId,
-            onSuccess = ::loadCartDataToProduct,
-            onFailure = {
-            },
-        )
+    fun saveRecentProduct() {
+        viewModelScope.launch {
+            recentProductRepository.save(
+                productDetailUiState.value?.product?.toProduct() ?: return@launch,
+            )
+        }
     }
 
-    private fun loadCartDataToProduct(productItem: ProductItemDomain) {
-        cartRepository.getCartTotalQuantity(
-            onSuccess = { totalQuantity ->
-                cartRepository.getCartItems(
-                    page = 0,
-                    size = totalQuantity,
-                    sort = "asc",
-                    onSuccess = { cart ->
-                        _productDetailUiState.value =
-                            productDetailUiState.value?.copy(
-                                isLoading = false,
-                                product = productItem,
-                                lastlyViewedProduct = recentProductRepository.findMostRecentProduct(),
-                                quantity = 1,
-                                cartItems = cart.cartItems,
-                            )
-                    },
-                    onFailure = {
-                    },
+    private fun loadProduct() {
+        viewModelScope.launch {
+            val result = productRepository.getProductById(id = productId).getOrNull()
+            val entireCartItems = cartRepository.getEntireCartData().getOrNull() ?: emptyList()
+            val targetCartItem =
+                entireCartItems.firstOrNull { it.productId == result?.productItemDomain?.id }
+            if (result == null) {
+                notifyError()
+                return@launch
+            }
+
+            _productDetailUiState.value =
+                productDetailUiState.value?.copy(
+                    isLoading = false,
+                    product = result.productItemDomain,
+                    lastlyViewedProduct = recentProductRepository.findMostRecentProduct(),
+                    quantity = targetCartItem?.quantity ?: 1,
+                    cartItems = entireCartItems,
                 )
-            },
-            onFailure = {
-            },
-        )
+        }
+    }
+
+    private fun notifyError() {
+        _detailUiEvent.value = Event(DetailUiEvent.Error)
     }
 }
