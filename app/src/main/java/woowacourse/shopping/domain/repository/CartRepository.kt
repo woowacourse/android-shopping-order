@@ -2,56 +2,46 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
+import woowacourse.shopping.domain.model.UpdatedQuantity
 
 interface CartRepository {
-    fun fetchCartItemsInfo(resultCallback: (Result<List<CartItem>>) -> Unit)
+    suspend fun fetchCartItemsInfo(): Result<List<CartItem>>
 
-    fun fetchCartItemsInfoWithPage(
+    suspend fun fetchCartItemsInfoWithPage(
         page: Int,
         pageSize: Int,
-        resultCallback: (List<CartItem>) -> Unit,
-    )
+    ): Result<List<CartItem>>
 
-    fun fetchTotalQuantity(resultCallback: (Result<Int>) -> Unit)
+    suspend fun fetchTotalQuantity(): Result<Int>
 
-    fun findCartItemWithProductId(productId: Long): CartItem?
+    suspend fun findCartItemWithProductId(productId: Long): CartItem?
 
-    fun fetchItemQuantityWithProductId(productId: Long): Int
+    suspend fun findCartItemsWithProductIds(productIds: Set<Long>): List<CartItem>
 
-    fun fetchCartItem(cartItemId: Long): CartItem
+    suspend fun fetchItemQuantityWithProductId(productId: Long): Int
 
-    fun addCartItem(
+    suspend fun fetchCartItem(cartItemId: Long): CartItem?
+
+    suspend fun addCartItem(
         productId: Long,
         quantity: Int,
-        resultCallback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
-        resultCallback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun updateCartItemQuantityWithProductId(
+    suspend fun updateCartItemQuantityWithProductId(
         productId: Long,
         quantity: Int,
-        resultCallback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun deleteCartItem(
-        cartItemId: Long,
-        resultCallback: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCartItem(cartItemId: Long): Result<Unit>
 
-    fun deleteCartItemWithProductId(
-        productId: Long,
-        resultCallback: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCartItemWithProductId(productId: Long): Result<Unit>
 
-    fun deleteAllItems()
+    suspend fun deleteAllItems(): Result<Unit>
 
-    fun makeOrder(
-        order: Order,
-        resultCallback: (Result<Unit>) -> Unit,
-    )
+    suspend fun getCartItemsQuantities(productIds: Set<Long>): Result<List<UpdatedQuantity>>
 }

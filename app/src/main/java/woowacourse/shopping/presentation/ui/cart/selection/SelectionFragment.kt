@@ -8,13 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.R
-import woowacourse.shopping.data.database.OrderDatabase
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.data.database.order.OrderDatabase
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
-import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.FragmentSelectionBinding
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
 import woowacourse.shopping.presentation.ui.cart.FragmentController
 import woowacourse.shopping.presentation.ui.detail.DetailActivity
@@ -24,12 +23,7 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     private lateinit var selectionAdapter: SelectionAdapter
     private lateinit var fragmentEventListener: FragmentController
     private val viewModel: SelectionViewModel by lazy {
-        val viewModelFactory =
-            SelectionViewModelFactory(
-                shoppingRepository = RemoteShoppingRepositoryImpl(),
-                recentProductRepository = RecentProductRepositoryImpl(requireContext()),
-                cartRepository = RemoteCartRepositoryImpl(),
-            )
+        val viewModelFactory = SelectionViewModelFactory(RemoteCartRepositoryImpl())
         viewModelFactory.create(SelectionViewModel::class.java)
     }
 
@@ -63,6 +57,7 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         binding.clickListener = this
 
         observeViewModel()
+        loadCartItems(savedInstanceState)
     }
 
     private fun setUpRecyclerView() {
@@ -102,6 +97,12 @@ class SelectionFragment : Fragment(), SelectionClickListener {
             }
         }
 
+        viewModel.addedItemsCount.observe(viewLifecycleOwner) {
+            if (it > 0) {
+                selectionAdapter.notifyItemsAdded(it)
+            }
+        }
+
         viewModel.navigateToDetail.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let { productId ->
                 navigateToDetail(productId)
@@ -136,10 +137,11 @@ class SelectionFragment : Fragment(), SelectionClickListener {
         startActivity(DetailActivity.createIntent(requireContext(), productId))
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.setLoadingState(true)
-        viewModel.setUpCartItems()
+    private fun loadCartItems(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            viewModel.setLoadingState(true)
+            viewModel.setUpCartItems()
+        }
     }
 
     override fun onMakeOrderClick() {
@@ -152,6 +154,9 @@ class SelectionFragment : Fragment(), SelectionClickListener {
     }
 
     fun onShow() {
-        viewModel.setUpCartItems()
+        if (SharedChangedIdsDB.existAddedRecommendProducts()) {
+            viewModel.acceptAddedItems(SharedChangedIdsDB.getAddedRecommendProductsIds())
+            SharedChangedIdsDB.clearAddedRecommendProductsIds()
+        }
     }
 }

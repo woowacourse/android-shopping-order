@@ -11,7 +11,6 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteShoppingRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.presentation.ui.cart.CartActivity
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
@@ -20,7 +19,7 @@ class DetailActivity : AppCompatActivity() {
         DetailViewModelFactory(
             cartRepository = RemoteCartRepositoryImpl(),
             shoppingRepository = RemoteShoppingRepositoryImpl(),
-            recentProductRepository = RecentProductRepositoryImpl(this),
+            recentProductRepository = RecentProductRepositoryImpl(applicationContext),
             productId = productId,
         )
     }
@@ -42,7 +41,7 @@ class DetailActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.isAddCartSuccess.observe(this) {
             it.getContentIfNotHandled()?.let {
-                navigateToCart()
+                navigateToShopping()
             }
         }
 
@@ -63,11 +62,9 @@ class DetailActivity : AppCompatActivity() {
         startActivity(DetailActivity.createIntent(this, productId))
     }
 
-    private fun navigateToCart() {
+    private fun navigateToShopping() {
         popUpToast()
-        startActivity(
-            CartActivity.createIntent(context = this),
-        )
+        finish()
     }
 
     private fun popUpToast() {

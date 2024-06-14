@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,9 +8,17 @@ plugins {
     id("kotlin-parcelize")
 }
 
+val properties = Properties().apply {
+    load(project.rootProject.file("local.properties").inputStream())
+}
+
 android {
     namespace = "woowacourse.shopping"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "woowacourse.shopping"
@@ -19,6 +29,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "TEMP_EMAIL", "\"${properties["temp_email"]}\"")
+        buildConfigField("String", "TEMP_PASSWORD", "\"${properties["temp_password"]}\"")
+        buildConfigField("String", "BASE_URL", "\"${properties["base_url"]}\"")
     }
 
     testOptions {
@@ -85,4 +99,5 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("androidx.room:room-ktx:2.6.1")
 }

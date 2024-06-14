@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.dto.ProductDto
+import woowacourse.shopping.data.remote.model.dto.ProductDto
 import woowacourse.shopping.domain.model.Product
 
 fun ProductDto.toDomainModel(): Product {

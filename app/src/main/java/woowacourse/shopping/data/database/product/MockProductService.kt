@@ -8,7 +8,7 @@ import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.service.ProductService
+import woowacourse.shopping.data.database.service.ProductService
 
 class MockProductService : ProductService {
     private val client = OkHttpClient()

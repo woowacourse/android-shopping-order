@@ -37,7 +37,6 @@ class RecentProductAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateProducts(recentlyProducts: List<RecentProduct>) {
-        Log.d("ㅌㅅㅌ", "recentAdapter, recentProducts = $recentlyProducts")
         this.recentProducts = recentlyProducts
         notifyDataSetChanged()
     }

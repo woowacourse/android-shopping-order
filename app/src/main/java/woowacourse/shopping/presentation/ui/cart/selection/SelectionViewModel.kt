@@ -5,22 +5,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.database.OrderDatabase
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.database.order.OrderDatabase
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 import woowacourse.shopping.presentation.event.Event
 import woowacourse.shopping.presentation.event.SingleLiveEvent
 import woowacourse.shopping.presentation.state.UIState
+import woowacourse.shopping.presentation.ui.SharedChangedIdsDB
 import woowacourse.shopping.presentation.ui.cart.CartItemUiModel
 
-class SelectionViewModel(
-    private val shoppingRepository: ShoppingItemsRepository,
-    private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
-) : ViewModel(),
+class SelectionViewModel(private val cartRepository: CartRepository) : ViewModel(),
     CartItemSelectionEventHandler,
     SelectionCountHandler {
     private var cartItems: List<CartItem> = emptyList()
@@ -74,6 +71,14 @@ class SelectionViewModel(
     val deletedId: LiveData<Event<Long>>
         get() = _deletedId
 
+    private val _changedProductIds = SingleLiveEvent<Set<Long>>()
+    val changedProductIds: LiveData<Set<Long>>
+        get() = _changedProductIds
+
+    private val _addedItemsCount = SingleLiveEvent<Int>()
+    val addedItemsCount: LiveData<Int>
+        get() = _addedItemsCount
+
     init {
         with(_isAllSelected) {
             addSource(order) { checkAllSelected(uiCartItemsState, order) }
@@ -92,7 +97,8 @@ class SelectionViewModel(
     }
 
     fun setUpCartItems() {
-        cartRepository.fetchCartItemsInfo { result ->
+        viewModelScope.launch {
+            val result = cartRepository.fetchCartItemsInfo()
             result.onSuccess { items ->
                 cartItems = items
                 setUpUIState()
@@ -190,8 +196,8 @@ class SelectionViewModel(
     }
 
     private fun updatePriceAndQuantity() {
-        _totalOrderPrice.postValue(order.value?.getTotalPrice() ?: 0L)
-        _totalOrderQuantity.postValue(order.value?.getTotalQuantity() ?: 0)
+        _totalOrderPrice.value = order.value?.getTotalPrice() ?: 0L
+        _totalOrderQuantity.value = order.value?.getTotalQuantity() ?: 0
     }
 
     fun selectAllByCondition() {
@@ -225,7 +231,7 @@ class SelectionViewModel(
     }
 
     override fun onProductClicked(productId: Long) {
-        _navigateToDetail.postValue(Event(productId))
+        _navigateToDetail.value = Event(productId)
     }
 
     override fun onXButtonClicked(itemId: Long) {
@@ -234,15 +240,18 @@ class SelectionViewModel(
     }
 
     private fun deleteItem(itemId: Long) {
-        cartRepository.deleteCartItem(itemId) { result ->
+        val productId = cartItems.find { it.id == itemId }?.productId
+        viewModelScope.launch {
+            val result = cartRepository.deleteCartItem(itemId)
             result.onSuccess {
-                _deletedId.postValue(Event(itemId))
+                _deletedId.value = Event(itemId)
                 updatePriceAndQuantity()
                 cartItems = cartItems.filterNot { it.id == itemId }
                 val cartItems =
                     (uiCartItemsState.value as UIState.Success<List<CartItemUiModel>>).data
                 val updatedCartItems = cartItems.filterNot { it.id == itemId }
-                _uiCartItemsState.postValue(UIState.Success(updatedCartItems))
+                _uiCartItemsState.value = UIState.Success(updatedCartItems)
+                productId?.let { SharedChangedIdsDB.addChangedProductsId(setOf(it)) }
             }.onFailure {
                 Log.d(this::class.java.simpleName, "$it")
             }
@@ -253,7 +262,9 @@ class SelectionViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc()) { result ->
+        viewModelScope.launch {
+            val result =
+                cartRepository.updateCartItemQuantityWithProductId(productId, quantity.inc())
             result.onSuccess {
                 changeCartItemQuantity(productId, quantity.inc())
                 changeUiCartItemQuantity(productId, quantity.inc())
@@ -268,11 +279,13 @@ class SelectionViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        if (quantity > 1) {
-            cartRepository.updateCartItemQuantityWithProductId(
-                productId,
-                quantity.dec(),
-            ) { result ->
+        viewModelScope.launch {
+            if (quantity > 1) {
+                val result =
+                    cartRepository.updateCartItemQuantityWithProductId(
+                        productId,
+                        quantity.dec(),
+                    )
                 result.onSuccess {
                     changeCartItemQuantity(productId, quantity.dec())
                     changeUiCartItemQuantity(productId, quantity.dec())
@@ -311,8 +324,18 @@ class SelectionViewModel(
                     it
                 }
             }
-        _uiCartItemsState.postValue(UIState.Success(uiCartItems))
-        _quantityChangedIds.postValue(setOf(productId))
+        _uiCartItemsState.value = UIState.Success(uiCartItems)
+        _quantityChangedIds.value = setOf(productId)
+        SharedChangedIdsDB.addChangedProductsId(setOf(productId))
+    }
+
+    fun acceptAddedItems(addedProductsIds: Set<Long>) {
+        viewModelScope.launch {
+            val addedItems = cartRepository.findCartItemsWithProductIds(addedProductsIds)
+            cartItems += addedItems
+            setUpUIState()
+            _addedItemsCount.value = addedItems.size
+        }
     }
 
     private fun CartItem.toUiModel(isChecked: Boolean): CartItemUiModel {

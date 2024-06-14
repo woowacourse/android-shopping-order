@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.dto.ProductResponseDto
+import woowacourse.shopping.data.remote.model.dto.ProductResponseDto
 import woowacourse.shopping.domain.model.PageInfo
 
 fun ProductResponseDto.extractPageInfo(): PageInfo {

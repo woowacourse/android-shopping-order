@@ -6,19 +6,12 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.ShoppingItemsRepository
 
-class SelectionViewModelFactory(
-    private val shoppingRepository: ShoppingItemsRepository,
-    private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
-) : ViewModelProvider.Factory {
+class SelectionViewModelFactory(private val cartRepository: CartRepository) :
+    ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SelectionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return SelectionViewModel(
-                shoppingRepository = shoppingRepository,
-                recentProductRepository = recentProductRepository,
-                cartRepository = cartRepository,
-            ) as T
+            return SelectionViewModel(cartRepository = cartRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
