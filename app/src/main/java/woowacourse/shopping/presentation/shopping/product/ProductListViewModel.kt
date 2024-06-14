@@ -37,15 +37,20 @@ class ProductListViewModel(
     }
 
     override fun loadProducts() {
+        println("load products start")
         var uiState = _uiState.value ?: return
         val currentPage = uiState.currentPage
+        println("current page : ${uiState.currentPage}")
         viewModelScope.launch {
+            println("this : ${Thread.currentThread().name}")
             shoppingRepository.products(currentPage - 1, PAGE_SIZE)
                 .onSuccess {
+                    println("type : ${it.javaClass.name}")
                     uiState = _uiState.value ?: return@launch
                     val newProducts = it.map(Product::toShoppingUiModel)
                     _uiState.value = uiState.addProducts(newProducts, getLoadMore(currentPage + 1))
                 }.onFailure {
+                    println(it.localizedMessage)
                     _errorEvent.setValue(ProductListErrorEvent.LoadProducts)
                 }
         }
