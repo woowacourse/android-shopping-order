@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/background_cart"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <CheckBox
+                android:id="@+id/cb_coupon_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@{coupon.isSelected}"
+                android:onClick="@{() -> couponActionHandler.onCouponClick(coupon)}" />
+
+            <TextView
+                android:id="@+id/tv_coupon_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{String.valueOf(coupon.description)}"
+                android:textAppearance="@style/H2"
+                tools:text="5000원 할인 쿠폰" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_coupon_expire_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@{}"
+            android:textAppearance="@style/B2"
+            android:textColor="#555555"
+            app:expirationDate="@{coupon.expirationDate}"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/tv_coupon_condition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="18dp"
+            android:textAppearance="@style/B2"
+            android:textColor="#555555"
+            app:minimumAmountIsVisible="@{coupon.minimumAmount}"
+            tools:text="최소 주문 금액: 100,000원" />
+    </LinearLayout>
+
+    <data>
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.coupon.Coupon" />
+
+
+        <variable
+            name="couponActionHandler"
+            type="woowacourse.shopping.presentation.ui.payment.CouponActionHandler" />
+    </data>
+
+</layout>

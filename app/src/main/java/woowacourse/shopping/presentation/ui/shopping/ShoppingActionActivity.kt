@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.ui.shopping
 
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -136,5 +137,9 @@ class ShoppingActionActivity : BindingActivity<ActivityShoppingBinding>() {
     companion object {
         const val GRIDLAYOUT_COL = 2
         const val EXTRA_UPDATED_PRODUCT = "updatedProduct"
+
+        fun createIntent(context: Context): Intent {
+            return Intent(context, ShoppingActionActivity::class.java)
+        }
     }
 }

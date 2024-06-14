@@ -3,15 +3,16 @@ package woowacourse.shopping.presentation.ui.curation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
-import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
 import woowacourse.shopping.domain.CartProduct
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
-import kotlin.concurrent.thread
 
 class CurationViewModel(
     private val repository: Repository,
@@ -26,59 +27,38 @@ class CurationViewModel(
     private val _eventHandler = MutableLiveData<EventState<CurationEvent>>()
     val eventHandler: LiveData<EventState<CurationEvent>> get() = _eventHandler
 
-    private var _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
+    private val _orderProducts = MutableLiveData<UiState<List<CartProduct>>>(UiState.Loading)
     val orderProducts: LiveData<UiState<List<CartProduct>>> get() = _orderProducts
 
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            _errorHandler.value = EventState(CURATION_ERROR)
+        }
+
     init {
-        thread {
-            repository.getCuration { result ->
-                if (result.isSuccess) {
-                    _cartProducts.postValue(UiState.Success(result.getOrNull() ?: emptyList()))
-                } else {
-                    _errorHandler.postValue(EventState(LOAD_ERROR))
+        viewModelScope.launch(exceptionHandler) {
+            repository.getCuration()
+                .onSuccess {
+                    _cartProducts.value = UiState.Success(it)
+                    orderProducts()
                 }
-            }
-            repository.getCartItems(0, 1000) { result ->
-                result.onSuccess {
-                    if (it == null) {
-                        _errorHandler.postValue(EventState(LOAD_ERROR))
-                    } else {
-                        val filteredCartItems =
-                            it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
-                        _orderProducts.postValue(UiState.Success(filteredCartItems))
-                    }
-                }.onFailure {
-                    _errorHandler.postValue(EventState(LOAD_ERROR))
-                }
-            }
         }
     }
 
-    override fun order() {
-        thread {
-            var orderCartIds =
-                (_cartProducts.value as UiState.Success).data.filter {
-                    it.quantity > 0
-                }.map {
-                    it.cartId.toInt()
-                }
-            orderCartIds = orderCartIds + ids.map { it.toInt() }
-            repository.postOrders(
-                OrderRequest(
-                    orderCartIds,
-                ),
-            ).onSuccess {
-                val cartProducts =
-                    (this.cartProducts.value as UiState.Success).data.map { it.copy() }
-
-                orderCartIds.forEach { id ->
-                    cartProducts.find { it.cartId == id.toLong() }?.quantity = 0
-                }
-                _eventHandler.postValue(EventState(CurationEvent.SuccessOrder))
-                _cartProducts.postValue(UiState.Success(cartProducts))
-            }.onFailure {
+    private suspend fun orderProducts() {
+        repository.getCartItemsCounts()
+            .onSuccess {
+                repository.getCartItems(0, it)
+                    .onSuccess {
+                        val filteredCartItems =
+                            it.filter { cartProduct -> ids.contains(cartProduct.cartId) }
+                        _orderProducts.value = UiState.Success(filteredCartItems)
+                    }
             }
-        }
+    }
+
+    override fun onOrderClick() {
+        _eventHandler.value = (EventState(CurationEvent.SuccessOrder))
     }
 
     override fun onProductClick(cartProduct: CartProduct) {
@@ -98,7 +78,7 @@ class CurationViewModel(
     }
 
     override fun onPlus(cartProduct: CartProduct) {
-        thread {
+        viewModelScope.launch(exceptionHandler) {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].plusQuantity()
@@ -109,57 +89,68 @@ class CurationViewModel(
                         productId = cartProducts[index].productId.toInt(),
                         quantity = cartProducts[index].quantity,
                     ),
-                )
-                    .onSuccess {
-                        cartProducts[index].cartId = it.toLong()
-                        _cartProducts.postValue(UiState.Success(cartProducts))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
-                    }
+                ).onSuccess {
+                    cartProducts[index].cartId = it.toLong()
+                    _cartProducts.value = UiState.Success(cartProducts)
+                    _orderProducts.value =
+                        UiState.Success((_orderProducts.value as UiState.Success).data + cartProducts[index])
+                }
             } else {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
-                )
-                    .onSuccess {
-                        _cartProducts.postValue(UiState.Success(cartProducts))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
-                    }
+                ).onSuccess {
+                    _cartProducts.value = UiState.Success(cartProducts)
+                    _orderProducts.value =
+                        UiState.Success(
+                            (_orderProducts.value as UiState.Success).data.map {
+                                if (it.productId == cartProduct.productId) {
+                                    it.copy(quantity = cartProducts[index].quantity)
+                                } else {
+                                    it
+                                }
+                            },
+                        )
+                }
             }
         }
     }
 
     override fun onMinus(cartProduct: CartProduct) {
-        thread {
+        viewModelScope.launch(exceptionHandler) {
             val cartProducts = (_cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        _cartProducts.postValue(UiState.Success(cartProducts))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        _cartProducts.value = UiState.Success(cartProducts)
+                        _orderProducts.value =
+                            UiState.Success(
+                                (_orderProducts.value as UiState.Success).data.map {
+                                    if (it.productId == cartProduct.productId) {
+                                        it.copy(quantity = cartProducts[index].quantity)
+                                    } else {
+                                        it
+                                    }
+                                },
+                            )
                     }
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
-                    _cartProducts.postValue(UiState.Success(cartProducts))
-                }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                    _cartProducts.value = UiState.Success(cartProducts)
+                    _orderProducts.value =
+                        UiState.Success((_orderProducts.value as UiState.Success).data - cartProduct)
                 }
             }
         }
     }
 
     companion object {
-        const val LOAD_ERROR = "큐레이션 로드 에러입니다"
+        const val CURATION_ERROR = "상품 추천 에러입니다."
     }
 }

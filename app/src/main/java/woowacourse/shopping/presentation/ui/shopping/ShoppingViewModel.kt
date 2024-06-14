@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.mapper.toCartProduct
@@ -15,8 +16,6 @@ import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
 import woowacourse.shopping.presentation.ui.EventState
 import woowacourse.shopping.presentation.ui.UiState
-import woowacourse.shopping.presentation.ui.cart.CartViewModel
-import kotlin.concurrent.thread
 
 class ShoppingViewModel(private val repository: Repository) :
     ViewModel(), ShoppingActionHandler {
@@ -39,6 +38,11 @@ class ShoppingViewModel(private val repository: Repository) :
     val carts: LiveData<UiState<List<CartProduct>>> get() = _carts
 
     val cartProducts = MediatorLiveData<UiState<List<CartProduct>>>(UiState.Loading)
+
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            _errorHandler.value = EventState(SHOPPING_ERROR)
+        }
 
     init {
         cartProducts.addSource(_products) {
@@ -69,50 +73,31 @@ class ShoppingViewModel(private val repository: Repository) :
         }
     }
 
-    fun loadProductByOffset() {
-        repository.getProductsByPaging { result ->
-            result.onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(LOAD_ERROR))
+    fun loadProductByOffset() =
+        viewModelScope.launch(exceptionHandler) {
+            repository.getProductsByPaging().onSuccess { it ->
+                if (_products.value is UiState.Loading) {
+                    _products.value = UiState.Success(it)
                 } else {
-                    if (_products.value is UiState.Loading) {
-                        _products.postValue(UiState.Success(it))
-                    } else {
-                        _products.postValue(
-                            UiState.Success((_products.value as UiState.Success).data + it),
-                        )
-                    }
+                    _products.value =
+                        UiState.Success((_products.value as UiState.Success).data + it)
                 }
-            }.onFailure {
-                _errorHandler.postValue(EventState(LOAD_ERROR))
             }
         }
-    }
 
-    fun loadCartByOffset() {
-        repository.getCartItems(0, 2000) { result ->
-            result.onSuccess {
-                if (it == null) {
-                    _errorHandler.postValue(EventState(LOAD_ERROR))
-                } else {
-                    _carts.postValue(UiState.Success(it))
+    fun loadCartByOffset() =
+        viewModelScope.launch(exceptionHandler) {
+            repository.getCartItems(0, 2000)
+                .onSuccess {
+                    _carts.value = UiState.Success(it)
                 }
-            }.onFailure {
-                _errorHandler.postValue(EventState(CartViewModel.CART_LOAD_ERROR))
-            }
         }
-    }
 
-    fun getCartItemCounts() {
-        repository.getCartItemsCounts { result ->
-            result.onSuccess { _cartCount.postValue(it.quantity) }
-                .onFailure { _errorHandler.postValue(EventState(LOAD_ERROR)) }
+    fun getCartItemCounts() =
+        viewModelScope.launch(exceptionHandler) {
+            repository.getCartItemsCounts()
+                .onSuccess { _cartCount.value = it }
         }
-    }
-
-    companion object {
-        const val LOAD_ERROR = "아이템을 끝까지 불러왔습니다"
-    }
 
     override fun onProductClick(cartProduct: CartProduct) {
         _navigateHandler.value = EventState(NavigateUiState.ToDetail(cartProduct))
@@ -132,12 +117,14 @@ class ShoppingViewModel(private val repository: Repository) :
     }
 
     override fun loadMore() {
-        loadProductByOffset()
+        viewModelScope.launch {
+            loadProductByOffset()
+        }
     }
 
     override fun onPlus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+        viewModelScope.launch(exceptionHandler) {
+            val cartProducts = (cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
 
             cartProducts[index].plusQuantity()
@@ -151,71 +138,61 @@ class ShoppingViewModel(private val repository: Repository) :
                 )
                     .onSuccess {
                         cartProducts[index].cartId = it.toLong()
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
-                        _cartCount.postValue(_cartCount.value?.plus(1))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        this@ShoppingViewModel.cartProducts.value = (UiState.Success(cartProducts))
+                        _cartCount.value = _cartCount.value?.plus(1)
                     }
             } else {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
-                        _cartCount.postValue(_cartCount.value?.plus(1))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        this@ShoppingViewModel.cartProducts.value = (UiState.Success(cartProducts))
+                        _cartCount.value = _cartCount.value?.plus(1)
                     }
             }
         }
     }
 
     override fun onMinus(cartProduct: CartProduct) {
-        thread {
-            val cartProducts = (this.cartProducts.value as UiState.Success).data.map { it.copy() }
+        viewModelScope.launch(exceptionHandler) {
+            val cartProducts = (cartProducts.value as UiState.Success).data.map { it.copy() }
             val index = cartProducts.indexOfFirst { it.productId == cartProduct.productId }
             cartProducts[index].minusQuantity()
 
             if (cartProducts[index].quantity > 0) {
-                repository.patchCartItem(
+                repository.updateCartItem(
                     id = cartProducts[index].cartId.toInt(),
                     quantityRequest = QuantityRequest(quantity = cartProducts[index].quantity),
                 )
                     .onSuccess {
-                        this.cartProducts.postValue(UiState.Success(cartProducts))
-                        _cartCount.postValue(_cartCount.value?.minus(1))
-                    }
-                    .onFailure {
-                        _errorHandler.postValue(EventState("아이템 증가 오류"))
+                        this@ShoppingViewModel.cartProducts.value = (UiState.Success(cartProducts))
+                        _cartCount.value = _cartCount.value?.minus(1)
                     }
             } else {
                 repository.deleteCartItem(cartProduct.cartId.toInt()).onSuccess {
-                    this.cartProducts.postValue(UiState.Success(cartProducts))
-                    _cartCount.postValue(_cartCount.value?.minus(1))
-                }.onFailure {
-                    _errorHandler.postValue(EventState("아이템 증가 오류"))
+                    this@ShoppingViewModel.cartProducts.value = (UiState.Success(cartProducts))
+                    _cartCount.value = _cartCount.value?.minus(1)
                 }
             }
         }
     }
 
     fun syncProduct() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val loadCartJob = launch { loadCartByOffset() }
             loadCartJob.job
         }
     }
 
-    fun findAllRecent() {
-        thread {
+    fun findAllRecent() =
+        viewModelScope.launch(exceptionHandler) {
             repository.findByLimit(10).onSuccess {
-                _recentProducts.postValue(UiState.Success(it))
-            }.onFailure {
-                _errorHandler.postValue(EventState("최근 아이템 로드 에러"))
+                _recentProducts.value = UiState.Success(it)
             }
         }
+
+    companion object {
+        const val SHOPPING_ERROR = "쇼핑 에러입니다."
     }
 }

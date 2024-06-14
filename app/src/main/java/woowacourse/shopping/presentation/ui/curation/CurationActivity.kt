@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.ui.curation
 
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCurationBinding
@@ -10,6 +10,8 @@ import woowacourse.shopping.presentation.base.BindingActivity
 import woowacourse.shopping.presentation.ui.EventObserver
 import woowacourse.shopping.presentation.ui.UiState
 import woowacourse.shopping.presentation.ui.ViewModelFactory
+import woowacourse.shopping.presentation.ui.cart.CartActivity
+import woowacourse.shopping.presentation.ui.payment.PaymentActivity
 
 class CurationActivity : BindingActivity<ActivityCurationBinding>() {
     override val layoutResourceId: Int
@@ -17,6 +19,16 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
     private val orderItemsId: List<Long> by lazy {
         intent.getIntegerArrayListExtra(EXTRA_CART_PRODUCT)?.map { it.toLong() } ?: emptyList()
     }
+    private val onBackPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                CartActivity.createIntent(this@CurationActivity).apply {
+                    putExtra(CartActivity.EXTRA_BACK_FROM_CURATION, true)
+                    startActivity(this)
+                    finish()
+                }
+            }
+        }
 
     private val viewModel: CurationViewModel by viewModels { ViewModelFactory(orderItemsId) }
 
@@ -27,11 +39,13 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
 
         binding.rvCurations.adapter = curationAdapter
         binding.curationActionHandler = viewModel
+        this.onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         viewModel.cartProducts.observe(this) {
             when (it) {
                 is UiState.Loading -> {
                 }
+
                 is UiState.Success -> {
                     curationAdapter.submitList(it.data)
                 }
@@ -41,6 +55,7 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
             when (it) {
                 is UiState.Loading -> {
                 }
+
                 is UiState.Success -> {
                     binding.tvPrice.text =
                         getString(
@@ -63,7 +78,13 @@ class CurationActivity : BindingActivity<ActivityCurationBinding>() {
             EventObserver {
                 when (it) {
                     is CurationEvent.SuccessOrder -> {
-                        Toast.makeText(this, "주문이 성공적으로 진행되었습니다.", Toast.LENGTH_SHORT).show()
+                        PaymentActivity.createIntent(
+                            this,
+                            (viewModel.orderProducts.value as UiState.Success).data.map { it.cartId.toInt() },
+                        )
+                            .also {
+                                startActivity(it)
+                            }
                     }
                 }
             },

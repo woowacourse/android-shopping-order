@@ -13,14 +13,14 @@ interface RecentProductDao {
     fun saveRecent(recentEntity: RecentEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveRecentProduct(recentProductEntity: RecentProductEntity)
+    suspend fun saveRecentProduct(recentProductEntity: RecentProductEntity)
 
     @Query(
         "UPDATE recentproductentity " +
             "SET quantity = :quantity, cartId = :cartId " +
             "WHERE productId = :productId",
     )
-    fun updateRecentProduct(
+    suspend fun updateRecentProduct(
         productId: Long,
         quantity: Int,
         cartId: Long,
@@ -31,12 +31,12 @@ interface RecentProductDao {
             "FROM recentproductentity " +
             "ORDER BY createdAt DESC LIMIT :limit",
     )
-    fun findByLimit(limit: Int): List<RecentProductEntity>
+    suspend fun findByLimit(limit: Int): List<RecentProductEntity>
 
     @Query(
         "SELECT productId, name, imgUrl, quantity, price, createdAt, category, cartId " +
             "FROM recentproductentity " +
             "ORDER BY createdAt DESC",
     )
-    fun findOne(): RecentProductEntity?
+    suspend fun findOne(): RecentProductEntity?
 }

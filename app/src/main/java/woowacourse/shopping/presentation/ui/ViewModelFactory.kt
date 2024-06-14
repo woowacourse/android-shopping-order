@@ -6,6 +6,7 @@ import woowacourse.shopping.data.RepositoryInjector
 import woowacourse.shopping.presentation.ui.cart.CartViewModel
 import woowacourse.shopping.presentation.ui.curation.CurationViewModel
 import woowacourse.shopping.presentation.ui.detail.ProductDetailViewModel
+import woowacourse.shopping.presentation.ui.payment.PaymentViewModel
 import woowacourse.shopping.presentation.ui.shopping.ShoppingViewModel
 
 class ViewModelFactory(private val ids: List<Long> = emptyList()) : ViewModelProvider.Factory {
@@ -31,6 +32,13 @@ class ViewModelFactory(private val ids: List<Long> = emptyList()) : ViewModelPro
 
             modelClass.isAssignableFrom(CurationViewModel::class.java) -> {
                 CurationViewModel(
+                    RepositoryInjector.repository,
+                    ids,
+                ) as T
+            }
+
+            modelClass.isAssignableFrom(PaymentViewModel::class.java) -> {
+                PaymentViewModel(
                     RepositoryInjector.repository,
                     ids,
                 ) as T

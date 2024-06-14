@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/shimmer_color"
+        android:gravity="center_vertical"
+        android:orientation="vertical" />
+
+    <data>
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.coupon.Coupon" />
+
+
+        <variable
+            name="couponActionHandler"
+            type="woowacourse.shopping.presentation.ui.payment.CouponActionHandler" />
+    </data>
+
+</layout>

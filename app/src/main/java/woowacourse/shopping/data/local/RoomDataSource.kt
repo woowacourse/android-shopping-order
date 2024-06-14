@@ -25,11 +25,11 @@ class RoomDataSource(
         return cartProductDao.findCartByPaging(offset, pageSize)
     }
 
-    override fun findByLimit(limit: Int): List<RecentProductEntity> {
+    override suspend fun findByLimit(limit: Int): List<RecentProductEntity> {
         return recentProductDao.findByLimit(limit)
     }
 
-    override fun findOne(): RecentProductEntity? {
+    override suspend fun findOne(): RecentProductEntity? {
         return recentProductDao.findOne()
     }
 
@@ -56,12 +56,12 @@ class RoomDataSource(
         return cartProductDao.getMaxCartCount()
     }
 
-    override fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long {
+    override suspend fun saveRecentProduct(recentProductEntity: RecentProductEntity): Long {
         recentProductDao.saveRecentProduct(recentProductEntity)
         return recentProductEntity.productId
     }
 
-    override fun updateRecentProduct(
+    override suspend fun updateRecentProduct(
         productId: Long,
         quantity: Int,
         cartId: Long,

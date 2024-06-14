@@ -10,12 +10,10 @@ import woowacourse.shopping.data.remote.dto.mapper.toDomain
 import woowacourse.shopping.data.remote.dto.request.CartItemRequest
 import woowacourse.shopping.data.remote.dto.request.OrderRequest
 import woowacourse.shopping.data.remote.dto.request.QuantityRequest
-import woowacourse.shopping.data.remote.dto.response.QuantityResponse
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartProduct
-import woowacourse.shopping.domain.Recent
 import woowacourse.shopping.domain.RecentProduct
 import woowacourse.shopping.domain.Repository
+import woowacourse.shopping.domain.coupon.Coupon
 
 class RepositoryImpl(
     private val localDataSource: LocalDataSource,
@@ -23,140 +21,69 @@ class RepositoryImpl(
 ) : Repository {
     val productPagingSource = ProductPagingSource(remoteDataSource)
 
-    override fun findProductByPaging(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            localDataSource.findProductByPaging(offset, pageSize).map { it.toDomain() }
-        }
+    override suspend fun getProductsByPaging(): Result<List<CartProduct>> {
+        val data = productPagingSource.load()
+        return when (data) {
+            is LoadResult.Page -> {
+                Result.success(data.data)
+            }
 
-    override fun getProducts(
-        category: String,
+            is LoadResult.Error -> {
+                Result.failure(Throwable(data.message))
+            }
+        }
+    }
+
+    override suspend fun getCartItems(
         page: Int,
         size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit,
-    ) {
-        remoteDataSource.getProducts(category, page, size) { result ->
-            result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
-                .onFailure { callback(Result.failure(it)) }
-        }
+    ): Result<List<CartProduct>> {
+        return remoteDataSource.getCartItems(page, size)
+            .mapCatching {
+                it.map { it.toDomain() }
+            }
+            .recoverCatching {
+                throw it
+            }
     }
 
-    override fun getProductsByPaging(callback: (Result<List<CartProduct>?>) -> Unit) {
-        productPagingSource.load { result ->
-            when (result) {
-                is LoadResult.Page -> {
-                    callback(Result.success(result.data))
-                }
-
-                is LoadResult.Error -> {
-                    callback(Result.failure(Throwable(result.message)))
-                }
-            }
-        }
+    override suspend fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> {
+        return remoteDataSource.addCartItem(cartItemRequest)
+            .mapCatching { it.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0 }
+            .recoverCatching { throw it }
     }
 
-    override fun getCartItems(
-        page: Int,
-        size: Int,
-        callback: (Result<List<CartProduct>?>) -> Unit,
-    ) {
-        remoteDataSource.getCartItems { result ->
-            result.onSuccess { callback(Result.success(it.content.map { it.toDomain() })) }
-                .onFailure { callback(Result.failure(it)) }
-        }
-    }
-
-    override fun getProductById(id: Int): Result<CartProduct?> =
-        runCatching {
-            val response = remoteDataSource.getProductById(id = id)
-            if (response.isSuccessful) {
-                return Result.success(response.body()?.toDomain())
-            }
-            return Result.failure(Throwable())
-        }
-
-    override fun postCartItem(cartItemRequest: CartItemRequest): Result<Int> =
-        runCatching {
-            val response = remoteDataSource.postCartItem(cartItemRequest)
-            if (response.isSuccessful) {
-                return Result.success(
-                    response.headers()["LOCATION"]?.substringAfterLast("/")?.toIntOrNull() ?: 0,
-                )
-            }
-            return Result.failure(Throwable())
-        }
-
-    override fun patchCartItem(
+    override suspend fun updateCartItem(
         id: Int,
         quantityRequest: QuantityRequest,
-    ): Result<Unit> =
-        runCatching {
-            val response = remoteDataSource.patchCartItem(id, quantityRequest)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable())
-        }
+    ): Result<Unit> {
+        return remoteDataSource.updateCartItem(id, quantityRequest).recoverCatching { throw it }
+    }
 
-    override fun deleteCartItem(id: Int): Result<Unit> =
-        runCatching {
-            val response = remoteDataSource.deleteCartItem(id)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable())
-        }
+    override suspend fun deleteCartItem(id: Int): Result<Unit> {
+        return remoteDataSource.deleteCartItem(id).recoverCatching { throw it }
+    }
 
-    override fun postOrders(orderRequest: OrderRequest): Result<Unit> =
-        runCatching {
-            val response = remoteDataSource.postOrders(orderRequest)
-            if (response.isSuccessful) {
-                return Result.success(Unit)
-            }
-            return Result.failure(Throwable())
-        }
+    override suspend fun submitOrders(orderRequest: OrderRequest): Result<Unit> {
+        return remoteDataSource.submitOrders(orderRequest).recoverCatching { throw it }
+    }
 
-    override fun findCartByPaging(
-        offset: Int,
-        pageSize: Int,
-    ): Result<List<CartProduct>> =
-        runCatching {
-            localDataSource.findCartByPaging(offset, pageSize).map { it.toDomain() }
-        }
-
-    override fun findByLimit(limit: Int): Result<List<RecentProduct>> =
+    override suspend fun findByLimit(limit: Int): Result<List<RecentProduct>> =
         runCatching {
             localDataSource.findByLimit(limit).map { it.toDomain() }
         }
 
-    override fun findOne(): Result<RecentProduct?> =
+    override suspend fun findOne(): Result<RecentProduct?> =
         runCatching {
             localDataSource.findOne()?.toDomain()
         }
 
-    override fun findProductById(id: Long): Result<CartProduct?> =
-        runCatching {
-            localDataSource.findProductById(id)?.toDomain()
-        }
-
-    override fun saveCart(cart: Cart): Result<Long> =
-        runCatching {
-            localDataSource.saveCart(cart.toEntity())
-        }
-
-    override fun saveRecent(recent: Recent): Result<Long> =
-        runCatching {
-            localDataSource.saveRecent(recent.toEntity())
-        }
-
-    override fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
+    override suspend fun saveRecentProduct(recentProduct: RecentProduct): Result<Long> =
         runCatching {
             localDataSource.saveRecentProduct(recentProduct.toEntity())
         }
 
-    override fun updateRecentProduct(
+    override suspend fun updateRecentProduct(
         productId: Long,
         quantity: Int,
         cartId: Long,
@@ -164,53 +91,49 @@ class RepositoryImpl(
         localDataSource.updateRecentProduct(productId, quantity, cartId)
     }
 
-    override fun deleteCart(id: Long): Result<Long> =
-        runCatching {
-            localDataSource.deleteCart(id)
-        }
-
-    override fun getMaxCartCount(): Result<Int> =
-        runCatching {
-            localDataSource.getMaxCartCount()
-        }
-
-    override fun getCartItemsCounts(callback: (Result<QuantityResponse>) -> Unit) {
-        remoteDataSource.getCartItemsCounts { result ->
-            callback(result)
-        }
+    override suspend fun getCartItemsCounts(): Result<Int> {
+        return remoteDataSource.getCartItemsCounts()
+            .mapCatching { it.quantity }
+            .recoverCatching { throw it }
     }
 
-    override fun getCuration(callback: (Result<List<CartProduct>>) -> Unit) {
-        localDataSource.findOne()?.toDomain()?.let {
-            remoteDataSource.getProducts(it.category, 0, 10) { productResult ->
-                productResult.onSuccess { products ->
-                    remoteDataSource.getCartItems(0, 1000) { cartResult ->
-                        cartResult.onSuccess { cartItems ->
-                            val cartProductIds = cartItems.content.map { it.product.id }.toSet()
+    override suspend fun getCuration(): Result<List<CartProduct>> =
+        runCatching {
+            localDataSource.findOne()?.toDomain()?.let {
+                val productResponse = remoteDataSource.getProducts(it.category, 0, 10)
+                val cartResponse = remoteDataSource.getCartItems(0, 1000)
 
-                            val filteredProducts =
-                                products.content.filter { product -> product.id !in cartProductIds }
+                if (productResponse.isSuccess && cartResponse.isSuccess) {
+                    val products = productResponse.getOrNull()
+                    val cartItems = cartResponse.getOrNull()
 
-                            val cartProducts =
-                                filteredProducts.map { product ->
-                                    val cart =
-                                        cartItems.content.find { it.product.id == product.id }
+                    val cartProductIds = cartItems?.map { it.product.id }?.toSet()
+                    val filteredProducts =
+                        products?.filter { product -> product.id !in cartProductIds!! }
+                    val cartProducts =
+                        filteredProducts?.map { product ->
+                            val cart = cartItems?.find { it.product.id == product.id }
 
-                                    CartProduct(
-                                        productId = product.id.toLong(),
-                                        name = product.name,
-                                        imgUrl = product.imageUrl,
-                                        price = product.price.toLong(),
-                                        category = product.category,
-                                        cartId = cart?.id?.toLong() ?: 0,
-                                        quantity = cart?.quantity ?: 0,
-                                    )
-                                }
-                            callback(Result.success(cartProducts))
+                            CartProduct(
+                                productId = product.id.toLong(),
+                                name = product.name,
+                                imgUrl = product.imageUrl,
+                                price = product.price.toLong(),
+                                category = product.category,
+                                cartId = cart?.id?.toLong() ?: 0,
+                                quantity = cart?.quantity ?: 0,
+                            )
                         }
-                    }
+                    cartProducts
+                } else {
+                    throw Throwable()
                 }
-            }
+            } ?: throw Throwable()
         }
+
+    override suspend fun getCoupons(): Result<List<Coupon>> {
+        return remoteDataSource.getCoupons()
+            .mapCatching { it.map { it.toDomain() } }
+            .recoverCatching { throw it }
     }
 }
