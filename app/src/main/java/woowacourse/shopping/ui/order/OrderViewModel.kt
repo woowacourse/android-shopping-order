@@ -1,57 +1,70 @@
 package woowacourse.shopping.ui.order
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
-import woowacourse.shopping.data.order.OrderRemoteRepository
-import woowacourse.shopping.data.product.DefaultProductRepository
+import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
+import woowacourse.shopping.data.order.remote.OrderRemoteRepository
+import woowacourse.shopping.data.product.remote.DefaultProductRepository
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductIdsCount
+import woowacourse.shopping.domain.model.ProductIdsCount.Companion.DECREASE_VARIATION
+import woowacourse.shopping.domain.model.ProductIdsCount.Companion.INCREASE_VARIATION
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
 import woowacourse.shopping.domain.repository.order.OrderRepository
 import woowacourse.shopping.domain.repository.product.ProductRepository
-import woowacourse.shopping.common.OnItemQuantityChangeListener
-import woowacourse.shopping.common.SingleLiveData
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.model.OrderInformation
-import woowacourse.shopping.ui.order.listener.OnOrderListener
-import kotlin.concurrent.thread
+import woowacourse.shopping.ui.order.listener.OnNavigationPaymentListener
 
 class OrderViewModel(
     private val orderInformation: OrderInformation,
     private val orderRepository: OrderRepository,
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
-) : ViewModel(), OnOrderListener, OnItemQuantityChangeListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
+) : ViewModel(), OnNavigationPaymentListener, OnItemQuantityChangeListener {
     private val _recommendProducts = MutableLiveData<List<Product>>(emptyList())
     val recommendProducts: LiveData<List<Product>> get() = _recommendProducts
 
-    private val _orderAmount = MutableLiveData(orderInformation.orderAmount)
+    private val _orderAmount = MutableLiveData(orderInformation.calculateOrderAmount())
     val orderAmount: LiveData<Int> get() = _orderAmount
 
-    private val _ordersCount = MutableLiveData(orderInformation.ordersCount)
+    private val _ordersCount = MutableLiveData(orderInformation.countProducts())
     val ordersCount: LiveData<Int> get() = _ordersCount
 
-    private val _isOrderSuccess: MutableSingleLiveData<Boolean> = MutableSingleLiveData(false)
-    val isOrderSuccess: SingleLiveData<Boolean> get() = _isOrderSuccess
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> get() = _errorMessage
 
-    override fun createOrder() {
-        thread {
-            val recommendProducts: List<Product> = recommendProducts.value ?: return@thread
+    private var _navigationPaymentEvent = MutableSingleLiveData<OrderInformation>()
+    val navigationPaymentEvent: SingleLiveData<OrderInformation> get() = _navigationPaymentEvent
+
+    override fun onOrderClick() {
+        viewModelScope.launch {
+            val recommendProducts: List<Product> = recommendProducts.value ?: return@launch
             val addedProductIds: List<Long> = recommendProducts.filter { it.quantity != 0 }.map { it.id }
-            val cartItems: List<CartItem> = cartItemRepository.loadCartItems()
-            val cartItemIds: List<Long> = cartItems.filter { it.product.id in addedProductIds }.map { it.id }
-            orderRepository.order(orderInformation.cartItemIds + cartItemIds)
-            uiHandler.post {
-                _isOrderSuccess.setValue(true)
-            }
+            handleResponseResult(
+                responseResult = cartItemRepository.loadCartItems(),
+                onSuccess = { cartItems ->
+                    val newCartItems: List<CartItem> =
+                        cartItems.filter { it.product.id in addedProductIds }
+                    _navigationPaymentEvent.setValue(
+                        OrderInformation(
+                            cartItems = orderInformation.cartItems + newCartItems,
+                        ),
+                    )
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
@@ -59,70 +72,81 @@ class OrderViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            try {
-                cartItemRepository.increaseCartProduct(productId, quantity)
-            } catch (e: NoSuchElementException) {
-                cartItemRepository.addCartItem(productId, quantity)
-            } finally {
-                updateProductQuantity(productId, INCREASE_VARIATION)
-                val product = productRepository.loadProduct(productId)
-                updateOrderAmount(product.price)
-                updateOrdersCount(INCREASE_VARIATION)
-            }
-        }
+        updateQuantity(ProductIdsCount(productId, quantity), INCREASE_VARIATION) { price -> price }
     }
 
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            cartItemRepository.decreaseCartProduct(productId, quantity)
-            updateProductQuantity(productId, DECREASE_VARIATION)
-            val product = productRepository.loadProduct(productId)
-            updateOrderAmount(-product.price)
-            updateOrdersCount(DECREASE_VARIATION)
-        }
+        updateQuantity(ProductIdsCount(productId, quantity), DECREASE_VARIATION) { price -> -price }
     }
 
     fun loadRecommendedProducts() {
-        thread {
-            _recommendProducts.postValue(orderRepository.recommendedProducts())
+        viewModelScope.launch {
+            handleResponseResult(
+                responseResult = orderRepository.loadRecommendedProducts(),
+                onSuccess = { products ->
+                    _recommendProducts.value = products
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
+    }
+
+    private fun updateQuantity(
+        productQuantity: ProductIdsCount,
+        variation: Int,
+        priceConvert: (price: Int) -> Int,
+    ) {
+        updateProductQuantity(productQuantity, variation)
+        updateOrderAmount(productQuantity.productId, priceConvert)
+        updateOrdersCount(variation)
     }
 
     private fun updateProductQuantity(
-        productId: Long,
+        productQuantity: ProductIdsCount,
         variation: Int,
     ) {
-        uiHandler.post {
-            _recommendProducts.value =
-                recommendProducts.value?.map { product ->
-                    val quantity: Int = product.quantity + variation
-                    product.takeIf { it.id == productId }?.copy(quantity = quantity) ?: product
-                }
+        viewModelScope.launch {
+            cartItemRepository.updateProductQuantity(productQuantity.productId, productQuantity.quantity)
         }
+        _recommendProducts.value =
+            recommendProducts.value?.map { product ->
+                val quantity: Int = product.quantity + variation
+                product.takeIf { it.id == productQuantity.productId }?.copy(quantity = quantity) ?: product
+            }
     }
 
-    private fun updateOrderAmount(amountVariation: Int) {
-        val currentOrderAmount = orderAmount.value ?: 0
-        uiHandler.post {
-            _orderAmount.value = currentOrderAmount + amountVariation
+    private fun updateOrderAmount(
+        productId: Long,
+        priceConvert: (price: Int) -> Int,
+    ) {
+        viewModelScope.launch {
+            handleResponseResult(
+                responseResult = productRepository.loadProduct(productId),
+                onSuccess = { product ->
+                    val currentOrderAmount = orderAmount.value ?: DEFAULT_ORDER_AMOUNT
+                    _orderAmount.value = currentOrderAmount + priceConvert(product.price)
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
     private fun updateOrdersCount(countVariation: Int) {
-        val currentOrdersCount = ordersCount.value ?: 0
-        uiHandler.post {
-            _ordersCount.value = currentOrdersCount + countVariation
-        }
+        val currentOrdersCount = ordersCount.value ?: DEFAULT_ORDERS_COUNT
+        _ordersCount.value = currentOrdersCount + countVariation
     }
 
     companion object {
         private const val TAG = "ProductDetailViewModel"
-        private const val INCREASE_VARIATION = 1
-        private const val DECREASE_VARIATION = -1
+        private const val DEFAULT_ORDERS_COUNT = 0
+        private const val DEFAULT_ORDER_AMOUNT = 0
 
         fun factory(
             orderInformation: OrderInformation,

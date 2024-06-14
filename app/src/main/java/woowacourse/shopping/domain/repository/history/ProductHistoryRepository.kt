@@ -3,13 +3,13 @@ package woowacourse.shopping.domain.repository.history
 import woowacourse.shopping.domain.model.Product
 
 interface ProductHistoryRepository {
-    fun saveProductHistory(productId: Long)
+    suspend fun saveProductHistory(productId: Long): Result<Long>
 
-    fun loadAllProductHistory(): List<Product>
+    suspend fun loadProductsHistory(): Result<List<Product>>
 
-    fun loadProductHistory(productId: Long): Product
+    suspend fun loadProductHistory(productId: Long): Result<Product>
 
-    fun loadLatestProduct(): Product
+    suspend fun loadLatestProduct(): Result<Product>
 
-    fun deleteAllProductHistory()
+    suspend fun deleteProductsHistory()
 }

@@ -1,13 +1,11 @@
 package woowacourse.shopping.domain.repository.product
 
+import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductsPage
 
 interface ProductRepository {
-    fun loadAllProducts(page: Int): List<Product>
+    suspend fun loadProducts(page: Int): ResponseResult<ProductsPage>
 
-    fun loadProduct(id: Long): Product
-
-    fun isFinalPage(page: Int): Boolean
-
-    fun shoppingCartProductQuantity(): Int
+    suspend fun loadProduct(id: Long): ResponseResult<Product>
 }

@@ -1,20 +1,18 @@
 package woowacourse.shopping.ui.product.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.databinding.HolderProductBinding
-import woowacourse.shopping.domain.model.Product
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.OnProductItemClickListener
+import woowacourse.shopping.databinding.HolderProductBinding
+import woowacourse.shopping.domain.model.Product
 
 class ProductAdapter(
     private val onProductItemClickListener: OnProductItemClickListener,
     private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
-) : RecyclerView.Adapter<ProductViewHolder>() {
-    private var products: List<Product> = emptyList()
-
+) : ListAdapter<Product, ProductViewHolder>(diffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -29,19 +27,31 @@ class ProductAdapter(
         holder: ProductViewHolder,
         position: Int,
     ) {
-        holder.bind(products[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = products.size
-
-    // TODO: 최적화
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateAllLoadedProducts(newData: List<Product>) {
-        this.products = newData
-        notifyDataSetChanged()
+    fun updateProducts(newData: List<Product>) {
+        submitList(newData)
     }
 
     companion object {
         private const val TAG = "ProductRecyclerViewAdapter"
+
+        val diffUtil =
+            object : DiffUtil.ItemCallback<Product>() {
+                override fun areItemsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean {
+                    return (oldItem.id == newItem.id)
+                }
+
+                override fun areContentsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean {
+                    return oldItem == newItem
+                }
+            }
     }
 }

@@ -1,29 +1,22 @@
 package woowacourse.shopping.domain.repository.cart
 
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.data.common.ResponseResult
+import woowacourse.shopping.domain.model.CartItem
 
 interface CartItemRepository {
-    fun loadCartItems(): List<CartItem>
+    suspend fun loadCartItems(): ResponseResult<List<CartItem>>
 
-    fun addCartItem(
-        id: Long,
+    suspend fun updateProductQuantity(
+        productId: Long,
         quantity: Int,
     )
 
-    fun removeCartItem(id: Long)
+    suspend fun delete(cartItemId: Long): ResponseResult<Unit>
 
-    fun increaseCartProduct(
-        id: Long,
-        quantity: Int,
-    )
-
-    fun decreaseCartProduct(
-        id: Long,
-        quantity: Int,
-    )
-
-    fun increaseCartItem(
+    suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
-    )
+    ): ResponseResult<Unit>
+
+    suspend fun calculateCartItemsCount(): ResponseResult<Int>
 }

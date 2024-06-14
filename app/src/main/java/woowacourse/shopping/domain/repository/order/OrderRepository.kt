@@ -1,9 +1,10 @@
 package woowacourse.shopping.domain.repository.order
 
+import woowacourse.shopping.data.common.ResponseResult
 import woowacourse.shopping.domain.model.Product
 
 interface OrderRepository {
-    fun order(cartItemIds: List<Long>)
+    suspend fun orderCartItems(cartItemIds: List<Long>): ResponseResult<Unit>
 
-    fun recommendedProducts(): List<Product>
+    suspend fun loadRecommendedProducts(): ResponseResult<List<Product>>
 }

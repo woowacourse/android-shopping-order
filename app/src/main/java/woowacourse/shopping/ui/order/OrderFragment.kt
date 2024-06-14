@@ -5,11 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.R
+import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.common.UniversalViewModelFactory
 import woowacourse.shopping.databinding.FragmentOrderBinding
 import woowacourse.shopping.ui.FragmentNavigator
@@ -48,12 +46,18 @@ class OrderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initToolbar()
         initRecommendProductsAdapter()
-        observeIsOrderSuccess()
+        observeNavigationPaymentEvent()
+        observeErrorMessage()
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.loadRecommendedProducts()
+    }
+
+    private fun initViewModel() {
+        fetchOrderInformation()
+        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
     private fun fetchOrderInformation() {
@@ -63,11 +67,6 @@ class OrderFragment : Fragment() {
                     ?: throw NoSuchElementException()
             factory = OrderViewModel.factory(orderInformation)
         }
-    }
-
-    private fun initViewModel() {
-        fetchOrderInformation()
-        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
     }
 
     private fun initBinding() {
@@ -88,17 +87,16 @@ class OrderFragment : Fragment() {
         }
     }
 
-    private fun observeIsOrderSuccess() {
-        viewModel.isOrderSuccess.observe(viewLifecycleOwner) { isOrderSuccess ->
-            if (isOrderSuccess) {
-                makeToast(getString(R.string.order_success))
-                parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            }
+    private fun observeNavigationPaymentEvent() {
+        viewModel.navigationPaymentEvent.observe(viewLifecycleOwner) { orderInformation ->
+            (requireActivity() as FragmentNavigator).navigateToPayment(orderInformation)
         }
     }
 
-    private fun makeToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    private fun observeErrorMessage() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     private fun <T : Serializable> Bundle.bundleSerializable(

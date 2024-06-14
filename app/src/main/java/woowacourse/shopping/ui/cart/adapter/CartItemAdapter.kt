@@ -2,28 +2,19 @@ package woowacourse.shopping.ui.cart.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.databinding.HolderCartBinding
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.databinding.HolderCartBinding
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.model.CartItemUiModel
 
 class CartItemAdapter(
     private val onCartItemDeleteListener: OnCartItemDeleteListener,
     private val onItemQuantityChangeListener: OnItemQuantityChangeListener,
     private val onCartItemSelectedListener: OnCartItemSelectedListener,
-) : RecyclerView.Adapter<CartItemViewHolder>() {
-    private var products: List<CartItem> = emptyList()
-
-    private lateinit var recyclerView: RecyclerView
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
-        recyclerView.itemAnimator = null
-    }
-
+) : ListAdapter<CartItemUiModel, CartItemViewHolder>(diffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -38,18 +29,28 @@ class CartItemAdapter(
     override fun onBindViewHolder(
         holder: CartItemViewHolder,
         position: Int,
-    ) = holder.bind(products[position])
+    ) = holder.bind(getItem(position))
 
-    override fun getItemCount(): Int = products.size
+    fun updateCartItems(newData: List<CartItemUiModel>) {
+        submitList(newData)
+    }
 
-    fun updateData(newData: List<CartItem>) {
-        val oldSize = products.size
-        this.products = newData.toList()
-        if (newData.isEmpty()) {
-            notifyItemRangeRemoved(0, oldSize)
-            return
-        }
+    companion object {
+        val diffUtil =
+            object : DiffUtil.ItemCallback<CartItemUiModel>() {
+                override fun areItemsTheSame(
+                    oldItem: CartItemUiModel,
+                    newItem: CartItemUiModel,
+                ): Boolean {
+                    return oldItem.id == newItem.id
+                }
 
-        notifyItemRangeChanged(0, itemCount)
+                override fun areContentsTheSame(
+                    oldItem: CartItemUiModel,
+                    newItem: CartItemUiModel,
+                ): Boolean {
+                    return oldItem == newItem
+                }
+            }
     }
 }

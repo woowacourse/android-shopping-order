@@ -1,24 +1,26 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.common.MutableSingleLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.common.MutableSingleLiveData
+import woowacourse.shopping.common.OnItemQuantityChangeListener
 import woowacourse.shopping.common.SingleLiveData
 import woowacourse.shopping.common.UniversalViewModelFactory
-import woowacourse.shopping.data.cart.DefaultCartItemRepository
+import woowacourse.shopping.data.cart.remote.DefaultCartItemRepository
 import woowacourse.shopping.domain.repository.cart.CartItemRepository
-import woowacourse.shopping.common.OnItemQuantityChangeListener
+import woowacourse.shopping.ui.ResponseHandler.handleResponseResult
 import woowacourse.shopping.ui.cart.listener.OnAllCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemDeleteListener
 import woowacourse.shopping.ui.cart.listener.OnCartItemSelectedListener
 import woowacourse.shopping.ui.cart.listener.OnNavigationOrderListener
-import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.mapper.CartItemMapper.toDomain
+import woowacourse.shopping.ui.mapper.CartItemMapper.toUiModel
+import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.OrderInformation
-import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
     private val cartItemRepository: CartItemRepository,
@@ -28,10 +30,8 @@ class ShoppingCartViewModel(
     OnCartItemSelectedListener,
     OnAllCartItemSelectedListener,
     OnNavigationOrderListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
-    private var _cartItems = MutableLiveData<List<CartItem>>()
-    val cartItems: LiveData<List<CartItem>> get() = _cartItems
+    private var _cartItems = MutableLiveData<List<CartItemUiModel>>()
+    val cartItems: LiveData<List<CartItemUiModel>> get() = _cartItems
 
     private var _deletedItemId: MutableSingleLiveData<Long> = MutableSingleLiveData()
     val deletedItemId: SingleLiveData<Long> get() = _deletedItemId
@@ -51,25 +51,36 @@ class ShoppingCartViewModel(
     private var _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    fun loadAll() {
-        thread {
-            val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> get() = _errorMessage
 
-            uiHandler.post {
-                _cartItems.value = currentItems
-                _isLoading.value = false
-            }
+    fun loadAll() {
+        viewModelScope.launch {
+            handleResponseResult(
+                responseResult = cartItemRepository.loadCartItems(),
+                onSuccess = { cartItems ->
+                    _cartItems.value = cartItems.map { it.toUiModel() }
+                    _isLoading.value = false
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
     }
 
     fun deleteItem(cartItemId: Long) {
-        thread {
-            cartItemRepository.removeCartItem(cartItemId)
-            val currentItems: List<CartItem> = cartItemRepository.loadCartItems()
-
-            uiHandler.post {
-                _cartItems.value = currentItems
-            }
+        viewModelScope.launch {
+            handleResponseResult(cartItemRepository.delete(cartItemId), { }, { })
+            handleResponseResult(
+                responseResult = cartItemRepository.loadCartItems(),
+                onSuccess = { cartItems ->
+                    _cartItems.value = cartItems.map { it.toUiModel() }
+                },
+                onError = { message ->
+                    _errorMessage.value = message
+                },
+            )
         }
         updateSelectedCartItemsCount()
     }
@@ -81,14 +92,10 @@ class ShoppingCartViewModel(
     override fun navigateToOrder() {
         if (selectedCartItemsCount.value == 0) return
 
-        val productIds = cartItems.value?.filter { it.checked }?.map { it.id } ?: return
-        val orderAmount = selectedCartItemsTotalPrice.value ?: return
-        val ordersCount = selectedCartItemsCount.value ?: return
+        val selectedCartItems = cartItems.value?.filter { it.checked }?.map { it.toDomain() } ?: return
         _navigationOrderEvent.setValue(
             OrderInformation(
-                productIds,
-                orderAmount,
-                ordersCount,
+                selectedCartItems,
             ),
         )
     }
@@ -101,13 +108,10 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         quantity: Int,
     ) {
-        thread {
-            cartItemRepository.increaseCartItem(cartItemId, quantity)
-            val currentItems = cartItemRepository.loadCartItems()
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-            }
+        viewModelScope.launch {
+            cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
+            updateCartItems()
+            updateTotalPrice()
         }
     }
 
@@ -115,23 +119,28 @@ class ShoppingCartViewModel(
         cartItemId: Long,
         quantity: Int,
     ) {
-        thread {
-            cartItemRepository.decreaseCartProduct(cartItemId, quantity)
-            val currentItems = cartItemRepository.loadCartItems()
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-                updateSelectedCartItemsCount()
-            }
+        viewModelScope.launch {
+            cartItemRepository.updateCartItemQuantity(cartItemId, quantity)
+            updateCartItems()
+            updateTotalPrice()
+            updateSelectedCartItemsCount()
         }
     }
 
-    private fun updateCartItems(currentItems: List<CartItem>) {
+    private suspend fun updateCartItems() {
         val cartItems = cartItems.value ?: return
-        _cartItems.value =
-            currentItems.map { cartItem ->
-                cartItem.copy(checked = cartItems.first { it.id == cartItem.id }.checked)
-            }
+        handleResponseResult(
+            responseResult = cartItemRepository.loadCartItems(),
+            onSuccess = { currentItems ->
+                _cartItems.value =
+                    currentItems.map { cartItem ->
+                        cartItem.toUiModel().copy(checked = cartItems.first { it.id == cartItem.id }.checked)
+                    }
+            },
+            onError = { message ->
+                _errorMessage.value = message
+            },
+        )
     }
 
     override fun selected(cartItemId: Long) {
@@ -153,23 +162,19 @@ class ShoppingCartViewModel(
     }
 
     private fun updateTotalPrice() {
+        val cartItems = cartItems.value ?: return
         _selectedCartItemsTotalPrice.value =
-            cartItems.value?.filter { it.checked }?.sumOf {
+            cartItems.filter { it.checked }.sumOf {
                 it.product.price * it.quantity
             }
     }
 
     override fun selectedAll() {
-        if (isAllSelected.value == true) {
-            updateCartItemsChecked(checked = false)
-            updateTotalPrice()
-            _isAllSelected.value = false
-            return
-        }
-        updateCartItemsChecked(checked = true)
+        val isAllSelected = isAllSelected.value ?: false
+        updateCartItemsChecked(checked = isAllSelected.not())
         updateTotalPrice()
-        updateSelectedCartItemsCount()
-        _isAllSelected.value = true
+        _isAllSelected.value = isAllSelected.not()
+        if (isAllSelected.not()) updateSelectedCartItemsCount()
     }
 
     private fun updateCartItemsChecked(checked: Boolean) {

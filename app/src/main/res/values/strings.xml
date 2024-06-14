@@ -19,12 +19,24 @@
 
     <string name="product_history_empty">최근 본 상품이 없어요!</string>
     <string name="products_history">최근 본 상품</string>
+
+    // fragment_order.xml
     <string name="order_all">전체</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="order_recommended_product_title">이런 상품은 어떠세요?</string>
     <string name="order_recommended_product_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
-
     <string name="order_items_count">주문하기(%d)</string>
-    <string name="order_success">주문이 완료되었습니다.</string>
+
+   // fragment_payment.xml
+    <string name="payment_success">주문이 완료되었습니다.</string>
+    <string name="payment_coupon_title">적용 가능한 쿠폰</string>
+    <string name="payment_coupon_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="payment">결제하기</string>
+    <string name="payment_order_amount">주문 금액</string>
+    <string name="payment_coupon_discount_amount">쿠폰 할인 금액</string>
+    <string name="payment_delivery_fee">배송비</string>
+    <string name="payment_total_amount">총 결제 금액</string>
+
+    // item_coupon.xml
+    <string name="coupon_expiration_date">만료일:&#160;%s년 %s월 %s일</string>
+    <string name="coupon_minimum_amount">최소 주문 금액:&#160;%,d원</string>
 </resources>

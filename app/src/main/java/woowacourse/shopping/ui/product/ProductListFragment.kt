@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.common.UniversalViewModelFactory
@@ -48,6 +49,7 @@ class ProductListFragment : Fragment() {
         observeDetailProductDestination()
         observeProductsHistory()
         observeLoadedProducts()
+        observeErrorMessage()
     }
 
     override fun onResume() {
@@ -86,16 +88,22 @@ class ProductListFragment : Fragment() {
 
     private fun observeProductsHistory() {
         viewModel.productsHistory.observe(viewLifecycleOwner) {
-            historyAdapter.update(it)
+            historyAdapter.updateProductsHistory(it)
         }
     }
 
     private fun observeLoadedProducts() {
         viewModel.loadedProducts.observe(viewLifecycleOwner) { products ->
             if (products.isNotEmpty()) {
-                productsAdapter.updateAllLoadedProducts(products)
+                productsAdapter.updateProducts(products)
                 binding.shimmerProductList.stopShimmer()
             }
+        }
+    }
+
+    private fun observeErrorMessage() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Snackbar.make(requireView(), errorMessage, Snackbar.LENGTH_SHORT).show()
         }
     }
 
