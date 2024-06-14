@@ -1,6 +1,5 @@
 package woowacourse.shopping.remote.service
 
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -8,29 +7,29 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.remote.model.CartItemRequest
-import woowacourse.shopping.remote.model.CartItemResponse
+import woowacourse.shopping.remote.model.request.CartItemRequest
+import woowacourse.shopping.remote.model.response.CartItemListResponse
 
 interface CartItemApiService {
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
-    ): Call<CartItemResponse>
+    ): CartItemListResponse
 
     @POST("/cart-items")
-    fun addCartItem(
+    suspend fun addCartItem(
         @Body cartItemRequest: CartItemRequest,
-    ): Call<Unit>
+    )
 
     @PATCH("/cart-items/{id}")
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         @Path("id") id: Long,
         @Body quantity: Int,
-    ): Call<Unit>
+    )
 
     @DELETE("/cart-items/{id}")
-    fun removeCartItem(
+    suspend fun removeCartItem(
         @Path("id") id: Long,
-    ): Call<Unit>
+    )
 }

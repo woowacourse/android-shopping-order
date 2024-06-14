@@ -1,16 +1,23 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.model.OrderItem
+import woowacourse.shopping.domain.model.Orders
+
 interface OrderRepository {
-    fun order(cartItemIds: List<Long>)
+    suspend fun order(): Result<Unit>
 
-    fun saveOrderItem(
-        cartItemId: Long,
+    suspend fun save(orderItem: OrderItem): Result<Unit>
+
+    suspend fun save(orderItems: List<OrderItem>): Result<Unit>
+
+    suspend fun updateOrderItem(
+        productId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    fun orderItems(): Map<Long, Int>
+    suspend fun loadAllOrders(): Result<Orders>
 
-    fun allOrderItemsQuantity(): Int
+    suspend fun allOrderItemsQuantity(): Result<Int>
 
-    fun orderItemsTotalPrice(): Int
+    suspend fun orderItemsTotalPrice(): Result<Int>
 }

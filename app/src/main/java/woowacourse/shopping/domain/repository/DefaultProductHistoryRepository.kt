@@ -9,28 +9,27 @@ class DefaultProductHistoryRepository(
     private val productHistoryDataSource: ProductHistoryDataSource,
     private val productDataSource: ProductDataSource,
 ) : ProductHistoryRepository {
-    override fun saveProductHistory(productId: Long) {
-        productHistoryDataSource.saveProductHistory(productId)
+    override suspend fun saveProductHistory(productId: Long): Result<Unit> = productHistoryDataSource.saveProductHistory(productId)
+
+    override suspend fun loadLatestProduct(): Result<Product> {
+        val latestProductId =
+            productHistoryDataSource.loadLatestProduct().getOrNull()?.id
+                ?: return Result.failure(Exception("No latest product found"))
+        val productData =
+            productDataSource.findById(latestProductId).getOrNull() ?: return Result.failure(Exception("No product found"))
+        return Result.success(productData.toDomain(quantity = 0))
     }
 
-    override fun loadAllProductHistory(): List<Product> {
-        val productIds = productHistoryDataSource.loadAllProductHistory()
-        return productIds.map {
-            productDataSource.findById(it).toDomain(quantity = 0)
-        }
-    }
-
-    override fun loadLatestProduct(): Product {
-        val productId: Long = productHistoryDataSource.loadLatestProduct()
-        val productData = productDataSource.findById(productId)
-        return Product(
-            productData.id,
-            productData.imgUrl,
-            productData.name,
-            productData.price,
-            quantity = 0,
-            category = productData.category,
-        )
+    override suspend fun loadRecentProducts(size: Int): Result<List<Product>> {
+        val productIds =
+            productHistoryDataSource.loadRecentProduct(size).getOrNull()
+                ?: return Result.failure(Exception("No recent products found"))
+        val products =
+            productIds.map {
+                productDataSource.findById(it.id).getOrNull()?.toDomain(quantity = 0)
+                    ?: return Result.failure(Exception("No product found"))
+            }
+        return Result.success(products)
     }
 
     companion object {

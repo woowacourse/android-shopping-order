@@ -1,30 +1,21 @@
 package woowacourse.shopping.data.source
 
+import woowacourse.shopping.data.model.CartItemData
 import woowacourse.shopping.data.model.ProductIdsCountData
-import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.remote.model.CartItemDto
 
 interface ShoppingCartDataSource {
-    fun findByProductId(productId: Long): ProductIdsCountData?
+    suspend fun findByProductId(productId: Long): Result<ProductIdsCountData>
 
-    fun loadAllCartItems(): List<CartItemDto>
+    suspend fun findCartItemByProductId(productId: Long): Result<CartItemData>
 
-    fun addNewProduct(productIdsCount: ProductIdsCount)
+    suspend fun loadAllCartItems(): Result<List<CartItemData>>
 
-    fun removeCartItem(cartItemId: Long)
+    suspend fun addNewProduct(productIdsCountData: ProductIdsCountData): Result<Unit>
 
-    fun plusProductsIdCount(
-        cartItemId: Long,
-        quantity: Int,
-    )
+    suspend fun removeCartItem(cartItemId: Long): Result<Unit>
 
-    fun minusProductsIdCount(
-        cartItemId: Long,
-        quantity: Int,
-    )
-
-    fun updateProductsCount(
+    suspend fun updateProductsCount(
         cartItemId: Long,
         newQuantity: Int,
-    )
+    ): Result<Unit>
 }

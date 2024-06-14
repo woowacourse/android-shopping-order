@@ -1,16 +1,17 @@
 package woowacourse.shopping.data.source
 
+import woowacourse.shopping.data.model.OrderItemData
+
 interface OrderDataSource {
-    fun order(cartItemIds: List<Long>)
+    suspend fun order(): Result<Unit>
 
-    fun save(
-        cartItemId: Long,
-        quantity: Int,
-    )
+    suspend fun saveOrderItem(orderItemData: OrderItemData): Result<Unit>
 
-    fun load(): Map<Long, Int>
+    suspend fun saveOrderItems(orderItemsData: List<OrderItemData>): Result<Unit>
 
-    fun allQuantity(): Int
+    suspend fun removeOrderItem(cartItemId: Long): Result<Unit>
 
-    fun claer()
+    suspend fun loadAllOrderItems(): Result<List<OrderItemData>>
+
+    suspend fun clear(): Result<Unit>
 }

@@ -1,8 +1,10 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.model.HistoryProduct
 import woowacourse.shopping.data.model.ProductData
 import woowacourse.shopping.data.model.toDomain
 import woowacourse.shopping.data.source.ProductDataSource
+import woowacourse.shopping.data.source.ProductHistoryDataSource
 import woowacourse.shopping.data.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.model.Product
 import kotlin.math.min
@@ -10,25 +12,32 @@ import kotlin.math.min
 class CategoryBasedProductRecommendationRepository(
     private val productsSource: ProductDataSource,
     private val cartSource: ShoppingCartDataSource,
+    private val historySource: ProductHistoryDataSource,
 ) : ProductsRecommendationRepository {
-    override fun recommendedProducts(productId: Long): List<Product> {
-        val latest = productsSource.findById(productId)
+    override suspend fun recommendedProducts(): Result<List<Product>> =
+        runCatching {
+            val latestProductId =
+                historySource.loadLatestProduct()
+                    .map(HistoryProduct::id)
+                    .recover {
+                        productsSource.findByPaged(1).getOrThrow().random().id
+                    }.getOrThrow()
 
-        val allCartItemProductIds: List<Long> = cartSource.loadAllCartItems().map { it.product.id }
+            val latestProduct = productsSource.findById(latestProductId).getOrThrow()
 
-        val productsWithCategory: List<ProductData> = productsSource.findByCategory(latest.category)
+            val allCartItemsProductsIds = cartSource.loadAllCartItems().getOrThrow().map { it.product.id }
 
-        val filteredProducts =
-            productsWithCategory.filterNot { productData ->
-                allCartItemProductIds.contains(productData.id)
-            }
+            val productsWithCategory = productsSource.findByCategory(latestProduct.category).getOrThrow()
 
-        val minimumCount = min(filteredProducts.size, 10)
+            val filteredProducts =
+                productsWithCategory.filterNot { productData ->
+                    allCartItemsProductsIds.contains(productData.id)
+                }
 
-        return filteredProducts.map { productData ->
-            productData.toDomain()
-        }.subList(0, minimumCount)
-    }
+            val minimumCount = min(filteredProducts.size, 10)
+
+            filteredProducts.subList(0, minimumCount).map(ProductData::toDomain)
+        }
 
     companion object {
         private const val TAG = "CategoryBasedProductRecommendationRepository"

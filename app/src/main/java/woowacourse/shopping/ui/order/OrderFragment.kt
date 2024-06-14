@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentOrderBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.order.event.OrderError
 import woowacourse.shopping.ui.order.event.OrderEvent
 
 class OrderFragment : Fragment() {
@@ -42,8 +45,20 @@ class OrderFragment : Fragment() {
 
         observeRecommendedProducts()
         observeEvent()
+        observeError()
 
         return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeRecommendedProducts()
+        observeEvent()
+        observeError()
     }
 
     private fun observeRecommendedProducts() {
@@ -56,11 +71,31 @@ class OrderFragment : Fragment() {
         viewModel.event.observe(viewLifecycleOwner) { event ->
             when (event) {
                 OrderEvent.CompleteOrder -> {
-                    Toast.makeText(requireContext(), "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    (requireActivity() as FragmentNavigator).navigateToProductList()
+                    ((requireActivity()) as FragmentNavigator).navigateToPayment()
                 }
             }
         }
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            when (error) {
+                OrderError.LoadRecommendedProducts -> showToast(R.string.error_load_recommended_products)
+                OrderError.CalculateOrderItemsQuantity -> showToast(R.string.error_calculate_order_items_quantity)
+                OrderError.CalculateOrderItemsTotalPrice -> showToast(R.string.error_calculate_order_items_total_price)
+                OrderError.UpdateOrderItem -> showToast(R.string.error_update_order_item)
+            }
+        }
+    }
+
+    private fun showToast(
+        @StringRes stringId: Int,
+    ) {
+        Toast.makeText(
+            requireContext(),
+            stringId,
+            Toast.LENGTH_SHORT,
+        ).show()
     }
 
     companion object {

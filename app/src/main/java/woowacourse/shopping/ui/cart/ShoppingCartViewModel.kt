@@ -1,31 +1,30 @@
 package woowacourse.shopping.ui.cart
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.repository.DefaultOrderRepository
 import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.ui.cart.event.ShoppingCartError
 import woowacourse.shopping.ui.cart.event.ShoppingCartEvent
 import woowacourse.shopping.ui.cart.listener.ShoppingCartListener
 import woowacourse.shopping.ui.model.CartItem
+import woowacourse.shopping.ui.model.toOrderItem
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
-import kotlin.concurrent.thread
 
 class ShoppingCartViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository,
+    private val cartRepository: ShoppingCartRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
     ShoppingCartListener {
-    private val uiHandler = Handler(Looper.getMainLooper())
-
-    private var _cartItems = MutableLiveData<List<CartItem>>()
+    private var _cartItems = MutableLiveData<List<CartItem>>(emptyList())
     val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
     private var _deletedItemId: MutableSingleLiveData<Long> = MutableSingleLiveData()
@@ -43,49 +42,59 @@ class ShoppingCartViewModel(
     private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ShoppingCartEvent> get() = _event
 
+    private val _error: MutableSingleLiveData<ShoppingCartError> = MutableSingleLiveData()
+    val error: SingleLiveData<ShoppingCartError> get() = _error
+
     fun loadAll() {
-        thread {
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-            _cartItems.postValue(currentItems)
+        viewModelScope.launch {
+            updateCartItems()
         }
     }
 
     fun deleteItem(cartItemId: Long) {
-        thread {
-            shoppingCartRepository.removeShoppingCartProduct(cartItemId)
-        }.join()
-
-        thread {
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-            _cartItems.postValue(currentItems)
-        }.join()
-
-        updateTotalPrice()
-        updateSelectedCartItemsCount()
+        viewModelScope.launch {
+            cartRepository.removeShoppingCartProduct(cartItemId)
+                .onSuccess {
+                    _event.setValue(ShoppingCartEvent.DeleteCartItem)
+                }
+                .onFailure {
+                    _error.setValue(ShoppingCartError.DeleteCartItem)
+                }
+            updateCartItems()
+        }
     }
 
     private fun updateSelectedCartItemsCount() {
         _selectedCartItemsCount.value =
-            cartItems.value?.sumOf { cartItem: CartItem ->
-                if (cartItem.checked) {
-                    cartItem.quantity
-                } else {
-                    0
-                }
-            }
+            cartItems.value.orEmpty().asSequence()
+                .filter(CartItem::checked)
+                .sumOf(CartItem::quantity)
+
+        if (cartItems.value.isNullOrEmpty()) {
+            _isAllSelected.value = false
+        }
     }
 
     override fun navigateToOrder() {
-        if (selectedCartItemsCount.value == 0) return
+        if (selectedCartItemsCount.value == 0) {
+            _error.setValue(ShoppingCartError.EmptyOrderProduct)
+            return
+        }
 
-        thread {
-            _event.postValue(ShoppingCartEvent.NavigationOrder)
+        val orderItems =
+            cartItems.value.orEmpty()
+                .asSequence()
+                .filter(CartItem::checked)
+                .map(CartItem::toOrderItem)
 
-            cartItems.value?.forEach { cartItem ->
-                if (cartItem.checked) {
-                    orderRepository.saveOrderItem(cartItem.product.id, cartItem.quantity)
+        viewModelScope.launch {
+            orderRepository.save(orderItems.toList())
+                .onSuccess {
+                    _event.setValue(ShoppingCartEvent.NavigationOrder)
                 }
-            }
+                .onFailure {
+                    _error.setValue(ShoppingCartError.SaveOrderItems)
+                }
         }
     }
 
@@ -93,78 +102,80 @@ class ShoppingCartViewModel(
         _deletedItemId.setValue(productId)
     }
 
-    // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
     override fun onIncrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            val item =
-                cartItems.value?.find { it.id == productId }
-                    ?: throw NoSuchElementException("There is no product with id: $productId")
-            shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity + 1)
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-                updateSelectedCartItemsCount()
-            }
+        viewModelScope.launch {
+            cartRepository.addShoppingCartProduct(productId, INCREASE_AMOUNT)
+                .onSuccess {
+                    updateCartItems()
+                }
+                .onFailure {
+                    _error.setValue(ShoppingCartError.UpdateCartItems)
+                }
         }
     }
 
-    // 여기서의 파라미터 productId 는 사실 cartItemId 였나?
+    private suspend fun updateCartItems() {
+        cartRepository.loadAllCartItems()
+            .onSuccess { cartItems ->
+                updateCartItems(cartItems)
+                updateTotalPrice()
+                updateSelectedCartItemsCount()
+            }
+            .onFailure {
+                _error.setValue(ShoppingCartError.LoadCartProducts)
+            }
+    }
+
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            val item =
-                cartItems.value?.find { it.id == productId }
-                    ?: throw NoSuchElementException("There is no product with id: $productId")
-            shoppingCartRepository.updateProductQuantity(cartItemId = productId, quantity = item.quantity - 1)
+        val cart =
+            cartItems.value.orEmpty().find { cartItem ->
+                cartItem.product.id == productId
+            } ?: return
 
-            val currentItems = shoppingCartRepository.loadAllCartItems()
-
-            uiHandler.post {
-                updateCartItems(currentItems)
-                updateTotalPrice()
-                updateSelectedCartItemsCount()
-            }
+        viewModelScope.launch {
+            cartRepository.updateProductQuantity(cart.id, quantity)
+                .onSuccess {
+                    updateCartItems()
+                }
+                .onFailure {
+                    _error.setValue(ShoppingCartError.UpdateCartItems)
+                }
         }
     }
 
     private fun updateCartItems(currentItems: List<CartItem>) {
+        val existingCartItems = _cartItems.value.orEmpty()
+
         _cartItems.value =
             currentItems.map { cartItem ->
-                // TODO: 널 단언 제거하기
-                cartItem.copy(checked = cartItems.value?.find { it.id == cartItem.id }!!.checked)
+                cartItem.copy(checked = existingCartItems.find { it.id == cartItem.id }?.checked ?: false)
             }
     }
 
     override fun selected(cartItemId: Long) {
-        val selectedItem =
-            cartItems.value?.find { it.id == cartItemId } ?: throw IllegalStateException()
-        val changedItem = selectedItem.copy(checked = !selectedItem.checked)
-
         _cartItems.value =
-            cartItems.value?.map {
-                if (it.id == cartItemId) {
-                    changedItem
-                } else {
-                    it
-                }
+            cartItems.value.orEmpty().map { cartItem ->
+                cartItem.takeIf { it.id == cartItemId }
+                    ?.run { copy(checked = !checked) }
+                    ?: cartItem
             }
+
         updateTotalPrice()
         updateSelectedCartItemsCount()
-        _isAllSelected.value = cartItems.value?.all { it.checked }
+        _isAllSelected.value = cartItems.value.orEmpty().all(CartItem::checked)
     }
 
     private fun updateTotalPrice() {
         _selectedCartItemsTotalPrice.value =
-            cartItems.value?.filter { it.checked }?.sumOf {
-                it.product.price * it.quantity
-            }
+            cartItems.value.orEmpty()
+                .filter(CartItem::checked)
+                .sumOf(CartItem::price)
     }
 
     fun onBackClick() {
@@ -185,14 +196,13 @@ class ShoppingCartViewModel(
     }
 
     private fun updateCartItemsChecked(checked: Boolean) {
-        _cartItems.value =
-            cartItems.value?.map { cartItem ->
-                cartItem.copy(checked = checked)
-            }
+        _cartItems.value = cartItems.value?.map { cartItem -> cartItem.copy(checked = checked) }
     }
 
     companion object {
         private const val TAG = "ShoppingCartViewModel"
+
+        private const val INCREASE_AMOUNT = 1
 
         fun factory(
             shoppingCartRepository: ShoppingCartRepository =
@@ -202,7 +212,7 @@ class ShoppingCartViewModel(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
                     orderSource = ShoppingApp.orderSource,
-                    productSource = ShoppingApp.productSource,
+                    cartSource = ShoppingApp.cartSource,
                 ),
         ): UniversalViewModelFactory =
             UniversalViewModelFactory {

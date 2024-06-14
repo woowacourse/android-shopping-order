@@ -12,8 +12,7 @@
 
         <variable
             name="listener"
-            type="woowacourse.shopping.ui.cart.listener.ShoppingCartItemListener"
-            />
+            type="woowacourse.shopping.ui.cart.listener.ShoppingCartItemListener" />
 
     </data>
 
@@ -55,10 +54,10 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginEnd="16dp"
+            android:background="@color/black"
             android:importantForAccessibility="no"
             android:onClick="@{() -> listener.onRemove(cartItem.id)}"
             android:src="@drawable/ic_x"
-            android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/cart_product_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cart_product_name"
@@ -66,7 +65,7 @@
 
         <ImageView
             android:id="@+id/cart_product_image"
-            imageUrl="@{cartItem.product.imageUrl}"
+            imageUrl="@{cartItem.product.imgUrl}"
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginTop="16dp"
@@ -85,9 +84,10 @@
             app:layout_constraintBottom_toTopOf="@id/cart_product_price"
             app:layout_constraintEnd_toEndOf="@id/cart_product_delete"
             app:layout_constraintTop_toTopOf="@id/cart_product_image"
-            bind:itemId="@{cartItem.id}"
+            bind:itemId="@{cartItem.product.id}"
             bind:onItemChargeListener="@{listener}"
-            bind:quantity="@{cartItem.quantity}" />
+            bind:quantity="@{cartItem.quantity}"
+            bind:changeAmountPerEach = "@{cartItem.CHANGE_AMOUNT_PER_EACH}"/>
 
         <TextView
             android:id="@+id/cart_product_price"

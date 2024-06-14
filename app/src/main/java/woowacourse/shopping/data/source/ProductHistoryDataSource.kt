@@ -1,9 +1,11 @@
 package woowacourse.shopping.data.source
 
+import woowacourse.shopping.data.model.HistoryProduct
+
 interface ProductHistoryDataSource {
-    fun saveProductHistory(productId: Long)
+    suspend fun saveProductHistory(productId: Long): Result<Unit>
 
-    fun loadLatestProduct(): Long
+    suspend fun loadLatestProduct(): Result<HistoryProduct>
 
-    fun loadAllProductHistory(): List<Long>
+    suspend fun loadRecentProduct(size: Int): Result<List<HistoryProduct>>
 }

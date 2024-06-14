@@ -75,14 +75,14 @@
             android:id="@+id/include_order"
             layout="@layout/layout_recommended_order"
             android:layout_width="0dp"
-            bind:totalCartItemQuantity="@{viewModel.addedProductQuantity}"
-            bind:totalCartItemsPrice="@{viewModel.totalPrice}"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rv_order_recommended_products"
-            bind:onOrderListener="@{viewModel}" />
+            bind:onOrderListener="@{viewModel}"
+            bind:totalCartItemQuantity="@{viewModel.addedProductQuantity}"
+            bind:totalCartItemsPrice="@{viewModel.totalPrice}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

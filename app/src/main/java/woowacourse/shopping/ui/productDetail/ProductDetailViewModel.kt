@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.productDetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
@@ -11,10 +13,11 @@ import woowacourse.shopping.domain.repository.DefaultShoppingProductRepository
 import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingProductsRepository
+import woowacourse.shopping.ui.productDetail.event.ProductDetailError
+import woowacourse.shopping.ui.productDetail.event.ProductDetailEvent
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
-import kotlin.concurrent.thread
 
 class ProductDetailViewModel(
     private val productId: Long,
@@ -25,38 +28,75 @@ class ProductDetailViewModel(
     private val _currentProduct: MutableLiveData<Product> = MutableLiveData()
     val currentProduct: LiveData<Product> get() = _currentProduct
 
-    private val _productCount: MutableLiveData<Int> = MutableLiveData(1)
+    private val _productCount: MutableLiveData<Int> = MutableLiveData(FIRST_AMOUNT)
     val productCount: LiveData<Int> get() = _productCount
 
     private val _latestProduct: MutableLiveData<Product> = MutableLiveData()
     val latestProduct: LiveData<Product> get() = _latestProduct
 
-    private var _detailProductDestinationId: MutableSingleLiveData<Long> = MutableSingleLiveData()
-    val detailProductDestinationId: SingleLiveData<Long> get() = _detailProductDestinationId
+    private var _event: MutableSingleLiveData<ProductDetailEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ProductDetailEvent> get() = _event
+
+    private var _error: MutableSingleLiveData<ProductDetailError> = MutableSingleLiveData()
+    val error: SingleLiveData<ProductDetailError> get() = _error
 
     fun loadAll() {
-        thread {
-            val currentProduct = shoppingProductsRepository.loadProduct(id = productId)
-            val latestProduct =
-                try {
-                    productHistoryRepository.loadLatestProduct()
-                } catch (e: NoSuchElementException) {
-                    Product.NULL
+        loadProduct()
+        loadLatestProduct()
+        saveProductHistory()
+    }
+
+    private fun loadProduct() {
+        viewModelScope.launch {
+            shoppingProductsRepository.loadProduct(id = productId)
+                .onSuccess { loadedProduct ->
+                    _currentProduct.value = loadedProduct
                 }
+                .onFailure {
+                    _error.setValue(ProductDetailError.LoadProduct)
+                }
+        }
+    }
 
+    private fun loadLatestProduct() {
+        viewModelScope.launch {
+            productHistoryRepository.loadLatestProduct()
+                .onSuccess { loadedLatestProduct ->
+                    _latestProduct.value = loadedLatestProduct
+                }
+                .onFailure {
+                    _error.setValue(ProductDetailError.LoadLatestProduct)
+                }
+        }
+    }
+
+    private fun saveProductHistory() {
+        viewModelScope.launch {
             productHistoryRepository.saveProductHistory(productId)
-
-            _currentProduct.postValue(currentProduct)
-            _productCount.postValue(FIRST_AMOUNT)
-            _latestProduct.postValue(latestProduct)
+                .onSuccess {
+                    _event.setValue(ProductDetailEvent.SaveProductInHistory)
+                }
+                .onFailure {
+                    _error.setValue(ProductDetailError.SaveProductInHistory)
+                }
         }
     }
 
     fun addProductToCart() {
         val productCount = productCount.value ?: return
-        thread {
+        viewModelScope.launch {
             cartRepository.addShoppingCartProduct(productId, productCount)
+                .onSuccess {
+                    _event.setValue(ProductDetailEvent.AddProductToCart)
+                }
+                .onFailure {
+                    _error.setValue(ProductDetailError.AddProductToCart)
+                }
         }
+    }
+
+    fun onFinish() {
+        _event.setValue(ProductDetailEvent.Finish)
     }
 
     override fun onIncrease(
@@ -77,7 +117,7 @@ class ProductDetailViewModel(
     }
 
     override fun navigateToProductDetail(productId: Long) {
-        _detailProductDestinationId.setValue(productId)
+        _event.setValue(ProductDetailEvent.NavigateToProductDetail(productId))
     }
 
     companion object {

@@ -1,4 +1,4 @@
-package woowacourse.shopping.remote.model
+package woowacourse.shopping.remote.model.response
 
 data class Sort(
     val sorted: Boolean,

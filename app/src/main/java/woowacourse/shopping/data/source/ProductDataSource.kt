@@ -3,15 +3,15 @@ package woowacourse.shopping.data.source
 import woowacourse.shopping.data.model.ProductData
 
 interface ProductDataSource {
-    fun findByPaged(page: Int): List<ProductData>
+    suspend fun findByPaged(page: Int): Result<List<ProductData>>
 
-    fun findAllUntilPage(page: Int): List<ProductData>
+    suspend fun findAllUntilPage(page: Int): Result<List<ProductData>>
 
-    fun findById(id: Long): ProductData
+    suspend fun findById(id: Long): Result<ProductData>
 
-    fun findByCategory(category: String): List<ProductData>
+    suspend fun findByCategory(category: String): Result<List<ProductData>>
 
-    fun isFinalPage(page: Int): Boolean
+    suspend fun isFinalPage(page: Int): Result<Boolean>
 
     fun shutDown(): Boolean
 }

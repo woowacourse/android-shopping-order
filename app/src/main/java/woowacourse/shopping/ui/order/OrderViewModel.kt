@@ -3,28 +3,24 @@ package woowacourse.shopping.ui.order
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CategoryBasedProductRecommendationRepository
 import woowacourse.shopping.domain.repository.DefaultOrderRepository
-import woowacourse.shopping.domain.repository.DefaultProductHistoryRepository
-import woowacourse.shopping.domain.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductHistoryRepository
 import woowacourse.shopping.domain.repository.ProductsRecommendationRepository
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.ui.order.event.OrderError
 import woowacourse.shopping.ui.order.event.OrderEvent
 import woowacourse.shopping.ui.order.listener.OrderListener
 import woowacourse.shopping.ui.util.MutableSingleLiveData
 import woowacourse.shopping.ui.util.SingleLiveData
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
-import kotlin.concurrent.thread
 
 class OrderViewModel(
     private val orderRepository: OrderRepository,
-    private val historyRepository: ProductHistoryRepository,
     private val productsRecommendationRepository: ProductsRecommendationRepository,
-    private val cartRepository: ShoppingCartRepository,
 ) : ViewModel(), OrderListener {
     private val _recommendedProducts: MutableSingleLiveData<List<Product>> = MutableSingleLiveData()
     val recommendedProducts: SingleLiveData<List<Product>> get() = _recommendedProducts
@@ -38,87 +34,106 @@ class OrderViewModel(
     private val _event: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
     val event: SingleLiveData<OrderEvent> get() = _event
 
-    override fun order() {
-        thread {
-            val filter = orderRepository.orderItems().map { (id, _) -> id }
+    private val _error: MutableSingleLiveData<OrderError> = MutableSingleLiveData()
+    val error: SingleLiveData<OrderError> get() = _error
 
-            orderRepository.order(filter)
-            _event.postValue(OrderEvent.CompleteOrder)
+    fun loadAll() {
+        viewModelScope.launch {
+            loadRecommendProducts()
+            countOrderItemsQuantity()
+            calculateOrderItemsTotalPrice()
         }
     }
 
-    fun loadAll() {
-        thread {
-            _recommendedProducts.postValue(
-                productsRecommendationRepository.recommendedProducts(
-                    productId = historyRepository.loadLatestProduct().id,
-                ),
-            )
-            _addedProductQuantity.postValue(orderRepository.allOrderItemsQuantity())
+    private suspend fun loadRecommendProducts() {
+        productsRecommendationRepository.recommendedProducts()
+            .onSuccess { products ->
+                _recommendedProducts.setValue(products)
+            }
+            .onFailure {
+                _error.setValue(OrderError.LoadRecommendedProducts)
+            }
+    }
 
-            _totalPrice.postValue(orderRepository.orderItemsTotalPrice())
-        }
+    private suspend fun countOrderItemsQuantity() {
+        orderRepository.allOrderItemsQuantity()
+            .onSuccess { allOrderItemsQuantity ->
+                _addedProductQuantity.value = allOrderItemsQuantity
+            }
+            .onFailure {
+                _error.setValue(OrderError.CalculateOrderItemsQuantity)
+            }
+    }
+
+    private suspend fun calculateOrderItemsTotalPrice() {
+        orderRepository.orderItemsTotalPrice()
+            .onSuccess { calculatedTotalPrice ->
+                _totalPrice.value = calculatedTotalPrice
+            }
+            .onFailure {
+                _error.setValue(OrderError.CalculateOrderItemsTotalPrice)
+            }
+    }
+
+    override fun order() {
+        _event.setValue(OrderEvent.CompleteOrder)
     }
 
     override fun onIncrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            try {
-                cartRepository.updateProductQuantity(productId, quantity)
-                orderRepository.saveOrderItem(productId, quantity)
-            } catch (e: NoSuchElementException) {
-                cartRepository.addShoppingCartProduct(productId, quantity)
-                orderRepository.saveOrderItem(productId, quantity)
-            } finally {
-                updateRecommendProductsQuantity(productId, INCREASE_AMOUNT)
-                updateTotalQuantity(productId, INCREASE_AMOUNT)
-            }
-            _addedProductQuantity.postValue(_addedProductQuantity.value?.plus(1) ?: 1)
+        viewModelScope.launch {
+            updateItemQuantity(productId, quantity, INCREASE_AMOUNT)
         }
+    }
+
+    private suspend fun updateItemQuantity(
+        productId: Long,
+        quantity: Int,
+        changeAmount: Int,
+    ) {
+        orderRepository.updateOrderItem(productId, quantity)
+            .onSuccess {
+                updateRecommendProductsQuantity(productId, changeAmount)
+                updateTotalPrice(productId, changeAmount)
+                _addedProductQuantity.value = addedProductQuantity.value?.plus(changeAmount)
+            }
+            .onFailure {
+                _error.setValue(OrderError.UpdateOrderItem)
+            }
     }
 
     override fun onDecrease(
         productId: Long,
         quantity: Int,
     ) {
-        thread {
-            val item =
-                _recommendedProducts.getValue()?.find {
-                    it.id == productId
-                } ?: throw NoSuchElementException("There is no product with id: $productId")
-
-            cartRepository.updateProductQuantity(productId, item.quantity - 1)
-
-            updateRecommendProductsQuantity(productId, DECREASE_AMOUNT)
-            updateTotalQuantity(productId, DECREASE_AMOUNT)
-
-            _addedProductQuantity.postValue(_addedProductQuantity.value?.minus(1) ?: 0)
+        viewModelScope.launch {
+            updateItemQuantity(productId, quantity, DECREASE_AMOUNT)
         }
     }
 
-    private fun updateTotalQuantity(
+    private fun updateTotalPrice(
         productId: Long,
         changeAmount: Int,
     ) {
-        _totalPrice.postValue(_totalPrice.value?.plus(productQuantity(productId) * changeAmount) ?: 0)
+        _totalPrice.value = totalPrice.value?.plus(productPrice(productId) * changeAmount)
     }
 
-    private fun productQuantity(productId: Long) = _recommendedProducts.getValue()?.find { it.id == productId }?.price ?: 0
+    private fun productPrice(productId: Long) = _recommendedProducts.getValue()?.find { product -> product.id == productId }?.price ?: 0
 
     private fun updateRecommendProductsQuantity(
         productId: Long,
         changeAmount: Int,
     ) {
-        _recommendedProducts.postValue(
-            _recommendedProducts.getValue()?.map { product ->
+        _recommendedProducts.setValue(
+            recommendedProducts.getValue().orEmpty().map { product ->
                 if (product.id == productId) {
                     product.copy(quantity = product.quantity + changeAmount)
                 } else {
                     product
                 }
-            } ?: emptyList(),
+            },
         )
     }
 
@@ -132,29 +147,19 @@ class OrderViewModel(
             orderRepository: OrderRepository =
                 DefaultOrderRepository(
                     ShoppingApp.orderSource,
-                    ShoppingApp.productSource,
-                ),
-            historyRepository: ProductHistoryRepository =
-                DefaultProductHistoryRepository(
-                    ShoppingApp.historySource,
-                    ShoppingApp.productSource,
+                    ShoppingApp.cartSource,
                 ),
             productRecommendationRepository: ProductsRecommendationRepository =
                 CategoryBasedProductRecommendationRepository(
                     ShoppingApp.productSource,
                     ShoppingApp.cartSource,
-                ),
-            cartRepository: ShoppingCartRepository =
-                DefaultShoppingCartRepository(
-                    ShoppingApp.cartSource,
+                    ShoppingApp.historySource,
                 ),
         ): UniversalViewModelFactory {
             return UniversalViewModelFactory {
                 OrderViewModel(
                     orderRepository,
-                    historyRepository,
                     productRecommendationRepository,
-                    cartRepository,
                 )
             }
         }

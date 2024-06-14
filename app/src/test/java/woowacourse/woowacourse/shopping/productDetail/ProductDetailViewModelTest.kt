@@ -57,7 +57,7 @@ class ProductDetailViewModelTest {
             FakeProductDataSource(
                 allProducts = productsTestFixture(40).toMutableList(),
             )
-        cartSource = FakeShoppingCartDataSource(cartItemDtos = mutableListOf())
+        cartSource = FakeShoppingCartDataSource(cartItemResponses = mutableListOf())
         shoppingProductRepository = DefaultShoppingProductRepository(productsSource, cartSource)
 
         historyDataSource = FakeProductHistorySource()

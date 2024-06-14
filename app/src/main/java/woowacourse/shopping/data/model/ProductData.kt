@@ -10,13 +10,9 @@ data class ProductData(
     val category: String = "",
 ) {
     companion object {
-        val NULL =
-            ProductData(
-                id = -1,
-                imgUrl = "0",
-                name = "상품이 없습니다.",
-                price = 0,
-            )
+        val NULL = ProductData(-1, "0", "상품이 없습니다.", 0)
+
+        val DEFAULT = ProductData(0, "", "", 0)
     }
 }
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.remote.model
+package woowacourse.shopping.remote.model.response
 
 data class Pageable(
     val sort: Sort,

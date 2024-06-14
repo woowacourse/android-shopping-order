@@ -2,17 +2,17 @@ package woowacourse.shopping.ui.productDetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentProductDetailBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.productDetail.event.ProductDetailError
+import woowacourse.shopping.ui.productDetail.event.ProductDetailEvent
 import woowacourse.shopping.ui.util.UniversalViewModelFactory
 
 class ProductDetailFragment : Fragment() {
@@ -56,17 +56,11 @@ class ProductDetailFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         showSkeletonUi()
-        lifecycleScope.launch {
-            delay(1000)
-            viewModel.loadAll()
-        }
+        viewModel.loadAll()
+
         observeCurrentProduct()
-        viewModel.detailProductDestinationId.observe(viewLifecycleOwner) {
-            navigateToProductDetail(it)
-        }
-        binding.productDetailToolbar.setOnMenuItemClickListener {
-            navigateToMenuItem(it)
-        }
+        observeEvent()
+        observeError()
     }
 
     private fun observeCurrentProduct() {
@@ -77,17 +71,39 @@ class ProductDetailFragment : Fragment() {
         }
     }
 
-    private fun navigateToProductDetail(id: Long) = (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(id)
+    private fun observeEvent() {
+        viewModel.event.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is ProductDetailEvent.NavigateToProductDetail ->
+                    (requireActivity() as? FragmentNavigator)?.navigateToProductDetail(productId = event.productId)
 
-    private fun navigateToMenuItem(it: MenuItem) =
-        when (it.itemId) {
-            R.id.action_x -> {
-                (requireActivity() as? FragmentNavigator)?.popBackStack()
-                true
+                is ProductDetailEvent.AddProductToCart -> Unit
+                is ProductDetailEvent.SaveProductInHistory -> Unit
+                is ProductDetailEvent.Finish -> (requireActivity() as? FragmentNavigator)?.popBackStack()
             }
-
-            else -> false
         }
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            when (error) {
+                is ProductDetailError.AddProductToCart -> showToast(R.string.error_add_product_to_cart)
+                is ProductDetailError.LoadLatestProduct -> showToast(R.string.error_load_latest_product)
+                is ProductDetailError.LoadProduct -> showToast(R.string.error_load_product)
+                is ProductDetailError.SaveProductInHistory -> showToast(R.string.error_save_product_in_history)
+            }
+        }
+    }
+
+    private fun showToast(
+        @StringRes stringId: Int,
+    ) {
+        Toast.makeText(
+            requireContext(),
+            stringId,
+            Toast.LENGTH_SHORT,
+        ).show()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

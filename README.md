@@ -73,3 +73,55 @@ API 문서: http://54.180.95.212:8080/swagger-ui/index.html
 
 - [ ] navigation 을 더 MVVM 답게
 
+- [x] local.properties 에 url, id, password 저장.
+- [x] gson 선택 이유, adapter 의 생성 시점과 방법.
+- [x] Retrofit 의 execute, enqueue 차이, 장/단점 고찰.
+- [x] 여러 url 을 사용한다면?
+
+# 3 단계
+
+Coroutines을 적용하여 비동기 요청을 리팩터링한다.
+단, Flow를 사용하진 않는다.
+
+- [x] 모든 데이터 소스에 suspend, Result 적용
+- [x] 모든 Repository 에 suspend, Result 적용
+- [x] Repository 테스트 추가
+- [x] 뷰모델에 코루틴 적용하기
+
+
+- [x] 상품 추천 관련
+    - [x] productsRecommendationRepository 의 함수에 파라미터를 제거.
+    - [x] CategoryBasedProductRecommendationRepository 의 생성자에 historySource 추가.
+
+# 4 단계
+
+### 기능 요구 사항
+
+- 장바구니에 담긴 상품을 최종 주문할 수 있다.
+- 배송비는 기본 3,000원이다.
+- 결제 화면에서 적용 가능한 쿠폰을 조회하고 적용할 수 있다.
+- 쿠폰은 1개만 적용 가능하다.
+- 결제 수단은 구현하지 않는다.
+- 결제하기 버튼을 누르면 바로 최종 주문이 완료된다.
+- 최종 주문이 완료되면 상품 목록으로 이동과 함께 주문 완료 토스트 메시지를 노출한다.
+
+### API 구현 상세
+
+- 최종 주문이 완료되면 장바구니에서 주문된 상품이 초기화되는 것이 정상이다.
+- 쿠폰을 사용해도 사라지지 않는 것이 정상이다.
+
+- response -> data 로 쿠폰을 불러오고 domain 으로 매핑할 때 sealed class 로 처리한다.
+- 쿠폰 객체 자체를 의인화해서 사용한다.
+- 쿠폰 객체가 스스로 적용 가능한지, 할인 가격이 얼마인지 판단한다. 템플릿 메서드 패턴 사용.
+
+## 아직 해야 하는 것
+
+- [ ] 뷰모델 테스트. ⭐️⭐️⭐️⭐️ 꼭 해보고 싶음!! 코루틴을 코루틴 답게 사용하지 못하고 있는 것 같음!
+- [ ] 4 단계 적용하면서 
+  - [ ] OrderRepository 를 수정함. -> 테스트 다시 해야 함.
+  - [ ] CartRepository 와 OrderRepository 의 기능이 겹치게 되고, 사용하지 않는 것들이 생김. 개선! 
+- [ ] 쿠폰 도메인 쪽 테스트
+- [ ] 뒤로 가기 버튼, 네비게이션,
+- [ ] 이벤트 핸들링. 뷰모델에서 관련 객체를 갖게 해서 옵저빙하면 될 듯.
+- [ ] Repository 쪽 로직 개선
+- [ ] holder_coupon 에서 체크 박스를 클릭했을 때 vs 뷰 자체를 클릭했을 때

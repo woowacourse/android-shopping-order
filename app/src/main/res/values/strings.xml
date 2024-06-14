@@ -26,4 +26,43 @@
     <string name="order_recommended_product_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
 
     <string name="order_items_count">주문하기(%d)</string>
+    <string name="payment_title">결제하기</string>
+    <string name="available_coupon">적용 가능한 쿠폰</string>
+    <string name="coupon_guide">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price">주문 금액</string>
+    <string name="coupon_discount_amount">쿠폰 할인 금액</string>
+    <string name="delivery_fee">배송비</string>
+    <string name="total_payment_amount">총 결제 금액</string>
+
+
+
+    <string name="error_message_shopping_cart_delete_item">장바구니 상품이 삭제되지 않았습니다.</string>
+    <string name="error_message_empty_order_product">주문 상품이 없습니다.</string>
+    <string name="error_message_empty_order_product_list">주문 상품 목록이 없습니다.</string>
+    <string name="error_message_shopping_cart_products">장바구니 상품을 불러오는 데 실패했습니다.</string>
+    <string name="error_message_save_order_items">주문 상품 정보를 저장하지 못했습니다.</string>
+    <string name="error_message_update_cart_items">장바구니 상품을 저장하지 못했습니다. </string>
+
+    <string name="error_load_recommended_products">추천 상품 목록을 불러오지 못했습니다</string>
+    <string name="error_calculate_order_items_quantity">주문 상품들의 개수를 계산하는 데 실패했습니다.</string>
+    <string name="error_calculate_order_items_total_price">주문 상품들의 가격을 계산하는 데 실패했습니다.</string>
+    <string name="error_update_order_item">주문 상품의 개수를 변경하는 데 실패했습니다.</string>
+
+    <string name="success_order">주문이 완료되었습니다.</string>
+    <string name="error_discount_amount">할인 금액을 제대로 계산하지 못했습니다.</string>
+    <string name="error_load_coupons">쿠폰을 불러오지 못했습니다.</string>
+    <string name="error_load_orders">주문 상품들을 제대로 불러오지 못했습니다.</string>
+    <string name="error_order">주문에 실패했습니다.</string>
+
+    <string name="error_add_product_to_cart">장바구니에 상품을 추가하지 못했습니다.</string>
+    <string name="error_load_latest_product">마지막으로 본 상품을 불러오지 못했습니다.</string>
+    <string name="error_load_product">상품을 불러오지 못했습니다.</string>
+    <string name="error_save_product_in_history">상품 내역을 저장하지 못했습니다.</string>
+    <string name="error_message_update_products_quantity_in_cart">장바구니 상품의 개수를 갱신하지 못했습니다.</string>
+
+    <string name="error_count_cart_product_quantity">장바구니 상품의 개수를 불러오지 못했습니다.</string>
+    <string name="error_delete_cart_product">장바구니 상품을 삭제하지 못했습니다.</string>
+    <string name="error_calculate_final_page">마지막 페이지인지 계산하지 못했습니다.</string>
+    <string name="error_load_product_history">최근 본 상품 내역을 불러오지 못했습니다.</string>
+
 </resources>

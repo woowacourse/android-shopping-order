@@ -51,7 +51,8 @@
             app:layout_constraintStart_toStartOf="@id/iv_product"
             bind:itemId="@{product.id}"
             bind:onItemChargeListener="@{onItemChargeListener}"
-            bind:quantity="@{product.quantity}" />
+            bind:quantity="@{product.quantity}"
+            bind:changeAmountPerEach = "@{product.CHANGE_AMOUNT_PER_EACH}"/>
 
         <TextView
             android:id="@+id/main_product_list_product_name"

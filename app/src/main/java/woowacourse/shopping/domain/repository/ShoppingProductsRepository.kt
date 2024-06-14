@@ -3,11 +3,11 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface ShoppingProductsRepository {
-    fun pagedProducts(page: Int): List<Product>
+    suspend fun pagedProducts(page: Int): Result<List<Product>>
 
-    fun allProductsUntilPage(page: Int): List<Product>
+    suspend fun allProductsUntilPage(page: Int): Result<List<Product>>
 
-    fun loadProduct(id: Long): Product
+    suspend fun loadProduct(id: Long): Result<Product>
 
-    fun isFinalPage(page: Int): Boolean
+    suspend fun isFinalPage(page: Int): Result<Boolean>
 }

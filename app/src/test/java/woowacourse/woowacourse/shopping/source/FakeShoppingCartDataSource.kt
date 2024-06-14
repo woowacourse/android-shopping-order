@@ -1,76 +1,96 @@
 package woowacourse.shopping.source
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.withContext
+import woowacourse.shopping.data.model.CartItemData
 import woowacourse.shopping.data.model.ProductIdsCountData
 import woowacourse.shopping.data.source.ShoppingCartDataSource
-import woowacourse.shopping.domain.model.ProductIdsCount
-import woowacourse.shopping.remote.model.CartItemDto
-import woowacourse.shopping.remote.model.ProductDto
+import woowacourse.shopping.remote.model.response.CartItemResponse
+import woowacourse.shopping.remote.model.response.ProductResponse
+import woowacourse.shopping.remote.model.response.toData
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class FakeShoppingCartDataSource(
-    private var cartItemDtos: List<CartItemDto> = listOf(),
+    private var cartItemResponses: List<CartItemResponse> = listOf(),
+    private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
 ) : ShoppingCartDataSource {
-    constructor(vararg cartItemDtos: CartItemDto) : this(cartItemDtos.toList())
+    constructor(vararg cartItemResponses: CartItemResponse) : this(cartItemResponses.toList())
 
-    override fun findByProductId(productId: Long): ProductIdsCountData {
-        val foundItem =
-            cartItemDtos.find { cartItemDto -> cartItemDto.product.id == productId }
-                ?: throw NoSuchElementException("there is no product $productId")
+    override suspend fun findByProductId(productId: Long): Result<ProductIdsCountData> =
+        runCatchingWithDispatcher {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.product.id == productId }
+                    ?: throw NoSuchElementException("there is no product $productId")
 
-        return ProductIdsCountData(foundItem.id, foundItem.quantity)
-    }
+            ProductIdsCountData(foundItem.id, foundItem.quantity)
+        }
 
-    override fun loadAllCartItems(): List<CartItemDto> = cartItemDtos
+    override suspend fun findCartItemByProductId(productId: Long): Result<CartItemData> =
+        runCatchingWithDispatcher {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.product.id == productId }
+                    ?: throw NoSuchElementException("there is no product $productId")
 
-    override fun addNewProduct(productIdsCount: ProductIdsCount) {
-        val newId = cartItemDtos.size.toLong() + 1
-        val newCartItem =
-            CartItemDto(
-                newId,
-                productIdsCount.quantity,
-                ProductDto(
-                    productIdsCount.productId,
-                    "1",
-                    1,
-                    "1",
-                    "unit",
-                ),
-            )
-        cartItemDtos = cartItemDtos + newCartItem
-    }
+            foundItem.toData()
+        }
 
-    override fun removeCartItem(cartItemId: Long) {
-        val foundItem =
-            cartItemDtos.find { cartItemDto -> cartItemDto.id == cartItemId }
-                ?: throw NoSuchElementException()
-        cartItemDtos = cartItemDtos - foundItem
-    }
+    override suspend fun loadAllCartItems(): Result<List<CartItemData>> =
+        runCatchingWithDispatcher {
+            cartItemResponses.toData()
+        }
 
-    override fun plusProductsIdCount(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun addNewProduct(productIdsCountData: ProductIdsCountData): Result<Unit> =
+        runCatchingWithDispatcher {
+            val newCartItemResponse =
+                CartItemResponse(
+                    id = productIdsCountData.productId,
+                    quantity = productIdsCountData.quantity,
+                    product =
+                        ProductResponse(
+                            id = productIdsCountData.productId,
+                            name = "name",
+                            price = 1000,
+                            imageUrl = "url",
+                            category = "category",
+                        ),
+                )
+            cartItemResponses = cartItemResponses + newCartItemResponse
+        }
 
-    override fun minusProductsIdCount(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun removeCartItem(cartItemId: Long): Result<Unit> =
+        runCatchingWithDispatcher {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
+                    ?: throw NoSuchElementException()
+            cartItemResponses = cartItemResponses - foundItem
+        }
 
-    override fun updateProductsCount(
+    override suspend fun updateProductsCount(
         cartItemId: Long,
         newQuantity: Int,
-    ) {
-        val foundItem =
-            cartItemDtos.find { cartItemDto -> cartItemDto.id == cartItemId }
-                ?: throw NoSuchElementException()
-        val updatedItem = foundItem.copy(quantity = newQuantity)
-        val newCartItems =
-            cartItemDtos.map { cartItemDto ->
-                if (cartItemDto.id == cartItemId) updatedItem else cartItemDto
+    ): Result<Unit> =
+        runCatchingWithDispatcher {
+            val foundItem =
+                cartItemResponses.find { cartItemResponse -> cartItemResponse.id == cartItemId }
+                    ?: throw NoSuchElementException()
+
+            val updatedItem = foundItem.copy(quantity = newQuantity)
+            val newCartItems =
+                cartItemResponses.map { cartItemResponse ->
+                    if (cartItemResponse.id == cartItemId) updatedItem else cartItemResponse
+                }
+            cartItemResponses = newCartItems
+        }
+
+    private suspend fun <T> runCatchingWithDispatcher(
+        dispatcher: CoroutineDispatcher = this.dispatcher,
+        block: suspend () -> T,
+    ): Result<T> =
+        runCatching {
+            withContext(dispatcher) {
+                block()
             }
-        cartItemDtos = newCartItems
-    }
+        }
 }

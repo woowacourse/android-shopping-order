@@ -91,11 +91,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            bind:selectedItemsCount="@{vm.selectedCartItemsCount}"
             bind:isAllSelected="@{vm.isAllSelected}"
             bind:onAllCartItemSelectedListener="@{vm}"
             bind:onNavigationOrderListener="@{vm}"
-            bind:selectedCartItemsTotalPrice="@{vm.selectedCartItemsTotalPrice}" />
+            bind:selectedCartItemsTotalPrice="@{vm.selectedCartItemsTotalPrice}"
+            bind:selectedItemsCount="@{vm.selectedCartItemsCount}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
