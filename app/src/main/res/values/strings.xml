@@ -58,5 +58,11 @@
     <string name="error_load_latest_product">마지막으로 본 상품을 불러오지 못했습니다.</string>
     <string name="error_load_product">상품을 불러오지 못했습니다.</string>
     <string name="error_save_product_in_history">상품 내역을 저장하지 못했습니다.</string>
+    <string name="error_message_update_products_quantity_in_cart">장바구니 상품의 개수를 갱신하지 못했습니다.</string>
+
+    <string name="error_count_cart_product_quantity">장바구니 상품의 개수를 불러오지 못했습니다.</string>
+    <string name="error_delete_cart_product">장바구니 상품을 삭제하지 못했습니다.</string>
+    <string name="error_calculate_final_page">마지막 페이지인지 계산하지 못했습니다.</string>
+    <string name="error_load_product_history">최근 본 상품 내역을 불러오지 못했습니다.</string>
 
 </resources>

@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentProductListBinding
 import woowacourse.shopping.ui.FragmentNavigator
+import woowacourse.shopping.ui.productList.event.ProductListError
 import woowacourse.shopping.ui.productList.event.ProductListEvent
 
 class ProductListFragment : Fragment() {
@@ -76,6 +80,28 @@ class ProductListFragment : Fragment() {
                     (requireActivity() as FragmentNavigator).navigateToProductDetail(event.productId)
             }
         }
+    }
+
+    private fun observeError() {
+        viewModel.error.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is ProductListError.AddShoppingCartProduct -> showToast(R.string.error_add_product_to_cart)
+                is ProductListError.CountCartProductQuantity -> showToast(R.string.error_count_cart_product_quantity)
+                is ProductListError.CalculateFinalPage -> showToast(R.string.error_calculate_final_page)
+                is ProductListError.LoadCartProducts -> showToast(R.string.error_message_shopping_cart_products)
+                is ProductListError.LoadProductHistory -> showToast(R.string.error_load_product_history)
+                is ProductListError.LoadProducts -> showToast(R.string.error_load_product)
+                is ProductListError.UpdateProductQuantity -> showToast(R.string.error_message_update_products_quantity_in_cart)
+            }
+        }
+    }
+
+    private fun showToast(@StringRes stringId: Int) {
+        Toast.makeText(
+            requireContext(),
+            stringId,
+            Toast.LENGTH_SHORT,
+        ).show()
     }
 
     private fun observeLoadedProducts() {

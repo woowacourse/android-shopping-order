@@ -82,7 +82,7 @@ class ProductListViewModel(
                 _cartProductTotalCount.value = calculatedProductsQuantity
             }
             .onFailure {
-                _error.setValue(ProductListError.CalculateCartProductTotalCount)
+                _error.setValue(ProductListError.CountCartProductQuantity)
             }
     }
 
@@ -192,6 +192,7 @@ class ProductListViewModel(
                     updateProductsTotalCount()
                 }
                 .onFailure {
+                    // TODO: 장바구니 데이터 소스에서부터 내려오는 Failure 의 종류에 따라서 를 잡아서 다른 Error 로 set 해줘야 할 듯...
                     _error.setValue(ProductListError.UpdateProductQuantity)
                 }
         }
@@ -204,7 +205,7 @@ class ProductListViewModel(
                     _cartProductTotalCount.value = it
                 }
                 .onFailure {
-                    _error.setValue(ProductListError.CalculateCartProductCount)
+                    _error.setValue(ProductListError.CountCartProductQuantity)
                 }
         }
     }
