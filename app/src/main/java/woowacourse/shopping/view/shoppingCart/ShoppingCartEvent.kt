@@ -1,0 +1,8 @@
+package woowacourse.shopping.view.shoppingCart
+
+enum class ShoppingCartEvent {
+    LOAD_SHOPPING_CART_FAILURE,
+    REMOVE_SHOPPING_CART_PRODUCT_FAILURE,
+    UPDATE_SHOPPING_CART_PRODUCT_SUCCESS,
+    UPDATE_SHOPPING_CART_PRODUCT_FAILURE,
+}
