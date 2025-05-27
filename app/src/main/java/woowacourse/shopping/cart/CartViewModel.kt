@@ -7,6 +7,7 @@ import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
+import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartViewModel(
@@ -28,6 +29,10 @@ class CartViewModel(
 
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
+
+    private val _loadingState: MutableLiveData<LoadingState> =
+        MutableLiveData(LoadingState.loading())
+    val loadingState: LiveData<LoadingState> get() = _loadingState
 
     init {
         loadCartProducts()
@@ -105,6 +110,8 @@ class CartViewModel(
     }
 
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
+        _loadingState.postValue(LoadingState.loading())
+
         cartProductRepository.getAllProductsSize { totalSize ->
             val currentPage = page.value ?: INITIAL_PAGE
             val startIndex = currentPage * pageSize
@@ -113,14 +120,18 @@ class CartViewModel(
             if (startIndex >= totalSize) {
                 return@getAllProductsSize
             }
+            Thread.sleep(2000)
 
             cartProductRepository.getCartProductsInRange(startIndex, endIndex) { cartProducts ->
+
                 val pagedProducts: List<ProductUiModel> =
                     cartProducts.map { it.toUiModel() }
 
                 _cartProducts.postValue(pagedProducts)
                 checkNextButtonEnabled(totalSize)
                 checkPrevButtonEnabled()
+            }.also {
+                _loadingState.postValue(LoadingState.loaded())
             }
         }
     }

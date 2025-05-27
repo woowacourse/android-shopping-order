@@ -3,6 +3,8 @@ package woowacourse.shopping.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -64,6 +66,20 @@ class CartActivity : AppCompatActivity() {
         viewModel.page.observe(this) { updateCartItems() }
         viewModel.updatedItem.observe(this) { item ->
             (binding.recyclerViewCart.adapter as CartAdapter).setCartItem(item)
+        }
+        viewModel.loadingState.observe(this) {
+            Log.d("LOADING_STATE", "State : $it")
+            when (it.isLoading) {
+                true -> {
+                    binding.shimmerFrameLayoutCartProducts.startShimmer()
+                    binding.shimmerFrameLayoutCartProducts.visibility = View.VISIBLE
+                }
+
+                false -> {
+                    binding.shimmerFrameLayoutCartProducts.stopShimmer()
+                    binding.shimmerFrameLayoutCartProducts.visibility = View.GONE
+                }
+            }
         }
     }
 

@@ -23,5 +23,27 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:context=".cart.CartActivity" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerFrameLayout_cart_products"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include layout="@layout/shimmer_cart_product_item" />
+
+                <include layout="@layout/shimmer_cart_product_item" />
+
+                <include layout="@layout/shimmer_cart_product_item" />
+
+                <include layout="@layout/shimmer_cart_product_item" />
+
+                <include layout="@layout/shimmer_cart_product_item" />
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
