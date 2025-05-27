@@ -7,11 +7,11 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.product.catalog.ProductUiModel" />
+            type="woowacourse.shopping.presentation.product.catalog.ProductUiModel" />
 
         <variable
             name="handler"
-            type="woowacourse.shopping.product.ProductQuantityHandler" />
+            type="woowacourse.shopping.presentation.product.ProductQuantityHandler" />
         <variable
             name="cartHandler"
             type="woowacourse.shopping.presentation.cart.event.CartEventHandler" />

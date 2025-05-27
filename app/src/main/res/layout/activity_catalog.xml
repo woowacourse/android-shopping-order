@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.product.catalog.CatalogViewModel" />
+            type="woowacourse.shopping.presentation.product.catalog.CatalogViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView

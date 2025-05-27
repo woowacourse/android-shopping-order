@@ -8,23 +8,23 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="woowacourse.shopping.product.detail.DetailViewModel" />
+            type="woowacourse.shopping.presentation.product.detail.DetailViewModel" />
 
         <variable
             name="product"
-            type="woowacourse.shopping.product.catalog.ProductUiModel" />
+            type="woowacourse.shopping.presentation.product.catalog.ProductUiModel" />
 
         <variable
             name="handler"
-            type="woowacourse.shopping.product.ProductQuantityHandler" />
+            type="woowacourse.shopping.presentation.product.ProductQuantityHandler" />
 
         <variable
             name="detailHandler"
-            type="woowacourse.shopping.product.detail.event.DetailEventHandler" />
+            type="woowacourse.shopping.presentation.product.detail.event.DetailEventHandler" />
 
         <variable
             name="recentItem"
-            type="woowacourse.shopping.product.catalog.ProductUiModel" />
+            type="woowacourse.shopping.presentation.product.catalog.ProductUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

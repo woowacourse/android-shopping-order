@@ -8,10 +8,10 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.product.catalog.CatalogViewModel" />
+            type="woowacourse.shopping.presentation.product.catalog.CatalogViewModel" />
         <variable
             name="handler"
-            type="woowacourse.shopping.product.catalog.event.CatalogEventHandler" />
+            type="woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -9,15 +9,15 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.product.catalog.ProductUiModel" />
+            type="woowacourse.shopping.presentation.product.catalog.ProductUiModel" />
 
         <variable
             name="catalogHandler"
-            type="woowacourse.shopping.product.catalog.event.CatalogEventHandler" />
+            type="woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler" />
 
         <variable
             name="handler"
-            type="woowacourse.shopping.product.ProductQuantityHandler" />
+            type="woowacourse.shopping.presentation.product.ProductQuantityHandler" />
 
     </data>
 
