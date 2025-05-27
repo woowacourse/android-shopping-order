@@ -3,19 +3,29 @@ package woowacourse.shopping.data
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.cart.api.CartApiService
+import woowacourse.shopping.data.product.api.ProductsApiService
 
 object RetrofitClient {
-    val cartApiService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(CartApiService::class.java)
+    val cartApiService: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    val productApiService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(CartApiService::class.java)
+    val productApiService: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    const val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
+    val getProductRetrofitService: ProductsApiService by lazy {
+        productApiService.create(
+            ProductsApiService::class.java
+        )
+    }
+    val getCartRetrofitService: CartApiService by lazy { cartApiService.create(CartApiService::class.java) }
+
+    private const val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
 }
