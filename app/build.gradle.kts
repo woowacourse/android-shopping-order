@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
     id("kotlin-kapt")
 }
 
@@ -86,9 +87,10 @@ dependencies {
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
 
     implementation(libs.glide)
-    implementation(libs.okhttp)
     implementation(libs.mockwebserver)
-    implementation(libs.converter.gson)
+    implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
 
