@@ -1,17 +1,15 @@
 package woowacourse.shopping.mockserver
 
-import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import woowacourse.shopping.data.model.PageableResponse
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.model.ProductResponse
 
 class MockProductDispatcher(
-    private val products: List<Product>,
+    private val products: List<ProductResponse>,
 ) : Dispatcher() {
-    private val gson = Gson()
-
     override fun dispatch(request: RecordedRequest): MockResponse {
         val path = request.path ?: return MockResponse().setResponseCode(404)
 
@@ -23,7 +21,7 @@ class MockProductDispatcher(
                 if (product != null) {
                     MockResponse()
                         .setResponseCode(200)
-                        .setBody(gson.toJson(product))
+                        .setBody(Json.encodeToString(product))
                 } else {
                     MockResponse()
                         .setResponseCode(404)
@@ -33,9 +31,9 @@ class MockProductDispatcher(
 
             path.startsWith("/product?ids=") -> {
                 val idListString = path.substringAfter("?ids=")
-                val ids = gson.fromJson(idListString, Array<Long>::class.java).toList()
+                val ids = Json.decodeFromString<List<Long>>(idListString)
                 val foundProducts = products.filter { it.id in ids }
-                MockResponse().setResponseCode(200).setBody(gson.toJson(foundProducts))
+                MockResponse().setResponseCode(200).setBody(Json.encodeToString(foundProducts))
             }
 
             path.startsWith("/products/") -> {
@@ -44,7 +42,7 @@ class MockProductDispatcher(
                 val paged = products.drop(offset).take(limit)
                 val hasMore = offset + limit < products.size
                 val pagedWithHasMore = PageableResponse(paged, hasMore)
-                MockResponse().setResponseCode(200).setBody(gson.toJson(pagedWithHasMore))
+                MockResponse().setResponseCode(200).setBody(Json.encodeToString(pagedWithHasMore))
             }
 
             else -> MockResponse().setResponseCode(404).setBody("Not found")

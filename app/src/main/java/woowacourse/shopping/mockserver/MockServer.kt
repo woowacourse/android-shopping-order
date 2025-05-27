@@ -14,6 +14,6 @@ class MockServer {
 
     private fun startMockServer() {
         server = MockWebServer()
-        server.dispatcher = MockProductDispatcher(dummyProducts)
+        server.dispatcher = MockProductDispatcher(dummyProductResponses)
     }
 }

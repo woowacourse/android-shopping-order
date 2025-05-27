@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.service
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import woowacourse.shopping.data.model.PageableResponse
@@ -12,16 +11,14 @@ class MockProductService(
     private val client: OkHttpClient,
     private val server: MockServer,
 ) : ProductService {
-    private val gson = Gson()
-
     override fun findProductById(id: Long): ProductResponse {
         val url = "/product/$id"
-        return executeRequest(url, object : TypeToken<ProductResponse>() {})
+        return executeRequest<ProductResponse>(url)
     }
 
     override fun findProductsByIds(ids: List<Long>): List<ProductResponse> {
-        val url = "/product?ids=${gson.toJson(ids)}"
-        return executeRequest(url, object : TypeToken<List<ProductResponse>>() {})
+        val url = "/product?ids=${Json.encodeToString(ids)}"
+        return executeRequest<List<ProductResponse>>(url)
     }
 
     override fun loadProducts(
@@ -29,13 +26,10 @@ class MockProductService(
         limit: Int,
     ): PageableResponse<ProductResponse> {
         val url = "/products/?offset=$offset&limit=$limit"
-        return executeRequest(url, object : TypeToken<PageableResponse<ProductResponse>>() {})
+        return executeRequest<PageableResponse<ProductResponse>>(url)
     }
 
-    private inline fun <reified T> executeRequest(
-        url: String,
-        typeToken: TypeToken<T>,
-    ): T {
+    private inline fun <reified T> executeRequest(url: String): T {
         val httpUrl = server.createUrlWithBase(url)
         val request = Request.Builder().url(httpUrl).build()
         val response = client.newCall(request).execute()
@@ -53,7 +47,7 @@ class MockProductService(
             )
         }
 
-        return gson.fromJson(responseBody, typeToken.type)
+        return Json.decodeFromString<T>(responseBody)
     }
 
     companion object {
