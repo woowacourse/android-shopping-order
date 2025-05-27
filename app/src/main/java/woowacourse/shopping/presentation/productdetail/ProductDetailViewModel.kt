@@ -45,12 +45,12 @@ class ProductDetailViewModel(
     }
 
     fun addToCart(productId: Long) {
-        val quantity: Int = _productCount.value ?: return
-        cartRepository.insertOrIncrease(productId, quantity) { result ->
-            result
-                .onSuccess { _insertProductResult.postValue(ResultState.Success(Unit)) }
-                .onFailure { _insertProductResult.postValue(ResultState.Failure()) }
-        }
+//        val quantity: Int = _productCount.value ?: return
+//        cartRepository.insertOrIncrease(productId, quantity) { result ->
+//            result
+//                .onSuccess { _insertProductResult.postValue(ResultState.Success(Unit)) }
+//                .onFailure { _insertProductResult.postValue(ResultState.Failure()) }
+//        }
     }
 
     override fun onClickMinus(id: Long) {

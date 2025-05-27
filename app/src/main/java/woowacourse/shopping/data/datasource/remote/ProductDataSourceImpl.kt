@@ -3,9 +3,9 @@ package woowacourse.shopping.data.datasource.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.cart.toDomain
-import woowacourse.shopping.data.dto.product.Content
+import woowacourse.shopping.data.dto.product.ProductContent
 import woowacourse.shopping.data.dto.product.ProductsResponse
+import woowacourse.shopping.data.dto.product.toDomain
 import woowacourse.shopping.data.remote.ProductService
 import woowacourse.shopping.domain.model.Product
 
@@ -42,28 +42,28 @@ class ProductDataSourceImpl(
 
     override fun fetchProductById(
         id: Long,
-        onResult: (Product) -> Unit
+        onResult: (Product) -> Unit,
     ) {
         productService.requestProductById(id).enqueue(
-            object : Callback<Content> {
+            object : Callback<ProductContent> {
                 override fun onResponse(
-                    call: Call<Content>,
-                    response: Response<Content>,
+                    call: Call<ProductContent>,
+                    response: Response<ProductContent>,
                 ) {
                     if (response.isSuccessful) {
-                        val product = response.body()?.toDomain()
-                            ?: throw NoSuchElementException("해당 id의 상품을 찾지 못했습니다.")
+                        val product =
+                            response.body()?.toDomain()
+                                ?: throw NoSuchElementException("해당 id의 상품을 찾지 못했습니다.")
                         onResult(product)
                     }
                 }
 
                 override fun onFailure(
-                    call: Call<Content>,
+                    call: Call<ProductContent>,
                     t: Throwable,
                 ) {
                 }
             },
         )
-
     }
 }

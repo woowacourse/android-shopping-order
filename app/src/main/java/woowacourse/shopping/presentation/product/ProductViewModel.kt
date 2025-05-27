@@ -57,14 +57,14 @@ class ProductViewModel(
     }
 
     fun fetchCartItemCount() {
-        cartRepository.getTotalQuantity { result ->
-            result
-                .onSuccess { count ->
-                    _cartItemCount.postValue(count ?: 0)
-                }.onFailure {
-                    _toastMessage.postValue(R.string.product_toast_load_total_cart_quantity_fail)
-                }
-        }
+//        cartRepository.getTotalQuantity { result ->
+//            result
+//                .onSuccess { count ->
+//                    _cartItemCount.postValue(count ?: 0)
+//                }.onFailure {
+//                    _toastMessage.postValue(R.string.product_toast_load_total_cart_quantity_fail)
+//                }
+//        }
     }
 
     fun loadMore() {
@@ -85,54 +85,54 @@ class ProductViewModel(
     }
 
     fun increaseQuantity(productId: Long) {
-        cartRepository.increaseQuantity(productId, 1) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId, 1)
-                    fetchCartItemCount()
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_increase_fail
-                }
-        }
+//        cartRepository.increaseQuantity(productId, 1) { result ->
+//            result
+//                .onSuccess {
+//                    updateQuantity(productId, 1)
+//                    fetchCartItemCount()
+//                }.onFailure {
+//                    _toastMessage.value = R.string.product_toast_increase_fail
+//                }
+//        }
     }
 
     fun decreaseQuantity(productId: Long) {
-        val currentItems = (_products.value as? ResultState.Success)?.data ?: return
-        val item = currentItems.find { it.product.productId == productId } ?: return
-
-        if (item.quantity == 1) {
-            cartRepository.deleteProduct(productId) { result ->
-                result
-                    .onSuccess {
-                        updateQuantity(productId, -1)
-                        fetchCartItemCount()
-                    }.onFailure {
-                        _toastMessage.value = R.string.product_toast_delete_fail
-                    }
-            }
-        } else {
-            cartRepository.decreaseQuantity(productId) { result ->
-                result
-                    .onSuccess {
-                        updateQuantity(productId, -1)
-                        fetchCartItemCount()
-                    }.onFailure {
-                        _toastMessage.value = R.string.product_toast_decrease_fail
-                    }
-            }
-        }
+//        val currentItems = (_products.value as? ResultState.Success)?.data ?: return
+//        val item = currentItems.find { it.product.productId == productId } ?: return
+//
+//        if (item.quantity == 1) {
+//            cartRepository.deleteProduct(productId) { result ->
+//                result
+//                    .onSuccess {
+//                        updateQuantity(productId, -1)
+//                        fetchCartItemCount()
+//                    }.onFailure {
+//                        _toastMessage.value = R.string.product_toast_delete_fail
+//                    }
+//            }
+//        } else {
+//            cartRepository.decreaseQuantity(productId) { result ->
+//                result
+//                    .onSuccess {
+//                        updateQuantity(productId, -1)
+//                        fetchCartItemCount()
+//                    }.onFailure {
+//                        _toastMessage.value = R.string.product_toast_decrease_fail
+//                    }
+//            }
+//        }
     }
 
     fun addToCart(cartItem: CartItem) {
-        cartRepository.insertProduct(cartItem) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId = cartItem.product.productId, 1)
-                    fetchCartItemCount()
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_add_cart_fail
-                }
-        }
+//        cartRepository.insertProduct(cartItem) { result ->
+//            result
+//                .onSuccess {
+//                    updateQuantity(productId = cartItem.product.productId, 1)
+//                    fetchCartItemCount()
+//                }.onFailure {
+//                    _toastMessage.value = R.string.product_toast_add_cart_fail
+//                }
+//        }
     }
 
     private fun updateQuantity(

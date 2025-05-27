@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.remote
+package woowacourse.shopping.data.repository.local
 
 import woowacourse.shopping.data.datasource.local.RecentProductDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
