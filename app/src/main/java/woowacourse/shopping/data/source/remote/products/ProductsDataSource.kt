@@ -1,14 +1,13 @@
 package woowacourse.shopping.data.source.remote.products
 
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.model.ProductsResponse
 
 interface ProductsDataSource {
-    fun getProducts(): List<ProductUiModel>
+    fun getProducts(onResult: (Result<ProductsResponse>) -> Unit)
 
-    fun getSubListedProducts(
-        startIndex: Int,
-        lastIndex: Int,
-    ): List<ProductUiModel>
-
-    fun getProductsSize(): Int
+    fun getProductById(
+        id: Int,
+        onResult: (Result<ProductResponse>) -> Unit,
+    )
 }
