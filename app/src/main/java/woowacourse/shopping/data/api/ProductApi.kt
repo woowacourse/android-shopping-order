@@ -18,6 +18,6 @@ interface ProductApi {
 
     @GET("/products/{id}")
     fun getProductDetail(
-        @Path("id") productId: Long,
+        @Path("id") id: Long,
     ): Call<ProductDetailResponse>
 }
