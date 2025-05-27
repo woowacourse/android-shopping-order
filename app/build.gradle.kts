@@ -19,10 +19,20 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "MOCK_URL", gradleLocalProperties(rootDir, providers).getProperty("mock.url"))
+        buildConfigField(
+            "String",
+            "MOCK_URL",
+            gradleLocalProperties(rootDir, providers).getProperty("mock.url"),
+        )
+        buildConfigField(
+            "String",
+            "TECHCOURSE_URL",
+            gradleLocalProperties(rootDir, providers).getProperty("techcourse.url"),
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
     }
 
     buildTypes {

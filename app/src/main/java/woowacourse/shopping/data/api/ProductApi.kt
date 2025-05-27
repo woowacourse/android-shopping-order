@@ -6,7 +6,7 @@ import retrofit2.http.Query
 import woowacourse.shopping.data.model.response.ProductResponse
 
 interface ProductApi {
-    @GET("products")
+    @GET("/products")
     fun getProducts(
         @Query("lastId") lastId: Int,
         @Query("count") count: Int,
