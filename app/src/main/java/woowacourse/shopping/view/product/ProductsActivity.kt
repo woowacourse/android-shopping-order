@@ -62,7 +62,7 @@ class ProductsActivity :
         }
 
     private fun navigateToRecentProduct(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product, true))
+        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id, true))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -159,7 +159,7 @@ class ProductsActivity :
     }
 
     override fun onProductClick(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
+        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
     }
 
     override fun onLoadClick() {
@@ -167,7 +167,7 @@ class ProductsActivity :
     }
 
     override fun onRecentProductClick(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
+        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
     }
 
     override fun onPlusShoppingCartClick(

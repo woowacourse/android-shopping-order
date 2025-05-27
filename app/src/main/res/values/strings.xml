@@ -29,4 +29,5 @@
     <string name="product_detail_recent_watching_title">마지막으로 본 상품</string>
     <string name="product_detail_update_recent_watching_error_message">최근 본 상품을 조회하는 데 실패했습니다.</string>
 
+
 </resources>

@@ -34,24 +34,23 @@ class ProductDetailActivity :
             insets
         }
 
-        val product: Product =
-            intent.getSerializableExtraData(EXTRA_PRODUCT) ?: run {
+        val productId: Long =
+            intent.getSerializableExtraData(EXTRA_PRODUCT_ID) ?: run {
                 binding.root.showSnackBar(getString(R.string.product_not_provided_error_message))
                 return finish()
             }
+
         val isLastWatching: Boolean =
             intent.getSerializableExtraData(EXTRA_IS_LAST_WATCHING) ?: false
-        viewModel.updateProduct(product, isLastWatching)
-        bindViewModel(product)
+        viewModel.updateProduct(productId, isLastWatching)
+        bindViewModel()
         setupObservers()
     }
 
-    private fun bindViewModel(product: Product) {
+    private fun bindViewModel() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.productDetailEventListener = this
-        binding.productDetailQuantityComponent.product = product
-        binding.productDetailQuantityComponent.productQuantityClickListener = this
     }
 
     private fun setupObservers() {
@@ -72,6 +71,10 @@ class ProductDetailActivity :
                 ProductDetailEvent.ADD_SHOPPING_CART_FAILURE -> R.string.product_detail_add_shopping_cart_error_message
                 ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE -> R.string.product_detail_add_recent_watching_error_message
                 ProductDetailEvent.GET_RECENT_WATCHING_FAILURE -> R.string.product_detail_update_recent_watching_error_message
+                ProductDetailEvent.GET_PRODUCT_FAILURE -> {
+                    R.string.product_not_provided_error_message
+                    return finish()
+                }
             }
 
         binding.root.showSnackBar(getString(messageResourceId))
@@ -115,18 +118,18 @@ class ProductDetailActivity :
     }
 
     companion object {
-        private const val EXTRA_PRODUCT = "woowacourse.shopping.EXTRA_PRODUCT"
+        private const val EXTRA_PRODUCT_ID = "woowacourse.shopping.EXTRA_PRODUCT_ID"
         private const val EXTRA_IS_LAST_WATCHING = "woowacourse.shopping.EXTRA_IS_LAST_WATCHING"
 
         fun newIntent(
             context: Context,
-            product: Product,
+            productId: Long,
             isLastWatching: Boolean = false,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(
-                    EXTRA_PRODUCT,
-                    product,
+                    EXTRA_PRODUCT_ID,
+                    productId,
                 )
                 putExtra(EXTRA_IS_LAST_WATCHING, isLastWatching)
             }

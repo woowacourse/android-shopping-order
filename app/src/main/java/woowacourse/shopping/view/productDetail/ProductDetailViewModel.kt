@@ -35,20 +35,31 @@ class ProductDetailViewModel(
     val recentProductBoxVisible: LiveData<Boolean> get() = _recentProductBoxVisible
 
     fun updateProduct(
-        product: Product,
+        productId: Long,
         isLastWatching: Boolean,
     ) {
-        _product.value = product
-        _price.value = product.price
+        productsRepository.getProduct(productId) { result ->
+            result
+                .onSuccess { product ->
+                    if (product == null) {
+                        _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
+                    } else {
+                        _product.value = product
+                        _price.value = product.price
 
-        productsRepository.updateRecentWatchingProduct(product) { result ->
-            result.onFailure {
-                _event.postValue(ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE)
-            }
+                        productsRepository.updateRecentWatchingProduct(product) { result ->
+                            result.onFailure {
+                                _event.setValue(ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE)
+                            }
+                        }
+
+                        if (isLastWatching) return@getProduct
+                        updateRecentWatchingProduct()
+                    }
+                }.onFailure {
+                    _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
+                }
         }
-
-        if (isLastWatching) return
-        updateRecentWatchingProduct()
     }
 
     private fun updateRecentWatchingProduct() {

@@ -19,7 +19,7 @@ data class ProductResponseDto(
 ) {
     fun toDomain(): Product =
         Product(
-            id = id.toLong(),
+            id = id,
             name = name,
             price = price,
             imageUrl = imageUrl,

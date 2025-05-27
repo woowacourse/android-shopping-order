@@ -112,6 +112,8 @@
                     app:layout_constraintTop_toTopOf="@id/productDetailPrice">
 
                     <include
+                        app:productQuantityClickListener="@{productDetailEventListener}"
+                        app:product="@{viewModel.product}"
                         android:id="@+id/productDetailQuantityComponent"
                         layout="@layout/component_product_quantity" />
 

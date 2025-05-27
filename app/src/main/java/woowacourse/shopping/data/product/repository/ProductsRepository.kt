@@ -18,4 +18,9 @@ interface ProductsRepository {
         product: Product,
         onResult: (Result<Unit>) -> Unit,
     )
+
+    fun getProduct(
+        productId: Long,
+        onResult: (Result<Product?>) -> Unit,
+    )
 }
