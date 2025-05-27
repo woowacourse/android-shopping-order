@@ -13,7 +13,7 @@ object DatabaseModule {
         appContext = context.applicationContext
     }
 
-    fun provideDatabase(): CartDatabase = CartDatabase.getInstance(appContext).also { database = it }
+    private fun provideDatabase(): CartDatabase = CartDatabase.getInstance(appContext).also { database = it }
 
     fun provideCartDao(): CartDao = provideDatabase().cartDao()
 

@@ -1,8 +1,25 @@
 package woowacourse.shopping.di
 
-import woowacourse.shopping.data.remote.ProductMockWebServer
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import woowacourse.shopping.data.remote.OkHttpClientProvider
 import woowacourse.shopping.data.remote.ProductService
 
 object NetworkModule {
-    fun provideProductService(): ProductService = ProductMockWebServer()
+    private const val BASE_URL =
+        "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
+
+    private var productService: ProductService? = null
+
+    private fun provideRetrofit(): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .client(OkHttpClientProvider.provideClient())
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .build()
+
+    fun provideProductService(): ProductService = productService ?: provideRetrofit().create(ProductService::class.java)
 }
