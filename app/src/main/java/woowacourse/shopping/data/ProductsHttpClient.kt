@@ -3,11 +3,19 @@ package woowacourse.shopping.data
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 
 class ProductsHttpClient(
     private val baseUrl: String = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
 ) {
-    private val client: OkHttpClient = OkHttpClient()
+    private val client: OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                },
+            ).build()
 
     fun getShoppingCart(
         page: Int,
@@ -35,7 +43,7 @@ class ProductsHttpClient(
         val request: Request =
             Request
                 .Builder()
-                .url("$baseUrl/products?page=${page}&size=${size}")
+                .url("$baseUrl/products?page=$page&size=$size")
                 .get()
                 .build()
 
