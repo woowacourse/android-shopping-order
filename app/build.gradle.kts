@@ -81,6 +81,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.json)
 
     // Android Test
     androidTestImplementation(libs.androidx.test.ext.junit)
