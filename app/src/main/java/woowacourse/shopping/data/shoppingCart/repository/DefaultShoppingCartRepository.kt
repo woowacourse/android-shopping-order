@@ -5,7 +5,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.shoppingCart.local.dao.ShoppingCartDao
 import woowacourse.shopping.data.shoppingCart.local.entity.ShoppingCartProductEntity
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsDto
+import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsResponseDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
@@ -147,16 +147,16 @@ class DefaultShoppingCartRepository(
 
     override fun fetchAllQuantity(onResult: (Result<Int>) -> Unit) {
         shoppingCartService.getCartCounts().enqueue(
-            object : Callback<CartCountsDto> {
+            object : Callback<CartCountsResponseDto> {
                 override fun onResponse(
-                    call: Call<CartCountsDto?>,
-                    response: Response<CartCountsDto?>,
+                    call: Call<CartCountsResponseDto?>,
+                    response: Response<CartCountsResponseDto?>,
                 ) {
                     onResult(Result.success(response.body()?.quantity ?: 0))
                 }
 
                 override fun onFailure(
-                    call: Call<CartCountsDto?>,
+                    call: Call<CartCountsResponseDto?>,
                     t: Throwable,
                 ) {
                     onResult(Result.failure(t))
