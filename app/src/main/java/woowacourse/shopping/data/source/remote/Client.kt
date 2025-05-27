@@ -5,15 +5,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.source.remote.api.CartApiService
 import woowacourse.shopping.data.source.remote.api.ProductsApiService
 
-object RetrofitClient {
-    val cartApiService: Retrofit by lazy {
+object Client {
+    private val cartApiService: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
-    val productApiService: Retrofit by lazy {
+    private val productApiService: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
