@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProductsResponse(
     @SerialName("content")
-    val content: List<Content>,
+    val content: List<ProductContent>,
     @SerialName("empty")
     val empty: Boolean,
     @SerialName("first")

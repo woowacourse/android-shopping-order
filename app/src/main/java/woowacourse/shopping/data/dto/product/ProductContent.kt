@@ -1,22 +1,25 @@
-package woowacourse.shopping.data.dto.cart
+package woowacourse.shopping.data.dto.product
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.data.dto.product.Content
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 
 @Serializable
-data class Content(
+data class ProductContent(
+    @SerialName("category")
+    val category: String,
     @SerialName("id")
     val id: Long,
-    @SerialName("product")
-    val product: CartResponse,
-    @SerialName("quantity")
-    val quantity: Int,
+    @SerialName("imageUrl")
+    val imageUrl: String,
+    @SerialName("name")
+    val name: String,
+    @SerialName("price")
+    val price: Int,
 )
 
-fun Content.toDomain(): Product =
+fun ProductContent.toDomain(): Product =
     Product(
         productId = this.id,
         name = this.name,

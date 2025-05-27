@@ -2,6 +2,9 @@ package woowacourse.shopping.data.dto.cart
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Price
+import woowacourse.shopping.domain.model.Product
 
 @Serializable
 data class CartResponse(
@@ -16,3 +19,9 @@ data class CartResponse(
     @SerialName("price")
     val price: Int,
 )
+
+fun CartResponse.toDomain(quantity: Int): CartItem =
+    CartItem(
+        Product(this.id, this.name, Price(this.price), this.imageUrl, this.category),
+        quantity,
+    )
