@@ -10,6 +10,6 @@ interface GoodsService {
     fun requestGoods(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 1
+        @Query("size") size: Int = 30
     ): Call<ProductResponse>
 }

@@ -12,6 +12,7 @@ import retrofit2.Response
 import woowacourse.shopping.data.local.cart.repository.CartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.GoodsClient
+import woowacourse.shopping.data.remote.Product
 import woowacourse.shopping.data.remote.ProductResponse
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
@@ -27,6 +28,10 @@ class GoodsViewModel(
 ) : ViewModel() {
     private val _items = MutableLiveData<List<Any>>()
     val items: LiveData<List<Any>> get() = _items
+
+    private val _products = MutableLiveData<List<Product>>()
+    val products: LiveData<List<Product>> get() = _products
+
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
     private val _hasNextPage = MutableLiveData(true)
@@ -41,7 +46,7 @@ class GoodsViewModel(
 
     init {
         loadItems()
-        loadProduct()
+        loadProductsInRange()
     }
 
     fun addPage() {
@@ -114,19 +119,18 @@ class GoodsViewModel(
         return dummyGoods.subList(fromIndex, toIndex)
     }
 
-    fun loadProduct() {
-        GoodsClient.getRetrofitService().requestGoods().enqueue(object: Callback<ProductResponse> {
-            override fun onResponse(
-                call: Call<ProductResponse>,
-                response: Response<ProductResponse>
-            ) {
-                Log.d("123451", "hi")
+    fun loadProductsInRange() {
+        GoodsClient.getRetrofitService().requestGoods().enqueue(object : Callback<ProductResponse> {
+            override fun onResponse(call: Call<ProductResponse>, response: Response<ProductResponse>) {
+                if (response.isSuccessful) {
+                    val allItems = response.body()?.content.orEmpty()
+                    _products.value = allItems
+                }
             }
 
             override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                Log.d("123452", "hi")
+                Log.e("loadProductsInRange", "API 요청 실패", t)
             }
-
         })
     }
 
