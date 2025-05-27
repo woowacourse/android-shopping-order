@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.CartProduct
 @Serializable
 data class CartProductDto(
     @SerialName("id")
-    val id: Long,
+    val id: Int,
     @SerialName("quantity")
     val quantity: Int,
     @SerialName("product")

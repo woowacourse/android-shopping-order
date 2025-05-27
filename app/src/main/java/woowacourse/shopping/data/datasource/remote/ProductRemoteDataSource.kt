@@ -15,7 +15,7 @@ class ProductRemoteDataSource(
     private val productService: ProductApiService,
 ) {
     fun getProductById(
-        id: Long,
+        id: Int,
         onSuccess: (Product?) -> Unit,
     ) {
         productService.getProductById(id = id.toInt()).enqueue(
@@ -42,7 +42,7 @@ class ProductRemoteDataSource(
     }
 
     fun getProductsByIds(
-        ids: List<Long>,
+        ids: List<Int>,
         onSuccess: (List<Product>?) -> Unit,
     ) {
         val latch = CountDownLatch(ids.size)

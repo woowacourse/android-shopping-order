@@ -5,12 +5,12 @@ import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     fun getProductById(
-        id: Long,
+        id: Int,
         onSuccess: (Product?) -> Unit,
     )
 
     fun getProductsByIds(
-        ids: List<Long>,
+        ids: List<Int>,
         onSuccess: (List<Product>?) -> Unit,
     )
 

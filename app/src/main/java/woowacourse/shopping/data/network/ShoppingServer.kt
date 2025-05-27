@@ -31,7 +31,7 @@ class ShoppingServer {
             request.requestUrl?.queryParameter(PARAM_ID)
                 ?: return failureResponse()
 
-        val id = idParam.toLongOrNull() ?: return failureResponse()
+        val id = idParam.toIntOrNull() ?: return failureResponse()
         val product = ProductData.getProductById(id) ?: return failureResponse()
         val body = gson.toJson(product)
         return successResponse(body)
@@ -42,7 +42,7 @@ class ShoppingServer {
             request.requestUrl?.queryParameterValues(PARAM_ID)
                 ?: return failureResponse()
 
-        val ids = idParams.mapNotNull { it?.toLongOrNull() }
+        val ids = idParams.mapNotNull { it?.toIntOrNull() }
         val products = ids.mapNotNull { ProductData.getProductById(it) }
         val body = gson.toJson(products)
         return successResponse(body)

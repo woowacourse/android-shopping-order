@@ -19,7 +19,7 @@ class FakeCartProductRepository : CartProductRepository {
     }
 
     override fun getQuantityByProductId(
-        productId: Long,
+        productId: Int,
         onSuccess: (Int?) -> Unit,
     ) {
         onSuccess(cartProducts.find { it.product.id == productId }?.quantity)
@@ -30,7 +30,7 @@ class FakeCartProductRepository : CartProductRepository {
     }
 
     override fun updateQuantity(
-        productId: Long,
+        productId: Int,
         currentQuantity: Int,
         newQuantity: Int,
         onSuccess: () -> Unit,
@@ -50,7 +50,7 @@ class FakeCartProductRepository : CartProductRepository {
     }
 
     override fun deleteByProductId(
-        productId: Long,
+        productId: Int,
         onSuccess: () -> Unit,
     ) {
         cartProducts.removeIf { it.product.id == productId }
@@ -58,7 +58,7 @@ class FakeCartProductRepository : CartProductRepository {
     }
 
     private fun insert(
-        productId: Long,
+        productId: Int,
         quantity: Int,
     ) {
         val product =

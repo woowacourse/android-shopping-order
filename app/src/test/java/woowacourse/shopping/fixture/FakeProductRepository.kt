@@ -8,7 +8,7 @@ class FakeProductRepository : ProductRepository {
     private val fakeProducts =
         List(100) { index ->
             Product(
-                id = index.toLong(),
+                id = index,
                 imageUrl = "",
                 name = "Product $index",
                 price = (index + 1) * 1000,
@@ -16,14 +16,14 @@ class FakeProductRepository : ProductRepository {
         }
 
     override fun getProductById(
-        id: Long,
+        id: Int,
         onSuccess: (Product?) -> Unit,
     ) {
         onSuccess(fakeProducts.find { it.id == id })
     }
 
     override fun getProductsByIds(
-        ids: List<Long>,
+        ids: List<Int>,
         onSuccess: (List<Product>?) -> Unit,
     ) {
         val result = ids.mapNotNull { id -> fakeProducts.find { it.id == id } }

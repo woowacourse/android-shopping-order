@@ -26,7 +26,7 @@ class CartProductRepositoryImpl(
     }
 
     override fun getQuantityByProductId(
-        productId: Long,
+        productId: Int,
         onSuccess: (Int?) -> Unit,
     ) {
         thread {
@@ -43,7 +43,7 @@ class CartProductRepositoryImpl(
     }
 
     override fun updateQuantity(
-        productId: Long,
+        productId: Int,
         currentQuantity: Int,
         newQuantity: Int,
         onSuccess: () -> Unit,
@@ -56,7 +56,7 @@ class CartProductRepositoryImpl(
                 }
 
                 currentQuantity == 0 -> {
-                    remoteDataSource.insert(productId.toInt(), newQuantity, onSuccess)
+                    remoteDataSource.insert(productId, newQuantity, onSuccess)
                     totalCount++
                 }
 
@@ -69,7 +69,7 @@ class CartProductRepositoryImpl(
     }
 
     override fun deleteByProductId(
-        productId: Long,
+        productId: Int,
         onSuccess: () -> Unit,
     ) {
         thread {

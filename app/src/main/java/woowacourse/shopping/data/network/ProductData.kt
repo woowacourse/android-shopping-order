@@ -79,9 +79,9 @@ object ProductData {
         (0..4)
             .flatMap { i -> items.map { it.copy(id = it.id + i * items.size) } }
 
-    private val productsMap: Map<Long, Product> = products.associateBy { it.id }
+    private val productsMap: Map<Int, Product> = products.associateBy { it.id }
 
-    fun getProductById(id: Long): Product? = productsMap[id]
+    fun getProductById(id: Int): Product? = productsMap[id]
 
     fun getPagedProducts(
         limit: Int,

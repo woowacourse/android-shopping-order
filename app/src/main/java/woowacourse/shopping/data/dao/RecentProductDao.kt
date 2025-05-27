@@ -21,7 +21,7 @@ interface RecentProductDao {
     fun getLastViewedProduct(): RecentProductEntity?
 
     @Query("DELETE from recent_product WHERE product_id == :productId")
-    fun deleteByProductId(productId: Long)
+    fun deleteByProductId(productId: Int)
 
     @Transaction
     fun replaceRecentProduct(recentProductEntity: RecentProductEntity) {

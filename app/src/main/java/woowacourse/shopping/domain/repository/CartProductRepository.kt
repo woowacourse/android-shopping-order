@@ -11,21 +11,21 @@ interface CartProductRepository {
     )
 
     fun getQuantityByProductId(
-        productId: Long,
+        productId: Int,
         onSuccess: (Int?) -> Unit,
     )
 
     fun getTotalQuantity(onSuccess: (Int) -> Unit)
 
     fun updateQuantity(
-        productId: Long,
+        productId: Int,
         currentQuantity: Int,
         newQuantity: Int,
         onSuccess: () -> Unit,
     )
 
     fun deleteByProductId(
-        productId: Long,
+        productId: Int,
         onSuccess: () -> Unit,
     )
 }

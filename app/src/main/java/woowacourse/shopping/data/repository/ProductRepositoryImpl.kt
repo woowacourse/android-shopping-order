@@ -9,14 +9,14 @@ class ProductRepositoryImpl(
     private val remoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override fun getProductById(
-        id: Long,
+        id: Int,
         onSuccess: (Product?) -> Unit,
     ) {
         remoteDataSource.getProductById(id, onSuccess)
     }
 
     override fun getProductsByIds(
-        ids: List<Long>,
+        ids: List<Int>,
         onSuccess: (List<Product>?) -> Unit,
     ) {
         remoteDataSource.getProductsByIds(ids, onSuccess)

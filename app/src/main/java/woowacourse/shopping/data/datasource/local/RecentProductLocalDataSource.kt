@@ -13,7 +13,5 @@ class RecentProductLocalDataSource(
         offset: Int,
     ): List<RecentProductEntity> = dao.getPagedProducts(limit, offset)
 
-    fun deleteByProductId(productId: Long) = dao.deleteByProductId(productId)
-
     fun replaceRecentProduct(recentProductEntity: RecentProductEntity) = dao.replaceRecentProduct(recentProductEntity)
 }
