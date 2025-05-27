@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.shoppingCart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +11,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.PaginationItem
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ProductItem
+import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
@@ -41,6 +42,7 @@ class ShoppingCartViewModel(
 
                     val items = createShoppingCartItems(shoppingCartProducts)
                     _shoppingCart.value = items
+                    Log.d("moongchi", "updateShoppingCart: $shoppingCartProducts")
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE)
                 }
@@ -69,7 +71,7 @@ class ShoppingCartViewModel(
                 previousEnabled = hasPreviousPage,
             )
 
-        return visibleProducts.map(::ProductItem) + paginationItem
+        return visibleProducts.map(::ShoppingCartProductItem) + paginationItem
     }
 
     fun removeShoppingCartProduct(product: Product) {
@@ -107,11 +109,51 @@ class ShoppingCartViewModel(
         }
     }
 
+    fun decreaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
+        val product = shoppingCartProductItem.shoppingCartProduct.product
+        shoppingCartRepository.decreaseQuantity(
+            product,
+            shoppingCartProductItem.shoppingCartProduct.quantity - 1,
+        ) { result ->
+            result
+                .onSuccess {
+                    updateShoppingCart()
+                    val currentUpdatedProducts =
+                        updatedProducts.value?.toMutableList() ?: mutableListOf()
+                    if (currentUpdatedProducts.contains(product)) return@decreaseQuantity
+                    currentUpdatedProducts.add(product)
+                    _updatedProducts.value = currentUpdatedProducts
+                }.onFailure {
+                    _event.postValue(ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE)
+                }
+        }
+    }
+
     fun addQuantity(
         product: Product,
         quantity: Int,
     ) {
         shoppingCartRepository.add(product, quantity + 1) { result ->
+            result
+                .onSuccess {
+                    updateShoppingCart()
+                    val currentUpdatedProducts =
+                        updatedProducts.value?.toMutableList() ?: mutableListOf()
+                    if (currentUpdatedProducts.contains(product)) return@add
+                    currentUpdatedProducts.add(product)
+                    _updatedProducts.value = currentUpdatedProducts
+                }.onFailure {
+                    _event.postValue(ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE)
+                }
+        }
+    }
+
+    fun addQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
+        val product = shoppingCartProductItem.shoppingCartProduct.product
+        shoppingCartRepository.add(
+            shoppingCartProductItem.shoppingCartProduct,
+            shoppingCartProductItem.shoppingCartProduct.quantity + 1,
+        ) { result ->
             result
                 .onSuccess {
                     updateShoppingCart()

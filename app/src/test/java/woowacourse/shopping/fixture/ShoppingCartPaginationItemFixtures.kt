@@ -5,7 +5,7 @@ import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 val SHOPPING_CART_PRODUCT_ITEMS_5_PAGE_1MORE =
     getProducts(5).map {
-        ShoppingCartItem.ProductItem(
+        ShoppingCartItem.ShoppingCartProductItem(
             ShoppingCartProduct(
                 product = it,
                 quantity = 0,
@@ -19,7 +19,7 @@ val SHOPPING_CART_PRODUCT_ITEMS_5_PAGE_1MORE =
         )
 val SHOPPING_CART_PRODUCT_ITEMS_4_PAGE_1 =
     getProducts(4).map {
-        ShoppingCartItem.ProductItem(
+        ShoppingCartItem.ShoppingCartProductItem(
             ShoppingCartProduct(
                 product = it,
                 quantity = 0,
@@ -34,7 +34,7 @@ val SHOPPING_CART_PRODUCT_ITEMS_4_PAGE_1 =
 
 val SHOPPING_CART_PRODUCT_ITEMS_4_PAGE_2 =
     getProducts(4).map {
-        ShoppingCartItem.ProductItem(
+        ShoppingCartItem.ShoppingCartProductItem(
             ShoppingCartProduct(
                 product = it,
                 quantity = 0,

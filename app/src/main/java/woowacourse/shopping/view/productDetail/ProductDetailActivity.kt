@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
@@ -83,7 +84,7 @@ class ProductDetailActivity :
     override fun onCloseButton() {
         val intent =
             Intent().apply {
-                putExtra("updateProduct", viewModel.product.value)
+                putExtra("updateProduct", viewModel.product.value?.product)
             }
         setResult(ResultFrom.PRODUCT_DETAIL_BACK.RESULT_OK, intent)
         finish()
@@ -97,23 +98,17 @@ class ProductDetailActivity :
         val intent =
             Intent().apply {
                 putExtra("recentProduct", viewModel.recentWatchingProduct.value)
-                putExtra("updateProduct", viewModel.product.value)
+                putExtra("updateProduct", viewModel.product.value?.product)
             }
         setResult(ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK, intent)
         finish()
     }
 
-    override fun onPlusShoppingCartClick(
-        product: Product,
-        quantity: Int,
-    ) {
+    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
         viewModel.plusQuantity()
     }
 
-    override fun onMinusShoppingCartClick(
-        product: Product,
-        quantity: Int,
-    ) {
+    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
         viewModel.minusQuantity()
     }
 

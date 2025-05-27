@@ -37,7 +37,7 @@ class ShoppingCartProductAdapter(
         position: Int,
     ) {
         when (holder) {
-            is ShoppingCartProductViewHolder -> holder.bind(items[position] as ShoppingCartItem.ProductItem)
+            is ShoppingCartProductViewHolder -> holder.bind(items[position] as ShoppingCartItem.ShoppingCartProductItem)
             is ShoppingCartPaginationViewHolder -> holder.bind(items[position] as ShoppingCartItem.PaginationItem)
         }
     }

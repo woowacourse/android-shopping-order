@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.product
 
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.product.ProductsItem.ItemType.entries
 
 sealed interface ProductsItem {
@@ -16,7 +17,8 @@ sealed interface ProductsItem {
     data class ProductItem(
         val product: Product,
         val selectedQuantity: Int = 0,
-    ) : ProductsItem {
+    ) : ProductsItem,
+        QuantityObservable {
         override val viewType: ItemType = ItemType.PRODUCT
     }
 

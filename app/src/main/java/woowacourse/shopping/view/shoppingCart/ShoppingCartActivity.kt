@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.showSnackBar
 
@@ -95,18 +96,12 @@ class ShoppingCartActivity :
         viewModel.removeShoppingCartProduct(product)
     }
 
-    override fun onPlusShoppingCartClick(
-        product: Product,
-        quantity: Int,
-    ) {
-        viewModel.addQuantity(product, quantity)
+    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
+        viewModel.addQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
     }
 
-    override fun onMinusShoppingCartClick(
-        product: Product,
-        quantity: Int,
-    ) {
-        viewModel.decreaseQuantity(product, quantity)
+    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
+        viewModel.decreaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
     }
 
     companion object {

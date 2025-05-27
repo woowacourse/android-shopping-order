@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:onClick="@{() -> productClickListener.onPlusShoppingCartClick(productItem.product, productItem.selectedQuantity )}"
+            android:onClick="@{() -> productClickListener.onPlusShoppingCartClick(productItem)}"
             android:src="@drawable/btn_product_plus"
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="@id/productImage" />
@@ -52,8 +52,8 @@
             <include
                 android:id="@+id/productQuantityComponent"
                 layout="@layout/component_product_quantity"
-                app:product="@{productItem.product}"
-                app:productQuantityClickListener="@{productClickListener}" />
+                app:productQuantityClickListener="@{productClickListener}"
+                app:quantityObservable="@{productItem}" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

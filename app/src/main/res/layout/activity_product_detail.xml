@@ -61,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:adjustViewBounds="true"
-                    app:imageUrl="@{viewModel.product.imageUrl}"
+                    app:imageUrl="@{viewModel.product.product.imageUrl}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="18dp"
                     android:layout_marginTop="16dp"
-                    android:text="@{viewModel.product.name}"
+                    android:text="@{viewModel.product.product.name}"
                     android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -112,10 +112,10 @@
                     app:layout_constraintTop_toTopOf="@id/productDetailPrice">
 
                     <include
-                        app:productQuantityClickListener="@{productDetailEventListener}"
-                        app:product="@{viewModel.product}"
                         android:id="@+id/productDetailQuantityComponent"
-                        layout="@layout/component_product_quantity" />
+                        layout="@layout/component_product_quantity"
+                        app:productQuantityClickListener="@{productDetailEventListener}"
+                        app:quantityObservable="@{viewModel.product}" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

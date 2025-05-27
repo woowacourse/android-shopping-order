@@ -21,7 +21,7 @@ import woowacourse.shopping.fixture.getProducts
 import woowacourse.shopping.view.common.InstantTaskExecutorExtension
 import woowacourse.shopping.view.common.getOrAwaitValue
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.PaginationItem
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ProductItem
+import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ShoppingCartViewModelTest {
@@ -56,7 +56,7 @@ class ShoppingCartViewModelTest {
         // then: ProductItem 과 nextEnabled 와 previousEnabled 가 false 인 PaginationItem 으로 구성된 shoppingCart 값이 된다
         val result = shoppingCartViewModel.shoppingCart.getOrAwaitValue()
         assertAll({
-            assertThat(result.count { it is ProductItem }).isEqualTo(4)
+            assertThat(result.count { it is ShoppingCartProductItem }).isEqualTo(4)
             assertThat(result.last()).isInstanceOf(PaginationItem::class.java)
             assertThat(result).isEqualTo(SHOPPING_CART_PRODUCT_ITEMS_4_PAGE_1)
         })
@@ -78,7 +78,7 @@ class ShoppingCartViewModelTest {
         val result = shoppingCartViewModel.shoppingCart.getOrAwaitValue()
         val pagination = result.last() as PaginationItem
         assertAll({
-            assertThat(result.count { it is ProductItem }).isEqualTo(5)
+            assertThat(result.count { it is ShoppingCartProductItem }).isEqualTo(5)
             assertThat(pagination.nextEnabled).isTrue()
             assertThat(pagination.previousEnabled).isFalse()
             assertThat(result).isEqualTo(SHOPPING_CART_PRODUCT_ITEMS_5_PAGE_1MORE)
@@ -161,7 +161,7 @@ class ShoppingCartViewModelTest {
         // then:
         val result = shoppingCartViewModel.shoppingCart.getOrAwaitValue()
         assertAll({
-            assertThat(result.count { it is ProductItem }).isEqualTo(4)
+            assertThat(result.count { it is ShoppingCartProductItem }).isEqualTo(4)
             assertThat(result).isEqualTo(SHOPPING_CART_PRODUCT_ITEMS_4_PAGE_2)
         })
     }
@@ -181,7 +181,7 @@ class ShoppingCartViewModelTest {
         // then:
         val result = shoppingCartViewModel.shoppingCart.getOrAwaitValue()
         assertAll({
-            assertThat(result.count { it is ProductItem }).isEqualTo(4)
+            assertThat(result.count { it is ShoppingCartProductItem }).isEqualTo(4)
             assertThat(result).isEqualTo(SHOPPING_CART_PRODUCT_ITEMS_4_PAGE_1)
         })
     }

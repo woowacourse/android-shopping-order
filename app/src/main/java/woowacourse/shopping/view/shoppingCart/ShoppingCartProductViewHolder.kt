@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.ProductQuantityClickListener
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ProductItem
+import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
 
 class ShoppingCartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
@@ -17,9 +17,8 @@ class ShoppingCartProductViewHolder(
         binding.shoppingCartQuantityComponent.productQuantityClickListener = shoppingCartListener
     }
 
-    fun bind(item: ProductItem) {
-        binding.shoppingCartProduct = item.shoppingCartProduct
-        binding.shoppingCartQuantityComponent.product = item.shoppingCartProduct.product
+    fun bind(item: ShoppingCartProductItem) {
+        binding.shoppingCartProductItem = item
         binding.shoppingCartQuantityComponent.quantity = item.shoppingCartProduct.quantity
     }
 
