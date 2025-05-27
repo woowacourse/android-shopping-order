@@ -2,7 +2,6 @@ package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.datasource.local.CartDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
-import woowacourse.shopping.data.runThread
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -26,10 +25,9 @@ class ProductRepositoryImpl(
         productId: Long,
         onResult: (Result<Product>) -> Unit,
     ) {
-        runThread(
-            block = { productDataSource.fetchProductById(productId) },
-            onResult = onResult,
-        )
+        productDataSource.fetchProductById(productId) { product ->
+            onResult(Result.success(product))
+        }
     }
 
     private fun List<Product>.toCartItems(): List<CartItem> =

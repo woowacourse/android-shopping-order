@@ -25,8 +25,9 @@ class CartRepositoryImpl(
     ) {
         runThread(
             block = {
-                val entities = cartDataSource.getPagedCartProducts(page, pageSize)
-                entities.map { cartItemMapper.toDomain(it) }
+//                val entities = cartDataSource.getPagedCartProducts(page, pageSize)
+//                entities.map { cartItemMapper.toDomain(it) }
+                emptyList()
             },
             onResult = onResult,
         )

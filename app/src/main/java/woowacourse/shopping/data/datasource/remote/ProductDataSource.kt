@@ -9,5 +9,8 @@ interface ProductDataSource {
         onResult: (List<Product>) -> Unit,
     )
 
-    fun fetchProductById(id: Long): Product
+    fun fetchProductById(
+        id: Long,
+        onResult: (Product) -> Unit
+    )
 }

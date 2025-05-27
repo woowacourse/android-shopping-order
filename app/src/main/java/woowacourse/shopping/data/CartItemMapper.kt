@@ -7,10 +7,13 @@ import woowacourse.shopping.domain.model.CartItem
 class CartItemMapper(
     private val productDataSource: ProductDataSource,
 ) {
-    fun toDomain(data: CartEntity): CartItem {
-        val product = productDataSource.fetchProductById(data.productId)
-        return CartItem(product, data.quantity)
-    }
+//    fun toDomain(data: CartEntity): CartItem {
+//        productDataSource.fetchProductById(data.productId){ result ->
+//            result.
+//        }
+//        return CartItem(product, data.quantity)
+//    }
+
 
     fun toData(domain: CartItem): CartEntity =
         CartEntity(
