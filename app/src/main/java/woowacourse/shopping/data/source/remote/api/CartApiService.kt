@@ -24,24 +24,24 @@ interface CartApiService {
         @Header("accept") accept: String = "*/*",
         @Query("productId") productId: Int,
         @Query("quantity") quantity: Int
-    ): String
+    ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItems(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
-    ): String
+    ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItems(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
         @Query("quantity") quantity: Int,
-    )
+    ): Call<Unit>
 
     @PATCH("/cart-items/counts")
     fun getCartItemsCounts(
         @Header("accept") accept: String = "*/*",
         @Query("quantity") quantity: Int,
-    )
+    ): Call<CartItemResponse>
 }
