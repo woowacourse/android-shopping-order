@@ -62,10 +62,13 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.mockwebserver)
+    implementation(libs.shimmer)
+
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
+
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
