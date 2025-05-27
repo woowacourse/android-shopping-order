@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.model
 
 data class CatalogProducts(
     val products: List<CatalogProduct>,
+    val currentPage: Int,
     val hasMore: Boolean,
 ) {
     val catalogProductsQuantity: Int get() = products.sumOf { it.quantity }
@@ -10,6 +11,7 @@ data class CatalogProducts(
         val mergedProducts = products + other.products
         return CatalogProducts(
             products = mergedProducts,
+            currentPage = other.currentPage,
             hasMore = other.hasMore,
         )
     }
@@ -50,6 +52,6 @@ data class CatalogProducts(
     }
 
     companion object {
-        val EMPTY_CATALOG_PRODUCTS = CatalogProducts(emptyList(), false)
+        val EMPTY_CATALOG_PRODUCTS = CatalogProducts(emptyList(), 0, false)
     }
 }

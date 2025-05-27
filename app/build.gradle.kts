@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
 }
@@ -82,6 +83,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.kotlinx.serialization.json)
 
     // Unit Test
     testImplementation(libs.junit.jupiter)

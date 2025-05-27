@@ -8,15 +8,18 @@ class GetCatalogProductsUseCase(
     private val repository: ProductRepository,
 ) {
     operator fun invoke(
-        lastId: Int,
-        count: Int,
+        currentPage: Int,
+        size: Int,
         callback: (CatalogProducts) -> Unit,
     ) {
         thread {
-            val products = repository.fetchProducts(lastId, count)
-            val lastProductId = products.lastOrNull()?.product?.id ?: lastId
-            val hasMore = repository.hasMoreProducts(lastProductId)
-            callback(CatalogProducts(products, hasMore))
+            val nextPage = if (currentPage == INITIAL_PAGE) INITIAL_PAGE else currentPage + PAGE_INCREMENT
+            callback(repository.fetchProducts(nextPage, size))
         }
+    }
+
+    companion object {
+        private const val INITIAL_PAGE: Int = 0
+        private const val PAGE_INCREMENT: Int = 1
     }
 }

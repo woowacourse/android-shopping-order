@@ -31,16 +31,8 @@ class CatalogViewModel(
     private val _historyProducts: MutableLiveData<List<HistoryProduct>> = MutableLiveData(emptyList())
     val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
 
-    private val lastProductId: Int
-        get() =
-            catalogProducts.value
-                ?.products
-                ?.lastOrNull()
-                ?.product
-                ?.id ?: 0
-
     fun loadCartProducts(count: Int = SHOWN_PRODUCTS_COUNT) {
-        getCatalogProductsUseCase(lastId = lastProductId, count = count) { newProducts ->
+        getCatalogProductsUseCase(currentPage = catalogProducts.value?.currentPage ?: 0, size = count) { newProducts ->
             _catalogProducts.postValue(catalogProducts.value?.plus(newProducts))
         }
     }

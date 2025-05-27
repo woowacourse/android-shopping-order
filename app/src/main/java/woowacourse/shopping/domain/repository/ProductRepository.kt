@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CatalogProduct
+import woowacourse.shopping.domain.model.CatalogProducts
 
 interface ProductRepository {
     fun fetchCatalogProduct(productId: Int): CatalogProduct?
@@ -8,9 +9,7 @@ interface ProductRepository {
     fun fetchCatalogProducts(productIds: List<Int>): List<CatalogProduct>
 
     fun fetchProducts(
-        lastId: Int,
-        count: Int,
-    ): List<CatalogProduct>
-
-    fun hasMoreProducts(lastId: Int): Boolean
+        page: Int,
+        size: Int,
+    ): CatalogProducts
 }
