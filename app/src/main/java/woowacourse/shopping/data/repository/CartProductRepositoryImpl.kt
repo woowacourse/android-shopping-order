@@ -2,7 +2,6 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.local.CartProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
-import woowacourse.shopping.data.entity.CartProductEntity
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -57,9 +56,8 @@ class CartProductRepositoryImpl(
                 }
 
                 currentQuantity == 0 -> {
-                    localDataSource.insert(CartProductEntity(productId, newQuantity))
+                    remoteDataSource.insert(productId.toInt(), newQuantity, onSuccess)
                     totalCount++
-                    onSuccess()
                 }
 
                 else -> {

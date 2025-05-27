@@ -3,6 +3,7 @@ package woowacourse.shopping.data.datasource.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.dto.request.CartProductRequestDto
 import woowacourse.shopping.data.dto.response.CartProductResponseDto
 import woowacourse.shopping.data.dto.response.toCartProduct
 import woowacourse.shopping.data.model.PagedResult
@@ -34,6 +35,32 @@ class CartProductRemoteDataSource(
 
                 override fun onFailure(
                     call: Call<CartProductResponseDto>,
+                    t: Throwable,
+                ) {
+                    println("error : $t")
+                }
+            },
+        )
+    }
+
+    fun insert(
+        id: Int,
+        quantity: Int,
+        onSuccess: () -> Unit,
+    ) {
+        cartProductService.insert(body = CartProductRequestDto(id, quantity)).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.code() == 201) {
+                        onSuccess()
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit>,
                     t: Throwable,
                 ) {
                     println("error : $t")
