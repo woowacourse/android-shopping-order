@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.mockwebserver)
     implementation(libs.shimmer)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)
