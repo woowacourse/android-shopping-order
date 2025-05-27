@@ -1,10 +1,10 @@
 package woowacourse.shopping.di
 
 import android.content.Context
-import woowacourse.shopping.data.datasource.local.CartDataSource
-import woowacourse.shopping.data.datasource.local.CartDataSourceImpl
 import woowacourse.shopping.data.datasource.local.RecentProductDataSource
 import woowacourse.shopping.data.datasource.local.RecentProductDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.CartDataSource
+import woowacourse.shopping.data.datasource.remote.CartDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSourceImpl
 
@@ -26,8 +26,8 @@ object DataSourceModule {
 
     fun provideCartDataSource(): CartDataSource =
         cartDataSource ?: run {
-            val cartDao = DatabaseModule.provideCartDao()
-            CartDataSourceImpl(cartDao).also { cartDataSource = it }
+            val cartItemService = NetworkModule.provideCartItemService()
+            CartDataSourceImpl(cartItemService).also { cartDataSource = it }
         }
 
     fun provideRecentProductDataSource(): RecentProductDataSource =

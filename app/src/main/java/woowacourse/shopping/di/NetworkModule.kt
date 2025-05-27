@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import woowacourse.shopping.data.remote.CartItemService
 import woowacourse.shopping.data.remote.OkHttpClientProvider
 import woowacourse.shopping.data.remote.ProductService
 
@@ -12,6 +13,7 @@ object NetworkModule {
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
 
     private var productService: ProductService? = null
+    private var cartItemService: CartItemService? = null
 
     private fun provideRetrofit(): Retrofit =
         Retrofit
@@ -22,4 +24,6 @@ object NetworkModule {
             .build()
 
     fun provideProductService(): ProductService = productService ?: provideRetrofit().create(ProductService::class.java)
+
+    fun provideCartItemService(): CartItemService = cartItemService ?: provideRetrofit().create(CartItemService::class.java)
 }
