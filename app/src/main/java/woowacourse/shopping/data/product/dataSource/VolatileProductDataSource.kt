@@ -1,3 +1,5 @@
+@file:Suppress("ktlint")
+
 package woowacourse.shopping.data.product.dataSource
 
 import woowacourse.shopping.data.product.local.entity.ProductEntity
