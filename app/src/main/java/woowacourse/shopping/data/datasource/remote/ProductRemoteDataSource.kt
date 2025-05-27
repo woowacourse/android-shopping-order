@@ -3,6 +3,7 @@ package woowacourse.shopping.data.datasource.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.dto.response.ProductDto
 import woowacourse.shopping.data.dto.response.ProductResponseDto
 import woowacourse.shopping.data.dto.response.toProduct
 import woowacourse.shopping.data.model.PagedResult
@@ -14,7 +15,32 @@ class ProductRemoteDataSource(
     private val service: ProductService,
     private val apiService: ProductApiService,
 ) {
-    fun getProductById(id: Long): Product? = service.getProductById(id)
+    fun getProductById(
+        id: Long,
+        onSuccess: (Product?) -> Unit,
+    ) {
+        apiService.getProductById(id = id.toInt()).enqueue(
+            object : Callback<ProductDto> {
+                override fun onResponse(
+                    call: Call<ProductDto>,
+                    response: Response<ProductDto>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { body ->
+                            onSuccess(body.toProduct())
+                        } ?: onSuccess(null)
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<ProductDto>,
+                    t: Throwable,
+                ) {
+                    println("error : $t")
+                }
+            },
+        )
+    }
 
     fun getProductsByIds(ids: List<Long>): List<Product>? = service.getProductsByIds(ids)
 

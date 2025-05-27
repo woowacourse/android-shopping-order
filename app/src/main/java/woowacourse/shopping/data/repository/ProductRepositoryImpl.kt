@@ -13,8 +13,9 @@ class ProductRepositoryImpl(
         id: Long,
         onSuccess: (Product?) -> Unit,
     ) {
-        val result = remoteDataSource.getProductById(id)
-        onSuccess(result)
+        thread {
+            remoteDataSource.getProductById(id, onSuccess)
+        }
     }
 
     override fun getProductsByIds(

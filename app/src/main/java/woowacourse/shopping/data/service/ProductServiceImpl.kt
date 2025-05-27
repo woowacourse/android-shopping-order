@@ -12,23 +12,6 @@ class ProductServiceImpl : ProductService {
     private val client = OkHttpClient()
     private val gson = Gson()
 
-    override fun getProductById(id: Long): Product? {
-        val url =
-            BASE_URL
-                .toHttpUrl()
-                .newBuilder()
-                .addPathSegment("product")
-                .addQueryParameter(PARAM_ID, id.toString())
-                .build()
-
-        val body = executeRequest(url)
-        return try {
-            gson.fromJson(body, Product::class.java)
-        } catch (e: JsonSyntaxException) {
-            null
-        }
-    }
-
     override fun getProductsByIds(ids: List<Long>): List<Product>? {
         val url =
             BASE_URL
