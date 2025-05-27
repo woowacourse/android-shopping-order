@@ -15,6 +15,7 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.cart.CartActivity
 import woowacourse.shopping.databinding.ActivityCatalogBinding
 import woowacourse.shopping.databinding.MenuCartLayoutBinding
+import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.detail.DetailActivity
 
 class CatalogActivity : AppCompatActivity() {
@@ -102,7 +103,8 @@ class CatalogActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int = spanSizeByPosition(position, adapter.itemCount)
+                override fun getSpanSize(position: Int): Int =
+                    spanSizeByPosition(position, adapter.itemCount)
             }
         binding.recyclerViewProducts.layoutManager = gridLayoutManager
     }

@@ -40,6 +40,7 @@ class CatalogViewModel(
         catalogProductRepository.getAllProductsSize { allProductsSize ->
             loadCatalog(0, PAGE_SIZE, allProductsSize)
         }
+        _catalogItems.postValue(List(10) { CatalogItem.LoadingStateProductItem(LoadingState.loading()) })
     }
 
     fun increaseQuantity(product: ProductUiModel) {
@@ -93,6 +94,7 @@ class CatalogViewModel(
         allProductsSize: Int,
     ) {
         _loadingState.postValue(LoadingState.loading())
+        _catalogItems.postValue(emptyList<CatalogItem>())
 
         catalogProductRepository.getProductsInRange(startIndex, endIndex) { pagedProducts ->
 

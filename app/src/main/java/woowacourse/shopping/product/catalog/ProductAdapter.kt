@@ -2,14 +2,14 @@ package woowacourse.shopping.product.catalog
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.domain.LoadingState
 
 class ProductAdapter(
-    products: List<ProductUiModel>,
+    products: List<CatalogItem>,
     private val productActionListener: ProductActionListener,
     private val quantityControlListener: QuantityControlListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val products: MutableList<CatalogItem> =
-        products.map { CatalogItem.ProductItem(it) }.toMutableList()
+    private val products: MutableList<CatalogItem> = products.toMutableList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
