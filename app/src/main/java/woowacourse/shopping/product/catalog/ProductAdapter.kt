@@ -14,12 +14,15 @@ class ProductAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder =
-        if (viewType == VIEW_TYPE_PRODUCT) {
+    ): RecyclerView.ViewHolder = when (viewType) {
+        VIEW_TYPE_PRODUCT ->
             ProductViewHolder.from(parent, productActionListener, quantityControlListener)
-        } else {
-            LoadButtonViewHolder.from(parent, productActionListener)
-        }
+
+        VIEW_TYPE_LOAD_MORE -> LoadButtonViewHolder.from(parent, productActionListener)
+
+        else -> LoadingStateProductViewHolder.from(parent)
+
+    }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -36,6 +39,7 @@ class ProductAdapter(
         when (products[position]) {
             CatalogItem.LoadMoreButtonItem -> VIEW_TYPE_LOAD_MORE
             is CatalogItem.ProductItem -> VIEW_TYPE_PRODUCT
+            is CatalogItem.LoadingStateProductItem -> VIEW_TYPE_LOADING_PRODUCT
         }
 
     fun setItems(items: List<CatalogItem>) {
@@ -56,5 +60,6 @@ class ProductAdapter(
     companion object {
         private const val VIEW_TYPE_PRODUCT = 1
         private const val VIEW_TYPE_LOAD_MORE = 2
+        private const val VIEW_TYPE_LOADING_PRODUCT = 3
     }
 }

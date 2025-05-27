@@ -8,6 +8,7 @@ import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.CatalogItem.ProductItem
 
 class CatalogViewModel(
@@ -31,6 +32,9 @@ class CatalogViewModel(
     private val _recentlyViewedProducts =
         MutableLiveData<List<ProductUiModel>>(emptyList<ProductUiModel>())
     val recentlyViewedProducts: LiveData<List<ProductUiModel>> = _recentlyViewedProducts
+
+    private val _loadingState: MutableLiveData<LoadingState> = MutableLiveData(LoadingState.loaded())
+    val loadingState: LiveData<LoadingState> get() = _loadingState
 
     init {
         catalogProductRepository.getAllProductsSize { allProductsSize ->
@@ -88,6 +92,8 @@ class CatalogViewModel(
         endIndex: Int,
         allProductsSize: Int,
     ) {
+        _loadingState.postValue(LoadingState.loading())
+
         catalogProductRepository.getProductsInRange(startIndex, endIndex) { pagedProducts ->
 
             cartProductRepository.getCartProductsInRange(startIndex, endIndex) { cartProducts ->
@@ -111,7 +117,9 @@ class CatalogViewModel(
                         prevItems + items
                     }
 
-                _catalogItems.postValue(updatedItems)
+                _catalogItems.postValue(updatedItems).also {
+                    _loadingState.postValue(LoadingState.loaded())
+                }
             }
         }
     }
