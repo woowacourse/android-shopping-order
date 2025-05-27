@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.product.storage
+package woowacourse.shopping.data.product.dataSource
 
 import woowacourse.shopping.data.product.local.entity.ProductEntity
 
-object VolatileProductsStorage : ProductsStorage {
+object VolatileProductDataSource : ProductDataSource {
     private val products: List<ProductEntity> =
         listOf(
             ProductEntity(

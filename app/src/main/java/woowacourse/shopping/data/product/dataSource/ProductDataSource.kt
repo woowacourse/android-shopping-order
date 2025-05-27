@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.product.storage
+package woowacourse.shopping.data.product.dataSource
 
 import woowacourse.shopping.data.product.local.entity.ProductEntity
 
-interface ProductsStorage {
+interface ProductDataSource {
     fun load(
         lastProductId: Long?,
         size: Int,

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.product.storage
+package woowacourse.shopping.data.product.dataSource
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -6,7 +6,7 @@ import woowacourse.shopping.data.common.convertJsonToList
 import woowacourse.shopping.data.product.local.entity.ProductEntity
 import woowacourse.shopping.data.product.remote.MockProductServer
 
-class ProductRemoteStorage : ProductsStorage {
+class ProductRemoteDataSource : ProductDataSource {
     private val mockProductServer = MockProductServer()
     private val client = OkHttpClient()
 
