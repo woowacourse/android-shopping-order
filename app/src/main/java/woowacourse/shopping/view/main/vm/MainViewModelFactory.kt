@@ -6,12 +6,10 @@ import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.view.loader.HistoryLoader
-import woowacourse.shopping.view.loader.ProductWithCartLoader
 
 class MainViewModelFactory(
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
-    private val productWithCartLoader: ProductWithCartLoader,
     private val historyLoader: HistoryLoader,
     private val defaultProductRepository: DefaultProductRepository,
 ) : ViewModelProvider.Factory {
@@ -20,7 +18,6 @@ class MainViewModelFactory(
             return MainViewModel(
                 cartRepository,
                 historyRepository,
-                productWithCartLoader,
                 historyLoader,
                 defaultProductRepository,
             ) as T
