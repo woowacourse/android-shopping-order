@@ -70,13 +70,13 @@ class ShoppingCartViewModel(
         val end = offset + PAGE_SIZE
 
         if (cartProducts.size < end) {
-            repository.getPagedProducts(end - cartProducts.size, cartProducts.size) { result ->
+            repository.getPagedProducts(page - 1, end - cartProducts.size) { result ->
                 cartProducts.addAll(result.items)
                 val hasNext = result.hasNext
                 updatePageState(page, offset, end, hasNext)
             }
         } else {
-            checkHasNext(end) {
+            checkHasNext(page) {
                 val hasNext = cartProducts.size > end || it
                 updatePageState(page, offset, end, hasNext)
             }
@@ -111,10 +111,10 @@ class ShoppingCartViewModel(
     }
 
     private fun checkHasNext(
-        offset: Int,
+        page: Int,
         callback: (Boolean) -> Unit,
     ) {
-        repository.getPagedProducts(1, offset) { result ->
+        repository.getPagedProducts(page - 1, 1) { result ->
             callback(result.items.isNotEmpty())
         }
     }

@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.model.CartProduct
 
 interface CartProductRepository {
     fun getPagedProducts(
-        limit: Int,
-        offset: Int,
+        page: Int,
+        size: Int,
         onSuccess: (PagedResult<CartProduct>) -> Unit,
     )
 

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartResponseDto(
+data class CartProductResponseDto(
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")

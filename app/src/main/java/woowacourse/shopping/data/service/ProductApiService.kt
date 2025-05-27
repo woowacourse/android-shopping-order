@@ -12,8 +12,8 @@ interface ProductApiService {
     @GET("/products")
     fun getPagedProducts(
         @Header("accept") accept: String = "*/*",
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 1,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
     ): Call<ProductResponseDto>
 
     @GET("/products/{id}")

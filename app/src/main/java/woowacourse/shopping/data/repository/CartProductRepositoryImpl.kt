@@ -1,16 +1,16 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.local.CartProductLocalDataSource
+import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
 import woowacourse.shopping.data.entity.CartProductEntity
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.concurrent.thread
 
 class CartProductRepositoryImpl(
+    private val remoteDataSource: CartProductRemoteDataSource,
     private val localDataSource: CartProductLocalDataSource,
-    private val productRepository: ProductRepository,
 ) : CartProductRepository {
     private var totalCount: Int = 0
 
@@ -19,34 +19,11 @@ class CartProductRepositoryImpl(
     }
 
     override fun getPagedProducts(
-        limit: Int,
-        offset: Int,
+        page: Int,
+        size: Int,
         onSuccess: (PagedResult<CartProduct>) -> Unit,
     ) {
-        if (offset >= totalCount) {
-            onSuccess(PagedResult(emptyList(), false))
-            return
-        }
-
-        val endIndex = (offset + limit).coerceAtMost(totalCount)
-        thread {
-            val entities = localDataSource.getPagedProducts(endIndex - offset, offset)
-            val productIds = entities.map { it.productId }
-            productRepository.getProductsByIds(productIds) { products ->
-                if (products == null) {
-                    onSuccess(PagedResult(emptyList(), false))
-                    return@getProductsByIds
-                }
-                val productMap = products.associateBy { it.id }
-                val cartProducts =
-                    entities.mapNotNull { entity ->
-                        productMap[entity.productId]?.let { product ->
-                            CartProduct(product, entity.quantity)
-                        }
-                    }
-                onSuccess(PagedResult(cartProducts, endIndex < totalCount))
-            }
-        }
+        remoteDataSource.getPagedProducts(page = page, size = size, onSuccess)
     }
 
     override fun getQuantityByProductId(

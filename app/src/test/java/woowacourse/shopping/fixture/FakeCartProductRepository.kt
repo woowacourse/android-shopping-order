@@ -9,12 +9,12 @@ class FakeCartProductRepository : CartProductRepository {
     private val cartProducts = mutableListOf<CartProduct>()
 
     override fun getPagedProducts(
-        limit: Int,
-        offset: Int,
+        page: Int,
+        size: Int,
         onSuccess: (PagedResult<CartProduct>) -> Unit,
     ) {
-        val pagedItems = cartProducts.drop(offset).take(limit)
-        val hasNext = offset + pagedItems.size < cartProducts.size
+        val pagedItems = cartProducts.drop(page * size).take(size)
+        val hasNext = page * size + pagedItems.size < cartProducts.size
         onSuccess(PagedResult(pagedItems, hasNext))
     }
 
@@ -68,6 +68,6 @@ class FakeCartProductRepository : CartProductRepository {
                 name = "Product $productId",
                 price = 1000,
             )
-        cartProducts.add(CartProduct(product, quantity))
+        cartProducts.add(CartProduct(product = product, quantity = quantity))
     }
 }
