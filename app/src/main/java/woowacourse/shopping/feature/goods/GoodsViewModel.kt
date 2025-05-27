@@ -6,15 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.local.cart.repository.CartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
-import woowacourse.shopping.data.remote.ProductClient
-import woowacourse.shopping.data.remote.Product
 import woowacourse.shopping.data.remote.ProductRepository
-import woowacourse.shopping.data.remote.ProductResponse
+import woowacourse.shopping.data.remote.Product
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.domain.model.Goods.Companion.dummyGoods
