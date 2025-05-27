@@ -1,8 +1,9 @@
 package woowacourse.shopping.product.catalog.model
 
 data class Product(
-    val id: Long = 0,
-    val imageUrl: String,
+    val id: Int,
     val name: String,
     val price: Int,
+    val imageUrl: String,
+    val category: String
 )
