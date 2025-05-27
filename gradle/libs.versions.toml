@@ -17,12 +17,15 @@ kotlin = "2.1.0"
 ktlint = "12.1.0"
 mannodermaus-junit5 = "1.7.0"
 mockk = "1.13.8"
+retrofit2-kotlinx-serialization-converter = "0.5.0"
 room = "2.7.1"
 retrofit = "3.0.0"
 okhttp = "4.12.0"
 shimmer = "0.5.0"
+kotlinx-serialization-json = "1.8.1"
 
 [libraries]
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity-ktx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -44,9 +47,12 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 mock-web-server = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2-kotlinx-serialization-converter" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 
 [plugins]
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "android-junit5" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
