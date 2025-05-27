@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
+    implementation(libs.androidx.datastore.preferences)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.mockk.android)
