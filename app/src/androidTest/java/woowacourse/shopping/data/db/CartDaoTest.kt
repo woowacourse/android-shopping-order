@@ -40,7 +40,7 @@ class CartDaoTest {
         val cart = cartEntityFixture1
 
         // given
-        cartDao.insert(cart)
+        cartDao.upsert(cart)
         val expected = cartDao.cartByProductId(1)
 
         expected?.productId shouldBe cart.productId
@@ -51,7 +51,7 @@ class CartDaoTest {
         // when
         val cart = cartEntityFixture2
 
-        cartDao.insert(cart)
+        cartDao.upsert(cart)
         val expected = cartDao.cartByProductId(2)
 
         expected?.productId shouldBe cart.productId
@@ -68,7 +68,7 @@ class CartDaoTest {
     fun `상품을_제거한다`() {
         // gieven
         val cart = cartEntityFixture4
-        cartDao.insert(cart)
+        cartDao.upsert(cart)
 
         // when
         cartDao.deleteByProductId(4)
@@ -82,7 +82,7 @@ class CartDaoTest {
     fun `첫_번쟤_페이자의_장바구니_상품울_5개_가져온다`() {
         // given
         cartEntityFixtures.forEach {
-            cartDao.insert(it)
+            cartDao.upsert(it)
         }
 
         // when
@@ -96,7 +96,7 @@ class CartDaoTest {
     fun `장바구니_전체_페이지_개수를_가져온다`() {
         // given
         cartEntityFixtures.forEach {
-            cartDao.insert(it)
+            cartDao.upsert(it)
         }
 
         // when

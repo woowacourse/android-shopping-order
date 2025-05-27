@@ -27,12 +27,6 @@ interface CartDao {
     @Query("SELECT (COUNT(*) + :size - 1) / :size FROM cart_table")
     fun pageCount(size: Int): Int
 
-    @Insert
-    fun insert(entity: CartEntity)
-
-    @Update
-    fun update(entity: CartEntity)
-
     @Query("DELETE FROM cart_table WHERE productId = :productId")
     fun deleteByProductId(productId: Long)
 }
