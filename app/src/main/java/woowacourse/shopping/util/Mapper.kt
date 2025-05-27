@@ -1,6 +1,6 @@
 package woowacourse.shopping.util
 
-import woowacourse.shopping.data.remote.Product
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.feature.model.CartUiModel

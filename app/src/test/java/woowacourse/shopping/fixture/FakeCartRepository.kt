@@ -2,11 +2,11 @@ package woowacourse.shopping.fixture
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 
-class FakeCartRepository : CartRepository {
+class FakeCartRepository : LocalCartRepository {
     private val cartList = mutableListOf<Cart>()
     private val cartLiveData = MutableLiveData<List<Cart>>()
     private var sizeLiveData: Int = 0

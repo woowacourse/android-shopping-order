@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
@@ -34,7 +34,7 @@ class GoodsViewModelTest {
     private val testDispatcher = StandardTestDispatcher(testScheduler)
 
     private lateinit var cartService: TestCartServiceImpl
-    private lateinit var cartRepository: CartRepository
+    private lateinit var cartRepository: LocalCartRepository
     private lateinit var historyRepository: HistoryRepository
     private lateinit var viewModel: GoodsViewModel
 

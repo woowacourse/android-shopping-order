@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 
-interface CartRepository {
+interface LocalCartRepository {
     fun getAll(callback: (Carts) -> Unit)
 
     fun insert(cart: Cart)

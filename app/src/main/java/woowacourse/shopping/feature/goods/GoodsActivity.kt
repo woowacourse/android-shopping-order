@@ -108,7 +108,8 @@ class GoodsActivity : AppCompatActivity() {
                     }
 
                     override fun insertToCart(cart: Cart) {
-                        viewModel.insertToCart(cart)
+//                        viewModel.insertToCart(cart)
+                        viewModel.addCartTest(cart)
                     }
 
                     override fun removeFromCart(cart: Cart) {

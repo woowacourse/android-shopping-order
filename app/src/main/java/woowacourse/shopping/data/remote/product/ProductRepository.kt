@@ -1,8 +1,9 @@
-package woowacourse.shopping.data.remote
+package woowacourse.shopping.data.remote.product
 
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.domain.model.Product
 
 class ProductRepository {
     fun fetchProducts(

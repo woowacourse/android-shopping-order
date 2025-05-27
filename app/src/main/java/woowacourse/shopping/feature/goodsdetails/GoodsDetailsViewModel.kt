@@ -3,16 +3,16 @@ package woowacourse.shopping.feature.goodsdetails
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
-import woowacourse.shopping.data.remote.Product
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.updateQuantity
 
 class GoodsDetailsViewModel(
-    private val cartRepository: CartRepository,
+    private val cartRepository: LocalCartRepository,
     private val historyRepository: HistoryRepository,
 ) : ViewModel() {
     private val _cart = MutableLiveData<Cart>()

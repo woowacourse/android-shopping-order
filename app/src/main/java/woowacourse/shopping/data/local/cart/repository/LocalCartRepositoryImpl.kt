@@ -9,9 +9,9 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 import kotlin.concurrent.thread
 
-class CartRepositoryImpl(
+class LocalCartRepositoryImpl(
     private val dao: CartDao,
-) : CartRepository {
+) : LocalCartRepository {
     override fun getAll(callback: (Carts) -> Unit) {
         thread {
             val cartList = dao.getAll().map { it.toDomain() }

@@ -2,9 +2,10 @@ package woowacourse.shopping.application
 
 import android.app.Application
 import woowacourse.shopping.data.local.ShoppingDatabase
-import woowacourse.shopping.data.local.cart.repository.CartRepositoryImpl
+import woowacourse.shopping.data.local.cart.repository.LocalCartRepositoryImpl
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
-import woowacourse.shopping.data.remote.ProductRepository
+import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.goods.GoodsViewModel
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel
@@ -16,9 +17,10 @@ class ShoppingApplication : Application() {
     val goodsFactory by lazy {
         ViewModelFactory {
             GoodsViewModel(
-                CartRepositoryImpl(database.cartDao()),
+                LocalCartRepositoryImpl(database.cartDao()),
                 HistoryRepositoryImpl(database.historyDao()),
-                ProductRepository()
+                ProductRepository(),
+                CartRepository()
             )
         }
     }
@@ -26,7 +28,7 @@ class ShoppingApplication : Application() {
     val goodsDetailsFactory by lazy {
         ViewModelFactory {
             GoodsDetailsViewModel(
-                CartRepositoryImpl(database.cartDao()),
+                LocalCartRepositoryImpl(database.cartDao()),
                 HistoryRepositoryImpl(database.historyDao()),
             )
         }
@@ -35,7 +37,8 @@ class ShoppingApplication : Application() {
     val cartFactory by lazy {
         ViewModelFactory {
             CartViewModel(
-                CartRepositoryImpl(database.cartDao()),
+                LocalCartRepositoryImpl(database.cartDao()),
+                CartRepository()
             )
         }
     }

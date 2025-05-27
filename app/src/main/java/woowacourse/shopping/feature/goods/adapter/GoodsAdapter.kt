@@ -3,7 +3,7 @@ package woowacourse.shopping.feature.goods.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.data.remote.Product
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.databinding.ItemGoodsBinding
 import woowacourse.shopping.databinding.ItemHistoryContainerBinding
 import woowacourse.shopping.databinding.ItemLoadMoreBinding
@@ -17,12 +17,6 @@ class GoodsAdapter(
     private var hasNextPage: Boolean = true
 
     fun setItems(newItems: List<Any>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
-    }
-
-    fun setItems2(newItems: List<Any>) {
         val oldHistory = items.firstOrNull()?.takeIf { it is List<*> && it.all { h -> h is Cart } } as? List<*>
         val newHistory = newItems.firstOrNull()?.takeIf { it is List<*> && it.all { h -> h is Cart } } as? List<*>
 

@@ -6,10 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
-import woowacourse.shopping.data.remote.ProductRepository
-import woowacourse.shopping.data.remote.Product
+import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.cart.CartRequest
+import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.domain.model.Goods.Companion.dummyGoods
@@ -19,9 +20,10 @@ import woowacourse.shopping.util.updateCartQuantity
 import kotlin.math.min
 
 class GoodsViewModel(
-    private val cartRepository: CartRepository,
+    private val localCartRepository: LocalCartRepository,
     private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _items = MutableLiveData<List<Any>>()
     val items: LiveData<List<Any>> get() = _items
@@ -52,7 +54,7 @@ class GoodsViewModel(
     fun insertToCart(cart: Cart) {
         viewModelScope.launch {
             try {
-                cartRepository.insert(cart)
+                localCartRepository.insert(cart)
                 updateItemsAndTotalQuantity(cart, cart.quantity + 1)
                 _isSuccess.setValue(Unit)
             } catch (e: Exception) {
@@ -61,9 +63,24 @@ class GoodsViewModel(
         }
     }
 
+    fun addCartTest(cart: Cart) {
+        val cartRequest = CartRequest(
+            productId = cart.product.id,
+            quantity = cart.quantity + 1
+        )
+
+        cartRepository.addToCart(cartRequest) { result ->
+            result.onSuccess {
+                Log.d("addCartTest", "장바구니에 추가 성공")
+            }.onFailure { error ->
+                Log.e("addCartTest", "장바구니 추가 실패", error)
+            }
+        }
+    }
+
     fun removeFromCart(cart: Cart) {
         viewModelScope.launch {
-            cartRepository.delete(cart)
+            localCartRepository.delete(cart)
             updateItemsAndTotalQuantity(cart, cart.quantity - 1)
         }
     }

@@ -1,15 +1,19 @@
 package woowacourse.shopping.feature.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
-import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
+import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.util.updateQuantity
 
 class CartViewModel(
+    private val localCartRepository: LocalCartRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _showPageButton = MutableLiveData(false)
@@ -21,7 +25,7 @@ class CartViewModel(
     val cart: LiveData<Cart> get() = _cart
     val carts: LiveData<Carts> =
         _page.switchMap { pageNum ->
-            cartRepository.getPage(PAGE_SIZE, (pageNum - 1) * PAGE_SIZE)
+            localCartRepository.getPage(PAGE_SIZE, (pageNum - 1) * PAGE_SIZE)
         }
     private val _totalItemsCount = MutableLiveData(0)
     val totalItemsCount: LiveData<Int> get() = _totalItemsCount
@@ -32,6 +36,7 @@ class CartViewModel(
 
     init {
         fetchTotalItemsCount()
+        test()
     }
 
     fun delete(cart: Cart) {
@@ -43,7 +48,7 @@ class CartViewModel(
             _page.value = currentPage
         }
 
-        cartRepository.deleteAll(cart)
+        localCartRepository.deleteAll(cart)
         updatePageButtonStates()
     }
 
@@ -72,7 +77,7 @@ class CartViewModel(
 
     fun insertToCart(cart: Cart) {
         _cart.value = cart
-        cartRepository.insert(cart)
+        localCartRepository.insert(cart)
         val current = _cart.value
         if (current != null) {
             val updated = current.updateQuantity(current.quantity + 1)
@@ -82,7 +87,7 @@ class CartViewModel(
 
     fun removeFromCart(cart: Cart) {
         _cart.value = cart
-        cartRepository.delete(cart)
+        localCartRepository.delete(cart)
         val current = _cart.value
         if (current != null) {
             val updated = current.updateQuantity(current.quantity - 1)
@@ -91,8 +96,39 @@ class CartViewModel(
     }
 
     private fun fetchTotalItemsCount() {
-        cartRepository.getAllItemsSize { count ->
+        localCartRepository.getAllItemsSize { count ->
             _totalItemsCount.postValue(count)
+        }
+    }
+
+    fun test() {
+        cartRepository.fetchCart(
+            onSuccess = { productList ->
+                val carts = productList.map { product ->
+                    Cart(product = product, quantity = 0)
+                }
+                Log.d("loadProductsInRange", "$carts")
+            },
+            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) }
+        )
+    }
+
+    fun addCartTest(cart: Cart) {
+        _cart.value = cart
+        val current = _cart.value
+        if (current != null) {
+            val cartRequest = CartRequest(
+                productId = current.product.id,
+                quantity = current.quantity
+            )
+
+            cartRepository.addToCart(cartRequest) { result ->
+                result.onSuccess {
+                    Log.d("addCartTest", "장바구니에 추가 성공")
+                }.onFailure { error ->
+                    Log.e("addCartTest", "장바구니 추가 실패", error)
+                }
+            }
         }
     }
 
