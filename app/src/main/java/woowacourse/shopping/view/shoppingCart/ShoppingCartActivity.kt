@@ -4,27 +4,42 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
-import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.shoppingCart.viewModel.OrderBarViewModel
+import woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel
+import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
 
 class ShoppingCartActivity :
     AppCompatActivity(),
-    ShoppingCartProductAdapter.ShoppingCartListener {
+    ShoppingCartProductAdapter.ShoppingCartListener,
+    ShoppingCartClickListener {
     private val viewModel: ShoppingCartViewModel by viewModels()
+    private val orderBarViewModel: OrderBarViewModel by viewModels()
+
     private val binding: ActivityShoppingCartBinding by lazy {
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
     private val shoppingCartProductAdapter by lazy {
-        ShoppingCartProductAdapter(viewModel::removeShoppingCartProduct, this)
+        ShoppingCartProductAdapter(this)
     }
+    private val activityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            when (result.resultCode) {
+                ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK -> viewModel.reload()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,70 +52,101 @@ class ShoppingCartActivity :
         }
 
         initDataBinding()
-        bindData()
-        handleEvents()
-
-        viewModel.updateShoppingCart()
+        setupAdapter()
+        setupObservers()
     }
 
     private fun initDataBinding() {
         binding.adapter = shoppingCartProductAdapter
-        binding.onClickBackButton = {
-            val intent =
-                Intent().apply {
-                    putExtra("updateProducts", viewModel.updatedProducts.value?.toTypedArray())
-                }
-            setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
-            finish()
+        binding.viewModel = this.viewModel
+        binding.orderBarViewModel = this.orderBarViewModel
+        binding.lifecycleOwner = this@ShoppingCartActivity
+        binding.shoppingCartListener = this@ShoppingCartActivity
+    }
+
+    private fun setupAdapter() {
+        binding.shoppingCartProducts.apply {
+            addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(
+                        recyclerView: RecyclerView,
+                        dx: Int,
+                        dy: Int,
+                    ) {
+                        super.onScrolled(recyclerView, dx, dy)
+
+                        val totalItemCount: Int =
+                            recyclerView.adapter?.itemCount ?: throw IllegalStateException()
+                        val visibleLastItemPosition: Int =
+                            (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+
+                        if (visibleLastItemPosition in totalItemCount - 1..totalItemCount) {
+                            viewModel.plusPage()
+                        }
+                    }
+                },
+            )
         }
     }
 
-    private fun bindData() {
-        viewModel.shoppingCart.observe(this) { shoppingCart: List<ShoppingCartItem> ->
+    private fun setupObservers() {
+        viewModel.shoppingCart.observe(this) { shoppingCart ->
             shoppingCartProductAdapter.submitList(shoppingCart)
+            orderBarViewModel.update(shoppingCart)
         }
-    }
 
-    private fun handleEvents() {
-        viewModel.event.observe(this) { event: ShoppingCartEvent ->
-            @StringRes
-            val messageResourceId: Int =
-                when (event) {
-                    ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE ->
-                        R.string.shopping_cart_update_shopping_cart_error_message
-
-                    ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.shopping_cart_remove_shopping_cart_product_error_message
-
-                    ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.products_minus_shopping_cart_product_error_message
-
-                    ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.product_detail_add_shopping_cart_error_message
+        orderBarViewModel.event.observe(this) { event ->
+            when (event) {
+                OrderEvent.PROCEED -> {
+                    activityResultLauncher.launch(
+                        ShoppingCartRecommendActivity.newIntent(
+                            this,
+                            orderBarViewModel.shoppingCartProductsToOrder.value?.toTypedArray()
+                                ?: emptyArray(),
+                        ),
+                    )
                 }
 
-            binding.root.showSnackBar(getString(messageResourceId))
+                OrderEvent.ABORT -> Unit
+            }
         }
     }
 
-    override fun onMinusPage() {
-        viewModel.minusPage()
+    override fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
+        viewModel.removeShoppingCartProduct(shoppingCartProductItem)
     }
 
-    override fun onPlusPage() {
-        viewModel.plusPage()
+    override fun onProductSelectedButton(
+        shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
+        isSelected: Boolean,
+    ) {
+        viewModel.selectShoppingCartProduct(shoppingCartProductItem, isSelected)
     }
 
-    override fun onRemoveButton(product: Product) {
-        viewModel.removeShoppingCartProduct(product)
+    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
+        viewModel.increaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
     }
 
-    override fun onPlusShoppingCartClick(product: Product) {
-        viewModel.addQuantity(product)
+    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
+        viewModel.decreaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
     }
 
-    override fun onMinusShoppingCartClick(product: Product) {
-        viewModel.decreaseQuantity(product)
+    override fun onBackButtonClick() {
+        val intent =
+            Intent().apply {
+                putExtra("updateProducts", viewModel.hasUpdatedProducts.value)
+            }
+        setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
+        finish()
+    }
+
+    override fun onAllSelectedButtonClick() {
+        val isAllSelected = !(orderBarViewModel.isAllSelected.value ?: false)
+        viewModel.selectAllShoppingCartProducts(isAllSelected)
+    }
+
+    override fun onOrderButtonClick() {
+        orderBarViewModel.checkoutIfPossible()
     }
 
     companion object {

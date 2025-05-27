@@ -4,22 +4,19 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.ProductQuantityClickListener
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ProductItem
+import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
 
 class ShoppingCartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
     shoppingCartListener: ShoppingCartProductClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.onRemoveProduct = shoppingCartListener::onRemoveButton
-        binding.shoppingCartQuantityComponent.productQuantityClickListener = shoppingCartListener
+        binding.shoppingCartProductClickListener = shoppingCartListener
     }
 
-    fun bind(item: ProductItem) {
-        binding.shoppingCartProduct = item.shoppingCartProduct
-        binding.shoppingCartQuantityComponent.product = item.shoppingCartProduct.product
+    fun bind(item: ShoppingCartProductItem) {
+        binding.shoppingCartProductItem = item
         binding.shoppingCartQuantityComponent.quantity = item.shoppingCartProduct.quantity
     }
 
@@ -35,6 +32,11 @@ class ShoppingCartProductViewHolder(
     }
 
     interface ShoppingCartProductClickListener : ProductQuantityClickListener {
-        fun onRemoveButton(product: Product)
+        fun onRemoveButton(shoppingCartProductItem: ShoppingCartProductItem)
+
+        fun onProductSelectedButton(
+            shoppingCartProductItem: ShoppingCartProductItem,
+            isSelected: Boolean,
+        )
     }
 }

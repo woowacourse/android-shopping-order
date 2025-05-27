@@ -1,9 +1,7 @@
 package woowacourse.shopping.view.common
 
-import woowacourse.shopping.domain.product.Product
-
 interface ProductQuantityClickListener {
-    fun onPlusShoppingCartClick(product: Product)
+    fun onPlusShoppingCartClick(quantityObservable: QuantityObservable)
 
-    fun onMinusShoppingCartClick(product: Product)
+    fun onMinusShoppingCartClick(quantityObservable: QuantityObservable)
 }

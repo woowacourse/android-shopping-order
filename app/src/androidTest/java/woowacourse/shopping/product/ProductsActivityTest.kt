@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
+import woowacourse.shopping.fixture.allRequests
 import woowacourse.shopping.fixture.page1
 import woowacourse.shopping.matcher.RecyclerViewMatcher.Companion.withRecyclerView
 import woowacourse.shopping.matcher.isDisplayed
@@ -43,11 +44,11 @@ class ProductsActivityTest {
             it.viewModelStore.clear()
         }
         mainActivityScenario.recreate()
+        Thread.sleep(100)
     }
 
     @Test
     fun 상품의_목록이_표시된다() {
-        mainActivityScenario.recreate()
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -71,15 +72,11 @@ class ProductsActivityTest {
     @Test
     fun 상품의_목록은_20개_단위로_표시된다() {
         // 최근 본 상품, 더보기 버튼 각각 +1 해서 총 22
-        mainActivityScenario.recreate()
-
         onView(withId(R.id.products)).check(matchSize(22))
     }
 
     @Test
     fun 더보기_버튼을_눌러서_상품을_추가_로드할_수_있다() {
-        mainActivityScenario.recreate()
-
         onView(withId(R.id.products)).perform(scrollToPosition(21))
         Thread.sleep(1000)
         onView(withId(R.id.productsMoreButton)).performClick()
@@ -88,8 +85,6 @@ class ProductsActivityTest {
 
     @Test
     fun 상품의_이름이_너무_길_경우_말줄임표로_표시된다() {
-        mainActivityScenario.recreate()
-
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -100,8 +95,6 @@ class ProductsActivityTest {
 
     @Test
     fun 상품을_클릭하면_상품_상세_화면으로_이동된다() {
-        mainActivityScenario.recreate()
-
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -113,8 +106,6 @@ class ProductsActivityTest {
 
     @Test
     fun 수량을_변경하면_현재_수량_정보가_장바구니에_반영된다() {
-        mainActivityScenario.recreate()
-
         // given
         // 기존 수량 : 1
 
@@ -128,12 +119,7 @@ class ProductsActivityTest {
             .performClick()
 
         // then
-        val requests =
-            buildList {
-                repeat(mockServerRule.mockShoppingCartServer.requestCount) {
-                    add(mockServerRule.mockShoppingCartServer.takeRequest())
-                }
-            }
+        val requests = mockServerRule.mockShoppingCartServer.allRequests()
 
         assertThat(
             requests.any { recorded -> recorded.path?.contains("/cart-items/1") == true },
@@ -158,8 +144,6 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_목록에서_플러스_버튼_클릭_시_뱃지_카운트가_증가한다() {
-        mainActivityScenario.recreate()
-
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -176,8 +160,6 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_목록에서_수량을_변경하면_상품을_다시_로딩한다() {
-        mainActivityScenario.recreate()
-
         // given
         // 1번째 상품의 수량 : 1
 
@@ -191,12 +173,7 @@ class ProductsActivityTest {
             .performClick()
 
         // then
-        val requests =
-            buildList {
-                repeat(mockServerRule.mockProductServer.requestCount) {
-                    add(mockServerRule.mockProductServer.takeRequest())
-                }
-            }
+        val requests = mockServerRule.mockProductServer.allRequests()
 
         assertThat(
             requests.any { recorded -> recorded.path?.contains("/products") == true },
@@ -209,14 +186,12 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_목록에서_수량이_0일_경우_수량_선택_버튼이_아닌_플러스_버튼만_제공된다() {
-        mainActivityScenario.recreate()
-
         // given
-        // 3번째 상품의 수량은 0
+        // 6번째 상품의 수량은 0
 
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
-                3,
+                6,
                 R.id.productPlusQuantityButtonDefault,
             ),
         )
@@ -225,8 +200,6 @@ class ProductsActivityTest {
 
     @Test
     fun 최근_본_상품의_목록이_나타난다() {
-        mainActivityScenario.recreate()
-
         // given
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
@@ -251,8 +224,6 @@ class ProductsActivityTest {
 
     @Test
     fun 최근_본_상품_목록이_10개가_넘어가면_맨_나중에_있는_아이템이_삭제된다() {
-        mainActivityScenario.recreate()
-
         // given - when
         for (i in 1..11) {
             onView(withId(R.id.products))
@@ -263,12 +234,10 @@ class ProductsActivityTest {
                     .atPositionOnView(i, R.id.productImage),
             )
                 .performClick()
-
+            Thread.sleep(100)
             onView(withId(R.id.detailClose))
                 .performClick()
         }
-
-        Thread.sleep(500)
 
         onView(withId(R.id.products))
             .perform(swipeDown())
@@ -280,8 +249,6 @@ class ProductsActivityTest {
 
     @Test
     fun 최근_본_상품에_있는_상품을_클릭하면_맨_앞으로_아이템이_이동한다() {
-        mainActivityScenario.recreate()
-
         // given
         for (i in 1..5) {
             onView(withId(R.id.products))
@@ -292,6 +259,7 @@ class ProductsActivityTest {
                     .atPositionOnView(i, R.id.productImage),
             )
                 .performClick()
+            Thread.sleep(200)
             onView(withId(R.id.detailClose))
                 .performClick()
         }
@@ -304,11 +272,11 @@ class ProductsActivityTest {
             ),
         )
             .performClick()
+        Thread.sleep(100)
 
         onView(withId(R.id.detailClose))
             .performClick()
 
-        Thread.sleep(500)
         // then
         onView(withId(R.id.products))
             .perform(swipeDown())
@@ -325,8 +293,6 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_로딩_전_스켈레톤_UI_를_보여준다() {
-        mainActivityScenario.recreate()
-
         mainActivityScenario.onActivity {
             thread {
                 mockServerRule.mockProductServer.dispatcher =

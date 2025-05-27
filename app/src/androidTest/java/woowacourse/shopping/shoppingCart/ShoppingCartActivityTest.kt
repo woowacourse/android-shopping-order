@@ -2,6 +2,7 @@ package woowacourse.shopping.shoppingCart
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.swipeUp
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isChecked
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -10,6 +11,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import woowacourse.shopping.R
+import woowacourse.shopping.fixture.allRequests
 import woowacourse.shopping.fixture.fakeContext
 import woowacourse.shopping.matcher.RecyclerViewMatcher.Companion.withRecyclerView
 import woowacourse.shopping.matcher.isDisplayed
@@ -53,22 +55,21 @@ class ShoppingCartActivityTest {
 
     @Test
     fun 장바구니에서_삭제_버튼을_누르면_서버로_요청을_보낸다() {
+        // given
+        // 첫 번째 아이템의 쇼핑카드 id는 12410 입니다
+
+        // when
         onView(
             withRecyclerView(R.id.shoppingCartProducts)
                 .atPositionOnView(0, R.id.shoppingCartProductDeleteButton),
         ).performClick()
 
         // then
-        val recorded =
-            buildList {
-                repeat(mockServerRule.mockShoppingCartServer.requestCount) {
-                    add(mockServerRule.mockShoppingCartServer.takeRequest())
-                }
-            }
+        val recorded = mockServerRule.mockShoppingCartServer.allRequests()
 
         val result =
             recorded.any {
-                it.method == "DELETE" && it.path == "/cart-items/1"
+                it.method == "DELETE" && it.path == "/cart-items/12410"
             }
 
         assertThat(result).isTrue()
@@ -83,12 +84,7 @@ class ShoppingCartActivityTest {
         ).performClick()
 
         // then
-        val recorded =
-            buildList {
-                repeat(mockServerRule.mockShoppingCartServer.requestCount) {
-                    add(mockServerRule.mockShoppingCartServer.takeRequest())
-                }
-            }
+        val recorded = mockServerRule.mockShoppingCartServer.allRequests()
 
         recorded.any {
             it.method == "PATCH" && it.path == "/cart-items/1" &&
@@ -99,9 +95,13 @@ class ShoppingCartActivityTest {
 
     @Test
     fun 스크롤을_하면_다섯개_단위로_무한스크롤_된다() {
-        // given - when
+        // given
         onView(withId(R.id.shoppingCartProducts))
-            .perform(scrollToPosition(4))
+            .perform(scrollToPosition(0))
+
+        // when
+        onView(withId(R.id.shoppingCartProducts))
+            .perform(swipeUp())
 
         // then
         onView(withId(R.id.shoppingCartProducts))
@@ -110,6 +110,8 @@ class ShoppingCartActivityTest {
 
     @Test
     fun 상품의_체크박스가_선택된_숫자만큼_주문할_수량과_가격정보가_표시된다() {
+        // given
+        // 첫 번째 상품의 수량은 1, 두 번째 상품의 수량은 2 입니다
         // when
         onView(
             withRecyclerView(R.id.shoppingCartProducts)
@@ -126,23 +128,29 @@ class ShoppingCartActivityTest {
             .matchText("300,000원")
 
         onView(withId(R.id.shoppingCartOrderButton))
-            .matchText("주문하기(2)")
+            .matchText("주문하기(3)")
     }
 
     @Test
     fun 상품의_전체_체크박스를_누르면_모든_상품이_선택된다() {
         // given
         // 전체 쇼핑카드 데이터는 7개입니다
+        onView(withId(R.id.shoppingCartProducts))
+            .perform(swipeUp())
 
         // when
         onView(withId(R.id.shoppingCartProductAllSelectCheckBox))
             .performClick()
 
         for (i in 0..6) {
+            onView(withId(R.id.shoppingCartProducts))
+                .perform(scrollToPosition(i))
+
             onView(
                 withRecyclerView(R.id.shoppingCartProducts)
                     .atPositionOnView(i, R.id.shoppingCartProductCheckBox),
-            ).check(matches(isChecked()))
+            )
+                .check(matches(isChecked()))
         }
     }
 

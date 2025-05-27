@@ -11,7 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
@@ -19,9 +19,19 @@ import woowacourse.shopping.view.common.showSnackBar
 class ProductDetailActivity :
     AppCompatActivity(),
     ProductDetailClickListener {
-    private val viewModel: ProductDetailViewModel by viewModels()
+    private var productId: Long = 0
+    private var shoppingCartId: Long? = null
+    private var shoppingCartQuantity: Int = 0
+
     private val binding: ActivityProductDetailBinding by lazy {
         ActivityProductDetailBinding.inflate(layoutInflater)
+    }
+    private val viewModel: ProductDetailViewModel by viewModels {
+        ProductDetailViewModel.factory(
+            productId,
+            shoppingCartId,
+            shoppingCartQuantity,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,24 +44,22 @@ class ProductDetailActivity :
             insets
         }
 
-        val product: Product =
-            intent.getSerializableExtraData(EXTRA_PRODUCT) ?: run {
+        productId =
+            intent.getSerializableExtraData(EXTRA_PRODUCT_ID) ?: run {
                 binding.root.showSnackBar(getString(R.string.product_not_provided_error_message))
                 return finish()
             }
-        val isLastWatching: Boolean =
-            intent.getSerializableExtraData(EXTRA_IS_LAST_WATCHING) ?: false
-        viewModel.updateProduct(product, isLastWatching)
-        bindViewModel(product)
+        shoppingCartId = intent.getSerializableExtraData(EXTRA_SHOPPING_CART_ID)
+        shoppingCartQuantity =
+            intent.getSerializableExtraData(EXTRA_SHOPPING_CART_QUANTITY) ?: 0
+        bindViewModel()
         setupObservers()
     }
 
-    private fun bindViewModel(product: Product) {
+    private fun bindViewModel() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.productDetailEventListener = this
-        binding.productDetailQuantityComponent.product = product
-        binding.productDetailQuantityComponent.productQuantityClickListener = this
     }
 
     private fun setupObservers() {
@@ -72,6 +80,10 @@ class ProductDetailActivity :
                 ProductDetailEvent.ADD_SHOPPING_CART_FAILURE -> R.string.product_detail_add_shopping_cart_error_message
                 ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE -> R.string.product_detail_add_recent_watching_error_message
                 ProductDetailEvent.GET_RECENT_WATCHING_FAILURE -> R.string.product_detail_update_recent_watching_error_message
+                ProductDetailEvent.GET_PRODUCT_FAILURE -> {
+                    R.string.product_not_provided_error_message
+                    return finish()
+                }
             }
 
         binding.root.showSnackBar(getString(messageResourceId))
@@ -80,7 +92,7 @@ class ProductDetailActivity :
     override fun onCloseButton() {
         val intent =
             Intent().apply {
-                putExtra("updateProduct", viewModel.product.value)
+                putExtra("updateProduct", viewModel.product.value?.product)
             }
         setResult(ResultFrom.PRODUCT_DETAIL_BACK.RESULT_OK, intent)
         finish()
@@ -90,39 +102,33 @@ class ProductDetailActivity :
         viewModel.addToShoppingCart()
     }
 
-    override fun onPlusShoppingCartClick(product: Product) {
+    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
         viewModel.plusQuantity()
     }
 
-    override fun onMinusShoppingCartClick(product: Product) {
+    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
         viewModel.minusQuantity()
     }
 
-    override fun onRecentProduct(product: Product) {
-        val intent =
-            Intent().apply {
-                putExtra("recentProduct", viewModel.recentWatchingProduct.value)
-                putExtra("updateProduct", viewModel.product.value)
-            }
-        setResult(ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK, intent)
-        finish()
-    }
-
     companion object {
-        private const val EXTRA_PRODUCT = "woowacourse.shopping.EXTRA_PRODUCT"
-        private const val EXTRA_IS_LAST_WATCHING = "woowacourse.shopping.EXTRA_IS_LAST_WATCHING"
+        private const val EXTRA_PRODUCT_ID = "woowacourse.shopping.EXTRA_PRODUCT_ID"
+        private const val EXTRA_SHOPPING_CART_ID = "woowacourse.shopping.EXTRA_SHOPPING_CART_ID"
+        private const val EXTRA_SHOPPING_CART_QUANTITY =
+            "woowacourse.shopping.EXTRA_SHOPPING_CART_QUANTITY"
 
         fun newIntent(
             context: Context,
-            product: Product,
-            isLastWatching: Boolean = false,
+            productId: Long,
+            shoppingCartId: Long? = 0,
+            quantity: Int = 0,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(
-                    EXTRA_PRODUCT,
-                    product,
+                    EXTRA_PRODUCT_ID,
+                    productId,
                 )
-                putExtra(EXTRA_IS_LAST_WATCHING, isLastWatching)
+                putExtra(EXTRA_SHOPPING_CART_ID, shoppingCartId)
+                putExtra(EXTRA_SHOPPING_CART_QUANTITY, quantity)
             }
     }
 }
