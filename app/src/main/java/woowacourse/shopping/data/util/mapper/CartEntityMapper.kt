@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.util
+package woowacourse.shopping.data.util.mapper
 
 import woowacourse.shopping.data.carts.CartEntity
 import woowacourse.shopping.domain.model.CartItem
@@ -13,6 +13,6 @@ fun Goods.toEntity(quantity: Int = 0): CartEntity =
         quantity = quantity,
     )
 
-fun CartEntity.toDomainGoods(): Goods = Goods(name = name, price = price, thumbnailUrl = thumbnailUrl, id = id)
+fun CartEntity.toDomainGoods(): Goods = Goods(name = name, price = price, thumbnailUrl = thumbnailUrl, id = id , category = "")
 
 fun CartEntity.toDomainCartItem(): CartItem = CartItem(goods = this.toDomainGoods(), quantity = quantity)

@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.goods.repository
 
+import woowacourse.shopping.data.goods.dto.GoodsResponse
+import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.Goods
 
 class GoodsRepositoryImpl(
@@ -14,8 +16,21 @@ class GoodsRepositoryImpl(
         limit: Int,
         offset: Int,
         onComplete: (List<Goods>) -> Unit,
+        onFail: (Throwable) -> Unit
     ) {
-        remoteDataSource.fetchPageGoods(limit, offset, onComplete)
+        remoteDataSource.fetchPageGoods(
+            limit,
+            offset,
+            { response ->
+                onComplete(getGoodsByGoodsResponse(response))
+            },
+            onFail
+        )
+    }
+
+    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse):List<Goods>{
+        val content = goodsResponse.content
+        return content.map{it.toDomain()}
     }
 
     override fun fetchGoodsById(
@@ -58,6 +73,8 @@ class GoodsRepositoryImpl(
         }
     }
 
+
+
     override fun fetchMostRecentGoods(onComplete: (Goods?) -> Unit) {
         fetchRecentGoodsIds { recentIds ->
             if (recentIds.isEmpty()) {
@@ -75,4 +92,6 @@ class GoodsRepositoryImpl(
     ) {
         localDataSource.loggingRecentGoods(goods, onComplete)
     }
+
+
 }

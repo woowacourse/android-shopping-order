@@ -15,3 +15,4 @@ data class Content(
     @SerializedName("price")
     val price: Int
 )
+

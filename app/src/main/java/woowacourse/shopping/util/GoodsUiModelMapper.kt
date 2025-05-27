@@ -17,4 +17,5 @@ fun GoodsUiModel.toDomain(): Goods =
         price = price,
         thumbnailUrl = thumbnailUrl,
         id = id,
+        category = ""
     )

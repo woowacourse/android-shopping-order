@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.goods.repository
 
+import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface GoodsRemoteDataSource {
@@ -8,7 +9,8 @@ interface GoodsRemoteDataSource {
     fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (List<Goods>) -> Unit,
+        onSuccess: (GoodsResponse) -> Unit,
+        onFailure: (Throwable) -> Unit,
     )
 
     fun fetchGoodsById(

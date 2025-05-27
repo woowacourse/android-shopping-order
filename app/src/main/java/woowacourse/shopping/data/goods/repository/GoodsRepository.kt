@@ -9,6 +9,7 @@ interface GoodsRepository {
         limit: Int,
         offset: Int,
         onComplete: (List<Goods>) -> Unit,
+        onFail : (Throwable) -> Unit
     )
 
     fun fetchGoodsById(

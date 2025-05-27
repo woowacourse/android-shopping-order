@@ -27,12 +27,36 @@ class GoodsRemoteDataSourceImpl(
     override fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (List<Goods>) -> Unit,
+        onSuccess: (GoodsResponse) -> Unit,
+        onFailure: (Throwable) -> Unit,
     ) {
         retrofitService
-            .requestProducts(
-                page = offset / limit,
-                size = limit,
+            .requestProducts(page = offset / limit, size = limit)
+            .enqueue(object : Callback<GoodsResponse> {
+                override fun onResponse(call: Call<GoodsResponse>, response: Response<GoodsResponse>) {
+                    if (response.isSuccessful && response.body() != null) {
+                        onSuccess(response.body()!!)
+                    } else {
+                        onFailure(Throwable("응답 없음 또는 실패: ${response.code()}"))
+                    }
+                }
+
+                override fun onFailure(call: Call<GoodsResponse>, t: Throwable) {
+                    onFailure(t)
+                }
+            })
+    }
+
+    override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
+    }
+
+    override fun fetchGoodsById(
+        id: Int,
+        onComplete: (Goods?) -> Unit,
+    ) {
+        retrofitService
+            .requestProductDetail(
+                id = id.toLong()
             ).enqueue(
                 object : Callback<GoodsResponse> {
                     override fun onResponse(
@@ -53,14 +77,5 @@ class GoodsRemoteDataSourceImpl(
                     }
                 },
             )
-    }
-
-    override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
-    }
-
-    override fun fetchGoodsById(
-        id: Int,
-        onComplete: (Goods?) -> Unit,
-    ) {
     }
 }

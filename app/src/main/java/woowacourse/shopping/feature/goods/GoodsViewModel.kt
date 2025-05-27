@@ -41,13 +41,17 @@ class GoodsViewModel(
         goodsRepository.fetchPageGoods(
             limit = PAGE_SIZE,
             offset = goodsLoadOffset,
-        ) { fetchedGoods ->
-            goods.addAll(fetchedGoods)
-            goodsRepository.fetchGoodsSize { totalSize ->
-                _isFullLoaded.postValue(page * PAGE_SIZE >= totalSize)
+            onComplete = { fetchedGoods ->
+                goods.addAll(fetchedGoods)
+                goodsRepository.fetchGoodsSize { totalSize ->
+                    _isFullLoaded.postValue(page * PAGE_SIZE >= totalSize)
+                }
+                _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
+            },
+            onFail = { throwable ->
+                throw(throwable)
             }
-            _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
-        }
+        )
     }
 
     fun updateRecentlyViewedGoods() {

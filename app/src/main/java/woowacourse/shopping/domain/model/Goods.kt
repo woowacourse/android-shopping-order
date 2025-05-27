@@ -5,4 +5,5 @@ data class Goods(
     val price: Int,
     val thumbnailUrl: String,
     val id: Long = 0,
+    val category: String
 )
