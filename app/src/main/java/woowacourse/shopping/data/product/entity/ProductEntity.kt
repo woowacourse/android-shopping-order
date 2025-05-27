@@ -10,10 +10,11 @@ data class ProductEntity(
     val id: Long,
     val name: String,
     val price: Int,
+    val imageUrl: String? = null,
 ) {
-    fun toDomain(): Product = Product(id, name, price)
+    fun toDomain(): Product = Product(id, name, price, imageUrl)
 
     companion object {
-        fun Product.toEntity(): ProductEntity = ProductEntity(id, name, price)
+        fun Product.toEntity(): ProductEntity = ProductEntity(id, name, price, imageUrl)
     }
 }

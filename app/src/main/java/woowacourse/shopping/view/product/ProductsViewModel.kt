@@ -34,7 +34,7 @@ class ProductsViewModel(
 
     fun loadAllProducts() {
         _productItems.value = emptyList()
-        productsRepository.load { result: Result<List<Product>> ->
+        productsRepository.load(1, LOAD_PRODUCTS_SIZE) { result: Result<List<Product>> ->
             result
                 .onSuccess { products: List<Product> ->
                     allProducts = products

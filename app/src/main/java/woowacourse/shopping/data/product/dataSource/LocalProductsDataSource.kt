@@ -21,7 +21,7 @@ object LocalProductsDataSource : ProductsDataSource {
         dao = db.dao()
     }
 
-    override fun load(): List<ProductEntity> = dao.load()
+    override fun load(page: Int, size: Int): List<ProductEntity> = dao.load()
 
     override fun getById(id: Long): ProductEntity? = dao.load(id)
 }
