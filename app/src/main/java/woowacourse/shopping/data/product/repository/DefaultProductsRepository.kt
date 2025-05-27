@@ -1,10 +1,10 @@
 package woowacourse.shopping.data.product.repository
 
+import woowacourse.shopping.data.product.dataSource.ProductDataSource
+import woowacourse.shopping.data.product.dataSource.ProductRemoteDataSource
 import woowacourse.shopping.data.product.local.dao.RecentWatchingDao
 import woowacourse.shopping.data.product.local.entity.ProductEntity
 import woowacourse.shopping.data.product.local.entity.RecentWatchingEntity
-import woowacourse.shopping.data.product.dataSource.ProductRemoteDataSource
-import woowacourse.shopping.data.product.dataSource.ProductDataSource
 import woowacourse.shopping.domain.product.Product
 import kotlin.concurrent.thread
 
@@ -64,6 +64,7 @@ class DefaultProductsRepository(
     }
 
     companion object {
+        @Suppress("ktlint:standard:property-naming")
         private var INSTANCE: ProductsRepository? = null
 
         fun initialize(recentWatchingDao: RecentWatchingDao) {
