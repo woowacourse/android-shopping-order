@@ -10,4 +10,5 @@
     <color name="gray">#555555</color>
     <color name="light_gray">#AAAAAA</color>
     <color name="turquoise">#04C09E</color>
+    <color name="shimmer_background">#858585</color>
 </resources>
