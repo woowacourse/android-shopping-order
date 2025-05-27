@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.shoppingCart.storage
 
-import android.util.Log
 import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
@@ -12,14 +11,7 @@ class RemoteShoppingCartDataSource(
         size: Int,
     ): List<CartItemEntity> {
         val rawJson: String = productsHttpClient.getShoppingCart(page, size).body?.string() ?: ""
-        Log.e("TAG", "rawJson: $rawJson")
-//        {
-//            "page": 1073741824,
-//            "size": 1073741824,
-//            "sort": [
-//              "string"
-//            ]
-//        }
+
         rawJson
         return emptyList()
     }

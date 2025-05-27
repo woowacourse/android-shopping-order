@@ -28,7 +28,19 @@ class ProductsHttpClient(
         quantity: Int,
     ): Response = run("/cart-items")
 
-    fun getProducts(): Response = run("/products")
+    fun getProducts(
+        page: Int,
+        size: Int,
+    ): Response {
+        val request: Request =
+            Request
+                .Builder()
+                .url("$baseUrl/products?page=${page}&size=${size}")
+                .get()
+                .build()
+
+        return client.newCall(request).execute()
+    }
 
     fun getProductById(id: Long): Response = run("/products/$id")
 

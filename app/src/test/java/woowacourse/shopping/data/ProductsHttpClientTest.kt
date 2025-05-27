@@ -14,7 +14,7 @@ class ProductsHttpClientTest {
 
     @Test
     fun `모든 상품을 가져올 수 있다`() {
-        val response: Response = client.getProducts()
+        val response: Response = client.getProducts(1, 5)
         assertThat(response.body?.string()).isEqualTo(
             """
             [
