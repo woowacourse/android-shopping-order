@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="woowacourse.shopping.presentation.model.FetchPageDirection"/>
+        <import type="woowacourse.shopping.presentation.model.FetchPageDirection" />
 
         <variable
             name="vm"
@@ -22,9 +22,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/gray_55"
+            app:layout_constraintTop_toTopOf="parent"
             app:title="@string/toolbar_cart_title"
-            app:titleTextColor="@color/white"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:titleTextColor="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_cart"
@@ -42,9 +42,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@{vm.page == 1 ? @color/gray_aa : @color/mint}"
+            android:clickable="@{vm.page != 1}"
             android:contentDescription="@null"
             android:onClick="@{() -> vm.fetchCartItems(FetchPageDirection.PREVIOUS)}"
-            android:clickable="@{vm.page != 1}"
             android:padding="12dp"
             android:src="@drawable/ic_left"
             app:layout_constraintBottom_toBottomOf="@id/text_view_page"
@@ -72,9 +72,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@{vm.hasMore ? @color/mint : @color/gray_aa }"
+            android:clickable="@{vm.hasMore}"
             android:contentDescription="@null"
             android:onClick="@{() -> vm.fetchCartItems(FetchPageDirection.NEXT)}"
-            android:clickable="@{vm.hasMore}"
             android:padding="12dp"
             android:src="@drawable/ic_right"
             app:layout_constraintBottom_toBottomOf="@id/text_view_page"
@@ -82,5 +82,32 @@
             app:layout_constraintStart_toEndOf="@id/text_view_page"
             app:layout_constraintTop_toTopOf="@id/text_view_page" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_cart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="40dp"
+            android:paddingHorizontal="16dp"
+            app:isShow="@{vm.isLoading}"
+            app:layout_constraintBottom_toTopOf="@id/text_view_page"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/item_cart_shimmer" />
+
+                <include layout="@layout/item_cart_shimmer" />
+
+                <include layout="@layout/item_cart_shimmer" />
+
+                <include layout="@layout/item_cart_shimmer" />
+
+                <include layout="@layout/item_cart_shimmer" />
+
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

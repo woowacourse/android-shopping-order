@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="20dp">
+
         <ImageView
             android:id="@+id/image_view_shimmer"
             android:layout_width="0dp"
@@ -44,7 +45,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image_view_shimmer_title" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

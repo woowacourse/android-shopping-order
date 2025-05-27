@@ -32,6 +32,9 @@ class CartViewModel(
     private val _hasMore = MutableLiveData<Boolean>()
     val hasMore: LiveData<Boolean> = _hasMore
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private val limit = 5
 
     init {
@@ -41,7 +44,7 @@ class CartViewModel(
     fun fetchCartItems(direction: FetchPageDirection) {
         val newPage = calculatePage(direction)
         val offset = (newPage - DEFAULT_PAGE) * limit
-
+        _isLoading.value = true
         cartRepository.loadCartItems(offset, limit) { result ->
             result
                 .onSuccess { handleFetchCartItemsSuccess(it, newPage) }
@@ -89,6 +92,7 @@ class CartViewModel(
         _cartItems.postValue(pageableItem.items.map { it.toCartItemUiModel() })
         _hasMore.postValue(pageableItem.hasMore)
         _page.postValue(newPage)
+        _isLoading.postValue(false)
     }
 
     private fun refreshProductQuantity(productId: Long) {
