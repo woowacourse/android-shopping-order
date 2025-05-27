@@ -6,5 +6,5 @@ interface AuthenticationRepository {
     val id: String
     val password: String
 
-    suspend fun updateUserAuthentication(userAuthentication: UserAuthentication)
+    fun updateUserAuthentication(userAuthentication: UserAuthentication)
 }

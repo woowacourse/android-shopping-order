@@ -1,34 +1,38 @@
 package woowacourse.shopping.data.authentication.repository
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.map
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import woowacourse.shopping.domain.authentication.UserAuthentication
 
 class DefaultAuthenticationRepository(
-    private val authDataStore: DataStore<Preferences>
+    private val authDataSource: SharedPreferences,
 ) : AuthenticationRepository {
-    override val id: String
-        get() = authDataStore.data.map { preferences ->
-            preferences[USER_ID_KEY]
-        }.toString()
+    override var id: String
+        get() = authDataSource.getString(USER_ID_KEY, "").orEmpty()
+        private set(value) = authDataSource.edit { putString(USER_ID_KEY, value) }
 
-    override val password: String
-        get() = authDataStore.data.map { preferences ->
-            preferences[USER_PASSWORD_KEY]
-        }.toString()
+    override var password: String
+        get() = authDataSource.getString(USER_PASSWORD_KEY, "").orEmpty()
+        private set(value) = authDataSource.edit { putString(USER_PASSWORD_KEY, value) }
 
-    override suspend fun updateUserAuthentication(userAuthentication: UserAuthentication) {
-        authDataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = userAuthentication.id
-            preferences[USER_PASSWORD_KEY] = userAuthentication.password
-        }
+    override fun updateUserAuthentication(userAuthentication: UserAuthentication) {
+        this.id = userAuthentication.id
+        this.password = userAuthentication.password
     }
 
     companion object {
-        private val USER_ID_KEY = stringPreferencesKey("id")
-        private val USER_PASSWORD_KEY = stringPreferencesKey("password")
+        private const val USER_ID_KEY = "id"
+        private const val USER_PASSWORD_KEY = "password"
+
+        @Suppress("ktlint:standard:property-naming")
+        private var INSTANCE: AuthenticationRepository? = null
+
+        fun initialize(authDataStore: SharedPreferences) {
+            if (INSTANCE == null) {
+                INSTANCE = DefaultAuthenticationRepository(authDataSource = authDataStore)
+            }
+        }
+
+        fun get(): AuthenticationRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")
     }
 }
