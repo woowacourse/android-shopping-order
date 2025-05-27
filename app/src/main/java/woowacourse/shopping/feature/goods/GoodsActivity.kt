@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
+import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
@@ -34,7 +35,7 @@ class GoodsActivity : AppCompatActivity() {
     private lateinit var navbarBinding: MenuCartNavbarBinding
     private val viewModel: GoodsViewModel by viewModels {
         GoodsViewModelFactory(
-            CartRepositoryImpl(ShoppingDatabase.getDatabase(this)),
+            CartRepositoryImpl(CartRemoteDataSourceImpl()),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
                 GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),

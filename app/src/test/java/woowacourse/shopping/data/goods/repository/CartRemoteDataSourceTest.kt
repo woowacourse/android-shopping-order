@@ -12,7 +12,7 @@ import woowacourse.shopping.domain.model.Goods
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class GoodsRemoteDataSourceTest {
+class CartRemoteDataSourceTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var dataSource: GoodsRemoteDataSourceImpl
     private val gson = Gson()

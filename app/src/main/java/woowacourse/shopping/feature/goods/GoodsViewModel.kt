@@ -50,7 +50,7 @@ class GoodsViewModel(
             },
             onFail = { throwable ->
                 throw(throwable)
-            }
+            },
         )
     }
 
@@ -61,14 +61,14 @@ class GoodsViewModel(
     }
 
     fun updateCartQuantity() {
-        cartRepository.fetchAllCartItems { cartItems ->
-            val cartItemsMap = cartItems.associateBy { it.goods.id }
-            _goodsWithCartQuantity.value =
-                goods.map { goods ->
-                    cartItemsMap[goods.id] ?: CartItem(goods = goods, quantity = 0)
-                }
-            setTotalCartItemSize(cartItems.sumOf { it.quantity })
-        }
+//        cartRepository.fetchAllCartItems { cartItems ->
+//            val cartItemsMap = cartItems.associateBy { it.goods.id }
+//            _goodsWithCartQuantity.value =
+//                goods.map { goods ->
+//                    cartItemsMap[goods.id] ?: CartItem(goods = goods, quantity = 0)
+//                }
+//            setTotalCartItemSize(cartItems.sumOf { it.quantity })
+//        }
     }
 
     private fun setTotalCartItemSize(totalCartQuantity: Int) {

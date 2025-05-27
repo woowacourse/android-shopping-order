@@ -5,6 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 
@@ -21,4 +22,13 @@ interface RetrofitService {
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long = 0,
     ): Call<Content>
+
+    @GET("/cart-items")
+    fun requestCartProduct(
+        @Header("accept") accept: String = "*/*",
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 5,
+        @Query("sort") sort: String = "id,desc",
+        @Header("Authorization") authorization: String,
+    ): Call<CartResponse>
 }

@@ -1,55 +1,51 @@
 package woowacourse.shopping.data.carts.repository
 
-import android.os.Handler
-import android.os.Looper
-import woowacourse.shopping.data.ShoppingDatabase
-import woowacourse.shopping.data.util.mapper.toDomainCartItem
-import woowacourse.shopping.data.util.mapper.toEntity
+import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
-import kotlin.concurrent.thread
 
 class CartRepositoryImpl(
-    private val shoppingDatabase: ShoppingDatabase,
+    private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    override fun fetchAllCartItems(onComplete: (List<CartItem>) -> Unit) {
-        thread {
-            val cartEntities = shoppingDatabase.cartDao().getAll()
-
-            Handler(Looper.getMainLooper()).post {
-                onComplete(cartEntities.map { it.toDomainCartItem() })
-            }
-        }
+    override fun fetchAllCartItems(
+        onComplete: (List<CartItem>) -> Unit,
+        onFail: (Throwable) -> Unit,
+    ) {
+        remoteDataSource.fetchPageCartItem(
+            Int.MAX_VALUE,
+            0,
+            { response ->
+                onComplete(getCartItemByCartResponse(response))
+            },
+            { },
+        )
     }
 
     override fun fetchPageCartItems(
         limit: Int,
         offset: Int,
         onComplete: (List<CartItem>) -> Unit,
+        onFail: (Throwable) -> Unit,
     ) {
-        thread {
-            val cartEntities = shoppingDatabase.cartDao().getPage(limit, offset)
-
-            Handler(Looper.getMainLooper()).post {
-                onComplete(cartEntities.map { it.toDomainCartItem() })
-            }
-        }
+        remoteDataSource.fetchPageCartItem(
+            limit,
+            offset,
+            { response ->
+                onComplete(getCartItemByCartResponse(response))
+            },
+            { },
+        )
     }
+
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     override fun addOrIncreaseQuantity(
         goods: Goods,
         addQuantity: Int,
         onComplete: () -> Unit,
     ) {
-        thread {
-            shoppingDatabase
-                .cartDao()
-                .addOrIncreaseQuantity(goods.toEntity(addQuantity))
-
-            Handler(Looper.getMainLooper()).post {
-                onComplete()
-            }
-        }
+        // Todo
     }
 
     override fun removeOrDecreaseQuantity(
@@ -57,37 +53,17 @@ class CartRepositoryImpl(
         removeQuantity: Int,
         onComplete: () -> Unit,
     ) {
-        thread {
-            shoppingDatabase
-                .cartDao()
-                .removeOrDecreaseQuantity(goods.toEntity(removeQuantity))
-
-            Handler(Looper.getMainLooper()).post {
-                onComplete()
-            }
-        }
+        // Todo
     }
 
     override fun delete(
         goods: Goods,
         onComplete: () -> Unit,
     ) {
-        thread {
-            shoppingDatabase.cartDao().delete(goods.toEntity())
-
-            Handler(Looper.getMainLooper()).post {
-                onComplete()
-            }
-        }
+        // Todo
     }
 
     override fun getAllItemsSize(onComplete: (Int) -> Unit) {
-        thread {
-            val size = shoppingDatabase.cartDao().getAllItemsSize()
-
-            Handler(Looper.getMainLooper()).post {
-                onComplete(size)
-            }
-        }
+        // Todo
     }
 }

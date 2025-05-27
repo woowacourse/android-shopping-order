@@ -38,6 +38,13 @@ class CartViewModel(
         updateCartQuantity()
     }
 
+    fun onLoginInput(
+        id: String,
+        pw: String,
+    ) {
+        // Todo
+    }
+
     fun getPosition(cartItem: CartItem): Int? {
         val idx = cart.value?.indexOf(cartItem) ?: return null
         return if (idx >= 0) idx else null
@@ -60,9 +67,11 @@ class CartViewModel(
         cartRepository.fetchPageCartItems(
             PAGE_SIZE,
             (currentPage - 1) * PAGE_SIZE,
-        ) { currentPageCartItems ->
-            _cart.value = currentPageCartItems
-        }
+            { currentPageCartItems ->
+                _cart.value = currentPageCartItems
+            },
+            {},
+        )
         updateCartDataSize()
         updatePageMoveAvailability()
     }
@@ -71,9 +80,11 @@ class CartViewModel(
         cartRepository.fetchPageCartItems(
             PAGE_SIZE,
             (currentPage - 1) * PAGE_SIZE,
-        ) { currentPageCartItems ->
-            _cart.postValue(currentPageCartItems)
-        }
+            { currentPageCartItems ->
+                _cart.postValue(currentPageCartItems)
+            },
+            {},
+        )
     }
 
     private fun updateCartDataSize() {
