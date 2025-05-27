@@ -5,7 +5,7 @@ import woowacourse.shopping.data.product.entity.CartItemEntity
 interface ShoppingCartDataSource {
     fun load(): List<CartItemEntity>
 
-    fun upsert(product: CartItemEntity)
+    fun upsert(cartItem: CartItemEntity)
 
     fun remove(product: CartItemEntity)
 

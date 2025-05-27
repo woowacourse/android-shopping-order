@@ -3,14 +3,14 @@ package woowacourse.shopping.data.shoppingCart.repository
 import woowacourse.shopping.data.product.entity.CartItemEntity
 import woowacourse.shopping.data.product.entity.CartItemEntity.Companion.toEntity
 import woowacourse.shopping.data.product.entity.ProductEntity.Companion.toEntity
-import woowacourse.shopping.data.shoppingCart.storage.LocalShoppingCartDataSource
+import woowacourse.shopping.data.shoppingCart.storage.RemoteShoppingCartDataSource
 import woowacourse.shopping.data.shoppingCart.storage.ShoppingCartDataSource
 import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.domain.product.Product
 import kotlin.concurrent.thread
 
 class DefaultShoppingCartRepository(
-    private val shoppingCartDataSource: ShoppingCartDataSource = LocalShoppingCartDataSource,
+    private val shoppingCartDataSource: ShoppingCartDataSource = RemoteShoppingCartDataSource()
 ) : ShoppingCartRepository {
     override fun load(onLoad: (Result<List<CartItem>>) -> Unit) {
         { shoppingCartDataSource.load().map(CartItemEntity::toDomain) }.runAsync(onLoad)
@@ -20,7 +20,7 @@ class DefaultShoppingCartRepository(
         cartItem: CartItem,
         onAdd: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.upsert(cartItem.toEntity()) }.runAsync(onAdd)
+        {shoppingCartDataSource.upsert(cartItem.toEntity())}.runAsync(onAdd)
     }
 
     override fun remove(
