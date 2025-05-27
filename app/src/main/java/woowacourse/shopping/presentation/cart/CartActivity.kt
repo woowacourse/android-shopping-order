@@ -78,7 +78,7 @@ class CartActivity :
                 is ResultState.Success -> {
                     binding.root.postDelayed({
                         showSampleData(false)
-                    }, 2_000)
+                    }, 1_000L)
 
                     cartAdapter.submitList(result.data)
                 }
