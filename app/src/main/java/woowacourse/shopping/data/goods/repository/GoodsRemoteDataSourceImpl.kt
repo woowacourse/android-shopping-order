@@ -7,9 +7,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.util.RetrofitService
-import woowacourse.shopping.domain.model.Goods
 
 class GoodsRemoteDataSourceImpl(
     private val baseUrl: String = BuildConfig.BASE_URL,
@@ -32,19 +32,27 @@ class GoodsRemoteDataSourceImpl(
     ) {
         retrofitService
             .requestProducts(page = offset / limit, size = limit)
-            .enqueue(object : Callback<GoodsResponse> {
-                override fun onResponse(call: Call<GoodsResponse>, response: Response<GoodsResponse>) {
-                    if (response.isSuccessful && response.body() != null) {
-                        onSuccess(response.body()!!)
-                    } else {
-                        onFailure(Throwable("응답 없음 또는 실패: ${response.code()}"))
+            .enqueue(
+                object : Callback<GoodsResponse> {
+                    override fun onResponse(
+                        call: Call<GoodsResponse>,
+                        response: Response<GoodsResponse>,
+                    ) {
+                        if (response.isSuccessful && response.body() != null) {
+                            onSuccess(response.body()!!)
+                        } else {
+                            onFailure(Throwable("응답 없음 또는 실패: ${response.code()}"))
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<GoodsResponse>, t: Throwable) {
-                    onFailure(t)
-                }
-            })
+                    override fun onFailure(
+                        call: Call<GoodsResponse>,
+                        t: Throwable,
+                    ) {
+                        onFailure(t)
+                    }
+                },
+            )
     }
 
     override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
@@ -52,25 +60,24 @@ class GoodsRemoteDataSourceImpl(
 
     override fun fetchGoodsById(
         id: Int,
-        onComplete: (Goods?) -> Unit,
+        onComplete: (Content) -> Unit,
     ) {
         retrofitService
             .requestProductDetail(
-                id = id.toLong()
+                id = id.toLong(),
             ).enqueue(
-                object : Callback<GoodsResponse> {
+                object : Callback<Content> {
                     override fun onResponse(
-                        call: Call<GoodsResponse>,
-                        response: Response<GoodsResponse>,
+                        call: Call<Content>,
+                        response: Response<Content>,
                     ) {
-                        if (response.isSuccessful) {
-                            val body = response.body()
-                            println("body : $body")
+                        if (response.isSuccessful && response.body() != null) {
+                            onComplete(response.body()!!)
                         }
                     }
 
                     override fun onFailure(
-                        call: Call<GoodsResponse>,
+                        call: Call<Content>,
                         t: Throwable,
                     ) {
                         println("error : $t")

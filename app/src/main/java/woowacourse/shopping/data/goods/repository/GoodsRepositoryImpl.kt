@@ -16,7 +16,7 @@ class GoodsRepositoryImpl(
         limit: Int,
         offset: Int,
         onComplete: (List<Goods>) -> Unit,
-        onFail: (Throwable) -> Unit
+        onFail: (Throwable) -> Unit,
     ) {
         remoteDataSource.fetchPageGoods(
             limit,
@@ -24,20 +24,22 @@ class GoodsRepositoryImpl(
             { response ->
                 onComplete(getGoodsByGoodsResponse(response))
             },
-            onFail
+            onFail,
         )
     }
 
-    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse):List<Goods>{
+    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> {
         val content = goodsResponse.content
-        return content.map{it.toDomain()}
+        return content.map { it.toDomain() }
     }
 
     override fun fetchGoodsById(
         id: Int,
         onComplete: (Goods?) -> Unit,
     ) {
-        remoteDataSource.fetchGoodsById(id, onComplete)
+        remoteDataSource.fetchGoodsById(id, { response ->
+            onComplete(response.toDomain())
+        })
     }
 
     override fun fetchRecentGoodsIds(onComplete: (List<String>) -> Unit) {
@@ -73,8 +75,6 @@ class GoodsRepositoryImpl(
         }
     }
 
-
-
     override fun fetchMostRecentGoods(onComplete: (Goods?) -> Unit) {
         fetchRecentGoodsIds { recentIds ->
             if (recentIds.isEmpty()) {
@@ -92,6 +92,4 @@ class GoodsRepositoryImpl(
     ) {
         localDataSource.loggingRecentGoods(goods, onComplete)
     }
-
-
 }

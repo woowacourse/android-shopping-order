@@ -25,7 +25,6 @@ class GoodsRemoteDataSourceTest {
         dataSource =
             GoodsRemoteDataSourceImpl(
                 baseUrl = mockWebServer.url("/").toString().removeSuffix("/"),
-                useInterceptor = false,
             )
     }
 

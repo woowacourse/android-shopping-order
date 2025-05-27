@@ -5,6 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 
 interface RetrofitService {
@@ -18,7 +19,6 @@ interface RetrofitService {
     @GET("/products/{id}")
     fun requestProductDetail(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id:Long = 0
-    ): Call<GoodsResponse>
-
+        @Path("id") id: Long = 0,
+    ): Call<Content>
 }

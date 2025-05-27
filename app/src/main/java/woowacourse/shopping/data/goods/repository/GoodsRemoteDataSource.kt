@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.goods.repository
 
+import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
-import woowacourse.shopping.domain.model.Goods
 
 interface GoodsRemoteDataSource {
     fun fetchGoodsSize(onComplete: (Int) -> Unit)
@@ -15,6 +15,6 @@ interface GoodsRemoteDataSource {
 
     fun fetchGoodsById(
         id: Int,
-        onComplete: (Goods?) -> Unit,
+        onComplete: (Content) -> Unit,
     )
 }
