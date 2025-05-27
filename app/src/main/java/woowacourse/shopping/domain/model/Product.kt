@@ -7,6 +7,7 @@ data class Product(
     val imageUrl: String,
     val name: String,
     val price: Int,
+    val category: String = "",
 ) : Serializable {
     init {
         require(price >= MINIMUM_PRODUCT_PRICE) { INVALID_PRICE_MESSAGE }

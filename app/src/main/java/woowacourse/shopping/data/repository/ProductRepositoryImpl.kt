@@ -26,19 +26,14 @@ class ProductRepositoryImpl(
     }
 
     override fun getPagedProducts(
-        limit: Int,
-        offset: Int,
+        page: Int,
+        size: Int,
         onSuccess: (PagedResult<Product>) -> Unit,
     ) {
-        require(offset >= 0)
-        require(limit > 0)
+        require(page >= 0)
+        require(size > 0)
         thread {
-            val result = remoteDataSource.getPagedProducts(limit, offset)
-            if (result == null) {
-                onSuccess(PagedResult(emptyList(), false))
-            } else {
-                onSuccess(result)
-            }
+            remoteDataSource.getPagedProducts(page, size, onSuccess)
         }
     }
 }

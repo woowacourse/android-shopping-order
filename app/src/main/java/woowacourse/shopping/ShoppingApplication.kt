@@ -5,6 +5,7 @@ import woowacourse.shopping.data.ShoppingCartDatabase
 import woowacourse.shopping.data.datasource.local.CartProductLocalDataSource
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.network.RetrofitInstance
 import woowacourse.shopping.data.network.ShoppingServer
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
@@ -16,7 +17,7 @@ class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
 
     val productRepository
-        by lazy { ProductRepositoryImpl(ProductRemoteDataSource(ProductServiceImpl())) }
+        by lazy { ProductRepositoryImpl(ProductRemoteDataSource(ProductServiceImpl(), RetrofitInstance.retrofitService)) }
     val cartProductRepository
         by lazy {
             CartProductRepositoryImpl(

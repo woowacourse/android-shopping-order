@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.Product
 
 class ProductServiceImpl : ProductService {
@@ -45,29 +44,6 @@ class ProductServiceImpl : ProductService {
         return try {
             val type = object : TypeToken<List<Product>>() {}.type
             gson.fromJson<List<Product>>(body, type)
-        } catch (e: JsonSyntaxException) {
-            null
-        }
-    }
-
-    override fun getPagedProducts(
-        limit: Int,
-        offset: Int,
-    ): PagedResult<Product>? {
-        val url =
-            BASE_URL
-                .toHttpUrl()
-                .newBuilder()
-                .addPathSegment("products")
-                .addPathSegment("page")
-                .addQueryParameter(PARAM_LIMIT, limit.toString())
-                .addQueryParameter(PARAM_OFFSET, offset.toString())
-                .build()
-
-        val body = executeRequest(url)
-        return try {
-            val type = object : TypeToken<PagedResult<Product>>() {}.type
-            gson.fromJson<PagedResult<Product>>(body, type)
         } catch (e: JsonSyntaxException) {
             null
         }

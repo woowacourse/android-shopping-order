@@ -20,7 +20,7 @@ class ProductCatalogViewModel(
     ProductCatalogEventHandler {
     private val productItems = mutableListOf<ProductCatalogItem.ProductItem>()
     private var recentProducts = emptyList<RecentProduct>()
-    private var offset = FIRST_OFFSET
+    private var page = FIRST_PAGE
     private var hasNext = false
 
     private val _productCatalogItems = MutableLiveData<List<ProductCatalogItem>>()
@@ -76,9 +76,7 @@ class ProductCatalogViewModel(
     }
 
     private fun loadProducts() {
-        productRepository.getPagedProducts(PRODUCT_SIZE_LIMIT, offset) { result ->
-            offset += result.items.size
-
+        productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
             val tempItems = mutableListOf<ProductCatalogItem.ProductItem>()
             var completedCount = 0
             result.items.forEach { product ->
@@ -93,6 +91,7 @@ class ProductCatalogViewModel(
                     }
                 }
             }
+            if (result.items.isNotEmpty()) page++
         }
     }
 
@@ -140,7 +139,7 @@ class ProductCatalogViewModel(
         }
 
     companion object {
-        private const val FIRST_OFFSET = 0
+        private const val FIRST_PAGE = 0
         private const val PRODUCT_SIZE_LIMIT = 20
         private const val RECENT_PRODUCT_SIZE_LIMIT = 10
     }
