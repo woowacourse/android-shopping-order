@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -38,6 +39,7 @@ class CartActivity :
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
+        showSampleData(true)
         initInsets()
         initAdapter()
         setupToolbar()
@@ -74,6 +76,10 @@ class CartActivity :
         viewModel.products.observe(this) { result ->
             when (result) {
                 is ResultState.Success -> {
+                    binding.root.postDelayed({
+                        showSampleData(false)
+                    }, 2_000)
+
                     cartAdapter.submitList(result.data)
                 }
 
@@ -89,6 +95,22 @@ class CartActivity :
 
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
+        }
+    }
+
+    private fun showSampleData(isLoading: Boolean) {
+        if (isLoading) {
+            binding.rvCartProduct.visibility = View.GONE
+            binding.btnCartNext.visibility = View.GONE
+            binding.btnCartPrevious.visibility = View.GONE
+            binding.tvCartPage.visibility = View.GONE
+        } else {
+            binding.rvCartProduct.visibility = View.VISIBLE
+            binding.btnCartNext.visibility = View.VISIBLE
+            binding.btnCartPrevious.visibility = View.VISIBLE
+            binding.tvCartPage.visibility = View.VISIBLE
+
+            binding.shimmerLayoutCart.visibility = View.GONE
         }
     }
 
