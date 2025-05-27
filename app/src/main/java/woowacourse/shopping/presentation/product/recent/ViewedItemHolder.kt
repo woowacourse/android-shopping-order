@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ViewedItemBinding
-import woowacourse.shopping.product.catalog.ProductUiModel
-import woowacourse.shopping.product.catalog.event.CatalogEventHandler
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
 
 class ViewedItemHolder(
     private val binding: ViewedItemBinding,

@@ -2,8 +2,8 @@ package woowacourse.shopping.presentation.product.recent
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.product.catalog.ProductUiModel
-import woowacourse.shopping.product.catalog.event.CatalogEventHandlerImpl
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
 
 class ViewedItemAdapter(
     private val handler: CatalogEventHandlerImpl,

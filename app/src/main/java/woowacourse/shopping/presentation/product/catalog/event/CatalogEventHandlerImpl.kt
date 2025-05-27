@@ -1,8 +1,8 @@
 package woowacourse.shopping.presentation.product.catalog.event
 
-import woowacourse.shopping.product.ProductQuantityHandler
-import woowacourse.shopping.product.catalog.CatalogViewModel
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
+import woowacourse.shopping.presentation.product.catalog.CatalogViewModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class CatalogEventHandlerImpl(
     private val viewModel: CatalogViewModel,
@@ -14,18 +14,18 @@ class CatalogEventHandlerImpl(
     }
 
     override fun onLoadButtonClick() {
-        viewModel.loadNextCatalogProducts()
+//        viewModel.loadNextCatalogProducts()
     }
 
     override fun onOpenProductQuantitySelector(product: ProductUiModel) {
-        viewModel.onQuantitySelectorToggled(product)
+//        viewModel.onQuantitySelectorToggled(product)
     }
 
     override fun onPlusQuantity(product: ProductUiModel) {
-        viewModel.increaseQuantity(product)
+//        viewModel.increaseQuantity(product)
     }
 
     override fun onMinusQuantity(product: ProductUiModel) {
-        viewModel.decreaseQuantity(product)
+//        viewModel.decreaseQuantity(product)
     }
 }

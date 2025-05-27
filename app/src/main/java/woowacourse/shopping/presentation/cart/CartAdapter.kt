@@ -6,8 +6,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.cart.viewHolder.CartViewHolder
 import woowacourse.shopping.presentation.cart.viewHolder.PaginationButtonViewHolder
-import woowacourse.shopping.product.ProductQuantityHandler
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class CartAdapter(
     private var cartProducts: List<ProductUiModel>,

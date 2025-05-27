@@ -1,8 +1,8 @@
 package woowacourse.shopping.presentation.product.detail.event
 
-import woowacourse.shopping.product.ProductQuantityHandler
-import woowacourse.shopping.product.catalog.ProductUiModel
-import woowacourse.shopping.product.detail.DetailViewModel
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.detail.DetailViewModel
 
 class DetailEventHandlerImpl(
     private val viewModel: DetailViewModel,

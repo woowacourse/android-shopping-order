@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.cart.event
 
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface CartEventHandler {
     fun onDeleteProduct(cartProduct: ProductUiModel)

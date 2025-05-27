@@ -3,10 +3,10 @@ package woowacourse.shopping.presentation.product.catalog
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.product.ProductQuantityHandler
-import woowacourse.shopping.product.catalog.event.CatalogEventHandler
-import woowacourse.shopping.product.catalog.viewHolder.LoadButtonViewHolder
-import woowacourse.shopping.product.catalog.viewHolder.ProductViewHolder
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
+import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
+import woowacourse.shopping.presentation.product.catalog.viewHolder.LoadButtonViewHolder
+import woowacourse.shopping.presentation.product.catalog.viewHolder.ProductViewHolder
 
 class ProductAdapter(
     private var products: List<ProductUiModel>,

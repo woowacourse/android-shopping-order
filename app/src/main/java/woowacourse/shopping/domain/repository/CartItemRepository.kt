@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
@@ -28,10 +28,10 @@ interface CartItemRepository {
         onComplete: () -> Unit,
     )
 
-    fun findCartItem(
-        product: ProductUiModel,
-        callback: (CartItem?) -> Unit,
-    )
+//    fun findCartItem(
+//        product: ProductUiModel,
+//        callback: (CartItem?) -> Unit,
+//    )
 
     fun updateOrInsertItem(
         product: ProductUiModel,

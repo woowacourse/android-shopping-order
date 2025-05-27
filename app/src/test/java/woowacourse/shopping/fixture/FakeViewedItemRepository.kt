@@ -1,7 +1,7 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.repository.ViewedItemRepository
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.domain.repository.ViewedItemRepository
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class FakeViewedItemRepository(
     private val size: Int,
@@ -9,7 +9,7 @@ class FakeViewedItemRepository(
     private val viewed =
         MutableList(size) { index ->
             ProductUiModel(
-                id = (index + 1).toLong(),
+                id = index + 1,
                 name = "${index + 1} 아이스 카페 아메리카노",
                 imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
                 price = 1000 * (index + 1),

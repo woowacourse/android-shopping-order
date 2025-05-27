@@ -3,10 +3,10 @@ package woowacourse.shopping.presentation.cart.viewHolder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.databinding.CartItemBinding
-import woowacourse.shopping.product.ProductQuantityHandler
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.cart.event.CartEventHandler
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class CartViewHolder(
     private val binding: CartItemBinding,

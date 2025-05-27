@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.product.catalog.event
 
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface CatalogEventHandler {
     fun onProductClick(product: ProductUiModel)
