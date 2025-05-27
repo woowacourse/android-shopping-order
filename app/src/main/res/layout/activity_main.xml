@@ -46,7 +46,7 @@
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <FrameLayout
                 android:id="@+id/cart_container"
@@ -67,13 +67,13 @@
                     android:layout_height="24dp"
                     android:background="@drawable/badge_background"
                     android:gravity="center"
+                    android:text="@{String.valueOf(vm.uiState.sumOfCartQuantity)}"
                     android:textColor="@color/white"
-                    tools:text="1"
                     android:textSize="14sp"
                     android:translationX="14dp"
                     android:translationY="8dp"
-                    android:text="@{String.valueOf(vm.uiState.sumOfCartQuantity)}"
-                    android:visibility="@{vm.uiState.sumOfCartQuantity  > 0 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{vm.uiState.sumOfCartQuantity  > 0 ? View.VISIBLE : View.GONE}"
+                    tools:text="1" />
 
             </FrameLayout>
         </LinearLayout>
@@ -83,11 +83,71 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:adapter="@{adapter}"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
             tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             tools:listitem="@layout/item_product"
             tools:spanCount="2" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:shimmer_auto_start="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/item_shimmer_product" />
+                    <include layout="@layout/item_shimmer_product" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

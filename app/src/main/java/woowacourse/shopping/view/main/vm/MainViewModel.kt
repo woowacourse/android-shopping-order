@@ -41,17 +41,22 @@ class MainViewModel(
     private val _uiEvent = MutableSingleLiveData<MainUiEvent>()
     val uiEvent: SingleLiveData<MainUiEvent> get() = _uiEvent
 
+    private val _isLoading = MutableSingleLiveData<Boolean>()
+    val isLoading: SingleLiveData<Boolean> get() = _isLoading
+
     init {
         loadInitial()
     }
 
     private fun loadInitial() {
+        handleLoading(true)
         historyLoader { historyStates ->
             productWithCartLoader(INITIAL_PAGE, PAGE_SIZE) { productStates, hasNextPage ->
                 historyItems.postValue(historyStates)
                 productItems.postValue(productStates)
                 loadState.postValue(LoadState.of(hasNextPage))
             }
+            handleLoading(false)
         }
     }
 
@@ -106,6 +111,10 @@ class MainViewModel(
                 _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
             }
         }
+    }
+
+    private fun handleLoading(isLoading: Boolean){
+        _isLoading.postValue(isLoading)
     }
 
     private fun handleIncreaseQuantity(
