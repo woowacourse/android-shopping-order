@@ -7,6 +7,7 @@ data class Product(
     val name: String,
     private val _price: Price,
     val imageUrl: String,
+    val category: String,
 ) : Serializable {
     val price get() = _price.value
 }
