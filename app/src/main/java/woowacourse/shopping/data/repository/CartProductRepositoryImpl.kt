@@ -36,10 +36,7 @@ class CartProductRepositoryImpl(
     }
 
     override fun getTotalQuantity(onSuccess: (Int) -> Unit) {
-        thread {
-            val result = localDataSource.getTotalQuantity()
-            onSuccess(result)
-        }
+        remoteDataSource.getTotalQuantity(onSuccess)
     }
 
     override fun updateQuantity(
@@ -73,7 +70,7 @@ class CartProductRepositoryImpl(
         onSuccess: () -> Unit,
     ) {
         thread {
-            remoteDataSource.deleteByProductId(productId.toInt(), onSuccess)
+            remoteDataSource.deleteByProductId(productId, onSuccess)
             totalCount--
         }
     }

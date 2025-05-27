@@ -9,6 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
+import woowacourse.shopping.data.dto.response.CartProductQuantityResponseDto
 import woowacourse.shopping.data.dto.response.CartProductResponseDto
 
 interface CartProductApiService {
@@ -30,4 +31,9 @@ interface CartProductApiService {
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
     ): Call<Unit>
+
+    @GET("/cart-items/counts")
+    fun getTotalQuantity(
+        @Header("accept") accept: String = "*/*",
+    ): Call<CartProductQuantityResponseDto>
 }

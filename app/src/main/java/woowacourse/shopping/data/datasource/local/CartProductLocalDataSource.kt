@@ -9,8 +9,6 @@ class CartProductLocalDataSource(
 
     fun getQuantityByProductId(productId: Int): Int? = dao.getQuantityByProductId(productId)
 
-    fun getTotalQuantity(): Int = dao.getTotalQuantity()
-
     fun updateQuantity(
         productId: Int,
         quantity: Int,

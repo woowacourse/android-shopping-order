@@ -4,6 +4,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
+import woowacourse.shopping.data.dto.response.CartProductQuantityResponseDto
 import woowacourse.shopping.data.dto.response.CartProductResponseDto
 import woowacourse.shopping.data.dto.response.toCartProduct
 import woowacourse.shopping.data.model.PagedResult
@@ -86,6 +87,30 @@ class CartProductRemoteDataSource(
 
                 override fun onFailure(
                     call: Call<Unit>,
+                    t: Throwable,
+                ) {
+                    println("error : $t")
+                }
+            },
+        )
+    }
+
+    fun getTotalQuantity(onSuccess: (Int) -> Unit) {
+        cartProductService.getTotalQuantity().enqueue(
+            object : Callback<CartProductQuantityResponseDto> {
+                override fun onResponse(
+                    call: Call<CartProductQuantityResponseDto>,
+                    response: Response<CartProductQuantityResponseDto>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { body ->
+                            onSuccess(body.quantity)
+                        }
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<CartProductQuantityResponseDto>,
                     t: Throwable,
                 ) {
                     println("error : $t")
