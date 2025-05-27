@@ -15,7 +15,7 @@ import woowacourse.shopping.ui.model.ActivityResult
 
 class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(R.layout.activity_product_detail) {
     private val viewModel: ProductDetailViewModel by viewModels { ProductDetailViewModel.Factory }
-    private val productId: Int by lazy { intent.getIntExtra(KEY_PRODUCT_ID, 0) }
+    private val productId: Long by lazy { intent.getLongExtra(KEY_PRODUCT_ID, 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +52,7 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
                     viewModel.updateCartProduct()
                 }
 
-                override fun onLastHistoryProductClick(id: Int) {
+                override fun onLastHistoryProductClick(id: Long) {
                     setResult(
                         ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.code,
                         Intent().apply {
@@ -106,7 +106,7 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
     interface OnClickHandler {
         fun onAddCartProductClick()
 
-        fun onLastHistoryProductClick(id: Int)
+        fun onLastHistoryProductClick(id: Long)
     }
 
     companion object {
@@ -115,7 +115,7 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
 
         fun newIntent(
             context: Context,
-            id: Int,
+            id: Long,
             isRecentHistoryProductShown: Boolean = true,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {

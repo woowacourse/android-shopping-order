@@ -49,7 +49,7 @@ class CatalogViewModel(
         }
     }
 
-    fun increaseCartProduct(id: Int) {
+    fun increaseCartProduct(id: Long) {
         increaseCartProductQuantityUseCase(id) { newQuantity ->
             _catalogProducts.postValue(
                 catalogProducts.value?.updateCatalogProductQuantity(
@@ -60,7 +60,7 @@ class CatalogViewModel(
         }
     }
 
-    fun decreaseCartProduct(id: Int) {
+    fun decreaseCartProduct(id: Long) {
         decreaseCartProductQuantityUseCase(id) { newQuantity ->
             _catalogProducts.postValue(
                 catalogProducts.value?.updateCatalogProductQuantity(
@@ -71,7 +71,7 @@ class CatalogViewModel(
         }
     }
 
-    fun loadCartProduct(id: Int) {
+    fun loadCartProduct(id: Long) {
         getCatalogProductUseCase(id) { cartProduct ->
             _catalogProducts.postValue(
                 catalogProducts.value?.updateCatalogProduct(

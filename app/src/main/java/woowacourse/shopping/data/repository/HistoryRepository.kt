@@ -11,7 +11,7 @@ class HistoryRepository(
 ) : HistoryRepository {
     override fun fetchAllHistory(): List<HistoryProduct> = dao.getHistoryProducts().map { it.toDomain() }
 
-    override fun saveHistory(productId: Int) {
+    override fun saveHistory(productId: Long) {
         dao.insertHistoryWithLimit(
             history = HistoryProductEntity(productId),
             limit = MAX_HISTORY_COUNT,

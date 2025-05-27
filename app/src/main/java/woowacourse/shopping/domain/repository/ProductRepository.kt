@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CatalogProduct
 import woowacourse.shopping.domain.model.CatalogProducts
 
 interface ProductRepository {
-    fun fetchCatalogProduct(productId: Int): CatalogProduct?
+    fun fetchCatalogProduct(productId: Long): CatalogProduct?
 
     fun fetchCatalogProducts(productIds: List<Int>): List<CatalogProduct>
 

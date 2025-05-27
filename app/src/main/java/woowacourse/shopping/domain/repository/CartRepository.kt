@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
 
 interface CartRepository {
-    fun fetchCartProductDetail(productId: Int): CartProduct?
+    fun fetchCartProductDetail(productId: Long): CartProduct?
 
     fun fetchCartProducts(
         page: Int,
@@ -14,9 +14,9 @@ interface CartRepository {
     fun fetchCartItemCount(): Int
 
     fun saveCartProduct(
-        productId: Int,
+        productId: Long,
         quantity: Int,
     )
 
-    fun deleteCartProduct(productId: Int)
+    fun deleteCartProduct(productId: Long)
 }

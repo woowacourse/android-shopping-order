@@ -14,7 +14,7 @@ class CartRepository(
     private val dao: CartDao,
     private val api: CartApi,
 ) : CartRepository {
-    override fun fetchCartProductDetail(productId: Int): CartProduct? = dao.getCartProductDetailById(productId)?.toDomain()
+    override fun fetchCartProductDetail(productId: Long): CartProduct? = dao.getCartProductDetailById(productId)?.toDomain()
 
     override fun fetchCartProducts(
         page: Int,
@@ -38,19 +38,19 @@ class CartRepository(
     override fun fetchCartItemCount(): Int = dao.getCartItemCount()
 
     override fun saveCartProduct(
-        productId: Int,
+        productId: Long,
         quantity: Int,
     ) {
         api.postCartItem(
             cartItemRequest =
                 CartItemRequest(
-                    productId = productId.toLong(),
+                    productId = productId,
                     quantity = quantity,
                 ),
         )
     }
 
-    override fun deleteCartProduct(productId: Int) {
+    override fun deleteCartProduct(productId: Long) {
         dao.deleteCartProduct(productId)
     }
 }

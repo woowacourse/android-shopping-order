@@ -29,10 +29,10 @@ class CartViewHolder(
     }
 
     interface OnClickHandler {
-        fun onRemoveCartProductClick(id: Int)
+        fun onRemoveCartProductClick(id: Long)
 
-        fun onIncreaseClick(id: Int)
+        fun onIncreaseClick(id: Long)
 
-        fun onDecreaseClick(id: Int)
+        fun onDecreaseClick(id: Long)
     }
 }

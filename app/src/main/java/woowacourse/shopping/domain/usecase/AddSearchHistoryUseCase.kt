@@ -6,7 +6,7 @@ import kotlin.concurrent.thread
 class AddSearchHistoryUseCase(
     private val repository: HistoryRepository,
 ) {
-    operator fun invoke(productId: Int) {
+    operator fun invoke(productId: Long) {
         thread {
             repository.saveHistory(productId)
         }

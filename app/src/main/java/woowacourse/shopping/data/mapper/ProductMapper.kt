@@ -18,7 +18,7 @@ fun ProductsResponse.Content.toDomain(): CatalogProduct =
     CatalogProduct(
         productDetail =
             ProductDetail(
-                id = id.toInt(),
+                id = id,
                 name = name,
                 imageUrl = imageUrl,
                 price = price,
@@ -28,7 +28,7 @@ fun ProductsResponse.Content.toDomain(): CatalogProduct =
 
 fun ProductDetailResponse.toDomain(): ProductDetail =
     ProductDetail(
-        id = id.toInt(),
+        id = id,
         name = name,
         imageUrl = imageUrl,
         price = price,

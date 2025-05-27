@@ -63,15 +63,15 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
 
     private fun createAdapterOnClickHandler() =
         object : OnClickHandler {
-            override fun onProductClick(id: Int) {
+            override fun onProductClick(id: Long) {
                 navigateToProductDetail(id)
             }
 
-            override fun onIncreaseClick(id: Int) {
+            override fun onIncreaseClick(id: Long) {
                 viewModel.increaseCartProduct(id)
             }
 
-            override fun onDecreaseClick(id: Int) {
+            override fun onDecreaseClick(id: Long) {
                 viewModel.decreaseCartProduct(id)
             }
 
@@ -86,7 +86,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     }
 
     private fun navigateToProductDetail(
-        id: Int,
+        id: Long,
         isRecentHistoryProductShown: Boolean = true,
     ) {
         val intent = ProductDetailActivity.newIntent(this, id, isRecentHistoryProductShown)
@@ -129,7 +129,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
                 when (result.resultCode) {
                     ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.code ->
                         navigateToProductDetail(
-                            result.data?.getIntExtra(
+                            result.data?.getLongExtra(
                                 ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.key,
                                 0,
                             ) ?: 0,
@@ -138,7 +138,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
 
                     ActivityResult.PRODUCT_DETAIL_CART_UPDATED.code ->
                         viewModel.loadCartProduct(
-                            result.data?.getIntExtra(
+                            result.data?.getLongExtra(
                                 ActivityResult.PRODUCT_DETAIL_CART_UPDATED.key,
                                 0,
                             ) ?: 0,

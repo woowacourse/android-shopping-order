@@ -17,7 +17,7 @@ data class CatalogProducts(
     }
 
     fun updateCatalogProductQuantity(
-        productId: Int,
+        productId: Long,
         quantity: Int,
     ): CatalogProducts {
         val updatedProducts =

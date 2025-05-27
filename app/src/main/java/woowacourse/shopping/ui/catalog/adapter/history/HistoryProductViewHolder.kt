@@ -17,6 +17,6 @@ class HistoryProductViewHolder(
     }
 
     fun interface OnClickHandler {
-        fun onHistoryProductClick(id: Int)
+        fun onHistoryProductClick(id: Long)
     }
 }

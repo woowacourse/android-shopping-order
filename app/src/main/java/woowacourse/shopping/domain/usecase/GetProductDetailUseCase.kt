@@ -8,7 +8,7 @@ class GetProductDetailUseCase(
     private val repository: ProductRepository,
 ) {
     operator fun invoke(
-        productId: Int,
+        productId: Long,
         callback: (CatalogProduct?) -> Unit,
     ) {
         thread {

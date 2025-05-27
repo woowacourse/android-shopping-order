@@ -51,7 +51,7 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                 Intent().apply {
                     putIntegerArrayListExtra(
                         ActivityResult.CART_PRODUCT_EDITED.key,
-                        ArrayList(editedProductIds),
+                        ArrayList(editedProductIds.map { it.toInt() }),
                     )
                 },
             )
@@ -60,15 +60,15 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
 
     private fun createAdapterOnClickHandler() =
         object : CartViewHolder.OnClickHandler {
-            override fun onRemoveCartProductClick(id: Int) {
+            override fun onRemoveCartProductClick(id: Long) {
                 viewModel.removeCartProduct(id)
             }
 
-            override fun onIncreaseClick(id: Int) {
+            override fun onIncreaseClick(id: Long) {
                 viewModel.increaseCartProductQuantity(id)
             }
 
-            override fun onDecreaseClick(id: Int) {
+            override fun onDecreaseClick(id: Long) {
                 viewModel.decreaseCartProductQuantity(id)
             }
         }

@@ -19,5 +19,5 @@ interface CartApi {
     @POST("/cart-items")
     fun postCartItem(
         @Body cartItemRequest: CartItemRequest,
-    ): Call<String?>
+    ): Call<Unit>
 }

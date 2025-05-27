@@ -25,8 +25,8 @@ class CartViewModel(
     private val _cartProducts: MutableLiveData<CartProducts> = MutableLiveData(EMPTY_CART_PRODUCTS)
     val cartProducts: LiveData<CartProducts> get() = _cartProducts
 
-    private val _editedProductIds: MutableLiveData<Set<Int>> = MutableLiveData(emptySet())
-    val editedProductIds: LiveData<Set<Int>> get() = _editedProductIds
+    private val _editedProductIds: MutableLiveData<Set<Long>> = MutableLiveData(emptySet())
+    val editedProductIds: LiveData<Set<Long>> get() = _editedProductIds
 
     init {
         loadCartProducts()
@@ -41,7 +41,7 @@ class CartViewModel(
         }
     }
 
-    fun removeCartProduct(id: Int) {
+    fun removeCartProduct(id: Long) {
         removeCartProductUseCase(id)
         _editedProductIds.postValue(editedProductIds.value?.plus(id))
         loadCartProducts()
@@ -57,14 +57,14 @@ class CartViewModel(
         loadCartProducts(page.copy(current = page.current - step))
     }
 
-    fun increaseCartProductQuantity(id: Int) {
+    fun increaseCartProductQuantity(id: Long) {
         increaseCartProductQuantityUseCase(id) { newQuantity ->
             _cartProducts.postValue(cartProducts.value?.updateCartProductQuantity(id, newQuantity))
         }
         _editedProductIds.value = editedProductIds.value?.plus(id)
     }
 
-    fun decreaseCartProductQuantity(id: Int) {
+    fun decreaseCartProductQuantity(id: Long) {
         decreaseCartProductQuantityUseCase(id) { newQuantity ->
             if (newQuantity > 0) {
                 _cartProducts.postValue(

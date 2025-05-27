@@ -7,7 +7,7 @@ data class CartProducts(
     val page: Page,
 ) {
     fun updateCartProductQuantity(
-        productId: Int,
+        productId: Long,
         quantity: Int,
     ): CartProducts {
         val updatedProducts =

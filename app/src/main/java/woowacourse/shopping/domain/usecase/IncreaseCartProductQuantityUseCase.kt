@@ -7,7 +7,7 @@ class IncreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
 ) {
     operator fun invoke(
-        productId: Int,
+        productId: Long,
         quantity: Int = DEFAULT_QUANTITY_STEP,
         callback: (Int) -> Unit,
     ) {

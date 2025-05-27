@@ -31,7 +31,7 @@ interface CartDao {
     fun insertCartProduct(cartProductEntity: CartProductEntity)
 
     @Query("DELETE FROM cart_products WHERE productId = :productId")
-    fun deleteCartProduct(productId: Int)
+    fun deleteCartProduct(productId: Long)
 
     @Query("SELECT * FROM cart_products ORDER BY productId ASC LIMIT :size OFFSET (:page - 1) * :size")
     fun getCartProductDetails(
@@ -46,5 +46,5 @@ interface CartDao {
     fun getTotalPageCount(size: Int): Int
 
     @Query("SELECT * FROM cart_products WHERE productId = :productId")
-    fun getCartProductDetailById(productId: Int): CartProductDetailResponse?
+    fun getCartProductDetailById(productId: Long): CartProductDetailResponse?
 }

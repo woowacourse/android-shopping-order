@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class ProductRepository(
     private val api: ProductApi,
 ) : ProductRepository {
-    override fun fetchCatalogProduct(productId: Int): CatalogProduct {
+    override fun fetchCatalogProduct(productId: Long): CatalogProduct {
         val productDetail: ProductDetail =
             api
                 .getProductDetail(productId)

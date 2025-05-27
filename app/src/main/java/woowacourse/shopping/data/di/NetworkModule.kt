@@ -6,11 +6,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.api.CartApi
 import woowacourse.shopping.data.api.ProductApi
+import woowacourse.shopping.data.interceptor.ShoppingAuthInterceptor
 
 object NetworkModule {
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
+            .addInterceptor(ShoppingAuthInterceptor("parkjiminnnn", "password"))
             .build()
     }
 

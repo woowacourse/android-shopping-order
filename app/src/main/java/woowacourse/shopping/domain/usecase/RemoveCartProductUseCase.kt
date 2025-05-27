@@ -6,7 +6,7 @@ import kotlin.concurrent.thread
 class RemoveCartProductUseCase(
     private val repository: CartRepository,
 ) {
-    operator fun invoke(productId: Int) {
+    operator fun invoke(productId: Long) {
         thread {
             repository.deleteCartProduct(productId)
         }
