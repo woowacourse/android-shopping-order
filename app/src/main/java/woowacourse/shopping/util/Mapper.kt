@@ -1,8 +1,9 @@
 package woowacourse.shopping.util
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.remote.cart.CartResponse.Content.CartRemoteProduct
+import woowacourse.shopping.data.remote.product.ProductResponse.Content.RemoteProduct
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Goods
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.model.CartUiModel
 
 fun Cart.toUi(): CartUiModel =
@@ -40,3 +41,23 @@ fun List<Any>.updateCartQuantity(
     }
 
 fun Cart.updateQuantity(newQuantity: Int): Cart = this.copy(quantity = newQuantity)
+
+fun CartRemoteProduct.toDomain(): Product {
+    return Product(
+        id = id.toInt(),
+        name = name,
+        price = price,
+        imageUrl = imageUrl,
+        category = category
+    )
+}
+
+fun RemoteProduct.toDomain(): Product {
+    return Product(
+        id = id.toInt(),
+        name = name,
+        price = price,
+        imageUrl = imageUrl,
+        category = category
+    )
+}

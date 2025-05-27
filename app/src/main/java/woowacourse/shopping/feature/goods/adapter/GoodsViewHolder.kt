@@ -1,7 +1,6 @@
 package woowacourse.shopping.feature.goods.adapter
 
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.databinding.ItemGoodsBinding
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.CustomCartQuantity

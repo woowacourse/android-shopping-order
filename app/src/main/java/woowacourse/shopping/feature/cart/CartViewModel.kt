@@ -8,8 +8,11 @@ import androidx.lifecycle.switchMap
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
+import woowacourse.shopping.data.remote.product.ProductResponse.Content.RemoteProduct
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
 class CartViewModel(
@@ -104,8 +107,8 @@ class CartViewModel(
     fun test() {
         cartRepository.fetchCart(
             onSuccess = { productList ->
-                val carts = productList.map { product ->
-                    Cart(product = product, quantity = 0)
+                val carts = productList.map { content ->
+                    Cart(product = content.product.toDomain(), quantity = content.quantity)
                 }
                 Log.d("loadProductsInRange", "$carts")
             },

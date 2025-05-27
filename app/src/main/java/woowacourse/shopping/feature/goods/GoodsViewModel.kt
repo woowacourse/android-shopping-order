@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.domain.model.Goods.Companion.dummyGoods
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
+import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateCartQuantity
 import kotlin.math.min
 
@@ -137,7 +138,7 @@ class GoodsViewModel(
         productRepository.fetchProducts(
             onSuccess = { productList ->
                 val carts = productList.map { product ->
-                    Cart(product = product, quantity = 0)
+                    Cart(product = product.toDomain(), quantity = 0)
                 }
                 _products.value = carts
                 Log.d("loadProductsInRange", "$carts")

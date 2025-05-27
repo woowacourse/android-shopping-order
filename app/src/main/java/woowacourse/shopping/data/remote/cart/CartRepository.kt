@@ -4,17 +4,16 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.remote.product.ProductResponse
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.remote.cart.CartResponse.Content
 import kotlin.collections.orEmpty
 
 class CartRepository {
     fun fetchCart(
-        onSuccess: (List<Product>) -> Unit,
+        onSuccess: (List<Content>) -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        CartClient.getRetrofitService().requestCart().enqueue(object : Callback<ProductResponse> {
-            override fun onResponse(call: Call<ProductResponse>, response: Response<ProductResponse>) {
+        CartClient.getRetrofitService().requestCart().enqueue(object : Callback<CartResponse> {
+            override fun onResponse(call: Call<CartResponse>, response: Response<CartResponse>) {
                 if (response.isSuccessful) {
                     val result = response.body()?.content.orEmpty()
                     Log.d("CartRepository", "장바구니 성공: ${result.size}개")
@@ -31,7 +30,7 @@ class CartRepository {
                 }
             }
 
-            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+            override fun onFailure(call: Call<CartResponse>, t: Throwable) {
                 Log.e("CartRepository", "네트워크 실패", t)
                 onError(t)
             }

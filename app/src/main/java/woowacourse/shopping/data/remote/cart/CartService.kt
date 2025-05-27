@@ -6,7 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
-import woowacourse.shopping.data.remote.product.ProductResponse
 
 interface CartService {
     @GET("/cart-items")
@@ -14,7 +13,7 @@ interface CartService {
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 30
-    ): Call<ProductResponse>
+    ): Call<CartResponse>
 
     @POST("/cart-items")
     fun addToCart(

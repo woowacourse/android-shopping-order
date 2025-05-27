@@ -1,13 +1,13 @@
-package woowacourse.shopping.data.remote.product
+package woowacourse.shopping.data.remote.cart
+
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.data.remote.product.ProductResponse.Content.RemoteProduct
 
 @Serializable
-data class ProductResponse(
+data class CartResponse(
     @SerialName("content")
-    val content: List<RemoteProduct>,
+    val content: List<Content>,
     @SerialName("empty")
     val empty: Boolean,
     @SerialName("first")
@@ -32,36 +32,26 @@ data class ProductResponse(
     @Serializable
     data class Content(
         @SerialName("id")
-        val id: Int,
+        val id: Long,
         @SerialName("product")
-        val product: RemoteProduct,
+        val product: CartRemoteProduct,
         @SerialName("quantity")
         val quantity: Int
     ) {
         @Serializable
-        data class RemoteProduct(
+        data class CartRemoteProduct(
+            @SerialName("category")
+            val category: String,
             @SerialName("id")
-            val id: Int,
+            val id: Long,
+            @SerialName("imageUrl")
+            val imageUrl: String,
             @SerialName("name")
             val name: String,
             @SerialName("price")
-            val price: Int,
-            @SerialName("imageUrl")
-            val imageUrl: String,
-            @SerialName("category")
-            val category: String?,
+            val price: Int
         )
     }
-
-    @Serializable
-    data class Sort(
-        @SerialName("empty")
-        val empty: Boolean,
-        @SerialName("sorted")
-        val sorted: Boolean,
-        @SerialName("unsorted")
-        val unsorted: Boolean
-    )
 
     @Serializable
     data class Pageable(
@@ -77,5 +67,15 @@ data class ProductResponse(
         val sort: Sort,
         @SerialName("unpaged")
         val unpaged: Boolean
+    )
+
+    @Serializable
+    data class Sort(
+        @SerialName("empty")
+        val empty: Boolean,
+        @SerialName("sorted")
+        val sorted: Boolean,
+        @SerialName("unsorted")
+        val unsorted: Boolean
     )
 }

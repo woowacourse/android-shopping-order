@@ -3,7 +3,6 @@ package woowacourse.shopping.feature.goods.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.databinding.ItemGoodsBinding
 import woowacourse.shopping.databinding.ItemHistoryContainerBinding
 import woowacourse.shopping.databinding.ItemLoadMoreBinding
