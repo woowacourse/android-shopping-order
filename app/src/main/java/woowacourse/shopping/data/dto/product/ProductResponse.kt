@@ -3,7 +3,7 @@ package woowacourse.shopping.data.dto.product
 
 import com.google.gson.annotations.SerializedName
 
-data class Product(
+data class ProductResponse(
     @SerializedName("content")
     val content: List<Content>,
     @SerializedName("empty")

@@ -7,7 +7,7 @@ import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.cartitem.ProductResponse
+import woowacourse.shopping.data.dto.product.ProductResponse
 import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel

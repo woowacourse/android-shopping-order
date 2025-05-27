@@ -3,8 +3,8 @@ package woowacourse.shopping.data.repository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.dto.cartitem.Content
-import woowacourse.shopping.data.dto.cartitem.ProductResponse
+import woowacourse.shopping.data.dto.product.Content
+import woowacourse.shopping.data.dto.product.ProductResponse
 import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -78,12 +78,12 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                 if (response.isSuccessful) {
                     val body: ProductResponse? = response.body()
                     val content: List<Content>? = body?.content
-                    val products: List<ProductUiModel>? = content?.map {
+                    val products: List<ProductUiModel>? = content?.mapNotNull {
                         ProductUiModel(
-                            id = it.product.id.toInt(),
-                            imageUrl = it.product.imageUrl,
-                            name = it.product.name,
-                            price = it.product.price,
+                            id = it.id.toInt(),
+                            imageUrl = it.imageUrl,
+                            name = it.name,
+                            price = it.price,
                         )
                     }
                     callback(products ?: emptyList())
