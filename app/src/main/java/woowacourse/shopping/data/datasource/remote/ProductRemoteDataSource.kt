@@ -8,18 +8,17 @@ import woowacourse.shopping.data.dto.response.ProductResponseDto
 import woowacourse.shopping.data.dto.response.toProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.ProductApiService
-import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.domain.model.Product
+import java.util.concurrent.CountDownLatch
 
 class ProductRemoteDataSource(
-    private val service: ProductService,
-    private val apiService: ProductApiService,
+    private val productService: ProductApiService,
 ) {
     fun getProductById(
         id: Long,
         onSuccess: (Product?) -> Unit,
     ) {
-        apiService.getProductById(id = id.toInt()).enqueue(
+        productService.getProductById(id = id.toInt()).enqueue(
             object : Callback<ProductDto> {
                 override fun onResponse(
                     call: Call<ProductDto>,
@@ -42,14 +41,28 @@ class ProductRemoteDataSource(
         )
     }
 
-    fun getProductsByIds(ids: List<Long>): List<Product>? = service.getProductsByIds(ids)
+    fun getProductsByIds(
+        ids: List<Long>,
+        onSuccess: (List<Product>?) -> Unit,
+    ) {
+        val latch = CountDownLatch(ids.size)
+        val result = mutableListOf<Product>()
+        ids.forEach { id ->
+            getProductById(id) { product ->
+                product?.let { result.add(it) }
+                latch.countDown()
+            }
+        }
+        latch.await()
+        onSuccess(result)
+    }
 
     fun getPagedProducts(
         page: Int,
         size: Int,
         onSuccess: (PagedResult<Product>) -> Unit,
     ) {
-        apiService.getPagedProducts(page = page, size = size).enqueue(
+        productService.getPagedProducts(page = page, size = size).enqueue(
             object :
                 Callback<ProductResponseDto> {
                 override fun onResponse(

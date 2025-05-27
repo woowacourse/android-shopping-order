@@ -10,14 +10,13 @@ import woowacourse.shopping.data.network.ShoppingServer
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.data.service.ProductServiceImpl
 import kotlin.concurrent.thread
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
 
     val productRepository
-        by lazy { ProductRepositoryImpl(ProductRemoteDataSource(ProductServiceImpl(), RetrofitInstance.retrofitService)) }
+        by lazy { ProductRepositoryImpl(ProductRemoteDataSource(RetrofitInstance.retrofitService)) }
     val cartProductRepository
         by lazy {
             CartProductRepositoryImpl(
