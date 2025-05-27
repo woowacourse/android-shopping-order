@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
@@ -43,8 +44,8 @@ android {
             excludes += "win32-x86*/**"
         }
     }
-    buildFeatures {
-        dataBinding = true
+    dataBinding {
+        enable = true
     }
 }
 
@@ -77,6 +78,15 @@ dependencies {
     androidTestImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.mannodermaus.junit5.core)
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
-    androidTestImplementation(libs.androidx.espresso.contrib)
-    testImplementation(kotlin("test"))
+    testImplementation(libs.json)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.glide)
+    implementation(libs.gson)
+    implementation(libs.okhttp)
+    implementation(libs.mockwebserver)
+    implementation(libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }
