@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -59,6 +60,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.mockwebserver)
     implementation(libs.converter.gson)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
