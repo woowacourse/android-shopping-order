@@ -98,4 +98,6 @@ dependencies {
     debugImplementation(libs.androidx.fragment.testing.manifest)
     androidTestImplementation(libs.androidx.fragment.testing)
     androidTestImplementation(libs.androidx.espresso.contrib)
+
+    implementation(libs.shimmer)
 }
