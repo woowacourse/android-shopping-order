@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.product.dto
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,5 +26,16 @@ data class ProductResponse(
     @SerialName("totalElements")
     val totalElements: Long?,
     @SerialName("totalPages")
-    val totalPages: Int?
-)
+    val totalPages: Int?,
+) {
+    val loadable: Boolean =
+        run {
+            val pageNumber = pageable?.pageNumber
+            val pageSize = pageable?.pageSize
+            if (pageNumber == null || pageSize == null) {
+                false
+            } else {
+                pageNumber < pageSize
+            }
+        }
+}

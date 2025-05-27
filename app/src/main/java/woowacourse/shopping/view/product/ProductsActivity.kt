@@ -25,7 +25,7 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val viewModel: ProductsViewModel by viewModels()
     private val productsAdapter: ProductsAdapter by lazy {
-        ProductsAdapter(::navigateToProductDetail, viewModel::updateProducts)
+        ProductsAdapter(::navigateToProductDetail, viewModel::loadMoreProducts)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +117,7 @@ class ProductsActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == RESULT_OK) {
-                viewModel.loadAllProducts()
+                viewModel.loadMoreProducts()
             }
         }
 }

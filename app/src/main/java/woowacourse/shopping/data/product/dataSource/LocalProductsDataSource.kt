@@ -2,6 +2,7 @@ package woowacourse.shopping.data.product.dataSource
 
 import android.content.Context
 import androidx.room.Room
+import woowacourse.shopping.data.product.PageableProducts
 import woowacourse.shopping.data.product.dao.ProductDao
 import woowacourse.shopping.data.product.database.ProductDatabase
 import woowacourse.shopping.data.product.entity.ProductEntity
@@ -21,7 +22,10 @@ object LocalProductsDataSource : ProductsDataSource {
         dao = db.dao()
     }
 
-    override fun load(page: Int, size: Int): List<ProductEntity> = dao.load()
+    override fun load(
+        page: Int,
+        size: Int,
+    ): PageableProducts = PageableProducts(emptyList(), false)
 
     override fun getById(id: Long): ProductEntity? = dao.load(id)
 }

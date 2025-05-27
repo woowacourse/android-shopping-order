@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.product.dto
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,5 +16,5 @@ data class Pageable(
     @SerialName("sort")
     val sort: Sort?,
     @SerialName("unpaged")
-    val unpaged: Boolean?
+    val unpaged: Boolean?,
 )

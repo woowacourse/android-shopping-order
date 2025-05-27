@@ -1,29 +1,28 @@
 package woowacourse.shopping.data.product.dataSource
 
 import kotlinx.serialization.json.Json
-import okhttp3.Response
 import woowacourse.shopping.data.ProductsHttpClient
+import woowacourse.shopping.data.product.PageableProducts
 import woowacourse.shopping.data.product.dto.Content
 import woowacourse.shopping.data.product.dto.ProductResponse
 import woowacourse.shopping.data.product.entity.ProductEntity
 
 class RemoteProductsDataSource(
-    private val productsHttpClient: ProductsHttpClient = ProductsHttpClient()
+    private val productsHttpClient: ProductsHttpClient = ProductsHttpClient(),
 ) : ProductsDataSource {
     override fun load(
         page: Int,
-        size: Int
-    ): List<ProductEntity> {
-        val response: Response = productsHttpClient.getProducts(page, size)
-        val jsonString: String = response.body?.string() ?: return emptyList()
-        val productResponse: ProductResponse = Json.decodeFromString<ProductResponse>(jsonString)
-        return productResponse.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList()
+        size: Int,
+    ): PageableProducts {
+        val jsonString: String = productsHttpClient.getProducts(page, size).body?.string() ?: ""
+        val response: ProductResponse = Json.decodeFromString<ProductResponse>(jsonString)
+        val products = response.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList()
+        return PageableProducts(products, response.loadable)
     }
 
     override fun getById(id: Long): ProductEntity? {
         TODO("Not yet implemented")
     }
-
 }
 
 private fun Content.toEntityOrNull(): ProductEntity? {
