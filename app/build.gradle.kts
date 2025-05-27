@@ -51,6 +51,7 @@ android {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.logging.interceptor)
     implementation(libs.retrofit)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.androidx.activity.ktx)
