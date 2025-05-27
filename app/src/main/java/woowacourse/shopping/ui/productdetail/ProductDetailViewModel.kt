@@ -24,13 +24,15 @@ class ProductDetailViewModel(
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
 ) : ViewModel() {
-    private val _catalogProduct: MutableLiveData<CatalogProduct> = MutableLiveData(EMPTY_CATALOG_PRODUCT)
+    private val _catalogProduct: MutableLiveData<CatalogProduct> =
+        MutableLiveData(EMPTY_CATALOG_PRODUCT)
     val catalogProduct: LiveData<CatalogProduct> get() = _catalogProduct
 
     private val _lastHistoryProduct: MutableLiveData<HistoryProduct?> = MutableLiveData(null)
     val lastHistoryProduct: LiveData<HistoryProduct?> get() = _lastHistoryProduct
 
-    private val _onCartProductAddSuccess: MutableSingleLiveData<Boolean?> = MutableSingleLiveData(null)
+    private val _onCartProductAddSuccess: MutableSingleLiveData<Boolean?> =
+        MutableSingleLiveData(null)
     val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
 
     fun loadProductDetail(id: Int) {
@@ -60,7 +62,13 @@ class ProductDetailViewModel(
     fun updateCartProduct() {
         val catalogProduct: CatalogProduct = catalogProduct.value ?: return
         runCatching {
-            updateCartProductUseCase(CartProduct(catalogProduct.productDetail, catalogProduct.quantity))
+            updateCartProductUseCase(
+                CartProduct(
+                    catalogProduct.productDetail.id.toLong(),
+                    catalogProduct.productDetail,
+                    catalogProduct.quantity,
+                ),
+            )
         }.onSuccess {
             _onCartProductAddSuccess.postValue(true)
         }

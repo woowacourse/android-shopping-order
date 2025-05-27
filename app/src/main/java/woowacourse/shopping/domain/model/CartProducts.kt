@@ -1,8 +1,10 @@
 package woowacourse.shopping.domain.model
 
+import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
+
 data class CartProducts(
     val products: List<CartProduct>,
-    val totalPage: Int,
+    val page: Page,
 ) {
     fun updateCartProductQuantity(
         productId: Int,
@@ -20,6 +22,6 @@ data class CartProducts(
     }
 
     companion object {
-        val EMPTY_CART_PRODUCTS = CartProducts(emptyList(), 0)
+        val EMPTY_CART_PRODUCTS = CartProducts(emptyList(), EMPTY_PAGE)
     }
 }

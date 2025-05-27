@@ -23,7 +23,8 @@ import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.activity_catalog) {
     private val viewModel: CatalogViewModel by viewModels { CatalogViewModel.Factory }
     private val catalogAdapter: CatalogAdapter = CatalogAdapter(createAdapterOnClickHandler())
-    private val historyProductAdapter: HistoryProductAdapter = HistoryProductAdapter { id -> navigateToProductDetail(id) }
+    private val historyProductAdapter: HistoryProductAdapter =
+        HistoryProductAdapter { id -> navigateToProductDetail(id) }
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,7 +113,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
 
     private fun initObservers() {
         viewModel.catalogProducts.observe(this) { products ->
-            catalogAdapter.submitItems(products.products, products.hasMore)
+            catalogAdapter.submitItems(products.products, !products.page.isLast)
         }
 
         viewModel.historyProducts.observe(this) { products ->
@@ -128,18 +129,26 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
                 when (result.resultCode) {
                     ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.code ->
                         navigateToProductDetail(
-                            result.data?.getIntExtra(ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.key, 0) ?: 0,
+                            result.data?.getIntExtra(
+                                ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.key,
+                                0,
+                            ) ?: 0,
                             false,
                         )
 
                     ActivityResult.PRODUCT_DETAIL_CART_UPDATED.code ->
                         viewModel.loadCartProduct(
-                            result.data?.getIntExtra(ActivityResult.PRODUCT_DETAIL_CART_UPDATED.key, 0) ?: 0,
+                            result.data?.getIntExtra(
+                                ActivityResult.PRODUCT_DETAIL_CART_UPDATED.key,
+                                0,
+                            ) ?: 0,
                         )
 
                     ActivityResult.CART_PRODUCT_EDITED.code ->
                         viewModel.loadCartProducts(
-                            result.data?.getIntegerArrayListExtra(ActivityResult.CART_PRODUCT_EDITED.key)?.toList() ?: emptyList(),
+                            result.data
+                                ?.getIntegerArrayListExtra(ActivityResult.CART_PRODUCT_EDITED.key)
+                                ?.toList() ?: emptyList(),
                         )
                 }
             }

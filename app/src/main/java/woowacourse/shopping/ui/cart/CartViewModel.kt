@@ -9,12 +9,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.CartProducts.Companion.EMPTY_CART_PRODUCTS
+import woowacourse.shopping.domain.model.Page
+import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
-import woowacourse.shopping.ui.model.PageState
-import woowacourse.shopping.ui.model.PageState.Companion.INITIAL_PAGE
 
 class CartViewModel(
     private val getCartProductsUseCase: GetCartProductsUseCase,
@@ -25,9 +25,6 @@ class CartViewModel(
     private val _cartProducts: MutableLiveData<CartProducts> = MutableLiveData(EMPTY_CART_PRODUCTS)
     val cartProducts: LiveData<CartProducts> get() = _cartProducts
 
-    private val _pageState: MutableLiveData<PageState> = MutableLiveData<PageState>(PageState())
-    val pageState: LiveData<PageState> get() = _pageState
-
     private val _editedProductIds: MutableLiveData<Set<Int>> = MutableLiveData(emptySet())
     val editedProductIds: LiveData<Set<Int>> get() = _editedProductIds
 
@@ -35,16 +32,12 @@ class CartViewModel(
         loadCartProducts()
     }
 
-    private fun loadCartProducts() {
+    private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
         getCartProductsUseCase(
-            page = pageState.value?.current ?: INITIAL_PAGE,
+            page = page.current,
             size = DEFAULT_PAGE_SIZE,
         ) { cartProducts ->
             _cartProducts.postValue(cartProducts)
-        }
-
-        if (cartProducts.value?.products.isNullOrEmpty()) {
-            decreasePage()
         }
     }
 
@@ -55,14 +48,13 @@ class CartViewModel(
     }
 
     fun increasePage(step: Int = DEFAULT_PAGE_STEP) {
-        _pageState.value = pageState.value?.plus(step)
-        loadCartProducts()
+        val page = cartProducts.value?.page ?: EMPTY_PAGE
+        loadCartProducts(page.copy(current = page.current + step))
     }
 
     fun decreasePage(step: Int = DEFAULT_PAGE_STEP) {
-        if (pageState.value?.isFirstPage ?: true) return
-        _pageState.value = pageState.value?.minus(step)
-        loadCartProducts()
+        val page = cartProducts.value?.page ?: EMPTY_PAGE
+        loadCartProducts(page.copy(current = page.current - step))
     }
 
     fun increaseCartProductQuantity(id: Int) {
@@ -75,16 +67,17 @@ class CartViewModel(
     fun decreaseCartProductQuantity(id: Int) {
         decreaseCartProductQuantityUseCase(id) { newQuantity ->
             if (newQuantity > 0) {
-                _cartProducts.postValue(cartProducts.value?.updateCartProductQuantity(id, newQuantity))
+                _cartProducts.postValue(
+                    cartProducts.value?.updateCartProductQuantity(
+                        id,
+                        newQuantity,
+                    ),
+                )
             } else {
                 loadCartProducts()
             }
         }
         _editedProductIds.value = editedProductIds.value?.plus(id)
-    }
-
-    fun updateTotalPage(total: Int) {
-        _pageState.value = pageState.value?.copy(total = total)
     }
 
     companion object {

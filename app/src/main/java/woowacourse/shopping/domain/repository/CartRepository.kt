@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProducts
 
 interface CartRepository {
     fun fetchCartProductDetail(productId: Int): CartProduct?
@@ -8,7 +9,7 @@ interface CartRepository {
     fun fetchCartProducts(
         page: Int,
         size: Int,
-    ): List<CartProduct>
+    ): CartProducts
 
     fun fetchCartItemCount(): Int
 

@@ -13,11 +13,7 @@ class GetCartProductsUseCase(
         callback: (CartProducts) -> Unit,
     ) {
         thread {
-            val products = repository.fetchCartProducts(page, size)
-            val totalCount = repository.fetchCartItemCount()
-            val totalPage = (totalCount + size - 1) / size
-
-            callback(CartProducts(products, totalPage))
+            callback(repository.fetchCartProducts(page, size))
         }
     }
 }

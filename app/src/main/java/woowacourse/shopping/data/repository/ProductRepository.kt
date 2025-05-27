@@ -5,6 +5,7 @@ import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.CatalogProduct
 import woowacourse.shopping.domain.model.CatalogProduct.Companion.EMPTY_CATALOG_PRODUCT
 import woowacourse.shopping.domain.model.CatalogProducts
+import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.model.ProductDetail.Companion.EMPTY_PRODUCT_DETAIL
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -38,8 +39,7 @@ class ProductRepository(
 
         return CatalogProducts(
             products = products?.content?.map { it.toDomain() } ?: emptyList(),
-            currentPage = products?.pageable?.pageNumber ?: 0,
-            hasMore = products?.last?.not() ?: false,
+            page = Page(page, products?.first ?: false, products?.last ?: false),
         )
     }
 }

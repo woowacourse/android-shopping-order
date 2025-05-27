@@ -10,6 +10,7 @@ import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.CatalogProducts
 import woowacourse.shopping.domain.model.CatalogProducts.Companion.EMPTY_CATALOG_PRODUCTS
 import woowacourse.shopping.domain.model.HistoryProduct
+import woowacourse.shopping.domain.model.Page.Companion.UNINITIALIZED_PAGE
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
@@ -25,14 +26,19 @@ class CatalogViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
 ) : ViewModel() {
-    private val _catalogProducts: MutableLiveData<CatalogProducts> = MutableLiveData(EMPTY_CATALOG_PRODUCTS)
+    private val _catalogProducts: MutableLiveData<CatalogProducts> =
+        MutableLiveData(EMPTY_CATALOG_PRODUCTS)
     val catalogProducts: LiveData<CatalogProducts> get() = _catalogProducts
 
-    private val _historyProducts: MutableLiveData<List<HistoryProduct>> = MutableLiveData(emptyList())
+    private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
+        MutableLiveData(emptyList())
     val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
 
     fun loadCartProducts(count: Int = SHOWN_PRODUCTS_COUNT) {
-        getCatalogProductsUseCase(currentPage = catalogProducts.value?.currentPage ?: 0, size = count) { newProducts ->
+        getCatalogProductsUseCase(
+            currentPage = catalogProducts.value?.page?.current ?: UNINITIALIZED_PAGE,
+            size = count,
+        ) { newProducts ->
             _catalogProducts.postValue(catalogProducts.value?.plus(newProducts))
         }
     }
@@ -45,19 +51,33 @@ class CatalogViewModel(
 
     fun increaseCartProduct(id: Int) {
         increaseCartProductQuantityUseCase(id) { newQuantity ->
-            _catalogProducts.postValue(catalogProducts.value?.updateCatalogProductQuantity(id, newQuantity))
+            _catalogProducts.postValue(
+                catalogProducts.value?.updateCatalogProductQuantity(
+                    id,
+                    newQuantity,
+                ),
+            )
         }
     }
 
     fun decreaseCartProduct(id: Int) {
         decreaseCartProductQuantityUseCase(id) { newQuantity ->
-            _catalogProducts.postValue(catalogProducts.value?.updateCatalogProductQuantity(id, newQuantity))
+            _catalogProducts.postValue(
+                catalogProducts.value?.updateCatalogProductQuantity(
+                    id,
+                    newQuantity,
+                ),
+            )
         }
     }
 
     fun loadCartProduct(id: Int) {
         getCatalogProductUseCase(id) { cartProduct ->
-            _catalogProducts.postValue(catalogProducts.value?.updateCatalogProduct(cartProduct ?: return@getCatalogProductUseCase))
+            _catalogProducts.postValue(
+                catalogProducts.value?.updateCatalogProduct(
+                    cartProduct ?: return@getCatalogProductUseCase,
+                ),
+            )
         }
     }
 
