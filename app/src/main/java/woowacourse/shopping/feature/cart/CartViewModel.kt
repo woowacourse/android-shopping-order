@@ -3,8 +3,12 @@ package woowacourse.shopping.feature.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Key
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 import kotlin.math.max
 
 class CartViewModel(
@@ -34,15 +38,20 @@ class CartViewModel(
 
     private val endPage: Int get() = max(1, (totalCartSizeData + PAGE_SIZE - 1) / PAGE_SIZE)
 
+    private val _loginErrorEvent : MutableSingleLiveData<CartFetchError> = MutableSingleLiveData()
+    val loginErrorEvent : SingleLiveData<CartFetchError> get() = _loginErrorEvent
+
     init {
-        updateCartQuantity()
+        //updateCartQuantity()
     }
 
     fun onLoginInput(
         id: String,
         pw: String,
     ) {
-        // Todo
+        Key.id = id
+        Key.pw = pw
+        updateCartQuantity()
     }
 
     fun getPosition(cartItem: CartItem): Int? {
@@ -70,7 +79,10 @@ class CartViewModel(
             { currentPageCartItems ->
                 _cart.value = currentPageCartItems
             },
-            {},
+            {
+                cartFetchError ->
+                _loginErrorEvent.setValue(cartFetchError)
+            },
         )
         updateCartDataSize()
         updatePageMoveAvailability()

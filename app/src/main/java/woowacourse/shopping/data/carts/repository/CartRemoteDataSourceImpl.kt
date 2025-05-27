@@ -1,13 +1,16 @@
 package woowacourse.shopping.data.carts.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.RetrofitService
+import woowacourse.shopping.domain.model.Key
 
 class CartRemoteDataSourceImpl(
     private val baseUrl: String = BuildConfig.BASE_URL,
@@ -28,10 +31,11 @@ class CartRemoteDataSourceImpl(
         limit: Int,
         offset: Int,
         onSuccess: (CartResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
     ) {
+        Log.d("test",Key.basicKey)
         retrofitService
-            .requestCartProduct(page = offset / limit, size = limit, authorization = "Basic bWVkQW5kcm86cGFzc3dvcmQ=")
+            .requestCartProduct(page = offset / limit, size = limit, authorization = "Basic "+ Key.basicKey)
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(
@@ -41,7 +45,8 @@ class CartRemoteDataSourceImpl(
                         if (response.isSuccessful && response.body() != null) {
                             onSuccess(response.body()!!)
                         } else {
-                            onFailure(Throwable("응답 없음 또는 실패: ${response.code()}"))
+                            Log.d("test","onResponse")
+                            onFailure(CartFetchError.Server(response.code(),response.message()))
                         }
                     }
 
@@ -49,8 +54,8 @@ class CartRemoteDataSourceImpl(
                         call: Call<CartResponse>,
                         t: Throwable,
                     ) {
-                        print(t)
-                        onFailure(t)
+                        Log.d("test","onFailure")
+                        onFailure(CartFetchError.Network)
                     }
                 },
             )

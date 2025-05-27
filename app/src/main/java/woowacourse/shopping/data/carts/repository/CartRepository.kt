@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 
@@ -11,7 +12,7 @@ interface CartRepository {
         limit: Int,
         offset: Int,
         onComplete: (List<CartItem>) -> Unit,
-        onFail: (Throwable) -> Unit
+        onFail: (CartFetchError) -> Unit
     )
 
     fun addOrIncreaseQuantity(

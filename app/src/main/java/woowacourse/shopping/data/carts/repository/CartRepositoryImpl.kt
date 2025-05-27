@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
@@ -26,7 +27,7 @@ class CartRepositoryImpl(
         limit: Int,
         offset: Int,
         onComplete: (List<CartItem>) -> Unit,
-        onFail: (Throwable) -> Unit,
+        onFail: (CartFetchError) -> Unit,
     ) {
         remoteDataSource.fetchPageCartItem(
             limit,
@@ -34,7 +35,8 @@ class CartRepositoryImpl(
             { response ->
                 onComplete(getCartItemByCartResponse(response))
             },
-            { },
+            { response ->
+                onFail(response)},
         )
     }
 

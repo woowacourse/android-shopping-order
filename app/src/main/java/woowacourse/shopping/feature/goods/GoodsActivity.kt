@@ -83,12 +83,10 @@ class GoodsActivity : AppCompatActivity() {
         binding = ActivityGoodsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.lifecycleOwner = this
-
         binding.rvGoodsItems.adapter = concatAdapter
         binding.viewModel = viewModel
 
         binding.rvGoodsItems.layoutManager = getLayoutManager()
-
         viewModel.navigateToCart.observe(this) {
             val intent = CartActivity.newIntent(this)
             startActivity(intent)

@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartResponse
 
 interface CartRemoteDataSource {
@@ -9,7 +10,7 @@ interface CartRemoteDataSource {
         limit: Int,
         offset: Int,
         onSuccess: (CartResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
     )
 
     fun fetchGoodsCount(onSuccess: (Int) -> Unit)
