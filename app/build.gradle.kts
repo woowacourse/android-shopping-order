@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -16,7 +17,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
     }
 
     buildTypes {
@@ -41,6 +43,9 @@ android {
             excludes += "win32-x86*/**"
         }
     }
+    buildFeatures {
+        dataBinding = true
+    }
 }
 
 dependencies {
@@ -49,9 +54,18 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.google.material)
+    implementation(libs.google.glide)
+    implementation(libs.okhttp3.okhttp)
+    implementation(libs.mockwebserver)
+    implementation(libs.gson)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.mockwebserver)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
