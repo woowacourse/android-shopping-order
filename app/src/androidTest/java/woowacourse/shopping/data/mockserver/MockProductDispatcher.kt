@@ -1,4 +1,4 @@
-package woowacourse.shopping.mockserver
+package woowacourse.shopping.data.mockserver
 
 import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.Dispatcher

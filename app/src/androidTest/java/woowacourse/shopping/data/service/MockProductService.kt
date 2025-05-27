@@ -3,9 +3,9 @@ package woowacourse.shopping.data.service
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import woowacourse.shopping.data.mockserver.MockServer
 import woowacourse.shopping.data.model.PageableResponse
 import woowacourse.shopping.data.model.ProductResponse
-import woowacourse.shopping.mockserver.MockServer
 
 class MockProductService(
     private val client: OkHttpClient,

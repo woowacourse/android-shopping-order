@@ -9,8 +9,6 @@ import woowacourse.shopping.data.datasource.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.db.ShoppingDatabase
-import woowacourse.shopping.data.service.MockProductService
-import woowacourse.shopping.mockserver.MockServer
 
 object DataSourceProvider {
     val productRemoteDataSource: ProductRemoteDataSource by lazy { initProductDataSource() }
@@ -19,9 +17,8 @@ object DataSourceProvider {
 
     private fun initProductDataSource(): ProductRemoteDataSource {
         val client = OkHttpClient()
-        val mockServer = MockServer()
-        val productService = MockProductService(client, mockServer)
-        return ProductRemoteDataSourceImpl(productService)
+        val productService =
+            return ProductRemoteDataSourceImpl(productService)
     }
 
     private fun initCartDataSource(): CartLocalDataSource {

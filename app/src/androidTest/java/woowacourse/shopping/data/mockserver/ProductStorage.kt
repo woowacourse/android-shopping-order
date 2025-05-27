@@ -1,4 +1,4 @@
-package woowacourse.shopping.mockserver
+package woowacourse.shopping.data.mockserver
 
 import woowacourse.shopping.data.model.ProductResponse
 
