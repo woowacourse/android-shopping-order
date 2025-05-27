@@ -26,6 +26,7 @@ room-runtime = "2.7.1"
 mockk = "1.14.0"
 espresso-intents = "3.6.1"
 espresso-contrib = "3.6.1"
+json = "20140107"
 
 [libraries]
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity-ktx" }
@@ -54,6 +55,7 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espresso-intents" }
 androidx-espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "espresso-contrib" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
+json = { module = "org.json:json", version.ref = "json" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
