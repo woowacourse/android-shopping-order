@@ -23,8 +23,9 @@ class MainViewModel(
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
     private val historyLoader: HistoryLoader,
-    private val defaultProductRepository: DefaultProductRepository,
+    private val productRepository: DefaultProductRepository,
 ) : ViewModel() {
+
     private val _uiState = MutableLiveData<ProductUiState>()
     val uiState: LiveData<ProductUiState> get() = _uiState
 
@@ -35,89 +36,75 @@ class MainViewModel(
     val isLoading: SingleLiveData<Boolean> get() = _isLoading
 
     init {
-        loadInitial()
-    }
-
-    private fun loadInitial() {
-        defaultProductRepository.loadSinglePage(INITIAL_PAGE, PAGE_SIZE) { result ->
-            result.fold(
-                onSuccess = { page ->
-                    val productList: List<Product> = page.products
-                    val newState =
-                        productList.map { product -> ProductState(product, Quantity(10)) }
-
-                    _uiState.value =
-                        ProductUiState(
-                            productItems = newState,
-                            load = LoadState.of(page.hasNextPage),
-                        )
-                    handleLoading(false)
-                },
-                onFailure = { throwable ->
-                    Log.e("ProductLoad", "Error loading products", throwable)
-                },
-            )
-        }
+        loadPage(INITIAL_PAGE)
     }
 
     fun loadPage() {
         withState(_uiState.value) { state ->
-            val productItems = state.productItems
-            val pageIndex = productItems.size / PAGE_SIZE
-            defaultProductRepository.loadSinglePage(pageIndex, PAGE_SIZE) { result ->
-                result.fold(
-                    onSuccess = { page ->
-                        val productList: List<Product> = page.products
-                        val newState =
-                            productList.map { product -> ProductState(product, Quantity(10)) }
+            val pageIndex = state.productItems.size / PAGE_SIZE
+            loadPage(pageIndex)
+        }
+    }
 
-                        _uiState.value =
-                            state.copy(
-                                productItems = state.productItems + newState,
-                                load = LoadState.of(page.hasNextPage),
-                            )
-                    },
-                    onFailure = { throwable ->
-                        Log.e("ProductLoad", "Error loading products", throwable)
-                    },
-                )
+    private fun loadPage(pageIndex: Int) {
+        productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { result ->
+            result.fold(
+                onSuccess = { page ->
+                    val newItems = page.products.map { ProductState(it, Quantity(10)) }
+                    val currentItems = _uiState.value?.productItems.orEmpty()
+                    _uiState.value = ProductUiState(
+                        productItems = currentItems + newItems,
+                        load = LoadState.of(page.hasNextPage)
+                    )
+                    handleLoading(false)
+                },
+                onFailure = { throwable ->
+                    Log.e("ProductLoad", "Error loading products", throwable)
+                    handleLoading(false)
+                }
+            )
+        }
+    }
+
+    fun increaseCartQuantity(productId: Long) {
+        withState(_uiState.value) { state ->
+            when (val result = state.canIncreaseCartQuantity(productId)) {
+                is IncreaseState.CanIncrease -> {
+                    _uiState.value = state.modifyUiState(result.value)
+                    cartRepository.upsert(productId, result.value.cartQuantity)
+                }
+
+                is IncreaseState.CannotIncrease -> {
+                    sendEvent(MainUiEvent.ShowCannotIncrease(result.quantity))
+                }
             }
         }
     }
 
     fun decreaseCartQuantity(productId: Long) {
         withState(_uiState.value) { state ->
-            val result = state.decreaseCartQuantity(productId)
-            handleDecreaseQuantity(state, result, productId)
-        }
-    }
+            val updated = state.decreaseCartQuantity(productId)
+            _uiState.value = state.modifyUiState(updated)
 
-    fun increaseCartQuantity(productId: Long) {
-        withState(_uiState.value) { state ->
-            val result = state.canIncreaseCartQuantity(productId)
-            handleIncreaseQuantity(state, result, productId)
+            if (!updated.cartQuantity.hasQuantity()) {
+                cartRepository.delete(productId)
+            } else {
+                cartRepository.upsert(productId, updated.cartQuantity)
+            }
         }
     }
 
     fun syncCartQuantities() {
         withState(_uiState.value) { state ->
-            val productItems = state.productItems
-            val productIds = state.productIds
-
-            cartRepository.getCarts(productIds) { carts ->
-//                val updated =
-//                    state.mapIndexed { i, productState ->
-//                        val quantity = carts.getOrNull(i)?.quantity ?: Quantity(0)
-//                        productState.copy(cartQuantity = quantity)
-//                    }
-//                productItems.postValue(updated)
+            cartRepository.getCarts(state.productIds) { carts ->
+                // 구현 예정
             }
         }
     }
 
     fun syncHistory() {
         historyLoader { historyStates ->
-            // historyItems.postValue(historyStates)
+            // 구현 예정
         }
     }
 
@@ -131,36 +118,6 @@ class MainViewModel(
 
     private fun handleLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)
-    }
-
-    private fun handleIncreaseQuantity(
-        uiState: ProductUiState,
-        state: IncreaseState,
-        productId: Long,
-    ) {
-        when (state) {
-            is IncreaseState.CanIncrease -> {
-                val newState = state.value
-                _uiState.value = uiState.modifyUiState(newState)
-                cartRepository.upsert(productId, newState.cartQuantity)
-            }
-
-            is IncreaseState.CannotIncrease -> sendEvent(MainUiEvent.ShowCannotIncrease(state.quantity))
-        }
-    }
-
-    private fun handleDecreaseQuantity(
-        uiState: ProductUiState,
-        decreaseResult: ProductState,
-        productId: Long,
-    ) {
-        _uiState.value = uiState.modifyUiState(decreaseResult)
-
-        if (!decreaseResult.cartQuantity.hasQuantity()) {
-            cartRepository.delete(productId)
-        } else {
-            cartRepository.upsert(productId, decreaseResult.cartQuantity)
-        }
     }
 
     private fun sendEvent(event: MainUiEvent) {
