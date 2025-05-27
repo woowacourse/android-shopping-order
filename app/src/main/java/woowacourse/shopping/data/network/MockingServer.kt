@@ -10,12 +10,12 @@ import woowacourse.shopping.data.network.entity.ProductEntity
 import woowacourse.shopping.data.network.entity.ProductPageEntity
 import woowacourse.shopping.data.storage.ProductStorage
 
-class MockingServer : ProductService {
+class MockingServer {
     private val mockWebServer = MockWebServer()
     private val client = OkHttpClient()
     private val gson = Gson()
 
-    override fun getProduct(productId: Long): ProductEntity {
+    fun getProduct(productId: Long): ProductEntity {
         val product = ProductStorage[productId]
         val json = gson.toJson(product)
         val path = "$BASE_PATH$productId"
@@ -25,7 +25,7 @@ class MockingServer : ProductService {
         return parseProduct(responseBody)
     }
 
-    override fun getProducts(productIds: List<Long>): List<ProductEntity> {
+    fun getProducts(productIds: List<Long>): List<ProductEntity> {
         val products = ProductStorage.getProductsById(productIds)
 
         val json = gson.toJson(products)
@@ -36,7 +36,7 @@ class MockingServer : ProductService {
         return parseProductList(responseBody)
     }
 
-    override fun singlePage(
+    fun singlePage(
         fromIndex: Int,
         toIndex: Int,
     ): ProductPageEntity {

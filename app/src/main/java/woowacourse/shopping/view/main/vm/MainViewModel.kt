@@ -1,10 +1,13 @@
 package woowacourse.shopping.view.main.vm
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.Quantity
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.view.core.common.withState
@@ -25,6 +28,7 @@ class MainViewModel(
     private val historyRepository: HistoryRepository,
     private val productWithCartLoader: ProductWithCartLoader,
     private val historyLoader: HistoryLoader,
+    private val defaultProductRepository: DefaultProductRepository,
 ) : ViewModel() {
     private val productItems = MutableLiveData<List<ProductState>>(emptyList())
 
@@ -50,6 +54,19 @@ class MainViewModel(
 
     private fun loadInitial() {
         handleLoading(true)
+        defaultProductRepository.loadSinglePage(INITIAL_PAGE, PAGE_SIZE) { result ->
+            result.fold(
+                onSuccess = { paged ->
+                    val productList: List<Product> = paged.products
+                    val stateList = productList.map { product -> ProductState(product, Quantity(10)) }
+                    productItems.postValue(stateList)
+                },
+                onFailure = { throwable ->
+                    Log.e("ProductLoad", "Error loading products", throwable)
+                },
+            )
+        }
+
         historyLoader { historyStates ->
             productWithCartLoader(INITIAL_PAGE, PAGE_SIZE) { productStates, hasNextPage ->
                 historyItems.postValue(historyStates)
@@ -113,7 +130,7 @@ class MainViewModel(
         }
     }
 
-    private fun handleLoading(isLoading: Boolean){
+    private fun handleLoading(isLoading: Boolean)  {
         _isLoading.postValue(isLoading)
     }
 

@@ -1,9 +1,7 @@
 package woowacourse.shopping.data.db.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.Upsert
 import woowacourse.shopping.data.db.entity.CartEntity
 

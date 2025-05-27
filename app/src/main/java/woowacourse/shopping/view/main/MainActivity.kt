@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
             container.historyRepository,
             container.productWithCartLoader,
             container.historyLoader,
+            container.defaultProductSinglePageRepository,
         )
     }
     private val productsAdapter: ProductAdapter by lazy {
@@ -94,7 +95,7 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
             productsAdapter.submitList(value)
         }
 
-        viewModel.isLoading.observe(this){ value ->
+        viewModel.isLoading.observe(this) { value ->
             if (value.not()) {
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE

@@ -9,7 +9,6 @@ class RecentProductAdapter(
     private val items: List<HistoryState>,
     private val handler: HistoryViewHolder.Handler,
 ) : RecyclerView.Adapter<HistoryViewHolder>() {
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

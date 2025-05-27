@@ -4,9 +4,13 @@ import android.content.Context
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.datasource.HistoryDataSource
 import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.data.datasource.ProductsDataSource2
 import woowacourse.shopping.data.db.PetoMarketDatabase
 import woowacourse.shopping.data.network.MockingServer
+import woowacourse.shopping.data.network.RetrofitProvider
+import woowacourse.shopping.data.network.service.ProductService
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.data.repository.HistoryRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
@@ -33,6 +37,12 @@ class AppContainer(
     private val productDataSource = ProductsDataSource(productService)
 
     private val historyDataSource = HistoryDataSource(historyDao)
+
+    private val productService2: ProductService = RetrofitProvider.productService
+
+    private val productsDataSource2 = ProductsDataSource2(productService2)
+
+    val defaultProductSinglePageRepository = DefaultProductRepository(productsDataSource2)
 
     val productRepository: ProductRepository by lazy { ProductRepositoryImpl(productDataSource) }
 
