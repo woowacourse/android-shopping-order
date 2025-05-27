@@ -5,7 +5,10 @@ import androidx.databinding.BindingAdapter
 import com.facebook.shimmer.ShimmerFrameLayout
 
 @BindingAdapter("isShow")
-fun setShimmerBindingAdapter(view: ShimmerFrameLayout, isShow: Boolean) {
+fun setShimmerBindingAdapter(
+    view: ShimmerFrameLayout,
+    isShow: Boolean,
+) {
     view.isVisible = isShow
 
     if (!isShow) {
