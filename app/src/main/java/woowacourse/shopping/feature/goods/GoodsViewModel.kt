@@ -6,8 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.local.cart.repository.CartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.data.remote.GoodsClient
+import woowacourse.shopping.data.remote.ProductResponse
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.domain.model.Goods.Companion.dummyGoods
@@ -36,6 +41,7 @@ class GoodsViewModel(
 
     init {
         loadItems()
+        loadProduct()
     }
 
     fun addPage() {
@@ -106,6 +112,22 @@ class GoodsViewModel(
         val fromIndex = page * pageSize
         val toIndex = min(fromIndex + pageSize, dummyGoods.size)
         return dummyGoods.subList(fromIndex, toIndex)
+    }
+
+    fun loadProduct() {
+        GoodsClient.getRetrofitService().requestGoods().enqueue(object: Callback<ProductResponse> {
+            override fun onResponse(
+                call: Call<ProductResponse>,
+                response: Response<ProductResponse>
+            ) {
+                Log.d("123451", "hi")
+            }
+
+            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                Log.d("123452", "hi")
+            }
+
+        })
     }
 
     private fun loadItems() {
