@@ -20,7 +20,7 @@ class ShoppingApplication : Application() {
         thread { DevMockServer.start() }
         database = ShoppingDatabase.getInstance(applicationContext)
 
-        sharedPreferences.edit().putString(ID, "wondroid-world")
+        sharedPreferences.edit().putString(ID, "ijh1298")
         sharedPreferences.edit().putString(PASSWORD, "password")
     }
 

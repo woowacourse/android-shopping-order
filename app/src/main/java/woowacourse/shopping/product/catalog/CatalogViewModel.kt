@@ -8,6 +8,7 @@ import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.CatalogItem.ProductItem
 
@@ -15,6 +16,7 @@ class CatalogViewModel(
     private val catalogProductRepository: CatalogProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val remoteCatalogProductRepositoryImpl: RemoteCatalogProductRepositoryImpl,
 ) : ViewModel() {
     private val _catalogItems =
         MutableLiveData<List<CatalogItem>>(emptyList<CatalogItem>())
@@ -67,7 +69,7 @@ class CatalogViewModel(
         increasePage()
         val currentPage = page.value ?: 0
 
-        catalogProductRepository.getAllProductsSize { size ->
+        remoteCatalogProductRepositoryImpl.getAllProductsSize { size ->
             val startIndex = currentPage * PAGE_SIZE
             val endIndex = minOf(startIndex + PAGE_SIZE, size)
 
@@ -79,7 +81,7 @@ class CatalogViewModel(
         _catalogItems.value = emptyList()
         val currentPage = page.value ?: 0
 
-        catalogProductRepository.getAllProductsSize { size ->
+        remoteCatalogProductRepositoryImpl.getAllProductsSize { size ->
             val startIndex = 0
             val endIndex = minOf((currentPage + 1) * PAGE_SIZE, size)
 
@@ -96,7 +98,7 @@ class CatalogViewModel(
         Thread.sleep(2000)
         _catalogItems.postValue(emptyList<CatalogItem>())
 
-        catalogProductRepository.getProductsInRange(startIndex, endIndex) { pagedProducts ->
+        remoteCatalogProductRepositoryImpl.getProductsByPage(0, 1) { pagedProducts ->
 
             cartProductRepository.getCartProductsInRange(startIndex, endIndex) { cartProducts ->
                 val cartProductMap = cartProducts.associateBy { it.uid }

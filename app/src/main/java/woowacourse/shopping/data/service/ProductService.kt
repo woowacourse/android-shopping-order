@@ -13,6 +13,12 @@ interface ProductService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 1,
     ) : Call<ProductResponse>
+
+    @GET("/products")
+    fun requestDetailProduct(
+        @Header("accept") accept: String = "*/*",
+        @Query("id") id: Int = 0,
+    ) : Call<ProductResponse>
 }
 
 

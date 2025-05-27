@@ -7,6 +7,7 @@ import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.data.repository.HttpCatalogProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 import woowacourse.shopping.data.server.DevMockServer
 
 class CatalogViewModelFactory(
@@ -26,6 +27,7 @@ class CatalogViewModelFactory(
                         HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
                     ),
                 catalogProductRepository = HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
+                remoteCatalogProductRepositoryImpl = RemoteCatalogProductRepositoryImpl()
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

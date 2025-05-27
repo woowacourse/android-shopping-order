@@ -15,4 +15,10 @@ interface CatalogProductRepository {
         uids: List<Int>,
         callback: (List<ProductUiModel>) -> Unit,
     )
+
+    fun getProductsByPage(
+        page: Int,
+        size: Int,
+        callback: (List<ProductUiModel>) -> Unit
+    )
 }

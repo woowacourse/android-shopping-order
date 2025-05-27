@@ -4,6 +4,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import woowacourse.shopping.data.dto.cartitem.ProductResponse
+import woowacourse.shopping.data.service.RetrofitProductService.retrofitService
 import woowacourse.shopping.product.catalog.ProductUiModel
 import kotlin.concurrent.thread
 
@@ -18,6 +23,22 @@ class HttpCatalogProductRepositoryImpl(
             callback(cachedProducts!!)
             return
         }
+
+        retrofitService.requestProducts().enqueue(object : Callback<ProductResponse> {
+            override fun onResponse(
+                call: Call<ProductResponse>,
+                response: Response<ProductResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    println("body : $body")
+                }
+            }
+
+            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                println("error : $t")
+            }
+        })
 
         thread {
             try {
@@ -66,5 +87,13 @@ class HttpCatalogProductRepositoryImpl(
         getAllProducts { products ->
             callback(products.filter { it.id in uids })
         }
+    }
+
+    override fun getProductsByPage(
+        page: Int,
+        size: Int,
+        callback: (List<ProductUiModel>) -> Unit
+    ) {
+        TODO("Not yet implemented")
     }
 }
