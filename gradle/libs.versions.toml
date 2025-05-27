@@ -12,6 +12,7 @@ assertj-core = "3.27.3"
 core-testing = "2.2.0"
 glide = "4.16.0"
 kotlinx-serialization-json = "1.8.1"
+retrofit-serialization-converter = "0.8.0"
 google-material = "1.12.0"
 gson = "2.11.0"
 junit-jupiter = "5.12.0"
@@ -41,6 +42,7 @@ assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "as
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 google-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+retrofit-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit-serialization-converter" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }

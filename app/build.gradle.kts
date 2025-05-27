@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.room.runtime)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     kapt(libs.androidx.room.compiler)
