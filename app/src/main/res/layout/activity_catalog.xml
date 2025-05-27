@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <import type="android.view.View" />
 
         <variable
@@ -20,61 +21,132 @@
             android:layout_height="wrap_content">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:visibility="@{viewModel.hasRecentViewedItems ? View.VISIBLE : View.GONE}"
                 android:id="@+id/layout_recentView"
-                android:paddingVertical="20dp"
-                android:paddingHorizontal="16dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="20dp"
+                android:visibility="@{viewModel.hasRecentViewedItems ? View.VISIBLE : View.GONE}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:layout_marginStart="4dp"
                     android:id="@+id/textView_recentView_info"
-                    android:textStyle="bold"
-                    android:text="최근 본 상품"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/text_recent_products_info"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView_recentView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    app:layout_constraintTop_toBottomOf="@id/textView_recentView_info"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textView_recentView_info" />
+
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
-                android:visibility="@{viewModel.hasRecentViewedItems ? View.VISIBLE : View.GONE}"
                 android:id="@+id/view_catalog_divider"
                 android:layout_width="match_parent"
                 android:layout_height="7dp"
                 android:background="@color/catalog_divider_background"
-                app:layout_constraintTop_toBottomOf="@id/layout_recentView"
+                android:visibility="@{viewModel.hasRecentViewedItems ? View.VISIBLE : View.GONE}"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@id/layout_recentView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_products"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="14dp"
-                app:layout_constraintTop_toBottomOf="@id/view_catalog_divider"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_catalog_divider" />
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/fr_product_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_catalog_divider">
+
+                <GridLayout
+                    android:alignmentMode="alignMargins"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:columnCount="2"
+                    android:orientation="horizontal"
+                    android:padding="14dp"
+                    android:useDefaultMargins="true"
+                    android:rowCount="4">
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                    <include
+                        layout="@layout/layout_product_item_shimmer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
+                </GridLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 </layout>

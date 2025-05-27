@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="android.view.View" />
 
         <variable
@@ -20,15 +21,14 @@
 
     </data>
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:onClick="@{() -> catalogHandler.onProductClick(product)}"
-        >
+        android:onClick="@{() -> catalogHandler.onProductClick(product)}">
 
         <ImageView
-            app:loadImage="@{product.imageUrl}"
             android:id="@+id/imageView_product"
             android:layout_width="match_parent"
             android:layout_height="154dp"
@@ -37,33 +37,34 @@
             android:src="@drawable/iced_americano"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:loadImage="@{product.imageUrl}" />
 
         <include
-            app:product="@{product}"
-            app:handler="@{handler}"
-            android:visibility="@{product.isExpanded ? View.VISIBLE : View.GONE}"
+            android:id="@+id/layout_quantity_selector"
+            layout="@layout/product_count_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:visibility="@{product.isExpanded ? View.VISIBLE : View.GONE}"
+            app:handler="@{handler}"
+            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
-            android:id="@+id/layout_quantity_selector"
-            layout="@layout/product_count_item" />
+            app:product="@{product}" />
 
         <include
-            app:product="@{product}"
-            app:handler="@{catalogHandler}"
-            android:visibility="@{product.isExpanded ? View.GONE : View.VISIBLE}"
+            android:id="@+id/layout_button_open_quantity_selector"
+            layout="@layout/product_count_open_item"
             android:layout_width="53dp"
             android:layout_height="53dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
             android:layout_marginEnd="13dp"
-            android:id="@+id/layout_button_open_quantity_selector"
-            layout="@layout/product_count_open_item"/>
+            android:layout_marginBottom="8dp"
+            android:visibility="@{product.isExpanded ? View.GONE : View.VISIBLE}"
+            app:handler="@{catalogHandler}"
+            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:product="@{product}" />
 
 
         <TextView
