@@ -36,7 +36,7 @@ class GoodsAdapter(
             if (
                 oldItem is Cart &&
                 newItem is Cart &&
-                oldItem.goods.id == newItem.goods.id &&
+                oldItem.product.id == newItem.product.id &&
                 oldItem.quantity != newItem.quantity
             ) {
                 items[index] = newItem
@@ -64,7 +64,7 @@ class GoodsAdapter(
                 val item = items[position]
                 when {
                     item is List<*> && item.all { it is Cart } -> ItemViewType.HISTORY.type
-                    item is Product -> ItemViewType.GOODS.type
+                    item is Cart -> ItemViewType.GOODS.type
                     else -> ItemViewType.LOAD_MORE.type
                 }
             }
@@ -105,7 +105,7 @@ class GoodsAdapter(
             }
             is GoodsViewHolder -> {
                 val item = items[position]
-                if (item is Product) {
+                if (item is Cart) {
                     holder.bind(item)
                 }
             }

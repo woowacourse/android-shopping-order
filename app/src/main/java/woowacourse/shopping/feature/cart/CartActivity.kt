@@ -72,7 +72,7 @@ class CartActivity : AppCompatActivity() {
         setResult(
             ResultCode.CART_INSERT.code,
             Intent().apply {
-                putExtra("GOODS_ID", cart.goods.id)
+                putExtra("GOODS_ID", cart.product.id)
                 putExtra("GOODS_QUANTITY", viewModel.cart.value?.quantity)
             },
         )

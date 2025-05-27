@@ -22,7 +22,7 @@ class CartRepositoryImpl(
 
     override fun insert(cart: Cart) {
         thread {
-            val existing = dao.findById(cart.goods.id)
+            val existing = dao.findById(cart.product.id)
             if (existing != null) {
                 val updated =
                     existing.copy(
@@ -43,7 +43,7 @@ class CartRepositoryImpl(
 
     override fun delete(cart: Cart) {
         thread {
-            val existing = dao.findById(cart.goods.id)
+            val existing = dao.findById(cart.product.id)
             if (existing != null) {
                 if (existing.quantity > 1) {
                     val updated =

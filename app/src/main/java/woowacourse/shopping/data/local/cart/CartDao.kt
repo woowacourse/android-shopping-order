@@ -48,7 +48,7 @@ interface CartDao {
     fun getTotalQuantity(): Int
 
     @Query("SELECT * FROM cart WHERE id = :id LIMIT 1")
-    fun findById(id: Long): CartEntity?
+    fun findById(id: Int): CartEntity?
 
     @Update
     fun update(cartEntity: CartEntity)

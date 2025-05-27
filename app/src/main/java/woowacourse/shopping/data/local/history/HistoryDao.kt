@@ -14,7 +14,7 @@ interface HistoryDao {
     fun insert(vararg historyEntity: HistoryEntity)
 
     @Query("SELECT * FROM history WHERE id = :id LIMIT 1")
-    fun findById(id: Long): HistoryEntity?
+    fun findById(id: Int): HistoryEntity?
 
     @Query("DELETE FROM history WHERE id = (SELECT id FROM history ORDER BY timestamp ASC LIMIT 1)")
     fun deleteOldest()

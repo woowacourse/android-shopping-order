@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "history")
 data class HistoryEntity(
-    @PrimaryKey val id: Long,
+    @PrimaryKey val id: Int,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "price") val price: Int,
-    @ColumnInfo(name = "thumbnail_url") val thumbnailUrl: String,
+    @ColumnInfo(name = "image_url") val imageUrl: String,
     @ColumnInfo(name = "quantity") val quantity: Int,
     @ColumnInfo(name = "timestamp") val timestamp: Long = System.currentTimeMillis(),
 )

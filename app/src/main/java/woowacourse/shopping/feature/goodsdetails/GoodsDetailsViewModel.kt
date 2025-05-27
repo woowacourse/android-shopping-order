@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.cart.repository.CartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.data.remote.Product
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.updateQuantity
@@ -63,17 +63,15 @@ class GoodsDetailsViewModel(
     }
 
     fun updateLastViewedVisibility() {
-        val lastName = _lastViewed.value?.goods?.name
-        val currentName = cart.value?.goods?.name
+        val lastName = _lastViewed.value?.product?.name
+        val currentName = cart.value?.product?.name
         _isLastViewedVisible.postValue(lastName != null && currentName != null && lastName != currentName)
     }
 
     fun loadLastViewed() {
         historyRepository.findLatest { lastViewed ->
-            if (lastViewed != null) {
-                _lastViewed.postValue(lastViewed)
-                updateLastViewedVisibility()
-            }
+            _lastViewed.postValue(lastViewed)
+            updateLastViewedVisibility()
         }
     }
 
@@ -83,6 +81,6 @@ class GoodsDetailsViewModel(
     }
 
     private fun insertToHistory(cart: Cart) {
-        historyRepository.insert(Cart(Goods(cart.goods.id, cart.goods.name, cart.goods.price, cart.goods.thumbnailUrl), cart.quantity))
+        historyRepository.insert(Cart(Product(cart.product.id, cart.product.name, cart.product.price, cart.product.imageUrl, ""), cart.quantity))
     }
 }

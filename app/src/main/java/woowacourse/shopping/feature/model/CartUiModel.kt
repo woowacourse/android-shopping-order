@@ -5,9 +5,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CartUiModel(
-    val id: Long,
+    val id: Int,
     val name: String = "",
     val price: Int = 0,
-    val thumbnailUrl: String = "",
+    val imageUrl: String = "",
     val quantity: Int = 0,
 ) : Parcelable

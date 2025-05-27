@@ -7,5 +7,5 @@ interface HistoryRepository {
 
     fun insert(cart: Cart)
 
-    fun findLatest(callback: (Cart?) -> Unit)
+    fun findLatest(callback: (Cart) -> Unit)
 }

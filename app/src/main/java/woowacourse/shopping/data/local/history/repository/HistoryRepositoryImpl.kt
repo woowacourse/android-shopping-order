@@ -18,7 +18,7 @@ class HistoryRepositoryImpl(
 
     override fun insert(cart: Cart) {
         thread {
-            val isNew = dao.findById(cart.goods.id) == null
+            val isNew = dao.findById(cart.product.id) == null
             if (isNew && dao.getAll().size >= 10) {
                 dao.deleteOldest()
             }
@@ -26,10 +26,10 @@ class HistoryRepositoryImpl(
         }
     }
 
-    override fun findLatest(callback: (Cart?) -> Unit) {
+    override fun findLatest(callback: (Cart) -> Unit) {
         thread {
             val lastViewed = dao.findLatest()
-            callback(lastViewed?.toDomain())
+            if (lastViewed != null) callback(lastViewed.toDomain())
         }
     }
 }
