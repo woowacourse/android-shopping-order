@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
@@ -51,16 +52,18 @@ android {
 dependencies {
     implementation(libs.glide)
     implementation(libs.androidx.room.runtime)
-    kapt("androidx.room:room-compiler:2.7.1")
+    kapt(libs.androidx.room.compiler)
     implementation(libs.okhttp)
     implementation(libs.converter.gson)
-
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.google.material)
     implementation(libs.androidx.activity)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
