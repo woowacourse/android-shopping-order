@@ -4,6 +4,7 @@ import android.app.Application
 import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.local.cart.repository.CartRepositoryImpl
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
+import woowacourse.shopping.data.remote.ProductRepository
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.goods.GoodsViewModel
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel
@@ -17,6 +18,7 @@ class ShoppingApplication : Application() {
             GoodsViewModel(
                 CartRepositoryImpl(database.cartDao()),
                 HistoryRepositoryImpl(database.historyDao()),
+                ProductRepository()
             )
         }
     }

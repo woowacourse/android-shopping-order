@@ -5,8 +5,8 @@
 
     <data>
         <variable
-            name="cart"
-            type="woowacourse.shopping.domain.model.Cart" />
+            name="product"
+            type="woowacourse.shopping.data.remote.Product" />
         <variable
             name="goodsClickListener"
             type="woowacourse.shopping.feature.goods.adapter.GoodsClickListener" />
@@ -16,8 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="6dp"
-        android:paddingBottom="12dp"
-        android:onClick="@{() -> goodsClickListener.onClickGoods(cart)}">
+        android:paddingBottom="12dp">
+
+<!--        android:onClick="@{() -> goodsClickListener.onClickGoods(product)}"-->
 
 
         <ImageView
@@ -26,7 +27,7 @@
             android:layout_height="0dp"
             android:contentDescription="@string/goods_image_description"
             android:scaleType="centerCrop"
-            app:imgUrl="@{cart.goods.thumbnailUrl}"
+            app:imgUrl="@{product.imageUrl}"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,21 +42,22 @@
             android:contentDescription="@string/goods_cart_add_button_description"
             android:src="@drawable/ic_add"
             android:visibility="visible"
-            android:onClick="@{() -> goodsClickListener.insertToCart(cart)}"
             app:layout_constraintBottom_toBottomOf="@+id/iv_item_goods_thumbnail"
             app:layout_constraintEnd_toEndOf="@+id/iv_item_goods_thumbnail" />
 
-        <woowacourse.shopping.feature.CustomCartQuantity
-            android:id="@+id/custom_cart_quantity"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginBottom="8dp"
-            app:visible="@{cart.quantity > 0}"
-            app:count="@{cart.quantity}"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_item_goods_thumbnail"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+<!--        android:onClick="@{() -> goodsClickListener.insertToCart(product)}"-->
+
+<!--        <woowacourse.shopping.feature.CustomCartQuantity-->
+<!--            android:id="@+id/custom_cart_quantity"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_marginHorizontal="5dp"-->
+<!--            android:layout_marginBottom="8dp"-->
+<!--            app:visible="@{cart.quantity > 0}"-->
+<!--            app:count="@{cart.quantity}"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/iv_item_goods_thumbnail"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"/>-->
 
         <TextView
             android:id="@+id/tv_item_goods_name"
@@ -66,7 +68,7 @@
             android:layout_marginEnd="6dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cart.goods.name}"
+            android:text="@{product.name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -78,7 +80,7 @@
             android:id="@+id/tv_item_goods_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/goods_price(cart.goods.price)}"
+            android:text="@{@string/goods_price(product.price)}"
             android:textColor="@color/gray_800"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/tv_item_goods_name"

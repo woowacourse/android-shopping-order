@@ -1,18 +1,33 @@
 package woowacourse.shopping.feature
 
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
 
+//@BindingAdapter("imgUrl")
+//fun ImageView.loadImageFromUrl(url: String) {
+//    Glide.with(this.context).load(url).into(this)
+//}
+
 @BindingAdapter("imgUrl")
-fun ImageView.loadImageFromUrl(url: String) {
-    Glide.with(this.context).load(url).into(this)
+fun ImageView.loadImageFromUrl(url: String?) {
+    Log.d("123453", "$url")
+    if (url != null && url.isNotEmpty()) {
+        Glide.with(this.context)
+            .load(url)
+            .into(this)
+    } else {
+        this.setImageResource(R.drawable.ic_launcher_background)
+    }
 }
+
 
 @BindingAdapter("cartItems")
 fun RecyclerView.bindCartItems(items: List<Cart>?) {
