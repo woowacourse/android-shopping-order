@@ -25,9 +25,8 @@ class GoodsViewModel(
 ) : ViewModel() {
     private val _items = MutableLiveData<List<Any>>()
     val items: LiveData<List<Any>> get() = _items
-
     private val _products = MutableLiveData<List<Product>>()
-    val products: LiveData<List<Product>> get() = _products
+    private val _histories = MutableLiveData<List<Cart>>()
 
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
@@ -42,7 +41,8 @@ class GoodsViewModel(
     private var page: Int = INITIAL_PAGE
 
     init {
-        loadProductsInRange()
+        loadProducts()
+        loadHistories()
     }
 
     fun addPage() {
@@ -113,9 +113,11 @@ class GoodsViewModel(
         return dummyGoods.subList(fromIndex, toIndex)
     }
 
-    fun loadProductsInRange() {
+    fun loadProducts() {
         productRepository.fetchProducts(
-            onSuccess = { products -> _products.value = products },
+            onSuccess = {
+                products -> _products.value = products
+                refreshItems() },
             onError = { Log.e("loadProductsInRange", "API 요청 실패", it) }
         )
     }
@@ -166,6 +168,24 @@ class GoodsViewModel(
             val total = currentItems.filterIsInstance<Cart>().sumOf { it.quantity }
             _totalQuantity.value = total
         }
+    }
+
+    fun loadHistories() {
+        historyRepository.getAll { histories ->
+            _histories.postValue(histories)
+            refreshItems()
+        }
+    }
+
+    private fun refreshItems() {
+        val historyList = _histories.value.orEmpty()
+        val productList = _products.value.orEmpty()
+
+        val combined: MutableList<Any> = mutableListOf()
+        if (historyList.isNotEmpty()) combined.add(historyList)
+        combined.addAll(productList)
+
+        _items.postValue(combined)
     }
 
     companion object {

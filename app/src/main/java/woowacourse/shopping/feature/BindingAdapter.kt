@@ -18,7 +18,6 @@ import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
 
 @BindingAdapter("imgUrl")
 fun ImageView.loadImageFromUrl(url: String?) {
-    Log.d("123453", "$url")
     if (url != null && url.isNotEmpty()) {
         Glide.with(this.context)
             .load(url)
