@@ -4,9 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
-import woowacourse.shopping.data.repository.CartItemRepository
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class CartViewModel(
@@ -35,9 +38,9 @@ class CartViewModel(
     }
 
     override fun onDeleteProduct(cartProduct: ProductUiModel) {
-        repository.deleteCartItemById(cartProduct.id) {
-            loadCartProducts()
-        }
+//        repository.deleteCartItemById(cartProduct.id) {
+//            loadCartProducts()
+//        }
     }
 
     override fun onNextPage() {
@@ -105,6 +108,14 @@ class CartViewModel(
     companion object {
         private const val PAGE_SIZE = 5
         private const val INITIAL_PAGE = 0
+
+        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                CartViewModel(
+                    RepositoryProvider.cartItemRepository
+                )
+            }
+        }
 
         fun factory(repository: CartItemRepository): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

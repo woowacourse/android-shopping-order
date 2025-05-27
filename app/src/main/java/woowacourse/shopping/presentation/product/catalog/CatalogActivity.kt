@@ -3,33 +3,27 @@ package woowacourse.shopping.presentation.product.catalog
 import android.os.Bundle
 import android.view.Menu
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.source.local.cart.CartItemDatabase
-import woowacourse.shopping.data.repository.CartItemRepositoryImpl
-import woowacourse.shopping.data.product.MockProducts
-import woowacourse.shopping.data.recent.ViewedItemDatabase
-import woowacourse.shopping.data.repository.ViewedItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCatalogBinding
-import woowacourse.shopping.product.catalog.CatalogViewModel.Companion.factory
-import woowacourse.shopping.product.catalog.event.CatalogEventHandlerImpl
-import woowacourse.shopping.product.catalog.viewHolder.CartActionViewHolder
+import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
+import woowacourse.shopping.presentation.product.catalog.viewHolder.CartActionViewHolder
 import woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.newIntent
-import woowacourse.shopping.product.recent.ViewedItemAdapter
+import woowacourse.shopping.presentation.product.recent.ViewedItemAdapter
 
 class CatalogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCatalogBinding
     private lateinit var productAdapter: ProductAdapter
     private lateinit var viewedAdapter: ViewedItemAdapter
 
-    private val viewModel: CatalogViewModel by lazy {
-        provideViewModel()
+    private val viewModel: CatalogViewModel by viewModels {
+        CatalogViewModel.FACTORY
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,18 +47,18 @@ class CatalogActivity : AppCompatActivity() {
         }
     }
 
-    private fun provideViewModel(): CatalogViewModel {
-        val cartDao = CartItemDatabase.getInstance(this).cartItemDao()
-        val viewedDao = ViewedItemDatabase.getInstance(this).viewedItemDao()
-        return ViewModelProvider(
-            this,
-            factory(
-                MockProducts,
-                CartItemRepositoryImpl(cartDao),
-                ViewedItemRepositoryImpl(viewedDao),
-            ),
-        )[CatalogViewModel::class.java]
-    }
+//    private fun provideViewModel(): CatalogViewModel {
+//        val cartDao = CartItemDatabase.getInstance(this).cartItemDao()
+//        val viewedDao = ViewedItemDatabase.getInstance(this).viewedItemDao()
+//        return ViewModelProvider(
+//            this,
+//            factory(
+//                ProductsRepositoryImpl(),
+//                CartItemsRepositoryImpl(),
+//                ViewedItemRepositoryImpl(viewedDao),
+//            ),
+//        )[CatalogViewModel::class.java]
+//    }
 
     private fun initRecyclerView() {
         val handler = createHandler()
@@ -124,11 +118,11 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun createHandler(): CatalogEventHandlerImpl =
         CatalogEventHandlerImpl(viewModel) { product ->
-            startActivity(newIntent(this, product))
+            startActivity(newIntent(this, product.id))
         }
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadRecentViewedItems()
+//        viewModel.loadRecentViewedItems()
     }
 }

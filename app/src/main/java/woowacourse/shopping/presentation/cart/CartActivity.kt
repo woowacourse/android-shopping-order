@@ -2,21 +2,20 @@ package woowacourse.shopping.presentation.cart
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.cart.CartViewModel.Companion.factory
-import woowacourse.shopping.presentation.cart.event.CartEventHandlerImpl
-import woowacourse.shopping.data.source.local.cart.CartItemDatabase
-import woowacourse.shopping.data.repository.CartItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.presentation.cart.event.CartEventHandlerImpl
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    private val viewModel: CartViewModel by lazy { createViewModel() }
+    private val viewModel: CartViewModel by viewModels {
+        CartViewModel.FACTORY
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +28,6 @@ class CartActivity : AppCompatActivity() {
         initRecyclerView()
         observeCartProducts()
         observePagination()
-    }
-
-    private fun createViewModel(): CartViewModel {
-        val db = CartItemDatabase.getInstance(this)
-        val repository = CartItemRepositoryImpl(db.cartItemDao())
-        return ViewModelProvider(this, factory(repository))[CartViewModel::class.java]
     }
 
     private fun initBinding() {

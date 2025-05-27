@@ -4,13 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.data.repository.CartItemRepository
-import woowacourse.shopping.data.repository.ViewedItemRepository
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import woowacourse.shopping.RepositoryProvider
+import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.ProductsRepository
+import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.mapper.toUiModel
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class DetailViewModel(
-    private val repository: CartItemRepository,
+    private val productsRepository: ProductsRepository,
+    private val cartItemRepository: CartItemRepository,
     private val viewedRepository: ViewedItemRepository,
 ) : ViewModel() {
     private val _product = MutableLiveData<ProductUiModel>()
@@ -23,34 +28,43 @@ class DetailViewModel(
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
 
     fun setProduct(
-        product: ProductUiModel,
+        id: Int,
         onInserted: () -> Unit = {},
     ) {
-        _product.value = product.copy(quantity = 1)
-        viewedRepository.insertViewedItem(product) { onInserted() }
-    }
-
-    fun addToCart() {
-        val item = _product.value ?: return
-        if (item.quantity <= 0) return
-
-        repository.findCartItem(item) { exist ->
-            val updated =
-                exist?.let {
-                    it.copy(quantity = it.quantity + item.quantity).toUiModel()
-                } ?: item
-
-            val callback = { _uiState.postValue(CartUiState.SUCCESS) }
-
-            if (exist != null) {
-                repository.updateCartItem(updated, callback)
-            } else {
-                repository.insertCartItem(updated, callback)
+        productsRepository.getProductById(id) { result ->
+            result
+                .onSuccess { product ->
+                    _product.postValue(product.toUiModel())
+                }
+        }
+        _product.value?.let {
+            viewedRepository.insertViewedItem(it) {
+                onInserted()
             }
         }
     }
 
-    fun loadLastViewedItem(currentProductId: Long) {
+    fun addToCart() {
+//        val item = _product.value ?: return
+//        if (item.quantity <= 0) return
+//
+//        cartItemRepository.findCartItem(item) { exist ->
+//            val updated =
+//                exist?.let {
+//                    it.copy(quantity = it.quantity + item.quantity).toUiModel()
+//                } ?: item
+//
+//            val callback = { _uiState.postValue(CartUiState.SUCCESS) }
+//
+//            if (exist != null) {
+//                cartItemRepository.updateCartItem(updated, callback)
+//            } else {
+//                cartItemRepository.insertCartItem(updated, callback)
+//            }
+//        }
+    }
+
+    fun loadLastViewedItem(currentProductId: Int) {
         viewedRepository.getLastViewedItem { lastViewedItem ->
             val filtered = if (lastViewedItem?.id == currentProductId) null else lastViewedItem
             _lastViewed.postValue(filtered)
@@ -68,18 +82,14 @@ class DetailViewModel(
     }
 
     companion object {
-        fun factory(
-            repository: CartItemRepository,
-            viewedRepository: ViewedItemRepository,
-        ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
-                        return DetailViewModel(repository, viewedRepository) as T
-                    }
-                    throw IllegalArgumentException("알 수 없는 ViewModel 클래스입니다.$modelClass")
-                }
+        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                DetailViewModel(
+                    productsRepository = RepositoryProvider.productsRepository,
+                    cartItemRepository = RepositoryProvider.cartItemRepository,
+                    viewedRepository = RepositoryProvider.viewedItemRepository,
+                )
             }
+        }
     }
 }

@@ -7,25 +7,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
-import woowacourse.shopping.data.source.local.cart.CartItemDatabase
-import woowacourse.shopping.data.repository.CartItemRepositoryImpl
-import woowacourse.shopping.data.recent.ViewedItemDatabase
-import woowacourse.shopping.data.repository.ViewedItemRepositoryImpl
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.product.detail.DetailViewModel.Companion.factory
-import woowacourse.shopping.product.detail.event.DetailEventHandlerImpl
-import woowacourse.shopping.presentation.util.IntentCompat
+import woowacourse.shopping.presentation.product.detail.event.DetailEventHandlerImpl
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
-    private val viewModel by lazy { provideViewModel() }
+    private val viewModel: DetailViewModel by viewModels {
+        DetailViewModel.FACTORY
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,15 +36,6 @@ class DetailActivity : AppCompatActivity() {
         loadInitialData()
     }
 
-    private fun provideViewModel(): woowacourse.shopping.presentation.product.detail.DetailViewModel {
-        val cartDao = CartItemDatabase.getInstance(this).cartItemDao()
-        val viewedDao = ViewedItemDatabase.getInstance(this).viewedItemDao()
-        return ViewModelProvider(
-            this,
-            factory(CartItemRepositoryImpl(cartDao), ViewedItemRepositoryImpl(viewedDao)),
-        )[woowacourse.shopping.presentation.product.detail.DetailViewModel::class.java]
-    }
-
     private fun initBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -59,15 +45,10 @@ class DetailActivity : AppCompatActivity() {
         viewModel.uiState.observe(this) { state ->
             val msgRes =
                 when (state) {
-                    woowacourse.shopping.presentation.product.detail.CartUiState.SUCCESS -> R.string.text_add_to_cart_success
-                    woowacourse.shopping.presentation.product.detail.CartUiState.FAIL -> R.string.text_unInserted_toast
+                    CartUiState.SUCCESS -> R.string.text_add_to_cart_success
+                    CartUiState.FAIL -> R.string.text_unInserted_toast
                 }
             showToast(msgRes)
-        }
-
-        viewModel.product.observe(this) {
-            binding.product = it
-            binding.executePendingBindings()
         }
 
         viewModel.lastViewed.observe(this) {
@@ -79,9 +60,9 @@ class DetailActivity : AppCompatActivity() {
         val handler =
             DetailEventHandlerImpl(viewModel) { product ->
                 startActivity(
-                    woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.newIntent(
+                    newIntent(
                         this,
-                        product
+                        product.id
                     )
                 )
                 finish()
@@ -91,10 +72,9 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun loadInitialData() {
-        productFromIntent()?.let { product ->
-            binding.product = product
-            viewModel.setProduct(product)
-            viewModel.loadLastViewedItem(product.id)
+        productFromIntent().let { id ->
+            viewModel.setProduct(id)
+            viewModel.loadLastViewedItem(id)
         }
     }
 
@@ -118,9 +98,7 @@ class DetailActivity : AppCompatActivity() {
         Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
     }
 
-    private fun productFromIntent(): ProductUiModel? =
-        IntentCompat.getParcelableExtra(intent,
-            woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.KEY_PRODUCT_DETAIL, ProductUiModel::class.java)
+    private fun productFromIntent(): Int = intent.getIntExtra(KEY_PRODUCT_DETAIL, 0)
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.detail_back_menu_item, menu)
@@ -142,10 +120,10 @@ class DetailActivity : AppCompatActivity() {
 
         fun newIntent(
             context: Context,
-            product: ProductUiModel,
+            id: Int,
         ): Intent =
-            Intent(context, woowacourse.shopping.presentation.product.detail.DetailActivity::class.java).apply {
-                putExtra(woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.KEY_PRODUCT_DETAIL, product)
+            Intent(context, DetailActivity::class.java).apply {
+                putExtra(KEY_PRODUCT_DETAIL, id)
             }
     }
 }
