@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 @Serializable
 data class ShoppingCartItemResponseDto(
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("product")
     val product: ProductResponseDto,
     @SerialName("quantity")
@@ -15,6 +15,7 @@ data class ShoppingCartItemResponseDto(
 ) {
     fun toDomain(): ShoppingCartProduct =
         ShoppingCartProduct(
+            id = id,
             product = product.toDomain(),
             quantity = quantity,
         )

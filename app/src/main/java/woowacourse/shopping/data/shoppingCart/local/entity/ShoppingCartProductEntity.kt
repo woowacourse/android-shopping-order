@@ -21,6 +21,7 @@ data class ShoppingCartProductEntity(
         ShoppingCartProduct(
             product = product.toDomain(),
             quantity = quantity,
+            id = id,
         )
 }
 

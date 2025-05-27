@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -76,7 +77,63 @@ class DefaultShoppingCartRepository(
             val requestDto = CartItemQuantityRequestDto(quantity = quantity)
             shoppingCartService
                 .updateCartItemQuantity(
-                    productId = product.id,
+                    shoppingCartId = product.id,
+                    cartItemQuantityRequestDto = requestDto,
+                ).enqueue(
+                    object : Callback<Unit> {
+                        override fun onResponse(
+                            call: Call<Unit>,
+                            response: Response<Unit>,
+                        ) {
+                            onResult(Result.success(Unit))
+                        }
+
+                        override fun onFailure(
+                            call: Call<Unit>,
+                            t: Throwable,
+                        ) {
+                            onResult(Result.failure(t))
+                        }
+                    },
+                )
+        }
+    }
+
+    override fun add(
+        shoppingCartProduct: ShoppingCartProduct,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        Log.d("moongchi", "add: $quantity")
+        if (quantity == 1) {
+            shoppingCartService
+                .postCartItem(
+                    CartItemRequestDto(
+                        productId = shoppingCartProduct.product.id,
+                        quantity = quantity,
+                    ),
+                ).enqueue(
+                    object : Callback<Unit> {
+                        override fun onResponse(
+                            call: Call<Unit>,
+                            response: Response<Unit>,
+                        ) {
+                            onResult(Result.success(Unit))
+                        }
+
+                        override fun onFailure(
+                            call: Call<Unit>,
+                            t: Throwable,
+                        ) {
+                            onResult(Result.failure(t))
+                        }
+                    },
+                )
+        } else {
+            val requestDto = CartItemQuantityRequestDto(quantity = quantity)
+            shoppingCartService
+                .updateCartItemQuantity(
+                    shoppingCartId = shoppingCartProduct.id,
                     cartItemQuantityRequestDto = requestDto,
                 ).enqueue(
                     object : Callback<Unit> {
@@ -106,7 +163,7 @@ class DefaultShoppingCartRepository(
         val requestDto = CartItemQuantityRequestDto(quantity = quantity)
         shoppingCartService
             .updateCartItemQuantity(
-                productId = product.id,
+                shoppingCartId = product.id,
                 cartItemQuantityRequestDto = requestDto,
             ).enqueue(
                 object : Callback<Unit> {
@@ -168,6 +225,7 @@ class DefaultShoppingCartRepository(
                     ShoppingCartProduct(
                         product = product,
                         quantity = quantity,
+                        id = 0L,
                     )
                 }
             }.onSuccess { shoppingCartProducts ->
