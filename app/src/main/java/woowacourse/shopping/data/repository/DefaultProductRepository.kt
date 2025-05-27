@@ -8,11 +8,8 @@ class DefaultProductRepository(private val dataSource: ProductsDataSource2) {
         page: Int,
         pageSize: Int,
         callback: (Result<ProductSinglePage>) -> Unit,
-    )  {
-        val fromIndex = page * pageSize
-        val toIndex = fromIndex + pageSize
-
-        dataSource.singlePage(fromIndex, toIndex) { result ->
+    ) {
+        dataSource.singlePage(page, pageSize) { result ->
             result.fold(
                 onSuccess = { response ->
                     if (response != null) {

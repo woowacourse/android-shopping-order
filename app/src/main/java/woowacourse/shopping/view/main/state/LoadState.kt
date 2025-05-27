@@ -6,6 +6,6 @@ sealed interface LoadState {
     object CannotLoad : LoadState
 
     companion object {
-        fun of(value: Boolean) = if (value) CanLoad else CannotLoad
+        fun of(value: Boolean) = if (value) CannotLoad else CanLoad
     }
 }

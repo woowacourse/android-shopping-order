@@ -17,7 +17,7 @@ data class ProductsResponse(
     val totalElements: Int,
     val totalPages: Int,
 ) {
-    fun toDomain(): ProductSinglePage  {
+    fun toDomain(): ProductSinglePage {
         val products = content.map { it.toDomain() }
         return ProductSinglePage(products, last)
     }
