@@ -5,6 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.catalog.CatalogViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +25,7 @@
             android:background="@color/gray_55"
             app:layout_constraintTop_toTopOf="parent"
             app:title="@string/toolbar_catalog_title"
-            app:titleTextColor="@color/white"/>
+            app:titleTextColor="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_products"
@@ -29,6 +34,66 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
             tools:listitem="@layout/item_product" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_product"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:isShow="@{vm.isLoading}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:columnCount="2"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/item_product_shimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_product_shimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_product_shimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_product_shimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_product_shimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_product_shimmer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1" />
+
+
+            </GridLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -33,6 +33,9 @@ class CatalogViewModel(
     private val _cartItemCount = MutableLiveData<Int>()
     val cartItemCount: LiveData<Int> = _cartItemCount
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private var page = 0
 
     init {
@@ -41,6 +44,8 @@ class CatalogViewModel(
 
     fun loadProducts() {
         val offset = page * PRODUCT_LOAD_LIMIT
+        _isLoading.value = true
+
         productRepository.loadProducts(offset, PRODUCT_LOAD_LIMIT) { result ->
             result
                 .onSuccess { handleProductPageLoad(it) }
@@ -103,14 +108,15 @@ class CatalogViewModel(
     ) {
         cartRepository.getAll { result ->
             result
+                .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
                 .onSuccess { cartItems ->
                     val updatedItems = applyCartQuantities(cartItems, currentItems)
                     val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
                     _products.postValue(finalCatalog)
                     updateCartItemCount()
-                }.onFailure {
-                    emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE)
                 }
+
+            _isLoading.postValue(false)
         }
     }
 

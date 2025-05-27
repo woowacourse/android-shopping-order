@@ -114,6 +114,9 @@ class CatalogFragment :
     }
 
     private fun setupObservers() {
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
         viewModel.products.observe(viewLifecycleOwner) {
             catalogAdapter.submitList(it)
         }
