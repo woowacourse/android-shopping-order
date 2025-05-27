@@ -5,8 +5,6 @@ import woowacourse.shopping.data.dao.CartProductDao
 class CartProductLocalDataSource(
     private val dao: CartProductDao,
 ) {
-    fun getTotalCount(): Int = dao.getTotalCount()
-
     fun getQuantityByProductId(productId: Int): Int? = dao.getQuantityByProductId(productId)
 
     fun updateQuantity(

@@ -11,12 +11,6 @@ class CartProductRepositoryImpl(
     private val remoteDataSource: CartProductRemoteDataSource,
     private val localDataSource: CartProductLocalDataSource,
 ) : CartProductRepository {
-    private var totalCount: Int = 0
-
-    init {
-        thread { totalCount = localDataSource.getTotalCount() }.join()
-    }
-
     override fun getPagedProducts(
         page: Int,
         size: Int,
@@ -54,7 +48,6 @@ class CartProductRepositoryImpl(
 
                 currentQuantity == 0 -> {
                     remoteDataSource.insert(productId, newQuantity, onSuccess)
-                    totalCount++
                 }
 
                 else -> {
@@ -71,7 +64,6 @@ class CartProductRepositoryImpl(
     ) {
         thread {
             remoteDataSource.deleteByProductId(productId, onSuccess)
-            totalCount--
         }
     }
 }
