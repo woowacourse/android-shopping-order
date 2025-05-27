@@ -37,7 +37,7 @@ class ProductsViewModel(
     }
 
     fun updateProducts() {
-        val offset = (page - 1) * LOAD_PRODUCTS_SIZE
+        val offset = page - 1
         val limit = LOAD_PRODUCTS_SIZE + 1
         val currentProducts: List<ProductsItem> = _products.value ?: emptyList()
 
@@ -290,6 +290,11 @@ class ProductsViewModel(
                     updateShoppingCartQuantity()
                 }
         }
+    }
+
+    fun updateMoreProducts() {
+        page++
+        updateProducts()
     }
 
     companion object {

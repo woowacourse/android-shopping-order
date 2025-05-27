@@ -171,7 +171,7 @@ class ProductsActivity :
     }
 
     override fun onLoadClick() {
-        viewModel.updateProducts()
+        viewModel.updateMoreProducts()
     }
 
     override fun onRecentProductClick(product: Product) {

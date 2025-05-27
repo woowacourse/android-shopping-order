@@ -9,7 +9,7 @@ data class ProductResponseDto(
     @SerialName("category")
     val category: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("imageUrl")
     val imageUrl: String,
     @SerialName("name")
