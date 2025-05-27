@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
@@ -65,6 +66,9 @@ dependencies {
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.json)
+    testImplementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.gson)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.mockito.core)
