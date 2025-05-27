@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import woowacourse.shopping.data.dao.CartDao
 import woowacourse.shopping.data.dao.HistoryDao
-import woowacourse.shopping.data.dao.ProductDao
 import woowacourse.shopping.data.model.entity.CartProductEntity
 import woowacourse.shopping.data.model.entity.HistoryProductEntity
 import woowacourse.shopping.data.model.entity.ProductEntity
@@ -16,8 +15,6 @@ import woowacourse.shopping.data.model.entity.ProductEntity
     version = 10001,
 )
 abstract class ShoppingDatabase : RoomDatabase() {
-    abstract fun productDao(): ProductDao
-
     abstract fun cartDao(): CartDao
 
     abstract fun historyDao(): HistoryDao

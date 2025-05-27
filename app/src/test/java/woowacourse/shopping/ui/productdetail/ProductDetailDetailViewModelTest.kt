@@ -18,13 +18,13 @@ import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 import woowacourse.shopping.model.DUMMY_HISTORY_PRODUCT_1
-import woowacourse.shopping.model.DUMMY_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_PRODUCT_Detail_1
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 import woowacourse.shopping.util.setUpTestLiveData
 
 @ExtendWith(InstantTaskExecutorExtension::class)
-class ProductDetailViewModelTest {
+class ProductDetailDetailViewModelTest {
     private lateinit var getProductDetailUseCase: GetProductDetailUseCase
     private lateinit var getRecentSearchHistoryUseCase: GetRecentSearchHistoryUseCase
     private lateinit var addSearchHistoryUseCase: AddSearchHistoryUseCase
@@ -53,13 +53,13 @@ class ProductDetailViewModelTest {
         val expected = DUMMY_CATALOG_PRODUCT_1
 
         every {
-            getProductDetailUseCase.invoke(DUMMY_PRODUCT_1.id, any())
+            getProductDetailUseCase.invoke(DUMMY_PRODUCT_Detail_1.id, any())
         } answers {
             secondArg<(CatalogProduct?) -> Unit>().invoke(expected)
         }
 
         // when
-        viewModel.loadProductDetail(DUMMY_PRODUCT_1.id)
+        viewModel.loadProductDetail(DUMMY_PRODUCT_Detail_1.id)
 
         // then
         val actual = viewModel.catalogProduct.getOrAwaitValue()
@@ -86,7 +86,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `최근 탐색한 상품 목록에 현재 상품을 추가한다`() {
         // given
-        val productId = DUMMY_PRODUCT_1.id
+        val productId = DUMMY_PRODUCT_Detail_1.id
 
         // when
         viewModel.addHistoryProduct(productId)
@@ -133,7 +133,7 @@ class ProductDetailViewModelTest {
         viewModel.updateCartProduct()
 
         // then
-        verify { updateCartProductUseCase.invoke(CartProduct(DUMMY_PRODUCT_1, 5)) }
+        verify { updateCartProductUseCase.invoke(CartProduct(DUMMY_PRODUCT_Detail_1, 5)) }
         assertThat(viewModel.onCartProductAddSuccess.getValue()).isTrue()
     }
 

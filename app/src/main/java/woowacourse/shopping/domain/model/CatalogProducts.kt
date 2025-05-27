@@ -22,7 +22,7 @@ data class CatalogProducts(
     ): CatalogProducts {
         val updatedProducts =
             products.map { product ->
-                if (product.product.id == productId) {
+                if (product.productDetail.id == productId) {
                     product.copy(quantity = quantity)
                 } else {
                     product
@@ -34,7 +34,7 @@ data class CatalogProducts(
     fun updateCatalogProduct(newProduct: CatalogProduct): CatalogProducts {
         val updatedProducts =
             products.map { product ->
-                if (product.product.id == newProduct.product.id) {
+                if (product.productDetail.id == newProduct.productDetail.id) {
                     newProduct
                 } else {
                     product
@@ -46,12 +46,12 @@ data class CatalogProducts(
     fun updateCatalogProducts(newProducts: List<CatalogProduct>): CatalogProducts {
         val updatedProducts =
             products.map { product ->
-                newProducts.find { it.product.id == product.product.id } ?: product
+                newProducts.find { it.productDetail.id == product.productDetail.id } ?: product
             }
         return copy(products = updatedProducts)
     }
 
     companion object {
-        val EMPTY_CATALOG_PRODUCTS = CatalogProducts(emptyList(), 0, false)
+        val EMPTY_CATALOG_PRODUCTS = CatalogProducts(emptyList(), -1, false)
     }
 }

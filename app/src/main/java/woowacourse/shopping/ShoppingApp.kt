@@ -2,7 +2,6 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.di.NetworkModule
 import woowacourse.shopping.data.di.NetworkModule.productApi
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
@@ -27,7 +26,7 @@ class ShoppingApp : Application() {
 
     private val productRepository: woowacourse.shopping.domain.repository.ProductRepository by lazy {
         woowacourse.shopping.data.repository
-            .ProductRepository(database.productDao(), productApi)
+            .ProductRepository(productApi)
     }
 
     private val historyRepository: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
@@ -81,10 +80,5 @@ class ShoppingApp : Application() {
 
     val getCatalogProductsByIdsUseCase by lazy {
         GetCatalogProductsByIdsUseCase(productRepository)
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        NetworkModule.init(database.productDao())
     }
 }

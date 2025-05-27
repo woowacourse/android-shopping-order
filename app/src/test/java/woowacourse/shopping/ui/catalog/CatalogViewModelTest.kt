@@ -22,7 +22,7 @@ import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_2
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_2
 import woowacourse.shopping.model.DUMMY_HISTORY_PRODUCT_1
-import woowacourse.shopping.model.DUMMY_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_PRODUCT_Detail_1
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 import woowacourse.shopping.util.setUpTestLiveData
@@ -108,7 +108,7 @@ class CatalogViewModelTest {
     @Test
     fun `장바구니 상품 갯수를 증가시킨다`() {
         // given
-        val productId = DUMMY_CATALOG_PRODUCT_1.product.id
+        val productId = DUMMY_CATALOG_PRODUCT_1.productDetail.id
         setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
 
         every {
@@ -122,13 +122,13 @@ class CatalogViewModelTest {
 
         // then
         val updated = viewModel.catalogProducts.getOrAwaitValue()
-        assertThat(updated.products.first { it.product.id == productId }.quantity).isEqualTo(10)
+        assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(10)
     }
 
     @Test
     fun `장바구니 상품 갯수를 감소시킨다`() {
         // given
-        val productId = DUMMY_CATALOG_PRODUCT_1.product.id
+        val productId = DUMMY_CATALOG_PRODUCT_1.productDetail.id
         setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
 
         every {
@@ -142,13 +142,13 @@ class CatalogViewModelTest {
 
         // then
         val updated = viewModel.catalogProducts.getOrAwaitValue()
-        assertThat(updated.products.first { it.product.id == productId }.quantity).isEqualTo(1)
+        assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(1)
     }
 
     @Test
     fun `특정 상품의 정보를 불러와 상품 목록에 반영한다`() {
         // given
-        val productId = DUMMY_CATALOG_PRODUCT_1.product.id
+        val productId = DUMMY_CATALOG_PRODUCT_1.productDetail.id
         setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
 
         val updatedProduct = DUMMY_CATALOG_PRODUCT_1.copy(quantity = 100)
@@ -164,7 +164,7 @@ class CatalogViewModelTest {
 
         // then
         val result = viewModel.catalogProducts.getOrAwaitValue()
-        assertThat(result.products.first { it.product.id == productId }.quantity).isEqualTo(100)
+        assertThat(result.products.first { it.productDetail.id == productId }.quantity).isEqualTo(100)
     }
 
     @Test
@@ -181,7 +181,7 @@ class CatalogViewModelTest {
         }
 
         // when
-        viewModel.loadCartProducts(listOf(DUMMY_PRODUCT_1.id))
+        viewModel.loadCartProducts(listOf(DUMMY_PRODUCT_Detail_1.id))
 
         // then
         val result = viewModel.catalogProducts.getOrAwaitValue()

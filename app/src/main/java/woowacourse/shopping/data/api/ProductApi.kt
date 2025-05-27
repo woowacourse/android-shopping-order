@@ -2,7 +2,9 @@ package woowacourse.shopping.data.api
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.model.response.ProductDetailResponse
 import woowacourse.shopping.data.model.response.ProductsResponse
 
 interface ProductApi {
@@ -13,4 +15,9 @@ interface ProductApi {
         @Query("size") size: Int,
         @Query("sort") sort: List<String>? = null,
     ): Call<ProductsResponse>
+
+    @GET("/products/{id}")
+    fun getProductDetail(
+        @Path("id") productId: Int,
+    ): Call<ProductDetailResponse>
 }

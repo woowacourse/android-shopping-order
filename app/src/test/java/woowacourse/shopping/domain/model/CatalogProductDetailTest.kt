@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 
-class CatalogProductTest {
+class CatalogProductDetailTest {
     @Test
     fun `수량을 증가시키면 해당 수량만큼 증가된 객체를 반환한다`() {
         // given
@@ -15,7 +15,7 @@ class CatalogProductTest {
 
         // then
         assertThat(increased.quantity).isEqualTo(6)
-        assertThat(increased.product).isEqualTo(original.product)
+        assertThat(increased.productDetail).isEqualTo(original.productDetail)
     }
 
     @Test
@@ -28,7 +28,7 @@ class CatalogProductTest {
 
         // then
         assertThat(decreased.quantity).isEqualTo(4)
-        assertThat(decreased.product).isEqualTo(original.product)
+        assertThat(decreased.productDetail).isEqualTo(original.productDetail)
     }
 
     @Test
@@ -52,6 +52,6 @@ class CatalogProductTest {
         val total = catalogProduct.totalPrice
 
         // then
-        assertThat(total).isEqualTo(catalogProduct.product.price * catalogProduct.quantity)
+        assertThat(total).isEqualTo(catalogProduct.productDetail.price * catalogProduct.quantity)
     }
 }

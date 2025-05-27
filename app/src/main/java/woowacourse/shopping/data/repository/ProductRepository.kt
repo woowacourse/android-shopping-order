@@ -3,15 +3,26 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.api.ProductApi
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.CatalogProduct
+import woowacourse.shopping.domain.model.CatalogProduct.Companion.EMPTY_CATALOG_PRODUCT
 import woowacourse.shopping.domain.model.CatalogProducts
+import woowacourse.shopping.domain.model.ProductDetail
+import woowacourse.shopping.domain.model.ProductDetail.Companion.EMPTY_PRODUCT_DETAIL
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepository(
     private val api: ProductApi,
 ) : ProductRepository {
-    override fun fetchCatalogProduct(productId: Int): CatalogProduct? = dao.getProduct(productId)?.toDomain()
+    override fun fetchCatalogProduct(productId: Int): CatalogProduct {
+        val productDetail: ProductDetail =
+            api
+                .getProductDetail(productId)
+                .execute()
+                .body()
+                ?.toDomain() ?: EMPTY_PRODUCT_DETAIL
+        return CatalogProduct(productDetail, 0)
+    }
 
-    override fun fetchCatalogProducts(productIds: List<Int>): List<CatalogProduct> = dao.getProducts(productIds).map { it.toDomain() }
+    override fun fetchCatalogProducts(productIds: List<Int>): List<CatalogProduct> = listOf(EMPTY_CATALOG_PRODUCT)
 
     override fun fetchProducts(
         page: Int,

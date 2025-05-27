@@ -9,7 +9,7 @@ class UpdateCartProductUseCase(
 ) {
     operator fun invoke(cartProduct: CartProduct) {
         thread {
-            repository.saveCartProduct(cartProduct.product.id, cartProduct.quantity)
+            repository.saveCartProduct(cartProduct.productDetail.id, cartProduct.quantity)
         }
     }
 }

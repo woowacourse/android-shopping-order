@@ -60,7 +60,7 @@ class ProductDetailViewModel(
     fun updateCartProduct() {
         val catalogProduct: CatalogProduct = catalogProduct.value ?: return
         runCatching {
-            updateCartProductUseCase(CartProduct(catalogProduct.product, catalogProduct.quantity))
+            updateCartProductUseCase(CartProduct(catalogProduct.productDetail, catalogProduct.quantity))
         }.onSuccess {
             _onCartProductAddSuccess.postValue(true)
         }

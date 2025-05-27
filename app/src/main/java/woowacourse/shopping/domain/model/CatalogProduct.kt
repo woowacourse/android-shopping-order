@@ -1,12 +1,12 @@
 package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
+import woowacourse.shopping.domain.model.ProductDetail.Companion.EMPTY_PRODUCT_DETAIL
 
 data class CatalogProduct(
-    val product: Product,
+    val productDetail: ProductDetail,
     val quantity: Int,
 ) {
-    val totalPrice: Int get() = product.price * quantity
+    val totalPrice: Int get() = productDetail.price * quantity
 
     fun increaseQuantity(delta: Int = DEFAULT_QUANTITY_DELTA): CatalogProduct = copy(quantity = quantity + delta)
 
@@ -18,7 +18,7 @@ data class CatalogProduct(
         }
 
     companion object {
-        val EMPTY_CATALOG_PRODUCT = CatalogProduct(EMPTY_PRODUCT, 0)
+        val EMPTY_CATALOG_PRODUCT = CatalogProduct(EMPTY_PRODUCT_DETAIL, 0)
         private const val DEFAULT_QUANTITY_DELTA = 1
     }
 }

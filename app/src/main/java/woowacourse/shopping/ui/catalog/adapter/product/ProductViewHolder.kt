@@ -21,11 +21,11 @@ class ProductViewHolder(
         binding.productCartProductCount.setOnClickHandler(
             object : CartCountView.OnClickHandler {
                 override fun onIncreaseClick() {
-                    onClickHandler.onIncreaseClick(item.value.product.id)
+                    onClickHandler.onIncreaseClick(item.value.productDetail.id)
                 }
 
                 override fun onDecreaseClick() {
-                    onClickHandler.onDecreaseClick(item.value.product.id)
+                    onClickHandler.onDecreaseClick(item.value.productDetail.id)
                 }
             },
         )

@@ -29,13 +29,13 @@ class CatalogProductsTest {
         val newQuantity = 100
 
         // when
-        val updated = original.updateCatalogProductQuantity(DUMMY_CATALOG_PRODUCT_2.product.id, newQuantity)
+        val updated = original.updateCatalogProductQuantity(DUMMY_CATALOG_PRODUCT_2.productDetail.id, newQuantity)
 
         // then
-        val modified = updated.products.first { it.product.id == DUMMY_CATALOG_PRODUCT_2.product.id }
+        val modified = updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }
         assertThat(modified.quantity).isEqualTo(newQuantity)
 
-        val unmodified = updated.products.first { it.product.id == DUMMY_CATALOG_PRODUCT_1.product.id }
+        val unmodified = updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
         assertThat(unmodified.quantity).isEqualTo(DUMMY_CATALOG_PRODUCT_1.quantity)
     }
 
@@ -49,10 +49,10 @@ class CatalogProductsTest {
         val result = original.updateCatalogProduct(updatedProduct)
 
         // then
-        val modified = result.products.first { it.product.id == updatedProduct.product.id }
+        val modified = result.products.first { it.productDetail.id == updatedProduct.productDetail.id }
         assertThat(modified.quantity).isEqualTo(100)
 
-        val unmodified = result.products.first { it.product.id == DUMMY_CATALOG_PRODUCT_1.product.id }
+        val unmodified = result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
         assertThat(unmodified.quantity).isEqualTo(DUMMY_CATALOG_PRODUCT_1.quantity)
     }
 
@@ -71,10 +71,10 @@ class CatalogProductsTest {
         val result = original.updateCatalogProducts(updatedList)
 
         // then
-        assertThat(result.products.first { it.product.id == DUMMY_CATALOG_PRODUCT_1.product.id }.quantity).isEqualTo(1)
-        assertThat(result.products.first { it.product.id == DUMMY_CATALOG_PRODUCT_2.product.id }.quantity)
+        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }.quantity).isEqualTo(1)
+        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }.quantity)
             .isEqualTo(DUMMY_CATALOG_PRODUCT_2.quantity)
-        assertThat(result.products.first { it.product.id == DUMMY_CATALOG_PRODUCT_3.product.id }.quantity).isEqualTo(2)
+        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_3.productDetail.id }.quantity).isEqualTo(2)
     }
 
     @Test

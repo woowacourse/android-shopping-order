@@ -18,7 +18,7 @@ import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
 import woowacourse.shopping.model.DUMMY_CART_PRODUCTS_1
-import woowacourse.shopping.model.DUMMY_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_PRODUCT_Detail_1
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 
@@ -62,7 +62,7 @@ class CartViewModelTest {
     @Test
     fun `장바구니 상품 수량을 증가시키고 수정된 상품 목록에 추가한다`() {
         // given
-        val productId = DUMMY_PRODUCT_1.id
+        val productId = DUMMY_PRODUCT_Detail_1.id
         val newQuantity = 10
 
         every {
@@ -79,7 +79,7 @@ class CartViewModelTest {
             viewModel.cartProducts
                 .getOrAwaitValue()
                 .products
-                .find { it.product.id == productId }
+                .find { it.productDetail.id == productId }
         assertThat(updatedProduct?.quantity).isEqualTo(newQuantity)
         assertThat(viewModel.editedProductIds.getOrAwaitValue()).contains(productId)
     }
@@ -87,7 +87,7 @@ class CartViewModelTest {
     @Test
     fun `장바구니 상품 수량을 감소시키고 장바구니 상품 목록을 불러온 뒤 수정된 상품 목록에 추가한다`() {
         // given
-        val productId = DUMMY_PRODUCT_1.id
+        val productId = DUMMY_PRODUCT_Detail_1.id
 
         every {
             decreaseCartProductQuantityUseCase.invoke(eq(productId), any(), any())
@@ -106,7 +106,7 @@ class CartViewModelTest {
     @Test
     fun `장바구니 상품을 제거하고 상품 목록을 불러온다`() {
         // given
-        val productId = DUMMY_PRODUCT_1.id
+        val productId = DUMMY_PRODUCT_Detail_1.id
 
         every { removeCartProductUseCase.invoke(productId) } just Runs
         every { getCartProductsUseCase.invoke(any(), any(), any()) } answers {

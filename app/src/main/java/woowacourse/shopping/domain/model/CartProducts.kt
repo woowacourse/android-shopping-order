@@ -10,7 +10,7 @@ data class CartProducts(
     ): CartProducts {
         val updatedProducts =
             products.map { product ->
-                if (product.product.id == productId) {
+                if (product.productDetail.id == productId) {
                     product.copy(quantity = quantity)
                 } else {
                     product

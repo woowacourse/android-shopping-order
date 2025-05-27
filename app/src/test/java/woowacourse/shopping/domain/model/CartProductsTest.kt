@@ -10,21 +10,21 @@ class CartProductsTest {
     fun `상품 수량을 수정하면 해당 상품을 반영한다`() {
         // given
         val original = DUMMY_CART_PRODUCTS_1
-        val targetId = DUMMY_CART_PRODUCT_2.product.id
+        val targetId = DUMMY_CART_PRODUCT_2.productDetail.id
         val newQuantity = 100
 
         // when
         val updated = original.updateCartProductQuantity(targetId, newQuantity)
 
         // then
-        val modified = updated.products.first { it.product.id == targetId }
+        val modified = updated.products.first { it.productDetail.id == targetId }
         assertThat(modified.quantity).isEqualTo(newQuantity)
 
-        val originalTarget = original.products.first { it.product.id == targetId }
+        val originalTarget = original.products.first { it.productDetail.id == targetId }
         assertThat(originalTarget.quantity).isNotEqualTo(newQuantity)
 
-        val otherOriginal = original.products.filter { it.product.id != targetId }
-        val otherUpdated = updated.products.filter { it.product.id != targetId }
+        val otherOriginal = original.products.filter { it.productDetail.id != targetId }
+        val otherUpdated = updated.products.filter { it.productDetail.id != targetId }
         assertThat(otherUpdated).containsExactlyElementsIn(otherOriginal)
     }
 }

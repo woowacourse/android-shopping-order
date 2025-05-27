@@ -5,11 +5,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.api.ProductApi
-import woowacourse.shopping.data.dao.ProductDao
 
 object NetworkModule {
-    private lateinit var productDao: ProductDao
-
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
@@ -27,9 +24,5 @@ object NetworkModule {
 
     val productApi: ProductApi by lazy {
         retrofit.create(ProductApi::class.java)
-    }
-
-    fun init(productDao: ProductDao) {
-        this.productDao = productDao
     }
 }

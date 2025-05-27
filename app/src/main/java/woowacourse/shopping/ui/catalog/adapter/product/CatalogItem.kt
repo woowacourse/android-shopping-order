@@ -13,7 +13,7 @@ sealed class CatalogItem(
         val value: CatalogProduct,
     ) : CatalogItem(PRODUCT) {
         override val id: Int
-            get() = value.product.id
+            get() = value.productDetail.id
     }
 
     data object LoadMoreItem : CatalogItem(LOAD_MORE) {
