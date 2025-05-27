@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.product.catalog.model
+package woowacourse.shopping.data.model
 
 data class Sort(
     val sorted: Boolean,

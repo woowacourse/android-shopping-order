@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.product.catalog.model
+package woowacourse.shopping.domain.model
 
 data class Product(
     val id: Int,
