@@ -130,7 +130,7 @@ class ProductActivity :
                 is ResultState.Success -> {
                     binding.root.postDelayed({
                         showSampleData(false)
-                    }, 2_000)
+                    }, 1_000L)
 
                     val showLoadMore = viewModel.showLoadMore.value == true
                     productAdapter.setData(result.data, showLoadMore)

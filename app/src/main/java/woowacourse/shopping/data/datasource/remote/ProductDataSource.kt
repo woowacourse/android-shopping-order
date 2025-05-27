@@ -6,7 +6,8 @@ interface ProductDataSource {
     fun fetchPagingProducts(
         page: Int,
         pageSize: Int,
-    ): List<Product>
+        onResult: (List<Product>) -> Unit,
+    )
 
     fun fetchProductById(id: Long): Product
 }

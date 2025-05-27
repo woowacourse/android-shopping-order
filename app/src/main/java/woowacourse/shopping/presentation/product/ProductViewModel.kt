@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.data.DummyProducts
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -76,7 +75,7 @@ class ProductViewModel(
                     val currentList = (_products.value as? ResultState.Success)?.data.orEmpty()
                     val updatedList = currentList + newItems
                     _products.postValue(ResultState.Success(updatedList))
-                    _showLoadMore.postValue(updatedList.size < DummyProducts.values.size)
+                    _showLoadMore.postValue(updatedList.size < 100)
                 },
                 onFailure = {
                     _products.postValue(ResultState.Failure())

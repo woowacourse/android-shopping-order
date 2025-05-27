@@ -16,12 +16,10 @@ class ProductRepositoryImpl(
         pageSize: Int,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        runThread(
-            block = {
-                productDataSource.fetchPagingProducts(page, pageSize).toCartItems()
-            },
-            onResult = onResult,
-        )
+        productDataSource.fetchPagingProducts(page, pageSize) { products ->
+            val cartItems = products.toCartItems()
+            onResult(Result.success(cartItems))
+        }
     }
 
     override fun fetchProductById(
@@ -36,7 +34,7 @@ class ProductRepositoryImpl(
 
     private fun List<Product>.toCartItems(): List<CartItem> =
         this.map { product ->
-            val quantity = cartDataSource.getQuantityById(product.productId)
-            CartItem(product, quantity)
+//            val quantity = cartDataSource.getQuantityById(product.productId)
+            CartItem(product, 0)
         }
 }
