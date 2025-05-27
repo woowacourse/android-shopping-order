@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.history.repository
+package woowacourse.shopping.data.local.history.repository
 
-import woowacourse.shopping.data.history.HistoryDao
-import woowacourse.shopping.data.toDomain
-import woowacourse.shopping.data.toHistoryEntity
+import woowacourse.shopping.data.local.history.HistoryDao
+import woowacourse.shopping.data.local.toDomain
+import woowacourse.shopping.data.local.toHistoryEntity
 import woowacourse.shopping.domain.model.Cart
 import kotlin.concurrent.thread
 

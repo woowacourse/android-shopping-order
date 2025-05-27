@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.history
+package woowacourse.shopping.data.local.history
 
 import androidx.room.Dao
 import androidx.room.Insert

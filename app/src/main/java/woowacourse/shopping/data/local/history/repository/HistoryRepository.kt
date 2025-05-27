@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.history.repository
+package woowacourse.shopping.data.local.history.repository
 
 import woowacourse.shopping.domain.model.Cart
 

@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.cart.repository.CartRepository
-import woowacourse.shopping.data.history.repository.HistoryRepository
+import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel

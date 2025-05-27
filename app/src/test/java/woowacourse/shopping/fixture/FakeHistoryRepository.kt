@@ -1,6 +1,6 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.history.repository.HistoryRepository
+import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.domain.model.Cart
 
 class FakeHistoryRepository : HistoryRepository {

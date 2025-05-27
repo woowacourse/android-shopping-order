@@ -1,7 +1,7 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.local
 
-import woowacourse.shopping.data.cart.CartEntity
-import woowacourse.shopping.data.history.HistoryEntity
+import woowacourse.shopping.data.local.cart.CartEntity
+import woowacourse.shopping.data.local.history.HistoryEntity
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 

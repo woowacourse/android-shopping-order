@@ -7,8 +7,8 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import woowacourse.shopping.data.cart.server.CartService
-import woowacourse.shopping.data.cart.server.DummyCarts
+import woowacourse.shopping.data.local.cart.server.CartService
+import woowacourse.shopping.data.local.cart.server.DummyCarts
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
 

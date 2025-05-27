@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import woowacourse.shopping.data.cart.repository.CartRepository
-import woowacourse.shopping.data.history.repository.HistoryRepository
+import woowacourse.shopping.data.local.cart.repository.CartRepository
+import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.feature.goods.GoodsViewModel

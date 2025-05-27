@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.cart.server
+package woowacourse.shopping.data.local.cart.server
 
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
