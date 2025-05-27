@@ -6,13 +6,15 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsDto
+import retrofit2.http.Query
+import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsResponseDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
+import woowacourse.shopping.data.shoppingCart.remote.dto.ShoppingCartItemsResponseDto
 
 interface ShoppingCartService {
     @GET("cart-items/counts")
-    fun getCartCounts(): Call<CartCountsDto>
+    fun getCartCounts(): Call<CartCountsResponseDto>
 
     @POST("cart-items")
     fun postCartItem(
@@ -24,4 +26,10 @@ interface ShoppingCartService {
         @Path("id") productId: Long,
         @Body cartItemQuantityRequestDto: CartItemQuantityRequestDto,
     ): Call<Unit>
+
+    @GET("cart-items")
+    fun getCartItems(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Call<ShoppingCartItemsResponseDto>
 }

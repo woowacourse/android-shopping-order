@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 interface ShoppingCartRepository {
     fun load(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
         onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
     )
 

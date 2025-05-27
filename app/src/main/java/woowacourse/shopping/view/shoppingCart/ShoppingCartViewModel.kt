@@ -30,9 +30,9 @@ class ShoppingCartViewModel(
     private var hasNextPage: Boolean = false
 
     fun updateShoppingCart() {
-        val offset = (page - 1) * COUNT_PER_PAGE
-        val limit = COUNT_PER_PAGE + 1
-        shoppingCartRepository.load(offset, limit) { result ->
+        val size = COUNT_PER_PAGE + 1
+        val page = this.page - 1
+        shoppingCartRepository.load(page, size) { result ->
             result
                 .onSuccess { shoppingCartProducts: List<ShoppingCartProduct> ->
                     if (isEmptyPage(shoppingCartProducts)) return@load

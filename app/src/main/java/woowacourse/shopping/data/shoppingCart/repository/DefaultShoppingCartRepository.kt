@@ -4,10 +4,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.shoppingCart.local.dao.ShoppingCartDao
-import woowacourse.shopping.data.shoppingCart.local.entity.ShoppingCartProductEntity
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsResponseDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
+import woowacourse.shopping.data.shoppingCart.remote.dto.ShoppingCartItemsResponseDto
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
@@ -18,21 +18,29 @@ class DefaultShoppingCartRepository(
     private val shoppingCartService: ShoppingCartService,
 ) : ShoppingCartRepository {
     override fun load(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
         onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
     ) {
-        thread {
-            runCatching {
-                shoppingCartDao
-                    .getShoppingCartProducts(offset, offset + limit)
-                    .map(ShoppingCartProductEntity::toDomain)
-            }.onSuccess { productList ->
-                onResult(Result.success(productList))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
+        shoppingCartService
+            .getCartItems(page, size)
+            .enqueue(
+                object : Callback<ShoppingCartItemsResponseDto> {
+                    override fun onResponse(
+                        call: Call<ShoppingCartItemsResponseDto>,
+                        response: Response<ShoppingCartItemsResponseDto>,
+                    ) {
+                        onResult(Result.success(response.body()?.toDomain() ?: emptyList()))
+                    }
+
+                    override fun onFailure(
+                        call: Call<ShoppingCartItemsResponseDto>,
+                        t: Throwable,
+                    ) {
+                        onResult(Result.failure(t))
+                    }
+                },
+            )
     }
 
     override fun add(
