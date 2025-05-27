@@ -29,6 +29,13 @@ class DefaultProductsRepository(
         }.runAsync(onLoad)
     }
 
+    override fun loadProductById(
+        id: Long,
+        onLoad: (Result<Product?>) -> Unit,
+    ) {
+        { productsDataSource.getProductById(id)?.toDomain() }.runAsync(onLoad)
+    }
+
     override fun loadLatestViewedProduct(onLoad: (Result<Product?>) -> Unit) {
         {
             val latestViewedProductId: Long? =
@@ -39,7 +46,7 @@ class DefaultProductsRepository(
             if (latestViewedProductId == null) {
                 null
             } else {
-                productsDataSource.getById(latestViewedProductId)?.toDomain()
+                productsDataSource.getProductById(latestViewedProductId)?.toDomain()
             }
         }.runAsync(onLoad)
     }
@@ -49,7 +56,7 @@ class DefaultProductsRepository(
             recentViewedProductsDataSource
                 .load()
                 .sortedByDescending { it.viewedAt }
-                .mapNotNull { productsDataSource.getById(it.productId)?.toDomain() }
+                .mapNotNull { productsDataSource.getProductById(it.productId)?.toDomain() }
         }.runAsync(onLoad)
     }
 

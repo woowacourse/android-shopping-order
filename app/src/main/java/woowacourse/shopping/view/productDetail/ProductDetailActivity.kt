@@ -2,7 +2,6 @@ package woowacourse.shopping.view.productDetail
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -11,7 +10,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.showToast
 
 class ProductDetailActivity :
@@ -32,26 +30,14 @@ class ProductDetailActivity :
             insets
         }
 
-        val product: Product =
-            intent.getProductExtra() ?: run {
-                showToast(R.string.product_not_provided_error_message)
-                return finish()
-            }
-        initViewModel(product)
+        initViewModel(intent.getLongExtra(EXTRA_PRODUCT_ID, NO_SUCH_PRODUCT))
         bindViewModel()
         handleEvents()
     }
 
-    private fun initViewModel(cartItem: Product) {
-        viewModel.updateProduct(cartItem)
+    private fun initViewModel(id: Long) {
+        viewModel.updateProduct(id)
     }
-
-    private fun Intent.getProductExtra(): Product? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getSerializableExtra(EXTRA_PRODUCT, Product::class.java)
-        } else {
-            getSerializableExtra(EXTRA_PRODUCT) as? Product
-        }
 
     private fun bindViewModel() {
         binding.viewModel = viewModel
@@ -70,6 +56,9 @@ class ProductDetailActivity :
 
                 ProductDetailEvent.ADD_SHOPPING_CART_FAILURE ->
                     showToast(R.string.product_detail_add_shopping_cart_error_message)
+
+                ProductDetailEvent.LOAD_PRODUCT_FAILURE ->
+                    showToast(R.string.product_detail_load_product_error_message)
             }
         }
     }
@@ -93,7 +82,7 @@ class ProductDetailActivity :
 
     override fun onSelectLatestViewedProduct() {
         val intent =
-            newIntent(this, viewModel.latestViewedProduct.value ?: return).apply {
+            newIntent(this, viewModel.latestViewedProduct.value?.id ?: return).apply {
                 flags = Intent.FLAG_ACTIVITY_FORWARD_RESULT
             }
         startActivity(intent)
@@ -101,15 +90,16 @@ class ProductDetailActivity :
     }
 
     companion object {
-        private const val EXTRA_PRODUCT = "woowacourse.shopping.EXTRA_PRODUCT"
+        private const val EXTRA_PRODUCT_ID = "woowacourse.shopping.EXTRA_PRODUCT_ID"
+        private const val NO_SUCH_PRODUCT = -1L
 
         fun newIntent(
             context: Context,
-            product: Product,
+            id: Long,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).putExtra(
-                EXTRA_PRODUCT,
-                product,
+                EXTRA_PRODUCT_ID,
+                id,
             )
     }
 }

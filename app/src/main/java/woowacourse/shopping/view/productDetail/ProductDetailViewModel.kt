@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import woowacourse.shopping.data.product.ProductImageUrls.imageUrl
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -36,18 +35,14 @@ class ProductDetailViewModel(
         loadLatestViewedProduct()
     }
 
-    fun updateProduct(product: Product) {
-        _product.value = product
-        productsRepository.recordViewedProduct(product)
-        updateQuantity()
-    }
-
-    fun updateQuantity() {
-        val product = product.value ?: return
-        shoppingCartRepository.quantityOf(product) { result: Result<Int> ->
-            if (result.getOrNull() != 0) {
-                _quantity.postValue(result.getOrElse { 1 })
-            }
+    fun updateProduct(id: Long) {
+        productsRepository.loadProductById(id) { result: Result<Product?> ->
+            result
+                .onSuccess { product: Product? ->
+                    _product.postValue(product)
+                }.onFailure {
+                    _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
+                }
         }
     }
 

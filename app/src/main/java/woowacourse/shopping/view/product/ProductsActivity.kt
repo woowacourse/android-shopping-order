@@ -108,7 +108,7 @@ class ProductsActivity : AppCompatActivity() {
 
     private fun navigateToProductDetail(product: Product) {
         viewModel.updateShoppingCart {
-            activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
+            activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
         }
     }
 

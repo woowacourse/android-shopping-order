@@ -9,5 +9,5 @@ interface ProductsDataSource {
         size: Int,
     ): PageableProducts
 
-    fun getById(id: Long): ProductEntity?
+    fun getProductById(id: Long): ProductEntity?
 }

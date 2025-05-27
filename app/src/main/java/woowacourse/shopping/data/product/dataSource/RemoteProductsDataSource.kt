@@ -21,7 +21,7 @@ class RemoteProductsDataSource(
         return PageableProducts(products, response.loadable)
     }
 
-    override fun getById(id: Long): ProductEntity? {
+    override fun getProductById(id: Long): ProductEntity? {
         val productResponse = productsHttpClient.getProductById(id)
         return productResponse.toEntityOrNull()
     }

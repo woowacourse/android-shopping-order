@@ -27,5 +27,5 @@ object LocalProductsDataSource : ProductsDataSource {
         size: Int,
     ): PageableProducts = PageableProducts(emptyList(), false)
 
-    override fun getById(id: Long): ProductEntity? = dao.load(id)
+    override fun getProductById(id: Long): ProductEntity? = dao.load(id)
 }
