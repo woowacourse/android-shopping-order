@@ -41,13 +41,14 @@ class CartRepository(
         productId: Long,
         quantity: Int,
     ) {
-        api.postCartItem(
-            cartItemRequest =
-                CartItemRequest(
-                    productId = productId,
-                    quantity = quantity,
-                ),
-        )
+        api
+            .postCartItem(
+                cartItemRequest =
+                    CartItemRequest(
+                        productId = productId,
+                        quantity = quantity,
+                    ),
+            ).execute()
     }
 
     override fun deleteCartProduct(productId: Long) {

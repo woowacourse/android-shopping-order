@@ -82,6 +82,7 @@ class CartViewModel(
 
     companion object {
         const val DEFAULT_PAGE_STEP: Int = 1
+        const val PAGE_INDEX_OFFSET: Int = 1
         const val DEFAULT_PAGE_SIZE: Int = 5
 
         val Factory: ViewModelProvider.Factory =

@@ -8,16 +8,12 @@ class GetCatalogProductsUseCase(
     private val repository: ProductRepository,
 ) {
     operator fun invoke(
-        currentPage: Int,
+        page: Int,
         size: Int,
         callback: (CatalogProducts) -> Unit,
     ) {
         thread {
-            callback(repository.fetchProducts(currentPage + PAGE_INCREMENT, size))
+            callback(repository.fetchProducts(page, size))
         }
-    }
-
-    companion object {
-        private const val PAGE_INCREMENT: Int = 1
     }
 }

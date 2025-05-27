@@ -34,13 +34,29 @@ class CatalogViewModel(
         MutableLiveData(emptyList())
     val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
 
-    fun loadCartProducts(count: Int = SHOWN_PRODUCTS_COUNT) {
+    init {
+        loadCartProducts()
+    }
+
+    private fun loadCartProducts(
+        page: Int = catalogProducts.value?.page?.current ?: UNINITIALIZED_PAGE,
+        count: Int = SHOWN_PRODUCTS_COUNT,
+    ) {
         getCatalogProductsUseCase(
-            currentPage = catalogProducts.value?.page?.current ?: UNINITIALIZED_PAGE,
+            page = page,
             size = count,
         ) { newProducts ->
             _catalogProducts.postValue(catalogProducts.value?.plus(newProducts))
         }
+    }
+
+    fun loadMoreCartProducts() {
+        val currentPage =
+            catalogProducts.value
+                ?.page
+                ?.current
+                ?.plus(DEFAULT_PAGE_STEP) ?: UNINITIALIZED_PAGE
+        loadCartProducts(page = currentPage + 1)
     }
 
     fun loadHistoryProducts() {
@@ -88,6 +104,7 @@ class CatalogViewModel(
     }
 
     companion object {
+        private const val DEFAULT_PAGE_STEP: Int = 1
         private const val SHOWN_PRODUCTS_COUNT: Int = 20
 
         val Factory: ViewModelProvider.Factory =

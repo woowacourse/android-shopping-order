@@ -33,7 +33,6 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
         initViewBinding()
         initObservers()
         initActivityResultLauncher()
-        viewModel.loadCartProducts()
     }
 
     override fun onResume() {
@@ -76,7 +75,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
             }
 
             override fun onLoadMoreClick() {
-                viewModel.loadCartProducts()
+                viewModel.loadMoreCartProducts()
             }
         }
 
