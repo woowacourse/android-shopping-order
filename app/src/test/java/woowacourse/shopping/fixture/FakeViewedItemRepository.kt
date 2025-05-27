@@ -1,6 +1,6 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.recent.ViewedItemRepository
+import woowacourse.shopping.data.repository.ViewedItemRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class FakeViewedItemRepository(

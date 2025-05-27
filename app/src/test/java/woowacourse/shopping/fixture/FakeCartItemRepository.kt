@@ -1,7 +1,6 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.cart.CartItem
-import woowacourse.shopping.data.cart.CartItemRepository
+import woowacourse.shopping.data.repository.CartItemRepository
 import woowacourse.shopping.mapper.toCartItem
 import woowacourse.shopping.product.catalog.ProductUiModel
 

@@ -39,7 +39,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:context=".product.detail.DetailActivity">
+                tools:context=".presentation.product.detail.DetailActivity">
 
                 <ImageView
                     app:loadImage="@{product.imageUrl}"

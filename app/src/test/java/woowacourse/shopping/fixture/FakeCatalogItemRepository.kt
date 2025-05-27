@@ -1,6 +1,6 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.product.ProductsDataSource
+import woowacourse.shopping.data.source.remote.products.ProductsDataSource
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class FakeCatalogItemRepository(

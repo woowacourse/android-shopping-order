@@ -3,7 +3,7 @@ package woowacourse.shopping.fixture
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import woowacourse.shopping.data.product.ProductsDataSource
+import woowacourse.shopping.data.source.remote.products.ProductsDataSource
 import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.product.catalog.ProductUiModel
 import woowacourse.shopping.product.catalog.model.Product

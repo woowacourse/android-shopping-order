@@ -1,7 +1,7 @@
 package woowacourse.shopping.mapper
 
-import woowacourse.shopping.data.recent.ViewedItem
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.data.model.ViewedItem
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 fun ViewedItem.toUiModel() =
     ProductUiModel(
