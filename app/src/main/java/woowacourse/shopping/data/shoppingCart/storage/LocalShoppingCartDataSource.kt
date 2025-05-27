@@ -21,7 +21,10 @@ object LocalShoppingCartDataSource : ShoppingCartDataSource {
         dao = db.dao()
     }
 
-    override fun load(): List<CartItemEntity> = dao.load()
+    override fun load(
+        page: Int,
+        size: Int,
+    ): List<CartItemEntity> = dao.load()
 
     override fun upsert(cartItem: CartItemEntity) = dao.upsert(cartItem)
 

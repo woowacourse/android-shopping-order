@@ -7,7 +7,11 @@ import woowacourse.shopping.domain.product.Product
 class FakeShoppingCartRepository : ShoppingCartRepository {
     private var cartItems: List<CartItem> = List(50) { CartItem(it.toLong(), "이름", 1_000, 5) }
 
-    override fun load(onLoad: (Result<List<CartItem>>) -> Unit) {
+    override fun load(
+        page: Int,
+        size: Int,
+        onLoad: (Result<List<CartItem>>) -> Unit,
+    ) {
         onLoad(runCatching(::cartItems))
     }
 

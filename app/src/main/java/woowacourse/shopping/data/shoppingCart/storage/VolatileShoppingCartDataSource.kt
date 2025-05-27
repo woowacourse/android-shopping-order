@@ -5,7 +5,10 @@ import woowacourse.shopping.data.product.entity.CartItemEntity
 object VolatileShoppingCartDataSource : ShoppingCartDataSource {
     private var cartItems: List<CartItemEntity> = emptyList()
 
-    override fun load(): List<CartItemEntity> = cartItems.toList()
+    override fun load(
+        page: Int,
+        size: Int,
+    ): List<CartItemEntity> = cartItems.toList()
 
     override fun upsert(cartItem: CartItemEntity) {
         cartItems = cartItems.filterNot { it.id == cartItem.id }

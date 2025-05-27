@@ -47,7 +47,7 @@ class ShoppingCartViewModel(
     }
 
     fun loadShoppingCart() {
-        shoppingCartRepository.load { result: Result<List<CartItem>> ->
+        shoppingCartRepository.load(page, COUNT_PER_PAGE) { result: Result<List<CartItem>> ->
             result
                 .onSuccess { cartItems: List<CartItem> ->
                     allShoppingCartItems = cartItems

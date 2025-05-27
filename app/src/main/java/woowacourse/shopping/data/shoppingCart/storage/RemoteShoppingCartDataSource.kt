@@ -1,17 +1,31 @@
 package woowacourse.shopping.data.shoppingCart.storage
 
+import android.util.Log
 import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 class RemoteShoppingCartDataSource(
-    private val productsHttpClient: ProductsHttpClient = ProductsHttpClient()
+    private val productsHttpClient: ProductsHttpClient = ProductsHttpClient(),
 ) : ShoppingCartDataSource {
-    override fun load(): List<CartItemEntity> {
-        TODO("Not yet implemented")
+    override fun load(
+        page: Int,
+        size: Int,
+    ): List<CartItemEntity> {
+        val rawJson: String = productsHttpClient.getShoppingCart(page, size).body?.string() ?: ""
+        Log.e("TAG", "rawJson: $rawJson")
+//        {
+//            "page": 1073741824,
+//            "size": 1073741824,
+//            "sort": [
+//              "string"
+//            ]
+//        }
+        rawJson
+        return emptyList()
     }
 
     override fun upsert(cartItem: CartItemEntity) {
-        productsHttpClient.postProducts(cartItem.id,cartItem.quantity)
+        productsHttpClient.postShoppingCartItem(cartItem.id, cartItem.quantity)
     }
 
     override fun remove(product: CartItemEntity) {

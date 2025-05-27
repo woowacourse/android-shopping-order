@@ -9,10 +9,24 @@ class ProductsHttpClient(
 ) {
     private val client: OkHttpClient = OkHttpClient()
 
-    fun postProducts(
+    fun getShoppingCart(
+        page: Int,
+        size: Int,
+    ): Response {
+        val request: Request =
+            Request
+                .Builder()
+                .url("$baseUrl/cart-items?page=$page&size=$size&sort=string")
+                .get()
+                .build()
+
+        return client.newCall(request).execute()
+    }
+
+    fun postShoppingCartItem(
         id: Long,
         quantity: Int,
-        ): Response = run("/cart-items")
+    ): Response = run("/cart-items")
 
     fun getProducts(): Response = run("/products")
 

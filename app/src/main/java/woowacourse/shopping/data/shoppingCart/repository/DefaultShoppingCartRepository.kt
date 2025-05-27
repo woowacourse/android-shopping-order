@@ -10,17 +10,21 @@ import woowacourse.shopping.domain.product.Product
 import kotlin.concurrent.thread
 
 class DefaultShoppingCartRepository(
-    private val shoppingCartDataSource: ShoppingCartDataSource = RemoteShoppingCartDataSource()
+    private val shoppingCartDataSource: ShoppingCartDataSource = RemoteShoppingCartDataSource(),
 ) : ShoppingCartRepository {
-    override fun load(onLoad: (Result<List<CartItem>>) -> Unit) {
-        { shoppingCartDataSource.load().map(CartItemEntity::toDomain) }.runAsync(onLoad)
+    override fun load(
+        page: Int,
+        size: Int,
+        onLoad: (Result<List<CartItem>>) -> Unit,
+    ) {
+        { shoppingCartDataSource.load(page, size).map(CartItemEntity::toDomain) }.runAsync(onLoad)
     }
 
     override fun upsert(
         cartItem: CartItem,
         onAdd: (Result<Unit>) -> Unit,
     ) {
-        {shoppingCartDataSource.upsert(cartItem.toEntity())}.runAsync(onAdd)
+        { shoppingCartDataSource.upsert(cartItem.toEntity()) }.runAsync(onAdd)
     }
 
     override fun remove(

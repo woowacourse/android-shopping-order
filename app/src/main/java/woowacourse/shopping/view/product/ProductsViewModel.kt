@@ -38,15 +38,21 @@ class ProductsViewModel(
             result
                 .onSuccess { products: List<Product> ->
                     allProducts = products
-                    loadShoppingCart()
+                    loadShoppingCart(1, 5)
                 }.onFailure {
                     _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
                 }
         }
     }
 
-    private fun loadShoppingCart() {
-        shoppingCartRepository.load { result: Result<List<CartItem>> ->
+    private fun loadShoppingCart(
+        page: Int,
+        size: Int,
+    ) {
+        shoppingCartRepository.load(page, size) { result: Result<List<CartItem>> ->
+            result.onFailure {
+                throw it
+            }
             shoppingCart = result.getOrElse { emptyList() }
             _shoppingCartSize.postValue(shoppingCart.size)
             updateProducts()

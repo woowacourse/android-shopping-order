@@ -3,7 +3,10 @@ package woowacourse.shopping.data.shoppingCart.storage
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 interface ShoppingCartDataSource {
-    fun load(): List<CartItemEntity>
+    fun load(
+        page: Int,
+        size: Int,
+    ): List<CartItemEntity>
 
     fun upsert(cartItem: CartItemEntity)
 

@@ -4,7 +4,11 @@ import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.domain.product.Product
 
 interface ShoppingCartRepository {
-    fun load(onLoad: (Result<List<CartItem>>) -> Unit)
+    fun load(
+        page: Int,
+        size: Int,
+        onLoad: (Result<List<CartItem>>) -> Unit,
+    )
 
     fun upsert(
         cartItem: CartItem,
