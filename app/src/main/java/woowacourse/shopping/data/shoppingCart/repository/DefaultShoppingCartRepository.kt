@@ -1,75 +1,135 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
-import okio.IOException
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequest
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequest
-import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
+import woowacourse.shopping.data.shoppingCart.local.dao.ShoppingCartDao
+import woowacourse.shopping.data.shoppingCart.local.entity.ShoppingCartProductEntity
+import woowacourse.shopping.data.shoppingCart.local.entity.toEntity
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
+import kotlin.concurrent.thread
 
 class DefaultShoppingCartRepository(
-    private val shoppingCartService: ShoppingCartService,
+    private val shoppingCartDao: ShoppingCartDao,
 ) : ShoppingCartRepository {
-    override suspend fun load(
-        page: Int,
-        size: Int,
-    ): ShoppingCarts {
-        val result =
-            shoppingCartService
-                .getCartItems(page, size)
-        return ShoppingCarts(
-            last = result.last,
-            shoppingCartItems = result.shoppingCartItems.map { it.toDomain() },
-        )
+    override fun load(
+        offset: Int,
+        limit: Int,
+        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                shoppingCartDao
+                    .getShoppingCartProducts(offset, offset + limit)
+                    .map(ShoppingCartProductEntity::toDomain)
+            }.onSuccess { productList ->
+                onResult(Result.success(productList))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
     }
 
-    override suspend fun add(
+    override fun add(
         product: Product,
         quantity: Int,
-    ): ShoppingCartProduct {
-        shoppingCartService
-            .postCartItem(
-                CartItemRequest(
-                    productId = product.id,
-                    quantity = quantity,
-                ),
-            )
-
-        return load().shoppingCartItems
-            .firstOrNull { it.product.id == product.id } ?: throw IOException(ERR_NOT_ADDED_PRODUCT)
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                val shoppingCartProduct = ShoppingCartProduct(product, quantity)
+                shoppingCartDao.increaseQuantity(shoppingCartProduct.toEntity())
+            }.onSuccess {
+                onResult(Result.success(Unit))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
     }
 
-    override suspend fun updateQuantity(
-        shoppingCartId: Long,
-        quantity: Int,
-    ): ShoppingCartProduct? {
-        val requestDto = CartItemQuantityRequest(quantity = quantity)
-        shoppingCartService
-            .updateCartItemQuantity(
-                shoppingCartId = shoppingCartId,
-                cartItemQuantityRequest = requestDto,
-            )
-        return load().shoppingCartItems
-            .firstOrNull { it.id == shoppingCartId }
+    override fun decreaseQuantity(
+        product: Product,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                shoppingCartDao.decreaseQuantity(product.id)
+            }.onSuccess {
+                onResult(Result.success(Unit))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
     }
 
-    override suspend fun remove(shoppingCartId: Long) {
-        shoppingCartService.deleteCartItem(shoppingCartId)
+    override fun remove(
+        product: Product,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                shoppingCartDao.delete(product.id)
+            }.onSuccess {
+                onResult(Result.success(Unit))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
     }
 
-    override suspend fun fetchAllQuantity(): Int = shoppingCartService.getCartCounts().quantity
+    override fun fetchSelectedQuantity(
+        product: Product,
+        onResult: (Result<Int?>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                shoppingCartDao.getQuantity(product.id)
+            }.onSuccess { quantity: Int? ->
+                onResult(Result.success(quantity))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
+    }
+
+    override fun fetchSelectedQuantity(
+        products: List<Product>,
+        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                products.map { product ->
+                    val quantity = shoppingCartDao.getQuantity(product.id)
+                    ShoppingCartProduct(
+                        product = product,
+                        quantity = quantity,
+                    )
+                }
+            }.onSuccess { shoppingCartProducts ->
+                onResult(Result.success(shoppingCartProducts))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
+    }
+
+    override fun fetchAllQuantity(onResult: (Result<Int>) -> Unit) {
+        thread {
+            runCatching {
+                shoppingCartDao.getTotalQuantity()
+            }.onSuccess { allQuantity: Int ->
+                onResult(Result.success(allQuantity))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
+    }
 
     companion object {
-        @Suppress("ktlint:standard:property-naming")
         private var INSTANCE: ShoppingCartRepository? = null
-        private const val ERR_NOT_ADDED_PRODUCT = "상품이 추가되지 않았습니다"
 
-        fun initialize(shoppingCartService: ShoppingCartService) {
-            INSTANCE =
-                DefaultShoppingCartRepository(
-                    shoppingCartService = shoppingCartService,
-                )
+        fun initialize(shoppingCartDao: ShoppingCartDao) {
+            if (INSTANCE == null) {
+                INSTANCE = DefaultShoppingCartRepository(shoppingCartDao = shoppingCartDao)
+            }
         }
 
         fun get(): ShoppingCartRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")

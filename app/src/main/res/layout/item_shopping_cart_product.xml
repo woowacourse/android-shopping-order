@@ -6,13 +6,12 @@
     <data>
 
         <variable
-            name="shoppingCartProductClickListener"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartProductViewHolder.ShoppingCartProductClickListener" />
+            name="shoppingCartProduct"
+            type="woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct" />
 
         <variable
-            name="shoppingCartProductItem"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem" />
-
+            name="onRemoveProduct"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,39 +20,28 @@
         android:layout_marginBottom="24dp"
         android:background="@drawable/background_shopping_cart_product">
 
-        <CheckBox
-            android:id="@+id/shoppingCartProductCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:checked="@{shoppingCartProductItem.isChecked}"
-            android:onClick="@{()->shoppingCartProductClickListener.onProductSelectedButton(shoppingCartProductItem, !shoppingCartProductCheckBox.checked)}"
-            app:layout_constraintEnd_toStartOf="@id/shoppingCartProductName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/shoppingCartProductName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="18dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{shoppingCartProductItem.shoppingCartProduct.product.name}"
+            android:text="@{shoppingCartProduct.product.name}"
             android:textColor="@color/gray_5"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductCheckBox"
             app:layout_constraintEnd_toStartOf="@id/shoppingCartProductDeleteButton"
-            app:layout_constraintStart_toEndOf="@id/shoppingCartProductCheckBox"
-            app:layout_constraintTop_toTopOf="@id/shoppingCartProductCheckBox"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="[든든] 동원 스위트콘" />
 
         <ImageView
             android:id="@+id/shoppingCartProductDeleteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> shoppingCartProductClickListener.onRemoveButton(shoppingCartProductItem)}"
+            android:onClick="@{() -> onRemoveProduct.invoke(shoppingCartProduct.product)}"
             android:padding="16dp"
             android:src="@drawable/ic_close"
             app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductName"
@@ -65,14 +53,14 @@
             android:id="@+id/shoppingCartProductImage"
             android:layout_width="136dp"
             android:layout_height="72dp"
-            android:layout_marginStart="12dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="18dp"
             android:background="@color/gray_a"
-            app:imageUrl="@{shoppingCartProductItem.shoppingCartProduct.product.imageUrl}"
+            app:imageUrl="@{shoppingCartProduct.product.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@id/shoppingCartProductCheckBox"
-            app:layout_constraintTop_toBottomOf="@id/shoppingCartProductName" />
+            app:layout_constraintStart_toStartOf="@id/shoppingCartProductName"
+            app:layout_constraintTop_toBottomOf="@id/shoppingCartProductName"
+            tools:src="@drawable/product_image_example" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -83,9 +71,7 @@
 
             <include
                 android:id="@+id/shoppingCartQuantityComponent"
-                layout="@layout/component_product_quantity"
-                app:productQuantityClickListener="@{shoppingCartProductClickListener}"
-                app:quantityObservable="@{shoppingCartProductItem}" />
+                layout="@layout/component_product_quantity" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -95,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:gravity="end"
-            android:text="@{@string/product_price_format(shoppingCartProductItem.shoppingCartProduct.price)}"
+            android:text="@{@string/product_price_format(shoppingCartProduct.price)}"
             android:textColor="@color/gray_5"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductImage"

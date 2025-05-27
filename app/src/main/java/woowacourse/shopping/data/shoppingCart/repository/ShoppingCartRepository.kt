@@ -2,25 +2,39 @@ package woowacourse.shopping.data.shoppingCart.repository
 
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 interface ShoppingCartRepository {
-    suspend fun load(
-        page: Int = 0,
-        size: Int = Integer.MAX_VALUE,
-    ): ShoppingCarts
+    fun load(
+        offset: Int,
+        limit: Int,
+        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
+    )
 
-    suspend fun add(
+    fun add(
         product: Product,
         quantity: Int,
-    ): ShoppingCartProduct
+        onResult: (Result<Unit>) -> Unit,
+    )
 
-    suspend fun updateQuantity(
-        shoppingCartId: Long,
-        quantity: Int,
-    ): ShoppingCartProduct?
+    fun decreaseQuantity(
+        product: Product,
+        onResult: (Result<Unit>) -> Unit,
+    )
 
-    suspend fun remove(shoppingCartId: Long)
+    fun remove(
+        product: Product,
+        onResult: (Result<Unit>) -> Unit,
+    )
 
-    suspend fun fetchAllQuantity(): Int
+    fun fetchSelectedQuantity(
+        product: Product,
+        onResult: (Result<Int?>) -> Unit,
+    )
+
+    fun fetchSelectedQuantity(
+        products: List<Product>,
+        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
+    )
+
+    fun fetchAllQuantity(onResult: (Result<Int>) -> Unit)
 }

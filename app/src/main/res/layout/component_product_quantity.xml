@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="quantityObservable"
-            type="woowacourse.shopping.view.common.QuantityObservable" />
+            name="product"
+            type="woowacourse.shopping.domain.product.Product" />
 
         <variable
             name="quantity"
@@ -29,7 +29,7 @@
             android:layout_height="42dp"
             android:background="@drawable/background_product_minus_quantity_button"
             android:gravity="center"
-            android:onClick="@{() -> productQuantityClickListener.onMinusShoppingCartClick(quantityObservable)}"
+            android:onClick="@{() -> productQuantityClickListener.onMinusShoppingCartClick(product)}"
             android:text="@string/product_minus_quantity_button"
             android:textColor="@color/gray_5"
             android:textSize="22sp"
@@ -63,7 +63,7 @@
             android:layout_height="42dp"
             android:background="@drawable/background_product_plus_quantity_button"
             android:gravity="center"
-            android:onClick="@{() -> productQuantityClickListener.onPlusShoppingCartClick(quantityObservable)}"
+            android:onClick="@{() -> productQuantityClickListener.onPlusShoppingCartClick(product)}"
             android:text="@string/product_plus_quantity_button"
             android:textColor="@color/gray_5"
             android:textSize="22sp"

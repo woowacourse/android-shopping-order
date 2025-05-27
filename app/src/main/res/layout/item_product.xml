@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="productItem"
-            type="woowacourse.shopping.view.product.ProductsItem.ProductItem" />
+            name="product"
+            type="woowacourse.shopping.domain.product.Product" />
 
         <variable
             name="productClickListener"
@@ -17,15 +17,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> productClickListener.onProductClick(productItem)}">
+        android:onClick="@{() -> productClickListener.onProductClick(product)}">
 
         <ImageView
             android:id="@+id/productImage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="@color/gray_a"
-            android:contentDescription="@{productItem.product.name}"
-            app:imageUrl="@{productItem.product.imageUrl}"
+            android:contentDescription="@{product.name}"
+            app:imageUrl="@{product.imageUrl}"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,24 +35,27 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:onClick="@{() -> productClickListener.onPlusShoppingCartClick(productItem)}"
+            android:onClick="@{() -> productClickListener.onPlusShoppingCartClick(product)}"
             android:src="@drawable/btn_product_plus"
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="@id/productImage" />
 
-        <include
-            android:id="@+id/productQuantityComponent"
-            layout="@layout/component_product_quantity"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/productQuantityComponentLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="6dp"
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:productQuantityClickListener="@{productClickListener}"
-            app:quantityObservable="@{productItem}"
+            app:layout_constraintStart_toStartOf="parent">
 
-            />
+            <include
+                android:id="@+id/productQuantityComponent"
+                layout="@layout/component_product_quantity"
+                app:product="@{product}"
+                app:productQuantityClickListener="@{productClickListener}" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/productName"
@@ -62,7 +65,7 @@
             android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{productItem.product.name}"
+            android:text="@{product.name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -70,10 +73,9 @@
             tools:text="PET보틀-정사각형어쩌구저쩌구" />
 
         <TextView
-            android:id="@+id/productPrice"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{@string/product_price_format(productItem.product.price)}"
+            android:text="@{@string/product_price_format(product.price)}"
             android:textColor="@color/gray_5"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

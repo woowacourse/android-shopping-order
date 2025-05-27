@@ -33,7 +33,6 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/detailClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -62,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:adjustViewBounds="true"
-                    app:imageUrl="@{viewModel.product.product.imageUrl}"
+                    app:imageUrl="@{viewModel.product.imageUrl}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -72,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="18dp"
                     android:layout_marginTop="16dp"
-                    android:text="@{viewModel.product.product.name}"
+                    android:text="@{viewModel.product.name}"
                     android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -114,9 +113,7 @@
 
                     <include
                         android:id="@+id/productDetailQuantityComponent"
-                        layout="@layout/component_product_quantity"
-                        app:productQuantityClickListener="@{productDetailEventListener}"
-                        app:quantityObservable="@{viewModel.product}" />
+                        layout="@layout/component_product_quantity" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -126,6 +123,7 @@
                     android:layout_marginHorizontal="18dp"
                     android:layout_marginTop="30dp"
                     android:background="@drawable/background_product_detail_recent_watching"
+                    android:onClick="@{() -> productDetailEventListener.onRecentProduct(viewModel.recentWatchingProduct)}"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="16dp"
                     android:visibility="@{viewModel.recentProductBoxVisible ? View.VISIBLE : View.GONE}"
@@ -145,7 +143,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/productDetailRecentWatchingName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"

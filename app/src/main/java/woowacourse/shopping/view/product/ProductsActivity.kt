@@ -13,12 +13,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.GridItemDecoration
-import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
-import woowacourse.shopping.view.product.viewModel.ProductsViewModel
-import woowacourse.shopping.view.product.viewModel.RecentProductsViewModel
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
 import woowacourse.shopping.view.shoppingCart.ShoppingCartActivity
 
@@ -30,7 +27,6 @@ class ProductsActivity :
     }
 
     private val viewModel: ProductsViewModel by viewModels()
-    private val recentProductsViewModel: RecentProductsViewModel by viewModels()
     private val productAdapter: ProductAdapter by lazy { ProductAdapter(this) }
     private val activityResultLauncher =
         registerForActivityResult(
@@ -38,31 +34,35 @@ class ProductsActivity :
         ) { result ->
             when (result.resultCode) {
                 ResultFrom.PRODUCT_DETAIL_BACK.RESULT_OK -> {
-                    val updateItem: Product? =
+                    val updateItem: Product =
                         result.data?.getSerializableExtraData("updateProduct")
-                    if (updateItem != null) {
-                        viewModel.reload()
-                    }
-                    recentProductsViewModel.updateRecentProducts()
+                            ?: return@registerForActivityResult
+                    viewModel.updateSelectedQuantity(updateItem)
+                    viewModel.updateRecentWatching()
                 }
 
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
-                    val updateItems: Boolean? =
+                    val updateItems: Array<Product> =
                         result.data?.getSerializableExtraData("updateProducts")
-                    if (updateItems != null) viewModel.reload()
+                            ?: return@registerForActivityResult
+                    viewModel.updateSelectedQuantity(updateItems.toList())
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {
+                    val updateQuantityProduct: Product =
+                        result.data?.getSerializableExtraData("updateProduct")
+                            ?: return@registerForActivityResult
                     val recentProduct: Product =
                         result.data?.getSerializableExtraData("recentProduct")
                             ?: return@registerForActivityResult
+                    viewModel.updateSelectedQuantity(listOf(updateQuantityProduct, recentProduct))
                     navigateToRecentProduct(recentProduct)
                 }
             }
         }
 
     private fun navigateToRecentProduct(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
+        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product, true))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,17 +84,11 @@ class ProductsActivity :
         binding.adapter = productAdapter
         binding.onClickShoppingCartButton = ::navigateToShoppingCart
         binding.lifecycleOwner = this
-        binding.viewModel = this@ProductsActivity.viewModel
     }
 
     private fun setupObservers() {
-        productAdapter.submitList(listOf(ProductsItem.LoadItem))
-        viewModel.productsUi.observe(this) { products ->
+        viewModel.products.observe(this) { products: List<ProductsItem> ->
             productAdapter.submitList(products)
-        }
-
-        recentProductsViewModel.recentProducts.observe(this) { recentProducts ->
-            productAdapter.submitList(listOf(recentProducts))
         }
 
         viewModel.shoppingCartQuantity.observe(this) { shoppingCartQuantity: Int ->
@@ -164,39 +158,23 @@ class ProductsActivity :
         activityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
     }
 
-    override fun onProductClick(productItem: ProductsItem.ProductItem) {
-        activityResultLauncher.launch(
-            ProductDetailActivity.newIntent(
-                context = this,
-                productId = productItem.product.id,
-                shoppingCartId = productItem.shoppingCartId,
-                quantity = productItem.selectedQuantity,
-            ),
-        )
+    override fun onProductClick(product: Product) {
+        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
+    }
+
+    override fun onPlusShoppingCartClick(product: Product) {
+        viewModel.addProductToShoppingCart(product)
+    }
+
+    override fun onMinusShoppingCartClick(product: Product) {
+        viewModel.minusProductToShoppingCart(product)
     }
 
     override fun onLoadClick() {
-        viewModel.updateMoreProducts()
+        viewModel.updateProducts()
     }
 
-    override fun onRecentProductClick(productItem: ProductsItem.ProductItem) {
-        activityResultLauncher.launch(
-            ProductDetailActivity.newIntent(
-                context = this,
-                productId = productItem.product.id,
-                shoppingCartId = productItem.shoppingCartId,
-                quantity = productItem.selectedQuantity,
-            ),
-        )
-    }
-
-    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
-        val item = quantityObservable as ProductsItem.ProductItem
-        viewModel.addProductToShoppingCart(item, item.selectedQuantity)
-    }
-
-    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
-        val item = quantityObservable as ProductsItem.ProductItem
-        viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
+    override fun onRecentProductClick(product: Product) {
+        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
     }
 }

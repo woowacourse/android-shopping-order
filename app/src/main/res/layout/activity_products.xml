@@ -6,19 +6,12 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="woowacourse.shopping.view.product.viewModel.ProductsViewModel" />
-
-        <variable
             name="adapter"
             type="woowacourse.shopping.view.product.ProductAdapter" />
 
         <variable
             name="onClickShoppingCartButton"
             type="kotlin.jvm.functions.Function0" />
-
-        <import type="android.view.View" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -99,43 +92,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/productsToolbar"
             tools:listitem="@layout/item_product" />
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/productsSkeletonLayout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
-            app:shimmer_auto_start="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/productsToolbar">
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:columnCount="2">
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-                <include layout="@layout/item_product_skeleton" />
-
-            </GridLayout>
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

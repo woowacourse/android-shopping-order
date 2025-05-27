@@ -9,22 +9,8 @@ import woowacourse.shopping.data.product.local.entity.RecentWatchingEntity
 @Dao
 interface RecentWatchingDao {
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insertRecentWatching(recentWatchingEntity: RecentWatchingEntity)
-
-    @Query(
-        """
-    SELECT * FROM recent_watching
-    WHERE category = (
-        SELECT category FROM recent_watching
-        ORDER BY watchedAt DESC
-        LIMIT 1
-    )
-    ORDER BY watchedAt DESC
-    LIMIT :size
-""",
-    )
-    suspend fun getRecentRecommendWatchingProducts(size: Int): List<RecentWatchingEntity>
+    fun insertRecentWatching(recentWatchingEntity: RecentWatchingEntity)
 
     @Query("SELECT * FROM recent_watching ORDER BY watchedAt DESC LIMIT :size")
-    suspend fun getRecentWatchingProducts(size: Int): List<RecentWatchingEntity>
+    fun getRecentWatchingProducts(size: Int): List<RecentWatchingEntity>
 }

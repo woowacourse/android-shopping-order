@@ -1,32 +1,16 @@
 package woowacourse.shopping.view.shoppingCart
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.domain.product.Product
 
 class ShoppingCartProductAdapter(
+    private val onRemoveProduct: (product: Product) -> Unit,
     private val shoppingCartListener: ShoppingCartListener,
-) : ListAdapter<ShoppingCartItem, RecyclerView.ViewHolder>(
-        object : DiffUtil.ItemCallback<ShoppingCartItem>() {
-            override fun areItemsTheSame(
-                oldItem: ShoppingCartItem,
-                newItem: ShoppingCartItem,
-            ): Boolean =
-                when {
-                    oldItem is ShoppingCartItem.ShoppingCartProductItem && newItem is ShoppingCartItem.ShoppingCartProductItem ->
-                        oldItem.shoppingCartProduct.id == newItem.shoppingCartProduct.id
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var items: List<ShoppingCartItem> = emptyList()
 
-                    else -> false
-                }
-
-            override fun areContentsTheSame(
-                oldItem: ShoppingCartItem,
-                newItem: ShoppingCartItem,
-            ): Boolean = oldItem == newItem
-        },
-    ) {
-    override fun getItemViewType(position: Int): Int = getItem(position).viewType.ordinal
+    override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -39,6 +23,12 @@ class ShoppingCartProductAdapter(
                     parent,
                     shoppingCartListener,
                 )
+
+            ShoppingCartItem.ItemType.PAGINATION ->
+                ShoppingCartPaginationViewHolder.of(
+                    parent,
+                    shoppingCartListener,
+                )
         }
     }
 
@@ -47,10 +37,19 @@ class ShoppingCartProductAdapter(
         position: Int,
     ) {
         when (holder) {
-            is ShoppingCartProductViewHolder -> holder.bind(getItem(position) as ShoppingCartItem.ShoppingCartProductItem)
+            is ShoppingCartProductViewHolder -> holder.bind(items[position] as ShoppingCartItem.ProductItem)
+            is ShoppingCartPaginationViewHolder -> holder.bind(items[position] as ShoppingCartItem.PaginationItem)
         }
     }
 
+    override fun getItemCount(): Int = items.size
+
+    fun submitList(items: List<ShoppingCartItem>) {
+        this.items = items
+        notifyDataSetChanged()
+    }
+
     interface ShoppingCartListener :
+        ShoppingCartPaginationViewHolder.ShoppingCartPaginationClickListener,
         ShoppingCartProductViewHolder.ShoppingCartProductClickListener
 }
