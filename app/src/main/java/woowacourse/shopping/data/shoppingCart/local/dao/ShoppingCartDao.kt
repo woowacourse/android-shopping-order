@@ -53,7 +53,4 @@ interface ShoppingCartDao {
 
     @Query("DELETE FROM shoppingCart WHERE product_id = :productId")
     fun delete(productId: Long)
-
-    @Query("SELECT IFNULL(SUM(quantity), 0) FROM shoppingCart")
-    fun getTotalQuantity(): Int
 }

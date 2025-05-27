@@ -1,14 +1,20 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.shoppingCart.local.dao.ShoppingCartDao
 import woowacourse.shopping.data.shoppingCart.local.entity.ShoppingCartProductEntity
 import woowacourse.shopping.data.shoppingCart.local.entity.toEntity
+import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsDto
+import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import kotlin.concurrent.thread
 
 class DefaultShoppingCartRepository(
     private val shoppingCartDao: ShoppingCartDao,
+    private val shoppingCartService: ShoppingCartService,
 ) : ShoppingCartRepository {
     override fun load(
         offset: Int,
@@ -112,23 +118,38 @@ class DefaultShoppingCartRepository(
     }
 
     override fun fetchAllQuantity(onResult: (Result<Int>) -> Unit) {
-        thread {
-            runCatching {
-                shoppingCartDao.getTotalQuantity()
-            }.onSuccess { allQuantity: Int ->
-                onResult(Result.success(allQuantity))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
+        shoppingCartService.getCartCounts().enqueue(
+            object : Callback<CartCountsDto> {
+                override fun onResponse(
+                    call: Call<CartCountsDto?>,
+                    response: Response<CartCountsDto?>,
+                ) {
+                    onResult(Result.success(response.body()?.quantity ?: 0))
+                }
+
+                override fun onFailure(
+                    call: Call<CartCountsDto?>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
     }
 
     companion object {
         private var INSTANCE: ShoppingCartRepository? = null
 
-        fun initialize(shoppingCartDao: ShoppingCartDao) {
+        fun initialize(
+            shoppingCartDao: ShoppingCartDao,
+            shoppingCartService: ShoppingCartService,
+        ) {
             if (INSTANCE == null) {
-                INSTANCE = DefaultShoppingCartRepository(shoppingCartDao = shoppingCartDao)
+                INSTANCE =
+                    DefaultShoppingCartRepository(
+                        shoppingCartDao = shoppingCartDao,
+                        shoppingCartService = shoppingCartService,
+                    )
             }
         }
 
