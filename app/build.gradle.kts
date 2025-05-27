@@ -18,7 +18,7 @@ android {
         versionName = "1.0"
         buildConfigField("String", "DB_NAME", "\"shopping_db\"")
         buildConfigField("Boolean", "IS_MOCK_MODE", "true")
-        buildConfigField("String", "BASE_URL", "\"https://api.mock.com\"")
+        buildConfigField("String", "BASE_URL", "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.converter.gson)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)

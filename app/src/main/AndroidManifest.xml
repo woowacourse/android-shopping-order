@@ -10,6 +10,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Shopping"
@@ -17,11 +18,11 @@
         <activity
             android:name=".feature.cart.CartActivity"
             android:exported="false"
-            android:label="@string/cart_action_bar_name"/>
+            android:label="@string/cart_action_bar_name" />
         <activity
             android:name=".feature.goodsdetails.GoodsDetailsActivity"
             android:exported="false"
-            android:label="@string/goods_detail_action_bar_name"/>
+            android:label="@string/goods_detail_action_bar_name" />
         <activity
             android:name=".feature.goods.GoodsActivity"
             android:exported="true">
