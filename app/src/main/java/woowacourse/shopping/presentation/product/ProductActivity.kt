@@ -47,6 +47,8 @@ class ProductActivity :
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product)
         binding.lifecycleOwner = this
 
+        showSampleData(true)
+
         initInsets()
         setupToolbar()
         initAdapter()
@@ -126,6 +128,10 @@ class ProductActivity :
         viewModel.products.observe(this) { result ->
             when (result) {
                 is ResultState.Success -> {
+                    binding.root.postDelayed({
+                        showSampleData(false)
+                    }, 2_000)
+
                     val showLoadMore = viewModel.showLoadMore.value == true
                     productAdapter.setData(result.data, showLoadMore)
                 }
@@ -164,6 +170,22 @@ class ProductActivity :
 
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
+        }
+    }
+
+    private fun showSampleData(isLoading: Boolean) {
+        if (isLoading) {
+            binding.rvProducts.visibility = View.GONE
+            binding.rvRecentProducts.visibility = View.GONE
+            binding.tvRecentProduct.visibility = View.GONE
+            binding.divider.visibility = View.GONE
+        } else {
+            binding.rvProducts.visibility = View.VISIBLE
+            binding.rvRecentProducts.visibility = View.VISIBLE
+            binding.tvRecentProduct.visibility = View.VISIBLE
+            binding.divider.visibility = View.VISIBLE
+
+            binding.shimmerLayoutProduct.visibility = View.GONE
         }
     }
 

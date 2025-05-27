@@ -85,6 +85,38 @@
                 tools:itemCount="8"
                 tools:listitem="@layout/item_product" />
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_layout_product"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:shimmer_auto_start="true"
+                app:layout_constraintTop_toBottomOf="@id/tb_product"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:rowCount="3">
+
+                    <include layout="@layout/layout_product_shimmer" />
+
+                    <include layout="@layout/layout_product_shimmer" />
+
+                    <include layout="@layout/layout_product_shimmer" />
+
+                    <include layout="@layout/layout_product_shimmer" />
+
+                    <include layout="@layout/layout_product_shimmer" />
+
+                    <include layout="@layout/layout_product_shimmer" />
+
+
+                </GridLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>
