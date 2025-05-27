@@ -72,7 +72,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
-    implementation(libs.converter.gson)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
 
     // shimmer
     implementation(libs.shimmer)

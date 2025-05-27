@@ -9,7 +9,6 @@ androidx-espresso-core = "3.6.1"
 androidx-test-ext-junit = "1.2.1"
 androidx-test-runner = "1.6.1"
 assertj-core = "3.27.3"
-converter-gson-version = "3.0.0"
 fragment-ktx = "1.8.6"
 glide = "4.16.0"
 google-material = "1.12.0"
@@ -23,6 +22,7 @@ mannodermaus-junit5 = "1.7.0"
 mockwebserver = "4.11.0"
 recyclerview = "1.4.0"
 retrofit = "3.0.0"
+retrofit2-kotlinx-serialization-converter = "1.0.0"
 room-runtime = "2.7.1"
 mockk = "1.14.0"
 espresso-intents = "3.6.1"
@@ -46,7 +46,6 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj-core" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converter-gson-version" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }
@@ -61,6 +60,7 @@ mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "
 json = { module = "org.json:json", version.ref = "json" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2-kotlinx-serialization-converter" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 
 [plugins]
