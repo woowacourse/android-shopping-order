@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.mockwebserver)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)

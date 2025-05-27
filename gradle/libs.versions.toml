@@ -29,6 +29,7 @@ kotlinx-serialization-json = "1.8.1"
 activity = "1.10.1"
 mockito-core = "5.11.0"
 okhttp = "4.12.0"
+retrofit = "3.0.0"
 room-runtime = "2.7.1"
 
 [libraries]
@@ -49,6 +50,7 @@ androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj-core" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 core-testing = { module = "android.arch.core:core-testing", version.ref = "core-testing-version" }
 espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso-intents" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
@@ -67,6 +69,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-core" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
