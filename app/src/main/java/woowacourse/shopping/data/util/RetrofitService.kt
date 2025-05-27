@@ -5,6 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
@@ -31,4 +32,10 @@ interface RetrofitService {
         @Query("sort") sort: String = "id,desc",
         @Header("Authorization") authorization: String,
     ): Call<CartResponse>
+
+    @GET("/cart-items/counts")
+    fun requestCartCounts(
+        @Header("accept") accept: String = "*/*",
+        @Header("Authorization") authorization: String,
+    ): Call<CartQuantity>
 }

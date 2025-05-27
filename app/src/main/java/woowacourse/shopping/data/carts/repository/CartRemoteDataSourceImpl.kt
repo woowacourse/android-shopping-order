@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.carts.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -8,14 +7,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.RetrofitService
-import woowacourse.shopping.domain.model.Key
+import woowacourse.shopping.domain.model.Authorization
 
 class CartRemoteDataSourceImpl(
-    private val baseUrl: String = BuildConfig.BASE_URL,
+    baseUrl: String = BuildConfig.BASE_URL,
 ) : CartRemoteDataSource {
-    val retrofitService =
+    private val retrofitService: RetrofitService =
         Retrofit
             .Builder()
             .baseUrl(baseUrl)
@@ -33,9 +33,8 @@ class CartRemoteDataSourceImpl(
         onSuccess: (CartResponse) -> Unit,
         onFailure: (CartFetchError) -> Unit,
     ) {
-        Log.d("test",Key.basicKey)
         retrofitService
-            .requestCartProduct(page = offset / limit, size = limit, authorization = "Basic "+ Key.basicKey)
+            .requestCartProduct(page = offset / limit, size = limit, authorization = "Basic " + Authorization.basicKey)
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(
@@ -45,8 +44,7 @@ class CartRemoteDataSourceImpl(
                         if (response.isSuccessful && response.body() != null) {
                             onSuccess(response.body()!!)
                         } else {
-                            Log.d("test","onResponse")
-                            onFailure(CartFetchError.Server(response.code(),response.message()))
+                            onFailure(CartFetchError.Server(response.code(), response.message()))
                         }
                     }
 
@@ -54,15 +52,61 @@ class CartRemoteDataSourceImpl(
                         call: Call<CartResponse>,
                         t: Throwable,
                     ) {
-                        Log.d("test","onFailure")
                         onFailure(CartFetchError.Network)
                     }
                 },
             )
     }
 
-    override fun fetchGoodsCount(onSuccess: (Int) -> Unit) {
-        // Todo
+    override fun fetchCartCount(
+        onSuccess: (Int) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
+    ) {
+        retrofitService
+            .requestCartCounts(authorization = "Basic " + Authorization.basicKey)
+            .enqueue(
+                object : Callback<CartQuantity> {
+                    override fun onResponse(
+                        call: Call<CartQuantity>,
+                        response: Response<CartQuantity>,
+                    ) {
+                        if (response.isSuccessful && response.body() != null) {
+                            onSuccess(response.body()!!.quantity)
+                        } else {
+                            onFailure(CartFetchError.Server(response.code(), response.message()))
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<CartQuantity>,
+                        t: Throwable,
+                    ) {
+                        onFailure(CartFetchError.Network)
+                    }
+                },
+            )
+    }
+
+    override fun fetchAuthCode(onResponse: (Int) -> Unit) {
+        retrofitService
+            .requestCartCounts(authorization = "Basic " + Authorization.basicKey)
+            .enqueue(
+                object : Callback<CartQuantity> {
+                    override fun onResponse(
+                        call: Call<CartQuantity>,
+                        response: Response<CartQuantity>,
+                    ) {
+                        onResponse(response.code())
+                    }
+
+                    override fun onFailure(
+                        call: Call<CartQuantity>,
+                        t: Throwable,
+                    ) {
+                        onResponse(-1)
+                    }
+                },
+            )
     }
 
     override fun increaseItemCount(itemId: Int) {

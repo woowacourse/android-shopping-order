@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.goods
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.activity.viewModels
@@ -28,6 +30,7 @@ import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.EXTRA_SOURCE
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.SOURCE_GOODS_LIST
+import woowacourse.shopping.feature.login.LoginActivity
 import woowacourse.shopping.util.toUi
 
 class GoodsActivity : AppCompatActivity() {
@@ -85,6 +88,8 @@ class GoodsActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.rvGoodsItems.adapter = concatAdapter
         binding.viewModel = viewModel
+        val sharedPreferences = getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
+        sharedPreferences.getString("basicKey", "bWVkQW5kcm86cGFzc3dvcmQ=")?.let { viewModel.login(it) }
 
         binding.rvGoodsItems.layoutManager = getLayoutManager()
         viewModel.navigateToCart.observe(this) {
@@ -101,6 +106,10 @@ class GoodsActivity : AppCompatActivity() {
 
         viewModel.recentlyViewedGoods.observe(this) { goods ->
             recentlyViewedGoodsAdapter.setItems(goods)
+        }
+
+        viewModel.navigateToLogin.observe(this) {
+            navigateGoodsLogin()
         }
     }
 
@@ -139,6 +148,11 @@ class GoodsActivity : AppCompatActivity() {
     private fun navigateGoodsDetails(goods: Goods) {
         val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
         intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
+        startActivity(intent)
+    }
+
+    private fun navigateGoodsLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }
 

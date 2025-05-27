@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.util.MutableSingleLiveData
@@ -27,9 +28,22 @@ class GoodsViewModel(
     private val _recentlyViewedGoods: MutableLiveData<List<Goods>> = MutableLiveData()
     val recentlyViewedGoods: LiveData<List<Goods>> get() = _recentlyViewedGoods
 
+    private val _navigateToLogin = MutableSingleLiveData<Unit>()
+    val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
+
     init {
         appendCartItemsWithZeroQuantity()
         updateRecentlyViewedGoods()
+    }
+
+    fun login(basicKey: String) {
+        Authorization.setBasicKey(basicKey)
+        cartRepository.checkValidBasicKey { code ->
+            when {
+                code == 200 -> Authorization.setLoginStatus(true)
+                else -> Authorization.setLoginStatus(false)
+            }
+        }
     }
 
     fun onCartClicked() {
@@ -49,7 +63,7 @@ class GoodsViewModel(
                 _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
             },
             onFail = { throwable ->
-                throw(throwable)
+                throw (throwable)
             },
         )
     }
@@ -87,8 +101,12 @@ class GoodsViewModel(
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
-        cartRepository.addOrIncreaseQuantity(cartItem.goods, cartItem.quantity) {
-            updateCartQuantity()
+        if (!Authorization.isLogin) {
+            _navigateToLogin.setValue(Unit)
+        } else {
+            cartRepository.addOrIncreaseQuantity(cartItem.goods, cartItem.quantity) {
+                updateCartQuantity()
+            }
         }
     }
 

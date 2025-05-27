@@ -13,7 +13,12 @@ interface CartRemoteDataSource {
         onFailure: (CartFetchError) -> Unit,
     )
 
-    fun fetchGoodsCount(onSuccess: (Int) -> Unit)
+    fun fetchCartCount(
+        onSuccess: (Int) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
+    )
+
+    fun fetchAuthCode(onResponse: (Int) -> Unit)
 
     fun increaseItemCount(itemId: Int)
 

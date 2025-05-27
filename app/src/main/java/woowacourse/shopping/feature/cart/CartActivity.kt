@@ -3,13 +3,9 @@ package woowacourse.shopping.feature.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.CartFetchError
@@ -17,7 +13,6 @@ import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Key
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.cart.adapter.CartViewHolder
@@ -47,47 +42,25 @@ class CartActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.lifecycleOwner = this
         binding.rvCartItems.adapter = adapter
         binding.viewModel = viewModel
-        viewModel.loginErrorEvent.observe(this){ result ->
-            when(result){
-                CartFetchError.Network -> Toast.makeText(this,"네트워크 에러 발생",Toast.LENGTH_SHORT).show()
-                is CartFetchError.Server -> Toast.makeText(this,"로그인 실패",Toast.LENGTH_SHORT).show()
+        viewModel.loginErrorEvent.observe(this) { result ->
+            when (result) {
+                CartFetchError.Network -> Toast.makeText(this, "네트워크 에러 발생", Toast.LENGTH_SHORT).show()
+                is CartFetchError.Server -> Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show()
             }
             finish()
         }
-        showLoginDialog(this)
-
-    }
-
-    fun showLoginDialog(context: Context) {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_login, null)
-        val idEditText = view.findViewById<EditText>(R.id.et_user_id)
-        val pwEditText = view.findViewById<EditText>(R.id.et_password)
-        Log.d("test","ShowLoginDialog")
-        AlertDialog
-            .Builder(context)
-            .setTitle("로그인")
-            .setView(view)
-            .setPositiveButton("로그인") { dialog, _ ->
-                val id = idEditText.text.toString()
-                val pw = pwEditText.text.toString()
-                if (id.isNotBlank() && pw.isNotBlank()) {
-                    viewModel.onLoginInput(id, pw)
-                } else {
-                    Toast.makeText(context, "아이디/비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
-                }
-            }.setNegativeButton("취소", null)
-            .show()
     }
 
     override fun onResume() {
         super.onResume()
-        //viewModel.updateCartQuantity()
+        viewModel.updateCartQuantity()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

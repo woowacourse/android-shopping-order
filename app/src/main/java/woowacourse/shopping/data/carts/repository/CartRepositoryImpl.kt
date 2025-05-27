@@ -9,6 +9,12 @@ import woowacourse.shopping.domain.model.Goods
 class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
+    override fun checkValidBasicKey(onResponse: (Int) -> Unit) {
+        remoteDataSource.fetchAuthCode { code ->
+            onResponse(code)
+        }
+    }
+
     override fun fetchAllCartItems(
         onComplete: (List<CartItem>) -> Unit,
         onFail: (Throwable) -> Unit,
@@ -36,7 +42,8 @@ class CartRepositoryImpl(
                 onComplete(getCartItemByCartResponse(response))
             },
             { response ->
-                onFail(response)},
+                onFail(response)
+            },
         )
     }
 
