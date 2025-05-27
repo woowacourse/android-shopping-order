@@ -11,6 +11,7 @@ androidx-test-runner = "1.6.2"
 assertj-core = "3.27.3"
 core-testing = "2.2.0"
 glide = "4.16.0"
+kotlinx-serialization-json = "1.8.1"
 google-material = "1.12.0"
 gson = "2.11.0"
 junit-jupiter = "5.12.0"
@@ -37,6 +38,7 @@ androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj-core" }
 google-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }
@@ -52,3 +54,4 @@ android-application = { id = "com.android.application", version.ref = "android-g
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "android-junit5" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

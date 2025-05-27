@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
     id("kotlin-kapt")
 }
 
@@ -59,6 +60,7 @@ dependencies {
     implementation(libs.mockwebserver)
     implementation(libs.gson)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.kotlinx.serialization.json)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
