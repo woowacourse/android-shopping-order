@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.shimmer)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
