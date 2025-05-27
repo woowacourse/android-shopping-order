@@ -40,7 +40,7 @@ class ShoppingCartViewModel(
                     updatePaginationState(shoppingCartProducts)
 
                     val items = createShoppingCartItems(shoppingCartProducts)
-                    _shoppingCart.postValue(items)
+                    _shoppingCart.value = items
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE)
                 }
@@ -100,7 +100,7 @@ class ShoppingCartViewModel(
                         updatedProducts.value?.toMutableList() ?: mutableListOf()
                     if (currentUpdatedProducts.contains(product)) return@decreaseQuantity
                     currentUpdatedProducts.add(product)
-                    _updatedProducts.postValue(currentUpdatedProducts)
+                    _updatedProducts.value = currentUpdatedProducts
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE)
                 }
@@ -119,7 +119,7 @@ class ShoppingCartViewModel(
                         updatedProducts.value?.toMutableList() ?: mutableListOf()
                     if (currentUpdatedProducts.contains(product)) return@add
                     currentUpdatedProducts.add(product)
-                    _updatedProducts.postValue(currentUpdatedProducts)
+                    _updatedProducts.value = currentUpdatedProducts
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE)
                 }

@@ -48,29 +48,54 @@ class DefaultShoppingCartRepository(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        shoppingCartService
-            .postCartItem(
-                CartItemRequestDto(
-                    productId = product.id,
-                    quantity = quantity,
-                ),
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        onResult(Result.success(Unit))
-                    }
+        if (quantity == 1) {
+            shoppingCartService
+                .postCartItem(
+                    CartItemRequestDto(
+                        productId = product.id,
+                        quantity = quantity,
+                    ),
+                ).enqueue(
+                    object : Callback<Unit> {
+                        override fun onResponse(
+                            call: Call<Unit>,
+                            response: Response<Unit>,
+                        ) {
+                            onResult(Result.success(Unit))
+                        }
 
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
+                        override fun onFailure(
+                            call: Call<Unit>,
+                            t: Throwable,
+                        ) {
+                            onResult(Result.failure(t))
+                        }
+                    },
+                )
+        } else {
+            val requestDto = CartItemQuantityRequestDto(quantity = quantity)
+            shoppingCartService
+                .updateCartItemQuantity(
+                    productId = product.id,
+                    cartItemQuantityRequestDto = requestDto,
+                ).enqueue(
+                    object : Callback<Unit> {
+                        override fun onResponse(
+                            call: Call<Unit>,
+                            response: Response<Unit>,
+                        ) {
+                            onResult(Result.success(Unit))
+                        }
+
+                        override fun onFailure(
+                            call: Call<Unit>,
+                            t: Throwable,
+                        ) {
+                            onResult(Result.failure(t))
+                        }
+                    },
+                )
+        }
     }
 
     override fun decreaseQuantity(
