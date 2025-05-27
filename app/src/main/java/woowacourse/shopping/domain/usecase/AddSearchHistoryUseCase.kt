@@ -8,7 +8,7 @@ class AddSearchHistoryUseCase(
 ) {
     operator fun invoke(productId: Long) {
         thread {
-            repository.saveHistory(productId)
+            repository.addHistory(productId)
         }
     }
 }

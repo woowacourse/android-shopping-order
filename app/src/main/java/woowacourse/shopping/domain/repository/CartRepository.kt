@@ -13,10 +13,15 @@ interface CartRepository {
 
     fun fetchCartItemCount(): Int
 
-    fun saveCartProduct(
-        productId: Long,
+    fun addCartProduct(
+        id: Long,
         quantity: Int,
     )
 
-    fun deleteCartProduct(productId: Long)
+    fun deleteCartProduct(id: Long)
+
+    fun updateCartProduct(
+        id: Long,
+        quantity: Int,
+    )
 }

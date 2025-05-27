@@ -15,7 +15,7 @@ class IncreaseCartProductQuantityUseCase(
             val existing = repository.fetchCartProductDetail(productId)
             val newQuantity = (existing?.quantity ?: 0) + quantity
 
-            repository.saveCartProduct(productId, newQuantity)
+            repository.addCartProduct(productId, newQuantity)
             callback(newQuantity)
         }
     }

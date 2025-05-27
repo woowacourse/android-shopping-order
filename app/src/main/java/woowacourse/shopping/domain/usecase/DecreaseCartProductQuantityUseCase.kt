@@ -20,7 +20,7 @@ class DecreaseCartProductQuantityUseCase(
                         repository.deleteCartProduct(productId)
                         0
                     } else {
-                        repository.saveCartProduct(productId, newQuantity)
+                        repository.addCartProduct(productId, newQuantity)
                         newQuantity
                     }
                 } else {

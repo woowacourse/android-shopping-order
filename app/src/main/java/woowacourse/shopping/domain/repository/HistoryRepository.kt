@@ -7,5 +7,5 @@ interface HistoryRepository {
 
     fun fetchRecentHistory(): HistoryProduct?
 
-    fun saveHistory(productId: Long)
+    fun addHistory(productId: Long)
 }

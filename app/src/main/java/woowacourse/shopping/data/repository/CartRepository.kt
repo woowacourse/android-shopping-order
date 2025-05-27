@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.api.CartApi
 import woowacourse.shopping.data.dao.CartDao
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.model.request.CartItemQuantityRequest
 import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.CartItemsResponse
 import woowacourse.shopping.domain.model.CartProduct
@@ -35,23 +36,39 @@ class CartRepository(
         )
     }
 
-    override fun fetchCartItemCount(): Int = dao.getCartItemCount()
+    override fun fetchCartItemCount(): Int =
+        api
+            .getCartItemsCount()
+            .execute()
+            .body()
+            ?.quantity ?: 0
 
-    override fun saveCartProduct(
-        productId: Long,
+    override fun addCartProduct(
+        id: Long,
         quantity: Int,
     ) {
         api
             .postCartItem(
                 cartItemRequest =
                     CartItemRequest(
-                        productId = productId,
+                        productId = id,
                         quantity = quantity,
                     ),
             ).execute()
     }
 
-    override fun deleteCartProduct(productId: Long) {
-        dao.deleteCartProduct(productId)
+    override fun updateCartProduct(
+        id: Long,
+        quantity: Int,
+    ) {
+        api
+            .patchCartItem(
+                id = id,
+                cartItemQuantityRequest = CartItemQuantityRequest(quantity),
+            ).execute()
+    }
+
+    override fun deleteCartProduct(id: Long) {
+        api.deleteCartItem(id).execute()
     }
 }
