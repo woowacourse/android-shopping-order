@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.product.dto
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,5 +14,5 @@ data class Content(
     @SerialName("name")
     val name: String?,
     @SerialName("price")
-    val price: Int?
+    val price: Int?,
 )

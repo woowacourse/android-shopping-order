@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.product.dto
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,5 +10,5 @@ data class Sort(
     @SerialName("sorted")
     val sorted: Boolean?,
     @SerialName("unsorted")
-    val unsorted: Boolean?
+    val unsorted: Boolean?,
 )

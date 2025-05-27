@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductResponse(
+data class ProductsResponse(
     @SerialName("content")
     val content: List<Content>?,
     @SerialName("empty")
