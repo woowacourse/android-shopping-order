@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.converter.gson)
     implementation(libs.mock.web.server)
+    implementation(libs.shimmer)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
 }
