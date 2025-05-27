@@ -5,6 +5,7 @@ import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.product.PageableProducts
 import woowacourse.shopping.data.product.dto.Content
 import woowacourse.shopping.data.product.dto.ProductResponse
+import woowacourse.shopping.data.product.dto.ProductsResponse
 import woowacourse.shopping.data.product.entity.ProductEntity
 
 class RemoteProductsDataSource(
@@ -15,17 +16,27 @@ class RemoteProductsDataSource(
         size: Int,
     ): PageableProducts {
         val jsonString: String = productsHttpClient.getProducts(page, size).body?.string() ?: ""
-        val response: ProductResponse = Json.decodeFromString<ProductResponse>(jsonString)
+        val response: ProductsResponse = Json.decodeFromString<ProductsResponse>(jsonString)
         val products = response.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList()
         return PageableProducts(products, response.loadable)
     }
 
     override fun getById(id: Long): ProductEntity? {
-        TODO("Not yet implemented")
+        val productResponse = productsHttpClient.getProductById(id)
+        return productResponse.toEntityOrNull()
     }
 }
 
 private fun Content.toEntityOrNull(): ProductEntity? {
+    return ProductEntity(
+        id = id ?: return null,
+        name = name ?: return null,
+        price = price ?: return null,
+        imageUrl = imageUrl,
+    )
+}
+
+private fun ProductResponse.toEntityOrNull(): ProductEntity? {
     return ProductEntity(
         id = id ?: return null,
         name = name ?: return null,
