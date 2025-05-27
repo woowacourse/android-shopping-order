@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
@@ -17,7 +20,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "USER_ID", "\"${getApiKey("USER_ID")}\"")
+        buildConfigField("String", "PASSWORD", "\"${getApiKey("PASSWORD")}\"")
     }
 
     buildTypes {
@@ -47,7 +54,12 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 configurations.all {
