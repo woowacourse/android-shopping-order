@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
@@ -44,8 +46,20 @@ android {
             excludes += "win32-x86*/**"
         }
     }
+    defaultConfig {
+        val localProperties =
+            Properties().apply {
+                load(File(rootDir, "local.properties").inputStream())
+            }
+        val id = localProperties["id"] as String
+        val pw = localProperties["password"] as String
+
+        buildConfigField("String", "ID", "\"$id\"")
+        buildConfigField("String", "PASSWORD", "\"$pw\"")
+    }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
 }
 
