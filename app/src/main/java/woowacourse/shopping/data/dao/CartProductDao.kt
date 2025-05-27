@@ -1,21 +1,10 @@
 package woowacourse.shopping.data.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
-import woowacourse.shopping.data.entity.CartProductEntity
 
 @Dao
 interface CartProductDao {
-    @Insert
-    fun insert(cartProductEntity: CartProductEntity)
-
-    @Query("SELECT * FROM cart_product LIMIT :limit OFFSET :offset")
-    fun getPagedProducts(
-        limit: Int,
-        offset: Int,
-    ): List<CartProductEntity>
-
     @Query("SELECT COUNT(*) FROM cart_product")
     fun getTotalCount(): Int
 
@@ -30,7 +19,4 @@ interface CartProductDao {
         productId: Long,
         quantity: Int,
     )
-
-    @Query("DELETE from cart_product WHERE product_id == :productId")
-    fun deleteByProductId(productId: Long)
 }

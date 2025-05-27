@@ -2,9 +2,11 @@ package woowacourse.shopping.data.service
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
 import woowacourse.shopping.data.dto.response.CartProductResponseDto
@@ -21,5 +23,11 @@ interface CartProductApiService {
     fun insert(
         @Header("accept") accept: String = "*/*",
         @Body body: CartProductRequestDto,
+    ): Call<Unit>
+
+    @DELETE("/cart-items/{id}")
+    fun deleteByProductId(
+        @Header("accept") accept: String = "*/*",
+        @Path("id") id: Int,
     ): Call<Unit>
 }

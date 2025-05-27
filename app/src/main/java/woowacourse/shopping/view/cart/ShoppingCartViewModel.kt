@@ -10,8 +10,6 @@ class ShoppingCartViewModel(
     private val repository: CartProductRepository,
 ) : ViewModel(),
     ShoppingCartEventHandler {
-    private val cartProducts = mutableListOf<CartProduct>()
-
     private val _products = MutableLiveData<List<CartProduct>>()
     val products: LiveData<List<CartProduct>> = _products
 
@@ -42,13 +40,10 @@ class ShoppingCartViewModel(
     }
 
     override fun onProductRemoveClick(item: CartProduct) {
-        repository.deleteByProductId(item.product.id) {
-            cartProducts.removeIf { it.product.id == item.product.id }
-
+        repository.deleteByProductId(item.id) {
             val currentPage = page.value ?: FIRST_PAGE_NUMBER
-            val startIndex = (currentPage - 1) * PAGE_SIZE
 
-            if (startIndex >= cartProducts.size && currentPage > FIRST_PAGE_NUMBER) {
+            if (products.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
                 loadPage(currentPage - 1)
             } else {
                 loadPage(currentPage)
@@ -66,33 +61,20 @@ class ShoppingCartViewModel(
     }
 
     private fun loadPage(page: Int) {
-        val offset = (page - 1) * PAGE_SIZE
-        val end = offset + PAGE_SIZE
-
-        if (cartProducts.size < end) {
-            repository.getPagedProducts(page - 1, end - cartProducts.size) { result ->
-                cartProducts.addAll(result.items)
-                val hasNext = result.hasNext
-                updatePageState(page, offset, end, hasNext)
-            }
-        } else {
-            checkHasNext(page) {
-                val hasNext = cartProducts.size > end || it
-                updatePageState(page, offset, end, hasNext)
-            }
+        repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
+            _products.postValue(result.items)
+            val hasNext = result.hasNext
+            updatePageState(page, hasNext)
         }
     }
 
     private fun updatePageState(
         page: Int,
-        offset: Int,
-        end: Int,
         hasNext: Boolean,
     ) {
-        _products.postValue(cartProducts.subList(offset, cartProducts.size.coerceAtMost(end)))
         _page.postValue(page)
         val hasPrevious = page > FIRST_PAGE_NUMBER
-        _hasPrevious.postValue(hasPrevious)
+        _hasPrevious.postValue(page > FIRST_PAGE_NUMBER)
         _hasNext.postValue(hasNext)
         _isSinglePage.postValue(!hasNext && !hasPrevious)
     }
@@ -102,20 +84,7 @@ class ShoppingCartViewModel(
         newQuantity: Int,
     ) {
         repository.updateQuantity(item.product.id, item.quantity, newQuantity) {
-            val index = cartProducts.indexOfFirst { it.product.id == item.product.id }
-            if (index != -1) {
-                cartProducts[index] = cartProducts[index].copy(quantity = newQuantity)
-            }
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-        }
-    }
-
-    private fun checkHasNext(
-        page: Int,
-        callback: (Boolean) -> Unit,
-    ) {
-        repository.getPagedProducts(page - 1, 1) { result ->
-            callback(result.items.isNotEmpty())
         }
     }
 

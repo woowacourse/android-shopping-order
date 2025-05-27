@@ -54,7 +54,7 @@ class CartProductRemoteDataSource(
                     call: Call<Unit>,
                     response: Response<Unit>,
                 ) {
-                    if (response.code() == 201) {
+                    if (response.code() == SUCCESS_POST) {
                         onSuccess()
                     }
                 }
@@ -67,5 +67,35 @@ class CartProductRemoteDataSource(
                 }
             },
         )
+    }
+
+    fun deleteByProductId(
+        id: Int,
+        onSuccess: () -> Unit,
+    ) {
+        cartProductService.deleteByProductId(id = id).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit>,
+                    response: Response<Unit>,
+                ) {
+                    if (response.code() == SUCCESS_DELETE) {
+                        onSuccess()
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit>,
+                    t: Throwable,
+                ) {
+                    println("error : $t")
+                }
+            },
+        )
+    }
+
+    companion object {
+        private const val SUCCESS_POST = 201
+        private const val SUCCESS_DELETE = 204
     }
 }

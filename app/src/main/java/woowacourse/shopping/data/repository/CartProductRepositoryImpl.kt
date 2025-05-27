@@ -73,9 +73,8 @@ class CartProductRepositoryImpl(
         onSuccess: () -> Unit,
     ) {
         thread {
-            localDataSource.deleteByProductId(productId)
+            remoteDataSource.deleteByProductId(productId.toInt(), onSuccess)
             totalCount--
-            onSuccess()
         }
     }
 }

@@ -15,6 +15,4 @@ class CartProductLocalDataSource(
         productId: Long,
         quantity: Int,
     ) = dao.updateQuantity(productId, quantity)
-
-    fun deleteByProductId(productId: Long) = dao.deleteByProductId(productId)
 }
