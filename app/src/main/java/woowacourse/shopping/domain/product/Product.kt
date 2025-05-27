@@ -6,8 +6,9 @@ data class Product(
     val id: Long,
     val name: String,
     val imgUrl: String,
+    val category: String = "",
     private val price: Price,
-    val quantity: Quantity,
+    val quantity: Quantity = Quantity(0),
 ) {
     fun canIncrease(other: Quantity): Boolean = !quantity.isExceeded(other)
 
