@@ -88,8 +88,11 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun decreaseQuantity(product: Product) {
-        shoppingCartRepository.decreaseQuantity(product) { result ->
+    fun decreaseQuantity(
+        product: Product,
+        quantity: Int,
+    ) {
+        shoppingCartRepository.decreaseQuantity(product, quantity - 1) { result ->
             result
                 .onSuccess {
                     updateShoppingCart()
@@ -104,8 +107,11 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun addQuantity(product: Product) {
-        shoppingCartRepository.add(product, 1) { result ->
+    fun addQuantity(
+        product: Product,
+        quantity: Int,
+    ) {
+        shoppingCartRepository.add(product, quantity + 1) { result ->
             result
                 .onSuccess {
                     updateShoppingCart()

@@ -162,19 +162,25 @@ class ProductsActivity :
         activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
     }
 
-    override fun onPlusShoppingCartClick(product: Product) {
-        viewModel.addProductToShoppingCart(product)
-    }
-
-    override fun onMinusShoppingCartClick(product: Product) {
-        viewModel.minusProductToShoppingCart(product)
-    }
-
     override fun onLoadClick() {
         viewModel.updateMoreProducts()
     }
 
     override fun onRecentProductClick(product: Product) {
         activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product))
+    }
+
+    override fun onPlusShoppingCartClick(
+        product: Product,
+        quantity: Int,
+    ) {
+        viewModel.addProductToShoppingCart(product, quantity)
+    }
+
+    override fun onMinusShoppingCartClick(
+        product: Product,
+        quantity: Int,
+    ) {
+        viewModel.minusProductToShoppingCart(product, quantity)
     }
 }

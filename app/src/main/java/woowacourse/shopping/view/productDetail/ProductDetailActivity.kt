@@ -90,14 +90,6 @@ class ProductDetailActivity :
         viewModel.addToShoppingCart()
     }
 
-    override fun onPlusShoppingCartClick(product: Product) {
-        viewModel.plusQuantity()
-    }
-
-    override fun onMinusShoppingCartClick(product: Product) {
-        viewModel.minusQuantity()
-    }
-
     override fun onRecentProduct(product: Product) {
         val intent =
             Intent().apply {
@@ -106,6 +98,20 @@ class ProductDetailActivity :
             }
         setResult(ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK, intent)
         finish()
+    }
+
+    override fun onPlusShoppingCartClick(
+        product: Product,
+        quantity: Int,
+    ) {
+        viewModel.plusQuantity()
+    }
+
+    override fun onMinusShoppingCartClick(
+        product: Product,
+        quantity: Int,
+    ) {
+        viewModel.minusQuantity()
     }
 
     companion object {

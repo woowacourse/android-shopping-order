@@ -204,8 +204,11 @@ class ProductsViewModel(
         }
     }
 
-    fun addProductToShoppingCart(product: Product) {
-        shoppingCartRepository.add(product, 1) { result ->
+    fun addProductToShoppingCart(
+        product: Product,
+        quantity: Int,
+    ) {
+        shoppingCartRepository.add(product, quantity + 1) { result ->
             result
                 .onSuccess {
                     val currentProducts = products.value?.toMutableList() ?: return@add
@@ -226,8 +229,11 @@ class ProductsViewModel(
         }
     }
 
-    fun minusProductToShoppingCart(product: Product) {
-        shoppingCartRepository.decreaseQuantity(product) { result ->
+    fun minusProductToShoppingCart(
+        product: Product,
+        quantity: Int,
+    ) {
+        shoppingCartRepository.decreaseQuantity(product, quantity - 1) { result ->
             result
                 .onSuccess {
                     val currentProducts = products.value?.toMutableList() ?: return@decreaseQuantity

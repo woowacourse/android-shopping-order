@@ -17,7 +17,7 @@ class ProductViewHolder(
     }
 
     fun bind(item: ProductsItem.ProductItem) {
-        binding.product = item.product
+        binding.productItem = item
         if (item.selectedQuantity == 0) {
             handleEmptySelectedQuantityVisibility()
             return

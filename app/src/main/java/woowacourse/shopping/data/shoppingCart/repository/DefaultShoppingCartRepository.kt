@@ -6,6 +6,7 @@ import retrofit2.Response
 import woowacourse.shopping.data.shoppingCart.local.dao.ShoppingCartDao
 import woowacourse.shopping.data.shoppingCart.local.entity.ShoppingCartProductEntity
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsDto
+import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
@@ -66,17 +67,31 @@ class DefaultShoppingCartRepository(
 
     override fun decreaseQuantity(
         product: Product,
+        quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        thread {
-            runCatching {
-                shoppingCartDao.decreaseQuantity(product.id)
-            }.onSuccess {
-                onResult(Result.success(Unit))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
+        val requestDto = CartItemQuantityRequestDto(quantity = quantity)
+        shoppingCartService
+            .updateCartItemQuantity(
+                productId = product.id,
+                cartItemQuantityRequestDto = requestDto,
+            ).enqueue(
+                object : Callback<Unit> {
+                    override fun onResponse(
+                        call: Call<Unit>,
+                        response: Response<Unit>,
+                    ) {
+                        onResult(Result.success(Unit))
+                    }
+
+                    override fun onFailure(
+                        call: Call<Unit>,
+                        t: Throwable,
+                    ) {
+                        onResult(Result.failure(t))
+                    }
+                },
+            )
     }
 
     override fun remove(

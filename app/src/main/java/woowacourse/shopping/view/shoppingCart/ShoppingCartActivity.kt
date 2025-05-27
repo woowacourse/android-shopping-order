@@ -95,12 +95,18 @@ class ShoppingCartActivity :
         viewModel.removeShoppingCartProduct(product)
     }
 
-    override fun onPlusShoppingCartClick(product: Product) {
-        viewModel.addQuantity(product)
+    override fun onPlusShoppingCartClick(
+        product: Product,
+        quantity: Int,
+    ) {
+        viewModel.addQuantity(product, quantity)
     }
 
-    override fun onMinusShoppingCartClick(product: Product) {
-        viewModel.decreaseQuantity(product)
+    override fun onMinusShoppingCartClick(
+        product: Product,
+        quantity: Int,
+    ) {
+        viewModel.decreaseQuantity(product, quantity)
     }
 
     companion object {
