@@ -1,8 +1,11 @@
 package woowacourse.shopping.data.network
 
+import android.provider.ContactsContract.Data.CONTENT_TYPE
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
 
 object ApiClient {
@@ -14,8 +17,11 @@ object ApiClient {
             .Builder()
             .baseUrl(BASE_URL)
             .client(provideOkHttpClient(AppInterceptor(authenticationRepository)))
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+            .addConverterFactory(
+                Json {
+                    ignoreUnknownKeys = true
+                }.asConverterFactory(CONTENT_TYPE.toMediaType()),
+            ).build()
 
     private fun provideOkHttpClient(interceptor: AppInterceptor): OkHttpClient =
         OkHttpClient.Builder().run {

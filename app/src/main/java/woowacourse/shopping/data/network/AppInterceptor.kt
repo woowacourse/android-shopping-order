@@ -9,10 +9,10 @@ import java.io.IOException
 class AppInterceptor(
     authenticationRepository: AuthenticationRepository,
 ) : Interceptor {
-    val basicAuth: String =
+    private val basicAuth: String =
         "Basic " +
             Base64.encodeToString(
-                "${authenticationRepository.id} :${authenticationRepository.password}".toByteArray(),
+                "${authenticationRepository.id}:${authenticationRepository.password}".toByteArray(),
                 Base64.NO_WRAP,
             )
 
