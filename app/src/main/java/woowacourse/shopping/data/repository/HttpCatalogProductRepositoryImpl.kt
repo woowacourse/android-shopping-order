@@ -8,7 +8,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.cartitem.ProductResponse
-import woowacourse.shopping.data.service.RetrofitProductService.retrofitService
+import woowacourse.shopping.data.service.ProductService
+import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
 import kotlin.concurrent.thread
 
@@ -16,6 +17,8 @@ class HttpCatalogProductRepositoryImpl(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : CatalogProductRepository {
+    val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
+
     private var cachedProducts: List<ProductUiModel>? = null
 
     private fun getAllProducts(callback: (List<ProductUiModel>) -> Unit) {

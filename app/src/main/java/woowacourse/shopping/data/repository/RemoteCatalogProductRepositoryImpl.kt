@@ -1,16 +1,17 @@
 package woowacourse.shopping.data.repository
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.dto.cartitem.Content
 import woowacourse.shopping.data.dto.cartitem.ProductResponse
-import woowacourse.shopping.data.service.RetrofitProductService.retrofitService
+import woowacourse.shopping.data.service.ProductService
+import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
 
-class RemoteCatalogProductRepositoryImpl: CatalogProductRepository {
+class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
+    val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
+
     override fun getAllProductsSize(callback: (Int) -> Unit) {
         retrofitService.requestProducts().enqueue(object : Callback<ProductResponse> {
             override fun onResponse(

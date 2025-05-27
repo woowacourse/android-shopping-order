@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.shimmer)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)
