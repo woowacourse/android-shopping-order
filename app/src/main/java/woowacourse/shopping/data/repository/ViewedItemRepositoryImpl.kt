@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.ViewedItem
 import woowacourse.shopping.data.source.local.recent.ViewedItemDao
+import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.mapper.toViewedItem
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel

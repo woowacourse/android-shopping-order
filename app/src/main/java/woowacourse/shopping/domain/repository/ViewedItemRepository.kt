@@ -1,6 +1,6 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface ViewedItemRepository {
     fun insertViewedItem(
