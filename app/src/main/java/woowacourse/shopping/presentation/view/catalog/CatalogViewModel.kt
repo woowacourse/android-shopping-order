@@ -30,6 +30,8 @@ class CatalogViewModel(
 
     private val loadSize: Int = 20
     private var lastId: Long = DEFAULT_ID
+    private var currentPage: Int = 0
+
 
     init {
         fetchProducts()
@@ -51,7 +53,7 @@ class CatalogViewModel(
                 val recentUiModels = recentProducts.map { it.toUiModel() }
                 val recentItem = CatalogItem.RecentProductItem(recentUiModels)
 
-                productRepository.loadProducts(lastId, loadSize) { fetchedProducts, hasMore ->
+                productRepository.loadProducts(currentPage, loadSize) { fetchedProducts, hasMore ->
 
                     val fetchedUiModels =
                         fetchedProducts.map { product ->
@@ -85,6 +87,7 @@ class CatalogViewModel(
                     }
 
                     _items.postValue(updatedItems)
+                    currentPage++
                 }
             }
         }
