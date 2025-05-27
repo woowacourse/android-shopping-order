@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.room.runtime)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
