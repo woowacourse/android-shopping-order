@@ -1,31 +1,42 @@
 package woowacourse.shopping.data.product.repository
 
-import woowacourse.shopping.data.product.dataSource.ProductDataSource
-import woowacourse.shopping.data.product.dataSource.ProductRemoteDataSource
+import retrofit2.Call
+import retrofit2.Response
 import woowacourse.shopping.data.product.local.dao.RecentWatchingDao
-import woowacourse.shopping.data.product.local.entity.ProductEntity
 import woowacourse.shopping.data.product.local.entity.RecentWatchingEntity
+import woowacourse.shopping.data.product.remote.dto.ProductsResponseDto
+import woowacourse.shopping.data.product.remote.service.ProductService
 import woowacourse.shopping.domain.product.Product
 import kotlin.concurrent.thread
 
 class DefaultProductsRepository(
-    private val productDataSource: ProductDataSource = ProductRemoteDataSource(),
+    private val productService: ProductService,
     private val recentWatchingDao: RecentWatchingDao,
 ) : ProductsRepository {
     override fun load(
-        lastProductId: Long?,
+        page: Int,
         size: Int,
         onResult: (Result<List<Product>>) -> Unit,
     ) {
-        thread {
-            runCatching {
-                productDataSource.load(lastProductId, size).map(ProductEntity::toDomain)
-            }.onSuccess { products ->
-                onResult(Result.success(products))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
+        productService
+            .getProducts(page = page, size = size)
+            .enqueue(
+                object : retrofit2.Callback<ProductsResponseDto> {
+                    override fun onResponse(
+                        call: Call<ProductsResponseDto>,
+                        response: Response<ProductsResponseDto>,
+                    ) {
+                        onResult(Result.success(response.body()?.toDomain() ?: emptyList()))
+                    }
+
+                    override fun onFailure(
+                        call: Call<ProductsResponseDto>,
+                        t: Throwable,
+                    ) {
+                        onResult(Result.failure(t))
+                    }
+                },
+            )
     }
 
     override fun getRecentWatchingProducts(
@@ -67,9 +78,16 @@ class DefaultProductsRepository(
         @Suppress("ktlint:standard:property-naming")
         private var INSTANCE: ProductsRepository? = null
 
-        fun initialize(recentWatchingDao: RecentWatchingDao) {
+        fun initialize(
+            recentWatchingDao: RecentWatchingDao,
+            productService: ProductService,
+        ) {
             if (INSTANCE == null) {
-                INSTANCE = DefaultProductsRepository(recentWatchingDao = recentWatchingDao)
+                INSTANCE =
+                    DefaultProductsRepository(
+                        recentWatchingDao = recentWatchingDao,
+                        productService = productService,
+                    )
             }
         }
 

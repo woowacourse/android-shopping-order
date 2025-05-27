@@ -29,6 +29,7 @@ class ProductsViewModel(
     val shoppingCartQuantity: LiveData<Int> get() = _shoppingCartQuantity
 
     private var loadable: Boolean = false
+    private var page: Int = MINIMUM_PAGE
 
     init {
         updateProducts()
@@ -36,11 +37,11 @@ class ProductsViewModel(
     }
 
     fun updateProducts() {
+        val offset = (page - 1) * LOAD_PRODUCTS_SIZE
+        val limit = LOAD_PRODUCTS_SIZE + 1
         val currentProducts: List<ProductsItem> = _products.value ?: emptyList()
-        val lastProductId: Long? =
-            (currentProducts.lastOrNull { it is ProductItem } as? ProductItem)?.product?.id
 
-        productsRepository.load(lastProductId, LOAD_PRODUCTS_SIZE + 1) { result ->
+        productsRepository.load(offset, limit) { result ->
             result
                 .onSuccess { newProducts ->
                     loadable = newProducts.size == LOAD_PRODUCTS_SIZE + 1
@@ -292,6 +293,7 @@ class ProductsViewModel(
     }
 
     companion object {
+        private const val MINIMUM_PAGE = 1
         private const val LOAD_PRODUCTS_SIZE = 20
     }
 }

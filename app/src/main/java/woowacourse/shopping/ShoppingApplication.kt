@@ -4,7 +4,9 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.room.Room
 import woowacourse.shopping.data.authentication.repository.DefaultAuthenticationRepository
+import woowacourse.shopping.data.network.ApiClient
 import woowacourse.shopping.data.product.local.database.ProductDatabase
+import woowacourse.shopping.data.product.remote.service.ProductService
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.shoppingCart.local.database.ShoppingCartDatabase
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -38,11 +40,20 @@ class ShoppingApplication : Application() {
         )
     }
 
+    private val productService: ProductService by lazy {
+        ApiClient
+            .getApiClient(DefaultAuthenticationRepository.get())
+            .create(ProductService::class.java)
+    }
+
     override fun onCreate() {
         super.onCreate()
         DefaultShoppingCartRepository.initialize(shoppingCartDatabase.shoppingCartDao())
-        DefaultProductsRepository.initialize(productDatabase.recentWatchingDao())
         DefaultAuthenticationRepository.initialize(authDataSource)
+        DefaultProductsRepository.initialize(
+            productDatabase.recentWatchingDao(),
+            productService,
+        )
 
         DefaultAuthenticationRepository.get().updateUserAuthentication(
             UserAuthentication(
