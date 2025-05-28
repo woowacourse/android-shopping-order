@@ -25,7 +25,7 @@ class ShoppingCartViewModel(
         loadShoppingCart()
     }
 
-    fun loadShoppingCart() {
+    private fun loadShoppingCart() {
         shoppingCartRepository.load(page - 1, COUNT_PER_PAGE) { result: Result<PageableCartItems> ->
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
@@ -91,9 +91,8 @@ class ShoppingCartViewModel(
     fun minusPage() {
         if (page != FIRST_PAGE) {
             page--
+            loadShoppingCart()
         }
-
-        loadShoppingCart()
     }
 
     companion object {
