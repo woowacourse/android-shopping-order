@@ -24,6 +24,9 @@ class ShoppingCartViewModel(
     private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ShoppingCartEvent> get() = _event
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     private var page: Int = MINIMUM_PAGE
     private var hasPreviousPage: Boolean = false
     private var hasNextPage: Boolean = false
@@ -40,8 +43,10 @@ class ShoppingCartViewModel(
 
                     val items = createShoppingCartItems(shoppingCartProducts)
                     _shoppingCart.value = items
+                    _isLoading.value = false
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE)
+                    _isLoading.value = false
                 }
         }
     }

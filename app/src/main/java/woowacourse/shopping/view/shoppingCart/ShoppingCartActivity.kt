@@ -3,6 +3,7 @@ package woowacourse.shopping.view.shoppingCart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -37,8 +38,7 @@ class ShoppingCartActivity :
         }
 
         initDataBinding()
-        bindData()
-        handleEvents()
+        setupObservers()
 
         viewModel.updateShoppingCart()
     }
@@ -55,31 +55,34 @@ class ShoppingCartActivity :
         }
     }
 
-    private fun bindData() {
+    private fun setupObservers() {
         viewModel.shoppingCart.observe(this) { shoppingCart: List<ShoppingCartItem> ->
             shoppingCartProductAdapter.submitList(shoppingCart)
         }
-    }
 
-    private fun handleEvents() {
         viewModel.event.observe(this) { event: ShoppingCartEvent ->
-            @StringRes
-            val messageResourceId: Int =
+            @StringRes val messageResourceId: Int =
                 when (event) {
-                    ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE ->
-                        R.string.shopping_cart_update_shopping_cart_error_message
+                    ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE -> R.string.shopping_cart_update_shopping_cart_error_message
 
-                    ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.shopping_cart_remove_shopping_cart_product_error_message
+                    ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE -> R.string.shopping_cart_remove_shopping_cart_product_error_message
 
-                    ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.products_minus_shopping_cart_product_error_message
+                    ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE -> R.string.products_minus_shopping_cart_product_error_message
 
-                    ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.product_detail_add_shopping_cart_error_message
+                    ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE -> R.string.product_detail_add_shopping_cart_error_message
                 }
 
             binding.root.showSnackBar(getString(messageResourceId))
+        }
+
+        viewModel.isLoading.observe(this) { loading ->
+            if (loading) {
+                binding.shimmerFrameLayoutShoppingCart.visibility = View.VISIBLE
+                binding.shimmerFrameLayoutShoppingCart.startShimmer()
+            } else {
+                binding.shimmerFrameLayoutShoppingCart.stopShimmer()
+                binding.shimmerFrameLayoutShoppingCart.visibility = View.GONE
+            }
         }
     }
 
