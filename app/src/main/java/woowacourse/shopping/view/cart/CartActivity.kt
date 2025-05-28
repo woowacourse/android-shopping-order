@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -81,6 +82,14 @@ class CartActivity : AppCompatActivity(), CartQuantityHandler, CartAdapter.Handl
                             .format(value.quantity),
                     )
             }
+        }
+
+        viewModel.isLoading.observe(this) {
+            if (!it)
+                {
+                    binding.recyclerViewCart.visibility = View.VISIBLE
+                    binding.shimmerLayout.visibility = View.GONE
+                }
         }
     }
 

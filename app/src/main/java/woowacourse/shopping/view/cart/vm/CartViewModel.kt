@@ -24,6 +24,9 @@ class CartViewModel(
     private val _event = MutableSingleLiveData<CartUiEvent>()
     val event: SingleLiveData<CartUiEvent> get() = _event
 
+    private val _isLoading = MutableSingleLiveData(true)
+    val isLoading: SingleLiveData<Boolean> get() = _isLoading
+
     fun decreaseCartQuantity(productId: Long) {
         withState(_uiState.value) { state ->
             val newState = state.decreaseCartQuantity(productId)
@@ -53,6 +56,7 @@ class CartViewModel(
     }
 
     fun loadCarts() {
+        setLoading(true)
         val nextPage = paging.getPageNo() - 1
         cartRepository.loadSinglePage(
             nextPage,
@@ -66,6 +70,8 @@ class CartViewModel(
                 },
                 onFailure = {},
             )
+            Thread.sleep(3000)
+            setLoading(false)
         }
     }
 
@@ -106,5 +112,9 @@ class CartViewModel(
 
     private fun sendEvent(event: CartUiEvent) {
         _event.setValue(event)
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        _isLoading.postValue(isLoading)
     }
 }
