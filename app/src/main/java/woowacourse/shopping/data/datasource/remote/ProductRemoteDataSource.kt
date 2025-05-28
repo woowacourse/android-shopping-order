@@ -58,8 +58,8 @@ class ProductRemoteDataSource(
     }
 
     fun getPagedProducts(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onSuccess: (PagedResult<Product>) -> Unit,
     ) {
         productService.getPagedProducts(page = page, size = size).enqueue(

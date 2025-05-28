@@ -15,7 +15,6 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
-import woowacourse.shopping.view.cart.selection.CartProductSelectionFragmentFactory
 
 class ShoppingCartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityShoppingCartBinding.inflate(layoutInflater) }
@@ -23,13 +22,17 @@ class ShoppingCartActivity : AppCompatActivity() {
         val app = application as ShoppingApplication
         ViewModelProvider(
             this,
-            ShoppingCartViewModelFactory(app.cartProductRepository),
+            ShoppingCartViewModelFactory(
+                app.cartProductRepository,
+                app.recentProductRepository,
+                app.productRepository,
+            ),
         )[ShoppingCartViewModel::class.java]
     }
     private var currentFragment: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportFragmentManager.fragmentFactory = CartProductSelectionFragmentFactory(viewModel)
+        supportFragmentManager.fragmentFactory = ShoppingCartFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
         setUpView()
         supportActionBar?.title = ACTION_BAR_TITLE

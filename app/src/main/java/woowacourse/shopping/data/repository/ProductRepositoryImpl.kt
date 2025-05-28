@@ -23,12 +23,10 @@ class ProductRepositoryImpl(
     }
 
     override fun getPagedProducts(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onSuccess: (PagedResult<Product>) -> Unit,
     ) {
-        require(page >= 0)
-        require(size > 0)
         remoteDataSource.getPagedProducts(page, size, onSuccess)
     }
 }

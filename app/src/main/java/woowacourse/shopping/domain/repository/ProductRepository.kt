@@ -15,8 +15,8 @@ interface ProductRepository {
     )
 
     fun getPagedProducts(
-        page: Int,
-        size: Int,
+        page: Int? = null,
+        size: Int? = null,
         onSuccess: (PagedResult<Product>) -> Unit,
     )
 }
