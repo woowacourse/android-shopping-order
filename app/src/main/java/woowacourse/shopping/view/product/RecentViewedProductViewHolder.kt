@@ -3,7 +3,6 @@ package woowacourse.shopping.view.product
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.data.product.ProductImageUrls.imageUrl
 import woowacourse.shopping.databinding.ItemRecentViewedProductBinding
 import woowacourse.shopping.domain.product.Product
 

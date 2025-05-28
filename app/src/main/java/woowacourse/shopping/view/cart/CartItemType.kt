@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.cart
 
-import woowacourse.shopping.data.product.ProductImageUrls.imageUrl
 import woowacourse.shopping.domain.product.CartItem
 
 sealed interface CartItemType {

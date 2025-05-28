@@ -11,6 +11,7 @@ class CartItemEntity(
     val productId: Long,
     val name: String,
     val price: Int,
+    val imageUrl: String?,
     val quantity: Int,
 ) {
     fun toDomain(): CartItem =
@@ -19,6 +20,7 @@ class CartItemEntity(
             productId,
             name,
             price,
+            imageUrl,
             quantity,
         )
 
@@ -40,16 +42,5 @@ class CartItemEntity(
         result = 31 * result + price
         result = 31 * result + name.hashCode()
         return result
-    }
-
-    companion object {
-        fun CartItem.toEntity(): CartItemEntity =
-            CartItemEntity(
-                id,
-                productId,
-                name,
-                price,
-                quantity,
-            )
     }
 }
