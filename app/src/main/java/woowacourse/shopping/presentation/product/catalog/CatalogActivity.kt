@@ -40,6 +40,11 @@ class CatalogActivity : AppCompatActivity() {
         observeViewModel()
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.initCatalog()
+    }
+
     private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -68,14 +73,16 @@ class CatalogActivity : AppCompatActivity() {
         GridLayoutManager(this, 2).apply {
             spanSizeLookup =
                 object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int = if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
+                    override fun getSpanSize(position: Int): Int =
+                        if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
                 }
         }
 
     private fun setupRecentViewedRecyclerView(handler: CatalogEventHandlerImpl) {
         viewedAdapter = ViewedItemAdapter(handler)
         binding.recyclerViewRecentView.apply {
-            layoutManager = LinearLayoutManager(this@CatalogActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager =
+                LinearLayoutManager(this@CatalogActivity, LinearLayoutManager.HORIZONTAL, false)
             adapter = viewedAdapter
         }
     }
@@ -116,9 +123,4 @@ class CatalogActivity : AppCompatActivity() {
         CatalogEventHandlerImpl(viewModel) { product ->
             startActivity(newIntent(this, product.id))
         }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadRecentViewedItems()
-    }
 }

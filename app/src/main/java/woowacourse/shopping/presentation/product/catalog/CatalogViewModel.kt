@@ -32,11 +32,11 @@ class CatalogViewModel(
     private val _updatedProduct = MutableLiveData<ProductUiModel>()
     val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
 
-    //    private val loadedProducts = mutableListOf<ProductUiModel>()
     private var currentPage = 0
     val page: Int get() = currentPage
 
-    init {
+    fun initCatalog() {
+        currentPage = 0
         loadCatalogProducts()
         loadRecentViewedItems()
         updateCartCount()
@@ -59,7 +59,7 @@ class CatalogViewModel(
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
         _updatedProduct.value = newProduct
-        cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
+        cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
             result
                 .onSuccess {
                     _updatedProduct.postValue(newProduct)
@@ -77,15 +77,15 @@ class CatalogViewModel(
             )
 
         _updatedProduct.value = updated
-        if (newQuantity == 0) {
-            cartRepository.deleteCartItem(updated.id) { result ->
+        if (product.quantity == 0) {
+            cartRepository.deleteCartItem(product.id) { result ->
                 result
                     .onSuccess {
-                        applyProductChange(updated)
+                        applyProductChange(product)
                     }
             }
         } else {
-            cartRepository.updateCartItem(updated.id, updated.quantity) { result ->
+            cartRepository.updateCartItemQuantity(updated.id, updated.quantity) { result ->
                 result
                     .onSuccess {
                         _updatedProduct.postValue(updated)
@@ -112,16 +112,15 @@ class CatalogViewModel(
 
     private fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
         productsRepository.getProducts(currentPage, pageSize) { result ->
-            result.onSuccess { pagingData ->
-                val newPagingData = cartRepository.getQuantity(pagingData)
-                _pagingData.postValue(
-                    newPagingData
-                )
-            }
+            result
+                .onSuccess { pagingData ->
+                    val newPagingData = cartRepository.getQuantity(pagingData)
+                    _pagingData.postValue(newPagingData)
+                }
         }
     }
 
-    fun loadRecentViewedItems() {
+    private fun loadRecentViewedItems() {
         viewedRepository.getViewedItems { items ->
             _recentViewedItems.postValue(items)
             _hasRecentViewedItems.postValue(items.isNotEmpty())
