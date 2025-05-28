@@ -58,14 +58,14 @@ class ProductViewModel(
     }
 
     fun fetchCartItemCount() {
-//        cartRepository.getTotalQuantity { result ->
-//            result
-//                .onSuccess { count ->
-//                    _cartItemCount.postValue(count ?: 0)
-//                }.onFailure {
-//                    _toastMessage.postValue(R.string.product_toast_load_total_cart_quantity_fail)
-//                }
-//        }
+        cartRepository.getTotalCount { result ->
+            result
+                .onSuccess { count ->
+                    _cartItemCount.postValue(count)
+                }.onFailure {
+                    _toastMessage.postValue(R.string.product_toast_load_total_cart_quantity_fail)
+                }
+        }
     }
 
     fun loadMore() {
