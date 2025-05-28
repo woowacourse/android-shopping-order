@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
@@ -27,7 +28,7 @@ class CartViewModel(
     val cartItems: LiveData<List<CartProductUiModel>> = _cartItems
 
     private val _page = MutableLiveData(DEFAULT_PAGE)
-    val page: LiveData<Int> = _page
+    val page: LiveData<Int> = _page.map { it + 1 }
 
     private val _hasMore = MutableLiveData<Boolean>()
     val hasMore: LiveData<Boolean> = _hasMore
@@ -43,36 +44,47 @@ class CartViewModel(
 
     fun fetchCartItems(direction: FetchPageDirection) {
         val newPage = calculatePage(direction)
-        val offset = (newPage - DEFAULT_PAGE) * limit
-        _isLoading.value = true
-        cartRepository.loadCartItems(offset, limit) { result ->
+        _isLoading.postValue(true)
+
+        cartRepository.fetchCartItems(newPage, limit) { result ->
             result
                 .onSuccess { handleFetchCartItemsSuccess(it, newPage) }
                 .onFailure { postFailureEvent(CartMessageEvent.FETCH_CART_ITEMS_FAILURE) }
         }
     }
 
-    fun deleteCartItem(productId: Long) {
-        cartRepository.deleteCartItem(productId) { result ->
+    fun deleteCartItem(cartId: Long) {
+        cartRepository.deleteCartItem(cartId) { result ->
             result
-                .onSuccess { handleFetchCartItemDeleted(productId) }
+                .onSuccess { handleFetchCartItemDeleted(cartId) }
                 .onFailure { postFailureEvent(CartMessageEvent.DELETE_CART_ITEM_FAILURE) }
         }
     }
 
-    fun increaseProductQuantity(productId: Long) {
-        cartRepository.addCartItem(productId, QUANTITY_STEP) { result ->
-            result
-                .onSuccess { refreshProductQuantity(productId) }
-                .onFailure { postFailureEvent(CartMessageEvent.INCREASE_PRODUCT_TO_CART_FAILURE) }
-        }
+    fun increaseProductQuantity(
+        cartId: Long,
+        currentQuantity: Int,
+    ) {
+        val increasedQuantity = currentQuantity + 1
+        patchCartItemQuantity(cartId, increasedQuantity)
     }
 
-    fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseCartItemQuantity(productId) { result ->
+    fun decreaseProductQuantity(
+        cartId: Long,
+        currentQuantity: Int,
+    ) {
+        val decreasedQuantity = currentQuantity - 1
+        patchCartItemQuantity(cartId, decreasedQuantity)
+    }
+
+    private fun patchCartItemQuantity(
+        cartId: Long,
+        quantity: Int,
+    ) {
+        cartRepository.patchCartItemQuantity(cartId, quantity) { result ->
             result
-                .onSuccess { refreshProductQuantity(productId) }
-                .onFailure { postFailureEvent(CartMessageEvent.DECREASE_PRODUCT_FROM_CART_FAILURE) }
+                .onSuccess { refreshProductQuantity() }
+                .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
@@ -95,34 +107,24 @@ class CartViewModel(
         _isLoading.postValue(false)
     }
 
-    private fun refreshProductQuantity(productId: Long) {
-        cartRepository.findCartItemByProductId(productId) { result ->
+    private fun refreshProductQuantity() {
+        val newPage = calculatePage(FetchPageDirection.CURRENT)
+        cartRepository.fetchCartItems(newPage, limit) { result ->
             result
-                .onSuccess { cartItem ->
-                    updateItemQuantityInList(cartItem)
+                .onSuccess { pageableItem ->
+                    val (cartItems, hasMore) = pageableItem
+                    val uiModels = cartItems.map { it.toCartItemUiModel() }
+                    _cartItems.postValue(uiModels)
+                    _hasMore.postValue(hasMore)
                 }.onFailure {
-                    if (it is NoSuchElementException) {
-                        handleFetchCartItemDeleted(productId)
-                        return@onFailure
-                    }
                     postFailureEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE)
                 }
         }
     }
 
-    private fun updateItemQuantityInList(updatedCartProduct: CartProduct) {
+    private fun handleFetchCartItemDeleted(deletedCartId: Long) {
         val items = _cartItems.value.orEmpty()
-        val updatedItems =
-            items.map { item ->
-                if (item.productId != updatedCartProduct.product.id) return@map item
-                updatedCartProduct.toCartItemUiModel()
-            }
-        _cartItems.postValue(updatedItems)
-    }
-
-    private fun handleFetchCartItemDeleted(deletedProductId: Long) {
-        val items = _cartItems.value.orEmpty()
-        val isLastItem = items.size == 1 && items.first().productId == deletedProductId
+        val isLastItem = items.size == 1 && items.first().cartId == deletedCartId
 
         fetchCartItems(if (isLastItem) FetchPageDirection.PREVIOUS else FetchPageDirection.CURRENT)
     }
@@ -132,9 +134,8 @@ class CartViewModel(
     }
 
     companion object {
-        private const val DEFAULT_PAGE = 1
+        private const val DEFAULT_PAGE = 0
         private const val PAGE_STEP = 1
-        private const val QUANTITY_STEP = 1
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

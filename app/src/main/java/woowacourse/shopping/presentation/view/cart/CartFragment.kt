@@ -26,16 +26,22 @@ class CartFragment :
         setupCartAdapter()
     }
 
-    override fun onDeleteProduct(productId: Long) {
-        viewModel.deleteCartItem(productId)
+    override fun onDeleteProduct(cartId: Long) {
+        viewModel.deleteCartItem(cartId)
     }
 
-    override fun increaseQuantity(productId: Long) {
-        viewModel.increaseProductQuantity(productId)
+    override fun increaseQuantity(
+        cartId: Long,
+        quantity: Int,
+    ) {
+        viewModel.increaseProductQuantity(cartId, quantity)
     }
 
-    override fun decreaseQuantity(productId: Long) {
-        viewModel.decreaseProductQuantity(productId)
+    override fun decreaseQuantity(
+        cartId: Long,
+        quantity: Int,
+    ) {
+        viewModel.decreaseProductQuantity(cartId, quantity)
     }
 
     private fun setupActionBar() {
@@ -70,11 +76,8 @@ class CartFragment :
             CartMessageEvent.DELETE_CART_ITEM_FAILURE ->
                 R.string.cart_screen_event_message_delete_cart_item_failure
 
-            CartMessageEvent.INCREASE_PRODUCT_TO_CART_FAILURE ->
-                R.string.cart_screen_event_message_increase_cart_item_count_failure
-
-            CartMessageEvent.DECREASE_PRODUCT_FROM_CART_FAILURE ->
-                R.string.cart_screen_event_message_decrease_cart_item_count_failure
+            CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE ->
+                R.string.cart_screen_event_message_patch_cart_product_quantity_failure
 
             CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE ->
                 R.string.cart_screen_event_message_find_quantity_failure

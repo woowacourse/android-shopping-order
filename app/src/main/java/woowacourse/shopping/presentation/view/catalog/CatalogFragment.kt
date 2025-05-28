@@ -57,15 +57,21 @@ class CatalogFragment :
     }
 
     override fun onQuantitySelectorOpenButtonClick(productId: Long) {
-        viewModel.increaseProductQuantity(productId)
+//        viewModel.increaseProductQuantity(productId, 0)
     }
 
-    override fun increaseQuantity(productId: Long) {
-        viewModel.increaseProductQuantity(productId)
+    override fun increaseQuantity(
+        cartId: Long,
+        quantity: Int,
+    ) {
+        viewModel.increaseProductQuantity(cartId, quantity)
     }
 
-    override fun decreaseQuantity(productId: Long) {
-        viewModel.decreaseProductQuantity(productId)
+    override fun decreaseQuantity(
+        cartId: Long,
+        quantity: Int,
+    ) {
+        viewModel.decreaseProductQuantity(cartId, quantity)
     }
 
     private fun setupUI() {
@@ -145,11 +151,8 @@ class CatalogFragment :
             CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE ->
                 R.string.catalog_screen_event_message_fetch_cart_item_count_failure
 
-            CatalogMessageEvent.INCREASE_PRODUCT_TO_CART_FAILURE ->
-                R.string.catalog_screen_event_message_increase_cart_item_count_failure
-
-            CatalogMessageEvent.DECREASE_PRODUCT_FROM_CART_FAILURE ->
-                R.string.catalog_screen_event_message_decrease_cart_item_count_failure
+            CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE ->
+                R.string.catalog_screen_event_message_patch_cart_product_quantity_failure
 
             CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE ->
                 R.string.catalog_screen_event_message_find_quantity_failure

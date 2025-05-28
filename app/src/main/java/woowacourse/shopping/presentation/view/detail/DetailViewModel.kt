@@ -49,7 +49,7 @@ class DetailViewModel(
     }
 
     fun loadProduct(productId: Long) {
-        productRepository.findProductInfoById(productId) { result ->
+        productRepository.fetchProduct(productId.toInt()) { result ->
             result
                 .onSuccess {
                     _product.postValue(it.toUiModel())
