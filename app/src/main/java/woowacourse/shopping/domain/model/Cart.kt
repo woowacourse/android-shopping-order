@@ -19,9 +19,10 @@ class Cart(
 
     fun findCartProductByProductId(productId: Long): CartProduct? = cachedCartProducts[productId]
 
-    fun findQuantityByProductId(productId: Long): Int = cachedCartProducts[productId]?.quantity ?: 0
+    fun findQuantityByProductId(productId: Long): Int = cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
 
-    fun findCartIdByProductId(productId: Long): Long = cachedCartProducts[productId]?.cartId ?: 0
+    fun findCartIdByProductId(productId: Long): Long =
+        requireNotNull(cachedCartProducts[productId]?.cartId) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
 
     fun updateQuantityByProductId(
         productId: Long,
@@ -29,5 +30,10 @@ class Cart(
     ) {
         val foundCartProduct = cachedCartProducts[productId] ?: return
         cachedCartProducts[productId] = foundCartProduct.copy(quantity = quantity)
+    }
+
+    companion object {
+        private const val DEFAULT_QUANTITY = 0
+        private const val NOT_FOUND_CART_ID_ERROR_MESSAGE = "해당 상품의 카트 ID를 찾을 수 없습니다."
     }
 }
