@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.product
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.product.Product
@@ -48,20 +49,8 @@ class ProductsAdapter(
 
     override fun getItemCount(): Int = items.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun submitList(items: List<ProductsItem>) {
-//        if (items.isEmpty()) {
-//            val oldItemCount = itemCount
-//            this.items = items
-//            notifyItemRangeRemoved(0, oldItemCount)
-//        }
-//
-//        val paginationItemPosition = itemCount - 1
-//        notifyItemRemoved(paginationItemPosition)
-//
-//        val oldItemCount = itemCount - 1
-//        this.items = items
-//        notifyItemChanged(0)
-//        notifyItemRangeInserted(oldItemCount, itemCount - oldItemCount)
         this.items = items
         notifyDataSetChanged()
     }
