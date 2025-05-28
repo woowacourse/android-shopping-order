@@ -184,12 +184,13 @@ class CartRemoteDataSourceImpl(
 
     override fun addItem(
         itemId: Int,
+        itemCount:Int,
         onSuccess: (resultCode: Int) -> Unit,
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
             .addCartItem(
-                cartItem = CartItemRequest(itemId, 1),
+                cartItem = CartItemRequest(itemId, itemCount),
                 authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
                 object : Callback<Unit> {

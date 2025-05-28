@@ -166,7 +166,7 @@ class GoodsViewModel(
     }
 
     private fun addCartItem(cartItem: CartItem) {
-        cartRepository.addCartItem(cartItem.goods, {
+        cartRepository.addCartItem(cartItem.goods, 1, {
             cashedCartItems[cartItem.goods.id] = cartItem.copy(quantity = 1)
             bindCartCache()
         }, {})

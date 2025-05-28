@@ -66,7 +66,8 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
+        cartResponse.toCartItems()
 
     override fun updateQuantity(
         cartId: Int,
@@ -98,10 +99,11 @@ class CartRepositoryImpl(
 
     override fun addCartItem(
         goods: Goods,
+        quantity: Int,
         onComplete: (Int) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
-        remoteDataSource.addItem(goods.id, onComplete, onFail)
+        remoteDataSource.addItem(goods.id, quantity, onComplete, onFail)
     }
 
     override fun getAllItemsSize(onComplete: (Int) -> Unit) {

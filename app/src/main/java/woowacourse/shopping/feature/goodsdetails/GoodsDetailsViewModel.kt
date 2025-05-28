@@ -68,7 +68,7 @@ class GoodsDetailsViewModel(
                     { Log.d("test", "fail") }
                 )
             } else {
-                cartRepository.addCartItem(item.goods, { addedCart(item.quantity) }, {})
+                cartRepository.addCartItem(item.goods, item.quantity, { addedCart(item.quantity) }, {})
             }
         }
     }
