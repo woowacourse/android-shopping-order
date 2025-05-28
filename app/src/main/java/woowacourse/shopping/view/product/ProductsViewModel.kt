@@ -26,6 +26,8 @@ class ProductsViewModel(
     private val _productsItems: MutableLiveData<List<ProductsItem>> = MutableLiveData(emptyList())
     val productsItems: LiveData<List<ProductsItem>> get() = _productsItems
 
+    val loading: MutableLiveData<Boolean> = MutableLiveData(true)
+
     private var cartItems: List<CartItem> = emptyList()
 
     private var page: Int = MIN_PAGE
@@ -80,6 +82,8 @@ class ProductsViewModel(
                         }
                     val loadItem = ProductsItem.LoadItem(pageableProducts.loadable)
                     _productsItems.postValue(listOf(recentViewedProductsItem) + productItems + loadItem)
+                    Thread.sleep(1000)
+                    loading.postValue(false)
                 }.onFailure {
                     _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
                 }

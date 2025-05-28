@@ -89,6 +89,7 @@
             android:orientation="vertical"
             android:paddingTop="20dp"
             android:paddingBottom="8dp"
+            android:visibility="@{viewModel.loading ? View.GONE: View.VISIBLE}"
             app:adapter="@{adapter}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/productsToolbar"
@@ -96,6 +97,48 @@
             tools:listitem="@layout/item_product"
             tools:spanCount="2" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"
+            android:visibility="@{viewModel.loading ? View.VISIBLE: View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productsToolbar">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:columnCount="2"
+                android:rowCount="5">
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+            </GridLayout>
+
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
