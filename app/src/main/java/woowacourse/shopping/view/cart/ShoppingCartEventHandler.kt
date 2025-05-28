@@ -6,4 +6,6 @@ interface ShoppingCartEventHandler : CartProductViewHolder.EventHandler {
     fun loadPreviousProducts()
 
     fun loadNextProducts()
+
+    fun onSelectAllItems()
 }

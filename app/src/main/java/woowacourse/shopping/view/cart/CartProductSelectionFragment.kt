@@ -52,7 +52,7 @@ class CartProductSelectionFragment(
             adapter.updateItems(value)
         }
 
-        viewModel.onFinishLoading.observe(viewLifecycleOwner) { value ->
+        viewModel.isFinishedLoading.observe(viewLifecycleOwner) { value ->
             when (value) {
                 true -> binding.sfLoading.visibility = View.GONE
                 false -> {

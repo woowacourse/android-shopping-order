@@ -28,8 +28,11 @@ class ShoppingCartViewModel(
     private val _isSinglePage = MutableLiveData(true)
     val isSinglePage: LiveData<Boolean> = _isSinglePage
 
-    private val _onFinishLoading = MutableLiveData(false)
-    val onFinishLoading: LiveData<Boolean> get() = _onFinishLoading
+    private val _isSelectedAll = MutableLiveData(false)
+    val isSelectedAll: LiveData<Boolean> = _isSelectedAll
+
+    private val _isFinishedLoading = MutableLiveData(false)
+    val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
 
     init {
         loadPage(FIRST_PAGE_NUMBER)
@@ -58,14 +61,16 @@ class ShoppingCartViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        val cartProductItem = products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
+        val cartProductItem =
+            products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
         repository.updateQuantity(cartProductItem.cartProduct, 1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
     }
 
     override fun onQuantityDecreaseClick(item: CartProduct) {
-        val cartProductItem = products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
+        val cartProductItem =
+            products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
         if (cartProductItem.cartProduct.quantity == 1) return
         repository.updateQuantity(cartProductItem.cartProduct, -1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
@@ -73,20 +78,52 @@ class ShoppingCartViewModel(
     }
 
     override fun onSelectItem(item: CartProduct) {
-        if (item.id in selectedId) {
-            selectedId.add(item.id)
-        } else {
+        val isSelected = item.id in selectedId
+        if (isSelected) {
             selectedId.remove(item.id)
+        } else {
+            selectedId.add(item.id)
         }
+        _products.value =
+            products.value.orEmpty().map {
+                if (it.cartProduct.id == item.id) {
+                    it.copy(isSelected = !isSelected)
+                } else {
+                    it
+                }
+            }
+        updateIsSelectedAll()
+    }
+
+    override fun onSelectAllItems() {
+        val currentProducts = products.value.orEmpty()
+        val allIds = currentProducts.map { it.cartProduct.id }
+        val isSelectedAll = isSelectedAll.value ?: false
+
+        if (isSelectedAll) {
+            selectedId.removeAll(allIds.toSet())
+        } else {
+            selectedId.addAll(allIds)
+        }
+
+        val updatedProducts = currentProducts.map { it.copy(isSelected = !isSelectedAll) }
+        _isSelectedAll.value = !isSelectedAll
+        _products.value = updatedProducts
+    }
+
+    private fun updateIsSelectedAll() {
+        _isSelectedAll.postValue(products.value?.all { it.isSelected } ?: false)
     }
 
     private fun loadPage(page: Int) {
-        _onFinishLoading.value = false
+        _isSelectedAll.value = false
+        _isFinishedLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
-            _onFinishLoading.value = true
-            _products.postValue(result.items.map { CartProductItem(it, it.id in selectedId) })
+            _isFinishedLoading.value = true
+            _products.value = (result.items.map { CartProductItem(it, it.id in selectedId) })
             val hasNext = result.hasNext
             updatePageState(page, hasNext)
+            updateIsSelectedAll()
         }
     }
 

@@ -35,6 +35,10 @@ class ShoppingCartActivity : AppCompatActivity() {
                 add(R.id.fragment, CartProductSelectionFragment::class.java, null)
             }
         }
+
+        binding.handler = viewModel
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
     }
 
     private fun setUpView() {
