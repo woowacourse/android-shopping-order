@@ -29,16 +29,24 @@ class CartViewModel(
     private val _editedProductIds: MutableLiveData<Set<Long>> = MutableLiveData(emptySet())
     val editedProductIds: LiveData<Set<Long>> get() = _editedProductIds
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     init {
         loadCartProducts()
     }
 
     private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
-        getCartProductsUseCase(
-            page = page.current,
-            size = DEFAULT_PAGE_SIZE,
-        ) { cartProducts ->
-            _cartProducts.postValue(cartProducts)
+        runCatching {
+            _isLoading.value = true
+            getCartProductsUseCase(
+                page = page.current,
+                size = DEFAULT_PAGE_SIZE,
+            ) { cartProducts ->
+                _cartProducts.postValue(cartProducts)
+            }
+        }.onSuccess {
+            _isLoading.value = false
         }
     }
 
