@@ -15,7 +15,7 @@ class DecreaseCartProductQuantityUseCase(
     ) {
         thread {
             if (product.cartId == null) return@thread
-            val newQuantity = (product.quantity - quantityStep).coerceAtLeast(0)
+            val newQuantity = (product.quantity - quantityStep).coerceAtLeast(MINIMUM_QUANTITY)
 
             if (newQuantity <= MINIMUM_QUANTITY) {
                 repository.deleteCartProduct(product.cartId)

@@ -52,11 +52,11 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
                     viewModel.updateCartProduct()
                 }
 
-                override fun onLastHistoryProductClick(id: Long) {
+                override fun onLastHistoryProductClick(productId: Long) {
                     setResult(
                         ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.code,
                         Intent().apply {
-                            putExtra(ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.key, id)
+                            putExtra(ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.key, productId)
                         },
                     )
                     finish()
@@ -106,7 +106,7 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
     interface OnClickHandler {
         fun onAddCartProductClick()
 
-        fun onLastHistoryProductClick(id: Long)
+        fun onLastHistoryProductClick(productId: Long)
     }
 
     companion object {

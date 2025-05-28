@@ -16,7 +16,6 @@ import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
-import woowacourse.shopping.ui.catalog.adapter.product.CatalogItem.LoadMoreItem.id
 
 class CartViewModel(
     private val getCartProductsUseCase: GetCartProductsUseCase,
@@ -76,9 +75,7 @@ class CartViewModel(
             product = cartProducts.value?.getProductByProductId(productId) ?: return,
         ) { newQuantity ->
             if (newQuantity > MINIMUM_QUANTITY) {
-                _cartProducts.postValue(
-                    cartProducts.value?.updateProductQuantity(id, newQuantity),
-                )
+                _cartProducts.postValue(cartProducts.value?.updateProductQuantity(productId, newQuantity))
             } else {
                 loadCartProducts()
             }
