@@ -49,7 +49,7 @@ class DetailViewModel(
     }
 
     fun loadProduct(productId: Long) {
-        productRepository.fetchProduct(productId.toInt()) { result ->
+        productRepository.fetchProduct(productId) { result ->
             result
                 .onSuccess {
                     _product.postValue(it.toUiModel())
@@ -72,7 +72,7 @@ class DetailViewModel(
         val product = _product.value ?: return
         val quantity = _quantity.value ?: DEFAULT_QUANTITY
 
-        cartRepository.addCartItem(product.id, quantity) { result ->
+        cartRepository.insertCartProductQuantityToCart(product.id, quantity) { result ->
             result
                 .onSuccess { _addToCartSuccessEvent.postValue(Unit) }
                 .onFailure { _toastEvent.postValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }
