@@ -10,11 +10,11 @@ class DetailEventHandlerImpl(
 ) : DetailEventHandler,
     ProductQuantityHandler {
     override fun onPlusQuantity(product: ProductUiModel) {
-//        viewModel.increaseQuantity()
+        viewModel.increaseQuantity()
     }
 
     override fun onMinusQuantity(product: ProductUiModel) {
-//        viewModel.decreaseQuantity()
+        viewModel.decreaseQuantity()
     }
 
     override fun onAddCartItem(product: ProductUiModel) {
