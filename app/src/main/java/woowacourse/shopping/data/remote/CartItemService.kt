@@ -35,8 +35,5 @@ interface CartItemService {
     ): Call<ProductsResponse>
 
     @GET("/cart-items/counts")
-    fun requestCartItemCount(
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20,
-    ): Call<ProductsResponse>
+    fun requestCartItemCount(): Call<CartItemCountResponse>
 }

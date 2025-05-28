@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.CartItem
 
 interface CartRepository {
-//    fun getCartItemCount(onResult: (Result<Int?>) -> Unit)
+    fun getTotalCount(onResult: (Result<Int>) -> Unit)
 
     fun fetchPagedCartItems(
         page: Int,

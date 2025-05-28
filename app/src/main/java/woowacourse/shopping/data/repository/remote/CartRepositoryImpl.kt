@@ -1,20 +1,24 @@
 package woowacourse.shopping.data.repository.remote
 
-import woowacourse.shopping.data.CartItemMapper
 import woowacourse.shopping.data.datasource.remote.CartDataSource
+import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
     private val cartDataSource: CartDataSource,
-    private val cartItemMapper: CartItemMapper,
 ) : CartRepository {
-//    override fun getCartItemCount(onResult: (Result<Int?>) -> Unit) {
-//        runThread(
-//            block = { cartDataSource.getCartProductCount() },
-//            onResult = onResult,
-//        )
-//    }
+    private var cachedCart = Cart()
+
+    init {
+        fetchAllCartItems()
+    }
+
+    override fun getTotalCount(onResult: (Result<Int>) -> Unit) {
+        cartDataSource.getTotalCount { result ->
+            onResult(result)
+        }
+    }
 
     override fun fetchPagedCartItems(
         page: Int,
@@ -93,4 +97,14 @@ class CartRepositoryImpl(
 //            onResult = onResult,
 //        )
 //    }
+
+    private fun fetchAllCartItems() {
+        cartDataSource.getTotalCount { result ->
+            val totalCount = result.getOrNull() ?: 0
+
+            cartDataSource.getPagedCartProducts(0, totalCount) { cartItems ->
+                cachedCart = Cart(cartItems)
+            }
+        }
+    }
 }

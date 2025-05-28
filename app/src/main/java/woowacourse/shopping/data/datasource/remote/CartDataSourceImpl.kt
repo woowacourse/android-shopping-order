@@ -9,19 +9,33 @@ import woowacourse.shopping.data.remote.CartItemService
 import woowacourse.shopping.domain.model.CartItem
 
 class CartDataSourceImpl(
-    private val carItemService: CartItemService,
+    private val cartItemService: CartItemService,
 ) : CartDataSource {
-//    override fun getCartProductCount(): Int = carItemService.getAllProductCount()
-//
-//    override fun getTotalQuantity(): Int? = carItemService.getTotalQuantity()
-//
-//    override fun getQuantityById(productId: Long): Int = carItemService.getQuantityById(productId)
+    override fun getTotalCount(
+        onResult: (Result<Int>) -> Unit
+    ) = cartItemService.requestCartItemCount().enqueue(
+        object : Callback<CartItemCountResponse> {
+            override fun onResponse(
+                call: Call<CartItemCountResponse>,
+                response: Response<CartItemCountResponse>
+            ) {
+                if (response.isSuccessful) {
+                    onResult(Result.success(response.body()?.quantity ?: 0))
+                }
+            }
+
+            override fun onFailure(call: Call<CartItemCountResponse>, t: Throwable) {
+                onResult(Result.failure(t))
+            }
+
+        }
+    )
 
     override fun getPagedCartProducts(
         page: Int,
         size: Int,
         onResult: (List<CartItem>) -> Unit,
-    ) = carItemService.requestCartItems(page = page, size = size).enqueue(
+    ) = cartItemService.requestCartItems(page = page, size = size).enqueue(
         object : Callback<CartsResponse> {
             override fun onResponse(
                 call: Call<CartsResponse>,

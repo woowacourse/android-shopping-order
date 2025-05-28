@@ -3,11 +3,7 @@ package woowacourse.shopping.data.datasource.remote
 import woowacourse.shopping.domain.model.CartItem
 
 interface CartDataSource {
-//    fun getCartProductCount(): Int
-//
-//    fun getTotalQuantity(): Int?
-//
-//    fun getQuantityById(productId: Long): Int
+    fun getTotalCount(onResult: (Result<Int>) -> Unit)
 
     fun getPagedCartProducts(
         page: Int,
