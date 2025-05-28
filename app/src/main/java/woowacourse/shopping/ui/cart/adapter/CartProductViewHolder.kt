@@ -5,7 +5,7 @@ import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.ui.custom.CartCountView
 
-class CartViewHolder(
+class CartProductViewHolder(
     private val binding: ItemCartBinding,
     private val onClickHandler: OnClickHandler,
 ) : RecyclerView.ViewHolder(binding.root) {

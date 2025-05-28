@@ -21,4 +21,7 @@
     <string name="products_cart">장바구니</string>
     <string name="cart_count_decrease">–</string>
     <string name="cart_count_increase">+</string>
+    <string name="cart_select_all">전체</string>
+    <string name="cart_order_price">%,d원</string>
+    <string name="cart_order">주문하기(%d)</string>
 </resources>

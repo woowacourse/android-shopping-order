@@ -5,19 +5,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.ui.cart.adapter.CartAdapter
-import woowacourse.shopping.ui.cart.adapter.CartViewHolder
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
 
 class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
     private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
-    private val cartAdapter: CartAdapter = CartAdapter(createAdapterOnClickHandler())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+            }
+        }
 
         initSupportActionBar()
         initViewBinding()
@@ -37,14 +41,9 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
     private fun initViewBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.cartProductItemsContainer.adapter = cartAdapter
-        binding.cartProductItemsContainer.itemAnimator = null
     }
 
     private fun initObservers() {
-        viewModel.cartProducts.observe(this) { products ->
-            cartAdapter.submitItems(products.products)
-        }
         viewModel.editedProductIds.observe(this) { editedProductIds ->
             setResult(
                 ActivityResult.CART_PRODUCT_EDITED.code,
@@ -57,24 +56,6 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
             )
         }
     }
-
-    private fun createAdapterOnClickHandler() =
-        object : CartViewHolder.OnClickHandler {
-            override fun onRemoveCartProductClick(
-                cartId: Long,
-                productId: Long,
-            ) {
-                viewModel.removeCartProduct(cartId, productId)
-            }
-
-            override fun onIncreaseClick(productId: Long) {
-                viewModel.increaseCartProductQuantity(productId)
-            }
-
-            override fun onDecreaseClick(productId: Long) {
-                viewModel.decreaseCartProductQuantity(productId)
-            }
-        }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
