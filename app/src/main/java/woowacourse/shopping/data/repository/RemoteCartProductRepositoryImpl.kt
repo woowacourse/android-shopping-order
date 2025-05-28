@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,9 +35,6 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                             val locationHeader = response.headers()["location"]
                             val id = locationHeader?.substringAfterLast("/")?.toIntOrNull()
                             callback(cartProduct.copy(cartItemId = id))
-                            println("생성된 cartItem id: $id")
-                        } else {
-                            println("실패한 응답: ${response.code()}")
                         }
                     }
 
@@ -46,7 +42,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         call: Call<Void>,
                         t: Throwable,
                     ) {
-                        println("에러 발생: $t")
+                        println("error : $t")
                     }
                 },
             )
@@ -59,8 +55,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                     override fun onResponse(
                         call: Call<Void>,
                         response: Response<Void>,
-                    ) {
-                    }
+                    ) = Unit
 
                     override fun onFailure(
                         call: Call<Void>,
@@ -132,13 +127,10 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         call: Call<Void>,
                         response: Response<Void>,
                     ) {
-                        Log.d("test", "api 호출됨 $response")
                         if (response.isSuccessful) {
                             callback(true)
-                            println("✅ 요청 성공 (status=${response.code()})")
                         } else {
                             callback(false)
-                            println("✅ 요청 실패 (status=${response.code()})")
                         }
                     }
 
@@ -147,39 +139,9 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         t: Throwable,
                     ) {
                         callback(false)
-                        println("error : $t")
                     }
                 },
             )
-    }
-
-//    override fun getProductQuantity(id: Int, callback: (Int?) -> Unit) {
-//        retrofitService.patchCartItemQuantity(
-//            productId = cartProduct.id,
-//            quantity = quantity,
-//        ).enqueue(object : Callback<Quantity> {
-//            override fun onResponse(
-//                call: Call<Quantity>,
-//                response: Response<Quantity>
-//            ) {
-//                if (response.isSuccessful) {
-//                    val body: Quantity = response.body() ?: return
-//                    val product = cartProduct.copy(
-//                        quantity = body.value
-//                    )
-//                    callback(product)
-//                    println("body : $body")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<Quantity>, t: Throwable) {
-//                println("error : $t")
-//            }
-//        })
-//    }
-
-    override fun getAllProductsSize(callback: (Int) -> Unit) {
-//        TODO("Not yet implemented")
     }
 
     override fun getCartItemSize(callback: (Int) -> Unit) {
@@ -218,11 +180,9 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         response: Response<ProductResponse>,
                     ) {
                         if (response.isSuccessful) {
-                            Log.d("test", "하잇 ${response.body()}")
                             val body: ProductResponse = response.body() ?: return
                             val totalElements = body.totalElements.toInt()
                             callback(totalElements)
-                            println("body : $body")
                         }
                     }
 
@@ -230,7 +190,6 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         call: Call<ProductResponse>,
                         t: Throwable,
                     ) {
-                        Log.d("test", "실패 $t")
                         println("error : $t")
                     }
                 },

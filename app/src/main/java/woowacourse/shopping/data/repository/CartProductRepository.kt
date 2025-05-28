@@ -3,7 +3,10 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartProductRepository {
-    fun insertCartProduct(cartProduct: ProductUiModel, callback: (ProductUiModel) -> Unit)
+    fun insertCartProduct(
+        cartProduct: ProductUiModel,
+        callback: (ProductUiModel) -> Unit,
+    )
 
     fun deleteCartProduct(cartProduct: ProductUiModel)
 
@@ -18,13 +21,6 @@ interface CartProductRepository {
         quantity: Int,
         callback: (Boolean) -> Unit,
     )
-
-//    fun getProductQuantity(
-//        id: Int,
-//        callback: (Int?) -> Unit,
-//    )
-
-    fun getAllProductsSize(callback: (Int) -> Unit)
 
     fun getCartItemSize(callback: (Int) -> Unit)
 

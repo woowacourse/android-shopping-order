@@ -13,27 +13,32 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
 
     override fun getAllProductsSize(callback: (Int) -> Unit) {
-        retrofitService.requestProducts().enqueue(object : Callback<ProductResponse> {
-            override fun onResponse(
-                call: Call<ProductResponse>,
-                response: Response<ProductResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val body: ProductResponse? = response.body()
-                    callback(body?.totalElements?.toInt() ?: 0)
-                    println("body : $body")
+        retrofitService.requestProducts().enqueue(
+            object : Callback<ProductResponse> {
+                override fun onResponse(
+                    call: Call<ProductResponse>,
+                    response: Response<ProductResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        val body: ProductResponse? = response.body()
+                        callback(body?.totalElements?.toInt() ?: 0)
+                        println("body : $body")
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                println("error : $t")
-            }
-        })
+                override fun onFailure(
+                    call: Call<ProductResponse>,
+                    t: Throwable,
+                ) {
+                    println("error : $t")
+                }
+            },
+        )
     }
 
     override fun getCartProductsByUids(
         uids: List<Int>,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     ) {
         val resultsMap = mutableMapOf<Int, ProductUiModel>()
         var completedCount = 0
@@ -49,7 +54,6 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                 completedCount++
 
                 if (completedCount == uids.size) {
-                    // uids 순서대로 결과 리스트 만들기
                     val orderedResults = uids.mapNotNull { resultsMap[it] }
                     callback(orderedResults)
                 }
@@ -57,70 +61,82 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
         }
     }
 
-
     override fun getProductsByPage(
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     ) {
-        retrofitService.requestProducts(
-            page = page,
-            size = size,
-        ).enqueue(object : Callback<ProductResponse> {
-            override fun onResponse(
-                call: Call<ProductResponse>,
-                response: Response<ProductResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val body: ProductResponse? = response.body()
-                    val content: List<Content>? = body?.content
-                    val products: List<ProductUiModel>? = content?.mapNotNull {
-                        ProductUiModel(
-                            id = it.id.toInt(),
-                            imageUrl = it.imageUrl,
-                            name = it.name,
-                            price = it.price,
-                        )
+        retrofitService
+            .requestProducts(
+                page = page,
+                size = size,
+            ).enqueue(
+                object : Callback<ProductResponse> {
+                    override fun onResponse(
+                        call: Call<ProductResponse>,
+                        response: Response<ProductResponse>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val body: ProductResponse? = response.body()
+                            val content: List<Content>? = body?.content
+                            val products: List<ProductUiModel>? =
+                                content?.mapNotNull {
+                                    ProductUiModel(
+                                        id = it.id.toInt(),
+                                        imageUrl = it.imageUrl,
+                                        name = it.name,
+                                        price = it.price,
+                                    )
+                                }
+                            callback(products ?: emptyList())
+                            println("body : $body")
+                        }
                     }
-                    callback(products ?: emptyList())
-                    println("body : $body")
-                }
-            }
 
-            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                println("error : $t")
-            }
-        })
+                    override fun onFailure(
+                        call: Call<ProductResponse>,
+                        t: Throwable,
+                    ) {
+                        println("error : $t")
+                    }
+                },
+            )
     }
 
     override fun getProduct(
         id: Int,
-        callback: (ProductUiModel) -> Unit
+        callback: (ProductUiModel) -> Unit,
     ) {
-        retrofitService.requestDetailProduct(
-            id = id,
-        ).enqueue(object : Callback<Content> {
-            override fun onResponse(
-                call: Call<Content>,
-                response: Response<Content>
-            ) {
-                if (response.isSuccessful) {
-                    val body: Content = response.body() ?: return
-                    val product =
-                        ProductUiModel(
-                            id = body.id.toInt(),
-                            imageUrl = body.imageUrl,
-                            name = body.name,
-                            price = body.price,
-                        )
-                    callback(product)
-                    println("body : $body")
-                }
-            }
+        retrofitService
+            .requestDetailProduct(
+                id = id,
+            ).enqueue(
+                object : Callback<Content> {
+                    override fun onResponse(
+                        call: Call<Content>,
+                        response: Response<Content>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val body: Content = response.body() ?: return
+                            val product =
+                                ProductUiModel(
+                                    id = body.id.toInt(),
+                                    imageUrl = body.imageUrl,
+                                    name = body.name,
+                                    price = body.price,
+                                )
+                            callback(product)
+                            println("body : $body")
+                        }
+                    }
 
-            override fun onFailure(call: Call<Content>, t: Throwable) {
-                println("error : $t")
-            }
-        })
+                    override fun onFailure(
+                        call: Call<Content>,
+                        t: Throwable,
+                    ) {
+                        println("error : $t")
+                    }
+                },
+            )
     }
 }

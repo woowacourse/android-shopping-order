@@ -3,7 +3,6 @@ package woowacourse.shopping.data.service
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
@@ -11,11 +10,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Base64
 
 object RetrofitProductService {
-    private val logging = HttpLoggingInterceptor().apply {
-        level = Level.BODY
-    }
+    private val logging =
+        HttpLoggingInterceptor().apply {
+            level = Level.BODY
+        }
 
-    // 헤더에 추가할 값 생성
     private val base64Credentials: String by lazy {
         val username = "wondroid-world"
         val password = "password"
@@ -23,21 +22,27 @@ object RetrofitProductService {
         Base64.getEncoder().encodeToString(credentials.toByteArray())
     }
 
-    private val authInterceptor = Interceptor { chain ->
-        val original: Request = chain.request()
-        val requestWithAuth: Request = original.newBuilder()
-            .header("Authorization", "Basic $base64Credentials")
-            .build()
-        chain.proceed(requestWithAuth)
-    }
+    private val authInterceptor =
+        Interceptor { chain ->
+            val original: Request = chain.request()
+            val requestWithAuth: Request =
+                original
+                    .newBuilder()
+                    .header("Authorization", "Basic $base64Credentials")
+                    .build()
+            chain.proceed(requestWithAuth)
+        }
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .addInterceptor(logging)
-        .build()
+    private val okHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(logging)
+            .build()
 
     val INSTANCE: Retrofit by lazy {
-        Retrofit.Builder()
+        Retrofit
+            .Builder()
             .client(okHttpClient)
             .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com")
             .addConverterFactory(GsonConverterFactory.create())
