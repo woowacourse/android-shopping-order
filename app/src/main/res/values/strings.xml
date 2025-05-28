@@ -14,4 +14,6 @@
     <string name="message_add_to_cart">장바구니에 상품을 담았어요</string>
     <string name="order">주문하기(%d)</string>
     <string name="select_all">전체</string>
+    <string name="recommend_label">이런 상품은 어떠세요?</string>
+    <string name="recommend_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들은 추천해 드려요.</string>
 </resources>
