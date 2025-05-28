@@ -36,4 +36,9 @@ interface CartService {
         @Path("id") id: Long,
         @Body cartQuantity: CartQuantity,
     ): Call<Void>
+
+    @GET("/cart-items/counts")
+    fun getCartCounts(
+        @Header("accept") accept: String = "*/*",
+    ): Call<CartQuantity>
 }

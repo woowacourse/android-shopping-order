@@ -39,6 +39,7 @@ class GoodsViewModel(
     init {
         loadProducts()
         loadHistories()
+        getCartCounts()
     }
 
     fun addPage() {
@@ -186,6 +187,15 @@ class GoodsViewModel(
         combined.addAll(productList)
 
         _items.postValue(combined)
+    }
+
+    private fun getCartCounts() {
+        cartRepository.getCartCounts(
+            onSuccess = { totalCount ->
+                _totalQuantity.value = totalCount.toInt()
+            },
+            onError = { Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it) },
+        )
     }
 
     companion object {

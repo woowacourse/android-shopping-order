@@ -107,4 +107,44 @@ class CartRepository {
                 },
             )
     }
+
+    fun getCartCounts(
+        onSuccess: (Long) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        CartClient
+            .getRetrofitService()
+            .getCartCounts()
+            .enqueue(
+                object : Callback<CartQuantity> {
+                    override fun onResponse(
+                        call: Call<CartQuantity?>,
+                        response: Response<CartQuantity?>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val totalCount = response.body()?.quantity?.toLong() ?: 0L
+                            onSuccess(totalCount)
+                        } else {
+                            val errorMessage =
+                                buildString {
+                                    append("응답 실패: ${response.code()}")
+                                    response.errorBody()?.let {
+                                        append(" - ${it.string()}")
+                                    }
+                                }
+                            Log.e("CartRepository", errorMessage)
+                            onError(Throwable(errorMessage))
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<CartQuantity?>,
+                        t: Throwable,
+                    ) {
+                        Log.e("CartRepository", "장바구니 조회 실패", t)
+                        onError(t)
+                    }
+                },
+            )
+    }
 }
