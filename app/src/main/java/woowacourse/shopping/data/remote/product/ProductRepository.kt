@@ -3,11 +3,11 @@ package woowacourse.shopping.data.remote.product
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.remote.product.ProductResponse.Content.RemoteProduct
+import woowacourse.shopping.data.remote.product.ProductResponse.Content
 
 class ProductRepository {
     fun fetchProducts(
-        onSuccess: (List<RemoteProduct>) -> Unit,
+        onSuccess: (List<Content>) -> Unit,
         onError: (Throwable) -> Unit
     ) {
         ProductClient.getRetrofitService().requestGoods().enqueue(object : Callback<ProductResponse> {

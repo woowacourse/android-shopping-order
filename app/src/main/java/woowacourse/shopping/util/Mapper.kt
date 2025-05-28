@@ -1,7 +1,7 @@
 package woowacourse.shopping.util
 
 import woowacourse.shopping.data.remote.cart.CartResponse.Content.CartRemoteProduct
-import woowacourse.shopping.data.remote.product.ProductResponse.Content.RemoteProduct
+import woowacourse.shopping.data.remote.product.ProductResponse.Content
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.model.CartUiModel
@@ -52,7 +52,7 @@ fun CartRemoteProduct.toDomain(): Product {
     )
 }
 
-fun RemoteProduct.toDomain(): Product {
+fun Content.toDomain(): Product {
     return Product(
         id = id.toInt(),
         name = name,

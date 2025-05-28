@@ -12,13 +12,10 @@ import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Goods
-import woowacourse.shopping.domain.model.Goods.Companion.dummyGoods
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateCartQuantity
-import kotlin.math.min
 
 class GoodsViewModel(
     private val localCartRepository: LocalCartRepository,
@@ -30,7 +27,6 @@ class GoodsViewModel(
     val items: LiveData<List<Any>> get() = _items
     private val _products = MutableLiveData<List<Cart>>()
     private val _histories = MutableLiveData<List<Cart>>()
-
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
     private val _hasNextPage = MutableLiveData(true)
@@ -52,19 +48,7 @@ class GoodsViewModel(
         page++
     }
 
-    fun insertToCart(cart: Cart) {
-        viewModelScope.launch {
-            try {
-                localCartRepository.insert(cart)
-                updateItemsAndTotalQuantity(cart, cart.quantity + 1)
-                _isSuccess.setValue(Unit)
-            } catch (e: Exception) {
-                _isFail.setValue(Unit)
-            }
-        }
-    }
-
-    fun addCartTest(cart: Cart) {
+    fun addToCart(cart: Cart) {
         val cartRequest = CartRequest(
             productId = cart.product.id,
             quantity = cart.quantity + 1
@@ -72,9 +56,9 @@ class GoodsViewModel(
 
         cartRepository.addToCart(cartRequest) { result ->
             result.onSuccess {
-                Log.d("addCartTest", "장바구니에 추가 성공")
+                _isSuccess.setValue(Unit)
             }.onFailure { error ->
-                Log.e("addCartTest", "장바구니 추가 실패", error)
+                _isFail.setValue(Unit)
             }
         }
     }
@@ -125,29 +109,6 @@ class GoodsViewModel(
         _totalQuantity.value = total
     }
 
-    private fun getProducts(
-        page: Int,
-        pageSize: Int = PAGE_SIZE,
-    ): List<Goods> {
-        val fromIndex = page * pageSize
-        val toIndex = min(fromIndex + pageSize, dummyGoods.size)
-        return dummyGoods.subList(fromIndex, toIndex)
-    }
-
-    private fun loadProducts() {
-        productRepository.fetchProducts(
-            onSuccess = { productList ->
-                val carts = productList.map { product ->
-                    Cart(product = product.toDomain(), quantity = 0)
-                }
-                _products.value = carts
-                Log.d("loadProductsInRange", "$carts")
-                refreshItems()
-            },
-            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) }
-        )
-    }
-
 //    private fun loadItems() {
 //        val currentItems = _items.value.orEmpty()
 //
@@ -194,6 +155,20 @@ class GoodsViewModel(
             val total = currentItems.filterIsInstance<Cart>().sumOf { it.quantity }
             _totalQuantity.value = total
         }
+    }
+
+    private fun loadProducts() {
+        productRepository.fetchProducts(
+            onSuccess = { productList ->
+                val carts = productList.map { product ->
+                    Cart(product = product.toDomain(), quantity = 0)
+                }
+                _products.value = carts
+                Log.d("loadProductsInRange", "$carts")
+                refreshItems()
+            },
+            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) }
+        )
     }
 
     private fun loadHistories() {
