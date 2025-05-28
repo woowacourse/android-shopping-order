@@ -36,7 +36,7 @@ class CartDataSourceImpl(
             },
         )
 
-    override fun getPagedCartProducts(
+    override fun getPagedCartItems(
         page: Int,
         size: Int,
         onResult: (List<CartItem>) -> Unit,
@@ -63,7 +63,7 @@ class CartDataSourceImpl(
         },
     )
 
-    override fun insertProduct(
+    override fun insertCartItem(
         productId: Long,
         quantity: Int,
         onResult: (Result<Long>) -> Unit,

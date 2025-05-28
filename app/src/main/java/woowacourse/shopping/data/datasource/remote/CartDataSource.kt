@@ -5,13 +5,13 @@ import woowacourse.shopping.domain.model.CartItem
 interface CartDataSource {
     fun getTotalCount(onResult: (Result<Int>) -> Unit)
 
-    fun getPagedCartProducts(
+    fun getPagedCartItems(
         page: Int,
         size: Int,
         onResult: (List<CartItem>) -> Unit,
     )
 
-    fun insertProduct(
+    fun insertCartItem(
         productId: Long,
         quantity: Int,
         onResult: (Result<Long>) -> Unit,

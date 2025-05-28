@@ -71,7 +71,7 @@ class CartViewModel(
     }
 
     private fun reloadProductsByPage(currentPage: Int) {
-        cartRepository.fetchPagedCartItems(PAGE_SIZE, currentPage) { result ->
+        cartRepository.fetchPagedCartItems(currentPage, PAGE_SIZE) { result ->
             result
                 .onSuccess { pagedProducts ->
                     if (pagedProducts.isEmpty()) {
