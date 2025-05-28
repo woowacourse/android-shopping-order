@@ -13,7 +13,6 @@ import woowacourse.shopping.data.dto.cart.CartItemCountResponse
 import woowacourse.shopping.data.dto.cart.CartItemRequest
 import woowacourse.shopping.data.dto.cart.CartsResponse
 import woowacourse.shopping.data.dto.cart.UpdateCartRequest
-import woowacourse.shopping.data.dto.product.ProductsResponse
 
 interface CartItemService {
     @GET("/cart-items")
@@ -29,15 +28,14 @@ interface CartItemService {
 
     @PATCH("/cart-items/{id}")
     fun updateCartItem(
-        @Path("id") id: Long,
+        @Path("id") cartId: Long,
         @Body updateCartRequest: UpdateCartRequest,
     ): Call<ResponseBody>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20,
-    ): Call<ProductsResponse>
+        @Path("id") cartId: Long,
+    ): Call<ResponseBody>
 
     @GET("/cart-items/counts")
     fun requestCartItemCount(): Call<CartItemCountResponse>

@@ -23,5 +23,8 @@ interface CartDataSource {
         onResult: (Result<Unit>) -> Unit,
     )
 
-//    fun deleteProductById(productId: Long)
+    fun deleteCartItemById(
+        cartId: Long,
+        onResult: (Result<Unit>) -> Unit,
+    )
 }

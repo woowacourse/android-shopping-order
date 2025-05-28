@@ -118,6 +118,28 @@ class CartDataSourceImpl(
         )
     }
 
-    //    override fun deleteProductById(productId: Long) = cartItemService.deleteProductById(productId)
+    override fun deleteCartItemById(
+        cartId: Long,
+        onResult: (Result<Unit>) -> Unit,
+    ) = cartItemService.deleteCartItem(cartId).enqueue(
+        object : Callback<ResponseBody> {
+            override fun onResponse(
+                call: Call<ResponseBody>,
+                response: Response<ResponseBody>,
+            ) {
+                if (response.isSuccessful) {
+                    onResult(Result.success(Unit))
+                }
+            }
+
+            override fun onFailure(
+                call: Call<ResponseBody>,
+                t: Throwable,
+            ) {
+                onResult(Result.failure(t))
+            }
+        },
+    )
+
     private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
 }

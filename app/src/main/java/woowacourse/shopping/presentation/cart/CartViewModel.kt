@@ -27,11 +27,11 @@ class CartViewModel(
                 .onSuccess { pagedProducts -> _products.postValue(ResultState.Success(pagedProducts)) }
                 .onFailure { _products.postValue(ResultState.Failure()) }
         }
-//        cartRepository.getCartItemCount { result ->
-//            result
-//                .onSuccess { count -> updateTotalPage(count) }
-//                .onFailure { _products.postValue(ResultState.Failure()) }
-//        }
+        cartRepository.getTotalCount { result ->
+            result
+                .onSuccess { count -> updateTotalPage(count) }
+                .onFailure { _products.postValue(ResultState.Failure()) }
+        }
     }
 
     fun changeNextPage() {
@@ -58,16 +58,16 @@ class CartViewModel(
     }
 
     fun deleteProduct(cartItem: CartItem) {
-//        val currentPage = _currentPage.value ?: 0
-//
-//        cartRepository.deleteProduct(cartItem.product.productId) { result ->
-//            result
-//                .onSuccess {
-//                    reloadProductsByPage(currentPage)
-//                }.onFailure {
-//                    _toastMessage.value = R.string.cart_toast_delete_fail
-//                }
-//        }
+        val currentPage = _currentPage.value ?: 0
+
+        cartRepository.deleteProduct(cartItem.product.productId) { result ->
+            result
+                .onSuccess {
+                    reloadProductsByPage(currentPage)
+                }.onFailure {
+                    _toastMessage.value = R.string.cart_toast_delete_fail
+                }
+        }
     }
 
     private fun reloadProductsByPage(currentPage: Int) {
@@ -137,13 +137,13 @@ class CartViewModel(
     }
 
     private fun updateTotalPageAsync(onComplete: (() -> Unit)? = null) {
-//        cartRepository.getCartItemCount { result ->
-//            result
-//                .onSuccess { count ->
-//                    updateTotalPage(count)
-//                    onComplete?.invoke()
-//                }.onFailure { _products.postValue(ResultState.Failure()) }
-//        }
+        cartRepository.getTotalCount { result ->
+            result
+                .onSuccess { count ->
+                    updateTotalPage(count)
+                    onComplete?.invoke()
+                }.onFailure { _products.postValue(ResultState.Failure()) }
+        }
     }
 
     private fun updateTotalPage(totalSize: Int?) {
