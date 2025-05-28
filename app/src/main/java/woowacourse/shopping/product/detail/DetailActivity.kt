@@ -33,13 +33,9 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar()
         setAddToCartClickListener()
 
-        val product: ProductUiModel? = productFromIntent()
-        product?.let {
-            binding.product = it
-            binding.layoutQuantityControlBar.product = it
-            setViewModel(it)
+        val productId = intent.getIntExtra(KEY_PRODUCT_DETAIL, 0)
+            setViewModel(productId)
             observeProduct()
-        }
         binding.vm = viewModel
         binding.lifecycleOwner = this
         binding.layoutQuantityControlBar.quantityControlListener =
@@ -52,18 +48,18 @@ class DetailActivity : AppCompatActivity() {
             }
         binding.layoutLatestViewedProduct.latestViewedProductClickListener =
             LatestViewedProductClickListener { product ->
-                val intent = DetailActivity.newIntent(this, product)
+                val intent = DetailActivity.newIntent(this, product.id)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
             }
         viewModel.setLatestViewedProduct()
     }
 
-    private fun setViewModel(product: ProductUiModel) {
+    private fun setViewModel(productId: Int) {
         viewModel =
             ViewModelProvider(
                 this,
-                DetailViewModelFactory(product, application as ShoppingApplication),
+                DetailViewModelFactory(productId, application as ShoppingApplication),
             )[DetailViewModel::class.java]
     }
 
@@ -74,7 +70,8 @@ class DetailActivity : AppCompatActivity() {
         viewModel.product.observe(this) {
             viewModel.setQuantity()
             viewModel.setPriceSum()
-            viewModel.addToRecentlyViewedProduct()
+//            viewModel.addToRecentlyViewedProduct()
+//            binding.layoutQuantityControlBar.product = it
         }
 
         viewModel.quantity.observe(this) {
@@ -84,6 +81,7 @@ class DetailActivity : AppCompatActivity() {
         viewModel.latestViewedProduct.observe(this) { product ->
             binding.layoutLatestViewedProduct.product = product
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -130,17 +128,17 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun productFromIntent(): ProductUiModel? = intent.intentParcelableExtra(KEY_PRODUCT_DETAIL, ProductUiModel::class.java)
+//    private fun productFromIntent(): ProductUiModel? = intent.intentParcelableExtra(KEY_PRODUCT_DETAIL, ::class.java)
 
     companion object {
         private const val KEY_PRODUCT_DETAIL = "productDetail"
 
         fun newIntent(
             context: Context,
-            product: ProductUiModel,
+            productId: Int,
         ): Intent =
             Intent(context, DetailActivity::class.java).apply {
-                putExtra(KEY_PRODUCT_DETAIL, product)
+                putExtra(KEY_PRODUCT_DETAIL, productId)
             }
     }
 }

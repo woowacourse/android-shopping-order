@@ -7,18 +7,19 @@ import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.data.repository.HttpCatalogProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 import woowacourse.shopping.data.server.DevMockServer
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class DetailViewModelFactory(
-    private val product: ProductUiModel,
+    private val productId: Int,
     private val application: ShoppingApplication,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return DetailViewModel(
-                product,
+                productId,
                 CartProductRepositoryImpl(
                     ShoppingDatabase.getInstance(application).cartProductDao(),
                 ),
@@ -26,6 +27,7 @@ class DetailViewModelFactory(
                     ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
                     HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
                 ),
+                RemoteCatalogProductRepositoryImpl()
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

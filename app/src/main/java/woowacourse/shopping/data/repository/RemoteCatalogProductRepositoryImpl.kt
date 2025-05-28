@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,30 +29,6 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                 println("error : $t")
             }
         })
-    }
-
-    override fun getProductsInRange(
-        startIndex: Int,
-        endIndex: Int,
-        callback: (List<ProductUiModel>) -> Unit
-    ) {
-        // 구현 안함
-        retrofitService.requestProducts().enqueue(object : Callback<ProductResponse> {
-            override fun onResponse(
-                call: Call<ProductResponse>,
-                response: Response<ProductResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    println("body : $body")
-                }
-            }
-
-            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                println("error : $t")
-            }
-        })
-
     }
 
     override fun getCartProductsByUids(
@@ -93,6 +68,37 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
             }
 
             override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                println("error : $t")
+            }
+        })
+    }
+
+    override fun getProduct(
+        id: Int,
+        callback: (ProductUiModel?) -> Unit
+    ) {
+        retrofitService.requestDetailProduct(
+            id = id,
+        ).enqueue(object : Callback<Content> {
+            override fun onResponse(
+                call: Call<Content>,
+                response: Response<Content>
+            ) {
+                if (response.isSuccessful) {
+                    val body: Content = response.body() ?: return
+                    val product =
+                        ProductUiModel(
+                            id = body.id.toInt(),
+                            imageUrl = body.imageUrl,
+                            name = body.name,
+                            price = body.price,
+                        )
+                    callback(product)
+                    println("body : $body")
+                }
+            }
+
+            override fun onFailure(call: Call<Content>, t: Throwable) {
                 println("error : $t")
             }
         })

@@ -5,18 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.repository.CartProductRepository
+import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class DetailViewModel(
-    private val productData: ProductUiModel,
+    productId: Int,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val catalogProductRepository: CatalogProductRepository,
 ) : ViewModel() {
-    private val _product = MutableLiveData<ProductUiModel>(productData)
+    private val _product = MutableLiveData<ProductUiModel>(
+        ProductUiModel(
+            id = 1,
+            imageUrl = "https://www.google.com/#q=ea",
+            name = "Krista Ochoa",
+            price = 1712,
+            quantity = 2646
+        )
+    )
     val product: LiveData<ProductUiModel> = _product
 
-    private val _quantity = MutableLiveData<Int>(0)
+    private val _quantity = MutableLiveData<Int>(1)
     val quantity: LiveData<Int> = _quantity
 
     private val _price = MutableLiveData<Int>(0)
@@ -24,6 +34,16 @@ class DetailViewModel(
 
     private val _latestViewedProduct = MutableLiveData<ProductUiModel>()
     val latestViewedProduct: LiveData<ProductUiModel> = _latestViewedProduct
+
+    init {
+        loadProduct(productId)
+    }
+
+    fun loadProduct(id: Int) {
+        catalogProductRepository.getProduct(id) {
+            _product.postValue(it)
+        }
+    }
 
     fun increaseQuantity() {
         _quantity.value = _quantity.value?.plus(1)
@@ -37,7 +57,7 @@ class DetailViewModel(
     }
 
     fun setQuantity() {
-        _quantity.value = productData.quantity
+//        _quantity.value = productData.quantity
     }
 
     fun setPriceSum() {

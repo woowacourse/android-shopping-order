@@ -79,7 +79,7 @@ class CatalogActivity : AppCompatActivity() {
                 productActionListener =
                     object : ProductActionListener {
                         override fun onProductClick(product: ProductUiModel) {
-                            val intent = DetailActivity.newIntent(this@CatalogActivity, product)
+                            val intent = DetailActivity.newIntent(this@CatalogActivity, product.id)
                             startActivity(intent)
                         }
 
@@ -115,7 +115,7 @@ class CatalogActivity : AppCompatActivity() {
             RecentlyViewedProductAdapter(
                 products = emptyList(),
             ) {
-                val intent = DetailActivity.newIntent(this@CatalogActivity, it)
+                val intent = DetailActivity.newIntent(this@CatalogActivity, it.id)
                 startActivity(intent)
             }
         binding.recyclerViewRecentlyViewedProducts.adapter = adapter

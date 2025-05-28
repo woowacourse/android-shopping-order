@@ -73,16 +73,6 @@ class HttpCatalogProductRepositoryImpl(
         }
     }
 
-    override fun getProductsInRange(
-        startIndex: Int,
-        endIndex: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        getAllProducts { products ->
-            callback(products.subList(startIndex, minOf(endIndex, products.size)))
-        }
-    }
-
     override fun getCartProductsByUids(
         uids: List<Int>,
         callback: (List<ProductUiModel>) -> Unit,
@@ -96,6 +86,13 @@ class HttpCatalogProductRepositoryImpl(
         page: Int,
         size: Int,
         callback: (List<ProductUiModel>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getProduct(
+        id: Int,
+        callback: (ProductUiModel?) -> Unit
     ) {
         TODO("Not yet implemented")
     }
