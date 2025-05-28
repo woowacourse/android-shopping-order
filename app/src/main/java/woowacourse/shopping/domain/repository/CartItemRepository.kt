@@ -9,18 +9,12 @@ interface CartItemRepository {
         onResult: (Result<PagingData>) -> Unit,
     )
 
-    fun addCartItem(
-        id: Int,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
-
     fun deleteCartItem(
         id: Int,
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun updateCartItem(
+    fun upsertCartItem(
         id: Int,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
