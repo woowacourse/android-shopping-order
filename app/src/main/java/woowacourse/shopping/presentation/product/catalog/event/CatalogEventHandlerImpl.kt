@@ -26,6 +26,6 @@ class CatalogEventHandlerImpl(
     }
 
     override fun onMinusQuantity(product: ProductUiModel) {
-//        viewModel.decreaseQuantity(product)
+        viewModel.decreaseQuantity(product)
     }
 }

@@ -62,15 +62,17 @@ class CatalogViewModel(
     private fun updateProduct(updated: ProductUiModel) {
         if (updated.quantity == 0) {
             cartRepository.deleteCartItem(updated.id) { result ->
-                result.onSuccess {
-                    applyProductChange(updated)
-                }
+                result
+                    .onSuccess {
+                        applyProductChange(updated)
+                    }
             }
         } else {
-            cartRepository.updateCartItem(updated.id, updated.quantity) { result ->
-                result.onSuccess {
-                    applyProductChange(updated)
-                }
+            cartRepository.upsertCartItem(updated.id, updated.quantity) { result ->
+                result
+                    .onSuccess {
+                        applyProductChange(updated)
+                    }
             }
         }
     }

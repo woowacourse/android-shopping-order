@@ -47,7 +47,7 @@ class DetailViewModel(
         val item = _product.value ?: return
         if (item.quantity <= 0) return
 
-        cartItemRepository.updateCartItem(item.id, item.quantity) { result ->
+        cartItemRepository.upsertCartItem(item.id, item.quantity) { result ->
             result
                 .onSuccess { response ->
                     _uiState.postValue(
