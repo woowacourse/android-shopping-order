@@ -63,14 +63,14 @@ class ProductsViewModel(
             result
                 .onSuccess { products: List<Product> ->
                     val recentViewedProductsItem = ProductsItem.RecentViewedProductsItem(products)
-                    loadMoreProducts(recentViewedProductsItem)
+                    loadProducts(recentViewedProductsItem)
                 }.onFailure {
                     _event.postValue(ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE)
                 }
         }
     }
 
-    fun loadMoreProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
+    fun loadProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
         productsRepository.loadPageableProducts(
             page = page,
             size = LOAD_PRODUCTS_SIZE,
@@ -90,6 +90,40 @@ class ProductsViewModel(
                         }
                     val loadItem = ProductsItem.LoadItem(pageableProducts.loadable)
                     _productsItems.postValue(listOf(recentViewedProductsItem) + productItems + loadItem)
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
+                }
+        }
+    }
+
+    fun loadMoreProducts() {
+        productsRepository.loadPageableProducts(
+            ++page,
+            LOAD_PRODUCTS_SIZE,
+        ) { result: Result<PageableProducts> ->
+            result
+                .onSuccess { pageableProducts: PageableProducts ->
+                    val recentViewedProductsItem =
+                        productsItems.value?.first() ?: ProductsItem.RecentViewedProductsItem(
+                            emptyList(),
+                        )
+                    val oldProductItems =
+                        productsItems.value?.filterIsInstance<ProductsItem.ProductItem>()
+                            ?: emptyList()
+                    val productItems =
+                        pageableProducts.products.map { product: Product ->
+                            ProductsItem.ProductItem(
+                                product = product,
+                                quantity =
+                                    cartItems
+                                        .find { cartItem: CartItem ->
+                                            cartItem.productId == product.id
+                                        }?.quantity ?: 0,
+                            )
+                        }
+                    val loadItem = ProductsItem.LoadItem(pageableProducts.loadable)
+
+                    _productsItems.postValue(listOf(recentViewedProductsItem) + oldProductItems + productItems + loadItem)
                 }.onFailure {
                     _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
                 }

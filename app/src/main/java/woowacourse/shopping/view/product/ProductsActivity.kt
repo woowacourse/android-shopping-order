@@ -25,7 +25,7 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val viewModel: ProductsViewModel by viewModels()
     private val productsAdapter: ProductsAdapter by lazy {
-        ProductsAdapter(::navigateToProductDetail, {})
+        ProductsAdapter(::navigateToProductDetail, viewModel::loadMoreProducts)
     }
 
     private val detailActivityResultLauncher =
