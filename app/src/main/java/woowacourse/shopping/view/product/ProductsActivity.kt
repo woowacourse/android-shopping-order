@@ -38,7 +38,7 @@ class ProductsActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == RESULT_OK) {
-                viewModel.updateRecentViewedProducts()
+                viewModel.loadCart()
             }
         }
 

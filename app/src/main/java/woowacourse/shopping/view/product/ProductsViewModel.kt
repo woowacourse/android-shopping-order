@@ -34,7 +34,7 @@ class ProductsViewModel(
         loadCart()
     }
 
-    private fun loadCart() {
+    fun loadCart() {
         cartRepository.loadCart { result ->
             result
                 .onSuccess { cartItems: List<CartItem> ->
@@ -174,10 +174,6 @@ class ProductsViewModel(
     }
 
     fun getCartItemId(product: Product): Long = 0L
-
-    fun updateRecentViewedProducts() {
-        TODO("Not yet implemented")
-    }
 
     //    private var shoppingCart: List<CartItem> = emptyList()
 //
