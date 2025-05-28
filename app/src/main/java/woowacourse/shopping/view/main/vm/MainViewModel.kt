@@ -75,20 +75,35 @@ class MainViewModel(
         productPage: ProductSinglePage,
         cartItems: List<ShoppingCart>,
     ) {
-        val newStates =
-            productPage.products.map { product ->
-                val cartItem = cartItems.find { it.product.id == product.id }
-                ProductState(
-                    cartId = cartItem?.id,
-                    item = product,
-                    cartQuantity = cartItem?.quantity ?: Quantity(0),
-                )
-            }
+        historyLoader { result ->
+            result.fold(
+                onSuccess = { historyStates ->
+                    val newStates = productPage.products.map { product ->
+                        val cartItem = cartItems.find { it.product.id == product.id }
+                        ProductState(
+                            cartId = cartItem?.id,
+                            item = product,
+                            cartQuantity = cartItem?.quantity ?: Quantity(0),
+                        )
+                    }
 
-        val updatedList = _uiState.value?.productItems.orEmpty() + newStates
-        _uiState.value = ProductUiState(updatedList, load = LoadState.of(productPage.hasNextPage))
+                    val updatedList = _uiState.value?.productItems.orEmpty() + newStates
 
-        setLoading(false)
+                    _uiState.postValue(
+                        ProductUiState(
+                            productItems = updatedList,
+                            historyItems = historyStates,
+                            load = LoadState.of(productPage.hasNextPage),
+                        )
+                    )
+
+                    setLoading(false)
+                },
+                onFailure = { throwable ->
+                    handleError("HistoryLoad", throwable)
+                }
+            )
+        }
     }
 
     fun increaseCartQuantity(productId: Long) =

@@ -58,7 +58,7 @@ class AppContainer(
 
     val cartRepository2 = DefaultCartRepository(cartDataSource2)
 
-    val historyLoader = HistoryLoader(productRepository, historyRepository)
+    val historyLoader = HistoryLoader(productRepository2, historyRepository)
 
     val cartLoader = CartLoader(cartRepository, productRepository)
 }

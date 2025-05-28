@@ -1,26 +1,49 @@
 package woowacourse.shopping.view.loader
 
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.main.state.HistoryState
 
 class HistoryLoader(
-    private val productRepository: ProductRepository,
+    private val productRepository: DefaultProductRepository,
     private val historyRepository: HistoryRepository,
 ) {
-    operator fun invoke(onResult: (List<HistoryState>) -> Unit) {
+    operator fun invoke(onResult: (Result<List<HistoryState>>) -> Unit) {
         historyRepository.getHistory { historyIds ->
             if (historyIds.isEmpty()) {
-                onResult(emptyList())
+                onResult(Result.success(emptyList()))
                 return@getHistory
             }
 
-            productRepository.getProducts(historyIds) { products ->
-                val historyStates =
-                    products.map {
-                        HistoryState(it.id, it.name, it.imgUrl)
-                    }
-                onResult(historyStates)
+            val historyProducts = mutableListOf<HistoryState>()
+            var remaining = historyIds.size
+            var isErrorOccurred = false
+
+            historyIds.forEach { productId ->
+                productRepository.loadProduct(productId) { result ->
+                    if (isErrorOccurred) return@loadProduct
+
+                    result.fold(
+                        onSuccess = { product ->
+                            historyProducts.add(
+                                HistoryState(
+                                    product.id,
+                                    product.name,
+                                    product.imgUrl
+                                )
+                            )
+                            remaining--
+                            if (remaining == 0) {
+                                onResult(Result.success(historyProducts))
+                            }
+                        },
+                        onFailure = { throwable ->
+                            isErrorOccurred = true
+                            onResult(Result.failure(throwable))
+                        }
+                    )
+                }
             }
         }
     }
