@@ -2,6 +2,7 @@ package woowacourse.shopping.data
 
 import android.content.Context
 import androidx.core.content.edit
+import woowacourse.shopping.BuildConfig
 import java.util.Base64
 
 class TokenProvider(
@@ -12,6 +13,10 @@ class TokenProvider(
             SHARED_NAME,
             Context.MODE_PRIVATE,
         )
+
+    init {
+        setToken(BuildConfig.NAME, BuildConfig.PASSWORD)
+    }
 
     fun getToken(): String? = storage.getString(KEY_TOKEN, null)
 

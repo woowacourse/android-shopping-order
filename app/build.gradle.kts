@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
@@ -20,6 +22,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "NAME", gradleLocalProperties(rootDir, providers).getProperty("name"))
+        buildConfigField("String", "PASSWORD", gradleLocalProperties(rootDir, providers).getProperty("password"))
     }
 
     buildTypes {
@@ -46,6 +51,7 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
 }
 
