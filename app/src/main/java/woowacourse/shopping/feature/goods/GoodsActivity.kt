@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.goods
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -28,9 +29,11 @@ import woowacourse.shopping.feature.goods.adapter.horizontal.RecentlyViewedGoods
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
+import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.CART_KEY
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.EXTRA_SOURCE
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.SOURCE_GOODS_LIST
 import woowacourse.shopping.feature.login.LoginActivity
+import woowacourse.shopping.feature.toUiModel
 import woowacourse.shopping.util.toUi
 
 class GoodsActivity : AppCompatActivity() {
@@ -148,6 +151,7 @@ class GoodsActivity : AppCompatActivity() {
     private fun navigateGoodsDetails(goods: Goods) {
         val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
         intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
+        intent.putExtra(CART_KEY,viewModel.findCart(goods)?.toUiModel())
         startActivity(intent)
     }
 

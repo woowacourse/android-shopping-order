@@ -17,6 +17,7 @@ import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.feature.CartUiModel
 import woowacourse.shopping.feature.GoodsUiModel
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.util.toUi
@@ -33,10 +34,13 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
         val goodsUiModel =
             IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java) ?: return
+        val cartUiModel =
+            IntentCompat.getParcelableExtra(intent, CART_KEY ,CartUiModel::class.java)
 
         viewModel =
             GoodsDetailsViewModel(
                 goodsUiModel,
+                cartUiModel,
                 CartRepositoryImpl(CartRemoteDataSourceImpl()),
                 GoodsRepositoryImpl(
                     GoodsRemoteDataSourceImpl(),
@@ -102,6 +106,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
     companion object {
         private const val GOODS_KEY = "GOODS"
+        const val CART_KEY = "CART"
 
         fun newIntent(
             context: Context,

@@ -1,12 +1,16 @@
 package woowacourse.shopping.feature.goodsdetails
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.R
+import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
+import woowacourse.shopping.feature.CartUiModel
 import woowacourse.shopping.feature.GoodsUiModel
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -14,6 +18,7 @@ import woowacourse.shopping.util.toDomain
 
 class GoodsDetailsViewModel(
     private val goodsUiModel: GoodsUiModel,
+    private val cartUiModel: CartUiModel?,
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
@@ -51,17 +56,31 @@ class GoodsDetailsViewModel(
     }
 
     fun addToCart() {
-        cartItem.value?.let {
-//            cartRepository.addOrIncreaseQuantity(it.goods, it.quantity) {
-//                _alertEvent.setValue(
-//                    GoodsDetailsAlertMessage(
-//                        R.string.goods_detail_cart_insert_complete_toast_message,
-//                        it.quantity,
-//                    ),
-//                )
-//                _cartItem.value = _cartItem.value?.copy(quantity = 1)
-//            }
+
+        cartItem.value?.let { item ->
+
+            if (cartUiModel != null) {
+                Log.d("test", "addToCart")
+                cartRepository.updateQuantity(
+                    cartUiModel.cartId,
+                    CartQuantity(cartUiModel.cartQuantity + item.quantity),
+                    { addedCart(item.quantity) },
+                    { Log.d("test", "fail") }
+                )
+            } else {
+                cartRepository.addCartItem(item.goods, { addedCart(item.quantity) }, {})
+            }
         }
+    }
+
+    private fun addedCart(quantity: Int) {
+        _alertEvent.setValue(
+            GoodsDetailsAlertMessage(
+                R.string.goods_detail_cart_insert_complete_toast_message,
+                quantity
+            )
+        )
+        _cartItem.value = _cartItem.value?.copy(quantity = 1)
     }
 
     fun onClickMostRecentlyGoodsSection() {

@@ -43,7 +43,11 @@ class GoodsViewModel(
         updateRecentlyViewedGoods()
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
+    fun findCart(goods: Goods): CartItem? =
+        cashedCartItems.values.find { it.goods.id == goods.id }
+
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
+        cartResponse.toCartItems()
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
@@ -128,7 +132,10 @@ class GoodsViewModel(
             if (cashedCartItem == null) {
                 addCartItem(cartItem)
             } else {
-                updateCartItemQuantity(cashedCartItem.id, cartItem.copy(quantity = cashedCartItem.quantity + 1))
+                updateCartItemQuantity(
+                    cashedCartItem.id,
+                    cartItem.copy(quantity = cashedCartItem.quantity + 1)
+                )
             }
         }
     }
@@ -144,7 +151,10 @@ class GoodsViewModel(
                         bindCartCache()
                     })
                 } else {
-                    updateCartItemQuantity(cartItemWillRemove.id, cartItem.copy(quantity = cartItemWillRemove.quantity - 1))
+                    updateCartItemQuantity(
+                        cartItemWillRemove.id,
+                        cartItem.copy(quantity = cartItemWillRemove.quantity - 1)
+                    )
                 }
             }
         }
