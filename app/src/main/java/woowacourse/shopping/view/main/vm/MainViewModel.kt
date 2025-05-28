@@ -91,6 +91,7 @@ class MainViewModel(
         setLoading(false)
     }
 
+    // 져장된 ID가 있는가 ?
     fun increaseCartQuantity(productId: Long) =
         withState(_uiState.value) { state ->
             val updated = state.increaseCartQuantity(productId)
@@ -123,19 +124,20 @@ class MainViewModel(
             val updated = state.decreaseCartQuantity(productId)
             val cartId = updated.cartId ?: return
 
-            val updateUiState = { _uiState.value = state.modifyUiState(updated) }
-
             if (updated.hasCartQuantity) {
                 cartRepository.updateQuantity(cartId, updated.cartQuantity) {
                     it.fold(
-                        onSuccess = { updateUiState() },
+                        onSuccess = { _uiState.value = state.modifyUiState(updated) },
                         onFailure = { handleError(TAG_DECREASE, it) },
                     )
                 }
             } else {
                 cartRepository.deleteCart(cartId) {
                     it.fold(
-                        onSuccess = { updateUiState() },
+                        onSuccess = {
+                            val result = updated.copy(cartId = null)
+                            _uiState.value = state.modifyUiState(result)
+                        },
                         onFailure = { handleError(TAG_DECREASE, it) },
                     )
                 }

@@ -101,6 +101,6 @@
                 bind:eventHandler="@{cartQuantityEventHandler}"
                 app:quantity="@{model.cartQuantityValue}"
                 app:containerVisibility="@{model.hasCartQuantity}"
-                app:cartId="@{model.cartId}" />
+                app:cartId="@{model.item.id}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
