@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.product.catalog
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
@@ -44,34 +43,10 @@ class ProductAdapter(
         }
 
     fun setData(newProducts: List<ProductUiModel>) {
-        val oldProducts = this.products
-        this.products = newProducts
+        val startPosition = products.size
+        products = products + newProducts
 
-        val diffResult =
-            DiffUtil.calculateDiff(
-                object : DiffUtil.Callback() {
-                    override fun getOldListSize() = oldProducts.size
-
-                    override fun getNewListSize() = newProducts.size
-
-                    override fun areItemsTheSame(
-                        oldPos: Int,
-                        newPos: Int,
-                    ) = oldProducts[oldPos].id == newProducts[newPos].id
-
-                    override fun areContentsTheSame(
-                        oldPos: Int,
-                        newPos: Int,
-                    ) = oldProducts[oldPos] == newProducts[newPos]
-
-                    override fun getChangePayload(
-                        oldPos: Int,
-                        newPos: Int,
-                    ): Any? = null
-                },
-            )
-
-        diffResult.dispatchUpdatesTo(this)
+        notifyItemRangeInserted(startPosition, newProducts.size)
     }
 
     override fun getItemCount(): Int = products.size + if (showLoadMoreButton) 1 else 0

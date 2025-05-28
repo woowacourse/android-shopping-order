@@ -14,15 +14,15 @@ class CatalogEventHandlerImpl(
     }
 
     override fun onLoadButtonClick() {
-//        viewModel.loadNextCatalogProducts()
+        viewModel.loadNextCatalogProducts()
     }
 
     override fun onOpenProductQuantitySelector(product: ProductUiModel) {
-//        viewModel.onQuantitySelectorToggled(product)
+        viewModel.onQuantitySelectorToggled(product)
     }
 
     override fun onPlusQuantity(product: ProductUiModel) {
-//        viewModel.increaseQuantity(product)
+        viewModel.increaseQuantity(product)
     }
 
     override fun onMinusQuantity(product: ProductUiModel) {

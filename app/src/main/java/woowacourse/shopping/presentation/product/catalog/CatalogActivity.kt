@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.product.catalog
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -47,19 +48,6 @@ class CatalogActivity : AppCompatActivity() {
         }
     }
 
-//    private fun provideViewModel(): CatalogViewModel {
-//        val cartDao = CartItemDatabase.getInstance(this).cartItemDao()
-//        val viewedDao = ViewedItemDatabase.getInstance(this).viewedItemDao()
-//        return ViewModelProvider(
-//            this,
-//            factory(
-//                ProductsRepositoryImpl(),
-//                CartItemsRepositoryImpl(),
-//                ViewedItemRepositoryImpl(viewedDao),
-//            ),
-//        )[CatalogViewModel::class.java]
-//    }
-
     private fun initRecyclerView() {
         val handler = createHandler()
 
@@ -94,6 +82,10 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.pagingData.observe(this) { paging ->
+            binding.frProductShimmer.stopShimmer()
+            binding.frProductShimmer.visibility = View.GONE
+            binding.recyclerViewProducts.visibility = View.VISIBLE
+
             productAdapter.apply {
                 setData(paging.products)
                 setLoadButtonVisible(paging.hasNext)
@@ -123,6 +115,6 @@ class CatalogActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        viewModel.loadRecentViewedItems()
+        viewModel.loadRecentViewedItems()
     }
 }
