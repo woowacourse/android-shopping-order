@@ -1,7 +1,7 @@
 package woowacourse.shopping.view.cart.vm
 
+import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.view.cart.state.PageState
-import woowacourse.shopping.view.main.state.ProductState
 
 class Paging(
     private val initialPage: Int = INITIAL_PAGE_NO,
@@ -22,7 +22,7 @@ class Paging(
         }
     }
 
-    fun resetToLastPageIfEmpty(currentProducts: List<ProductState>?): Boolean {
+    fun resetToLastPageIfEmpty(currentProducts: List<ShoppingCart>?): Boolean {
         if (currentProducts.isNullOrEmpty() && currentPage > initialPage) {
             currentPage--
             return true

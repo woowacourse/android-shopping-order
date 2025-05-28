@@ -2,15 +2,15 @@ package woowacourse.shopping.view.cart.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
+import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
-import woowacourse.shopping.view.main.state.ProductState
 
 class CartViewHolder(
     private val binding: ItemCartBinding,
     private val handler: Handler,
     private val cartQuantityHandler: CartQuantityHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: ProductState) {
+    fun bind(item: CartState) {
         with(binding) {
             model = item
             eventHandler = handler

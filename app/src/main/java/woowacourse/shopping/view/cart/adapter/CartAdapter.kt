@@ -4,15 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
+import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
-import woowacourse.shopping.view.main.state.ProductState
 
 class CartAdapter(
-    private var items: List<ProductState>,
+    private var items: List<CartState>,
     private val handler: Handler,
     private val cartQuantityHandler: CartQuantityHandler,
 ) : RecyclerView.Adapter<CartViewHolder>() {
-    fun submitList(newItems: List<ProductState>) {
+    fun submitList(newItems: List<CartState>) {
         items = newItems
         notifyDataSetChanged()
     }
