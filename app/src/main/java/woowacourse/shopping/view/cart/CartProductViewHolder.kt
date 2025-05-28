@@ -4,25 +4,24 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
-import woowacourse.shopping.domain.product.CartItem
 
 class CartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
-    onRemoveProduct: (cartItem: CartItem) -> Unit,
+    onRemoveProduct: (cartItemId: Long) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.shoppingCartItemActionListener =
             object : CartItemActionListener {
-                override fun onRemoveProduct(item: woowacourse.shopping.view.cart.CartItemType.ProductItem) {
-                    onRemoveProduct(item.cartItem)
+                override fun onRemoveProduct(item: CartItemType.ProductItem) {
+                    onRemoveProduct(item.cartItem.id)
                 }
 
-                override fun onPlusProductQuantity(item: woowacourse.shopping.view.cart.CartItemType.ProductItem) {
+                override fun onPlusProductQuantity(item: CartItemType.ProductItem) {
                     item.quantity++
                     binding.invalidateAll()
                 }
 
-                override fun onMinusProductQuantity(item: woowacourse.shopping.view.cart.CartItemType.ProductItem) {
+                override fun onMinusProductQuantity(item: CartItemType.ProductItem) {
                     if (item.quantity == 1) {
                         onRemoveProduct(item)
                         return
@@ -34,14 +33,14 @@ class CartProductViewHolder(
             }
     }
 
-    fun bind(item: woowacourse.shopping.view.cart.CartItemType.ProductItem) {
+    fun bind(item: CartItemType.ProductItem) {
         binding.productItem = item
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
-            onRemoveProduct: (CartItem) -> Unit,
+            onRemoveProduct: (cartItemId: Long) -> Unit,
         ): CartProductViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemShoppingCartProductBinding.inflate(layoutInflater, parent, false)

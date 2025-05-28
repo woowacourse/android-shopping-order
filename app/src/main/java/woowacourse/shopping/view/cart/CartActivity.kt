@@ -42,7 +42,8 @@ class CartActivity :
     private fun initDataBinding() {
         binding.adapter = cartProductAdapter
         binding.onClickBackButton = {
-            viewModel.updateShoppingCart()
+            setResult(RESULT_OK)
+            finish()
         }
     }
 
@@ -74,7 +75,8 @@ class CartActivity :
         }
 
         onBackPressedDispatcher.addCallback {
-            viewModel.updateShoppingCart()
+            setResult(RESULT_OK)
+            finish()
         }
     }
 

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.PageableCartItems
-import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
@@ -47,11 +46,19 @@ class CartViewModel(
         }
     }
 
-    fun removeCartItem(cartItem: CartItem) {
-    }
-
-    fun updateShoppingCart(): Any? {
-        TODO()
+    fun removeCartItem(cartItemId: Long) {
+        cartRepository.remove(cartItemId) { result ->
+            result
+                .onSuccess {
+                    if (_cartItems.value?.size == 1) {
+                        minusPage()
+                    } else {
+                        loadCartItems()
+                    }
+                }.onFailure {
+                    _event.postValue(CartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
+                }
+        }
     }
 
     fun minusPage() {

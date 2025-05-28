@@ -47,7 +47,7 @@ class ProductsActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult(),
         ) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
-                viewModel.loadRecentViewedProducts()
+                viewModel.loadCart()
             }
         }
 
