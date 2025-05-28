@@ -76,6 +76,36 @@
                 android:paddingHorizontal="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/productsHistoryContainer" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                app:shimmer_auto_start="true"
+                app:shimmer_duration="@integer/material_motion_duration_long_2"
+                android:layout_width="0dp"
+                android:background="@color/gray_5"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:columnCount="2">
+
+                    <include layout="@layout/item_product_skeleton" />
+
+                    <include layout="@layout/item_product_skeleton" />
+
+                    <include layout="@layout/item_product_skeleton" />
+
+                    <include layout="@layout/item_product_skeleton" />
+
+                    <include layout="@layout/item_product_skeleton" />
+
+                    <include layout="@layout/item_product_skeleton" />
+                </GridLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

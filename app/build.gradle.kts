@@ -72,6 +72,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.google.material)
 
+    // skeleton
+    implementation(libs.shimmer)
+
     // Image
     implementation(libs.glide)
 
