@@ -77,6 +77,7 @@ class ProductCatalogViewModel(
     }
 
     fun loadCatalog() {
+        _onFinishLoading.value = false
         loadRecentProducts()
         loadCartProducts()
         cartProductRepository.getTotalQuantity {

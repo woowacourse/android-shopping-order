@@ -119,6 +119,7 @@ class ProductCatalogActivity : AppCompatActivity() {
             if (value == true) {
                 binding.sfLoading.visibility = View.GONE
             } else {
+                binding.sfLoading.visibility = View.VISIBLE
                 binding.sfLoading.startShimmer()
             }
         }
