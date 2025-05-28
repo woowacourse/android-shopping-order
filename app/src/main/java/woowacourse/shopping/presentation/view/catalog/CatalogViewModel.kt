@@ -126,9 +126,9 @@ class CatalogViewModel(
         cartRepository.addCartItem(updatedProduct.toCartItem()) {
             cartRepository.getAllCartItems { cartItems ->
                 val found = cartItems?.find { it.product.id == updatedProduct.id }
-
                 if (found != null) {
                     _itemUpdateEvent.postValue(found.toUiModel())
+                    handleUpdatedCartItem(found.cartId)
                 } else {
                     _itemUpdateEvent.postValue(updatedProduct)
                     refreshCartState()
