@@ -3,22 +3,27 @@ package woowacourse.shopping.data.source.remote.cart
 import woowacourse.shopping.data.model.CartItemResponse
 
 interface CartItemsDataSource {
-    fun getCartItems(onResult: (Result<CartItemResponse>) -> Unit)
+    fun getCartItems(
+        page: Int,
+        size: Int = 5,
+        onResult: (Result<CartItemResponse>) -> Unit,
+    )
 
     fun addCartItem(
         id: Int,
         quantity: Int,
-        onResult: (Result<String>) -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     )
 
     fun deleteCartItem(
         id: Int,
-        onResult: (Result<String>) -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     )
 
     fun updateCartItem(
         id: Int,
-        onResult: (Result<String>) -> Unit,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
     )
 
     fun getCarItemsCount(onResult: (Result<CartItemResponse>) -> Unit)
