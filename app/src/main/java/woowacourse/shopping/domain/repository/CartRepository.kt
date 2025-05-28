@@ -26,6 +26,7 @@ interface CartRepository {
 
     fun updateProduct(
         cartId: Long,
+        product: Product,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     )

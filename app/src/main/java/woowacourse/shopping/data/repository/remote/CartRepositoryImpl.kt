@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository.remote
 
-import android.util.Log
 import woowacourse.shopping.data.datasource.remote.CartDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
@@ -41,7 +40,7 @@ class CartRepositoryImpl(
             val cartItem =
                 cachedCart.findCartItem(product.productId) ?: throw NoSuchElementException("")
 
-            updateProduct(cartItem.cartId, cartItem.quantity + productQuantity) {
+            updateProduct(cartItem.cartId, product, cartItem.quantity + productQuantity) {
                 onResult(Result.success(Unit))
             }
         } else {
@@ -67,11 +66,15 @@ class CartRepositoryImpl(
 
     override fun updateProduct(
         cartId: Long,
+        product: Product,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
         cartDataSource.updateQuantity(cartId, quantity) { result ->
-            onResult(result)
+            result.onSuccess {
+                onResult(result)
+                cachedCart = cachedCart.add(CartItem(cartId, product, quantity))
+            }
         }
     }
 
@@ -81,7 +84,10 @@ class CartRepositoryImpl(
     ) {
         val cartId = cachedCart.findCartItem(productId)?.cartId ?: -1
         cartDataSource.deleteCartItemById(cartId) { result ->
-            onResult(result)
+            result.onSuccess {
+                onResult(result)
+                cachedCart = cachedCart.delete(productId)
+            }
         }
     }
 
@@ -91,7 +97,6 @@ class CartRepositoryImpl(
 
             cartDataSource.getPagedCartItems(0, totalCount) { cartItems ->
                 cachedCart = Cart(cartItems)
-                Log.d("meeple_log", "$cachedCart")
             }
         }
     }

@@ -17,4 +17,10 @@ data class Cart(
     fun exist(productId: Long): Boolean = cartMapByProductId.containsKey(productId)
 
     fun findCartItem(productId: Long): CartItem? = cartMapByProductId[productId]
+
+    fun delete(productId: Long): Cart {
+        findCartItem(productId) ?: throw NoSuchElementException()
+        val newCartItems = cartMapByProductId - productId
+        return Cart(newCartItems)
+    }
 }
