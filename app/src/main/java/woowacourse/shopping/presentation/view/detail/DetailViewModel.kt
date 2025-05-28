@@ -47,9 +47,18 @@ class DetailViewModel(
 
     fun addCartItem() {
         val product = _product.value ?: return
-        val newProduct = product.copy(amount = _amount.value ?: 1)
-        cartRepository.addCartItem(newProduct.toCartItem()) {
-            _saveState.postValue(Unit)
+        if (product.cartId == 0L) {
+            cartRepository.addCartItem(product.toCartItem()) {
+                _saveState.postValue(Unit)
+            }
+        } else {
+            val totalAmount = (_product.value?.amount ?: 0) + (_amount.value ?: 0)
+            cartRepository.updateCartItemQuantity(
+                cartId = product.cartId,
+                quantity = totalAmount,
+            ) {
+                _saveState.postValue(Unit)
+            }
         }
     }
 

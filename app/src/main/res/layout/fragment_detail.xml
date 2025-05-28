@@ -97,7 +97,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_detail_price"
             app:layout_constraintTop_toTopOf="@id/text_view_detail_price"
-            app:productId="@{product.id}" />
+            app:product="@{product}" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/view_detail_last_viewed"

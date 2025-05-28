@@ -34,9 +34,9 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
 
         binding.detailItemCounter.listener =
             object : ItemCounterListener {
-                override fun increase(productId: Long) = viewModel.increaseAmount()
+                override fun increase(product: ProductUiModel) = viewModel.increaseAmount()
 
-                override fun decrease(productId: Long) = viewModel.decreaseAmount()
+                override fun decrease(product: ProductUiModel) = viewModel.decreaseAmount()
             }
     }
 
