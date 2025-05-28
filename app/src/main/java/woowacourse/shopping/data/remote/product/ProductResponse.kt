@@ -23,7 +23,7 @@ data class ProductResponse(
     @SerialName("size")
     val size: Int,
     @SerialName("sort")
-    val sort: SortX,
+    val sort: Sort,
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")
@@ -54,13 +54,13 @@ data class ProductResponse(
         @SerialName("paged")
         val paged: Boolean,
         @SerialName("sort")
-        val sort: SortX,
+        val sort: Sort,
         @SerialName("unpaged")
         val unpaged: Boolean
     )
 
     @Serializable
-    data class SortX(
+    data class Sort(
         @SerialName("empty")
         val empty: Boolean,
         @SerialName("sorted")

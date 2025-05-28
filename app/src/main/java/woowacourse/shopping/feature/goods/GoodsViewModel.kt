@@ -46,6 +46,7 @@ class GoodsViewModel(
 
     fun addPage() {
         page++
+        loadProducts()
     }
 
     fun addToCart(cart: Cart) {
@@ -109,34 +110,6 @@ class GoodsViewModel(
         _totalQuantity.value = total
     }
 
-//    private fun loadItems() {
-//        val currentItems = _items.value.orEmpty()
-//
-//        historyRepository.getAll { histories ->
-//            cartRepository.getAll { cartsResult ->
-//                val newGoods = getProducts(page)
-//
-//                val hasMore = (page + 1) * PAGE_SIZE < dummyGoods.size
-//                _hasNextPage.postValue(hasMore)
-//
-//                val updatedCarts =
-//                    newGoods.map { goods ->
-//                        val quantity = cartsResult.carts.find { it.product.id == goods.id }?.quantity ?: 0
-//                        Cart(goods = goods, quantity = quantity)
-//                    }
-//
-//                val combinedItems: MutableList<Any> = mutableListOf()
-//                if (page == INITIAL_PAGE) combinedItems.add(histories)
-//                combinedItems.addAll(updatedCarts)
-//
-//                _items.postValue(currentItems + combinedItems)
-//
-//                val total = combinedItems.filterIsInstance<Cart>().sumOf { it.quantity }
-//                _totalQuantity.postValue(total)
-//            }
-//        }
-//    }
-
     fun updateItemQuantity(
         id: Int,
         quantity: Int,
@@ -159,15 +132,21 @@ class GoodsViewModel(
 
     private fun loadProducts() {
         productRepository.fetchProducts(
-            onSuccess = { productList ->
-                val carts = productList.map { product ->
+            onSuccess = { response ->
+                val newCarts = response.content.map { product ->
                     Cart(product = product.toDomain(), quantity = 0)
                 }
-                _products.value = carts
-                Log.d("loadProductsInRange", "$carts")
+
+                val currentProducts = _products.value.orEmpty()
+                val combinedCarts = currentProducts + newCarts
+                _products.value = combinedCarts
+
+                _hasNextPage.value = !response.last
+
                 refreshItems()
             },
-            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) }
+            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
+            page = page
         )
     }
 
@@ -190,7 +169,6 @@ class GoodsViewModel(
     }
 
     companion object {
-        private const val PAGE_SIZE = 20
         private const val INITIAL_PAGE = 0
     }
 }

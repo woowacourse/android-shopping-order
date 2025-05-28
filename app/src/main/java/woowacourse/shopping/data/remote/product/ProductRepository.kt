@@ -7,21 +7,28 @@ import woowacourse.shopping.data.remote.product.ProductResponse.Content
 
 class ProductRepository {
     fun fetchProducts(
-        onSuccess: (List<Content>) -> Unit,
-        onError: (Throwable) -> Unit
+        onSuccess: (ProductResponse) -> Unit,
+        onError: (Throwable) -> Unit,
+        page: Int,
     ) {
-        ProductClient.getRetrofitService().requestGoods().enqueue(object : Callback<ProductResponse> {
-            override fun onResponse(call: Call<ProductResponse>, response: Response<ProductResponse>) {
-                if (response.isSuccessful) {
-                    onSuccess(response.body()?.content.orEmpty())
-                } else {
-                    onError(Throwable("응답 실패"))
+        ProductClient.getRetrofitService().requestGoods(page = page)
+            .enqueue(object : Callback<ProductResponse> {
+                override fun onResponse(
+                    call: Call<ProductResponse>,
+                    response: Response<ProductResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(it)
+                        } ?: onError(Throwable("응답 본문 없음"))
+                    } else {
+                        onError(Throwable("응답 실패: ${response.code()}"))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
-                onError(t)
-            }
-        })
+                override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                    onError(t)
+                }
+            })
     }
 }
