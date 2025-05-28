@@ -61,7 +61,7 @@
             app:layout_constraintBottom_toBottomOf="@id/image_view_product"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:productId="@{product.id}" />
+            app:product="@{product}" />
 
 
         <TextView

@@ -53,12 +53,12 @@ class CatalogFragment :
         viewModel.initialAddToCart(product)
     }
 
-    override fun increase(productId: Long) {
-        viewModel.increaseCartItem(productId)
+    override fun increase(product: ProductUiModel) {
+        viewModel.increaseCartItem(product)
     }
 
-    override fun decrease(productId: Long) {
-        viewModel.decreaseCartItem(productId)
+    override fun decrease(product: ProductUiModel) {
+        viewModel.decreaseCartItem(product)
     }
 
     private fun setCatalogAdapter() {

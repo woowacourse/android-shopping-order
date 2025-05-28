@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,7 @@ class CatalogViewModel(
 
     fun fetchProducts() {
         productRepository.loadCartItems { cartItems ->
+            Log.d("tama_log", "$cartItems")
 
             val totalCount = cartItems?.sumOf { it.amount } ?: 0
             _totalCartCount.postValue(totalCount)
@@ -125,20 +127,38 @@ class CatalogViewModel(
     fun initialAddToCart(product: ProductUiModel) {
         val updatedProduct = product.copy(amount = 1)
         cartRepository.addCartItem(updatedProduct.toCartItem()) {
-            _itemUpdateEvent.postValue(updatedProduct)
-            calculateTotalCartCount()
+            cartRepository.getAllCartItems { cartItems ->
+                val found = cartItems?.find { it.product.id == updatedProduct.id }
+
+                if (found != null) {
+                    _itemUpdateEvent.postValue(found.toUiModel())
+                } else {
+                    _itemUpdateEvent.postValue(updatedProduct)
+                    refreshCartState()
+                }
+            }
         }
     }
 
-    fun increaseCartItem(productId: Long) {
-        cartRepository.increaseCartItem(productId) { updatedCartItem ->
-            handleUpdatedCartItem(updatedCartItem)
+    fun increaseCartItem(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+        cartRepository.increaseCartItem(cartItem) { id ->
+            handleUpdatedCartItem(id)
         }
     }
 
-    fun decreaseCartItem(productId: Long) {
-        cartRepository.decreaseCartItem(productId) { updatedCartItem ->
-            handleUpdatedCartItem(updatedCartItem)
+    fun decreaseCartItem(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+
+        if (cartItem.amount <= 1) {
+            cartRepository.deleteCartItem(cartItem.cartId) {
+                _itemUpdateEvent.postValue(product.copy(amount = 0))
+                calculateTotalCartCount()
+            }
+        } else {
+            cartRepository.decreaseCartItem(cartItem) { id ->
+                handleUpdatedCartItem(id)
+            }
         }
     }
 
@@ -147,12 +167,12 @@ class CatalogViewModel(
         updateRecentProducts()
     }
 
-    private fun handleUpdatedCartItem(id: Long) {
-        getCartItemById(id) { cartItem ->
-            cartItem.let {
-                _itemUpdateEvent.postValue(it.toUiModel())
-                calculateTotalCartCount()
+    private fun handleUpdatedCartItem(cartId: Long) {
+        getCartItemByCartId(cartId) { cartItem ->
+            if (cartItem != null) {
+                _itemUpdateEvent.postValue(cartItem.toUiModel())
             }
+            calculateTotalCartCount()
         }
     }
 
@@ -185,12 +205,12 @@ class CatalogViewModel(
         }
     }
 
-    private fun getCartItemById(
+    private fun getCartItemByCartId(
         id: Long,
-        callback: (CartItem) -> Unit,
+        callback: (CartItem?) -> Unit,
     ) {
-        cartRepository.getAllCartItems { it ->
-            val foundItem = it.find { it.product.id == id }!!
+        cartRepository.getAllCartItems { list ->
+            val foundItem = list?.find { it.cartId == id }
             callback(foundItem)
         }
     }
