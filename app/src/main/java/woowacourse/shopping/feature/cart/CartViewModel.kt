@@ -4,14 +4,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
-import woowacourse.shopping.data.remote.product.ProductResponse.Content.RemoteProduct
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Carts
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
@@ -26,10 +23,8 @@ class CartViewModel(
     val page: LiveData<Int> get() = _page
     private val _cart = MutableLiveData<Cart>()
     val cart: LiveData<Cart> get() = _cart
-    val carts: LiveData<Carts> =
-        _page.switchMap { pageNum ->
-            localCartRepository.getPage(PAGE_SIZE, (pageNum - 1) * PAGE_SIZE)
-        }
+    private val _carts = MutableLiveData<Carts>()
+    val carts: LiveData<Carts> get() = _carts
     private val _totalItemsCount = MutableLiveData(0)
     val totalItemsCount: LiveData<Int> get() = _totalItemsCount
     private val _isLeftPageEnable = MutableLiveData(false)
@@ -39,7 +34,7 @@ class CartViewModel(
 
     init {
         fetchTotalItemsCount()
-        test()
+        loadCarts()
     }
 
     fun delete(cart: Cart) {
@@ -104,19 +99,20 @@ class CartViewModel(
         }
     }
 
-    fun test() {
+    fun loadCarts() {
         cartRepository.fetchCart(
             onSuccess = { productList ->
-                val carts = productList.map { content ->
-                    Cart(product = content.product.toDomain(), quantity = content.quantity)
+                val carts = productList.map {
+                    Cart(product = it.product.toDomain(), quantity = it.quantity)
                 }
-                Log.d("loadProductsInRange", "$carts")
+                val wrapper = Carts(carts = carts, totalQuantity = carts.sumOf { it.quantity })
+                _carts.postValue(wrapper)
             },
             onError = { Log.e("loadProductsInRange", "API 요청 실패", it) }
         )
     }
 
-    fun addCartTest(cart: Cart) {
+    fun addToCart(cart: Cart) {
         _cart.value = cart
         val current = _cart.value
         if (current != null) {

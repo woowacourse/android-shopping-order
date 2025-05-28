@@ -20,7 +20,7 @@ class CartViewHolder(
         binding.customCartQuantity.setClickListener(
             object : CustomCartQuantity.CartQuantityClickListener {
                 override fun onAddClick() {
-                    cartClickListener.insertToCart(cart)
+                    cartClickListener.addToCart(cart)
                 }
 
                 override fun onRemoveClick() {
@@ -44,7 +44,7 @@ class CartViewHolder(
     interface CartClickListener {
         fun onClickDeleteButton(cart: Cart)
 
-        fun insertToCart(cart: Cart)
+        fun addToCart(cart: Cart)
 
         fun removeFromCart(cart: Cart)
     }

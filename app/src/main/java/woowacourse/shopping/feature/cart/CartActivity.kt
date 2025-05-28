@@ -55,9 +55,8 @@ class CartActivity : AppCompatActivity() {
                         sendCartResult(cart)
                     }
 
-                    override fun insertToCart(cart: Cart) {
-//                        viewModel.insertToCart(cart)
-                        viewModel.addCartTest(cart)
+                    override fun addToCart(cart: Cart) {
+                        viewModel.addToCart(cart)
                         sendCartResult(cart)
                     }
 
