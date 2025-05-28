@@ -169,14 +169,14 @@ class CatalogViewModel(
             if (cartItem != null) {
                 _itemUpdateEvent.postValue(cartItem.toUiModel())
             }
+            cartRepository
             calculateTotalCartCount()
         }
     }
 
     private fun calculateTotalCartCount() {
-        productRepository.loadCartItems { cartItems ->
-            val totalCount = cartItems?.sumOf { it.amount } ?: 0
-            _totalCartCount.postValue(totalCount)
+        cartRepository.getAllCartItemsCount { count ->
+            _totalCartCount.postValue(count?.quantity)
         }
     }
 

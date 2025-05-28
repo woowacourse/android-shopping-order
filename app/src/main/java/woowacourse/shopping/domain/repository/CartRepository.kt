@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
 
 interface CartRepository {
@@ -9,6 +10,10 @@ interface CartRepository {
         callback: (List<CartItem>, Boolean) -> Unit,
     )
 
+    fun getAllCartItems(callback: (List<CartItem>?) -> Unit)
+
+    fun getAllCartItemsCount(callBack: (Quantity?) -> Unit)
+
     fun deleteCartItem(
         id: Long,
         callback: (Long) -> Unit,
@@ -16,20 +21,18 @@ interface CartRepository {
 
     fun addCartItem(
         cartItem: CartItem,
-        callback: () -> (Unit),
+        callback: () -> Unit,
     )
 
     fun increaseCartItem(
         cartItem: CartItem,
-        callback: (Long) -> (Unit),
+        callback: (Long) -> Unit,
     )
 
     fun decreaseCartItem(
         cartItem: CartItem,
-        callback: (Long) -> (Unit),
+        callback: (Long) -> Unit,
     )
-
-    fun getAllCartItems(callback: (List<CartItem>?) -> (Unit))
 
     fun updateCartItemQuantity(
         cartId: Long,
