@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource
 
-import okhttp3.ResponseBody
 import woowacourse.shopping.data.model.cart.AddCartItemCommand
 import woowacourse.shopping.data.model.cart.CartItemResponse
 import woowacourse.shopping.data.model.cart.Quantity
@@ -12,14 +11,14 @@ interface CartRemoteDataSource {
         size: Int,
     ): Result<PageableResponse<CartItemResponse>>
 
-    fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<ResponseBody>
+    fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long>
 
-    fun deleteCartItem(cartId: Long): Result<ResponseBody>
+    fun deleteCartItem(cartId: Long): Result<Unit>
 
     fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
-    ): Result<ResponseBody>
+    ): Result<Unit>
 
     fun fetchCartItemCount(): Result<Quantity>
 }

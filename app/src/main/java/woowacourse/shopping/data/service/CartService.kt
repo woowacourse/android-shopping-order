@@ -33,14 +33,14 @@ interface CartService {
     fun deleteCartItem(
         @Header("Authorization") key: String,
         @Path("id") cartId: Long,
-    ): Call<ResponseBody>
+    ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItemQuantity(
         @Header("Authorization") key: String,
         @Path("id") cartId: Long,
         @Body quantity: Quantity,
-    ): Call<ResponseBody>
+    ): Call<Unit>
 
     @GET("/cart-items/counts")
     fun fetchCartItem(
