@@ -34,8 +34,8 @@ class DetailActivity : AppCompatActivity() {
         setAddToCartClickListener()
 
         val productId = intent.getIntExtra(KEY_PRODUCT_DETAIL, 0)
-            setViewModel(productId)
-            observeProduct()
+        setViewModel(productId)
+        observeProduct()
         binding.vm = viewModel
         binding.lifecycleOwner = this
         binding.layoutQuantityControlBar.quantityControlListener =
@@ -70,8 +70,8 @@ class DetailActivity : AppCompatActivity() {
         viewModel.product.observe(this) {
             viewModel.setQuantity()
             viewModel.setPriceSum()
-//            viewModel.addToRecentlyViewedProduct()
-//            binding.layoutQuantityControlBar.product = it
+            viewModel.addToRecentlyViewedProduct()
+            binding.layoutQuantityControlBar.product = it
         }
 
         viewModel.quantity.observe(this) {

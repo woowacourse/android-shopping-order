@@ -30,9 +30,8 @@ class RecentlyViewedProductRepositoryImpl(
     override fun getLatestViewedProduct(callback: (ProductUiModel) -> Unit) {
         thread {
             val uid = recentlyViewedProductDao.getLatestViewedProductUid()
-            catalogProductRepository.getCartProductsByUids(listOf(uid)) { products ->
-                val first = products.firstOrNull() ?: return@getCartProductsByUids
-                callback(first)
+            catalogProductRepository.getProduct(uid) { product ->
+                callback(product)
             }
         }
     }

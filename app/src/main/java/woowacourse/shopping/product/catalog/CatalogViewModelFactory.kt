@@ -24,7 +24,7 @@ class CatalogViewModelFactory(
                 recentlyViewedProductRepository =
                     RecentlyViewedProductRepositoryImpl(
                         ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
-                        HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
+                        RemoteCatalogProductRepositoryImpl(),
                     ),
                 catalogProductRepository = HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
                 remoteCatalogProductRepositoryImpl = RemoteCatalogProductRepositoryImpl()

@@ -90,9 +90,11 @@ class HttpCatalogProductRepositoryImpl(
         TODO("Not yet implemented")
     }
 
+
+
     override fun getProduct(
         id: Int,
-        callback: (ProductUiModel?) -> Unit
+        callback: (ProductUiModel) -> Unit
     ) {
         TODO("Not yet implemented")
     }

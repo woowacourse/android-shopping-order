@@ -16,5 +16,5 @@ interface CatalogProductRepository {
         callback: (List<ProductUiModel>) -> Unit
     )
 
-    fun getProduct(id: Int, callback: (ProductUiModel?) -> Unit)
+    fun getProduct(id: Int, callback: (ProductUiModel) -> Unit)
 }

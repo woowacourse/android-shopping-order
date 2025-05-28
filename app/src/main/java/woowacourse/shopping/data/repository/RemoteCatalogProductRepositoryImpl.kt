@@ -35,8 +35,26 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
         uids: List<Int>,
         callback: (List<ProductUiModel>) -> Unit
     ) {
-        TODO("Not yet implemented")
+        val results = mutableListOf<ProductUiModel>()
+        var completedCount = 0
+
+        if (uids.isEmpty()) {
+            callback(emptyList())
+            return
+        }
+
+        uids.forEach { uid ->
+            getProduct(uid) { product ->
+                results.add(product)
+                completedCount++
+
+                if (completedCount == uids.size) {
+                    callback(results)
+                }
+            }
+        }
     }
+
 
     override fun getProductsByPage(
         page: Int,
@@ -75,7 +93,7 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
 
     override fun getProduct(
         id: Int,
-        callback: (ProductUiModel?) -> Unit
+        callback: (ProductUiModel) -> Unit
     ) {
         retrofitService.requestDetailProduct(
             id = id,

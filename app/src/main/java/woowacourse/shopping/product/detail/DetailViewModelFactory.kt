@@ -25,7 +25,7 @@ class DetailViewModelFactory(
                 ),
                 RecentlyViewedProductRepositoryImpl(
                     ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
-                    HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
+                    RemoteCatalogProductRepositoryImpl(),
                 ),
                 RemoteCatalogProductRepositoryImpl()
             ) as T
