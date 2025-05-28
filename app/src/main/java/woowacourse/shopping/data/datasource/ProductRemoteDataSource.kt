@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.PageableResponse
-import woowacourse.shopping.data.model.ProductResponse
+import retrofit2.Call
+import woowacourse.shopping.data.model.common.PageableResponse
+import woowacourse.shopping.data.model.product.ProductResponse
 
 interface ProductRemoteDataSource {
-    fun findProductById(id: Long): ProductResponse
+    fun fetchProducts(
+        category: String?,
+        page: Int,
+        size: Int,
+    ): Call<PageableResponse<ProductResponse>>
 
-    fun findProductsByIds(ids: List<Long>): List<ProductResponse>
-
-    fun loadProducts(
-        offset: Int,
-        limit: Int,
-    ): PageableResponse<ProductResponse>
+    fun fetchProduct(productId: Int): Call<ProductResponse>
 }

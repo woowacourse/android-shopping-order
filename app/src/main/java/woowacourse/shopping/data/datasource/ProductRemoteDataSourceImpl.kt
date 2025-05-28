@@ -1,18 +1,18 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.PageableResponse
-import woowacourse.shopping.data.model.ProductResponse
+import retrofit2.Call
+import woowacourse.shopping.data.model.common.PageableResponse
+import woowacourse.shopping.data.model.product.ProductResponse
 import woowacourse.shopping.data.service.ProductService
 
 class ProductRemoteDataSourceImpl(
     private val productService: ProductService,
 ) : ProductRemoteDataSource {
-    override fun findProductById(id: Long): ProductResponse = productService.findProductById(id)
+    override fun fetchProducts(
+        category: String?,
+        page: Int,
+        size: Int,
+    ): Call<PageableResponse<ProductResponse>> = productService.fetchProducts(category, page, size)
 
-    override fun findProductsByIds(ids: List<Long>): List<ProductResponse> = productService.findProductsByIds(ids)
-
-    override fun loadProducts(
-        offset: Int,
-        limit: Int,
-    ): PageableResponse<ProductResponse> = productService.loadProducts(offset, limit)
+    override fun fetchProduct(productId: Int): Call<ProductResponse> = productService.fetchProduct(productId)
 }
