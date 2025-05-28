@@ -22,8 +22,18 @@ class CartViewModel(
 
     val loading: MutableLiveData<Boolean> = MutableLiveData(true)
 
+    private var selectedCartItemIds: Set<Long> = emptySet()
+
     init {
         loadCartItems()
+    }
+
+    fun select(cartItemId: Long) {
+        selectedCartItemIds += cartItemId
+    }
+
+    fun unselect(cartItemId: Long) {
+        selectedCartItemIds -= cartItemId
     }
 
     private fun loadCartItems() {

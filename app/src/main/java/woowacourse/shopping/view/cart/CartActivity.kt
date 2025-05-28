@@ -21,7 +21,7 @@ class CartActivity :
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
     private val cartProductAdapter by lazy {
-        CartProductAdapter(viewModel::removeCartItem, this)
+        CartProductAdapter(viewModel::removeCartItem, this, viewModel::select, viewModel::unselect)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

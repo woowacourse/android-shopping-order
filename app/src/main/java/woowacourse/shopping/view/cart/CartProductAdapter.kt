@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 class CartProductAdapter(
     private val onRemoveProduct: (cartItemId: Long) -> Unit,
     private val onCartPaginationListener: OnCartPaginationListener,
+    private val onSelect: (cartItemId: Long) -> Unit,
+    private val onUnselect: (cartItemId: Long) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var items: List<CartItemType> = emptyList()
 
@@ -22,6 +24,8 @@ class CartProductAdapter(
                 CartProductViewHolder.of(
                     parent,
                     onRemoveProduct,
+                    onSelect,
+                    onUnselect,
                 )
 
             CartItemType.ItemType.PAGINATION ->

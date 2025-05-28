@@ -12,6 +12,7 @@
         <variable
             name="shoppingCartItemActionListener"
             type="woowacourse.shopping.view.cart.CartItemActionListener" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

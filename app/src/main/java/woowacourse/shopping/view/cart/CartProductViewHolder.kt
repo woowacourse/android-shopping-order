@@ -8,6 +8,8 @@ import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
 class CartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
     onRemoveProduct: (cartItemId: Long) -> Unit,
+    private val onSelect: (cartItemId: Long) -> Unit,
+    private val onUnselect: (cartItemId: Long) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.shoppingCartItemActionListener =
@@ -35,16 +37,25 @@ class CartProductViewHolder(
 
     fun bind(item: CartItemType.ProductItem) {
         binding.productItem = item
+        binding.shoppingCartProductCheckBox.setOnClickListener {
+            if (binding.shoppingCartProductCheckBox.isChecked) {
+                onSelect(item.cartItem.id)
+            } else {
+                onUnselect(item.cartItem.id)
+            }
+        }
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
             onRemoveProduct: (cartItemId: Long) -> Unit,
+            onSelect: (cartItemId: Long) -> Unit,
+            onUnselect: (cartItemId: Long) -> Unit,
         ): CartProductViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemShoppingCartProductBinding.inflate(layoutInflater, parent, false)
-            return CartProductViewHolder(binding, onRemoveProduct)
+            return CartProductViewHolder(binding, onRemoveProduct, onSelect, onUnselect)
         }
     }
 }
