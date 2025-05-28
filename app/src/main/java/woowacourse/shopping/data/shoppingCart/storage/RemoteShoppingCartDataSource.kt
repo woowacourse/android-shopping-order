@@ -29,7 +29,7 @@ class RemoteShoppingCartDataSource(
     }
 
     override fun remove(product: CartItemEntity) {
-        TODO("Not yet implemented")
+        productsHttpClient.deleteShoppingCartItem(product.id)
     }
 
     override fun update(products: List<CartItemEntity>) {

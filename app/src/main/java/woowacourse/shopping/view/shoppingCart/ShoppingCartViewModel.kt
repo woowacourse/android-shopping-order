@@ -76,7 +76,7 @@ class ShoppingCartViewModel(
         shoppingCartRepository.remove(cartItem) { result: Result<Unit> ->
             result
                 .onSuccess {
-//                    loadShoppingCart()
+                    loadShoppingCart()
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
                 }

@@ -61,18 +61,29 @@ class ProductsHttpClient(
         )
     }
 
+    fun deleteShoppingCartItem(id: Long) =
+        http(
+            HttpMethod.Delete(),
+            "/cart-items/$id",
+            true,
+        )
+
     fun getProducts(
         page: Int,
         size: Int,
     ): Response = httpGet("/products?page=$page&size=$size")
 
-    fun getCartItems(): Response = run(PATH_CART_ITEMS)
-
-    private fun run(path: String): Response {
+    private fun http(
+        httpMethod: HttpMethod,
+        path: String,
+        needAuthorization: Boolean = false,
+    ): Response {
         val request: Request =
             Request
                 .Builder()
                 .url(baseUrl + path)
+                .addBasicAuthorizationHeader(needAuthorization)
+                .method(httpMethod.name, httpMethod.body)
                 .build()
 
         return client.newCall(request).execute()
@@ -109,6 +120,22 @@ class ProductsHttpClient(
         return client.newCall(request).execute()
     }
 
+    private fun httpDelete(
+        path: String,
+        body: RequestBody,
+        needAuthorization: Boolean = false,
+    ): Response {
+        val request: Request =
+            Request
+                .Builder()
+                .url(baseUrl + path)
+                .addBasicAuthorizationHeader(needAuthorization)
+                .delete(body)
+                .build()
+
+        return client.newCall(request).execute()
+    }
+
     private fun Request.Builder.addBasicAuthorizationHeader(needAuthorization: Boolean): Request.Builder {
         val valueToEncode = "jerry8282:password".toByteArray()
 
@@ -119,6 +146,28 @@ class ProductsHttpClient(
                     "Basic " + Base64.getEncoder().encodeToString(valueToEncode),
                 )
             }
+        }
+    }
+
+    private sealed interface HttpMethod {
+        val name: String
+        val body: RequestBody?
+
+        class Get : HttpMethod {
+            override val name: String = "GET"
+            override val body: RequestBody? = null
+        }
+
+        class Post(
+            override val body: RequestBody?,
+        ) : HttpMethod {
+            override val name: String = "POST"
+        }
+
+        class Delete(
+            override val body: RequestBody? = null,
+        ) : HttpMethod {
+            override val name: String = "DELETE"
         }
     }
 
