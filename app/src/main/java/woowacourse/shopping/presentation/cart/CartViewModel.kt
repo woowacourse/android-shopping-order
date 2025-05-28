@@ -44,14 +44,14 @@ class CartViewModel(
     }
 
     override fun onNextPage() {
-        repository.getAllCartItemSize { size ->
-            val lastPage = (size - 1) / PAGE_SIZE
-            if (currentPage < lastPage) {
-                currentPage++
-                _pageEvent.postValue(currentPage)
-                loadCartProducts()
-            }
-        }
+//        repository.getAllCartItemSize { size ->
+//            val lastPage = (size - 1) / PAGE_SIZE
+//            if (currentPage < lastPage) {
+//                currentPage++
+//                _pageEvent.postValue(currentPage)
+//                loadCartProducts()
+//            }
+//        }
     }
 
     override fun onPrevPage() {
@@ -63,18 +63,18 @@ class CartViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        val newProduct = product.copy(quantity = product.quantity + 1)
-        repository.updateCartItem(newProduct) {
-            _product.postValue(newProduct)
-        }
+//        val newProduct = product.copy(quantity = product.quantity + 1)
+//        repository.updateCartItem(newProduct) {
+//            _product.postValue(newProduct)
+//        }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val newQuantity = if (product.quantity > 1) product.quantity - 1 else 1
-        val newProduct = product.copy(quantity = newQuantity)
-        repository.updateCartItem(newProduct) {
-            _product.postValue(newProduct)
-        }
+//        val newQuantity = if (product.quantity > 1) product.quantity - 1 else 1
+//        val newProduct = product.copy(quantity = newQuantity)
+//        repository.updateCartItem(newProduct) {
+//            _product.postValue(newProduct)
+//        }
     }
 
     override fun isNextButtonEnabled(): Boolean = _isNextButtonEnabled.value == true
@@ -86,23 +86,23 @@ class CartViewModel(
     override fun getPage(): Int = currentPage
 
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
-        repository.getAllCartItemSize { totalSize ->
-            var current = currentPage
-            while (current > 0 && current * pageSize >= totalSize) {
-                current--
-            }
-            currentPage = current
-            _pageEvent.postValue(current)
-
-            val startIndex = current * pageSize
-            val endIndex = minOf(startIndex + pageSize, totalSize)
-
-            repository.subListCartItems(startIndex, endIndex) { products ->
-                _cartProducts.postValue(products)
-                _isNextButtonEnabled.postValue(current < (totalSize - 1) / pageSize)
-                _isPrevButtonEnabled.postValue(current > 0)
-            }
-        }
+//        repository.getAllCartItemSize { totalSize ->
+//            var current = currentPage
+//            while (current > 0 && current * pageSize >= totalSize) {
+//                current--
+//            }
+//            currentPage = current
+//            _pageEvent.postValue(current)
+//
+//            val startIndex = current * pageSize
+//            val endIndex = minOf(startIndex + pageSize, totalSize)
+//
+//            repository.subListCartItems(startIndex, endIndex) { products ->
+//                _cartProducts.postValue(products)
+//                _isNextButtonEnabled.postValue(current < (totalSize - 1) / pageSize)
+//                _isPrevButtonEnabled.postValue(current > 0)
+//            }
+//        }
     }
 
     companion object {
@@ -116,16 +116,5 @@ class CartViewModel(
                 )
             }
         }
-
-        fun factory(repository: CartItemRepository): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
-                        return CartViewModel(repository) as T
-                    }
-                    throw IllegalArgumentException("알 수 없는 ViewModel 클래스입니다.$modelClass")
-                }
-            }
     }
 }
