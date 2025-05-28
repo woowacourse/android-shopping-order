@@ -43,6 +43,9 @@ class CartViewModel(
     private val _loginErrorEvent: MutableSingleLiveData<CartFetchError> = MutableSingleLiveData()
     val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
 
+    private val _removeItemEvent: MutableSingleLiveData<CartItem> = MutableSingleLiveData()
+    val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
+
     init {
         updateCartQuantity()
     }
@@ -63,7 +66,8 @@ class CartViewModel(
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         if (cartItem.quantity - 1 <= 0) {
-            cartRepository.delete(cartItem.id) { updateCartQuantity() }
+//            cartRepository.delete(cartItem.id) { updateCartQuantity() }
+            _removeItemEvent.setValue(cartItem)
         } else {
             cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
                 updateCartQuantity()

@@ -12,6 +12,6 @@ class CartViewHolder(
     }
 
     interface CartClickListener {
-        fun onClickDeleteButton(cartItem: CartItem)
+        fun onCartItemDelete(cartItem: CartItem)
     }
 }

@@ -55,6 +55,9 @@ class CartActivity :
             }
             finish()
         }
+        viewModel.removeItemEvent.observe(this) { cartItem ->
+            onCartItemDelete(cartItem)
+        }
     }
 
     override fun onResume() {
@@ -67,7 +70,7 @@ class CartActivity :
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onClickDeleteButton(cartItem: CartItem) {
+    override fun onCartItemDelete(cartItem: CartItem) {
         val deletedIndex: Int? = viewModel.getPosition(cartItem)
         deletedIndex?.let { adapter.removeItem(it) }
         viewModel.delete(cartItem)
