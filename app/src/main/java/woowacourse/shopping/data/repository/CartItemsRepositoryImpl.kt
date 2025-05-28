@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.Content
+import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
 import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.repository.CartItemRepository
@@ -8,6 +9,7 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class CartItemsRepositoryImpl(
     private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
+    private val cartItemsLocalDataSource: CartItemsLocalDataSource,
 ) : CartItemRepository {
     override fun getCartItems(
         page: Int,
@@ -26,46 +28,37 @@ class CartItemsRepositoryImpl(
         }
     }
 
-    override fun addCartItem(
-        id: Int,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
-            result
-                .mapCatching { it }
-                .let(onResult)
-        }
-    }
-
     override fun deleteCartItem(
         id: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
         cartItemsRemoteDataSource.deleteCartItem(id) { result ->
-            result
-                .mapCatching { it }
-                .let(onResult)
+            cartItemsLocalDataSource.remove(id)
+            result.let(onResult)
         }
     }
 
-    override fun updateCartItem(
+    override fun upsertCartItem(
         id: Int,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        cartItemsRemoteDataSource.updateCartItem(id, quantity) { result ->
-            result
-                .mapCatching { it }
-                .let(onResult)
+        if (cartItemsLocalDataSource.isCached(id)) {
+            cartItemsRemoteDataSource.updateCartItem(id, quantity) { result ->
+                cartItemsLocalDataSource.update(id, quantity)
+                result.let(onResult)
+            }
+        } else {
+            cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
+                cartItemsLocalDataSource.add(id, quantity)
+                result.let(onResult)
+            }
         }
     }
 
     override fun getCarItemsCount(onResult: (Result<Int>) -> Unit) {
         cartItemsRemoteDataSource.getCarItemsCount { result ->
-            result
-                .mapCatching { it.numberOfElements }
-                .let(onResult)
+            result.let(onResult)
         }
     }
 
