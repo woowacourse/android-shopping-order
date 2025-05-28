@@ -119,11 +119,20 @@ class ProductsActivity : AppCompatActivity() {
                 ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE ->
                     showToast(R.string.products_load_recent_products_error_message)
 
-                ProductsEvent.LOAD_SHOPPING_CART_FAILURE -> TODO()
-                ProductsEvent.ADD_CART_ITEM_FAILURE -> TODO()
-                ProductsEvent.PLUS_CART_ITEM_FAILURE -> TODO()
-                ProductsEvent.REMOVE_CART_ITEM_FAILURE -> TODO()
-                ProductsEvent.MINUS_CART_ITEM_FAILURE -> TODO()
+                ProductsEvent.LOAD_SHOPPING_CART_FAILURE ->
+                    showToast(R.string.products_load_shopping_cart_error_message)
+
+                ProductsEvent.ADD_CART_ITEM_FAILURE ->
+                    showToast(R.string.products_add_shopping_cart_error_message)
+
+                ProductsEvent.PLUS_CART_ITEM_FAILURE ->
+                    showToast(R.string.products_add_shopping_cart_error_message)
+
+                ProductsEvent.REMOVE_CART_ITEM_FAILURE ->
+                    showToast(R.string.products_patch_shopping_cart_error_message)
+
+                ProductsEvent.MINUS_CART_ITEM_FAILURE ->
+                    showToast(R.string.products_patch_shopping_cart_error_message)
             }
         }
     }

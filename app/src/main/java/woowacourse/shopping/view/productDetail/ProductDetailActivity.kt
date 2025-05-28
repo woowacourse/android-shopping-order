@@ -63,7 +63,8 @@ class ProductDetailActivity :
                 ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE ->
                     showToast(R.string.product_detail_record_recent_products_error_message)
 
-                ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE -> TODO()
+                ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE ->
+                    showToast(getString(R.string.shopping_cart_fetch_shopping_cart_error_message))
             }
         }
     }
