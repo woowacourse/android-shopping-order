@@ -4,33 +4,55 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.remote.cart.CartResponse.Content
-import kotlin.collections.orEmpty
 
 class CartRepository {
-    fun fetchCart(
-        onSuccess: (List<Content>) -> Unit,
+    fun fetchAllCart(
+        onSuccess: (CartResponse) -> Unit,
         onError: (Throwable) -> Unit,
     ) {
-        CartClient.getRetrofitService().requestCart().enqueue(
+        CartClient.getRetrofitService().requestCart(size = Int.MAX_VALUE).enqueue(
             object : Callback<CartResponse> {
                 override fun onResponse(
                     call: Call<CartResponse>,
                     response: Response<CartResponse>,
                 ) {
                     if (response.isSuccessful) {
-                        val result = response.body()?.content.orEmpty()
-                        onSuccess(result)
+                        response.body()?.let {
+                            onSuccess(it)
+                        } ?: onError(Throwable("응답 본문 없음"))
                     } else {
-                        val errorMessage =
-                            buildString {
-                                append("응답 실패: ${response.code()}")
-                                response.errorBody()?.let {
-                                    append(" - ${it.string()}")
-                                }
-                            }
-                        Log.e("CartRepository", errorMessage)
-                        onError(Throwable(errorMessage))
+                        onError(Throwable("응답 실패: ${response.code()}"))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<CartResponse>,
+                    t: Throwable,
+                ) {
+                    Log.e("CartRepository", "네트워크 실패", t)
+                    onError(t)
+                }
+            },
+        )
+    }
+
+    fun fetchCart(
+        onSuccess: (CartResponse) -> Unit,
+        onError: (Throwable) -> Unit,
+        page: Int,
+    ) {
+        CartClient.getRetrofitService().requestCart(page = page).enqueue(
+            object : Callback<CartResponse> {
+                override fun onResponse(
+                    call: Call<CartResponse>,
+                    response: Response<CartResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(it)
+                        } ?: onError(Throwable("응답 본문 없음"))
+                    } else {
+                        onError(Throwable("응답 실패: ${response.code()}"))
                     }
                 }
 

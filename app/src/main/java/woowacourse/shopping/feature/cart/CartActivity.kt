@@ -28,8 +28,6 @@ class CartActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.rvGoods.adapter = adapter
-
-        updatePageButton()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -37,14 +35,14 @@ class CartActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun updatePageButton() {
-        viewModel.totalItemsCount.observe(this) {
-            viewModel.updatePageButtonStates()
-        }
-        viewModel.page.observe(this) {
-            viewModel.updatePageButtonStates()
-        }
-    }
+//    private fun updatePageButton() {
+//        viewModel.totalItemsCount.observe(this) {
+// //            viewModel.updatePageButtonStates()
+//        }
+//        viewModel.page.observe(this) {
+// //            viewModel.updatePageButtonStates()
+//        }
+//    }
 
     private fun setupAdapter() {
         adapter =
@@ -52,28 +50,31 @@ class CartActivity : AppCompatActivity() {
                 object : CartViewHolder.CartClickListener {
                     override fun onClickDeleteButton(cart: Cart) {
                         viewModel.delete(cart)
-                        sendCartResult(cart)
+                        sendCartResult(cart, 0)
                     }
 
                     override fun addToCart(cart: Cart) {
                         viewModel.addToCart(cart)
-                        sendCartResult(cart)
+                        sendCartResult(cart, cart.quantity + 1)
                     }
 
                     override fun removeFromCart(cart: Cart) {
                         viewModel.removeFromCart(cart)
-                        sendCartResult(cart)
+                        sendCartResult(cart, cart.quantity - 1)
                     }
                 },
             )
     }
 
-    private fun sendCartResult(cart: Cart) {
+    private fun sendCartResult(
+        cart: Cart,
+        quantity: Int,
+    ) {
         setResult(
             ResultCode.CART_INSERT.code,
             Intent().apply {
                 putExtra("GOODS_ID", cart.product.id)
-                putExtra("GOODS_QUANTITY", cart.quantity)
+                putExtra("GOODS_QUANTITY", quantity)
             },
         )
     }
