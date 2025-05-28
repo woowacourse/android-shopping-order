@@ -42,8 +42,11 @@ class CartViewModel(
     }
 
     override fun onDeleteProduct(cartProduct: ProductUiModel) {
-        cartRepository.deleteCartItem(cartProduct.id) {
-            loadCartProducts()
+        cartRepository.deleteCartItem(cartProduct.id) { result ->
+            result
+                .onSuccess {
+                    loadCartProducts()
+                }
         }
     }
 
@@ -91,7 +94,8 @@ class CartViewModel(
 
     override fun isPrevButtonEnabled(): Boolean = _isPrevButtonEnabled.value == true
 
-    override fun isPaginationEnabled(): Boolean = (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
+    override fun isPaginationEnabled(): Boolean =
+        (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
 
     override fun getPage(): Int = currentPage
 

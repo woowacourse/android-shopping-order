@@ -58,7 +58,7 @@ class CartActivity : AppCompatActivity() {
         viewModel.pagingData.observe(this) {
             binding.frCartShimmer.stopShimmer()
             binding.frCartShimmer.visibility = View.GONE
-            binding.frCartShimmer.visibility = View.VISIBLE
+            binding.recyclerViewCart.visibility = View.VISIBLE
 
             adapter.setData(it.products)
         }
