@@ -93,7 +93,7 @@ class ShoppingCartViewModel(
             page--
         }
 
-        // loadShoppingCart()
+        loadShoppingCart()
     }
 
     companion object {
