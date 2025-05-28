@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import woowacourse.shopping.data.model.ViewedItem
 
-@Database(entities = [ViewedItem::class], version = 2)
+@Database(entities = [ViewedItem::class], version = 1)
 abstract class ViewedItemDatabase : RoomDatabase() {
     abstract fun viewedItemDao(): ViewedItemDao
 
@@ -16,15 +16,12 @@ abstract class ViewedItemDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): ViewedItemDatabase =
             instance ?: synchronized(this) {
-                val newInstance =
-                    Room
-                        .databaseBuilder(
-                            context.applicationContext,
-                            ViewedItemDatabase::class.java,
-                            "viewedItemDatabase",
-                        ).build()
-                instance = newInstance
-                newInstance
+                Room
+                    .databaseBuilder(
+                        context.applicationContext,
+                        ViewedItemDatabase::class.java,
+                        "viewedItemDatabase",
+                    ).build().also { instance = it }
             }
     }
 }
