@@ -8,6 +8,7 @@ data class ProductUiModel(
     val name: String,
     val imageUrl: String,
     val price: Int,
+    val category: String?,
 )
 
 fun Product.toUiModel() =
@@ -16,6 +17,7 @@ fun Product.toUiModel() =
         name = name,
         imageUrl = imageUrl,
         price = price.value,
+        category = category,
     )
 
 fun ProductUiModel.toProduct() =
@@ -24,4 +26,5 @@ fun ProductUiModel.toProduct() =
         name = name,
         imageUrl = imageUrl,
         price = Price(price),
+        category = category,
     )

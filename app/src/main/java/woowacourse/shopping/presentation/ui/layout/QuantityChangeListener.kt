@@ -1,7 +1,13 @@
 package woowacourse.shopping.presentation.ui.layout
 
 interface QuantityChangeListener {
-    fun increaseQuantity(productId: Long)
+    fun increaseQuantity(
+        cartId: Long,
+        quantity: Int,
+    )
 
-    fun decreaseQuantity(productId: Long)
+    fun decreaseQuantity(
+        cartId: Long,
+        quantity: Int,
+    )
 }

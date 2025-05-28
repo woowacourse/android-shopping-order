@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.model
 import woowacourse.shopping.domain.model.CartProduct
 
 data class CartProductUiModel(
+    val cartId: Long,
     val productId: Long,
     val productName: String,
     val imageUrl: String,
@@ -12,6 +13,7 @@ data class CartProductUiModel(
 
 fun CartProduct.toCartItemUiModel() =
     CartProductUiModel(
+        cartId,
         product.id,
         product.name,
         product.imageUrl,
