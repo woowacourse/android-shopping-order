@@ -36,8 +36,7 @@ object RepositoryModule {
     fun provideRecentProductRepository(): RecentProductRepository =
         recentProductRepository ?: run {
             val recentlyProductDataSource = DataSourceModule.provideRecentProductDataSource()
-            val productDataSource = DataSourceModule.provideProductDataSource()
-            RecentProductRepositoryImpl(recentlyProductDataSource, productDataSource).also {
+            RecentProductRepositoryImpl(recentlyProductDataSource).also {
                 recentProductRepository = it
             }
         }
