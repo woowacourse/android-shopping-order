@@ -10,22 +10,26 @@ interface CartRepository {
         onResult: (Result<PageableItem<CartProduct>>) -> Unit,
     )
 
-    fun addCartItem(
-        productId: Long,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
-
     fun deleteCartItem(
         cartId: Long,
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun patchCartItemQuantity(
-        cartId: Long,
-        quantity: Int,
+    fun insertCartProductQuantityToCart(
+        productId: Long,
+        increaseCount: Int,
+        onResult: (Result<Unit>) -> Unit,
+    )
+
+    fun decreaseCartProductQuantityFromCart(
+        productId: Long,
+        decreaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
     )
 
     fun fetchCartItemCount(onResult: (Result<Int>) -> Unit)
+
+    fun findQuantityByProductId(productId: Long): Result<Int>
+
+    fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
 }

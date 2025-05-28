@@ -13,6 +13,10 @@ class Cart(
         cachedCartProducts[cartProduct.product.id] = cartProduct
     }
 
+    fun deleteCartProductFromCartByCartId(cartId: Long) {
+        cachedCartProducts.values.removeIf { it.cartId == cartId }
+    }
+
     fun findCartProductByProductId(productId: Long): CartProduct? = cachedCartProducts[productId]
 
     fun findQuantityByProductId(productId: Long): Int = cachedCartProducts[productId]?.quantity ?: 0
