@@ -43,10 +43,14 @@ class ProductAdapter(
         }
 
     fun setData(newProducts: List<ProductUiModel>) {
-        val startPosition = products.size
-        products = products + newProducts
-
-        notifyItemRangeInserted(startPosition, newProducts.size)
+        if (newProducts.size == products.size) {
+            products = newProducts
+            notifyItemRangeChanged(0, newProducts.size)
+        } else {
+            val startPosition = products.size
+            products = products + newProducts
+            notifyItemRangeInserted(startPosition, newProducts.size)
+        }
     }
 
     override fun getItemCount(): Int = products.size + if (showLoadMoreButton) 1 else 0
