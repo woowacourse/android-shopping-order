@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import woowacourse.shopping.data.model.ViewedItem
 
-@Database(entities = [ViewedItem::class], version = 1)
+@Database(entities = [ViewedItem::class], version = 2)
 abstract class ViewedItemDatabase : RoomDatabase() {
     abstract fun viewedItemDao(): ViewedItemDao
 
