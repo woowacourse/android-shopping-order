@@ -65,7 +65,9 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
 
     private fun initObservers() {
         viewModel.product.observe(this) { product ->
-            viewModel.addHistoryProduct(product.productDetail)
+            product?.let {
+                viewModel.addHistoryProduct(product.productDetail)
+            }
         }
         viewModel.onCartProductAddSuccess.observe(this) { isSuccess ->
             isSuccess?.let { handleCartProductAddResult(it) }
