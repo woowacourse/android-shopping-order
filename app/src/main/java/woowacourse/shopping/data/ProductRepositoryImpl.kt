@@ -46,8 +46,8 @@ class ProductRepositoryImpl(
         cartItemDataSource.fetchCartItems(
             page = 0,
             size = Int.MAX_VALUE,
-        ) {
-            callback(it?.content?.map { it.toCartItem() } ?: emptyList())
+        ) { it ->
+            callback(it?.content?.map { it.toCartItem() }.orEmpty())
         }
     }
 

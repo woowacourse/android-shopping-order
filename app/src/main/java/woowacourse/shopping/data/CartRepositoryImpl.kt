@@ -28,7 +28,7 @@ class CartRepositoryImpl(
             page = 0,
             size = Int.MAX_VALUE,
         ) { it ->
-            callback(it?.content?.map { it.toCartItem() } ?: emptyList())
+            callback(it?.content?.map { it.toCartItem() }.orEmpty())
         }
     }
 
