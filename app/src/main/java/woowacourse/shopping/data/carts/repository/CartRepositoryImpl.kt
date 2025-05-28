@@ -18,14 +18,14 @@ class CartRepositoryImpl(
     }
 
     override fun fetchAllCartItems(
-        onComplete: (List<CartItem>) -> Unit,
+        onComplete: (CartResponse) -> Unit,
         onFail: (Throwable) -> Unit,
     ) {
         remoteDataSource.fetchCartItemByOffset(
             Int.MAX_VALUE,
             0,
             { response ->
-                onComplete(getCartItemByCartResponse(response))
+                onComplete(response)
             },
             { },
         )
@@ -34,14 +34,14 @@ class CartRepositoryImpl(
     override fun fetchCartItemsByOffset(
         limit: Int,
         offset: Int,
-        onComplete: (List<CartItem>) -> Unit,
+        onComplete: (CartResponse) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
         remoteDataSource.fetchCartItemByOffset(
             limit,
             offset,
             { response ->
-                onComplete(getCartItemByCartResponse(response))
+                onComplete(response)
             },
             { response ->
                 onFail(response)
@@ -52,14 +52,14 @@ class CartRepositoryImpl(
     override fun fetchCartItemsByPage(
         page: Int,
         size: Int,
-        onComplete: (List<CartItem>) -> Unit,
+        onComplete: (CartResponse) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
         remoteDataSource.fetchCartItemByOffset(
             page,
             size,
             { response ->
-                onComplete(getCartItemByCartResponse(response))
+                onComplete(response)
             },
             { response ->
                 onFail(response)
@@ -67,22 +67,7 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
-        cartResponse.toCartItems()
-
-    override fun addOrIncreaseQuantity(
-        goods: Goods,
-        addQuantity: Int,
-        onComplete: () -> Unit,
-    ) {
-        fetchAllCartItems({ cartItems: List<CartItem> ->
-            if (goods.id in cartItems.map { it.goods.id }) {
-            } else {
-                addCartItem(goods)
-            }
-        }, {
-        })
-    }
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     override fun updateQuantity(
         cartId: Int,
@@ -117,7 +102,7 @@ class CartRepositoryImpl(
     ) {
         remoteDataSource.deleteItem(
             cartId = cartId,
-            onSuccess = onComplete
+            onSuccess = onComplete,
         )
     }
 

@@ -5,8 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.carts.dto.CartQuantity
+import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
@@ -33,12 +35,14 @@ class GoodsViewModel(
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
 
-    var cashedCartItemWithIndex: Map<Int, Pair<CartItem, Int>> = mapOf()
+    private var cashedCartItemWithIndex: Map<Int, Pair<CartItem, Int>> = mapOf()
 
     init {
         appendCartItemsWithZeroQuantity()
         updateRecentlyViewedGoods()
     }
+
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
@@ -79,16 +83,18 @@ class GoodsViewModel(
     }
 
     fun updateCartCache() {
-        cartRepository.fetchAllCartItems({ cartItems ->
+        cartRepository.fetchAllCartItems({ cartResponse ->
+            val cartItems = getCartItemByCartResponse(cartResponse)
             cashedCartItemWithIndex =
                 cartItems
                     .mapIndexed { index, cartItem ->
                         cartItem.goods.id to Pair(cartItem, index)
                     }.toMap()
 
-            val newList = goods.map { goods ->
-                cashedCartItemWithIndex[goods.id]?.first ?: CartItem(goods = goods, quantity = 0)
-            }
+            val newList =
+                goods.map { goods ->
+                    cashedCartItemWithIndex[goods.id]?.first ?: CartItem(goods = goods, quantity = 0)
+                }
 
             if (_goodsWithCartQuantity.value != newList) {
                 _goodsWithCartQuantity.value = newList
@@ -119,19 +125,17 @@ class GoodsViewModel(
             _navigateToLogin.setValue(Unit)
         } else {
             val cashedCartItem = cashedCartItemWithIndex[cartItem.goods.id]
-            Log.d("Test",cashedCartItem.toString())
-            if(cashedCartItem==null){
+            Log.d("Test", cashedCartItem.toString())
+            if (cashedCartItem == null) {
                 addCartItem(cartItem.goods)
-            }
-            else{
+            } else {
                 increaseCartItem(cashedCartItem.first.id, cartItem.copy(quantity = cashedCartItem.first.quantity + 1))
             }
             updateCartCache()
-
         }
     }
 
-    private fun addCartItem(goods: Goods){
+    private fun addCartItem(goods: Goods) {
         cartRepository.addCartItem(goods)
     }
 
@@ -150,10 +154,9 @@ class GoodsViewModel(
             Log.d("카트아이템", "$cartItem")
             Log.d("캐시", "$cashedCartItemWithIndex")
             cashedCartItemWithIndex[cartItem.goods.id]?.first?.let {
-                if(it.quantity-1<=0){
-                    cartRepository.delete(it.id,{})
-                }
-                else{
+                if (it.quantity - 1 <= 0) {
+                    cartRepository.delete(it.id, {})
+                } else {
                     increaseCartItem(it.id, cartItem.copy(quantity = it.quantity - 1))
                 }
             }

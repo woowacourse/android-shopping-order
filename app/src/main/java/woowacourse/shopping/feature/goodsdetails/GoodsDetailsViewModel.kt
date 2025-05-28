@@ -3,7 +3,6 @@ package woowacourse.shopping.feature.goodsdetails
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.domain.model.CartItem
@@ -53,15 +52,15 @@ class GoodsDetailsViewModel(
 
     fun addToCart() {
         cartItem.value?.let {
-            cartRepository.addOrIncreaseQuantity(it.goods, it.quantity) {
-                _alertEvent.setValue(
-                    GoodsDetailsAlertMessage(
-                        R.string.goods_detail_cart_insert_complete_toast_message,
-                        it.quantity,
-                    ),
-                )
-                _cartItem.value = _cartItem.value?.copy(quantity = 1)
-            }
+//            cartRepository.addOrIncreaseQuantity(it.goods, it.quantity) {
+//                _alertEvent.setValue(
+//                    GoodsDetailsAlertMessage(
+//                        R.string.goods_detail_cart_insert_complete_toast_message,
+//                        it.quantity,
+//                    ),
+//                )
+//                _cartItem.value = _cartItem.value?.copy(quantity = 1)
+//            }
         }
     }
 
