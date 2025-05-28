@@ -29,7 +29,7 @@ interface ShoppingCartRepository {
     )
 
     fun remove(
-        product: Product,
+        shoppingCartId: Long,
         onResult: (Result<Unit>) -> Unit,
     )
 

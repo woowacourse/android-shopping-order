@@ -11,7 +11,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.showSnackBar
@@ -24,7 +23,7 @@ class ShoppingCartActivity :
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
     private val shoppingCartProductAdapter by lazy {
-        ShoppingCartProductAdapter(viewModel::removeShoppingCartProduct, this)
+        ShoppingCartProductAdapter(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +48,7 @@ class ShoppingCartActivity :
         binding.onClickBackButton = {
             val intent =
                 Intent().apply {
-                    putExtra("updateProducts", viewModel.updatedProducts.value?.toTypedArray())
+                    putExtra("updateProducts", viewModel.hasUpdatedProducts.value)
                 }
             setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
             finish()
@@ -92,8 +91,8 @@ class ShoppingCartActivity :
         viewModel.plusPage()
     }
 
-    override fun onRemoveButton(product: Product) {
-        viewModel.removeShoppingCartProduct(product)
+    override fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
+        viewModel.removeShoppingCartProduct(shoppingCartProductItem)
     }
 
     override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {

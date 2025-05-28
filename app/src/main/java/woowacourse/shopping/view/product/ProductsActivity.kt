@@ -45,16 +45,13 @@ class ProductsActivity :
                 }
 
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
-                    val updateItems: Array<Product>? =
+                    val updateItems: Boolean? =
                         result.data?.getSerializableExtraData("updateProducts")
-                    if (updateItems !== null) viewModel.updateProducts()
+                    if (updateItems != null && updateItems) viewModel.updateProducts()
                     viewModel.updateShoppingCartQuantity()
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {
-                    val updateQuantityProduct: Product =
-                        result.data?.getSerializableExtraData("updateProduct")
-                            ?: return@registerForActivityResult
                     val recentProduct: Product =
                         result.data?.getSerializableExtraData("recentProduct")
                             ?: return@registerForActivityResult

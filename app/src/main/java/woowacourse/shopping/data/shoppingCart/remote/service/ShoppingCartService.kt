@@ -2,6 +2,7 @@ package woowacourse.shopping.data.shoppingCart.remote.service
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -32,4 +33,9 @@ interface ShoppingCartService {
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Call<ShoppingCartItemsResponseDto>
+
+    @DELETE("cart-items/{id}")
+    fun deleteCartItem(
+        @Path("id") shoppingCartId: Long,
+    ): Call<Unit>
 }

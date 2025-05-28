@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
@@ -18,9 +17,9 @@ class ShoppingCartViewModel(
     private val _shoppingCart: MutableLiveData<List<ShoppingCartItem>> = MutableLiveData()
     val shoppingCart: LiveData<List<ShoppingCartItem>> get() = _shoppingCart
 
-    private val _updatedProducts: MutableLiveData<List<Product>> =
-        MutableLiveData()
-    val updatedProducts: LiveData<List<Product>> get() = _updatedProducts
+    private val _hasUpdatedProducts: MutableLiveData<Boolean> =
+        MutableLiveData(false)
+    val hasUpdatedProducts: LiveData<Boolean> get() = _hasUpdatedProducts
 
     private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ShoppingCartEvent> get() = _event
@@ -72,16 +71,12 @@ class ShoppingCartViewModel(
         return visibleProducts.map(::ShoppingCartProductItem) + paginationItem
     }
 
-    fun removeShoppingCartProduct(product: Product) {
-        shoppingCartRepository.remove(product) { result ->
+    fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartProductItem) {
+        shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id) { result ->
             result
                 .onSuccess {
                     updateShoppingCart()
-                    val currentUpdatedProducts =
-                        updatedProducts.value?.toMutableList() ?: mutableListOf()
-                    if (currentUpdatedProducts.contains(product)) return@remove
-                    currentUpdatedProducts.add(product)
-                    _updatedProducts.postValue(currentUpdatedProducts)
+                    _hasUpdatedProducts.postValue(true)
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
                 }
@@ -89,7 +84,6 @@ class ShoppingCartViewModel(
     }
 
     fun decreaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
-        val product = shoppingCartProductItem.shoppingCartProduct.product
         shoppingCartRepository.decreaseQuantity(
             shoppingCartProductItem.shoppingCartProduct.id,
             shoppingCartProductItem.shoppingCartProduct.quantity - 1,
@@ -97,11 +91,7 @@ class ShoppingCartViewModel(
             result
                 .onSuccess {
                     updateShoppingCart()
-                    val currentUpdatedProducts =
-                        updatedProducts.value?.toMutableList() ?: mutableListOf()
-                    if (currentUpdatedProducts.contains(product)) return@decreaseQuantity
-                    currentUpdatedProducts.add(product)
-                    _updatedProducts.value = currentUpdatedProducts
+                    _hasUpdatedProducts.value = true
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE)
                 }
@@ -109,7 +99,6 @@ class ShoppingCartViewModel(
     }
 
     fun increaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
-        val product = shoppingCartProductItem.shoppingCartProduct.product
         shoppingCartRepository.increaseQuantity(
             shoppingCartProductItem.shoppingCartProduct.id,
             shoppingCartProductItem.shoppingCartProduct.quantity + 1,
@@ -117,11 +106,7 @@ class ShoppingCartViewModel(
             result
                 .onSuccess {
                     updateShoppingCart()
-                    val currentUpdatedProducts =
-                        updatedProducts.value?.toMutableList() ?: mutableListOf()
-                    if (currentUpdatedProducts.contains(product)) return@onSuccess
-                    currentUpdatedProducts.add(product)
-                    _updatedProducts.value = currentUpdatedProducts
+                    _hasUpdatedProducts.value = true
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE)
                 }

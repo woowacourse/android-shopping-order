@@ -11,7 +11,6 @@ import woowacourse.shopping.data.shoppingCart.remote.dto.ShoppingCartItemsRespon
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import kotlin.concurrent.thread
 
 class DefaultShoppingCartRepository(
     private val shoppingCartDao: ShoppingCartDao,
@@ -119,18 +118,28 @@ class DefaultShoppingCartRepository(
     }
 
     override fun remove(
-        product: Product,
+        shoppingCartId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        thread {
-            runCatching {
-                shoppingCartDao.delete(product.id)
-            }.onSuccess {
-                onResult(Result.success(Unit))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
+        shoppingCartService.deleteCartItem(shoppingCartId).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit?>,
+                    response: Response<Unit?>,
+                ) {
+                    if (response.isSuccessful) {
+                        onResult(Result.success(Unit))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit?>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
     }
 
     override fun fetchAllQuantity(onResult: (Result<Int>) -> Unit) {
