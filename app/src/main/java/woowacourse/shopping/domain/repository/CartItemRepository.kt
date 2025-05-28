@@ -20,5 +20,5 @@ interface CartItemRepository {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun getCarItemsCount(onResult: (Result<Int>) -> Unit)
+    fun getCartItemsCount(onResult: (Result<Int>) -> Unit)
 }

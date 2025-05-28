@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.source.remote.cart
 
 import woowacourse.shopping.data.model.CartItemResponse
+import woowacourse.shopping.data.model.ItemCount
 
 interface CartItemsDataSource {
     fun getCartItems(
@@ -26,5 +27,5 @@ interface CartItemsDataSource {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun getCarItemsCount(onResult: (Result<Int>) -> Unit)
+    fun getCarItemsCount(onResult: (Result<ItemCount>) -> Unit)
 }

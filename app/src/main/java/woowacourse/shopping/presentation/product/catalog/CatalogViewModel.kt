@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.product.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,7 +40,7 @@ class CatalogViewModel(
     init {
         loadCatalogProducts()
         loadRecentViewedItems()
-//        updateCartCount()
+        updateCartCount()
     }
 
     fun onQuantitySelectorToggled(product: ProductUiModel) {
@@ -117,7 +118,7 @@ class CatalogViewModel(
     }
 
     private fun updateCartCount() {
-        cartRepository.getCarItemsCount { result ->
+        cartRepository.getCartItemsCount { result ->
             result.onSuccess { cartCount ->
                 _cartCount.postValue(cartCount)
             }

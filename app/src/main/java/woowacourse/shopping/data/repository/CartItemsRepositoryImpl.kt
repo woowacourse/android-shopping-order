@@ -57,9 +57,13 @@ class CartItemsRepositoryImpl(
         }
     }
 
-    override fun getCarItemsCount(onResult: (Result<Int>) -> Unit) {
+    override fun getCartItemsCount(onResult: (Result<Int>) -> Unit) {
         cartItemsRemoteDataSource.getCarItemsCount { result ->
-            result.let(onResult)
+            result
+                .mapCatching {
+                    it.quantity
+                }
+                .let(onResult)
         }
     }
 

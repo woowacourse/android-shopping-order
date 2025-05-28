@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.source.remote.cart
 
 import woowacourse.shopping.data.model.CartItemResponse
+import woowacourse.shopping.data.model.ItemCount
 import woowacourse.shopping.data.source.remote.api.CartApiService
 import woowacourse.shopping.data.source.remote.util.enqueueResult
 
@@ -38,7 +39,7 @@ class CartItemsRemoteDataSource(
         api.patchCartItems(id = id, quantity = quantity).enqueueResult(onResult)
     }
 
-    override fun getCarItemsCount(onResult: (Result<Int>) -> Unit) {
+    override fun getCarItemsCount(onResult: (Result<ItemCount>) -> Unit) {
         api.getCartItemsCounts().enqueueResult(onResult)
     }
 }
