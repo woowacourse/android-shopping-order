@@ -8,6 +8,8 @@ import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
@@ -34,50 +36,84 @@ class MainViewModel(
     val isLoading: SingleLiveData<Boolean> get() = _isLoading
 
     init {
-        loadPage(INITIAL_PAGE)
+        loadNextPage(INITIAL_PAGE)
     }
 
     fun loadPage() {
         withState(_uiState.value) { state ->
             val pageIndex = state.productItems.size / PAGE_SIZE
-            loadPage(pageIndex)
+            loadNextPage(pageIndex)
         }
     }
 
-    private fun loadPage(pageIndex: Int) {
-        productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { result ->
-            result.fold(
-                onSuccess = { page ->
-                    val newItems = page.products.map { ProductState(it, Quantity(0)) }
-                    val currentItems = _uiState.value?.productItems.orEmpty()
-                    _uiState.value =
-                        ProductUiState(
-                            productItems = currentItems + newItems,
-                            load = LoadState.of(page.hasNextPage),
-                        )
-                    handleLoading(false)
+    private fun loadNextPage(pageIndex: Int) {
+        handleLoading(true)
+
+        productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { productResult ->
+            productResult.fold(
+                onSuccess = { productPage ->
+                    loadCartAndMerge(productPage, pageIndex)
                 },
-                onFailure = { throwable ->
-                    Log.e("ProductLoad", "Error loading products", throwable)
+                onFailure = {
+                    logError("ProductLoad", it)
                     handleLoading(false)
                 },
             )
         }
     }
 
+    private fun loadCartAndMerge(
+        productPage: ProductSinglePage,
+        pageIndex: Int,
+    ) {
+        cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
+            cartResult.fold(
+                onSuccess = { cartPage ->
+                    mergeProductWithCart(productPage, cartPage.products)
+                },
+                onFailure = {
+                    logError("CartLoad", it)
+                    handleLoading(false)
+                },
+            )
+        }
+    }
+
+    private fun mergeProductWithCart(
+        productPage: ProductSinglePage,
+        cartItems: List<ShoppingCart>,
+    ) {
+        val newProductStates =
+            productPage.products.map { product ->
+                val cartItem = cartItems.find { cart -> cart.product.id == product.id }
+                ProductState(
+                    cartId = cartItem?.id,
+                    item = product,
+                    cartQuantity = cartItem?.quantity ?: Quantity(0),
+                )
+            }
+
+        val currentItems = _uiState.value?.productItems.orEmpty()
+
+        _uiState.value =
+            ProductUiState(
+                productItems = currentItems + newProductStates,
+                load = LoadState.of(productPage.hasNextPage),
+            )
+        handleLoading(false)
+    }
+
     fun increaseCartQuantity(productId: Long) {
         withState(_uiState.value) { state ->
             val increasedState = state.increaseCartQuantity(productId)
-
             cartRepository.addCart(Cart(increasedState.cartQuantity, productId)) { result ->
-
                 result.fold(
                     onSuccess = {
                         val response = state.modifyUiState(increasedState)
                         _uiState.value = response
                     },
-                    onFailure = { throwable ->
-                        Log.d("ProductQuantityIncrease", "Error increase products", throwable)
+                    onFailure = {
+                        logError("ProductQuantityIncrease", it)
                     },
                 )
             }
@@ -99,9 +135,7 @@ class MainViewModel(
 
     fun syncCartQuantities() {
         withState(_uiState.value) { state ->
-//            cartRepository.getCarts(state.productIds) { carts ->
-//                 구현 예정
-//            }
+            // cartRepository.getCarts(state.productIds) { ... } // 구현 예정
         }
     }
 
@@ -121,6 +155,13 @@ class MainViewModel(
 
     private fun handleLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)
+    }
+
+    private fun logError(
+        tag: String,
+        throwable: Throwable,
+    ) {
+        Log.e(tag, "Error occurred", throwable)
     }
 
     private fun sendEvent(event: MainUiEvent) {
