@@ -1,15 +1,22 @@
 package woowacourse.shopping.data.service
 
-import woowacourse.shopping.data.model.PageableResponse
-import woowacourse.shopping.data.model.ProductResponse
+import retrofit2.Call
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
+import woowacourse.shopping.data.model.common.PageableResponse
+import woowacourse.shopping.data.model.product.ProductResponse
 
 interface ProductService {
-    fun findProductById(id: Long): ProductResponse
+    @GET("/products")
+    fun fetchProducts(
+        @Query("category") category: String?,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Call<PageableResponse<ProductResponse>>
 
-    fun findProductsByIds(ids: List<Long>): List<ProductResponse>
-
-    fun loadProducts(
-        offset: Int,
-        limit: Int,
-    ): PageableResponse<ProductResponse>
+    @GET("/products/{id}")
+    fun fetchProduct(
+        @Path("id") productId: Int,
+    ): Call<ProductResponse>
 }
