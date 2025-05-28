@@ -10,6 +10,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.model.CartItemResponse
+import woowacourse.shopping.data.model.CartRequest
 import woowacourse.shopping.data.model.ItemCount
 
 interface CartApiService {
@@ -24,9 +25,8 @@ interface CartApiService {
     @POST("/cart-items")
     fun postCartItems(
         @Header("accept") accept: String = "*/*",
-        @Query("productId") productId: Int,
-        @Query("quantity") quantity: Int,
-    ): Call<Unit>
+        @Body request: CartRequest,
+    ): Call<Void>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItems(

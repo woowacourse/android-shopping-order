@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.product.catalog
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,14 +45,24 @@ class CatalogViewModel(
     fun onQuantitySelectorToggled(product: ProductUiModel) {
         val toggled =
             product.copy(isExpanded = !product.isExpanded, quantity = product.quantity + 1)
-        _updatedProduct.value = toggled
-        updateProduct(toggled)
+
+        cartRepository.addCartItem(toggled.id, toggled.quantity) { result ->
+            result
+                .onSuccess {
+                    _updatedProduct.postValue(toggled)
+                }
+        }
     }
 
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
-        updateProduct(newProduct)
-        _updatedProduct.value = newProduct
+
+        cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
+            result
+                .onSuccess {
+                    _updatedProduct.postValue(newProduct)
+                }
+        }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
@@ -63,24 +72,20 @@ class CatalogViewModel(
                 quantity = newQuantity,
                 isExpanded = newQuantity > 0,
             )
-        updateProduct(updated)
-        _updatedProduct.value = updated
-    }
 
-    private fun updateProduct(updated: ProductUiModel) {
-        if (updated.quantity == 0) {
+        if (newQuantity == 0) {
             cartRepository.deleteCartItem(updated.id) { result ->
-                result.onSuccess {
-                    _updatedProduct.value = updated
-                    applyProductChange(updated)
-                }
+                result
+                    .onSuccess {
+                        applyProductChange(updated)
+                    }
             }
         } else {
-            cartRepository.upsertCartItem(updated.id, updated.quantity) { result ->
-                result.onSuccess {
-                    _updatedProduct.value = updated
-                    applyProductChange(updated)
-                }
+            cartRepository.updateCartItem(updated.id, updated.quantity) { result ->
+                result
+                    .onSuccess {
+                        _updatedProduct.postValue(updated)
+                    }
             }
         }
     }

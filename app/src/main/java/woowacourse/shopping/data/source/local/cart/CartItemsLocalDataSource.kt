@@ -6,27 +6,18 @@ class CartItemsLocalDataSource {
     private val cache: MutableSet<CachedCartItem> = mutableSetOf()
 
     fun add(
-        id: Int,
-        quantity: Int,
+        cartId: Int,
+        productId: Int,
     ) {
-        val item = CachedCartItem(id, quantity)
+        val item = CachedCartItem(cartId, productId)
         cache.add(item)
     }
 
-    fun remove(id: Int) {
-        cache.removeIf { it.productId == id }
+    fun remove(cartId: Int) {
+        cache.removeIf { it.cartId == cartId }
     }
 
-    fun update(
-        id: Int,
-        quantity: Int,
-    ) {
-        val target = cache.find { it.productId == id }
-        if (target != null) {
-            cache.remove(target)
-            cache.add(target.copy(quantity = quantity))
-        }
+    fun findCachedCartId(productId: Int): Int? {
+        return cache.find { it.productId == productId }?.cartId
     }
-
-    fun isCached(id: Int): Boolean = cache.any { it.productId == id }
 }

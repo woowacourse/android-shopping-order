@@ -1,6 +1,10 @@
 package woowacourse.shopping.data.source.remote.cart
 
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import woowacourse.shopping.data.model.CartItemResponse
+import woowacourse.shopping.data.model.CartRequest
 import woowacourse.shopping.data.model.ItemCount
 import woowacourse.shopping.data.source.remote.api.CartApiService
 import woowacourse.shopping.data.source.remote.util.enqueueResult
@@ -19,9 +23,36 @@ class CartItemsRemoteDataSource(
     override fun addCartItem(
         id: Int,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
+        onResult: (Result<Int>) -> Unit,
     ) {
-        api.postCartItems(productId = id, quantity = quantity).enqueueResult(onResult)
+        val request =
+            CartRequest(
+                productId = id,
+                quantity = quantity,
+            )
+        api.postCartItems(request = request).enqueue(
+            object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void?>,
+                    response: Response<Void?>,
+                ) {
+                    val header = response.headers()
+                    val cartId = header["Location"]?.substringAfterLast("/")?.toIntOrNull()
+                    if (response.isSuccessful && cartId != null) {
+                        onResult(Result.success(cartId))
+                    } else {
+                        onResult(Result.failure(Exception(POST_ERROR_MESSAGE)))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Void?>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
     }
 
     override fun deleteCartItem(
@@ -41,5 +72,9 @@ class CartItemsRemoteDataSource(
 
     override fun getCarItemsCount(onResult: (Result<ItemCount>) -> Unit) {
         api.getCartItemsCounts().enqueueResult(onResult)
+    }
+
+    companion object {
+        private const val POST_ERROR_MESSAGE = "[ERROR] 장바구니 ID가 존재하지 않습니다."
     }
 }

@@ -44,21 +44,21 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-        val item = _product.value ?: return
-        if (item.quantity <= 0) return
-
-        cartItemRepository.upsertCartItem(item.id, item.quantity) { result ->
-            result
-                .onSuccess { response ->
-                    _uiState.postValue(
-                        CartUiState.SUCCESS,
-                    )
-                }
-                .onFailure { response ->
-                    _uiState.postValue(
-                        CartUiState.FAIL,
-                    )
-                }
+//        val item = _product.value ?: return
+//        if (item.quantity <= 0) return
+//
+//        cartItemRepository.upsertCartItem(item.id, item.quantity) { result ->
+//            result
+//                .onSuccess { response ->
+//                    _uiState.postValue(
+//                        CartUiState.SUCCESS,
+//                    )
+//                }
+//                .onFailure { response ->
+//                    _uiState.postValue(
+//                        CartUiState.FAIL,
+//                    )
+//                }
 
 //            exist ->
 //            val updated =
@@ -73,7 +73,7 @@ class DetailViewModel(
 //            } else {
 //                cartItemRepository.insertCartItem(updated, callback)
 //            }
-        }
+//        }
     }
 
     fun loadLastViewedItem(currentProductId: Int) {

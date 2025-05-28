@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -69,16 +68,22 @@ class CartViewModel(
 
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
-        cartRepository.upsertCartItem(newProduct.id, newProduct.quantity) {
-            _product.postValue(newProduct)
+        cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
+            result
+                .onSuccess {
+                    _product.postValue(newProduct)
+                }
         }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
         val newQuantity = if (product.quantity > 1) product.quantity - 1 else 1
         val newProduct = product.copy(quantity = newQuantity)
-        cartRepository.upsertCartItem(newProduct.id, newProduct.quantity) {
-            _product.postValue(newProduct)
+        cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
+            result
+                .onSuccess {
+                    _product.postValue(newProduct)
+                }
         }
     }
 
@@ -94,7 +99,6 @@ class CartViewModel(
         cartRepository.getCartItems(currentPage, pageSize) { response ->
             response
                 .onSuccess { pagingData ->
-                    Log.d("pagingData", pagingData.toString())
                     _pagingData.postValue(
                         pagingData,
                     )

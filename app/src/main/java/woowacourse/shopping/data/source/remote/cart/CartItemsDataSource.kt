@@ -13,7 +13,7 @@ interface CartItemsDataSource {
     fun addCartItem(
         id: Int,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
+        onResult: (Result<Int>) -> Unit,
     )
 
     fun deleteCartItem(

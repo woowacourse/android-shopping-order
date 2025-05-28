@@ -39,19 +39,28 @@ class CartItemsRepositoryImpl(
         }
     }
 
-    override fun upsertCartItem(
+    override fun addCartItem(
         id: Int,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        if (cartItemsLocalDataSource.isCached(id)) {
-            cartItemsRemoteDataSource.updateCartItem(id, quantity) { result ->
-                cartItemsLocalDataSource.update(id, quantity)
-                result.let(onResult)
-            }
-        } else {
-            cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
-                cartItemsLocalDataSource.add(id, quantity)
+        cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
+            result
+                .mapCatching { cartId ->
+                    cartItemsLocalDataSource.add(cartId, id)
+                }
+                .let(onResult)
+        }
+    }
+
+    override fun updateCartItem(
+        id: Int,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+        if (cartId != null) {
+            cartItemsRemoteDataSource.updateCartItem(cartId, quantity) { result ->
                 result.let(onResult)
             }
         }
