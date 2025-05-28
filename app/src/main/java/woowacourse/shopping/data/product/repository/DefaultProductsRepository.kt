@@ -55,6 +55,7 @@ class DefaultProductsRepository(
         {
             recentViewedProductsDataSource
                 .load()
+                .sortedByDescending { it.viewedAt }
                 .mapNotNull { recentViewedProductEntity: RecentViewedProductEntity ->
                     productsDataSource
                         .getProductById(recentViewedProductEntity.productId)
