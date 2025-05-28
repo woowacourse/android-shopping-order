@@ -58,16 +58,24 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         currentProducts: List<ProductsItem>,
     ) {
-        val offset = page - 1
-        val limit = LOAD_PRODUCTS_SIZE + 1
         var shoppingCartProducts = emptyList<ShoppingCartProduct>()
-        shoppingCartRepository.load(offset, limit) { result ->
-            result.onSuccess {
-                shoppingCartProducts = it
-            }
+        shoppingCartRepository.load(0, 20) { result ->
+            result
+                .onSuccess {
+                    shoppingCartProducts = it
+                    handleShoppingCartQuantitySuccess(
+                        currentProducts,
+                        productsToShow,
+                        shoppingCartProducts,
+                    )
+                }.onFailure {
+                    handleShoppingCartQuantitySuccess(
+                        currentProducts,
+                        productsToShow,
+                        shoppingCartProducts,
+                    )
+                }
         }
-
-        handleShoppingCartQuantitySuccess(currentProducts, productsToShow, shoppingCartProducts)
     }
 
     private fun handleShoppingCartQuantitySuccess(
@@ -170,7 +178,7 @@ class ProductsViewModel(
         )
     }
 
-    private fun updateShoppingCartQuantity() {
+    fun updateShoppingCartQuantity() {
         shoppingCartRepository.fetchAllQuantity { result ->
             result
                 .onSuccess { quantity: Int ->
