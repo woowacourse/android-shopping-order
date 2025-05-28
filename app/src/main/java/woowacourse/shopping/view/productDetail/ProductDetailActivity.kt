@@ -36,7 +36,7 @@ class ProductDetailActivity :
     }
 
     private fun initViewModel(id: Long) {
-        viewModel.updateProduct(id)
+        viewModel.loadProduct(id)
     }
 
     private fun bindViewModel() {
@@ -62,6 +62,8 @@ class ProductDetailActivity :
 
                 ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE ->
                     showToast(R.string.product_detail_record_recent_products_error_message)
+
+                ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE -> TODO()
             }
         }
     }
@@ -84,16 +86,16 @@ class ProductDetailActivity :
     }
 
     override fun onSelectLatestViewedProduct() {
-        val intent =
-            newIntent(
-                this,
-                viewModel.latestViewedProduct.value?.id ?: return,
-                viewModel.latestViewedProduct.value?.id ?: return,
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_FORWARD_RESULT
-            }
-        startActivity(intent)
-        finish()
+//        val intent =
+//            newIntent(
+//                this,
+//                viewModel.latestViewedProduct.value?.id ?: return,
+//                viewModel.latestViewedProduct.value?.id ?: return,
+//            ).apply {
+//                flags = Intent.FLAG_ACTIVITY_FORWARD_RESULT
+//            }
+//        startActivity(intent)
+//        finish()
     }
 
     companion object {
