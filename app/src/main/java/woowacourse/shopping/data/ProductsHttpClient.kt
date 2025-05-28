@@ -134,7 +134,7 @@ class ProductsHttpClient(
     }
 
     private fun Request.Builder.addBasicAuthorizationHeader(needAuthorization: Boolean): Request.Builder {
-        val valueToEncode = "jerry8282:password".toByteArray()
+        val valueToEncode = "${AuthStorage.id}:${AuthStorage.pw}".toByteArray()
 
         return apply {
             if (needAuthorization) {

@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.data.AuthStorage
 import woowacourse.shopping.data.product.source.LocalProductsDataSource
 import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
 import woowacourse.shopping.databinding.ActivityProductsBinding
@@ -63,6 +64,7 @@ class ProductsActivity : AppCompatActivity() {
 
         LocalProductsDataSource.init(applicationContext)
         LocalRecentViewedProductsDataSource.init(applicationContext)
+        AuthStorage.init(applicationContext)
 
         initDataBinding()
         handleEventsFromViewModel()

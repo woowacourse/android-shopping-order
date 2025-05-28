@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
     implementation(libs.shimmer)
+    implementation(libs.androidx.security.crypto)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
