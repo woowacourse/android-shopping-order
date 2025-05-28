@@ -29,7 +29,7 @@ class ProductsViewModel(
     private val _productItems: MutableLiveData<List<ProductsItem>> = MutableLiveData(emptyList())
     val productItems: LiveData<List<ProductsItem>> get() = _productItems
 
-    private val nextPage: Int get() = (_productItems.value?.size ?: 0) / LOAD_PRODUCTS_SIZE + 1
+    private val nextPage: Int get() = (_productItems.value?.size ?: 0) / LOAD_PRODUCTS_SIZE
 
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
