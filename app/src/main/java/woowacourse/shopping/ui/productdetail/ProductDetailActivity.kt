@@ -119,11 +119,11 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
 
         fun newIntent(
             context: Context,
-            id: Long,
+            productId: Long,
             isRecentHistoryProductShown: Boolean = true,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
-                putExtra(KEY_PRODUCT_ID, id)
+                putExtra(KEY_PRODUCT_ID, productId)
                 putExtra(KEY_IS_NAVIGATE_FROM_HOME, isRecentHistoryProductShown)
             }
     }
