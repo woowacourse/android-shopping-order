@@ -11,10 +11,6 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private var cachedCart: Cart = Cart()
 
-    init {
-        fetchAllCartItems()
-    }
-
     override fun getTotalCount(onResult: (Result<Int>) -> Unit) {
         cartDataSource.getTotalCount { result ->
             onResult(result)
@@ -31,6 +27,8 @@ class CartRepositoryImpl(
         }
     }
 
+    override fun getCartItemById(productId: Long): CartItem? = cachedCart.findCartItem(productId)
+
     override fun insertOrUpdate(
         product: Product,
         productQuantity: Int,
@@ -44,22 +42,26 @@ class CartRepositoryImpl(
                 onResult(Result.success(Unit))
             }
         } else {
-            insertProduct(productId = product.productId, productQuantity) { result ->
+            insertProduct(product, productQuantity) { result ->
                 val cartId = result.getOrNull() ?: -1L
                 val cartItem =
                     CartItem(cartId = cartId, product = product, quantity = productQuantity)
-                cachedCart = cachedCart.add(cartItem)
                 onResult(Result.success(Unit))
             }
         }
     }
 
     override fun insertProduct(
-        productId: Long,
+        product: Product,
         productQuantity: Int,
         onResult: (Result<Long>) -> Unit,
     ) {
-        cartDataSource.insertCartItem(productId, productQuantity) { result ->
+        cartDataSource.insertCartItem(product.productId, productQuantity) { result ->
+            val cartId = result.getOrNull() ?: -1L
+            val cartItem =
+                CartItem(cartId = cartId, product = product, quantity = productQuantity)
+            cachedCart = cachedCart.add(cartItem)
+
             onResult(result)
         }
     }
@@ -91,12 +93,13 @@ class CartRepositoryImpl(
         }
     }
 
-    private fun fetchAllCartItems() {
+    fun fetchAllCartItems(onFinished: (() -> Unit)? = null) {
         cartDataSource.getTotalCount { result ->
             val totalCount = result.getOrNull() ?: 0
 
             cartDataSource.getPagedCartItems(0, totalCount) { cartItems ->
                 cachedCart = Cart(cartItems)
+                onFinished?.invoke()
             }
         }
     }

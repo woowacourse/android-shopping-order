@@ -12,6 +12,8 @@ interface CartRepository {
         onResult: (Result<List<CartItem>>) -> Unit,
     )
 
+    fun getCartItemById(productId: Long): CartItem?
+
     fun insertOrUpdate(
         product: Product,
         productQuantity: Int,
@@ -19,7 +21,7 @@ interface CartRepository {
     )
 
     fun insertProduct(
-        productId: Long,
+        product: Product,
         productQuantity: Int,
         onResult: (Result<Long>) -> Unit,
     )

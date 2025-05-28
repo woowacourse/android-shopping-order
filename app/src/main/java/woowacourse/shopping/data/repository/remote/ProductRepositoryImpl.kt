@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.repository.remote
 
-import woowacourse.shopping.data.datasource.remote.CartDataSource
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
-    private val cartDataSource: CartDataSource,
     private val productDataSource: ProductDataSource,
+    private val cartRepository: CartRepository,
 ) : ProductRepository {
     override fun fetchPagingProducts(
         page: Int,
@@ -16,7 +16,14 @@ class ProductRepositoryImpl(
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
         productDataSource.fetchPagingProducts(page, pageSize) { products ->
-            val cartItems = products.toCartItems()
+            val cartItems =
+                products.map { product ->
+                    cartRepository
+                        .getCartItemById(product.productId) ?: CartItem(
+                        product = product,
+                        quantity = 0,
+                    )
+                }
             onResult(Result.success(cartItems))
         }
     }
@@ -33,6 +40,6 @@ class ProductRepositoryImpl(
     private fun List<Product>.toCartItems(): List<CartItem> =
         this.map { product ->
 //            val quantity = cartDataSource.getQuantityById(product.productId)
-            CartItem(product, 0)
+            CartItem(product = product, quantity = 0)
         }
 }

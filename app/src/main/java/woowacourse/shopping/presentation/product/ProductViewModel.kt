@@ -8,14 +8,12 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
 
 class ProductViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
-    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _products: MutableLiveData<ResultState<List<CartItem>>> = MutableLiveData()
     val products: LiveData<ResultState<List<CartItem>>> = _products
@@ -124,15 +122,15 @@ class ProductViewModel(
     }
 
     fun addToCart(cartItem: CartItem) {
-//        cartRepository.insertProduct(cartItem) { result ->
-//            result
-//                .onSuccess {
-//                    updateQuantity(productId = cartItem.product.productId, 1)
-//                    fetchCartItemCount()
-//                }.onFailure {
-//                    _toastMessage.value = R.string.product_toast_add_cart_fail
-//                }
-//        }
+        cartRepository.insertProduct(cartItem.product, 1) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(productId = cartItem.product.productId, 1)
+                    fetchCartItemCount()
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_add_cart_fail
+                }
+        }
     }
 
     private fun updateQuantity(

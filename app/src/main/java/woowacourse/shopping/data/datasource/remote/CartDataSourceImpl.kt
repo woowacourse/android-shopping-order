@@ -48,7 +48,7 @@ class CartDataSourceImpl(
             ) {
                 if (response.isSuccessful) {
                     val body =
-                        response.body()?.cartContent?.map { it.cartProduct.toDomain(it.quantity) }
+                        response.body()?.cartContent?.map { it.toDomain() }
                             ?: emptyList()
                     onResult(body)
                 }
