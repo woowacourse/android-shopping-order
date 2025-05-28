@@ -49,23 +49,21 @@ class FakeCartProductRepository : CartProductRepository {
     }
 
     override fun updateQuantity(
-        productId: Int,
+        cartProduct: CartProduct,
         quantityToAdd: Int,
         onSuccess: () -> Unit,
     ) {
-        getCartProductByProductId(productId) { cartProduct ->
-            val newQuantity = cartProduct?.quantity?.plus(quantityToAdd) ?: 0
-            when {
-                cartProduct == null -> insert(productId, newQuantity) { onSuccess() }
-                newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
-                else -> {
-                    cartProducts.replaceAll {
-                        if (it.product.id == productId) it.copy(quantity = newQuantity) else it
-                    }
-                    onSuccess()
+        val newQuantity = cartProduct.quantity + quantityToAdd
+        when {
+            newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
+            else -> {
+                cartProducts.replaceAll {
+                    if (it.product.id == cartProduct.product.id) it.copy(quantity = newQuantity) else it
                 }
+                onSuccess()
             }
         }
+        return
     }
 
     override fun delete(

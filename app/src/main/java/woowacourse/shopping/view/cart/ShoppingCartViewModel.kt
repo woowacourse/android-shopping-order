@@ -52,15 +52,16 @@ class ShoppingCartViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        repository.updateQuantity(item.product.id, 1) {
+        val cartProduct = products.value.orEmpty().first { it.product.id == item.product.id }
+        repository.updateQuantity(cartProduct, 1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
     }
 
     override fun onQuantityDecreaseClick(item: CartProduct) {
-        val quantity = products.value?.firstOrNull { it.product.id == item.product.id }?.quantity
-        if (quantity == 1) return
-        repository.updateQuantity(item.product.id, -1) {
+        val cartProduct = products.value.orEmpty().first { it.product.id == item.product.id }
+        if (cartProduct.quantity == 1) return
+        repository.updateQuantity(cartProduct, -1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
     }

@@ -24,7 +24,7 @@ interface CartProductRepository {
     fun getTotalQuantity(onSuccess: (Int) -> Unit)
 
     fun updateQuantity(
-        productId: Int,
+        cartProduct: CartProduct,
         quantityToAdd: Int,
         onSuccess: () -> Unit,
     )

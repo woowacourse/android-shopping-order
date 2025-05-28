@@ -4,7 +4,6 @@ import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
-import kotlin.concurrent.thread
 
 class CartProductRepositoryImpl(
     private val remoteDataSource: CartProductRemoteDataSource,
@@ -40,26 +39,26 @@ class CartProductRepositoryImpl(
     }
 
     override fun updateQuantity(
-        productId: Int,
+        cartProduct: CartProduct,
         quantityToAdd: Int,
         onSuccess: () -> Unit,
     ) {
-        getCartProductByProductId(productId) { cartProduct ->
-            val newQuantity = cartProduct?.quantity?.plus(quantityToAdd) ?: quantityToAdd
-            when {
-                cartProduct == null -> insert(productId, newQuantity) { onSuccess() }
-                newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
-                else -> remoteDataSource.updateQuantity(cartProduct.id, newQuantity) { onSuccess() }
-            }
+        val newQuantity = cartProduct.quantity + quantityToAdd
+        when {
+            newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
+            else ->
+                remoteDataSource.updateQuantity(
+                    cartProduct.id,
+                    newQuantity,
+                ) { onSuccess() }
         }
+        return
     }
 
     override fun delete(
         id: Int,
         onSuccess: () -> Unit,
     ) {
-        thread {
-            remoteDataSource.delete(id, onSuccess)
-        }
+        remoteDataSource.delete(id, onSuccess)
     }
 }
