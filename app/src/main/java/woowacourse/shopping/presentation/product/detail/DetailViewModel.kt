@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class DetailViewModel(
     private val productsRepository: ProductsRepository,
@@ -20,7 +21,7 @@ class DetailViewModel(
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
 
-    private val _uiState = MutableLiveData<CartUiState>()
+    private val _uiState = SingleLiveEvent<CartUiState>()
     val uiState: LiveData<CartUiState> = _uiState
 
     private val _lastViewed = MutableLiveData<ProductUiModel?>()
@@ -44,36 +45,16 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-//        val item = _product.value ?: return
-//        if (item.quantity <= 0) return
-//
-//        cartItemRepository.upsertCartItem(item.id, item.quantity) { result ->
-//            result
-//                .onSuccess { response ->
-//                    _uiState.postValue(
-//                        CartUiState.SUCCESS,
-//                    )
-//                }
-//                .onFailure { response ->
-//                    _uiState.postValue(
-//                        CartUiState.FAIL,
-//                    )
-//                }
-
-//            exist ->
-//            val updated =
-//                exist?.let {
-//                    it.copy(quantity = it.quantity + item.quantity).toUiModel()
-//                } ?: item
-//
-//            val callback = { _uiState.postValue(CartUiState.SUCCESS) }
-//
-//            if (exist != null) {
-//                cartItemRepository.updateCartItem(updated, callback)
-//            } else {
-//                cartItemRepository.insertCartItem(updated, callback)
-//            }
-//        }
+        val product = _product.value ?: return
+        cartItemRepository.addCartItemQuantity(product.id, product.quantity) { result ->
+            result
+                .onSuccess {
+                    _uiState.postValue(CartUiState.SUCCESS)
+                }
+                .onFailure {
+                    _uiState.postValue(CartUiState.FAILURE)
+                }
+        }
     }
 
     fun loadLastViewedItem(currentProductId: Long) {
@@ -83,17 +64,15 @@ class DetailViewModel(
         }
     }
 
-//    fun increaseQuantity() = updateQuantity(+1)
-//
-//    fun decreaseQuantity() = updateQuantity(-1)
+    fun increaseQuantity() = updateQuantity(+1)
 
-//    private fun updateQuantity(quantity: Int) {
-//        val current = _product.value ?: return
-//        val newQuantity = (current.quantity + quantity).coerceAtLeast(0)
-//        cartItemRepository.updateCartItem { }
-//        _product.postValue()
-//        _product.postValue(current.copy(quantity = newQuantity))
-//    }
+    fun decreaseQuantity() = updateQuantity(-1)
+
+    private fun updateQuantity(quantity: Int) {
+        val current = _product.value ?: return
+        val newQuantity = (current.quantity + quantity).coerceAtLeast(0)
+        _product.value = current.copy(quantity = newQuantity)
+    }
 
     companion object {
         val FACTORY: ViewModelProvider.Factory =

@@ -43,16 +43,20 @@ class DetailActivity : AppCompatActivity() {
 
     private fun initObservers() {
         viewModel.uiState.observe(this) { state ->
-            val msgRes =
-                when (state) {
-                    CartUiState.SUCCESS -> R.string.text_add_to_cart_success
-                    CartUiState.FAIL -> R.string.text_unInserted_toast
+            when (state) {
+                CartUiState.SUCCESS -> {
+                    showToast(R.string.text_add_to_cart_success)
+                    finish()
                 }
-            showToast(msgRes)
-        }
 
-        viewModel.lastViewed.observe(this) {
-            binding.recentItem = it
+                CartUiState.FAILURE -> {
+                    showToast(R.string.text_unInserted_toast)
+                }
+            }
+
+            viewModel.lastViewed.observe(this) {
+                binding.recentItem = it
+            }
         }
     }
 
