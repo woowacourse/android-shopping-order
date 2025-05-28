@@ -10,4 +10,5 @@ data class ProductUiModel(
     val name: String,
     val price: Int,
     val quantity: Int = 0,
+    val cartItemId: Int? = null,
 ) : Parcelable

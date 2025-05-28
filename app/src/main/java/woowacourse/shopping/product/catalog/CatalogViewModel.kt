@@ -1,5 +1,6 @@
 package woowacourse.shopping.product.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,6 +46,7 @@ class CatalogViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
+        Log.d("test", "호출됨 ${product.id}")
         val catalogProduct: CatalogItem? =
             catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
         val quantity = (catalogProduct as ProductItem).productItem.quantity
@@ -110,7 +112,6 @@ class CatalogViewModel(
             page.value ?: 0,
             size,
         ) { pagedProducts ->
-
             cartProductRepository.getTotalElements { totalElements ->
                 cartProductRepository.getCartProducts(totalElements) { cartProducts ->
                     val cartProductMap: Map<Int, ProductUiModel> =

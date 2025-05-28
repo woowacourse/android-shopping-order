@@ -3,7 +3,7 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartProductRepository {
-    fun insertCartProduct(cartProduct: ProductUiModel)
+    fun insertCartProduct(cartProduct: ProductUiModel, callback: (ProductUiModel) -> Unit)
 
     fun deleteCartProduct(cartProduct: ProductUiModel)
 

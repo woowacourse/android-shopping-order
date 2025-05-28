@@ -11,6 +11,7 @@ fun CartProductEntity.toUiModel(): ProductUiModel =
             name,
             price,
             quantity,
+            0,
         )
     }
 

@@ -66,7 +66,9 @@ class DetailViewModel(
 
     fun addToCart() {
         val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
-        addedProduct?.let { cartProductRepository.insertCartProduct(addedProduct) }
+        addedProduct?.let { cartProductRepository.insertCartProduct(addedProduct) {
+
+        } }
     }
 
     fun addToRecentlyViewedProduct() {

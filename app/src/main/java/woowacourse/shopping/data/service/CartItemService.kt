@@ -5,7 +5,6 @@ import retrofit2.Call
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -38,11 +37,11 @@ interface CartItemService {
     @PATCH("/cart-items/{id}")
     fun patchCartItemQuantity(
         @Header("accept") accept: String = "*/*",
-        @Path("id") productId: Int,
+        @Path("id") cartItemId: Int,
         @Query("quantity") quantity: Int,
     ): Call<Quantity>
 
-    @PATCH("/cart-items/count")
+    @PATCH("/cart-items/counts")
     fun getCartItemsCount(
         @Header("accept") accept: String = "*/*",
     ): Call<Quantity>
