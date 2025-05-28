@@ -168,11 +168,31 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         recentWatchingItem: ProductsItem?,
     ) {
+        if (productsWithoutLoadItem.isEmpty()) {
+            _products.postValue(
+                buildList {
+                    recentWatchingItem?.let { add(it) }
+                    addAll(productsWithoutLoadItem)
+                    addAll(updatedProductItems)
+                    if (loadable) add(LoadItem)
+                },
+            )
+            return
+        }
+        val mergedProducts =
+            productsWithoutLoadItem.map { item: ProductsItem ->
+                if (item is ProductItem) {
+                    val updated = updatedProductItems.find { it.product.id == item.product.id }
+                    updated ?: item
+                } else {
+                    item
+                }
+            }
+
         _products.postValue(
             buildList {
                 recentWatchingItem?.let { add(it) }
-                addAll(productsWithoutLoadItem)
-                addAll(updatedProductItems)
+                addAll(mergedProducts)
                 if (loadable) add(LoadItem)
             },
         )
