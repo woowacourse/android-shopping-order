@@ -103,7 +103,7 @@ class CartViewModel(
         cartRepository.fetchCart(
             onSuccess = { productList ->
                 val carts = productList.map {
-                    Cart(product = it.product.toDomain(), quantity = it.quantity)
+                    Cart(id = it.id, product = it.product.toDomain(), quantity = it.quantity)
                 }
                 val wrapper = Carts(carts = carts, totalQuantity = carts.sumOf { it.quantity })
                 _carts.postValue(wrapper)

@@ -17,6 +17,7 @@ fun Cart.toUi(): CartUiModel =
 
 fun CartUiModel.toDomain(): Cart =
     Cart(
+        id = id.toLong(),
         quantity = quantity,
         product =
             Product(

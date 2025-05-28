@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -17,7 +16,6 @@ import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateCartQuantity
 
 class GoodsViewModel(
-    private val localCartRepository: LocalCartRepository,
     private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
@@ -58,6 +56,7 @@ class GoodsViewModel(
         cartRepository.addToCart(cartRequest) { result ->
             result
                 .onSuccess {
+                    updateItemsAndTotalQuantity(cart, cart.quantity + 1)
                     _isSuccess.setValue(Unit)
                 }.onFailure { error ->
                     _isFail.setValue(Unit)
@@ -67,15 +66,14 @@ class GoodsViewModel(
 
     fun removeFromCart(cart: Cart) {
         cartRepository.updateCart(
-            id = cart.product.id.toLong(),
+            id = cart.id,
             cartQuantity = CartQuantity(cart.quantity - 1),
         ) { result ->
             result
                 .onSuccess {
-                    _isSuccess.setValue(Unit)
+                    updateItemsAndTotalQuantity(cart, cart.quantity - 1)
                 }.onFailure { error ->
                     _isFail.setValue(Unit)
-                    Log.d("removeFromCart", "error: $error")
                 }
         }
     }
@@ -106,19 +104,6 @@ class GoodsViewModel(
         }
     }
 
-    private fun updateItemsAndTotalQuantity(
-        updatedCart: Cart,
-        newQuantity: Int,
-    ) {
-        val updatedItems =
-            _items.value?.updateCartQuantity(updatedCart.product.id, newQuantity) ?: listOf(
-                updatedCart,
-            )
-        _items.value = updatedItems
-        val total = updatedItems.filterIsInstance<Cart>().sumOf { it.quantity }
-        _totalQuantity.value = total
-    }
-
     fun updateItemQuantity(
         id: Int,
         quantity: Int,
@@ -139,17 +124,34 @@ class GoodsViewModel(
         }
     }
 
+    private fun updateItemsAndTotalQuantity(
+        updatedCart: Cart,
+        newQuantity: Int,
+    ) {
+        val updatedItems =
+            _items.value?.updateCartQuantity(updatedCart.product.id, newQuantity) ?: listOf(
+                updatedCart,
+            )
+        _items.value = updatedItems
+        val total = updatedItems.filterIsInstance<Cart>().sumOf { it.quantity }
+        _totalQuantity.value = total
+    }
+
     private fun loadProducts() {
         cartRepository.fetchCart(
             onSuccess = { cartList ->
-                val cartByProductId = cartList.associateBy({ it.product.id }, { it.quantity })
+                val cartByProductId = cartList.associateBy { it.product.id }
 
                 productRepository.fetchProducts(
                     onSuccess = { response ->
                         val newCarts =
                             response.content.map { product ->
-                                val quantity = cartByProductId[product.id] ?: 0
-                                Cart(product = product.toDomain(), quantity = quantity)
+                                val matchedCart = cartByProductId[product.id]
+                                Cart(
+                                    id = matchedCart?.id?.toLong() ?: 0,
+                                    product = product.toDomain(),
+                                    quantity = matchedCart?.quantity ?: 0,
+                                )
                             }
 
                         val currentProducts = products.value.orEmpty()
