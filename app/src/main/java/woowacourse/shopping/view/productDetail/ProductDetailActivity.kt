@@ -86,30 +86,24 @@ class ProductDetailActivity :
     }
 
     override fun onSelectLatestViewedProduct() {
-//        val intent =
-//            newIntent(
-//                this,
-//                viewModel.latestViewedProduct.value?.id ?: return,
-//                viewModel.latestViewedProduct.value?.id ?: return,
-//            ).apply {
-//                flags = Intent.FLAG_ACTIVITY_FORWARD_RESULT
-//            }
-//        startActivity(intent)
-//        finish()
+        val productId: Long = viewModel.latestViewedProduct.value?.id ?: error("")
+        val intent =
+            newIntent(this, productId).apply {
+                flags = Intent.FLAG_ACTIVITY_FORWARD_RESULT
+            }
+        startActivity(intent)
+        finish()
     }
 
     companion object {
         private const val EXTRA_PRODUCT_ID = "woowacourse.shopping.EXTRA_PRODUCT_ID"
-        private const val EXTRA_CART_ITEM = "woowacourse.shopping.EXTRA_CART_ITEM_ID"
         private const val NO_SUCH_PRODUCT = -1L
 
         fun newIntent(
             context: Context,
             productId: Long,
-            cartItemId: Long,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java)
                 .putExtra(EXTRA_PRODUCT_ID, productId)
-                .putExtra(EXTRA_CART_ITEM, cartItemId)
     }
 }

@@ -62,7 +62,6 @@ class ProductsActivity : AppCompatActivity() {
         }
 
         LocalProductsDataSource.init(applicationContext)
-//        LocalShoppingCartDataSource.init(applicationContext)
         LocalRecentViewedProductsDataSource.init(applicationContext)
 
         initDataBinding()
@@ -144,7 +143,6 @@ class ProductsActivity : AppCompatActivity() {
             ProductDetailActivity.newIntent(
                 this,
                 product.id,
-                viewModel.getCartItemId(product),
             ),
         )
     }
