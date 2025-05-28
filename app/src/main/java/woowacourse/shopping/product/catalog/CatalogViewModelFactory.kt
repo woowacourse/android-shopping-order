@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.repository.HttpCatalogProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
-import woowacourse.shopping.data.server.DevMockServer
 
 class CatalogViewModelFactory(
     private val application: ShoppingApplication,

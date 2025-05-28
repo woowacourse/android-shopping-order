@@ -37,7 +37,7 @@ class CartViewModel(
     fun deleteCartProduct(cartProduct: ProductItem) {
         cartProductRepository.deleteCartProduct(cartProduct.productItem)
 
-        cartProductRepository.getAllProductsSize { updatedSize ->
+        cartProductRepository.getTotalElements { updatedSize ->
             val currentPage = page.value ?: INITIAL_PAGE
             val startIndex = currentPage * PAGE_SIZE
             if (startIndex >= updatedSize && currentPage > 0) {
@@ -48,7 +48,7 @@ class CartViewModel(
     }
 
     fun onPaginationButtonClick(buttonDirection: Int) {
-        cartProductRepository.getAllProductsSize { totalSize ->
+        cartProductRepository.getTotalElements { totalSize ->
             val currentPage = page.value ?: INITIAL_PAGE
             val lastPage = (totalSize - 1) / PAGE_SIZE
 
