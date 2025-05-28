@@ -4,28 +4,26 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.Quantity
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.loader.HistoryLoader
 import woowacourse.shopping.view.main.MainUiEvent
-import woowacourse.shopping.view.main.state.IncreaseState
 import woowacourse.shopping.view.main.state.LoadState
 import woowacourse.shopping.view.main.state.ProductState
 import woowacourse.shopping.view.main.state.ProductUiState
 
 class MainViewModel(
-    private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
     private val historyLoader: HistoryLoader,
     private val productRepository: DefaultProductRepository,
+    private val cartRepository: DefaultCartRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableLiveData<ProductUiState>()
     val uiState: LiveData<ProductUiState> get() = _uiState
 
@@ -50,33 +48,38 @@ class MainViewModel(
         productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { result ->
             result.fold(
                 onSuccess = { page ->
-                    val newItems = page.products.map { ProductState(it, Quantity(10)) }
+                    val newItems = page.products.map { ProductState(it, Quantity(0)) }
                     val currentItems = _uiState.value?.productItems.orEmpty()
-                    _uiState.value = ProductUiState(
-                        productItems = currentItems + newItems,
-                        load = LoadState.of(page.hasNextPage)
-                    )
+                    _uiState.value =
+                        ProductUiState(
+                            productItems = currentItems + newItems,
+                            load = LoadState.of(page.hasNextPage),
+                        )
                     handleLoading(false)
                 },
                 onFailure = { throwable ->
                     Log.e("ProductLoad", "Error loading products", throwable)
                     handleLoading(false)
-                }
+                },
             )
         }
     }
 
     fun increaseCartQuantity(productId: Long) {
         withState(_uiState.value) { state ->
-            when (val result = state.canIncreaseCartQuantity(productId)) {
-                is IncreaseState.CanIncrease -> {
-                    _uiState.value = state.modifyUiState(result.value)
-                    cartRepository.upsert(productId, result.value.cartQuantity)
-                }
+            val increasedState = state.increaseCartQuantity(productId)
 
-                is IncreaseState.CannotIncrease -> {
-                    sendEvent(MainUiEvent.ShowCannotIncrease(result.quantity))
-                }
+            cartRepository.addCart(Cart(increasedState.cartQuantity, productId)) { result ->
+
+                result.fold(
+                    onSuccess = {
+                        val response = state.modifyUiState(increasedState)
+                        _uiState.value = response
+                    },
+                    onFailure = { throwable ->
+                        Log.d("ProductQuantityIncrease", "Error increase products", throwable)
+                    },
+                )
             }
         }
     }
@@ -87,18 +90,18 @@ class MainViewModel(
             _uiState.value = state.modifyUiState(updated)
 
             if (!updated.cartQuantity.hasQuantity()) {
-                cartRepository.delete(productId)
+                // cartRepository.delete(productId)
             } else {
-                cartRepository.upsert(productId, updated.cartQuantity)
+                // cartRepository.upsert(productId, updated.cartQuantity)
             }
         }
     }
 
     fun syncCartQuantities() {
         withState(_uiState.value) { state ->
-            cartRepository.getCarts(state.productIds) { carts ->
-                // 구현 예정
-            }
+//            cartRepository.getCarts(state.productIds) { carts ->
+//                 구현 예정
+//            }
         }
     }
 

@@ -27,6 +27,11 @@ data class ProductState(
         }
     }
 
+    fun increaseCartQuantity2(): ProductState {
+        val increasedQuantity = cartQuantity + 1
+        return copy(cartQuantity = increasedQuantity)
+    }
+
     fun decreaseCartQuantity(): ProductState {
         val decreasedCartQuantity = cartQuantity - 1
         val newState = copy(cartQuantity = decreasedCartQuantity)

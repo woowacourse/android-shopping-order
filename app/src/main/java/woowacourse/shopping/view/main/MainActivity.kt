@@ -25,15 +25,17 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
     private val viewModel: MainViewModel by viewModels {
         val container = (application as App).container
         MainViewModelFactory(
-            container.cartRepository,
             container.historyRepository,
             container.historyLoader,
-            container.defaultProductSinglePageRepository,
+            container.cartRepository2,
+            container.productRepository2,
         )
     }
+
     private val productsAdapter: ProductAdapter by lazy {
         ProductAdapter(emptyList(), this)
     }
+
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +86,7 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
                     ProductRvItems.ViewType.VIEW_TYPE_DIVIDER.ordinal,
                     ProductRvItems.ViewType.VIEW_TYPE_LOAD.ordinal,
                     -> 2
+
                     else -> throw IllegalArgumentException()
                 }
             }

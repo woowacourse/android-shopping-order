@@ -18,13 +18,14 @@ data class ProductUiState(
         val targetIndex = targetIndex(newState.item.id)
         val mutableItems = productItems.toMutableList()
         mutableItems[targetIndex] = newState
+
         return copy(productItems = mutableItems)
     }
 
-    fun canIncreaseCartQuantity(productId: Long): IncreaseState {
+    fun increaseCartQuantity(productId: Long): ProductState {
         val targetIndex = targetIndex(productId)
         val target = productItems[targetIndex]
-        val result = target.increaseCartQuantity()
+        val result = target.increaseCartQuantity2()
 
         return result
     }
