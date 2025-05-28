@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentWatchingBinding
-import woowacourse.shopping.domain.product.Product
 
 class RecentProductViewHolder(
     private val binding: ItemRecentWatchingBinding,
@@ -14,8 +13,8 @@ class RecentProductViewHolder(
         binding.recentMoreWatchingClickListener = productListener
     }
 
-    fun bind(product: Product) {
-        binding.product = product
+    fun bind(productItem: ProductsItem.ProductItem) {
+        binding.productItem = productItem
     }
 
     companion object {
@@ -30,6 +29,6 @@ class RecentProductViewHolder(
     }
 
     interface ProductRecentMoreWatchingClickListener {
-        fun onRecentProductClick(product: Product)
+        fun onRecentProductClick(productItem: ProductsItem.ProductItem)
     }
 }

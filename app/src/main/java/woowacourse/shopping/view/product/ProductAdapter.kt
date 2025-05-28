@@ -30,7 +30,7 @@ class ProductAdapter(
     ) {
         when (holder) {
             is ProductViewHolder -> holder.bind(items[position] as ProductsItem.ProductItem)
-            is ProductRecentWatchingViewHolder -> holder.bind((items[position] as ProductsItem.RecentWatchingItem).products)
+            is ProductRecentWatchingViewHolder -> holder.bind((items[position] as ProductsItem.RecentWatchingItem))
         }
     }
 

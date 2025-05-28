@@ -8,7 +8,7 @@ sealed interface ProductsItem {
     val viewType: ItemType
 
     data class RecentWatchingItem(
-        val products: List<Product>,
+        val products: List<ProductItem>,
     ) : ProductsItem {
         override val viewType: ItemType
             get() = ItemType.RECENT_WATCHING

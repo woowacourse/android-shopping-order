@@ -121,10 +121,10 @@ class ProductsViewModel(
         hasRecentWatching: Boolean,
     ) {
         if (hasRecentWatching) {
-            updateNewProducts(
+            handleRecentProductsSuccess(
+                emptyList(),
                 productsWithoutLoadItem,
                 updatedProductItems,
-                null,
             )
             return
         }
@@ -138,10 +138,10 @@ class ProductsViewModel(
                         updatedProductItems,
                     )
                 }.onFailure {
-                    updateNewProducts(
+                    handleRecentProductsSuccess(
+                        emptyList(),
                         productsWithoutLoadItem,
                         updatedProductItems,
-                        null,
                     )
                     _event.postValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
                 }
@@ -153,13 +153,17 @@ class ProductsViewModel(
         productsWithoutLoadItem: List<ProductsItem>,
         updatedProductItems: List<ProductItem>,
     ) {
-        val recentWatchingItem =
+        val recentWatchingItem: RecentWatchingItem? =
             if (recentWatchingProducts.isEmpty()) {
                 null
             } else {
-                RecentWatchingItem(recentWatchingProducts)
+                val items =
+                    recentWatchingProducts.map { product ->
+                        updatedProductItems.find { it.product.id == product.id }
+                            ?: ProductItem(product = product)
+                    }
+                RecentWatchingItem(items)
             }
-
         updateNewProducts(
             productsWithoutLoadItem,
             updatedProductItems,
@@ -219,7 +223,9 @@ class ProductsViewModel(
                         if (recentWatchingProducts.isEmpty()) {
                             null
                         } else {
-                            RecentWatchingItem(recentWatchingProducts)
+                            val items =
+                                recentWatchingProducts.map { ProductItem(product = it) }
+                            RecentWatchingItem(items)
                         }
 
                     val currentProducts = _products.value ?: return@onSuccess

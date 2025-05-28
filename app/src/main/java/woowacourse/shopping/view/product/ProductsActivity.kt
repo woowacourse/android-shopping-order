@@ -167,16 +167,30 @@ class ProductsActivity :
         activityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
     }
 
-    override fun onProductClick(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
+    override fun onProductClick(productItem: ProductsItem.ProductItem) {
+        activityResultLauncher.launch(
+            ProductDetailActivity.newIntent(
+                context = this,
+                productId = productItem.product.id,
+                shoppingCartId = productItem.shoppingCartId,
+                quantity = productItem.selectedQuantity,
+            ),
+        )
     }
 
     override fun onLoadClick() {
         viewModel.updateMoreProducts()
     }
 
-    override fun onRecentProductClick(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
+    override fun onRecentProductClick(productItem: ProductsItem.ProductItem) {
+        activityResultLauncher.launch(
+            ProductDetailActivity.newIntent(
+                context = this,
+                productId = productItem.product.id,
+                shoppingCartId = productItem.shoppingCartId,
+                quantity = productItem.selectedQuantity,
+            ),
+        )
     }
 
     override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {

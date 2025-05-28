@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.productDetail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,7 @@ class ProductDetailViewModel(
     fun updateProduct(
         productId: Long,
         isLastWatching: Boolean,
+        shoppingCartQuantity: Int,
     ) {
         productsRepository.getProduct(productId) { result ->
             result
@@ -45,7 +47,11 @@ class ProductDetailViewModel(
                     if (product == null) {
                         _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
                     } else {
-                        _product.value = ProductsItem.ProductItem(product = product)
+                        _product.value =
+                            ProductsItem.ProductItem(
+                                product = product,
+                                selectedQuantity = shoppingCartQuantity,
+                            )
                         _price.value = product.price
 
                         productsRepository.updateRecentWatchingProduct(product) { result ->
@@ -82,7 +88,12 @@ class ProductDetailViewModel(
 
     fun addToShoppingCart() {
         val product = requireNotNull(product.value) { "product.value가 null입니다." }
-        shoppingCartRepository.add(product.product, quantity.value ?: return) { result ->
+        val totalQuantity = quantity.value?.plus(product.selectedQuantity) ?: 0
+        Log.d("moongchi", "addToShoppingCart: $totalQuantity")
+        shoppingCartRepository.add(
+            product.product,
+            totalQuantity,
+        ) { result ->
             result
                 .onSuccess {
                     _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
