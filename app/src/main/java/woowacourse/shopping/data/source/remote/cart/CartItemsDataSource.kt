@@ -5,7 +5,7 @@ import woowacourse.shopping.data.model.CartItemResponse
 interface CartItemsDataSource {
     fun getCartItems(
         page: Int,
-        size: Int = 5,
+        size: Int,
         onResult: (Result<CartItemResponse>) -> Unit,
     )
 
@@ -26,5 +26,5 @@ interface CartItemsDataSource {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun getCarItemsCount(onResult: (Result<CartItemResponse>) -> Unit)
+    fun getCarItemsCount(onResult: (Result<Int>) -> Unit)
 }
