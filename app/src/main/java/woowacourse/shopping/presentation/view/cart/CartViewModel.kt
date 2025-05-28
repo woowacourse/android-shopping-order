@@ -21,7 +21,7 @@ class CartViewModel(
     private val _deleteState = MutableLiveData<Long>()
     val deleteState: LiveData<Long> = _deleteState
 
-    private val _page = MutableLiveData(DEFAULT_PAGE)
+    private val _page = MutableLiveData(START_PAGE)
     val page: LiveData<Int> = _page
 
     private val _hasMore = MutableLiveData<Boolean>()
@@ -41,10 +41,10 @@ class CartViewModel(
         isRefresh: Boolean = false,
     ) {
         val currentPage = _page.value ?: DEFAULT_PAGE
-        val newPage = (calculatePage(isNextPage, currentPage, isRefresh))
+        val newPage = calculatePage(isNextPage, currentPage, isRefresh)
 
         cartRepository.getCartItems(
-            page = currentPage,
+            page = newPage - DEFAULT_PAGE,
             limit = limit,
         ) { products, hasMore ->
             _products.postValue(products.map { it })
@@ -92,10 +92,7 @@ class CartViewModel(
         return if (isNextPage) {
             currentPage + DEFAULT_PAGE
         } else {
-            max(
-                DEFAULT_PAGE,
-                currentPage - DEFAULT_PAGE,
-            )
+            max(DEFAULT_PAGE, currentPage - DEFAULT_PAGE)
         }
     }
 
@@ -110,7 +107,8 @@ class CartViewModel(
     }
 
     companion object {
-        private const val DEFAULT_PAGE = 0
+        private const val START_PAGE = 0
+        private const val DEFAULT_PAGE = 1
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
