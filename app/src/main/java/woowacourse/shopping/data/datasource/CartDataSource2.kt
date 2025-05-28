@@ -2,6 +2,7 @@ package woowacourse.shopping.data.datasource
 
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 import woowacourse.shopping.data.network.request.CartItemRequest
 import woowacourse.shopping.data.network.response.carts.CartsResponse
@@ -71,7 +72,7 @@ class CartDataSource2(
         cartId: Long,
         quantity: Int,
         callback: (Result<Unit?>) -> Unit,
-    )  {
+    ) {
         service.updateCart(cartId, quantity).enqueue(
             object : Callback<Unit> {
                 override fun onResponse(
@@ -81,7 +82,34 @@ class CartDataSource2(
                     if (response.isSuccessful) {
                         callback(Result.success(Unit))
                     } else {
-                        callback(Result.failure(NullPointerException()))
+                        callback(Result.failure(HttpException(response)))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit?>,
+                    t: Throwable,
+                ) {
+                    callback(Result.failure(t))
+                }
+            },
+        )
+    }
+
+    fun deleteCart(
+        cartId: Long,
+        callback: (Result<Unit?>) -> Unit,
+    ) {
+        service.deleteCart(cartId).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit?>,
+                    response: Response<Unit?>,
+                ) {
+                    if (response.isSuccessful) {
+                        callback(Result.success(Unit))
+                    } else {
+                        callback(Result.failure(HttpException(response)))
                     }
                 }
 

@@ -2,6 +2,7 @@ package woowacourse.shopping.data.network.service
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -22,9 +23,14 @@ interface CartService {
         @Query("size") size: Int,
     ): Call<CartsResponse>
 
-    @PATCH("cart-items/{id}")
+    @PATCH("/cart-items/{id}")
     fun updateCart(
         @Path("id") id: Long,
         @Body request: Int,
+    ): Call<Unit>
+
+    @DELETE("/cart-items/{id}")
+    fun deleteCart(
+        @Path("id") id: Long,
     ): Call<Unit>
 }

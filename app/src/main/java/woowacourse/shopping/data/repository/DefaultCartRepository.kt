@@ -57,8 +57,28 @@ class DefaultCartRepository(
         cartId: Long,
         quantity: Quantity,
         callback: (Result<Unit>) -> Unit,
-    )  {
+    ) {
         dataSource.updateCartQuantity(cartId, quantity.value) { result ->
+            result.fold(
+                onSuccess = { response ->
+                    if (response != null) {
+                        callback(Result.success(response))
+                    } else {
+                        callback(Result.failure(NullPointerException()))
+                    }
+                },
+                onFailure = { throwable ->
+                    callback(Result.failure(throwable))
+                },
+            )
+        }
+    }
+
+    fun deleteCart(
+        cartId: Long,
+        callback: (Result<Unit>) -> Unit,
+    ) {
+        dataSource.deleteCart(cartId) { result ->
             result.fold(
                 onSuccess = { response ->
                     if (response != null) {
