@@ -34,12 +34,6 @@ interface CartRepository {
         onFail: (CartFetchError) -> Unit,
     )
 
-    fun removeOrDecreaseQuantity(
-        goods: Goods,
-        removeQuantity: Int,
-        onComplete: () -> Unit,
-    )
-
     fun delete(
         cartId: Int,
         onComplete: (Int) -> Unit,

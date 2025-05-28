@@ -88,13 +88,6 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun removeOrDecreaseQuantity(
-        goods: Goods,
-        removeQuantity: Int,
-        onComplete: () -> Unit,
-    ) {
-        // Todo
-    }
 
     override fun delete(
         cartId: Int,
