@@ -21,6 +21,7 @@ class CartRepository {
                     if (response.isSuccessful) {
                         val result = response.body()?.content.orEmpty()
                         Log.d("CartRepository", "장바구니 성공: ${result.size}개")
+                        Log.d("CartRepository", "장바구니 성공: $result")
                         onSuccess(result)
                     } else {
                         val errorMessage =
@@ -69,6 +70,38 @@ class CartRepository {
 
                     override fun onFailure(
                         call: Call<Void>,
+                        t: Throwable,
+                    ) {
+                        onResult(Result.failure(t))
+                    }
+                },
+            )
+    }
+
+    fun updateCart(
+        id: Long,
+        cartQuantity: CartQuantity,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        CartClient
+            .getRetrofitService()
+            .updateCart(id = id, cartQuantity = cartQuantity)
+            .enqueue(
+                object : Callback<Void> {
+                    override fun onResponse(
+                        call: Call<Void?>,
+                        response: Response<Void?>,
+                    ) {
+                        if (response.isSuccessful) {
+                            onResult(Result.success(Unit))
+                        } else {
+                            val error = response.errorBody()?.string()
+                            onResult(Result.failure(Throwable("수정 실패: ${response.code()} - $error")))
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<Void?>,
                         t: Throwable,
                     ) {
                         onResult(Result.failure(t))

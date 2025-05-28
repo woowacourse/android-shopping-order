@@ -4,10 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
@@ -67,9 +66,17 @@ class GoodsViewModel(
     }
 
     fun removeFromCart(cart: Cart) {
-        viewModelScope.launch {
-            localCartRepository.delete(cart)
-            updateItemsAndTotalQuantity(cart, cart.quantity - 1)
+        cartRepository.updateCart(
+            id = cart.product.id.toLong(),
+            cartQuantity = CartQuantity(cart.quantity - 1),
+        ) { result ->
+            result
+                .onSuccess {
+                    _isSuccess.setValue(Unit)
+                }.onFailure { error ->
+                    _isFail.setValue(Unit)
+                    Log.d("removeFromCart", "error: $error")
+                }
         }
     }
 
