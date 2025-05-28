@@ -15,7 +15,7 @@ interface CartService {
     fun requestCart(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 30,
+        @Query("size") size: Int = 5,
     ): Call<CartResponse>
 
     @POST("/cart-items")

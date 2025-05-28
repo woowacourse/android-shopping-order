@@ -38,7 +38,6 @@ class ShoppingApplication : Application() {
     val cartFactory by lazy {
         ViewModelFactory {
             CartViewModel(
-                LocalCartRepositoryImpl(database.cartDao()),
                 CartRepository(),
             )
         }

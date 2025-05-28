@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.domain.model.Cart
@@ -12,12 +11,11 @@ import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
 class CartViewModel(
-    private val localCartRepository: LocalCartRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _showPageButton = MutableLiveData(false)
     val showPageButton: LiveData<Boolean> get() = _showPageButton
-    private var currentPage: Int = 1
+    private var currentPage: Int = 0
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
     private val _carts = MutableLiveData<List<Cart>>()
@@ -37,34 +35,33 @@ class CartViewModel(
     fun plusPage() {
         currentPage++
         _page.value = currentPage
+        loadCarts()
     }
 
     fun minusPage() {
         currentPage--
         _page.value = currentPage
+        loadCarts()
     }
 
-    fun updatePageButtonStates() {
-        val total = totalItemsCount.value ?: 0
-        val endPage = ((total - 1) / PAGE_SIZE) + 1
-
-        val leftEnabled = currentPage > 1
-        val rightEnabled = currentPage < endPage
-        val showButtons = total > PAGE_SIZE
-
-        _isLeftPageEnable.value = leftEnabled
-        _isRightPageEnable.value = rightEnabled
-        _showPageButton.value = showButtons
+    fun updatePageButtonStates(
+        first: Boolean,
+        last: Boolean,
+        total: Int,
+    ) {
+        _isLeftPageEnable.value = !first
+        _isRightPageEnable.value = !last
+        _showPageButton.value = total > PAGE_SIZE
     }
 
     fun delete(cart: Cart) {
-        val total = totalItemsCount.value ?: 0
-        val endPage = ((total - 1) / PAGE_SIZE) + 1
-
-        if (currentPage == endPage && (total - 1) == ((currentPage - 1) * PAGE_SIZE)) {
-            currentPage--
-            _page.value = currentPage
-        }
+//        val total = totalItemsCount.value ?: 0
+//        val endPage = ((total - 1) / PAGE_SIZE) + 1
+//
+//        if (currentPage == endPage && (total - 1) == ((currentPage - 1) * PAGE_SIZE)) {
+//            currentPage--
+//            _page.value = currentPage
+//        }
 
         cartRepository.deleteCart(cart.id) { result ->
             result
@@ -79,7 +76,6 @@ class CartViewModel(
                         } ?: emptyList()
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
-                    updatePageButtonStates()
                 }.onFailure { error ->
                     Log.e("123451", "$error")
                 }
@@ -100,7 +96,6 @@ class CartViewModel(
                         } ?: emptyList()
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
-                    updatePageButtonStates()
                 }.onFailure { error ->
                     Log.e("addCartTest", "장바구니 추가 실패", error)
                 }
@@ -127,7 +122,6 @@ class CartViewModel(
                             } ?: emptyList()
                         _carts.postValue(updatedList)
                         fetchTotalItemsCount()
-                        updatePageButtonStates()
                     }.onFailure { error ->
                         Log.e("123451", "$error")
                     }
@@ -136,21 +130,27 @@ class CartViewModel(
     }
 
     private fun fetchTotalItemsCount() {
-        localCartRepository.getAllItemsSize { count ->
-            _totalItemsCount.postValue(count)
-        }
+        cartRepository.getCartCounts(
+            onSuccess = { count ->
+                _totalItemsCount.postValue(count.toInt())
+            },
+            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
+        )
     }
 
     private fun loadCarts() {
         cartRepository.fetchCart(
-            onSuccess = { productList ->
+            onSuccess = { response ->
                 val cartList =
-                    productList.map {
+                    response.content.map {
                         Cart(id = it.id, product = it.product.toDomain(), quantity = it.quantity)
                     }
                 _carts.postValue(cartList)
+                _page.postValue(response.number)
+                updatePageButtonStates(response.first, response.last, totalItemsCount.value ?: 0)
             },
             onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
+            page = currentPage,
         )
     }
 

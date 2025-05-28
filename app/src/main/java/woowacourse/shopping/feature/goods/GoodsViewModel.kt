@@ -172,9 +172,9 @@ class GoodsViewModel(
     }
 
     private fun loadProducts() {
-        cartRepository.fetchCart(
+        cartRepository.fetchAllCart(
             onSuccess = { cartList ->
-                val cartByProductId = cartList.associateBy { it.product.id }
+                val cartByProductId = cartList.content.associateBy { it.product.id }
 
                 productRepository.fetchProducts(
                     onSuccess = { response ->
