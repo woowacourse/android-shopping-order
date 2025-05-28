@@ -12,6 +12,7 @@ fun ProductEntity.toDomain(): ProductDetail =
         name = name,
         imageUrl = imageUrl,
         price = price,
+        category = "",
     )
 
 fun ProductsResponse.Content.toDomain(): CatalogProduct =
@@ -22,6 +23,7 @@ fun ProductsResponse.Content.toDomain(): CatalogProduct =
                 name = name,
                 imageUrl = imageUrl,
                 price = price,
+                category = category,
             ),
         quantity = 0,
     )
@@ -32,4 +34,5 @@ fun ProductDetailResponse.toDomain(): ProductDetail =
         name = name,
         imageUrl = imageUrl,
         price = price,
+        category = category,
     )

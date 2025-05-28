@@ -22,6 +22,7 @@ fun CartItemsResponse.Content.toDomain(): CartProduct =
                 name = product.name,
                 imageUrl = product.imageUrl,
                 price = product.price,
+                category = product.category,
             ),
         quantity = quantity,
     )
