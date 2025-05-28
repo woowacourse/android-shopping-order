@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Content(
+data class ProductContent(
     @SerialName("category") val category: String,
     @SerialName("id") val id: Long,
     @SerialName("imageUrl") val imageUrl: String,
