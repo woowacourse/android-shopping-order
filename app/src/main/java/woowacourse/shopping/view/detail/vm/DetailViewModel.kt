@@ -3,10 +3,11 @@ package woowacourse.shopping.view.detail.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
@@ -16,7 +17,8 @@ import woowacourse.shopping.view.main.state.IncreaseState
 import woowacourse.shopping.view.main.state.ProductState
 
 class DetailViewModel(
-    private val productRepository: ProductRepository,
+    private val defaultProductRepository: DefaultProductRepository,
+    private val defaultCartRepository: DefaultCartRepository,
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
 ) : ViewModel() {
@@ -30,24 +32,31 @@ class DetailViewModel(
         productId: Long,
         lastSeenProductId: Long,
     ) {
-        productRepository.getProduct(productId) { product ->
-            if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
-                productRepository.getProduct(lastSeenProductId) { lastSeenProduct ->
-                    _uiState.postValue(
-                        DetailUiState(
-                            product = ProductState(item = product, cartQuantity = Quantity(1)),
-                            lastSeenProduct = lastSeenProduct,
+        defaultProductRepository.loadProduct(productId) { product ->
+            product.fold(
+                onSuccess = { productValue ->
+                    if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
+                        defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
+                            lastSeenProduct.fold(
+                                onSuccess = { lastSeenProductValue ->
+                                    _uiState.value = DetailUiState(
+                                        ProductState(item = productValue, cartQuantity = Quantity(1)),
+                                        lastSeenProduct = lastSeenProductValue
+                                    )
+                                },
+                                onFailure = {},
+                            )
+                        }
+                    } else {
+                        _uiState.postValue( DetailUiState(
+                            product = ProductState(item = productValue, cartQuantity = Quantity(1)),
+                            lastSeenProduct = null,
                         ),
-                    )
-                }
-            } else {
-                _uiState.postValue(
-                    DetailUiState(
-                        product = ProductState(item = product, cartQuantity = Quantity(1)),
-                        lastSeenProduct = null,
-                    ),
-                )
-            }
+                        )
+                    }
+                },
+                onFailure = {}
+            )
         }
     }
 

@@ -26,6 +26,8 @@ class DetailActivity : AppCompatActivity(), CartQuantityHandler {
         val container = (application as App).container
 
         DetailViewModelFactory(
+            container.productRepository2,
+            container.cartRepository2,
             container.productRepository,
             container.cartRepository,
             container.historyRepository,

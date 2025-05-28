@@ -91,7 +91,6 @@ class MainViewModel(
         setLoading(false)
     }
 
-    // 져장된 ID가 있는가 ?
     fun increaseCartQuantity(productId: Long) =
         withState(_uiState.value) { state ->
             val updated = state.increaseCartQuantity(productId)
