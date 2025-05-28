@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.ui.cart.CartActivity.OnClickHandler
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
 
@@ -17,12 +18,7 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-            }
-        }
-
+        initFragmentContainer(savedInstanceState)
         initSupportActionBar()
         initViewBinding()
         initObservers()
@@ -33,6 +29,15 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
         return super.onOptionsItemSelected(item)
     }
 
+    private fun initFragmentContainer(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.cartContainer, CartProductFragment())
+            }
+        }
+    }
+
     private fun initSupportActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.cart_title)
@@ -41,6 +46,12 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
     private fun initViewBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        binding.onClickHandler =
+            OnClickHandler {
+                supportFragmentManager.commit {
+                    replace(R.id.cartContainer, CartRecommendFragment())
+                }
+            }
     }
 
     private fun initObservers() {
@@ -55,6 +66,10 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                 },
             )
         }
+    }
+
+    fun interface OnClickHandler {
+        fun onOrderClick()
     }
 
     companion object {

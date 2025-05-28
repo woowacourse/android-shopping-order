@@ -9,6 +9,10 @@
         <variable
             name="viewModel"
             type="woowacourse.shopping.ui.cart.CartViewModel" />
+
+        <variable
+            name="onClickHandler"
+            type="woowacourse.shopping.ui.cart.CartActivity.OnClickHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -77,6 +81,7 @@
                 android:background="@color/mint_1"
                 android:gravity="center"
                 android:maxWidth="156dp"
+                android:onClick="@{()->onClickHandler.onOrderClick()}"
                 android:paddingHorizontal="16dp"
                 android:text="@string/cart_order"
                 android:textColor="@color/white"
