@@ -62,7 +62,7 @@ class CatalogViewModel(
                 ?.page
                 ?.current
                 ?.plus(DEFAULT_PAGE_STEP) ?: UNINITIALIZED_PAGE
-        loadCartProducts(page = currentPage + 1)
+        loadCartProducts(page = currentPage)
     }
 
     fun loadHistoryProducts() {
