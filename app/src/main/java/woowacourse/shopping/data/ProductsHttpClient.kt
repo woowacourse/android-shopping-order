@@ -4,7 +4,6 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
@@ -27,7 +26,11 @@ class ProductsHttpClient(
             ).build()
 
     fun getProductById(id: Long): ProductResponse {
-        val response = httpGet("/products/$id")
+        val response =
+            http(
+                HttpMethod.Get,
+                "/products/$id",
+            )
         val jsonString = response.body?.string() ?: ""
         return Json.decodeFromString(jsonString)
     }
@@ -36,13 +39,23 @@ class ProductsHttpClient(
         page: Int,
         size: Int,
     ): CartResponse {
-        val response = httpGet("$PATH_CART_ITEMS?page=$page&size=$size", true)
+        val response =
+            http(
+                HttpMethod.Get,
+                "$PATH_CART_ITEMS?page=$page&size=$size",
+                true,
+            )
         val jsonString: String = response.body?.string() ?: ""
         return Json.decodeFromString(jsonString)
     }
 
     fun getCartItemQuantity(): CartQuantityResponse {
-        val response = httpGet("$PATH_CART_ITEMS/counts", true)
+        val response =
+            http(
+                HttpMethod.Get,
+                "$PATH_CART_ITEMS/counts",
+                true,
+            )
         val jsonString = response.body?.string() ?: ""
         return Json.decodeFromString(jsonString)
     }
@@ -54,9 +67,9 @@ class ProductsHttpClient(
         val cartRequest = CartRequest(id, quantity)
         val jsonString: String = Json.encodeToString(cartRequest)
 
-        return httpPost(
+        return http(
+            HttpMethod.Post(jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull())),
             PATH_CART_ITEMS,
-            jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull()),
             true,
         )
     }
@@ -71,7 +84,7 @@ class ProductsHttpClient(
     fun getProducts(
         page: Int,
         size: Int,
-    ): Response = httpGet("/products?page=$page&size=$size")
+    ): Response = http(HttpMethod.Get, "/products?page=$page&size=$size")
 
     private fun http(
         httpMethod: HttpMethod,
@@ -89,53 +102,6 @@ class ProductsHttpClient(
         return client.newCall(request).execute()
     }
 
-    private fun httpGet(
-        path: String,
-        needAuthorization: Boolean = false,
-    ): Response {
-        val request: Request =
-            Request
-                .Builder()
-                .url(baseUrl + path)
-                .addBasicAuthorizationHeader(needAuthorization)
-                .get()
-                .build()
-
-        return client.newCall(request).execute()
-    }
-
-    private fun httpPost(
-        path: String,
-        body: RequestBody,
-        needAuthorization: Boolean = false,
-    ): Response {
-        val request: Request =
-            Request
-                .Builder()
-                .url(baseUrl + path)
-                .addBasicAuthorizationHeader(needAuthorization)
-                .post(body)
-                .build()
-
-        return client.newCall(request).execute()
-    }
-
-    private fun httpDelete(
-        path: String,
-        body: RequestBody,
-        needAuthorization: Boolean = false,
-    ): Response {
-        val request: Request =
-            Request
-                .Builder()
-                .url(baseUrl + path)
-                .addBasicAuthorizationHeader(needAuthorization)
-                .delete(body)
-                .build()
-
-        return client.newCall(request).execute()
-    }
-
     private fun Request.Builder.addBasicAuthorizationHeader(needAuthorization: Boolean): Request.Builder {
         val valueToEncode = "jerry8282:password".toByteArray()
 
@@ -146,28 +112,6 @@ class ProductsHttpClient(
                     "Basic " + Base64.getEncoder().encodeToString(valueToEncode),
                 )
             }
-        }
-    }
-
-    private sealed interface HttpMethod {
-        val name: String
-        val body: RequestBody?
-
-        class Get : HttpMethod {
-            override val name: String = "GET"
-            override val body: RequestBody? = null
-        }
-
-        class Post(
-            override val body: RequestBody?,
-        ) : HttpMethod {
-            override val name: String = "POST"
-        }
-
-        class Delete(
-            override val body: RequestBody? = null,
-        ) : HttpMethod {
-            override val name: String = "DELETE"
         }
     }
 
