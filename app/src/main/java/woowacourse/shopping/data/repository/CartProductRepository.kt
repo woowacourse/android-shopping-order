@@ -16,7 +16,7 @@ interface CartProductRepository {
     fun updateProduct(
         cartProduct: ProductUiModel,
         quantity: Int,
-        callback: (ProductUiModel?) -> Unit,
+        callback: (Boolean) -> Unit,
     )
 
 //    fun getProductQuantity(

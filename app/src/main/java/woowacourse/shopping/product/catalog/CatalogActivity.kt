@@ -126,6 +126,7 @@ class CatalogActivity : AppCompatActivity() {
             (binding.recyclerViewProducts.adapter as ProductAdapter).setItems(value)
         }
         viewModel.updatedItem.observe(this) { product ->
+            Log.d("test", "프로덕트 ${product}")
             if (product != null) {
                 (binding.recyclerViewProducts.adapter as ProductAdapter).updateItem(product)
             }

@@ -101,33 +101,33 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     override fun updateProduct(
         cartProduct: ProductUiModel,
         quantity: Int,
-        callback: (ProductUiModel?) -> Unit,
+        callback: (Boolean) -> Unit,
     ) {
         retrofitService
             .patchCartItemQuantity(
                 cartItemId = cartProduct.cartItemId!!,
                 quantity = Quantity(quantity),
             ).enqueue(
-                object : Callback<Quantity> {
+                object : Callback<Void> {
                     override fun onResponse(
-                        call: Call<Quantity>,
-                        response: Response<Quantity>,
+                        call: Call<Void>,
+                        response: Response<Void>,
                     ) {
+                        Log.d("test", "api 호출됨 ${response}")
                         if (response.isSuccessful) {
-                            val body: Quantity = response.body() ?: return
-                            val product =
-                                cartProduct.copy(
-                                    quantity = body.value,
-                                )
-                            callback(product)
-                            println("body : $body")
+                            callback(true)
+                            println("✅ 요청 성공 (status=${response.code()})")
+                        } else {
+                            callback(false)
+                            println("✅ 요청 실패 (status=${response.code()})")
                         }
                     }
 
                     override fun onFailure(
-                        call: Call<Quantity>,
+                        call: Call<Void>,
                         t: Throwable,
                     ) {
+                        callback(false)
                         println("error : $t")
                     }
                 },

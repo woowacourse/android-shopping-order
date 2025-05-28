@@ -75,12 +75,12 @@ class CartViewModel(
         product: ProductUiModel,
     ) {
         if (event == DECREASE_BUTTON) {
-            cartProductRepository.updateProduct(product, -1) { product ->
-                _updatedItem.postValue(product)
+            cartProductRepository.updateProduct(product, -1) {
+//                _updatedItem.postValue()
             }
         } else if (event == INCREASE_BUTTON) {
             cartProductRepository.updateProduct(product, 1) { product ->
-                _updatedItem.postValue(product)
+//                _updatedItem.postValue(product)
             }
         }
     }

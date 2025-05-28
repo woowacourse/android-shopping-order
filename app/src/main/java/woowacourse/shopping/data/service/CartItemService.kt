@@ -39,7 +39,7 @@ interface CartItemService {
         @Header("accept") accept: String = "*/*",
         @Path("id") cartItemId: Int,
         @Body quantity: Quantity,
-    ): Call<Quantity>
+    ): Call<Void>
 
     @PATCH("/cart-items/counts")
     fun getCartItemsCount(

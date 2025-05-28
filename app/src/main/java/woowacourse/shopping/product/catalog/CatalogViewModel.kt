@@ -49,10 +49,11 @@ class CatalogViewModel(
         Log.d("test", "호출됨 ${product.id}")
         val catalogProduct: CatalogItem? =
             catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
-        val quantity = (catalogProduct as ProductItem).productItem.quantity
 
-        cartProductRepository.updateProduct(product, quantity + 1) { updatedProduct ->
-            _updatedItem.postValue(updatedProduct)
+        cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
+            if (result == true) {
+                _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
+            }
         }
 
         loadCartItemSize()
@@ -63,12 +64,15 @@ class CatalogViewModel(
             catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
         val quantity = (catalogProduct as ProductItem).productItem.quantity
 
-        if (quantity == 1) {
+        if (product.quantity == 1) {
             cartProductRepository.deleteCartProduct(product.copy(quantity = 1))
             _updatedItem.postValue(product.copy(quantity = 0))
         } else {
-            cartProductRepository.updateProduct(product, quantity - 1) { updatedProduct ->
-                _updatedItem.postValue(updatedProduct)
+            cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
+                if (result == true) {
+                    _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
+                }
+
             }
         }
 
