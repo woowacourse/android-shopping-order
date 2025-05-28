@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.shoppingCart.dao
+package woowacourse.shopping.data.cart.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -8,7 +8,7 @@ import androidx.room.Query
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 @Dao
-interface ShoppingCartDao {
+interface CartDao {
     @Query("SELECT * FROM shoppingCart")
     fun load(): List<CartItemEntity>
 

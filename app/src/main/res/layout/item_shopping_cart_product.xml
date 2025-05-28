@@ -7,11 +7,11 @@
 
         <variable
             name="productItem"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ProductItem" />
+            type="woowacourse.shopping.view.cart.CartItemType.ProductItem" />
 
         <variable
             name="shoppingCartItemActionListener"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartItemActionListener" />
+            type="woowacourse.shopping.view.cart.CartItemActionListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -7,12 +7,12 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
+import woowacourse.shopping.data.cart.dto.CartItemResponse
+import woowacourse.shopping.data.cart.dto.CartQuantityResponse
+import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.product.dto.CartRequest
 import woowacourse.shopping.data.product.dto.ProductResponse
 import woowacourse.shopping.data.product.dto.ProductsResponse
-import woowacourse.shopping.data.shoppingCart.dto.CartItemResponse
-import woowacourse.shopping.data.shoppingCart.dto.CartQuantityResponse
-import woowacourse.shopping.data.shoppingCart.dto.CartResponse
 import java.util.Base64
 
 class ProductsHttpClient(

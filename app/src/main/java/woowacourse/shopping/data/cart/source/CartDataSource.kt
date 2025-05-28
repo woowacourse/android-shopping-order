@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.shoppingCart.source
+package woowacourse.shopping.data.cart.source
 
+import woowacourse.shopping.data.cart.PageableCartItemData
 import woowacourse.shopping.data.product.entity.CartItemEntity
-import woowacourse.shopping.data.shoppingCart.PageableCartItemData
 
-interface ShoppingCartDataSource {
+interface CartDataSource {
     fun pageableCartItems(
         page: Int,
         size: Int,

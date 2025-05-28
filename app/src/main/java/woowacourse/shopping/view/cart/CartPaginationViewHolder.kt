@@ -1,32 +1,32 @@
-package woowacourse.shopping.view.shoppingCart
+package woowacourse.shopping.view.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemShoppingCartPaginationBinding
 
-class ShoppingCartPaginationViewHolder(
+class CartPaginationViewHolder(
     private val binding: ItemShoppingCartPaginationBinding,
-    onShoppingCartPaginationListener: OnShoppingCartPaginationListener,
+    onCartPaginationListener: OnCartPaginationListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.onShoppingCartPaginationListener = onShoppingCartPaginationListener
+        binding.onShoppingCartPaginationListener = onCartPaginationListener
     }
 
-    fun bind(item: ShoppingCartItem.PaginationItem) {
+    fun bind(item: CartItemType.PaginationItem) {
         binding.paginationItem = item
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
-            onShoppingCartPaginationListener: OnShoppingCartPaginationListener,
-        ): ShoppingCartPaginationViewHolder {
+            onCartPaginationListener: OnCartPaginationListener,
+        ): CartPaginationViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemShoppingCartPaginationBinding.inflate(layoutInflater, parent, false)
-            return ShoppingCartPaginationViewHolder(
+            return CartPaginationViewHolder(
                 binding,
-                onShoppingCartPaginationListener,
+                onCartPaginationListener,
             )
         }
     }

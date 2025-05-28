@@ -9,11 +9,11 @@
 
         <variable
             name="paginationItem"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartItem.PaginationItem" />
+            type="woowacourse.shopping.view.cart.CartItemType.PaginationItem" />
 
         <variable
             name="onShoppingCartPaginationListener"
-            type="woowacourse.shopping.view.shoppingCart.OnShoppingCartPaginationListener" />
+            type="woowacourse.shopping.view.cart.OnCartPaginationListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

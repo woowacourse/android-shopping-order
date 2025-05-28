@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.shoppingCart
+package woowacourse.shopping.view.cart
 
 import android.content.Context
 import android.content.Intent
@@ -13,15 +13,15 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.showToast
 
-class ShoppingCartActivity :
+class CartActivity :
     AppCompatActivity(),
-    OnShoppingCartPaginationListener {
-    private val viewModel: ShoppingCartViewModel by viewModels()
+    OnCartPaginationListener {
+    private val viewModel: CartViewModel by viewModels()
     private val binding: ActivityShoppingCartBinding by lazy {
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
-    private val shoppingCartProductAdapter by lazy {
-        ShoppingCartProductAdapter(viewModel::removeShoppingCartProduct, this)
+    private val cartProductAdapter by lazy {
+        CartProductAdapter(viewModel::removeShoppingCartProduct, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,33 +40,33 @@ class ShoppingCartActivity :
     }
 
     private fun initDataBinding() {
-        binding.adapter = shoppingCartProductAdapter
+        binding.adapter = cartProductAdapter
         binding.onClickBackButton = {
             viewModel.updateShoppingCart()
         }
     }
 
     private fun bindData() {
-        viewModel.shoppingCartItems.observe(this) { shoppingCart: List<ShoppingCartItem> ->
-            shoppingCartProductAdapter.submitList(shoppingCart)
+        viewModel.cartItemsType.observe(this) { shoppingCart: List<CartItemType> ->
+            cartProductAdapter.submitList(shoppingCart)
         }
     }
 
     private fun handleEvents() {
-        viewModel.event.observe(this) { event: ShoppingCartEvent ->
+        viewModel.event.observe(this) { event: CartEvent ->
             when (event) {
-                ShoppingCartEvent.LOAD_SHOPPING_CART_FAILURE ->
+                CartEvent.LOAD_SHOPPING_CART_FAILURE ->
                     showToast(R.string.shopping_cart_load_shopping_cart_error_message)
 
-                ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE ->
+                CartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE ->
                     showToast(R.string.shopping_cart_remove_shopping_cart_product_error_message)
 
-                ShoppingCartEvent.UPDATE_SHOPPING_CART_PRODUCT_SUCCESS -> {
+                CartEvent.UPDATE_SHOPPING_CART_PRODUCT_SUCCESS -> {
                     setResult(RESULT_OK)
                     finish()
                 }
 
-                ShoppingCartEvent.UPDATE_SHOPPING_CART_PRODUCT_FAILURE -> {
+                CartEvent.UPDATE_SHOPPING_CART_PRODUCT_FAILURE -> {
                     showToast(R.string.shopping_cart_update_shopping_cart_error_message)
                     finish()
                 }
@@ -87,6 +87,6 @@ class ShoppingCartActivity :
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, ShoppingCartActivity::class.java)
+        fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
     }
 }

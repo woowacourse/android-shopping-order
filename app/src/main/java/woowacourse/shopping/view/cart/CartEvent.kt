@@ -1,6 +1,6 @@
-package woowacourse.shopping.view.shoppingCart
+package woowacourse.shopping.view.cart
 
-enum class ShoppingCartEvent {
+enum class CartEvent {
     LOAD_SHOPPING_CART_FAILURE,
     REMOVE_SHOPPING_CART_PRODUCT_FAILURE,
     UPDATE_SHOPPING_CART_PRODUCT_SUCCESS,

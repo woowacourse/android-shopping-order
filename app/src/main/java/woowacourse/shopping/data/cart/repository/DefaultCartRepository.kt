@@ -1,14 +1,14 @@
-package woowacourse.shopping.data.shoppingCart.repository
+package woowacourse.shopping.data.cart.repository
 
-import woowacourse.shopping.data.shoppingCart.PageableCartItemData
-import woowacourse.shopping.data.shoppingCart.source.RemoteShoppingCartDataSource
-import woowacourse.shopping.data.shoppingCart.source.ShoppingCartDataSource
+import woowacourse.shopping.data.cart.PageableCartItemData
+import woowacourse.shopping.data.cart.source.CartDataSource
+import woowacourse.shopping.data.cart.source.RemoteCartDataSource
 import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(
-    private val shoppingCartDataSource: ShoppingCartDataSource = RemoteShoppingCartDataSource(),
+    private val cartDataSource: CartDataSource = RemoteCartDataSource(),
 ) : CartRepository {
     override fun loadPageableCartItems(
         page: Int,
@@ -17,7 +17,7 @@ class DefaultCartRepository(
     ) {
         {
             val pageableCartItemData: PageableCartItemData =
-                shoppingCartDataSource.pageableCartItems(page, size)
+                cartDataSource.pageableCartItems(page, size)
             PageableCartItems(
                 cartItems = pageableCartItemData.cartItems.map { it.toDomain() },
                 hasPrevious = pageableCartItemData.hasPrevious,
@@ -27,7 +27,7 @@ class DefaultCartRepository(
     }
 
     override fun loadCart(onLoad: (Result<List<CartItem>>) -> Unit) {
-        { shoppingCartDataSource.cart().map { it.toDomain() } }.runAsync(onLoad)
+        { cartDataSource.cart().map { it.toDomain() } }.runAsync(onLoad)
     }
 
     override fun addCartItem(
@@ -36,7 +36,7 @@ class DefaultCartRepository(
         onAdd: (Result<Unit>) -> Unit,
     ) {
         {
-            shoppingCartDataSource.addCartItem(
+            cartDataSource.addCartItem(
                 productId = productId,
                 quantity = quantity,
             )
@@ -47,7 +47,7 @@ class DefaultCartRepository(
         cartItemId: Long,
         onRemove: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.remove(cartItemId) }.runAsync(onRemove)
+        { cartDataSource.remove(cartItemId) }.runAsync(onRemove)
     }
 
     override fun updateCartItemQuantity(
@@ -56,7 +56,7 @@ class DefaultCartRepository(
         onUpdate: (Result<Unit>) -> Unit,
     ) {
         {
-            shoppingCartDataSource.updateCartItemQuantity(
+            cartDataSource.updateCartItemQuantity(
                 cartItemId = cartItemId,
                 newQuantity = quantity,
             )
@@ -64,7 +64,7 @@ class DefaultCartRepository(
     }
 
     override fun cartItemsSize(onResult: (Result<Int>) -> Unit) {
-        { shoppingCartDataSource.cartItemsSize() }.runAsync(onResult)
+        { cartDataSource.cartItemsSize() }.runAsync(onResult)
     }
 
     private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {

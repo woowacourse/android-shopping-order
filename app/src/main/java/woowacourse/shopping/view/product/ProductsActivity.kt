@@ -15,8 +15,8 @@ import woowacourse.shopping.data.product.source.LocalProductsDataSource
 import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
-import woowacourse.shopping.view.shoppingCart.ShoppingCartActivity
 import woowacourse.shopping.view.showToast
 
 class ProductsActivity : AppCompatActivity() {
@@ -135,7 +135,7 @@ class ProductsActivity : AppCompatActivity() {
     }
 
     private fun navigateToShoppingCart() {
-        shoppingCartActivityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
+        shoppingCartActivityResultLauncher.launch(CartActivity.newIntent(this))
     }
 
     private fun navigateToProductDetail(product: Product) {

@@ -1,14 +1,14 @@
-package woowacourse.shopping.view.shoppingCart
+package woowacourse.shopping.view.cart
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.product.CartItem
 
-class ShoppingCartProductAdapter(
+class CartProductAdapter(
     private val onRemoveProduct: (cartItem: CartItem) -> Unit,
-    private val onShoppingCartPaginationListener: OnShoppingCartPaginationListener,
+    private val onCartPaginationListener: OnCartPaginationListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var items: List<ShoppingCartItem> = emptyList()
+    private var items: List<CartItemType> = emptyList()
 
     override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
 
@@ -16,18 +16,19 @@ class ShoppingCartProductAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder {
-        val viewType: ShoppingCartItem.ItemType = ShoppingCartItem.ItemType.from(viewType)
+        val viewType: CartItemType.ItemType =
+            CartItemType.ItemType.from(viewType)
         return when (viewType) {
-            ShoppingCartItem.ItemType.PRODUCT ->
-                ShoppingCartProductViewHolder.of(
+            CartItemType.ItemType.PRODUCT ->
+                CartProductViewHolder.of(
                     parent,
                     onRemoveProduct,
                 )
 
-            ShoppingCartItem.ItemType.PAGINATION ->
-                ShoppingCartPaginationViewHolder.of(
+            CartItemType.ItemType.PAGINATION ->
+                CartPaginationViewHolder.of(
                     parent,
-                    onShoppingCartPaginationListener,
+                    onCartPaginationListener,
                 )
         }
     }
@@ -37,17 +38,17 @@ class ShoppingCartProductAdapter(
         position: Int,
     ) {
         when (holder) {
-            is ShoppingCartProductViewHolder -> holder.bind(items[position] as ShoppingCartItem.ProductItem)
-            is ShoppingCartPaginationViewHolder -> holder.bind(items[position] as ShoppingCartItem.PaginationItem)
+            is CartProductViewHolder -> holder.bind(items[position] as CartItemType.ProductItem)
+            is CartPaginationViewHolder -> holder.bind(items[position] as CartItemType.PaginationItem)
         }
     }
 
     override fun getItemCount(): Int = items.size
 
-    fun submitList(items: List<ShoppingCartItem>) {
+    fun submitList(items: List<CartItemType>) {
         val isProductItemEmpty = items.size == 1
         if (isProductItemEmpty) {
-            onShoppingCartPaginationListener.onMinusPage()
+            onCartPaginationListener.onMinusPage()
         }
 
         val oldItems = this.items.size

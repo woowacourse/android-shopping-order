@@ -1,25 +1,26 @@
-package woowacourse.shopping.view.shoppingCart
+package woowacourse.shopping.view.cart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.shoppingCart.repository.CartRepository
-import woowacourse.shopping.data.shoppingCart.repository.DefaultCartRepository
+import woowacourse.shopping.data.cart.repository.CartRepository
+import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
-class ShoppingCartViewModel(
+class CartViewModel(
     private val cartRepository: CartRepository = DefaultCartRepository(),
 ) : ViewModel() {
     private var page: Int = FIRST_PAGE
 
-    private val _shoppingCartItems: MutableLiveData<List<ShoppingCartItem>> = MutableLiveData()
-    val shoppingCartItems: LiveData<List<ShoppingCartItem>> get() = _shoppingCartItems
+    private val _cartItemsType: MutableLiveData<List<CartItemType>> =
+        MutableLiveData()
+    val cartItemsType: LiveData<List<CartItemType>> get() = _cartItemsType
 
-    private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
-    val event: SingleLiveData<ShoppingCartEvent> get() = _event
+    private val _event: MutableSingleLiveData<CartEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<CartEvent> get() = _event
 
     init {
         loadShoppingCart()
@@ -32,22 +33,22 @@ class ShoppingCartViewModel(
         ) { result: Result<PageableCartItems> ->
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
-                    _shoppingCartItems.postValue(pageableCartItems.toShoppingCartItems())
+                    _cartItemsType.postValue(pageableCartItems.toShoppingCartItems())
                 }.onFailure {
-                    _event.postValue(ShoppingCartEvent.LOAD_SHOPPING_CART_FAILURE)
+                    _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
                 }
         }
     }
 
-    private fun PageableCartItems.toShoppingCartItems(): List<ShoppingCartItem> {
+    private fun PageableCartItems.toShoppingCartItems(): List<CartItemType> {
         val paginationItem =
-            ShoppingCartItem.PaginationItem(
+            CartItemType.PaginationItem(
                 page = page,
                 previousEnabled = hasPrevious,
                 nextEnabled = hasNext,
             )
 
-        return this.cartItems.map(ShoppingCartItem::ProductItem) + paginationItem
+        return this.cartItems.map(CartItemType::ProductItem) + paginationItem
     }
 
     fun removeShoppingCartProduct(cartItem: CartItem) {
@@ -56,7 +57,7 @@ class ShoppingCartViewModel(
                 .onSuccess {
                     loadShoppingCart()
                 }.onFailure {
-                    _event.postValue(ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
+                    _event.postValue(CartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
                 }
         }
     }

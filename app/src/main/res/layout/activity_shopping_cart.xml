@@ -7,7 +7,7 @@
 
         <variable
             name="adapter"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartProductAdapter" />
+            type="woowacourse.shopping.view.cart.CartProductAdapter" />
 
         <variable
             name="onClickBackButton"
@@ -19,7 +19,7 @@
         android:id="@+id/shoppingCartRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.shoppingCart.ShoppingCartActivity">
+        tools:context=".view.cart.CartActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/shoppingCartToolbar"

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.shoppingCart
+package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.product.entity.CartItemEntity
 

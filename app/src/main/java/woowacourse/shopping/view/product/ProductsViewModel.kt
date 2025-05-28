@@ -3,10 +3,10 @@ package woowacourse.shopping.view.product
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.cart.repository.CartRepository
+import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
-import woowacourse.shopping.data.shoppingCart.repository.CartRepository
-import woowacourse.shopping.data.shoppingCart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.domain.product.PageableProducts
 import woowacourse.shopping.domain.product.Product

@@ -19,7 +19,7 @@
             android:name=".view.productDetail.ProductDetailActivity"
             android:exported="true" />
         <activity
-            android:name=".view.shoppingCart.ShoppingCartActivity"
+            android:name=".view.cart.CartActivity"
             android:exported="false" />
         <activity
             android:name=".view.product.ProductsActivity"
