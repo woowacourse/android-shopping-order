@@ -19,7 +19,7 @@ class CartViewModel(
     private val _event: MutableSingleLiveData<CartEvent> = MutableSingleLiveData()
     val event: SingleLiveData<CartEvent> get() = _event
 
-    private var page: Int = FIRST_PAGE
+    private var page: Int = MIN_PAGE
 
     init {
         loadCartItems()
@@ -55,11 +55,13 @@ class CartViewModel(
     }
 
     fun minusPage() {
-        TODO("Not yet implemented")
+        page = (page - 1).coerceAtLeast(MIN_PAGE)
+        loadCartItems()
     }
 
     fun plusPage() {
-        TODO("Not yet implemented")
+        page++
+        loadCartItems()
     }
 
     //    private var page: Int = FIRST_PAGE
@@ -126,7 +128,7 @@ class CartViewModel(
 //    fun updateShoppingCart(): Any? = TODO()
 //
     companion object {
-        private const val FIRST_PAGE = 1
+        private const val MIN_PAGE = 1
         private const val COUNT_PER_PAGE = 5
     }
 }
