@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -54,8 +55,12 @@ class CartActivity : AppCompatActivity() {
     private fun observeCartProducts() {
         val adapter = getCartAdapter()
 
-        viewModel.cartProducts.observe(this) {
-            adapter.setData(it)
+        viewModel.pagingData.observe(this) {
+            binding.frCartShimmer.stopShimmer()
+            binding.frCartShimmer.visibility = View.GONE
+            binding.frCartShimmer.visibility = View.VISIBLE
+
+            adapter.setData(it.products)
         }
 
         viewModel.product.observe(this) {
