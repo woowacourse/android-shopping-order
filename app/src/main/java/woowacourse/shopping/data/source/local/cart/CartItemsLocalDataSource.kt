@@ -14,6 +14,17 @@ class CartItemsLocalDataSource {
         cache.add(item)
     }
 
+    fun update(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val existingItem = cache.find { it.productId == productId }
+        if (existingItem != null) {
+            cache.remove(existingItem)
+            cache.add(existingItem.copy(quantity = quantity))
+        }
+    }
+
     fun remove(cartId: Long) {
         cache.removeIf { it.cartId == cartId }
     }
