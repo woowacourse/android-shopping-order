@@ -54,7 +54,7 @@ class CartRepositoryImpl(
         onComplete: (CartResponse) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
-        remoteDataSource.fetchCartItemByOffset(
+        remoteDataSource.fetchCartItemByPage(
             page,
             size,
             { response ->
@@ -66,8 +66,7 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
-        cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     override fun updateQuantity(
         cartId: Int,

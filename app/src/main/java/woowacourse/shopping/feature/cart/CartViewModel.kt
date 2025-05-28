@@ -8,7 +8,6 @@ import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
-import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -20,7 +19,7 @@ class CartViewModel(
     private val _isMultiplePages = MutableLiveData(false)
     val isMultiplePages: LiveData<Boolean> get() = _isMultiplePages
 
-    private var currentPage: Int = 1
+    private var currentPage: Int = MINIMUM_PAGE
         set(value) {
             field = value
             _page.postValue(value)
@@ -48,8 +47,7 @@ class CartViewModel(
         updateCartQuantity()
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
-        cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     fun getPosition(cartItem: CartItem): Int? {
         val idx = cart.value?.indexOf(cartItem) ?: return null
@@ -60,15 +58,13 @@ class CartViewModel(
         cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
             updateCartQuantity()
         }) {
-
         }
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         if (cartItem.quantity - 1 <= 0) {
             cartRepository.delete(cartItem.id) { updateCartQuantity() }
-        }
-        else{
+        } else {
             cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
                 updateCartQuantity()
             }, {})
@@ -77,12 +73,16 @@ class CartViewModel(
 
     fun updateCartQuantity() {
         cartRepository.fetchCartItemsByPage(
+            currentPage - 1,
             PAGE_SIZE,
-            (currentPage - 1) * PAGE_SIZE,
             { cartResponse ->
                 _cart.value = getCartItemByCartResponse(cartResponse)
                 updatePageMoveAvailability(cartResponse)
                 updateCartDataSize(cartResponse)
+                if (cartResponse.totalPages >= MINIMUM_PAGE && cartResponse.totalPages < currentPage) {
+                    currentPage = cartResponse.totalPages
+                    updateCartQuantity()
+                }
             },
             { cartFetchError ->
                 _loginErrorEvent.setValue(cartFetchError)
@@ -101,7 +101,6 @@ class CartViewModel(
         }
     }
 
-
     private fun updatePage() {
         cartRepository.getAllItemsSize { totalCartSize ->
             totalCartSizeData = totalCartSize
@@ -112,7 +111,6 @@ class CartViewModel(
             updateCartQuantity()
         }
         cartRepository.fetchCartItemsByPage(currentPage, PAGE_SIZE, {}, {})
-
     }
 
     fun plusPage() {
@@ -131,6 +129,7 @@ class CartViewModel(
     }
 
     companion object {
+        private const val MINIMUM_PAGE = 1
         private const val PAGE_SIZE = 5
     }
 }
