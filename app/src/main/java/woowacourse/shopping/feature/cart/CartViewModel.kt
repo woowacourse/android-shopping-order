@@ -69,10 +69,9 @@ class CartViewModel(
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         if (cartItem.quantity - 1 <= 0) {
-//            cartRepository.delete(cartItem.id) { updateCartQuantity() }
             _removeItemEvent.setValue(cartItem)
         } else {
-            cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
+            cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
                 updateCartQuantity()
             }, {})
         }
