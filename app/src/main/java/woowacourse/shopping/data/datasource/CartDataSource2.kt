@@ -65,6 +65,33 @@ class CartDataSource2(
                 }
             },
         )
-        return
+    }
+
+    fun updateCartQuantity(
+        cartId: Long,
+        quantity: Int,
+        callback: (Result<Unit?>) -> Unit,
+    )  {
+        service.updateCart(cartId, quantity).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit?>,
+                    response: Response<Unit?>,
+                ) {
+                    if (response.isSuccessful) {
+                        callback(Result.success(Unit))
+                    } else {
+                        callback(Result.failure(NullPointerException()))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit?>,
+                    t: Throwable,
+                ) {
+                    callback(Result.failure(t))
+                }
+            },
+        )
     }
 }

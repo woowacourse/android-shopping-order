@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import retrofit2.HttpException
 import woowacourse.shopping.data.datasource.CartDataSource2
 import woowacourse.shopping.data.network.request.toRequest
+import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
 
@@ -43,6 +44,27 @@ class DefaultCartRepository(
                     } else {
                         val error = HttpException(response)
                         callback(Result.failure(error))
+                    }
+                },
+                onFailure = { throwable ->
+                    callback(Result.failure(throwable))
+                },
+            )
+        }
+    }
+
+    fun updateQuantity(
+        cartId: Long,
+        quantity: Quantity,
+        callback: (Result<Unit>) -> Unit,
+    )  {
+        dataSource.updateCartQuantity(cartId, quantity.value) { result ->
+            result.fold(
+                onSuccess = { response ->
+                    if (response != null) {
+                        callback(Result.success(response))
+                    } else {
+                        callback(Result.failure(NullPointerException()))
                     }
                 },
                 onFailure = { throwable ->
