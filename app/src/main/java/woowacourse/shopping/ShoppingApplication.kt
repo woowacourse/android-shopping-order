@@ -28,9 +28,8 @@ class ShoppingApplication : Application() {
     }
 
     private fun initCartRepository() {
-        val cartDataSource = DataSourceProvider.cartLocalDataSource
-        val productDataSource = DataSourceProvider.productRemoteDataSource
-        val repository = CartRepositoryImpl(cartDataSource, productDataSource)
+        val cartDataSource = DataSourceProvider.cartRemoteDataSource
+        val repository = CartRepositoryImpl(cartDataSource)
         RepositoryProvider.initCartRepository(repository)
     }
 
