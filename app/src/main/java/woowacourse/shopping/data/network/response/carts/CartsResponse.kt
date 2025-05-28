@@ -1,8 +1,7 @@
 package woowacourse.shopping.data.network.response.carts
 
-
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.cart.CartsSinglePage
 
 @Serializable
 data class CartsResponse(
@@ -16,5 +15,13 @@ data class CartsResponse(
     val size: Int,
     val sort: SortX,
     val totalElements: Int,
-    val totalPages: Int
-)
+    val totalPages: Int,
+) {
+    fun toDomain(): CartsSinglePage {
+        val shoppingCart = content.map { it.toDomain() }
+        return CartsSinglePage(
+            shoppingCart,
+            last,
+        )
+    }
+}

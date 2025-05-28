@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.network.response.carts
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -12,5 +11,5 @@ data class Pageable(
     val paged: Boolean,
     val sort: SortX,
     @SerialName("unpaged")
-    val unPaged: Boolean
+    val unPaged: Boolean,
 )
