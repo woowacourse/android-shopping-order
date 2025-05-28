@@ -35,11 +35,9 @@ interface CartRemoteDataSource {
         onFailure: (CartFetchError) -> Unit,
     )
 
-    fun increaseItemCount(itemId: Int)
 
-    fun decreaseItemCount(itemId: Int)
-
-    fun deleteItem(itemId: Int)
+    fun deleteItem(cartId: Int,onSuccess: (Int) -> Unit)
 
     fun addItem(itemId: Int)
+
 }

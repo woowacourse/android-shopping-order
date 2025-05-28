@@ -47,9 +47,11 @@ interface CartRepository {
     )
 
     fun delete(
-        goods: Goods,
-        onComplete: () -> Unit,
+        cartId : Int,
+        onComplete: (Int) -> Unit,
     )
 
     fun getAllItemsSize(onComplete: (Int) -> Unit)
+
+    fun addCartItem(goods: Goods)
 }

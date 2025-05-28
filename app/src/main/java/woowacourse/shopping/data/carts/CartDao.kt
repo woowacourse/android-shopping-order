@@ -35,7 +35,7 @@ interface CartDao {
     fun update(cartEntity: CartEntity)
 
     @Query("SELECT * FROM cart WHERE id = :id")
-    fun findByGoodsId(id: Long): CartEntity?
+    fun findByGoodsId(id: Int): CartEntity?
 
     @Transaction
     fun addOrIncreaseQuantity(cartEntity: CartEntity) {

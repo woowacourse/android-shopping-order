@@ -2,11 +2,14 @@ package woowacourse.shopping.data.util
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.goods.dto.Content
@@ -46,6 +49,20 @@ interface RetrofitService {
         @Path("id") cartId: Int,
         @Body requestBody: CartQuantity,
         @Header("accept") accept: String = "*/*",
+        @Header("Authorization") authorization: String,
+    ): Call<CartQuantity>
+
+    @DELETE("/cart-items/{id}")
+    fun deleteCartItem(
+        @Path("id") cartId: Int,
+        @Header("accept") accept: String = "*/*",
+        @Header("Authorization") authorization: String,
+    ): Call<CartQuantity>
+
+    @POST("/cart-items")
+    fun addCartItem(
+        @Header("accept") accept: String = "*/*",
+        @Body cartItem: CartItemRequest,
         @Header("Authorization") authorization: String,
     ): Call<CartQuantity>
 }

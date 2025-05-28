@@ -33,7 +33,7 @@ class GoodsViewModel(
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
 
-    var cashedCartItemWithIndex: Map<Long, Pair<CartItem, Int>> = mapOf()
+    var cashedCartItemWithIndex: Map<Int, Pair<CartItem, Int>> = mapOf()
 
     init {
         appendCartItemsWithZeroQuantity()
@@ -114,18 +114,21 @@ class GoodsViewModel(
         if (!Authorization.isLogin) {
             _navigateToLogin.setValue(Unit)
         } else {
-            // 일단 증가만 구현
-            Log.d("카트아이템", "$cartItem")
-            Log.d("캐시", "$cashedCartItemWithIndex")
-            cashedCartItemWithIndex[cartItem.goods.id]?.first?.let {
-                Log.d("카트아이템2", "$cartItem")
-                increaseCartItem(it.id, cartItem.copy(quantity = it.quantity + 1))
+            val cashedCartItem = cashedCartItemWithIndex[cartItem.goods.id]
+            Log.d("Test",cashedCartItem.toString())
+            if(cashedCartItem==null){
+                addCartItem(cartItem.goods)
+            }
+            else{
+                increaseCartItem(cashedCartItem.first.id, cartItem.copy(quantity = cashedCartItem.first.quantity + 1))
             }
             updateCartCache()
-//            cartRepository.addOrIncreaseQuantity(cartItem.goods, cartItem.quantity) {
-//
-//            }
+
         }
+    }
+
+    private fun addCartItem(goods: Goods){
+        cartRepository.addCartItem(goods)
     }
 
     private fun increaseCartItem(
@@ -136,6 +139,22 @@ class GoodsViewModel(
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
+        if (!Authorization.isLogin) {
+            _navigateToLogin.setValue(Unit)
+        } else {
+            // 일단 증가만 구현
+            Log.d("카트아이템", "$cartItem")
+            Log.d("캐시", "$cashedCartItemWithIndex")
+            cashedCartItemWithIndex[cartItem.goods.id]?.first?.let {
+                if(it.quantity-1<=0){
+                    cartRepository.delete(it.id,{})
+                }
+                else{
+                    increaseCartItem(it.id, cartItem.copy(quantity = it.quantity - 1))
+                }
+            }
+            updateCartCache()
+        }
         cartRepository.removeOrDecreaseQuantity(cartItem.goods, cartItem.quantity) {
             updateCartCache()
         }

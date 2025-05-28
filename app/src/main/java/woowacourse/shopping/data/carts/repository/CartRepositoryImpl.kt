@@ -67,7 +67,8 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
+        cartResponse.toCartItems()
 
     override fun addOrIncreaseQuantity(
         goods: Goods,
@@ -77,8 +78,7 @@ class CartRepositoryImpl(
         fetchAllCartItems({ cartItems: List<CartItem> ->
             if (goods.id in cartItems.map { it.goods.id }) {
             } else {
-                addCartItem(goods) {
-                }
+                addCartItem(goods)
             }
         }, {
         })
@@ -103,12 +103,6 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun addCartItem(
-        goods: Goods,
-        onComplete: () -> Unit,
-    ) {
-    }
-
     override fun removeOrDecreaseQuantity(
         goods: Goods,
         removeQuantity: Int,
@@ -118,10 +112,17 @@ class CartRepositoryImpl(
     }
 
     override fun delete(
-        goods: Goods,
-        onComplete: () -> Unit,
+        cartId: Int,
+        onComplete: (Int) -> Unit,
     ) {
-        // Todo
+        remoteDataSource.deleteItem(
+            cartId = cartId,
+            onSuccess = onComplete
+        )
+    }
+
+    override fun addCartItem(goods: Goods) {
+        remoteDataSource.addItem(goods.id)
     }
 
     override fun getAllItemsSize(onComplete: (Int) -> Unit) {

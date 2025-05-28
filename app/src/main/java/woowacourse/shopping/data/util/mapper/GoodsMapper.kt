@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Goods
 
 fun GoodsDto.toDomain(): Goods =
     Goods(
-        id = id.toLong(),
+        id = id,
         name = name,
         price = price,
         thumbnailUrl = imageUrl,

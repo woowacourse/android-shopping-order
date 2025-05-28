@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.RetrofitService
@@ -152,19 +153,57 @@ class CartRemoteDataSourceImpl(
             )
     }
 
-    override fun increaseItemCount(itemId: Int) {
-        // Todo
-    }
 
-    override fun decreaseItemCount(itemId: Int) {
-        // Todo
-    }
+    override fun deleteItem(cartId : Int ,onSuccess: (resultCode: Int) -> Unit) {
+        retrofitService
+            .deleteCartItem(
+                cartId = cartId,
+                authorization = "Basic " + Authorization.basicKey,
+            ).enqueue(
+                object : Callback<CartQuantity> {
+                    override fun onResponse(
+                        call: Call<CartQuantity>,
+                        response: Response<CartQuantity>,
+                    ) {
+                        if (response.isSuccessful) {
+                            onSuccess(response.code())
+                        } else {
+                        }
+                    }
 
-    override fun deleteItem(itemId: Int) {
-        // Todo
+                    override fun onFailure(
+                        call: Call<CartQuantity>,
+                        t: Throwable,
+                    ) {
+                    }
+                },
+            )
     }
 
     override fun addItem(itemId: Int) {
-        // Todo
+        retrofitService
+            .addCartItem(
+                cartItem = CartItemRequest(itemId,1),
+                authorization = "Basic " + Authorization.basicKey,
+            ).enqueue(
+                object : Callback<CartQuantity> {
+                    override fun onResponse(
+                        call: Call<CartQuantity>,
+                        response: Response<CartQuantity>,
+                    ) {
+                        if (response.isSuccessful) {
+
+                        } else {
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<CartQuantity>,
+                        t: Throwable,
+                    ) {
+                    }
+                },
+            )
     }
+
 }
