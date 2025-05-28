@@ -1,6 +1,9 @@
 package woowacourse.shopping.data.remote
 
 import android.util.Base64
+import android.util.Log
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import woowacourse.shopping.data.datasource.local.UserPreference
@@ -13,13 +16,39 @@ object OkHttpClientProvider {
         "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
 
     fun provideClient(): OkHttpClient {
-        val httpLoggingInterceptor =
-            HttpLoggingInterceptor().apply {
+        val json =
+            Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+            }
+
+        val prettyLogger =
+            HttpLoggingInterceptor(
+                object : HttpLoggingInterceptor.Logger {
+                    override fun log(message: String) {
+                        if (message.startsWith("{") || message.startsWith("[")) {
+                            try {
+                                val parsed = json.parseToJsonElement(message)
+                                Log.d(
+                                    "PrettyLogger",
+                                    json.encodeToString(JsonElement.serializer(), parsed),
+                                )
+                            } catch (e: Exception) {
+                                Log.d("PrettyLogger", message)
+                            }
+                        } else {
+                            Log.d("PrettyLogger", message)
+                        }
+                    }
+                },
+            ).apply {
                 level = HttpLoggingInterceptor.Level.BODY
             }
+
         return OkHttpClient
             .Builder()
-            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(prettyLogger)
             .addInterceptor { chain ->
                 val request =
                     chain
