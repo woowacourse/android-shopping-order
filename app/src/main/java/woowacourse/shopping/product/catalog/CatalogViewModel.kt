@@ -1,5 +1,6 @@
 package woowacourse.shopping.product.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,12 +36,13 @@ class CatalogViewModel(
         MutableLiveData<List<ProductUiModel>>(emptyList<ProductUiModel>())
     val recentlyViewedProducts: LiveData<List<ProductUiModel>> = _recentlyViewedProducts
 
-    private val _loadingState: MutableLiveData<LoadingState> = MutableLiveData(LoadingState.loaded())
+    private val _loadingState: MutableLiveData<LoadingState> =
+        MutableLiveData(LoadingState.loaded())
     val loadingState: LiveData<LoadingState> get() = _loadingState
 
     init {
         catalogProductRepository.getAllProductsSize { allProductsSize ->
-            loadCatalog(0, PAGE_SIZE, allProductsSize)
+            loadCatalog(0, PAGE_SIZE, 20, allProductsSize)
         }
     }
 
@@ -69,11 +71,11 @@ class CatalogViewModel(
         increasePage()
         val currentPage = page.value ?: 0
 
-        remoteCatalogProductRepositoryImpl.getAllProductsSize { size ->
+        remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
             val startIndex = currentPage * PAGE_SIZE
-            val endIndex = minOf(startIndex + PAGE_SIZE, size)
+            val endIndex = minOf(startIndex + PAGE_SIZE, allProductSize)
 
-            loadCatalog(startIndex, endIndex, size)
+            loadCatalog(startIndex, endIndex, 20, allProductSize)
         }
     }
 
@@ -81,24 +83,27 @@ class CatalogViewModel(
         _catalogItems.value = emptyList()
         val currentPage = page.value ?: 0
 
-        remoteCatalogProductRepositoryImpl.getAllProductsSize { size ->
+        remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
             val startIndex = 0
-            val endIndex = minOf((currentPage + 1) * PAGE_SIZE, size)
+            val endIndex = minOf((currentPage + 1) * PAGE_SIZE, allProductSize)
 
-            loadCatalog(startIndex, endIndex, size)
+            loadCatalog(startIndex, endIndex, 20, allProductSize)
         }
     }
 
     fun loadCatalog(
         startIndex: Int,
         endIndex: Int,
+        size: Int = 20,
         allProductsSize: Int,
     ) {
         _loadingState.postValue(LoadingState.loading())
         Thread.sleep(2000)
-        _catalogItems.postValue(emptyList<CatalogItem>())
 
-        remoteCatalogProductRepositoryImpl.getProductsByPage(0, 1) { pagedProducts ->
+        remoteCatalogProductRepositoryImpl.getProductsByPage(
+            page.value ?: 0,
+            size
+        ) { pagedProducts ->
 
             cartProductRepository.getCartProductsInRange(startIndex, endIndex) { cartProducts ->
                 val cartProductMap = cartProducts.associateBy { it.uid }
@@ -113,7 +118,6 @@ class CatalogViewModel(
                 val prevItems =
                     _catalogItems.value.orEmpty().filterNot { it is CatalogItem.LoadMoreButtonItem }
                 val hasNextPage = endIndex < allProductsSize
-
                 val updatedItems =
                     if (hasNextPage) {
                         prevItems + items + CatalogItem.LoadMoreButtonItem
