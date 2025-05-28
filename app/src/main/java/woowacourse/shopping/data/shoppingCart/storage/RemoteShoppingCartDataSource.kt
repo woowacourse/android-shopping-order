@@ -2,6 +2,7 @@ package woowacourse.shopping.data.shoppingCart.storage
 
 import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.product.entity.CartItemEntity
+import woowacourse.shopping.data.shoppingCart.dto.CartResponse
 
 class RemoteShoppingCartDataSource(
     private val productsHttpClient: ProductsHttpClient = ProductsHttpClient(),
@@ -10,10 +11,9 @@ class RemoteShoppingCartDataSource(
         page: Int,
         size: Int,
     ): List<CartItemEntity> {
-        val rawJson: String = productsHttpClient.getShoppingCart(page, size).body?.string() ?: ""
-
-        rawJson
-        return emptyList()
+        val cartResponse: CartResponse = productsHttpClient.getCart(page, size)
+        return cartResponse.content?.mapNotNull(CartResponse.Content::toCartItemEntityOrNull)
+            ?: emptyList()
     }
 
     override fun upsert(cartItem: CartItemEntity) {
@@ -32,3 +32,15 @@ class RemoteShoppingCartDataSource(
         TODO("Not yet implemented")
     }
 }
+
+private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
+    if (id == null || product?.name == null || product.price == null || quantity == null) {
+        null
+    } else {
+        CartItemEntity(
+            id = id,
+            name = product.name,
+            price = product.price,
+            quantity = quantity,
+        )
+    }

@@ -11,6 +11,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import woowacourse.shopping.data.product.dto.CartRequest
 import woowacourse.shopping.data.product.dto.ProductResponse
+import woowacourse.shopping.data.shoppingCart.dto.CartResponse
 import java.util.Base64
 
 class ProductsHttpClient(
@@ -31,10 +32,14 @@ class ProductsHttpClient(
         return Json.decodeFromString(jsonString)
     }
 
-    fun getShoppingCart(
+    fun getCart(
         page: Int,
         size: Int,
-    ): Response = httpGet("$PATH_CART_ITEMS?page=$page&size=$size&sort=string")
+    ): CartResponse {
+        val response = httpGet("$PATH_CART_ITEMS?page=$page&size=$size", true)
+        val jsonString: String = response.body?.string() ?: ""
+        return Json.decodeFromString(jsonString)
+    }
 
     fun postShoppingCartItem(
         id: Long,
@@ -42,6 +47,7 @@ class ProductsHttpClient(
     ): Response {
         val cartRequest = CartRequest(id, quantity)
         val jsonString: String = Json.encodeToString(cartRequest)
+        Log.e("TAG", "jsonString: $jsonString")
 
         return httpPost(
             PATH_CART_ITEMS,
@@ -71,26 +77,15 @@ class ProductsHttpClient(
         path: String,
         needAuthorization: Boolean = false,
     ): Response {
-        val valueToEncode = "jerry8282:password"
         val request: Request =
             Request
                 .Builder()
                 .url(baseUrl + path)
-                .apply {
-                    if (needAuthorization) {
-                        authorizationHeader(valueToEncode)
-                    }
-                }.get()
+                .addBasicAuthorizationHeader(needAuthorization)
+                .get()
                 .build()
 
         return client.newCall(request).execute()
-    }
-
-    private fun Request.Builder.authorizationHeader(valueToEncode: String) {
-        header(
-            "Authorization",
-            Base64.getEncoder().encodeToString(valueToEncode.toByteArray()),
-        )
     }
 
     private fun httpPost(
@@ -98,24 +93,28 @@ class ProductsHttpClient(
         body: RequestBody,
         needAuthorization: Boolean = false,
     ): Response {
-        val valueToEncode = "jerry8282:password".toByteArray()
-        Log.d("asdf", "valueToEncode  $valueToEncode")
         val request: Request =
             Request
                 .Builder()
                 .url(baseUrl + path)
-                .apply {
-                    if (needAuthorization) {
-                        header(
-                            "Authorization",
-                            "Basic " + Base64.getEncoder().encodeToString(valueToEncode),
-                        )
-                    }
-                }.post(body)
+                .addBasicAuthorizationHeader(needAuthorization)
+                .post(body)
                 .build()
 
-        Log.d("asdf", "request  ${request.headers}")
         return client.newCall(request).execute()
+    }
+
+    private fun Request.Builder.addBasicAuthorizationHeader(needAuthorization: Boolean): Request.Builder {
+        val valueToEncode = "jerry8282:password".toByteArray()
+
+        return apply {
+            if (needAuthorization) {
+                header(
+                    "Authorization",
+                    "Basic " + Base64.getEncoder().encodeToString(valueToEncode),
+                )
+            }
+        }
     }
 
     companion object {
