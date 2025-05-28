@@ -29,15 +29,12 @@ fun CartUiModel.toDomain(): Cart =
             ),
     )
 
-fun List<Any>.updateCartQuantity(
-    id: Int,
-    newQuantity: Int,
-): List<Any> =
-    this.map { item ->
-        if (item is Cart && item.product.id == id) {
-            item.copy(quantity = newQuantity)
+fun List<Any>.replaceCartByProductId(newCart: Cart): List<Any> =
+    map {
+        if (it is Cart && it.product.id == newCart.product.id) {
+            newCart
         } else {
-            item
+            it
         }
     }
 

@@ -12,8 +12,8 @@ import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
+import woowacourse.shopping.util.replaceCartByProductId
 import woowacourse.shopping.util.toDomain
-import woowacourse.shopping.util.updateCartQuantity
 
 class GoodsViewModel(
     private val historyRepository: HistoryRepository,
@@ -59,8 +59,12 @@ class GoodsViewModel(
 
             cartRepository.addToCart(cartRequest) { result ->
                 result
-                    .onSuccess {
-                        updateItems(cart, newQuantity)
+                    .onSuccess { response ->
+                        val locationHeader = response.headers()["Location"]
+                        val newId = locationHeader?.substringAfterLast("/")?.toLongOrNull() ?: 0
+                        val updatedCart = cart.copy(id = newId, quantity = newQuantity)
+
+                        updateItems(updatedCart)
                         getCartCounts()
                         _isSuccess.setValue(Unit)
                     }.onFailure {
@@ -74,14 +78,15 @@ class GoodsViewModel(
             ) { result ->
                 result
                     .onSuccess {
-                        updateItems(cart, newQuantity)
+                        val updatedCart = cart.copy(quantity = newQuantity)
+                        updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure {
+                        _isSuccess.setValue(Unit)
+                    }.onFailure { error ->
                         _isFail.setValue(Unit)
                     }
             }
         }
-        getCartCounts()
     }
 
     fun removeFromCart(cart: Cart) {
@@ -89,11 +94,11 @@ class GoodsViewModel(
             cartRepository.deleteCart(cart.id) { result ->
                 result
                     .onSuccess {
-                        updateItems(cart, cart.quantity - 1)
+                        val updatedCart = cart.copy(id = 0, quantity = cart.quantity - 1)
+                        updateItems(updatedCart)
+                        getCartCounts()
                     }.onFailure { error ->
                         _isFail.setValue(Unit)
-                        Log.e("123451", "$error")
-                        Log.d("123451", "${cart.id}")
                     }
             }
         } else {
@@ -103,10 +108,11 @@ class GoodsViewModel(
             ) { result ->
                 result
                     .onSuccess {
-                        updateItems(cart, cart.quantity - 1)
+                        val updatedCart = cart.copy(quantity = cart.quantity - 1)
+                        updateItems(updatedCart)
+                        getCartCounts()
                     }.onFailure { error ->
                         _isFail.setValue(Unit)
-                        Log.e("123451", "$error")
                     }
             }
         }
@@ -159,14 +165,9 @@ class GoodsViewModel(
         }
     }
 
-    private fun updateItems(
-        updatedCart: Cart,
-        newQuantity: Int,
-    ) {
+    private fun updateItems(updatedCart: Cart) {
         val updatedItems =
-            _items.value?.updateCartQuantity(updatedCart.product.id, newQuantity) ?: listOf(
-                updatedCart,
-            )
+            _items.value?.replaceCartByProductId(updatedCart) ?: listOf(updatedCart)
         _items.value = updatedItems
     }
 
