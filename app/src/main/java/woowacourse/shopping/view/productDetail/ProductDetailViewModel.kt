@@ -27,19 +27,12 @@ class ProductDetailViewModel(
 
     private var cartItems: List<CartItem> = emptyList()
 
+    private val _latestViewedProduct: MutableLiveData<Product?> = MutableLiveData()
+    val latestViewedProduct: LiveData<Product?> get() = _latestViewedProduct
+
     init {
         loadCartItems()
-    }
-
-    fun loadProduct(productId: Long) {
-        productsRepository.getProductById(productId) { result ->
-            result
-                .onSuccess { product ->
-                    _product.postValue(product)
-                }.onFailure {
-                    _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
-                }
-        }
+        loadLatestViewedProduct()
     }
 
     private fun loadCartItems() {
@@ -50,6 +43,32 @@ class ProductDetailViewModel(
                 }.onFailure {
                     _event.postValue(ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE)
                 }
+        }
+    }
+
+    private fun loadLatestViewedProduct() {
+        productsRepository.loadLatestViewedProduct { result ->
+            _latestViewedProduct.postValue(result.getOrNull())
+        }
+    }
+
+    fun loadProduct(productId: Long) {
+        productsRepository.getProductById(productId) { result ->
+            result
+                .onSuccess { product ->
+                    _product.postValue(product)
+                    if (product != null) addViewedProduct(product)
+                }.onFailure {
+                    _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
+                }
+        }
+    }
+
+    private fun addViewedProduct(product: Product) {
+        productsRepository.addViewedProduct(product) { result ->
+            result.onFailure {
+                _event.postValue(ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE)
+            }
         }
     }
 
