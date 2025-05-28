@@ -70,7 +70,7 @@ class GoodsActivity : AppCompatActivity() {
     private val moreButtonAdapter by lazy {
         MoreButtonAdapter {
             viewModel.addPage()
-            viewModel.updateCartCache()
+            viewModel.fetchAndSetCartCache()
         }
     }
     private val concatAdapter by lazy {
@@ -98,7 +98,7 @@ class GoodsActivity : AppCompatActivity() {
         }
 
         viewModel.goodsWithCartQuantity.observe(this) {
-            viewModel.updateCartCache()
+            viewModel.fetchAndSetCartCache()
         }
         binding.rvGoodsItems.addItemDecoration(
             GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING),
@@ -130,7 +130,7 @@ class GoodsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.updateCartCache()
+        viewModel.fetchAndSetCartCache()
         viewModel.updateRecentlyViewedGoods()
     }
 
