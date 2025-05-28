@@ -21,18 +21,18 @@ object LocalRecentViewedProductsDataSource : RecentViewedProductsDataSource {
         dao = db.dao()
     }
 
-    override fun load(): List<RecentViewedProductEntity> = dao.load()
+    override fun load(): List<RecentViewedProductEntity> = dao.loadProducts()
 
     override fun upsert(product: RecentViewedProductEntity) {
-        val count = dao.count()
+        val count = dao.productsSize()
         if (count < MAX_ENTITY_COUNT) {
-            dao.upsert(product)
+            dao.upsertProduct(product)
             return
         }
 
-        dao.deleteOldest(count - MAX_ENTITY_COUNT)
-        dao.upsert(product)
+        dao.deleteProduct(count - MAX_ENTITY_COUNT)
+        dao.upsertProduct(product)
     }
 
-    private const val MAX_ENTITY_COUNT = 30
+    private const val MAX_ENTITY_COUNT = 10
 }

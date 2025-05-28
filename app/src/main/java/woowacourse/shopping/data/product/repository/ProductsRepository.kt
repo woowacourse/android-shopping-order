@@ -15,12 +15,12 @@ interface ProductsRepository {
         onLoad: (Result<Product?>) -> Unit,
     )
 
-//    fun loadLatestViewedProduct(onLoad: (Result<Product?>) -> Unit)
-//
-//    fun loadLastViewedProducts(onLoad: (Result<List<Product>>) -> Unit)
+    fun loadLatestViewedProduct(onLoad: (productId: Result<Product?>) -> Unit)
 
-//    fun recordViewedProduct(
-//        product: Product,
-//        onLoad: (Result<Unit>) -> Unit,
-//    )
+    fun loadRecentViewedProducts(onLoad: (Result<List<Product>>) -> Unit)
+
+    fun addViewedProduct(
+        product: Product,
+        onLoad: (Result<Unit>) -> Unit,
+    )
 }

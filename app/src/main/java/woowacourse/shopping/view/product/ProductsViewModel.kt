@@ -41,7 +41,7 @@ class ProductsViewModel(
     }
 
     private fun loadViewedRecentProducts() {
-        productsRepository.loadLastViewedProducts { products ->
+        productsRepository.loadRecentViewedProducts { products ->
             products
                 .onSuccess { recentViewedProducts ->
                     recentProducts = RecentViewedProductsItem(recentViewedProducts)
@@ -53,7 +53,7 @@ class ProductsViewModel(
     }
 
     fun updateRecentViewedProducts() {
-        productsRepository.loadLastViewedProducts { products ->
+        productsRepository.loadRecentViewedProducts { products ->
             products
                 .onSuccess { recentViewedProducts ->
                     val lastList = productItems.value?.minus(recentProducts) ?: emptyList()

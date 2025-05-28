@@ -75,7 +75,7 @@ class ProductDetailViewModel(
     }
 
     private fun recordRecentProduct(product: Product) {
-        productsRepository.recordViewedProduct(product) { result ->
+        productsRepository.addViewedProduct(product) { result ->
             result
                 .onFailure {
                     _event.postValue(ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE)
