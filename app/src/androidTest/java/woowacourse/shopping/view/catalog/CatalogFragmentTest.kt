@@ -18,6 +18,7 @@ import org.hamcrest.core.AllOf.allOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
@@ -36,7 +37,10 @@ class CatalogFragmentTest {
         val fakeProductRepository = FakeProductRepository()
         val fakeCartRepository =
             FakeCartRepository(
-                initialCartProducts = productsFixture.take(1).map { CartProduct(it, 1) },
+                initialCartProducts =
+                    productsFixture
+                        .take(1)
+                        .map { CartProduct(it.id, it.toDomain(), 1) },
             )
         val fakeRecentProductRepository =
             FakeRecentProductRepository(
@@ -120,7 +124,13 @@ class CatalogFragmentTest {
     fun `최근_본_상품_목록이_보여진다`() {
         // Then
         Thread.sleep(100)
-        nthProductInRecyclerView(R.id.text_view_recent_product_name, 0).check(matches(withText(productsFixture[0].name)))
+        nthProductInRecyclerView(R.id.text_view_recent_product_name, 0).check(
+            matches(
+                withText(
+                    productsFixture[0].name,
+                ),
+            ),
+        )
     }
 
     private fun nthProductInRecyclerView(

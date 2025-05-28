@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
@@ -24,7 +25,7 @@ class DetailFragmentTest {
         val fakeProductRepository = FakeProductRepository()
         val fakeCartRepository =
             FakeCartRepository(
-                initialCartProducts = productsFixture.take(1).map { CartProduct(it, 1) },
+                initialCartProducts = productsFixture.take(1).map { CartProduct(it.id, it.toDomain(), 1) },
             )
         val fakeRecentProductRepository = FakeRecentProductRepository()
 
@@ -48,7 +49,7 @@ class DetailFragmentTest {
             ),
         )
 
-        val expectedPrice = "%,d원".format(productsFixture[0].price.value)
+        val expectedPrice = "%,d원".format(productsFixture[0].price)
 
         onView(withId(R.id.text_view_detail_price)).check(matches(withText(expectedPrice)))
         onView(withId(R.id.image_view_detail_product)).check(matches(isDisplayed()))
@@ -59,7 +60,7 @@ class DetailFragmentTest {
         onView(withId(R.id.btn_quantity_plus)).perform(click())
         onView(withId(R.id.textview_quantity)).check(matches(withText("2")))
 
-        val expectedPrice = "%,d원".format(productsFixture[0].price.value * 2)
+        val expectedPrice = "%,d원".format(productsFixture[0].price * 2)
         onView(withId(R.id.text_view_detail_price)).check(matches(withText(expectedPrice)))
     }
 
@@ -75,7 +76,7 @@ class DetailFragmentTest {
 
         // Then
         onView(withId(R.id.textview_quantity)).check(matches(withText("2")))
-        val expectedPrice = "%,d원".format(productsFixture[0].price.value * 2)
+        val expectedPrice = "%,d원".format(productsFixture[0].price * 2)
         onView(withId(R.id.text_view_detail_price)).check(matches(withText(expectedPrice)))
     }
 

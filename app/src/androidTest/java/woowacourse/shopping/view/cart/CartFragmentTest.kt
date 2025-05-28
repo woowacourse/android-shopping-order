@@ -15,6 +15,7 @@ import org.hamcrest.core.AllOf.allOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.R
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
@@ -33,7 +34,7 @@ class CartFragmentTest {
         val fakeProductRepository = FakeProductRepository()
         val fakeCartRepository =
             FakeCartRepository(
-                initialCartProducts = productsFixture.take(15).map { CartProduct(it, 1) },
+                initialCartProducts = productsFixture.take(15).map { CartProduct(it.id, it.toDomain(), 1) },
             )
         val fakeRecentProductRepository = FakeRecentProductRepository()
 
