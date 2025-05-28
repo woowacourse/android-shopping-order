@@ -12,14 +12,14 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
-import woowacourse.shopping.domain.usecase.GetProductDetailUseCase
+import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
 class ProductDetailViewModel(
-    private val getProductDetailUseCase: GetProductDetailUseCase,
+    private val getCatalogProductUseCase: GetCatalogProductUseCase,
     private val getRecentSearchHistoryUseCase: GetRecentSearchHistoryUseCase,
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
@@ -36,7 +36,7 @@ class ProductDetailViewModel(
     val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
 
     fun loadProductDetail(id: Long) {
-        getProductDetailUseCase(id) { catalogProduct ->
+        getCatalogProductUseCase(id) { catalogProduct ->
             _product.postValue(catalogProduct)
         }
     }
@@ -83,7 +83,7 @@ class ProductDetailViewModel(
                     val application = checkNotNull(extras[APPLICATION_KEY]) as ShoppingApp
 
                     return ProductDetailViewModel(
-                        getProductDetailUseCase = application.getProductDetailUseCase,
+                        getCatalogProductUseCase = application.getCatalogProductUseCase,
                         getRecentSearchHistoryUseCase = application.getRecentSearchHistoryUseCase,
                         addSearchHistoryUseCase = application.addSearchHistoryUseCase,
                         updateCartProductUseCase = application.updateCartProductUseCase,

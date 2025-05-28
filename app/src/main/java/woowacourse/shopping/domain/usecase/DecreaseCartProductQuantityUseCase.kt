@@ -11,7 +11,7 @@ class DecreaseCartProductQuantityUseCase(
     operator fun invoke(
         product: Product,
         quantityStep: Int = DEFAULT_QUANTITY_STEP,
-        callback: (Int) -> Unit,
+        callback: (Int) -> Unit = {},
     ) {
         thread {
             if (product.cartId == null) return@thread

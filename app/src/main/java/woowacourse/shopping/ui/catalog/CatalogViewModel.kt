@@ -72,28 +72,22 @@ class CatalogViewModel(
     }
 
     fun increaseCartProduct(productId: Long) {
-        increaseCartProductQuantityUseCase(
-            product = products.value?.getProductByProductId(productId) ?: return,
-        ) { newQuantity ->
-            _products.postValue(
-                products.value?.updateProductQuantity(
-                    productId,
-                    newQuantity,
-                ),
+        runCatching {
+            increaseCartProductQuantityUseCase(
+                product = products.value?.getProductByProductId(productId) ?: return,
             )
+        }.onSuccess {
+            loadCartProduct(productId)
         }
     }
 
     fun decreaseCartProduct(productId: Long) {
-        decreaseCartProductQuantityUseCase(
-            product = products.value?.getProductByProductId(productId) ?: return,
-        ) { newQuantity ->
-            _products.postValue(
-                products.value?.updateProductQuantity(
-                    productId,
-                    newQuantity,
-                ),
+        runCatching {
+            decreaseCartProductQuantityUseCase(
+                product = products.value?.getProductByProductId(productId) ?: return,
             )
+        }.onSuccess {
+            loadCartProduct(productId)
         }
     }
 

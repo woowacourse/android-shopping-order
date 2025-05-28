@@ -13,7 +13,6 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
-import woowacourse.shopping.domain.usecase.GetProductDetailUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
