@@ -185,7 +185,7 @@ class CatalogViewModelTest {
         }
 
         // when
-        viewModel.loadCartProducts(listOf(DUMMY_PRODUCT_Detail_1.id))
+        viewModel.loadCartProductsByIds(listOf(DUMMY_PRODUCT_Detail_1.id))
 
         // then
         val result = viewModel.products.getOrAwaitValue()

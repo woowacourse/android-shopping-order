@@ -107,7 +107,7 @@ class CatalogViewModel(
         }
     }
 
-    fun loadCartProducts(ids: List<Long>) {
+    fun loadCartProductsByIds(ids: List<Long>) {
         getCatalogProductsByIdsUseCase(ids) { cartProducts ->
             _products.postValue(products.value?.updateProducts(cartProducts))
         }

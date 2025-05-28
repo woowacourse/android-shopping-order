@@ -145,7 +145,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
                         )
 
                     ActivityResult.CART_PRODUCT_EDITED.code ->
-                        viewModel.loadCartProducts(
+                        viewModel.loadCartProductsByIds(
                             result.data
                                 ?.getLongArrayExtra(ActivityResult.CART_PRODUCT_EDITED.key)
                                 ?.toList() ?: emptyList(),
