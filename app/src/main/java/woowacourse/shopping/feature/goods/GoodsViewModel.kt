@@ -25,8 +25,8 @@ class GoodsViewModel(
 ) : ViewModel() {
     private val _items = MutableLiveData<List<Any>>()
     val items: LiveData<List<Any>> get() = _items
-    private val _products = MutableLiveData<List<Cart>>()
-    private val _histories = MutableLiveData<List<Cart>>()
+    private val products = MutableLiveData<List<Cart>>()
+    private val histories = MutableLiveData<List<Cart>>()
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
     private val _hasNextPage = MutableLiveData(true)
@@ -50,17 +50,19 @@ class GoodsViewModel(
     }
 
     fun addToCart(cart: Cart) {
-        val cartRequest = CartRequest(
-            productId = cart.product.id,
-            quantity = cart.quantity + 1
-        )
+        val cartRequest =
+            CartRequest(
+                productId = cart.product.id,
+                quantity = cart.quantity + 1,
+            )
 
         cartRepository.addToCart(cartRequest) { result ->
-            result.onSuccess {
-                _isSuccess.setValue(Unit)
-            }.onFailure { error ->
-                _isFail.setValue(Unit)
-            }
+            result
+                .onSuccess {
+                    _isSuccess.setValue(Unit)
+                }.onFailure { error ->
+                    _isFail.setValue(Unit)
+                }
         }
     }
 
@@ -103,7 +105,7 @@ class GoodsViewModel(
     ) {
         val updatedItems =
             _items.value?.updateCartQuantity(updatedCart.product.id, newQuantity) ?: listOf(
-                updatedCart
+                updatedCart,
             )
         _items.value = updatedItems
         val total = updatedItems.filterIsInstance<Cart>().sumOf { it.quantity }
@@ -131,35 +133,44 @@ class GoodsViewModel(
     }
 
     private fun loadProducts() {
-        productRepository.fetchProducts(
-            onSuccess = { response ->
-                val newCarts = response.content.map { product ->
-                    Cart(product = product.toDomain(), quantity = 0)
-                }
+        cartRepository.fetchCart(
+            onSuccess = { cartList ->
+                val cartByProductId = cartList.associateBy({ it.product.id }, { it.quantity })
 
-                val currentProducts = _products.value.orEmpty()
-                val combinedCarts = currentProducts + newCarts
-                _products.value = combinedCarts
+                productRepository.fetchProducts(
+                    onSuccess = { response ->
+                        val newCarts =
+                            response.content.map { product ->
+                                val quantity = cartByProductId[product.id] ?: 0
+                                Cart(product = product.toDomain(), quantity = quantity)
+                            }
 
-                _hasNextPage.value = !response.last
+                        val currentProducts = products.value.orEmpty()
+                        val combinedCarts = currentProducts + newCarts
+                        products.value = combinedCarts
 
-                refreshItems()
+                        _hasNextPage.value = !response.last
+
+                        refreshItems()
+                    },
+                    onError = { Log.e("loadProductsInRange", "상품 API 실패", it) },
+                    page = page,
+                )
             },
-            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
-            page = page
+            onError = { Log.e("loadProductsInRange", "장바구니 API 실패", it) },
         )
     }
 
     private fun loadHistories() {
-        historyRepository.getAll { histories ->
-            _histories.postValue(histories)
+        historyRepository.getAll { allHistories ->
+            histories.postValue(allHistories)
             refreshItems()
         }
     }
 
     private fun refreshItems() {
-        val historyList = _histories.value.orEmpty()
-        val productList = _products.value.orEmpty()
+        val historyList = histories.value.orEmpty()
+        val productList = products.value.orEmpty()
 
         val combined: MutableList<Any> = mutableListOf()
         if (historyList.isNotEmpty()) combined.add(historyList)

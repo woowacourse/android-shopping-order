@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.cart
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,7 +26,7 @@ data class CartResponse(
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 ) {
     @Serializable
     data class Content(
@@ -36,7 +35,7 @@ data class CartResponse(
         @SerialName("product")
         val product: CartRemoteProduct,
         @SerialName("quantity")
-        val quantity: Int
+        val quantity: Int,
     ) {
         @Serializable
         data class CartRemoteProduct(
@@ -49,7 +48,7 @@ data class CartResponse(
             @SerialName("name")
             val name: String,
             @SerialName("price")
-            val price: Int
+            val price: Int,
         )
     }
 
@@ -66,7 +65,7 @@ data class CartResponse(
         @SerialName("sort")
         val sort: Sort,
         @SerialName("unpaged")
-        val unpaged: Boolean
+        val unpaged: Boolean,
     )
 
     @Serializable
@@ -76,6 +75,6 @@ data class CartResponse(
         @SerialName("sorted")
         val sorted: Boolean,
         @SerialName("unsorted")
-        val unsorted: Boolean
+        val unsorted: Boolean,
     )
 }
