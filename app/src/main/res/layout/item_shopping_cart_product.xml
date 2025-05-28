@@ -20,21 +20,28 @@
         android:layout_marginBottom="24dp"
         android:background="@drawable/background_shopping_cart_product">
 
+        <CheckBox
+            android:id="@+id/shoppingCartProductCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/shoppingCartProductName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginStart="-4dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@{productItem.cartItem.name}"
             android:textColor="@color/gray_5"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/shoppingCartProductDeleteButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductCheckBox"
+            app:layout_constraintStart_toEndOf="@id/shoppingCartProductCheckBox"
+            app:layout_constraintTop_toTopOf="@id/shoppingCartProductCheckBox"
             tools:text="[든든] 동원 스위트콘" />
 
         <ImageView
