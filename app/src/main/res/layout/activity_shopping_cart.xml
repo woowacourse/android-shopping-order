@@ -71,7 +71,7 @@
             tools:listitem="@layout/item_shopping_cart_product" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmerFrameLayoutShoppingCart"
+            android:id="@+id/shoppingCartSkeletonLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="18dp"

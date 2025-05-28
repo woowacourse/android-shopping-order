@@ -95,7 +95,7 @@
             tools:listitem="@layout/item_product" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmerFrameLayout_main"
+            android:id="@+id/productsSkeletonLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="20dp"

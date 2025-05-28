@@ -77,11 +77,11 @@ class ShoppingCartActivity :
 
         viewModel.isLoading.observe(this) { loading ->
             if (loading) {
-                binding.shimmerFrameLayoutShoppingCart.visibility = View.VISIBLE
-                binding.shimmerFrameLayoutShoppingCart.startShimmer()
+                binding.shoppingCartSkeletonLayout.visibility = View.VISIBLE
+                binding.shoppingCartSkeletonLayout.startShimmer()
             } else {
-                binding.shimmerFrameLayoutShoppingCart.stopShimmer()
-                binding.shimmerFrameLayoutShoppingCart.visibility = View.GONE
+                binding.shoppingCartSkeletonLayout.stopShimmer()
+                binding.shoppingCartSkeletonLayout.visibility = View.GONE
             }
         }
     }

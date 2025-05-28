@@ -100,11 +100,11 @@ class ProductsActivity :
 
         viewModel.isLoading.observe(this) { loading ->
             if (loading) {
-                binding.shimmerFrameLayoutMain.visibility = View.VISIBLE
-                binding.shimmerFrameLayoutMain.startShimmer()
+                binding.productsSkeletonLayout.visibility = View.VISIBLE
+                binding.productsSkeletonLayout.startShimmer()
             } else {
-                binding.shimmerFrameLayoutMain.stopShimmer()
-                binding.shimmerFrameLayoutMain.visibility = View.GONE
+                binding.productsSkeletonLayout.stopShimmer()
+                binding.productsSkeletonLayout.visibility = View.GONE
             }
         }
     }
