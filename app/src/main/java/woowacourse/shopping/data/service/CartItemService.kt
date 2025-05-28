@@ -31,7 +31,7 @@ interface CartItemService {
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
         @Header("accept") accept: String = "*/*",
-        @Path("id") productId: Int,
+        @Path("id") cartItemId: Int,
     ): Call<Void>
 
     @PATCH("/cart-items/{id}")

@@ -21,10 +21,11 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     ) {
         retrofitService
             .postCartItems(
-                request = UpdateCartItemRequest(
-                    productId = cartProduct.id,
-                    quantity = cartProduct.quantity,
-                )
+                request =
+                    UpdateCartItemRequest(
+                        productId = cartProduct.id,
+                        quantity = cartProduct.quantity,
+                    ),
             ).enqueue(
                 object : Callback<Void> {
                     override fun onResponse(
@@ -52,7 +53,24 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     }
 
     override fun deleteCartProduct(cartProduct: ProductUiModel) {
-        retrofitService.deleteCartItem(productId = cartProduct.id)
+        if (cartProduct.cartItemId != null) {
+            retrofitService.deleteCartItem(cartItemId = cartProduct.cartItemId).enqueue(
+                object : Callback<Void> {
+                    override fun onResponse(
+                        call: Call<Void>,
+                        response: Response<Void>,
+                    ) {
+                    }
+
+                    override fun onFailure(
+                        call: Call<Void>,
+                        t: Throwable,
+                    ) {
+                        println("error : $t")
+                    }
+                },
+            )
+        }
     }
 
     override fun getCartProductsInRange(
@@ -113,7 +131,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         call: Call<Void>,
                         response: Response<Void>,
                     ) {
-                        Log.d("test", "api 호출됨 ${response}")
+                        Log.d("test", "api 호출됨 $response")
                         if (response.isSuccessful) {
                             callback(true)
                             println("✅ 요청 성공 (status=${response.code()})")
