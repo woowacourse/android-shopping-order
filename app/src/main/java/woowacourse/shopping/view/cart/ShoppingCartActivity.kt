@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
+import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragmentFactory
 
@@ -24,23 +26,28 @@ class ShoppingCartActivity : AppCompatActivity() {
             ShoppingCartViewModelFactory(app.cartProductRepository),
         )[ShoppingCartViewModel::class.java]
     }
+    private var currentFragment: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         supportFragmentManager.fragmentFactory = CartProductSelectionFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
-
         setUpView()
         supportActionBar?.title = ACTION_BAR_TITLE
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                add(R.id.fragment, CartProductSelectionFragment::class.java, null)
+                addToBackStack(null)
+                add(
+                    R.id.fragment,
+                    CartProductSelectionFragment::class.java,
+                    null,
+                    SELECTION_FRAGMENT_TAG,
+                )
+                currentFragment = SELECTION_FRAGMENT_TAG
             }
         }
 
-        binding.handler = viewModel
-        binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        initBindings()
     }
 
     private fun setUpView() {
@@ -53,7 +60,32 @@ class ShoppingCartActivity : AppCompatActivity() {
         }
     }
 
+    private fun initBindings() {
+        binding.handler = viewModel
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
+
+        binding.btnOrder.setOnClickListener {
+            if (currentFragment == SELECTION_FRAGMENT_TAG) {
+                binding.llSelectAllProducts.visibility = View.INVISIBLE
+                supportFragmentManager.commit {
+                    addToBackStack(null)
+                    add(
+                        R.id.fragment,
+                        CartProductRecommendationFragment::class.java,
+                        null,
+                        RECOMMENDATION_FRAGMENT_TAG,
+                    )
+                    currentFragment = RECOMMENDATION_FRAGMENT_TAG
+                }
+            }
+        }
+    }
+
     companion object {
+        private const val SELECTION_FRAGMENT_TAG = "selection"
+        private const val RECOMMENDATION_FRAGMENT_TAG = "recommendation"
+
         fun newIntent(context: Context): Intent = Intent(context, ShoppingCartActivity::class.java)
 
         private const val ACTION_BAR_TITLE = "Cart"
