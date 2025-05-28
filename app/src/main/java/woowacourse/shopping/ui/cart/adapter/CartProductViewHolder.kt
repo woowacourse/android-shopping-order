@@ -37,5 +37,7 @@ class CartProductViewHolder(
         fun onIncreaseClick(productId: Long)
 
         fun onDecreaseClick(productId: Long)
+
+        fun onSelectClick(cartId: Long)
     }
 }

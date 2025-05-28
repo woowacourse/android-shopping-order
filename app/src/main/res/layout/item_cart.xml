@@ -26,6 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:checked="@{product.selected}"
+            android:onClick="@{() -> onClickHandler.onSelectClick(product.cartId)}"
             app:layout_constraintBottom_toTopOf="@id/cartProductImage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

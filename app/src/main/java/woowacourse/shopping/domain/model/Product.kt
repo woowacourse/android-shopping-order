@@ -6,6 +6,7 @@ data class Product(
     val productDetail: ProductDetail,
     val cartId: Long? = null,
     val quantity: Int = 0,
+    val isSelected: Boolean = false,
 ) {
     val totalPrice: Int get() = productDetail.price * quantity
 
@@ -17,6 +18,8 @@ data class Product(
         } else {
             copy(quantity = 0)
         }
+
+    fun toggleSelection(): Product = copy(isSelected = !isSelected)
 
     companion object {
         const val MINIMUM_QUANTITY = 0

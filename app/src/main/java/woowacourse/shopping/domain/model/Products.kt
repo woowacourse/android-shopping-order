@@ -6,6 +6,8 @@ data class Products(
     val products: List<Product>,
     val page: Page,
 ) {
+    val isAllSelected: Boolean get() = products.all { it.isSelected }
+
     operator fun plus(other: Products): Products {
         val mergedProducts = products + other.products
         return Products(
@@ -50,6 +52,18 @@ data class Products(
     }
 
     fun getProductByProductId(productId: Long): Product? = products.find { it.productDetail.id == productId }
+
+    fun toggleSelectionByCartId(cartId: Long): Products =
+        copy(
+            products =
+                products.map { product ->
+                    if (product.cartId == cartId) {
+                        product.toggleSelection()
+                    } else {
+                        product
+                    }
+                },
+        )
 
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)

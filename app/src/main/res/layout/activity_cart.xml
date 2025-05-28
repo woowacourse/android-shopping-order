@@ -45,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="12dp"
+                android:checked="@{viewModel.cartProducts.allSelected}"
                 app:layout_constraintBottom_toBottomOf="@id/cartOrderInfoContainer"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/cartOrderInfoContainer"

@@ -11,7 +11,8 @@ import woowacourse.shopping.ui.common.DataBindingFragment
 
 class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.layout.fragment_cart_product) {
     private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
-    private val cartProductAdapter: CartProductAdapter = CartProductAdapter(createAdapterOnClickHandler())
+    private val cartProductAdapter: CartProductAdapter =
+        CartProductAdapter(createAdapterOnClickHandler())
 
     override fun onViewCreated(
         view: View,
@@ -51,6 +52,10 @@ class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.la
 
             override fun onDecreaseClick(productId: Long) {
                 viewModel.decreaseCartProductQuantity(productId)
+            }
+
+            override fun onSelectClick(cartId: Long) {
+                viewModel.updateCartProductSelection(cartId)
             }
         }
 }

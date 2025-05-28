@@ -73,7 +73,12 @@ class CartViewModel(
         increaseCartProductQuantityUseCase(
             product = cartProducts.value?.getProductByProductId(productId) ?: return,
         ) { newQuantity ->
-            _cartProducts.postValue(cartProducts.value?.updateProductQuantity(productId, newQuantity))
+            _cartProducts.postValue(
+                cartProducts.value?.updateProductQuantity(
+                    productId,
+                    newQuantity,
+                ),
+            )
         }
         _editedProductIds.value = editedProductIds.value?.plus(productId)
     }
@@ -83,12 +88,21 @@ class CartViewModel(
             product = cartProducts.value?.getProductByProductId(productId) ?: return,
         ) { newQuantity ->
             if (newQuantity > MINIMUM_QUANTITY) {
-                _cartProducts.postValue(cartProducts.value?.updateProductQuantity(productId, newQuantity))
+                _cartProducts.postValue(
+                    cartProducts.value?.updateProductQuantity(
+                        productId,
+                        newQuantity,
+                    ),
+                )
             } else {
                 loadCartProducts()
             }
         }
         _editedProductIds.value = editedProductIds.value?.plus(productId)
+    }
+
+    fun updateCartProductSelection(cartId: Long) {
+        _cartProducts.value = cartProducts.value?.toggleSelectionByCartId(cartId)
     }
 
     companion object {
