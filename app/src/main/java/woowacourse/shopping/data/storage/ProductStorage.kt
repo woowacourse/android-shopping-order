@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.storage
 
-import woowacourse.shopping.data.network.entity.ProductEntity
-import woowacourse.shopping.data.network.entity.ProductPageEntity
+import woowacourse.shopping.data.network.response.ProductEntity
+import woowacourse.shopping.data.network.response.ProductPageEntity
 
 @Suppress("ktlint:standard:max-line-length")
 object ProductStorage {

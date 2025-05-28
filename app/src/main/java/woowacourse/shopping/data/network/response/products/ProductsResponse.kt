@@ -1,6 +1,5 @@
-package woowacourse.shopping.data.network.entity.pages
+package woowacourse.shopping.data.network.response.products
 
-import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.product.ProductSinglePage
 
 @Serializable

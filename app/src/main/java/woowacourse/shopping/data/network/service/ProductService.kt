@@ -3,7 +3,7 @@ package woowacourse.shopping.data.network.service
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
-import woowacourse.shopping.data.network.entity.pages.ProductsResponse
+import woowacourse.shopping.data.network.response.products.ProductsResponse
 
 interface ProductService {
     @GET("/products")

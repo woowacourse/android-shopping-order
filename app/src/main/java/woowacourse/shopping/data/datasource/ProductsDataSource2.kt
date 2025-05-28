@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.network.entity.pages.ProductsResponse
+import woowacourse.shopping.data.network.response.products.ProductsResponse
 import woowacourse.shopping.data.network.service.ProductService
 
 class ProductsDataSource2(private val service: ProductService) {

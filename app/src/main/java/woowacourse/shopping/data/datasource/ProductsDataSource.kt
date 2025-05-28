@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.network.MockingServer
-import woowacourse.shopping.data.network.entity.ProductEntity
-import woowacourse.shopping.data.network.entity.ProductPageEntity
+import woowacourse.shopping.data.network.response.ProductEntity
+import woowacourse.shopping.data.network.response.ProductPageEntity
 
 class ProductsDataSource(private val service: MockingServer) {
     fun getProduct(productId: Long): ProductEntity = service.getProduct(productId)
