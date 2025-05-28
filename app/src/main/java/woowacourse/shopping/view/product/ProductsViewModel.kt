@@ -7,6 +7,7 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
+import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.domain.product.PageableProducts
 import woowacourse.shopping.domain.product.Product
@@ -70,11 +71,8 @@ class ProductsViewModel(
         page: Int,
         size: Int,
     ) {
-        shoppingCartRepository.load(page, size) { result: Result<List<CartItem>> ->
-            result.onFailure {
-                throw it
-            }
-            shoppingCart = result.getOrElse { emptyList() }
+        shoppingCartRepository.load(page, size) { result: Result<PageableCartItems> ->
+            shoppingCart = result.getOrNull()?.cartItems ?: emptyList()
             _shoppingCartSize.postValue(shoppingCart.size)
         }
     }

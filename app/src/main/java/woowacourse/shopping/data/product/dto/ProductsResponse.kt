@@ -31,11 +31,12 @@ data class ProductsResponse(
     val loadable: Boolean =
         run {
             val pageNumber = pageable?.pageNumber
-            val pageSize = pageable?.pageSize
-            if (pageNumber == null || pageSize == null) {
+            val totalPages = this.totalPages
+
+            if (pageNumber == null || totalPages == null) {
                 false
             } else {
-                pageNumber < pageSize
+                pageNumber + 1 < totalPages
             }
         }
 }

@@ -66,8 +66,10 @@ class ShoppingCartActivity :
                     finish()
                 }
 
-                ShoppingCartEvent.UPDATE_SHOPPING_CART_PRODUCT_FAILURE ->
+                ShoppingCartEvent.UPDATE_SHOPPING_CART_PRODUCT_FAILURE -> {
                     showToast(R.string.shopping_cart_update_shopping_cart_error_message)
+                    finish()
+                }
             }
         }
 

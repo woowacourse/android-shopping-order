@@ -1,12 +1,13 @@
 package woowacourse.shopping.data.shoppingCart.storage
 
 import woowacourse.shopping.data.product.entity.CartItemEntity
+import woowacourse.shopping.data.shoppingCart.PageableCartItems
 
 interface ShoppingCartDataSource {
     fun load(
         page: Int,
         size: Int,
-    ): List<CartItemEntity>
+    ): PageableCartItems
 
     fun upsert(cartItem: CartItemEntity)
 

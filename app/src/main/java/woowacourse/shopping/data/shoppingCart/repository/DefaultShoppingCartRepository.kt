@@ -5,6 +5,7 @@ import woowacourse.shopping.data.product.entity.CartItemEntity.Companion.toEntit
 import woowacourse.shopping.data.product.entity.ProductEntity.Companion.toEntity
 import woowacourse.shopping.data.shoppingCart.storage.RemoteShoppingCartDataSource
 import woowacourse.shopping.data.shoppingCart.storage.ShoppingCartDataSource
+import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.domain.product.Product
 import kotlin.concurrent.thread
@@ -15,9 +16,16 @@ class DefaultShoppingCartRepository(
     override fun load(
         page: Int,
         size: Int,
-        onLoad: (Result<List<CartItem>>) -> Unit,
+        onLoad: (Result<PageableCartItems>) -> Unit,
     ) {
-        { shoppingCartDataSource.load(page, size).map(CartItemEntity::toDomain) }.runAsync(onLoad)
+        {
+            val response = shoppingCartDataSource.load(page, size)
+            PageableCartItems(
+                cartItems = response.cartItems.map(CartItemEntity::toDomain),
+                hasPrevious = response.hasPrevious,
+                hasNext = response.hasNext,
+            )
+        }.runAsync(onLoad)
     }
 
     override fun upsert(

@@ -2,6 +2,7 @@ package woowacourse.shopping.data.shoppingCart.storage
 
 import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.product.entity.CartItemEntity
+import woowacourse.shopping.data.shoppingCart.PageableCartItems
 import woowacourse.shopping.data.shoppingCart.dto.CartResponse
 
 class RemoteShoppingCartDataSource(
@@ -10,10 +11,17 @@ class RemoteShoppingCartDataSource(
     override fun load(
         page: Int,
         size: Int,
-    ): List<CartItemEntity> {
+    ): PageableCartItems {
         val cartResponse: CartResponse = productsHttpClient.getCart(page, size)
-        return cartResponse.content?.mapNotNull(CartResponse.Content::toCartItemEntityOrNull)
-            ?: emptyList()
+        val cartItemsEntities: List<CartItemEntity> =
+            cartResponse.content?.mapNotNull(CartResponse.Content::toCartItemEntityOrNull)
+                ?: emptyList()
+
+        return PageableCartItems(
+            cartItems = cartItemsEntities,
+            hasPrevious = cartResponse.hasPrevious,
+            hasNext = cartResponse.hasNext,
+        )
     }
 
     override fun upsert(cartItem: CartItemEntity) {

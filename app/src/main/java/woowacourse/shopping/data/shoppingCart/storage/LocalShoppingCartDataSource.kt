@@ -3,6 +3,7 @@ package woowacourse.shopping.data.shoppingCart.storage
 import android.content.Context
 import androidx.room.Room
 import woowacourse.shopping.data.product.entity.CartItemEntity
+import woowacourse.shopping.data.shoppingCart.PageableCartItems
 import woowacourse.shopping.data.shoppingCart.dao.ShoppingCartDao
 import woowacourse.shopping.data.shoppingCart.database.ShoppingCartDatabase
 
@@ -24,7 +25,7 @@ object LocalShoppingCartDataSource : ShoppingCartDataSource {
     override fun load(
         page: Int,
         size: Int,
-    ): List<CartItemEntity> = dao.load()
+    ): PageableCartItems = TODO()
 
     override fun upsert(cartItem: CartItemEntity) = dao.upsert(cartItem)
 
