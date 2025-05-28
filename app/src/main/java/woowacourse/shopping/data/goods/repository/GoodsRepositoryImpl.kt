@@ -15,22 +15,17 @@ class GoodsRepositoryImpl(
     override fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (List<Goods>) -> Unit,
+        onComplete: (GoodsResponse) -> Unit,
         onFail: (Throwable) -> Unit,
     ) {
         remoteDataSource.fetchPageGoods(
             limit,
             offset,
             { response ->
-                onComplete(getGoodsByGoodsResponse(response))
+                onComplete(response)
             },
             onFail,
         )
-    }
-
-    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> {
-        val content = goodsResponse.content
-        return content.map { it.toDomain() }
     }
 
     override fun fetchGoodsById(

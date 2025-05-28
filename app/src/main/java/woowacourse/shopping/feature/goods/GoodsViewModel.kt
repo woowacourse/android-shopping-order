@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
+import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
+import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
@@ -62,11 +64,11 @@ class GoodsViewModel(
         goodsRepository.fetchPageGoods(
             limit = PAGE_SIZE,
             offset = goodsLoadOffset,
-            onComplete = { fetchedGoods ->
+            onComplete = { goodsResponse ->
+                val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
                 goods.addAll(fetchedGoods)
-                goodsRepository.fetchGoodsSize { totalSize ->
-                    _isFullLoaded.postValue(page * PAGE_SIZE >= totalSize)
-                }
+
+                _isFullLoaded.postValue(goodsResponse.last)
                 _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
             },
             onFail = { throwable ->
@@ -146,6 +148,11 @@ class GoodsViewModel(
                 }
             }
         }
+    }
+
+    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> {
+        val contents = goodsResponse.content
+        return contents.map { it.toDomain() }
     }
 
     private fun addCartItem(cartItem: CartItem) {

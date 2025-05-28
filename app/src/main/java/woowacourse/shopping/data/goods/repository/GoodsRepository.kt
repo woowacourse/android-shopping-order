@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.goods.repository
 
+import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface GoodsRepository {
@@ -8,8 +9,8 @@ interface GoodsRepository {
     fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (List<Goods>) -> Unit,
-        onFail : (Throwable) -> Unit
+        onComplete: (GoodsResponse) -> Unit,
+        onFail: (Throwable) -> Unit,
     )
 
     fun fetchGoodsById(
