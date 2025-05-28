@@ -20,6 +20,11 @@ class RemoteShoppingCartDataSource(
         )
     }
 
+    override fun cart(): List<CartItemEntity> {
+        val response: CartResponse = productsHttpClient.getAllCart()
+        return response.content?.mapNotNull { it.toCartItemEntityOrNull() } ?: emptyList()
+    }
+
     private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
         if (id == null || product?.id == null || product.name == null || product.price == null || quantity == null) {
             null

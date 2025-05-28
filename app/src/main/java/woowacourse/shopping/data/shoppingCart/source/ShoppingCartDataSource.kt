@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.shoppingCart.source
 
+import woowacourse.shopping.data.product.entity.CartItemEntity
 import woowacourse.shopping.data.shoppingCart.PageableCartItemData
 
 interface ShoppingCartDataSource {
@@ -7,6 +8,8 @@ interface ShoppingCartDataSource {
         page: Int,
         size: Int,
     ): PageableCartItemData
+
+    fun cart(): List<CartItemEntity>
 
     fun addCartItem(
         productId: Long,

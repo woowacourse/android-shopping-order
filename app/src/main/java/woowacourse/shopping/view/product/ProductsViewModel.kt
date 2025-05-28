@@ -7,6 +7,8 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.CartRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultCartRepository
+import woowacourse.shopping.domain.product.CartItem
+import woowacourse.shopping.domain.product.PageableProducts
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
@@ -15,17 +17,25 @@ class ProductsViewModel(
     private val productsRepository: ProductsRepository = DefaultProductsRepository(),
     private val cartRepository: CartRepository = DefaultCartRepository(),
 ) : ViewModel() {
-    private val _cartItemsSize: MutableLiveData<Int> = MutableLiveData(0)
+    private val _cartItemsSize: MutableLiveData<Int> = MutableLiveData(MIN_PAGE)
     val cartItemsSize: LiveData<Int> get() = _cartItemsSize
 
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
 
+    private val _productsItems: MutableLiveData<List<ProductsItem>> = MutableLiveData(emptyList())
+    val productsItems: LiveData<List<ProductsItem>> get() = _productsItems
+
+    private var cartItems: List<CartItem> = emptyList()
+
+    private var page: Int = MIN_PAGE
+
     init {
         loadCartItemsSize()
+        loadCart()
     }
 
-    fun loadCartItemsSize() {
+    private fun loadCartItemsSize() {
         cartRepository.cartItemsSize { result ->
             result
                 .onSuccess { size ->
@@ -36,8 +46,54 @@ class ProductsViewModel(
         }
     }
 
-    fun loadMoreProducts() {
-        TODO("Not yet implemented")
+    private fun loadCart() {
+        cartRepository.loadCart { result ->
+            result
+                .onSuccess { cartItems: List<CartItem> ->
+                    this.cartItems = cartItems
+                    loadRecentViewedProducts()
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_SHOPPING_CART_FAILURE)
+                }
+        }
+    }
+
+    fun loadRecentViewedProducts() {
+        productsRepository.loadRecentViewedProducts { result ->
+            result
+                .onSuccess { products: List<Product> ->
+                    val recentViewedProductsItem = ProductsItem.RecentViewedProductsItem(products)
+                    loadMoreProducts(recentViewedProductsItem)
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE)
+                }
+        }
+    }
+
+    fun loadMoreProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
+        productsRepository.loadPageableProducts(
+            page = page,
+            size = LOAD_PRODUCTS_SIZE,
+        ) { result ->
+            result
+                .onSuccess { pageableProducts: PageableProducts ->
+                    val productItems =
+                        pageableProducts.products.map { product: Product ->
+                            ProductsItem.ProductItem(
+                                product = product,
+                                quantity =
+                                    cartItems
+                                        .find { cartItem: CartItem ->
+                                            cartItem.productId == product.id
+                                        }?.quantity ?: 0,
+                            )
+                        }
+                    val loadItem = ProductsItem.LoadItem(pageableProducts.loadable)
+                    _productsItems.postValue(listOf(recentViewedProductsItem) + productItems + loadItem)
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
+                }
+        }
     }
 
     fun getCartItemId(product: Product): Long = 0L
@@ -46,7 +102,7 @@ class ProductsViewModel(
         TODO("Not yet implemented")
     }
 
-//    private var shoppingCart: List<CartItem> = emptyList()
+    //    private var shoppingCart: List<CartItem> = emptyList()
 //
 //    private val _shoppingCartSize: MutableLiveData<Int> = MutableLiveData(0)
 //    val shoppingCartSize: LiveData<Int> get() = _shoppingCartSize
@@ -149,8 +205,9 @@ class ProductsViewModel(
 //        TODO()
 //    }
 //
-//    companion object {
-//        private const val LOAD_PRODUCTS_SIZE = 20
-//        private const val LOAD_RECENT_VIEWED_PRODUCTS_SIZE = 10
-//    }
+    companion object {
+        private const val LOAD_PRODUCTS_SIZE = 20
+        private const val LOAD_RECENT_VIEWED_PRODUCTS_SIZE = 10
+        private const val MIN_PAGE = 0
+    }
 }

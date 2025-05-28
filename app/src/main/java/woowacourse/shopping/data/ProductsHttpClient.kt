@@ -32,6 +32,17 @@ class ProductsHttpClient(
         return Json.decodeFromString(jsonString)
     }
 
+    fun getAllCart(): CartResponse {
+        val response =
+            http(
+                HttpMethod.Get,
+                PATH_CART_ITEMS,
+                true,
+            )
+        val jsonString: String = response.body?.string() ?: ""
+        return Json.decodeFromString(jsonString)
+    }
+
     fun postCartItem(
         productId: Long,
         quantity: Int,

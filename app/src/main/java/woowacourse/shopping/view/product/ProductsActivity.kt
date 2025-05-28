@@ -25,7 +25,7 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val viewModel: ProductsViewModel by viewModels()
     private val productsAdapter: ProductsAdapter by lazy {
-        ProductsAdapter(::navigateToProductDetail, viewModel::loadMoreProducts)
+        ProductsAdapter(::navigateToProductDetail, {})
     }
 
     private val detailActivityResultLauncher =
@@ -42,7 +42,7 @@ class ProductsActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult(),
         ) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
-                viewModel.loadMoreProducts()
+                viewModel.loadRecentViewedProducts()
             }
         }
 
@@ -62,7 +62,7 @@ class ProductsActivity : AppCompatActivity() {
 
         initDataBinding()
         handleEventsFromViewModel()
-//        bindData()
+        bindData()
 
         binding.products.layoutManager =
             GridLayoutManager(this, spanCount).apply {
@@ -103,7 +103,7 @@ class ProductsActivity : AppCompatActivity() {
     private fun handleEventsFromViewModel() {
         viewModel.event.observe(this) { event: ProductsEvent ->
             when (event) {
-                ProductsEvent.UPDATE_PRODUCT_FAILURE ->
+                ProductsEvent.LOAD_MORE_PRODUCT_FAILURE ->
                     showToast(R.string.products_update_products_error_message)
 
                 ProductsEvent.UPDATE_SHOPPING_CART_FAILURE ->
@@ -114,15 +114,17 @@ class ProductsActivity : AppCompatActivity() {
 
                 ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE ->
                     showToast(R.string.products_load_recent_products_error_message)
+
+                ProductsEvent.LOAD_SHOPPING_CART_FAILURE -> TODO()
             }
         }
     }
 
-//    private fun bindData() {
-//        viewModel.productItems.observe(this) { productsItems: List<ProductsItem> ->
-//            productsAdapter.submitList(productsItems)
-//        }
-//    }
+    private fun bindData() {
+        viewModel.productsItems.observe(this) { productsItems: List<ProductsItem> ->
+            productsAdapter.submitList(productsItems)
+        }
+    }
 
     private fun navigateToShoppingCart() {
         shoppingCartActivityResultLauncher.launch(ShoppingCartActivity.newIntent(this))

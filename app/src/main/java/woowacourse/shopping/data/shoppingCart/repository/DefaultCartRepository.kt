@@ -4,6 +4,7 @@ import woowacourse.shopping.data.shoppingCart.PageableCartItemData
 import woowacourse.shopping.data.shoppingCart.source.RemoteShoppingCartDataSource
 import woowacourse.shopping.data.shoppingCart.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.cart.PageableCartItems
+import woowacourse.shopping.domain.product.CartItem
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(
@@ -23,6 +24,10 @@ class DefaultCartRepository(
                 hasNext = pageableCartItemData.hasNext,
             )
         }.runAsync(onLoad)
+    }
+
+    override fun loadCart(onLoad: (Result<List<CartItem>>) -> Unit) {
+        { shoppingCartDataSource.cart().map { it.toDomain() } }.runAsync(onLoad)
     }
 
     override fun addCartItem(

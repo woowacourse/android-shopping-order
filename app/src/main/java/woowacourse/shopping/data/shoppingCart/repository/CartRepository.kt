@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
 import woowacourse.shopping.domain.cart.PageableCartItems
+import woowacourse.shopping.domain.product.CartItem
 
 interface CartRepository {
     fun loadPageableCartItems(
@@ -8,6 +9,8 @@ interface CartRepository {
         size: Int,
         onLoad: (Result<PageableCartItems>) -> Unit,
     )
+
+    fun loadCart(onLoad: (Result<List<CartItem>>) -> Unit)
 
     fun addCartItem(
         productId: Long,

@@ -41,18 +41,20 @@ class ProductsAdapter(
     override fun getItemCount(): Int = items.size
 
     fun submitList(items: List<ProductsItem>) {
-        if (items.isEmpty()) {
-            val oldItemCount = itemCount
-            this.items = items
-            notifyItemRangeRemoved(0, oldItemCount)
-        }
-
-        val paginationItemPosition = itemCount - 1
-        notifyItemRemoved(paginationItemPosition)
-
-        val oldItemCount = itemCount - 1
+//        if (items.isEmpty()) {
+//            val oldItemCount = itemCount
+//            this.items = items
+//            notifyItemRangeRemoved(0, oldItemCount)
+//        }
+//
+//        val paginationItemPosition = itemCount - 1
+//        notifyItemRemoved(paginationItemPosition)
+//
+//        val oldItemCount = itemCount - 1
+//        this.items = items
+//        notifyItemChanged(0)
+//        notifyItemRangeInserted(oldItemCount, itemCount - oldItemCount)
         this.items = items
-        notifyItemChanged(0)
-        notifyItemRangeInserted(oldItemCount, itemCount - oldItemCount)
+        notifyDataSetChanged()
     }
 }
