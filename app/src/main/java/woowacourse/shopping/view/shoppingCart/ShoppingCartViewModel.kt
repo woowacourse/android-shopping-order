@@ -66,7 +66,11 @@ class ShoppingCartViewModel(
 
                     updatePaginationState(shoppingCartProducts)
 
-                    val items = createShoppingCartItems(shoppingCartProducts)
+                    val items =
+                        createShoppingCartItems(
+                            shoppingCartProducts,
+                            shoppingCart.value ?: emptyList(),
+                        )
                     _shoppingCart.value = items
                     _isLoading.value = false
                 }.onFailure {
@@ -89,8 +93,25 @@ class ShoppingCartViewModel(
         hasPreviousPage = page > MINIMUM_PAGE
     }
 
-    private fun createShoppingCartItems(products: List<ShoppingCartProduct>): List<ShoppingCartItem> {
-        val visibleProducts = products.take(COUNT_PER_PAGE)
+    private fun createShoppingCartItems(
+        products: List<ShoppingCartProduct>,
+        currentShoppingCartItems: List<ShoppingCartItem>,
+    ): List<ShoppingCartItem> {
+        val shoppingCartProductsToShow = products.take(COUNT_PER_PAGE)
+
+        val productItems =
+            shoppingCartProductsToShow.map { product ->
+                val existing =
+                    currentShoppingCartItems
+                        .filterIsInstance<ShoppingCartProductItem>()
+                        .find { it.shoppingCartProduct.id == product.id }
+
+                ShoppingCartProductItem(
+                    shoppingCartProduct = product,
+                    isChecked = existing?.isChecked == true,
+                )
+            }
+
         val paginationItem =
             PaginationItem(
                 page = page,
@@ -98,7 +119,7 @@ class ShoppingCartViewModel(
                 previousEnabled = hasPreviousPage,
             )
 
-        return visibleProducts.map(::ShoppingCartProductItem) + paginationItem
+        return productItems + paginationItem
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartProductItem) {
