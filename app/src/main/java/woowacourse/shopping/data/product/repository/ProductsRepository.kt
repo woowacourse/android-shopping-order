@@ -19,5 +19,8 @@ interface ProductsRepository {
 
     fun loadLastViewedProducts(onLoad: (Result<List<Product>>) -> Unit)
 
-    fun recordViewedProduct(product: Product)
+    fun recordViewedProduct(
+        product: Product,
+        onLoad: (Result<Unit>) -> Unit,
+    )
 }

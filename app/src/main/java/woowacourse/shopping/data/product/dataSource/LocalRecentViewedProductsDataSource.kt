@@ -34,5 +34,5 @@ object LocalRecentViewedProductsDataSource : RecentViewedProductsDataSource {
         dao.upsert(product)
     }
 
-    const val MAX_ENTITY_COUNT = 30
+    private const val MAX_ENTITY_COUNT = 30
 }

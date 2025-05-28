@@ -34,8 +34,35 @@ class ProductsViewModel(
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
 
+    private var recentProducts: RecentViewedProductsItem = RecentViewedProductsItem(emptyList())
+
     init {
-        loadMoreProducts()
+        loadViewedRecentProducts()
+    }
+
+    private fun loadViewedRecentProducts() {
+        productsRepository.loadLastViewedProducts { products ->
+            products
+                .onSuccess { recentViewedProducts ->
+                    recentProducts = RecentViewedProductsItem(recentViewedProducts)
+                    loadMoreProducts()
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE)
+                }
+        }
+    }
+
+    fun updateRecentViewedProducts() {
+        productsRepository.loadLastViewedProducts { products ->
+            products
+                .onSuccess { recentViewedProducts ->
+                    val lastList = productItems.value?.minus(recentProducts) ?: emptyList()
+                    recentProducts = RecentViewedProductsItem(recentViewedProducts)
+                    _productItems.postValue(listOf(recentProducts) + lastList)
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE)
+                }
+        }
     }
 
     fun loadMoreProducts() {
@@ -45,7 +72,7 @@ class ProductsViewModel(
         ) { result: Result<PageableProducts> ->
             result
                 .onSuccess { pageableProducts: PageableProducts ->
-                    val recentViewedProducts = RecentViewedProductsItem(emptyList())
+                    val recentViewedProducts = recentProducts
                     val newProductItems: List<ProductItem> =
                         pageableProducts.products.map { product: Product ->
                             val quantity: Int =

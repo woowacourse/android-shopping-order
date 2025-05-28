@@ -3,6 +3,7 @@ package woowacourse.shopping.view.product
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,23 @@ class ProductsActivity : AppCompatActivity() {
     private val productsAdapter: ProductsAdapter by lazy {
         ProductsAdapter(::navigateToProductDetail, viewModel::loadMoreProducts)
     }
+    private val detailActivityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.updateRecentViewedProducts()
+            }
+        }
+
+    private val shoppingCartActivityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.loadMoreProducts()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +111,9 @@ class ProductsActivity : AppCompatActivity() {
 
                 ProductsEvent.LOAD_SHOPPING_CART_QUANTITY_FAILURE ->
                     showToast(R.string.products_load_shopping_cart_quantity_error_message)
+
+                ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE ->
+                    showToast(R.string.products_load_recent_products_error_message)
             }
         }
     }
@@ -105,22 +126,13 @@ class ProductsActivity : AppCompatActivity() {
 
     private fun navigateToShoppingCart() {
         viewModel.updateShoppingCart {
-            activityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
+            shoppingCartActivityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
         }
     }
 
     private fun navigateToProductDetail(product: Product) {
         viewModel.updateShoppingCart {
-            activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
+            detailActivityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
         }
     }
-
-    private val activityResultLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                viewModel.loadMoreProducts()
-            }
-        }
 }

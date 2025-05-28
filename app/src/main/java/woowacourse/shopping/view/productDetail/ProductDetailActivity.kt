@@ -59,6 +59,9 @@ class ProductDetailActivity :
 
                 ProductDetailEvent.LOAD_PRODUCT_FAILURE ->
                     showToast(R.string.product_detail_load_product_error_message)
+
+                ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE ->
+                    showToast(R.string.product_detail_record_recent_products_error_message)
             }
         }
     }

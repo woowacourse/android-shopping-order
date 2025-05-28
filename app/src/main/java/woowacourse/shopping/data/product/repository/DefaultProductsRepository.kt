@@ -60,15 +60,15 @@ class DefaultProductsRepository(
         }.runAsync(onLoad)
     }
 
-    override fun recordViewedProduct(product: Product) {
-        thread {
+    override fun recordViewedProduct(
+        product: Product,
+        onLoad: (Result<Unit>) -> Unit,
+    ) {
+        {
             recentViewedProductsDataSource.upsert(
-                RecentViewedProductEntity(
-                    product.id,
-                    LocalDateTime.now(),
-                ),
+                RecentViewedProductEntity(product.id, LocalDateTime.now()),
             )
-        }
+        }.runAsync(onLoad)
     }
 
     private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {

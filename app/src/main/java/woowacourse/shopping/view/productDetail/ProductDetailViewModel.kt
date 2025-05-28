@@ -40,6 +40,9 @@ class ProductDetailViewModel(
             result
                 .onSuccess { product: Product? ->
                     _product.postValue(product)
+                    if (product != null) {
+                        recordRecentProduct(product)
+                    }
                 }.onFailure {
                     _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
                 }
@@ -66,6 +69,15 @@ class ProductDetailViewModel(
                     _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
                 }.onFailure {
                     _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
+                }
+        }
+    }
+
+    private fun recordRecentProduct(product: Product) {
+        productsRepository.recordViewedProduct(product) { result ->
+            result
+                .onFailure {
+                    _event.postValue(ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE)
                 }
         }
     }
