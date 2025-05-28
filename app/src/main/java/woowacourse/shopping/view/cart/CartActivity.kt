@@ -21,7 +21,7 @@ class CartActivity :
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
     private val cartProductAdapter by lazy {
-        CartProductAdapter(viewModel::removeShoppingCartProduct, this)
+        CartProductAdapter(viewModel::removeCartItem, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +47,7 @@ class CartActivity :
     }
 
     private fun bindData() {
-        viewModel.cartItemsType.observe(this) { shoppingCart: List<CartItemType> ->
+        viewModel.cartItems.observe(this) { shoppingCart: List<CartItemType> ->
             cartProductAdapter.submitList(shoppingCart)
         }
     }
