@@ -77,12 +77,13 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:paddingStart="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/shoppingCartRecommendDescription"
-            tools:listitem="@layout/item_product" />
+            tools:listitem="@layout/item_recommend_product" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/shoppingCartRecommendOrderLayout"
