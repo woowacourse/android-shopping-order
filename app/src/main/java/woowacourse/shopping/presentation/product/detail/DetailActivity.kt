@@ -98,7 +98,7 @@ class DetailActivity : AppCompatActivity() {
         Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
     }
 
-    private fun productFromIntent(): Int = intent.getIntExtra(KEY_PRODUCT_DETAIL, 0)
+    private fun productFromIntent(): Long = intent.getLongExtra(KEY_PRODUCT_DETAIL, 0)
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.detail_back_menu_item, menu)
@@ -120,7 +120,7 @@ class DetailActivity : AppCompatActivity() {
 
         fun newIntent(
             context: Context,
-            id: Int,
+            id: Long,
         ): Intent =
             Intent(context, DetailActivity::class.java).apply {
                 putExtra(KEY_PRODUCT_DETAIL, id)

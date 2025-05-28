@@ -13,17 +13,17 @@ class CartItemsRemoteDataSource(
     private val api: CartApiService,
 ) : CartItemsDataSource {
     override fun getCartItems(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onResult: (Result<CartItemResponse>) -> Unit,
     ) {
         api.getCartItems(page = page, size = size).enqueueResult(onResult)
     }
 
     override fun addCartItem(
-        id: Int,
+        id: Long,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
+        onResult: (Result<Long>) -> Unit,
     ) {
         val request =
             CartRequest(
@@ -37,7 +37,7 @@ class CartItemsRemoteDataSource(
                     response: Response<Void?>,
                 ) {
                     val header = response.headers()
-                    val cartId = header["Location"]?.substringAfterLast("/")?.toIntOrNull()
+                    val cartId = header["Location"]?.substringAfterLast("/")?.toLongOrNull()
                     if (response.isSuccessful && cartId != null) {
                         onResult(Result.success(cartId))
                     } else {
@@ -56,14 +56,14 @@ class CartItemsRemoteDataSource(
     }
 
     override fun deleteCartItem(
-        id: Int,
+        id: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
         api.deleteCartItems(id = id).enqueueResult(onResult)
     }
 
     override fun updateCartItem(
-        id: Int,
+        id: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {

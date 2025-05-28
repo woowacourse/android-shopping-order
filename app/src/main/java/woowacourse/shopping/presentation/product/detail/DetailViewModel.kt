@@ -27,7 +27,7 @@ class DetailViewModel(
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
 
     fun setProduct(
-        id: Int,
+        id: Long,
         onInserted: () -> Unit = {},
     ) {
         productsRepository.getProductById(id) { result ->
@@ -76,7 +76,7 @@ class DetailViewModel(
 //        }
     }
 
-    fun loadLastViewedItem(currentProductId: Int) {
+    fun loadLastViewedItem(currentProductId: Long) {
         viewedRepository.getLastViewedItem { lastViewedItem ->
             val filtered = if (lastViewedItem?.id == currentProductId) null else lastViewedItem
             _lastViewed.postValue(filtered)

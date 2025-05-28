@@ -5,24 +5,24 @@ import woowacourse.shopping.data.model.ItemCount
 
 interface CartItemsDataSource {
     fun getCartItems(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onResult: (Result<CartItemResponse>) -> Unit,
     )
 
     fun addCartItem(
-        id: Int,
+        id: Long,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
+        onResult: (Result<Long>) -> Unit,
     )
 
     fun deleteCartItem(
-        id: Int,
+        id: Long,
         onResult: (Result<Unit>) -> Unit,
     )
 
     fun updateCartItem(
-        id: Int,
+        id: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     )

@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "ViewedItemEntity")
 data class ViewedItem(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: Long,
     val imageUrl: String,
     val name: String,
     val price: Int,

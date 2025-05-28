@@ -19,6 +19,6 @@ interface ProductsApiService {
     @GET("/products/{id}")
     fun getProductById(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
+        @Path("id") id: Long,
     ): Call<ProductResponse>
 }

@@ -17,7 +17,7 @@ class ProductsRemoteDataSource(
     }
 
     override fun getProductById(
-        id: Int,
+        id: Long,
         onResult: (Result<ProductResponse>) -> Unit,
     ) {
         api.getProductById(id = id).enqueueResult(onResult)

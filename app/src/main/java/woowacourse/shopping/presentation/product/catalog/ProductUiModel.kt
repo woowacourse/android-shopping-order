@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ProductUiModel(
-    val id: Int,
+    val id: Long,
     val imageUrl: String,
     val name: String,
     val price: Int,

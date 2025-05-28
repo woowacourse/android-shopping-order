@@ -17,8 +17,8 @@ interface CartApiService {
     @GET("/cart-items")
     fun getCartItems(
         @Header("accept") accept: String = "*/*",
-        @Query("page") page: Int,
-        @Query("size") size: Int,
+        @Query("page") page: Int?,
+        @Query("size") size: Int?,
         @Query("sort") sort: List<String> = listOf(""),
     ): Call<CartItemResponse>
 
@@ -31,13 +31,13 @@ interface CartApiService {
     @DELETE("/cart-items/{id}")
     fun deleteCartItems(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
+        @Path("id") id: Long,
     ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItems(
         @Header("accept") accept: String = "*/*",
-        @Path("id") id: Int,
+        @Path("id") id: Long,
         @Body quantity: Int,
     ): Call<Unit>
 

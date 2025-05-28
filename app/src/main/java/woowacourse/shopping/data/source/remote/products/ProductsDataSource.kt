@@ -11,7 +11,7 @@ interface ProductsDataSource {
     )
 
     fun getProductById(
-        id: Int,
+        id: Long,
         onResult: (Result<ProductResponse>) -> Unit,
     )
 }

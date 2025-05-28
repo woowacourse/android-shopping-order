@@ -30,7 +30,7 @@ class ProductsRepositoryImpl(
     }
 
     override fun getProductById(
-        id: Int,
+        id: Long,
         onResult: (Result<ProductUiModel>) -> Unit,
     ) {
         productsRemoteDataSource.getProductById(id) { result ->

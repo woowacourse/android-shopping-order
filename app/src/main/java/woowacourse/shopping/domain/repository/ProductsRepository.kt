@@ -11,7 +11,7 @@ interface ProductsRepository {
     )
 
     fun getProductById(
-        id: Int,
+        id: Long,
         onResult: (Result<ProductUiModel>) -> Unit,
     )
 }
