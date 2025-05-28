@@ -4,6 +4,8 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 interface ShoppingCartRepository {
+    val cachedCartItem: List<ShoppingCartProduct>
+
     fun load(
         page: Int,
         size: Int,
@@ -16,14 +18,14 @@ interface ShoppingCartRepository {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun add(
-        shoppingCartProduct: ShoppingCartProduct,
+    fun increaseQuantity(
+        shoppingCartId: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     )
 
     fun decreaseQuantity(
-        product: Product,
+        shoppingCartId: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     )

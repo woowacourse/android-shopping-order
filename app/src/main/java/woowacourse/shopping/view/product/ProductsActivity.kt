@@ -173,11 +173,11 @@ class ProductsActivity :
 
     override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
         val item = quantityObservable as ProductsItem.ProductItem
-        viewModel.addProductToShoppingCart(item.product, item.selectedQuantity)
+        viewModel.addProductToShoppingCart(item, item.selectedQuantity)
     }
 
     override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
         val item = quantityObservable as ProductsItem.ProductItem
-        viewModel.minusProductToShoppingCart(item.product, item.selectedQuantity)
+        viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
     }
 }

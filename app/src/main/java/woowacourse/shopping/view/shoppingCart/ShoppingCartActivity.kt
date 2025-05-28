@@ -97,7 +97,7 @@ class ShoppingCartActivity :
     }
 
     override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
-        viewModel.addQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
+        viewModel.increaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
     }
 
     override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {

@@ -15,6 +15,7 @@ sealed interface ProductsItem {
     }
 
     data class ProductItem(
+        val shoppingCartId: Long? = null,
         val product: Product,
         val selectedQuantity: Int = 0,
     ) : ProductsItem,

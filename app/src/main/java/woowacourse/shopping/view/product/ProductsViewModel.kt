@@ -58,18 +58,8 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         currentProducts: List<ProductsItem>,
     ) {
-        shoppingCartRepository.fetchSelectedQuantity(productsToShow) { result ->
-            result
-                .onSuccess { shoppingCartProducts: List<ShoppingCartProduct> ->
-                    handleShoppingCartQuantitySuccess(
-                        currentProducts,
-                        productsToShow,
-                        shoppingCartProducts,
-                    )
-                }.onFailure {
-                    _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
-                }
-        }
+        val shoppingCartProducts = shoppingCartRepository.cachedCartItem
+        handleShoppingCartQuantitySuccess(currentProducts, productsToShow, shoppingCartProducts)
     }
 
     private fun handleShoppingCartQuantitySuccess(
@@ -86,13 +76,18 @@ class ProductsViewModel(
 
         val updatedProductItems =
             productsToShow.map { product ->
-                val quantity =
-                    shoppingCartProducts.find { it.product == product }?.quantity
-                        ?: 0
-                ProductItem(product, quantity)
+                val matchingCartProduct = shoppingCartProducts.find { it.product == product }
+
+                ProductItem(
+                    shoppingCartId = matchingCartProduct?.id,
+                    product = product,
+                    selectedQuantity = matchingCartProduct?.quantity ?: 0,
+                )
             }
+
         val hasRecentWatching =
             currentProducts.any { it is RecentWatchingItem }
+
         updateRecentProducts(
             productsWithoutLoadItem,
             updatedProductItems,
@@ -205,24 +200,49 @@ class ProductsViewModel(
     }
 
     fun addProductToShoppingCart(
-        product: Product,
+        productItem: ProductItem,
         quantity: Int,
     ) {
-        shoppingCartRepository.add(product, quantity + 1) { result ->
+        if (productItem.shoppingCartId == null) {
+            shoppingCartRepository.add(productItem.product, quantity + 1) { result ->
+                result
+                    .onSuccess {
+                        val currentProducts = products.value?.toMutableList() ?: return@add
+                        val index: Int =
+                            currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
+
+                        if (index != -1) {
+                            val productItem = currentProducts[index] as ProductItem
+                            val updatedItem =
+                                productItem.copy(selectedQuantity = productItem.selectedQuantity + 1)
+                            currentProducts[index] = updatedItem
+                            _products.value = currentProducts
+                        }
+                        _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
+                    }.onFailure {
+                        _event.postValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
+                    }
+            }
+            return
+        }
+        shoppingCartRepository.increaseQuantity(
+            productItem.shoppingCartId,
+            quantity + 1,
+        ) { result ->
             result
                 .onSuccess {
-                    val currentProducts = products.value?.toMutableList() ?: return@add
+                    val currentProducts = products.value?.toMutableList() ?: return@onSuccess
                     val index: Int =
-                        currentProducts.indexOfFirst { it is ProductItem && it.product == product }
+                        currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
                     if (index != -1) {
                         val productItem = currentProducts[index] as ProductItem
                         val updatedItem =
                             productItem.copy(selectedQuantity = productItem.selectedQuantity + 1)
                         currentProducts[index] = updatedItem
-                        _products.postValue(currentProducts)
+                        _products.value = currentProducts
                     }
-                    _shoppingCartQuantity.postValue(shoppingCartQuantity.value?.plus(1))
+                    _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
                 }.onFailure {
                     _event.postValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
                 }
@@ -230,15 +250,18 @@ class ProductsViewModel(
     }
 
     fun minusProductToShoppingCart(
-        product: Product,
+        productItem: ProductItem,
         quantity: Int,
     ) {
-        shoppingCartRepository.decreaseQuantity(product, quantity - 1) { result ->
+        shoppingCartRepository.decreaseQuantity(
+            productItem.shoppingCartId ?: return,
+            quantity - 1,
+        ) { result ->
             result
                 .onSuccess {
                     val currentProducts = products.value?.toMutableList() ?: return@decreaseQuantity
                     val index: Int =
-                        currentProducts.indexOfFirst { it is ProductItem && it.product == product }
+                        currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
                     if (index != -1) {
                         val productItem = currentProducts[index] as ProductItem

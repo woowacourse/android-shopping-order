@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,6 +17,9 @@ class DefaultShoppingCartRepository(
     private val shoppingCartDao: ShoppingCartDao,
     private val shoppingCartService: ShoppingCartService,
 ) : ShoppingCartRepository {
+    private val _cachedCartItems: MutableList<ShoppingCartProduct> = mutableListOf()
+    override val cachedCartItem: List<ShoppingCartProduct> get() = _cachedCartItems.map { it.copy() }
+
     override fun load(
         page: Int,
         size: Int,
@@ -31,6 +33,14 @@ class DefaultShoppingCartRepository(
                         call: Call<ShoppingCartItemsResponseDto>,
                         response: Response<ShoppingCartItemsResponseDto>,
                     ) {
+                        val items = response.body()?.toDomain().orEmpty()
+
+                        items.forEach { item ->
+                            if (_cachedCartItems.none { it.product.id == item.product.id }) {
+                                _cachedCartItems.add(item)
+                            }
+                        }
+
                         onResult(Result.success(response.body()?.toDomain() ?: emptyList()))
                     }
 
@@ -49,122 +59,12 @@ class DefaultShoppingCartRepository(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        if (quantity == 1) {
-            shoppingCartService
-                .postCartItem(
-                    CartItemRequestDto(
-                        productId = product.id,
-                        quantity = quantity,
-                    ),
-                ).enqueue(
-                    object : Callback<Unit> {
-                        override fun onResponse(
-                            call: Call<Unit>,
-                            response: Response<Unit>,
-                        ) {
-                            onResult(Result.success(Unit))
-                        }
-
-                        override fun onFailure(
-                            call: Call<Unit>,
-                            t: Throwable,
-                        ) {
-                            onResult(Result.failure(t))
-                        }
-                    },
-                )
-        } else {
-            val requestDto = CartItemQuantityRequestDto(quantity = quantity)
-            shoppingCartService
-                .updateCartItemQuantity(
-                    shoppingCartId = product.id,
-                    cartItemQuantityRequestDto = requestDto,
-                ).enqueue(
-                    object : Callback<Unit> {
-                        override fun onResponse(
-                            call: Call<Unit>,
-                            response: Response<Unit>,
-                        ) {
-                            onResult(Result.success(Unit))
-                        }
-
-                        override fun onFailure(
-                            call: Call<Unit>,
-                            t: Throwable,
-                        ) {
-                            onResult(Result.failure(t))
-                        }
-                    },
-                )
-        }
-    }
-
-    override fun add(
-        shoppingCartProduct: ShoppingCartProduct,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        Log.d("moongchi", "add: $quantity")
-        if (quantity == 1) {
-            shoppingCartService
-                .postCartItem(
-                    CartItemRequestDto(
-                        productId = shoppingCartProduct.product.id,
-                        quantity = quantity,
-                    ),
-                ).enqueue(
-                    object : Callback<Unit> {
-                        override fun onResponse(
-                            call: Call<Unit>,
-                            response: Response<Unit>,
-                        ) {
-                            onResult(Result.success(Unit))
-                        }
-
-                        override fun onFailure(
-                            call: Call<Unit>,
-                            t: Throwable,
-                        ) {
-                            onResult(Result.failure(t))
-                        }
-                    },
-                )
-        } else {
-            val requestDto = CartItemQuantityRequestDto(quantity = quantity)
-            shoppingCartService
-                .updateCartItemQuantity(
-                    shoppingCartId = shoppingCartProduct.id,
-                    cartItemQuantityRequestDto = requestDto,
-                ).enqueue(
-                    object : Callback<Unit> {
-                        override fun onResponse(
-                            call: Call<Unit>,
-                            response: Response<Unit>,
-                        ) {
-                            onResult(Result.success(Unit))
-                        }
-
-                        override fun onFailure(
-                            call: Call<Unit>,
-                            t: Throwable,
-                        ) {
-                            onResult(Result.failure(t))
-                        }
-                    },
-                )
-        }
-    }
-
-    override fun decreaseQuantity(
-        product: Product,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val requestDto = CartItemQuantityRequestDto(quantity = quantity)
         shoppingCartService
-            .updateCartItemQuantity(
-                shoppingCartId = product.id,
-                cartItemQuantityRequestDto = requestDto,
+            .postCartItem(
+                CartItemRequestDto(
+                    productId = product.id,
+                    quantity = quantity,
+                ),
             ).enqueue(
                 object : Callback<Unit> {
                     override fun onResponse(
@@ -172,6 +72,61 @@ class DefaultShoppingCartRepository(
                         response: Response<Unit>,
                     ) {
                         onResult(Result.success(Unit))
+                    }
+
+                    override fun onFailure(
+                        call: Call<Unit>,
+                        t: Throwable,
+                    ) {
+                        onResult(Result.failure(t))
+                    }
+                },
+            )
+    }
+
+    override fun increaseQuantity(
+        shoppingCartId: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        updateShoppingCartQuantity(quantity, shoppingCartId, onResult)
+    }
+
+    override fun decreaseQuantity(
+        shoppingCartId: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        updateShoppingCartQuantity(quantity, shoppingCartId, onResult)
+    }
+
+    private fun updateShoppingCartQuantity(
+        quantity: Int,
+        shoppingCartId: Long,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        val requestDto = CartItemQuantityRequestDto(quantity = quantity)
+        shoppingCartService
+            .updateCartItemQuantity(
+                shoppingCartId = shoppingCartId,
+                cartItemQuantityRequestDto = requestDto,
+            ).enqueue(
+                object : Callback<Unit> {
+                    override fun onResponse(
+                        call: Call<Unit>,
+                        response: Response<Unit>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val targetItem: ShoppingCartProduct =
+                                cachedCartItem.find { shoppingCartId == it.id } ?: return
+                            _cachedCartItems.remove(targetItem)
+                            if (quantity != 0) {
+                                _cachedCartItems.add(targetItem.copy(quantity = quantity))
+                            }
+                            onResult(Result.success(Unit))
+                        } else {
+                            onResult(Result.failure(IllegalStateException("")))
+                        }
                     }
 
                     override fun onFailure(

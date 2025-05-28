@@ -45,7 +45,7 @@ class ProductDetailViewModel(
                     if (product == null) {
                         _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
                     } else {
-                        _product.value = ProductsItem.ProductItem(product)
+                        _product.value = ProductsItem.ProductItem(product = product)
                         _price.value = product.price
 
                         productsRepository.updateRecentWatchingProduct(product) { result ->
