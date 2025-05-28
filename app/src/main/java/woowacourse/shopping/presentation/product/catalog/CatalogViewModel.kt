@@ -46,21 +46,24 @@ class CatalogViewModel(
         val toggled =
             product.copy(isExpanded = !product.isExpanded, quantity = product.quantity + 1)
 
+        _updatedProduct.value = toggled
         cartRepository.addCartItem(toggled.id, toggled.quantity) { result ->
             result
                 .onSuccess {
                     _updatedProduct.postValue(toggled)
+                    applyProductChange(toggled)
                 }
         }
     }
 
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
-
+        _updatedProduct.value = newProduct
         cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
             result
                 .onSuccess {
                     _updatedProduct.postValue(newProduct)
+                    applyProductChange(newProduct)
                 }
         }
     }
@@ -73,6 +76,7 @@ class CatalogViewModel(
                 isExpanded = newQuantity > 0,
             )
 
+        _updatedProduct.value = updated
         if (newQuantity == 0) {
             cartRepository.deleteCartItem(updated.id) { result ->
                 result
@@ -85,6 +89,7 @@ class CatalogViewModel(
                 result
                     .onSuccess {
                         _updatedProduct.postValue(updated)
+                        applyProductChange(updated)
                     }
             }
         }
@@ -108,8 +113,9 @@ class CatalogViewModel(
     private fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
         productsRepository.getProducts(currentPage, pageSize) { result ->
             result.onSuccess { pagingData ->
+                val newPagingData = cartRepository.getQuantity(pagingData)
                 _pagingData.postValue(
-                    pagingData,
+                    newPagingData
                 )
             }
         }
