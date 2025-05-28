@@ -32,10 +32,10 @@ class ProductViewHolder(
     }
 
     interface OnClickHandler {
-        fun onProductClick(id: Long)
+        fun onProductClick(productId: Long)
 
-        fun onIncreaseClick(id: Long)
+        fun onIncreaseClick(productId: Long)
 
-        fun onDecreaseClick(id: Long)
+        fun onDecreaseClick(productId: Long)
     }
 }

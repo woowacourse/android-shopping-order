@@ -26,9 +26,9 @@ class CatalogViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
 ) : ViewModel() {
-    private val _Products: MutableLiveData<Products> =
+    private val _products: MutableLiveData<Products> =
         MutableLiveData(EMPTY_PRODUCTS)
-    val products: LiveData<Products> get() = _Products
+    val products: LiveData<Products> get() = _products
 
     private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
         MutableLiveData(emptyList())
@@ -46,7 +46,7 @@ class CatalogViewModel(
             page = page,
             size = count,
         ) { newProducts ->
-            _Products.postValue(products.value?.plus(newProducts))
+            _products.postValue(products.value?.plus(newProducts))
         }
     }
 
@@ -65,31 +65,35 @@ class CatalogViewModel(
         }
     }
 
-    fun increaseCartProduct(id: Long) {
-        increaseCartProductQuantityUseCase(id) { newQuantity ->
-            _Products.postValue(
+    fun increaseCartProduct(productId: Long) {
+        increaseCartProductQuantityUseCase(
+            product = products.value?.getProductByProductId(productId) ?: return,
+        ) { newQuantity ->
+            _products.postValue(
                 products.value?.updateProductQuantity(
-                    id,
+                    productId,
                     newQuantity,
                 ),
             )
         }
     }
 
-    fun decreaseCartProduct(id: Long) {
-        decreaseCartProductQuantityUseCase(id) { newQuantity ->
-            _Products.postValue(
+    fun decreaseCartProduct(productId: Long) {
+        decreaseCartProductQuantityUseCase(
+            product = products.value?.getProductByProductId(productId) ?: return,
+        ) { newQuantity ->
+            _products.postValue(
                 products.value?.updateProductQuantity(
-                    id,
+                    productId,
                     newQuantity,
                 ),
             )
         }
     }
 
-    fun loadCartProduct(id: Long) {
-        getCatalogProductUseCase(id) { cartProduct ->
-            _Products.postValue(
+    fun loadCartProduct(productId: Long) {
+        getCatalogProductUseCase(productId) { cartProduct ->
+            _products.postValue(
                 products.value?.updateProduct(
                     cartProduct ?: return@getCatalogProductUseCase,
                 ),
@@ -97,9 +101,9 @@ class CatalogViewModel(
         }
     }
 
-    fun loadCartProducts(ids: List<Int>) {
+    fun loadCartProducts(ids: List<Long>) {
         getCatalogProductsByIdsUseCase(ids) { cartProducts ->
-            _Products.postValue(products.value?.updateProducts(cartProducts))
+            _products.postValue(products.value?.updateProducts(cartProducts))
         }
     }
 

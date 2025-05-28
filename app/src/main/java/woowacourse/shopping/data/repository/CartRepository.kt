@@ -39,6 +39,7 @@ class CartRepository(
     override fun fetchAllCartProducts(): Products {
         val firstPage: Int = 0
         val maxSize: Int = Int.MAX_VALUE
+
         return fetchCartProducts(firstPage, maxSize)
     }
 
@@ -50,31 +51,31 @@ class CartRepository(
             ?.quantity ?: 0
 
     override fun addCartProduct(
-        id: Long,
+        productId: Long,
         quantity: Int,
     ) {
         api
             .postCartItem(
                 cartItemRequest =
                     CartItemRequest(
-                        productId = id,
+                        productId = productId,
                         quantity = quantity,
                     ),
             ).execute()
     }
 
     override fun updateCartProduct(
-        id: Long,
+        cartId: Long,
         quantity: Int,
     ) {
         api
             .patchCartItem(
-                id = id,
+                id = cartId,
                 cartItemQuantityRequest = CartItemQuantityRequest(quantity),
             ).execute()
     }
 
-    override fun deleteCartProduct(id: Long) {
-        api.deleteCartItem(id).execute()
+    override fun deleteCartProduct(cartId: Long) {
+        api.deleteCartItem(cartId).execute()
     }
 }

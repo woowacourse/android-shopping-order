@@ -12,4 +12,6 @@ interface ProductRepository {
         page: Int,
         size: Int,
     ): Products
+
+    fun fetchAllProducts(): List<Product>
 }

@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.usecase
 
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
 import woowacourse.shopping.domain.repository.CartRepository
 import kotlin.concurrent.thread
 
@@ -7,31 +9,27 @@ class DecreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
 ) {
     operator fun invoke(
-        productId: Long,
-        quantity: Int = DEFAULT_QUANTITY_STEP,
+        product: Product,
+        quantityStep: Int = DEFAULT_QUANTITY_STEP,
         callback: (Int) -> Unit,
     ) {
         thread {
-            val existing = repository.fetchCartProductDetail(productId)
-            val result =
-                if (existing != null) {
-                    val newQuantity = existing.quantity - quantity
-                    if (newQuantity <= 0) {
-                        repository.deleteCartProduct(productId)
-                        0
-                    } else {
-                        repository.addCartProduct(productId, newQuantity)
-                        newQuantity
-                    }
-                } else {
-                    0
-                }
+            if (product.cartId == null) return@thread
+            val newQuantity = (product.quantity - quantityStep).coerceAtLeast(0)
 
-            callback(result)
+            if (newQuantity <= MINIMUM_QUANTITY) {
+                repository.deleteCartProduct(product.cartId)
+                callback(MINIMUM_QUANTITY)
+                return@thread
+            } else {
+                repository.updateCartProduct(product.cartId, newQuantity)
+            }
+
+            callback(newQuantity)
         }
     }
 
     companion object {
-        private const val DEFAULT_QUANTITY_STEP: Int = 1
+        private const val DEFAULT_QUANTITY_STEP = 1
     }
 }

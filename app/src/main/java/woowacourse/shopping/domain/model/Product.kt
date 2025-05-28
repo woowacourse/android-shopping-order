@@ -19,7 +19,8 @@ data class Product(
         }
 
     companion object {
-        val EMPTY_PRODUCT = Product(EMPTY_PRODUCT_DETAIL, null, 0)
+        const val MINIMUM_QUANTITY = 0
+        val EMPTY_PRODUCT = Product(EMPTY_PRODUCT_DETAIL, null, MINIMUM_QUANTITY)
         private const val DEFAULT_QUANTITY_DELTA = 1
     }
 }

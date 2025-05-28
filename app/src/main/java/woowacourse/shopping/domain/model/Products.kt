@@ -51,6 +51,8 @@ data class Products(
         return copy(products = updatedProducts)
     }
 
+    fun getProductByProductId(productId: Long): Product? = products.find { it.productDetail.id == productId }
+
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)
     }

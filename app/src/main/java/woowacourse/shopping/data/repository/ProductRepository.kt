@@ -42,4 +42,19 @@ class ProductRepository(
             page = Page(page, products?.first ?: false, products?.last ?: false),
         )
     }
+
+    override fun fetchAllProducts(): List<Product> {
+        val firstPage: Int = 0
+        val maxSize: Int = Int.MAX_VALUE
+
+        val products =
+            api
+                .getProducts(
+                    page = firstPage,
+                    size = maxSize,
+                ).execute()
+                .body()
+
+        return products?.content?.map { it.toDomain() } ?: emptyList()
+    }
 }

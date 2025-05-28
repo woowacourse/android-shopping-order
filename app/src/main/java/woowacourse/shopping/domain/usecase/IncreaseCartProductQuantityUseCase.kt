@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import kotlin.concurrent.thread
 
@@ -7,20 +8,24 @@ class IncreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
 ) {
     operator fun invoke(
-        productId: Long,
-        quantity: Int = DEFAULT_QUANTITY_STEP,
+        product: Product,
+        quantityStep: Int = DEFAULT_QUANTITY_STEP,
         callback: (Int) -> Unit,
     ) {
         thread {
-            val existing = repository.fetchCartProductDetail(productId)
-            val newQuantity = (existing?.quantity ?: 0) + quantity
+            val newQuantity = product.quantity + quantityStep
 
-            repository.addCartProduct(productId, newQuantity)
+            if (product.cartId == null) {
+                repository.addCartProduct(product.productDetail.id, newQuantity)
+            } else {
+                repository.updateCartProduct(product.cartId, newQuantity)
+            }
+
             callback(newQuantity)
         }
     }
 
     companion object {
-        private const val DEFAULT_QUANTITY_STEP: Int = 1
+        private const val DEFAULT_QUANTITY_STEP = 1
     }
 }

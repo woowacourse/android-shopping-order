@@ -68,7 +68,7 @@ class ShoppingApp : Application() {
     }
 
     val getCatalogProductsUseCase by lazy {
-        GetCatalogProductsUseCase(productRepository)
+        GetCatalogProductsUseCase(productRepository, cartRepository)
     }
 
     val getCatalogProductUseCase by lazy {
@@ -80,6 +80,6 @@ class ShoppingApp : Application() {
     }
 
     val getCatalogProductsByIdsUseCase by lazy {
-        GetCatalogProductsByIdsUseCase(productRepository)
+        GetCatalogProductsByIdsUseCase(productRepository, cartRepository)
     }
 }

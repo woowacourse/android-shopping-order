@@ -9,12 +9,14 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
+import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
+import woowacourse.shopping.ui.catalog.adapter.product.CatalogItem.LoadMoreItem.id
 
 class CartViewModel(
     private val getCartProductsUseCase: GetCartProductsUseCase,
@@ -41,9 +43,12 @@ class CartViewModel(
         }
     }
 
-    fun removeCartProduct(id: Long) {
-        removeCartProductUseCase(id)
-        _editedProductIds.postValue(editedProductIds.value?.plus(id))
+    fun removeCartProduct(
+        cartId: Long,
+        productId: Long,
+    ) {
+        removeCartProductUseCase(cartId)
+        _editedProductIds.postValue(editedProductIds.value?.plus(productId))
         loadCartProducts()
     }
 
@@ -57,16 +62,20 @@ class CartViewModel(
         loadCartProducts(page.copy(current = page.current - step))
     }
 
-    fun increaseCartProductQuantity(id: Long) {
-        increaseCartProductQuantityUseCase(id) { newQuantity ->
-            _cartProducts.postValue(cartProducts.value?.updateProductQuantity(id, newQuantity))
+    fun increaseCartProductQuantity(productId: Long) {
+        increaseCartProductQuantityUseCase(
+            product = cartProducts.value?.getProductByProductId(productId) ?: return,
+        ) { newQuantity ->
+            _cartProducts.postValue(cartProducts.value?.updateProductQuantity(productId, newQuantity))
         }
-        _editedProductIds.value = editedProductIds.value?.plus(id)
+        _editedProductIds.value = editedProductIds.value?.plus(productId)
     }
 
-    fun decreaseCartProductQuantity(id: Long) {
-        decreaseCartProductQuantityUseCase(id) { newQuantity ->
-            if (newQuantity > 0) {
+    fun decreaseCartProductQuantity(productId: Long) {
+        decreaseCartProductQuantityUseCase(
+            product = cartProducts.value?.getProductByProductId(productId) ?: return,
+        ) { newQuantity ->
+            if (newQuantity > MINIMUM_QUANTITY) {
                 _cartProducts.postValue(
                     cartProducts.value?.updateProductQuantity(id, newQuantity),
                 )
@@ -74,7 +83,7 @@ class CartViewModel(
                 loadCartProducts()
             }
         }
-        _editedProductIds.value = editedProductIds.value?.plus(id)
+        _editedProductIds.value = editedProductIds.value?.plus(productId)
     }
 
     companion object {

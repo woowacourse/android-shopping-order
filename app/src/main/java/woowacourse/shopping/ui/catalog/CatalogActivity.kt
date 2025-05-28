@@ -24,7 +24,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     private val viewModel: CatalogViewModel by viewModels { CatalogViewModel.Factory }
     private val catalogAdapter: CatalogAdapter = CatalogAdapter(createAdapterOnClickHandler())
     private val historyProductAdapter: HistoryProductAdapter =
-        HistoryProductAdapter { id -> navigateToProductDetail(id) }
+        HistoryProductAdapter { productId -> navigateToProductDetail(productId) }
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,16 +62,16 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
 
     private fun createAdapterOnClickHandler() =
         object : OnClickHandler {
-            override fun onProductClick(id: Long) {
-                navigateToProductDetail(id)
+            override fun onProductClick(productId: Long) {
+                navigateToProductDetail(productId)
             }
 
-            override fun onIncreaseClick(id: Long) {
-                viewModel.increaseCartProduct(id)
+            override fun onIncreaseClick(productId: Long) {
+                viewModel.increaseCartProduct(productId)
             }
 
-            override fun onDecreaseClick(id: Long) {
-                viewModel.decreaseCartProduct(id)
+            override fun onDecreaseClick(productId: Long) {
+                viewModel.decreaseCartProduct(productId)
             }
 
             override fun onLoadMoreClick() {
@@ -85,10 +85,10 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     }
 
     private fun navigateToProductDetail(
-        id: Long,
+        productId: Long,
         isRecentHistoryProductShown: Boolean = true,
     ) {
-        val intent = ProductDetailActivity.newIntent(this, id, isRecentHistoryProductShown)
+        val intent = ProductDetailActivity.newIntent(this, productId, isRecentHistoryProductShown)
         activityResultLauncher.launch(intent)
     }
 
@@ -146,7 +146,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
                     ActivityResult.CART_PRODUCT_EDITED.code ->
                         viewModel.loadCartProducts(
                             result.data
-                                ?.getIntegerArrayListExtra(ActivityResult.CART_PRODUCT_EDITED.key)
+                                ?.getLongArrayExtra(ActivityResult.CART_PRODUCT_EDITED.key)
                                 ?.toList() ?: emptyList(),
                         )
                 }

@@ -55,7 +55,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="8dp"
-            android:onClick="@{() -> onClickHandler.onRemoveCartProductClick(product.productDetail.id)}"
+            android:onClick="@{() -> onClickHandler.onRemoveCartProductClick(product.cartId, product.productDetail.id)}"
             android:padding="12dp"
             android:src="@drawable/ic_cart_remove"
             app:layout_constraintEnd_toEndOf="parent"
