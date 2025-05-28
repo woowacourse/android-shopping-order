@@ -48,35 +48,69 @@ class GoodsViewModel(
     }
 
     fun addToCart(cart: Cart) {
-        val cartRequest =
-            CartRequest(
-                productId = cart.product.id,
-                quantity = cart.quantity + 1,
-            )
+        val newQuantity = cart.quantity + 1
 
-        cartRepository.addToCart(cartRequest) { result ->
-            result
-                .onSuccess {
-                    updateItemsAndTotalQuantity(cart, cart.quantity + 1)
-                    _isSuccess.setValue(Unit)
-                }.onFailure { error ->
-                    _isFail.setValue(Unit)
-                }
+        if (cart.quantity == 0) {
+            val cartRequest =
+                CartRequest(
+                    productId = cart.product.id,
+                    quantity = newQuantity,
+                )
+
+            cartRepository.addToCart(cartRequest) { result ->
+                result
+                    .onSuccess {
+                        updateItems(cart, newQuantity)
+                        getCartCounts()
+                        _isSuccess.setValue(Unit)
+                    }.onFailure {
+                        _isFail.setValue(Unit)
+                    }
+            }
+        } else {
+            cartRepository.updateCart(
+                id = cart.id,
+                cartQuantity = CartQuantity(newQuantity),
+            ) { result ->
+                result
+                    .onSuccess {
+                        updateItems(cart, newQuantity)
+                        getCartCounts()
+                    }.onFailure {
+                        _isFail.setValue(Unit)
+                    }
+            }
         }
+        getCartCounts()
     }
 
     fun removeFromCart(cart: Cart) {
-        cartRepository.updateCart(
-            id = cart.id,
-            cartQuantity = CartQuantity(cart.quantity - 1),
-        ) { result ->
-            result
-                .onSuccess {
-                    updateItemsAndTotalQuantity(cart, cart.quantity - 1)
-                }.onFailure { error ->
-                    _isFail.setValue(Unit)
-                }
+        if (cart.quantity == 1) {
+            cartRepository.deleteCart(cart.id) { result ->
+                result
+                    .onSuccess {
+                        updateItems(cart, cart.quantity - 1)
+                    }.onFailure { error ->
+                        _isFail.setValue(Unit)
+                        Log.e("123451", "$error")
+                        Log.d("123451", "${cart.id}")
+                    }
+            }
+        } else {
+            cartRepository.updateCart(
+                id = cart.id,
+                cartQuantity = CartQuantity(cart.quantity - 1),
+            ) { result ->
+                result
+                    .onSuccess {
+                        updateItems(cart, cart.quantity - 1)
+                    }.onFailure { error ->
+                        _isFail.setValue(Unit)
+                        Log.e("123451", "$error")
+                    }
+            }
         }
+        getCartCounts()
     }
 
     fun refreshHistoryOnly() {
@@ -125,7 +159,7 @@ class GoodsViewModel(
         }
     }
 
-    private fun updateItemsAndTotalQuantity(
+    private fun updateItems(
         updatedCart: Cart,
         newQuantity: Int,
     ) {
@@ -134,8 +168,6 @@ class GoodsViewModel(
                 updatedCart,
             )
         _items.value = updatedItems
-        val total = updatedItems.filterIsInstance<Cart>().sumOf { it.quantity }
-        _totalQuantity.value = total
     }
 
     private fun loadProducts() {

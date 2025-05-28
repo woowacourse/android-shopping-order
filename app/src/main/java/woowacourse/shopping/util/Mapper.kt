@@ -43,22 +43,20 @@ fun List<Any>.updateCartQuantity(
 
 fun Cart.updateQuantity(newQuantity: Int): Cart = this.copy(quantity = newQuantity)
 
-fun CartRemoteProduct.toDomain(): Product {
-    return Product(
+fun CartRemoteProduct.toDomain(): Product =
+    Product(
         id = id.toInt(),
         name = name,
         price = price,
         imageUrl = imageUrl,
-        category = category
+        category = category,
     )
-}
 
-fun Content.toDomain(): Product {
-    return Product(
+fun Content.toDomain(): Product =
+    Product(
         id = id.toInt(),
         name = name,
         price = price,
         imageUrl = imageUrl,
-        category = category
+        category = category,
     )
-}

@@ -22,20 +22,20 @@ interface CartService {
     fun addToCart(
         @Header("accept") accept: String = "*/*",
         @Body cartRequest: CartRequest,
-    ): Call<Void>
+    ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
     fun deleteFromCart(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long,
-    ): Call<Void>
+    ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun updateCart(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long,
         @Body cartQuantity: CartQuantity,
-    ): Call<Void>
+    ): Call<Unit>
 
     @GET("/cart-items/counts")
     fun getCartCounts(

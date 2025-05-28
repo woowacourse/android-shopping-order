@@ -53,10 +53,10 @@ class CartRepository {
             .getRetrofitService()
             .addToCart(cartRequest = cartRequest)
             .enqueue(
-                object : Callback<Void> {
+                object : Callback<Unit> {
                     override fun onResponse(
-                        call: Call<Void>,
-                        response: Response<Void>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
                         if (response.isSuccessful) {
                             onResult(Result.success(Unit))
@@ -67,13 +67,41 @@ class CartRepository {
                     }
 
                     override fun onFailure(
-                        call: Call<Void>,
+                        call: Call<Unit>,
                         t: Throwable,
                     ) {
                         onResult(Result.failure(t))
                     }
                 },
             )
+    }
+
+    fun deleteCart(
+        id: Long,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        CartClient.getRetrofitService().deleteFromCart(id = id).enqueue(
+            object : Callback<Unit> {
+                override fun onResponse(
+                    call: Call<Unit?>,
+                    response: Response<Unit?>,
+                ) {
+                    if (response.isSuccessful) {
+                        onResult(Result.success(Unit))
+                    } else {
+                        val error = response.errorBody()?.string()
+                        onResult(Result.failure(Throwable("수정 실패: ${response.code()} - $error")))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Unit?>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
     }
 
     fun updateCart(
@@ -85,10 +113,10 @@ class CartRepository {
             .getRetrofitService()
             .updateCart(id = id, cartQuantity = cartQuantity)
             .enqueue(
-                object : Callback<Void> {
+                object : Callback<Unit> {
                     override fun onResponse(
-                        call: Call<Void?>,
-                        response: Response<Void?>,
+                        call: Call<Unit?>,
+                        response: Response<Unit?>,
                     ) {
                         if (response.isSuccessful) {
                             onResult(Result.success(Unit))
@@ -99,7 +127,7 @@ class CartRepository {
                     }
 
                     override fun onFailure(
-                        call: Call<Void?>,
+                        call: Call<Unit?>,
                         t: Throwable,
                     ) {
                         onResult(Result.failure(t))
