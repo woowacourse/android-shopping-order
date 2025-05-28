@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
@@ -14,6 +15,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.adapter.CartSkeletonAdapter
 import woowacourse.shopping.feature.cart.adapter.CartViewHolder
 
 class CartActivity :
@@ -23,7 +25,8 @@ class CartActivity :
     private val viewModel: CartViewModel by viewModels {
         CartViewModelFactory(CartRepositoryImpl(CartRemoteDataSourceImpl()))
     }
-    private val adapter: CartAdapter by lazy {
+
+    private val cartAdapter: CartAdapter by lazy {
         CartAdapter(
             this,
             quantityChangeListener =
@@ -39,6 +42,14 @@ class CartActivity :
         )
     }
 
+    private val cartSkeletonAdapter: CartSkeletonAdapter by lazy {
+        CartSkeletonAdapter()
+    }
+
+    private val concatAdapter: ConcatAdapter by lazy {
+        ConcatAdapter(cartSkeletonAdapter)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,7 +57,7 @@ class CartActivity :
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.lifecycleOwner = this
-        binding.rvCartItems.adapter = adapter
+        binding.rvCartItems.adapter = concatAdapter
         binding.viewModel = viewModel
         viewModel.loginErrorEvent.observe(this) { result ->
             when (result) {
@@ -57,6 +68,16 @@ class CartActivity :
         }
         viewModel.removeItemEvent.observe(this) { cartItem ->
             onCartItemDelete(cartItem)
+        }
+        viewModel.isLoading.observe(this) { isLoading ->
+            if (!isLoading) {
+                concatAdapter.removeAdapter(cartSkeletonAdapter)
+                concatAdapter.addAdapter(0, cartAdapter)
+            } else {
+                if (concatAdapter.adapters.contains(cartSkeletonAdapter).not()) {
+                    concatAdapter.addAdapter(0, cartSkeletonAdapter)
+                }
+            }
         }
     }
 
@@ -72,7 +93,7 @@ class CartActivity :
 
     override fun onCartItemDelete(cartItem: CartItem) {
         val deletedIndex: Int? = viewModel.getPosition(cartItem)
-        deletedIndex?.let { adapter.removeItem(it) }
+        deletedIndex?.let { cartAdapter.removeItem(it) }
         viewModel.delete(cartItem)
     }
 

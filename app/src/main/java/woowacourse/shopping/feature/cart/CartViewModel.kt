@@ -46,6 +46,9 @@ class CartViewModel(
     private val _removeItemEvent: MutableSingleLiveData<CartItem> = MutableSingleLiveData()
     val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
 
+    private val _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     init {
         updateCartQuantity()
     }
@@ -80,13 +83,15 @@ class CartViewModel(
             currentPage - 1,
             PAGE_SIZE,
             { cartResponse ->
+
                 _cart.value = getCartItemByCartResponse(cartResponse)
                 updatePageMoveAvailability(cartResponse)
                 updateCartDataSize(cartResponse)
-                if (cartResponse.totalPages >= MINIMUM_PAGE && cartResponse.totalPages < currentPage) {
+                if (cartResponse.totalPages in MINIMUM_PAGE..<currentPage) {
                     currentPage = cartResponse.totalPages
                     updateCartQuantity()
                 }
+                _isLoading.value = false
             },
             { cartFetchError ->
                 _loginErrorEvent.setValue(cartFetchError)

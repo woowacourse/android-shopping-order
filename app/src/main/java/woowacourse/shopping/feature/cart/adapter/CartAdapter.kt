@@ -14,6 +14,7 @@ class CartAdapter(
     private val cartItems: MutableList<CartItem> = mutableListOf()
 
     fun removeItem(position: Int) {
+        cartItems.removeAt(position)
         notifyItemRemoved(position)
     }
 
