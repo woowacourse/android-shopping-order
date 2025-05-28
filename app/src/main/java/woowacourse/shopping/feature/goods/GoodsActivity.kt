@@ -94,8 +94,6 @@ class GoodsActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.rvGoodsItems.adapter = concatAdapter
         binding.viewModel = viewModel
-        val sharedPreferences = getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
-        sharedPreferences.getString("basicKey", "bWVkQW5kcm86cGFzc3dvcmQ=")?.let { viewModel.login(it) }
 
         binding.rvGoodsItems.layoutManager = getLayoutManager()
         viewModel.navigateToCart.observe(this) {
@@ -120,7 +118,7 @@ class GoodsActivity : AppCompatActivity() {
         viewModel.isLoading.observe(this) { isLoading ->
             if (!isLoading) {
                 concatAdapter.removeAdapter(goodsSkeletonAdapter)
-                concatAdapter.addAdapter(1,goodsAdapter)
+                concatAdapter.addAdapter(1, goodsAdapter)
             } else {
                 if (concatAdapter.adapters.contains(goodsSkeletonAdapter).not()) {
                     concatAdapter.addAdapter(1, goodsSkeletonAdapter)
@@ -147,6 +145,8 @@ class GoodsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val sharedPreferences = getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
+        sharedPreferences.getString("basicKey", "")?.let { viewModel.login(it) }
         viewModel.fetchAndSetCartCache()
         viewModel.updateRecentlyViewedGoods()
     }

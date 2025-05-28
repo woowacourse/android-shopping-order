@@ -6,7 +6,11 @@ import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface CartRepository {
-    fun checkValidBasicKey(onResponse: (Int) -> Unit)
+    fun checkValidBasicKey(
+        validKey: String,
+        onResponse: (Int) -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    )
 
     fun fetchAllCartItems(
         onComplete: (CartResponse) -> Unit,

@@ -97,9 +97,13 @@ class CartRemoteDataSourceImpl(
             )
     }
 
-    override fun fetchAuthCode(onResponse: (Int) -> Unit) {
+    override fun fetchAuthCode(
+        validKey: String,
+        onResponse: (Int) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
+    ) {
         retrofitService
-            .requestCartCounts(authorization = "Basic " + Authorization.basicKey)
+            .requestCartCounts(authorization = "Basic $validKey")
             .enqueue(
                 object : Callback<CartQuantity> {
                     override fun onResponse(
@@ -113,7 +117,7 @@ class CartRemoteDataSourceImpl(
                         call: Call<CartQuantity>,
                         t: Throwable,
                     ) {
-                        onResponse(-1)
+                        onFailure(CartFetchError.Network)
                     }
                 },
             )
@@ -184,7 +188,7 @@ class CartRemoteDataSourceImpl(
 
     override fun addItem(
         itemId: Int,
-        itemCount:Int,
+        itemCount: Int,
         onSuccess: (resultCode: Int) -> Unit,
         onFailure: (CartFetchError) -> Unit,
     ) {

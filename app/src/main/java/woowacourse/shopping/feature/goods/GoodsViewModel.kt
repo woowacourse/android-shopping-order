@@ -52,16 +52,20 @@ class GoodsViewModel(
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
-        cartRepository.checkValidBasicKey { code ->
+        cartRepository.checkValidBasicKey(basicKey, { response ->
             when {
-                code == 200 -> Authorization.setLoginStatus(true)
+                response == 200 -> Authorization.setLoginStatus(true)
                 else -> Authorization.setLoginStatus(false)
             }
-        }
+        }, {})
     }
 
     fun onCartClicked() {
-        _navigateToCart.setValue(Unit)
+        if (!Authorization.isLogin) {
+            _navigateToLogin.setValue(Unit)
+        } else {
+            _navigateToCart.setValue(Unit)
+        }
     }
 
     private fun appendCartItemsWithZeroQuantity() {
