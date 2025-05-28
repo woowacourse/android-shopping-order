@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.network.response.products
 
+import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
 
