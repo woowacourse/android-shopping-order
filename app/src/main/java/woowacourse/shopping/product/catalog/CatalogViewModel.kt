@@ -1,10 +1,8 @@
 package woowacourse.shopping.product.catalog
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
@@ -47,23 +45,31 @@ class CatalogViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        cartProductRepository.updateProduct(product.toEntity(), 1) { updatedProduct ->
-            _updatedItem.postValue(updatedProduct?.toUiModel())
+        val catalogProduct: CatalogItem? =
+            catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
+        val quantity = (catalogProduct as ProductItem).productItem.quantity
+
+        cartProductRepository.updateProduct(product, quantity + 1) { updatedProduct ->
+            _updatedItem.postValue(updatedProduct)
         }
+
         loadCartItemSize()
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        cartProductRepository.getProductQuantity(product.id) { quantity ->
-            if (quantity == 1) {
-                cartProductRepository.deleteCartProduct(product.toEntity().copy(quantity = 1))
-                _updatedItem.postValue(product.copy(quantity = 0))
-            } else {
-                cartProductRepository.updateProduct(product.toEntity(), -1) { updatedProduct ->
-                    _updatedItem.postValue(updatedProduct?.toUiModel())
-                }
+        val catalogProduct: CatalogItem? =
+            catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
+        val quantity = (catalogProduct as ProductItem).productItem.quantity
+
+        if (quantity == 1) {
+            cartProductRepository.deleteCartProduct(product.copy(quantity = 1))
+            _updatedItem.postValue(product.copy(quantity = 0))
+        } else {
+            cartProductRepository.updateProduct(product, quantity - 1) { updatedProduct ->
+                _updatedItem.postValue(updatedProduct)
             }
         }
+
         loadCartItemSize()
     }
 
@@ -102,30 +108,34 @@ class CatalogViewModel(
 
         remoteCatalogProductRepositoryImpl.getProductsByPage(
             page.value ?: 0,
-            size
+            size,
         ) { pagedProducts ->
 
-            cartProductRepository.getCartProductsInRange(startIndex, endIndex) { cartProducts ->
-                val cartProductMap = cartProducts.associateBy { it.uid }
+            cartProductRepository.getTotalElements { totalElements ->
+                cartProductRepository.getCartProducts(totalElements) { cartProducts ->
+                    val cartProductMap: Map<Int, ProductUiModel> =
+                        cartProducts.associateBy { it.id }
 
-                val mergedProducts =
-                    pagedProducts.map { product ->
-                        val cartProduct = cartProductMap[product.id]
-                        if (cartProduct != null) product.copy(quantity = cartProduct.quantity) else product
-                    }
+                    val mergedProducts =
+                        pagedProducts.map { product ->
+                            val cartProduct = cartProductMap[product.id]
+                            if (cartProduct != null) product.copy(quantity = cartProduct.quantity) else product
+                        }
 
-                val items = mergedProducts.map { ProductItem(it) }
-                val prevItems =
-                    _catalogItems.value.orEmpty().filterNot { it is CatalogItem.LoadMoreButtonItem }
-                val hasNextPage = endIndex < allProductsSize
-                val updatedItems =
-                    if (hasNextPage) {
-                        prevItems + items + CatalogItem.LoadMoreButtonItem
-                    } else {
-                        prevItems + items
-                    }
+                    val items = mergedProducts.map { ProductItem(it) }
+                    val prevItems =
+                        _catalogItems.value
+                            .orEmpty()
+                            .filterNot { it is CatalogItem.LoadMoreButtonItem }
+                    val hasNextPage = endIndex < allProductsSize
+                    val updatedItems =
+                        if (hasNextPage) {
+                            prevItems + items + CatalogItem.LoadMoreButtonItem
+                        } else {
+                            prevItems + items
+                        }
 
-                _catalogItems.postValue(updatedItems).also {
+                    _catalogItems.postValue(updatedItems)
                     _loadingState.postValue(LoadingState.loaded())
                 }
             }

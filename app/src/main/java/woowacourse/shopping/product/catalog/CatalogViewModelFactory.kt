@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.data.repository.HttpCatalogProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 import woowacourse.shopping.data.server.DevMockServer
 
@@ -18,16 +18,14 @@ class CatalogViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return CatalogViewModel(
                 cartProductRepository =
-                    CartProductRepositoryImpl(
-                        ShoppingDatabase.getInstance(application).cartProductDao(),
-                    ),
+                    RemoteCartProductRepositoryImpl(),
                 recentlyViewedProductRepository =
                     RecentlyViewedProductRepositoryImpl(
                         ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
                         RemoteCatalogProductRepositoryImpl(),
                     ),
                 catalogProductRepository = HttpCatalogProductRepositoryImpl(DevMockServer.baseUrl),
-                remoteCatalogProductRepositoryImpl = RemoteCatalogProductRepositoryImpl()
+                remoteCatalogProductRepositoryImpl = RemoteCatalogProductRepositoryImpl(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

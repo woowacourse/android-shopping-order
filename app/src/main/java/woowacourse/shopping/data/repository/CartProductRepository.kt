@@ -1,30 +1,37 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.entity.CartProductEntity
+import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartProductRepository {
-    fun insertCartProduct(cartProduct: CartProductEntity)
+    fun insertCartProduct(cartProduct: ProductUiModel)
 
-    fun deleteCartProduct(cartProduct: CartProductEntity)
+    fun deleteCartProduct(cartProduct: ProductUiModel)
 
     fun getCartProductsInRange(
-        startIndex: Int,
-        endIndex: Int,
-        callback: (List<CartProductEntity>) -> Unit,
+        currentPage: Int,
+        pageSize: Int,
+        callback: (List<ProductUiModel>) -> Unit,
     )
 
     fun updateProduct(
-        cartProduct: CartProductEntity,
-        diff: Int,
-        callback: (CartProductEntity?) -> Unit,
+        cartProduct: ProductUiModel,
+        quantity: Int,
+        callback: (ProductUiModel?) -> Unit,
     )
 
-    fun getProductQuantity(
-        id: Int,
-        callback: (Int?) -> Unit,
-    )
+//    fun getProductQuantity(
+//        id: Int,
+//        callback: (Int?) -> Unit,
+//    )
 
     fun getAllProductsSize(callback: (Int) -> Unit)
 
     fun getCartItemSize(callback: (Int) -> Unit)
+
+    fun getTotalElements(callback: (Int) -> Unit)
+
+    fun getCartProducts(
+        totalElements: Int,
+        callback: (List<ProductUiModel>) -> Unit,
+    )
 }

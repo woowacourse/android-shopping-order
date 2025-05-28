@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.cart.CartItem.ProductItem
-import woowacourse.shopping.data.mapper.toEntity
-import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -13,8 +11,6 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class CartViewModel(
     private val cartProductRepository: CartProductRepository,
 ) : ViewModel() {
-    private val products = mutableListOf<ProductUiModel>()
-
     private val _cartProducts = MutableLiveData<List<ProductUiModel>>()
     val cartProducts: LiveData<List<ProductUiModel>> = _cartProducts
 
@@ -39,8 +35,7 @@ class CartViewModel(
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
-        products.remove(cartProduct.productItem)
-        cartProductRepository.deleteCartProduct(cartProduct.productItem.toEntity())
+        cartProductRepository.deleteCartProduct(cartProduct.productItem)
 
         cartProductRepository.getAllProductsSize { updatedSize ->
             val currentPage = page.value ?: INITIAL_PAGE
@@ -80,12 +75,12 @@ class CartViewModel(
         product: ProductUiModel,
     ) {
         if (event == DECREASE_BUTTON) {
-            cartProductRepository.updateProduct(product.toEntity(), -1) { product ->
-                _updatedItem.postValue(product?.toUiModel())
+            cartProductRepository.updateProduct(product, -1) { product ->
+                _updatedItem.postValue(product)
             }
         } else if (event == INCREASE_BUTTON) {
-            cartProductRepository.updateProduct(product.toEntity(), 1) { product ->
-                _updatedItem.postValue(product?.toUiModel())
+            cartProductRepository.updateProduct(product, 1) { product ->
+                _updatedItem.postValue(product)
             }
         }
     }
@@ -122,17 +117,18 @@ class CartViewModel(
             }
             Thread.sleep(2000)
 
-            cartProductRepository.getCartProductsInRange(startIndex, endIndex) { cartProducts ->
+            cartProductRepository
+                .getCartProductsInRange(currentPage, pageSize) { cartProducts ->
 
-                val pagedProducts: List<ProductUiModel> =
-                    cartProducts.map { it.toUiModel() }
+                    val pagedProducts: List<ProductUiModel> =
+                        cartProducts.map { it }
 
-                _cartProducts.postValue(pagedProducts)
-                checkNextButtonEnabled(totalSize)
-                checkPrevButtonEnabled()
-            }.also {
-                _loadingState.postValue(LoadingState.loaded())
-            }
+                    _cartProducts.postValue(pagedProducts)
+                    checkNextButtonEnabled(totalSize)
+                    checkPrevButtonEnabled()
+                }.also {
+                    _loadingState.postValue(LoadingState.loaded())
+                }
         }
     }
 
