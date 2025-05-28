@@ -5,13 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.view.cart.adapter.CartProductItem
 
 class ShoppingCartViewModel(
     private val repository: CartProductRepository,
 ) : ViewModel(),
     ShoppingCartEventHandler {
-    private val _products = MutableLiveData<List<CartProduct>>()
-    val products: LiveData<List<CartProduct>> = _products
+    private val selectedId: MutableSet<Int> = mutableSetOf()
+
+    private val _products = MutableLiveData<List<CartProductItem>>()
+    val products: LiveData<List<CartProductItem>> = _products
 
     private var _page = MutableLiveData(FIRST_PAGE_NUMBER)
     val page: LiveData<Int> = _page
@@ -55,17 +58,25 @@ class ShoppingCartViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        val cartProduct = products.value.orEmpty().first { it.product.id == item.product.id }
-        repository.updateQuantity(cartProduct, 1) {
+        val cartProductItem = products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
+        repository.updateQuantity(cartProductItem.cartProduct, 1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
     }
 
     override fun onQuantityDecreaseClick(item: CartProduct) {
-        val cartProduct = products.value.orEmpty().first { it.product.id == item.product.id }
-        if (cartProduct.quantity == 1) return
-        repository.updateQuantity(cartProduct, -1) {
+        val cartProductItem = products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
+        if (cartProductItem.cartProduct.quantity == 1) return
+        repository.updateQuantity(cartProductItem.cartProduct, -1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+        }
+    }
+
+    override fun onSelectItem(item: CartProduct) {
+        if (item.id in selectedId) {
+            selectedId.add(item.id)
+        } else {
+            selectedId.remove(item.id)
         }
     }
 
@@ -73,7 +84,7 @@ class ShoppingCartViewModel(
         _onFinishLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
             _onFinishLoading.value = true
-            _products.postValue(result.items)
+            _products.postValue(result.items.map { CartProductItem(it, it.id in selectedId) })
             val hasNext = result.hasNext
             updatePageState(page, hasNext)
         }

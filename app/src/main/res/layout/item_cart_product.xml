@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="isSelected"
+            type="Boolean" />
+
+        <variable
             name="cartProduct"
             type="woowacourse.shopping.domain.model.CartProduct" />
 
@@ -31,15 +35,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <CheckBox
+            android:id="@+id/cb_select_product"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:checked="@{isSelected}"
+            android:onClick="@{() -> handler.onSelectItem(cartProduct)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tv_product_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="@{cartProduct.product.name}"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/cb_select_product"
+            app:layout_constraintStart_toEndOf="@id/cb_select_product"
+            app:layout_constraintTop_toTopOf="@id/cb_select_product"
             tools:text="아메리카노" />
 
         <ImageView

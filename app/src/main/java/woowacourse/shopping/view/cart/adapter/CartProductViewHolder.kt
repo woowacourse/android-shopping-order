@@ -23,13 +23,16 @@ class CartProductViewHolder(
         }
     }
 
-    fun bind(product: CartProduct) {
-        currentItem = product
-        binding.cartProduct = product
+    fun bind(cartProductItem: CartProductItem) {
+        currentItem = cartProductItem.cartProduct
+        binding.cartProduct = cartProductItem.cartProduct
+        binding.isSelected = cartProductItem.isSelected
     }
 
     interface EventHandler : QuantityControlEventHandler<CartProduct> {
         fun onProductRemoveClick(item: CartProduct)
+
+        fun onSelectItem(item: CartProduct)
     }
 
     companion object {
