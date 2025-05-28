@@ -79,9 +79,8 @@
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 app:shimmer_auto_start="true"
-                app:shimmer_duration="@integer/material_motion_duration_long_2"
                 android:layout_width="0dp"
-                android:background="@color/gray_5"
+                android:background="@color/white"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -93,17 +92,42 @@
                     android:layout_height="match_parent"
                     android:columnCount="2">
 
-                    <include layout="@layout/item_product_skeleton" />
+                    <include
+                        layout="@layout/item_product_skeleton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
 
-                    <include layout="@layout/item_product_skeleton" />
+                    <include
+                        layout="@layout/item_product_skeleton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
 
-                    <include layout="@layout/item_product_skeleton" />
+                    <include
+                        layout="@layout/item_product_skeleton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
 
-                    <include layout="@layout/item_product_skeleton" />
+                    <include
+                        layout="@layout/item_product_skeleton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
 
-                    <include layout="@layout/item_product_skeleton" />
+                    <include
+                        layout="@layout/item_product_skeleton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
 
-                    <include layout="@layout/item_product_skeleton" />
+                    <include
+                        layout="@layout/item_product_skeleton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" />
+
                 </GridLayout>
             </com.facebook.shimmer.ShimmerFrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
