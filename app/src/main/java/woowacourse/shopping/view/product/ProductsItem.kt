@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.product
 
-import woowacourse.shopping.data.product.ProductImageUrls.imageUrl
 import woowacourse.shopping.domain.product.Product
 
 sealed interface ProductsItem {

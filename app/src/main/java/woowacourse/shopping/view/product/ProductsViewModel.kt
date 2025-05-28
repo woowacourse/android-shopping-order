@@ -47,7 +47,7 @@ class ProductsViewModel(
         }
     }
 
-    fun loadRecentViewedProducts() {
+    private fun loadRecentViewedProducts() {
         productsRepository.loadRecentViewedProducts { result ->
             result
                 .onSuccess { products: List<Product> ->
@@ -55,11 +55,12 @@ class ProductsViewModel(
                     loadProducts(recentViewedProductsItem)
                 }.onFailure {
                     _event.postValue(ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE)
+                    loadProducts(ProductsItem.RecentViewedProductsItem(emptyList()))
                 }
         }
     }
 
-    fun loadProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
+    private fun loadProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
         productsRepository.loadPageableProducts(
             page = page,
             size = LOAD_PRODUCTS_SIZE,
