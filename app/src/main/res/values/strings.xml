@@ -34,4 +34,6 @@
     <!-- Quantity Selector -->
     <string name="minus">−</string>
     <string name="plus">+</string>
+    <string name="order_count_text_format">주문하기(%d)</string>
+    <string name="order_checkbox_title">전체</string>
 </resources>

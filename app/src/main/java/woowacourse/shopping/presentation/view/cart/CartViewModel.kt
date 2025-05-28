@@ -27,6 +27,19 @@ class CartViewModel(
     private val _cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     val cartItems: LiveData<List<CartProductUiModel>> = _cartItems
 
+    private val _selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
+    val selectedCartItems: LiveData<List<CartProductUiModel>> = _selectedCartItems
+
+    val totalPrice: LiveData<Int> =
+        _selectedCartItems.map { it.sumOf { cartProduct -> cartProduct.totalPrice } }
+
+    val totalCount: LiveData<Int> = _selectedCartItems.map { it.count() }
+
+    val isCheckAll: LiveData<Boolean> =
+        _selectedCartItems.map { selectedCartItems ->
+            cartItems.value?.all { selectedCartItems.contains(it) } ?: false
+        }
+
     private val _page = MutableLiveData(DEFAULT_PAGE)
     val page: LiveData<Int> = _page.map { it + 1 }
 
