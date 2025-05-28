@@ -32,7 +32,7 @@ class CartViewModelTest {
     fun `fetchShoppingCart를 호출하면 장바구니 목록이 LiveData에 반영된다`() {
         viewModel.fetchShoppingCart(isNextPage = false)
 
-        val result = viewModel.products.getOrAwaitValue()
+        val result = viewModel.cartItems.getOrAwaitValue()
         assertThat(result).isEqualTo(dummyCartItemList)
     }
 

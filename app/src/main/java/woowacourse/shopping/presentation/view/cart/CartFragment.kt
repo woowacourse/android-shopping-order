@@ -42,7 +42,6 @@ class CartFragment :
         initListener()
         setCartAdapter()
 
-        binding.eventListener = this
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
     }
 
@@ -86,7 +85,7 @@ class CartFragment :
             binding.recyclerViewCart.smoothScrollToPosition(0)
         }
 
-        viewModel.products.observe(viewLifecycleOwner) {
+        viewModel.cartItems.observe(viewLifecycleOwner) {
             cartAdapter.updateCartItems(it)
         }
 
@@ -114,6 +113,7 @@ class CartFragment :
         binding.btnBack.setOnClickListener {
             navigateToScreen()
         }
+        binding.eventListener = this
     }
 
     private fun navigateToScreen() {

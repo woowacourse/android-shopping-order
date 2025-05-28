@@ -17,8 +17,8 @@ import kotlin.math.max
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _products = MutableLiveData<List<CartItemUiModel>>()
-    val products: LiveData<List<CartItemUiModel>> = _products
+    private val _cartItems = MutableLiveData<List<CartItemUiModel>>()
+    val cartItems: LiveData<List<CartItemUiModel>> = _cartItems
 
     private val _deleteState = MutableLiveData<Long>()
     val deleteState: LiveData<Long> = _deleteState
@@ -60,10 +60,9 @@ class CartViewModel(
         ) { products, hasMore ->
             val updatedItems =
                 products.map {
-                    val retainedSelection = selectedStates[it.cartId] ?: false
-                    it.toCartItemUiModel().copy(isSelected = retainedSelection)
+                    it.toCartItemUiModel().copy(isSelected = selectedStates[it.cartId] ?: false)
                 }
-            _products.postValue(updatedItems)
+            _cartItems.postValue(updatedItems)
             _page.postValue(newPage)
             _hasMore.postValue(hasMore)
             updateSelectionInfo()
@@ -118,8 +117,8 @@ class CartViewModel(
         isSelected: Boolean,
     ) {
         selectedStates[cartItem.cartItem.cartId] = isSelected
-        _products.postValue(
-            _products.value?.map {
+        _cartItems.postValue(
+            _cartItems.value?.map {
                 if (it.cartItem.cartId == cartItem.cartItem.cartId) {
                     it.copy(isSelected = isSelected)
                 } else {
@@ -134,8 +133,8 @@ class CartViewModel(
         cartRepository.getAllCartItems { allItems ->
             allItems?.forEach { cartItem ->
                 selectedStates[cartItem.cartId] = selectAll
-                _products.postValue(
-                    _products.value?.map {
+                _cartItems.postValue(
+                    _cartItems.value?.map {
                         if (it.cartItem.cartId == cartItem.cartId) {
                             it.copy(isSelected = selectAll)
                         } else {
@@ -153,14 +152,12 @@ class CartViewModel(
         isNextPage: Boolean,
         currentPage: Int,
         isRefresh: Boolean,
-    ): Int {
-        if (isRefresh) return currentPage
-        return if (isNextPage) {
-            currentPage + DEFAULT_PAGE
-        } else {
-            max(DEFAULT_PAGE, currentPage - DEFAULT_PAGE)
+    ): Int =
+        when {
+            isRefresh -> currentPage
+            isNextPage -> currentPage + DEFAULT_PAGE
+            else -> max(DEFAULT_PAGE, currentPage - DEFAULT_PAGE)
         }
-    }
 
     private fun getCartItemById(
         id: Long,
@@ -173,12 +170,12 @@ class CartViewModel(
     }
 
     private fun updateProducts(updatedItem: CartItemUiModel) {
-        _products.value =
-            _products.value?.map {
-                if (it.cartItem.cartId == updatedItem.cartItem.cartId) {
+        _cartItems.value =
+            _cartItems.value?.map { cartItem ->
+                if (cartItem.cartItem.cartId == updatedItem.cartItem.cartId) {
                     updatedItem
                 } else {
-                    it
+                    cartItem
                 }
             }
         updateSelectionInfo()
@@ -198,7 +195,7 @@ class CartViewModel(
     companion object {
         private const val START_PAGE = 0
         private const val DEFAULT_PAGE = 1
-        private const val PAGE_SIZE: Int = 5
+        private const val PAGE_SIZE = 5
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
