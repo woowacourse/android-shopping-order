@@ -1,27 +1,26 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
-import woowacourse.shopping.data.product.entity.CartItemEntity
-import woowacourse.shopping.data.product.entity.CartItemEntity.Companion.toEntity
+import woowacourse.shopping.data.shoppingCart.PageableCartItemData
 import woowacourse.shopping.data.shoppingCart.source.RemoteShoppingCartDataSource
 import woowacourse.shopping.data.shoppingCart.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.cart.PageableCartItems
-import woowacourse.shopping.domain.product.CartItem
 import kotlin.concurrent.thread
 
 class DefaultShoppingCartRepository(
     private val shoppingCartDataSource: ShoppingCartDataSource = RemoteShoppingCartDataSource(),
 ) : ShoppingCartRepository {
-    override fun load(
+    override fun loadPageableCartItems(
         page: Int,
         size: Int,
         onLoad: (Result<PageableCartItems>) -> Unit,
     ) {
         {
-            val response = shoppingCartDataSource.pageableCartItems(page, size)
+            val pageableCartItemData: PageableCartItemData =
+                shoppingCartDataSource.pageableCartItems(page, size)
             PageableCartItems(
-                cartItems = response.cartItems.map(CartItemEntity::toDomain),
-                hasPrevious = response.hasPrevious,
-                hasNext = response.hasNext,
+                cartItems = pageableCartItemData.cartItems.map { it.toDomain() },
+                hasPrevious = pageableCartItemData.hasPrevious,
+                hasNext = pageableCartItemData.hasNext,
             )
         }.runAsync(onLoad)
     }
@@ -31,14 +30,19 @@ class DefaultShoppingCartRepository(
         quantity: Int,
         onAdd: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.addCartItem(productId, quantity) }.runAsync(onAdd)
+        {
+            shoppingCartDataSource.addCartItem(
+                productId = productId,
+                quantity = quantity,
+            )
+        }.runAsync(onAdd)
     }
 
     override fun remove(
-        cartItem: CartItem,
+        cartItemId: Long,
         onRemove: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.remove(cartItem.toEntity()) }.runAsync(onRemove)
+        { shoppingCartDataSource.remove(cartItemId) }.runAsync(onRemove)
     }
 
     override fun updateCartItemQuantity(
@@ -46,10 +50,15 @@ class DefaultShoppingCartRepository(
         quantity: Int,
         onUpdate: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.updateCartItemQuantity(cartItemId, quantity) }.runAsync(onUpdate)
+        {
+            shoppingCartDataSource.updateCartItemQuantity(
+                cartItemId = cartItemId,
+                newQuantity = quantity,
+            )
+        }.runAsync(onUpdate)
     }
 
-    override fun quantity(onResult: (Result<Int>) -> Unit) {
+    override fun cartItemsSize(onResult: (Result<Int>) -> Unit) {
         { shoppingCartDataSource.cartItemsSize() }.runAsync(onResult)
     }
 

@@ -26,7 +26,10 @@ class ShoppingCartViewModel(
     }
 
     private fun loadShoppingCart() {
-        shoppingCartRepository.load(page - 1, COUNT_PER_PAGE) { result: Result<PageableCartItems> ->
+        shoppingCartRepository.loadPageableCartItems(
+            page - 1,
+            COUNT_PER_PAGE,
+        ) { result: Result<PageableCartItems> ->
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
                     _shoppingCartItems.postValue(pageableCartItems.toShoppingCartItems())

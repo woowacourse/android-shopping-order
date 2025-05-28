@@ -35,7 +35,7 @@ class ProductDetailViewModel(
     }
 
     fun updateProduct(id: Long) {
-        productsRepository.loadProductById(id) { result: Result<Product?> ->
+        productsRepository.getProductById(id) { result: Result<Product?> ->
             result
                 .onSuccess { product: Product? ->
                     _product.postValue(product)

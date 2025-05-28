@@ -66,7 +66,7 @@ class ProductsViewModel(
     }
 
     fun loadMoreProducts() {
-        productsRepository.load(
+        productsRepository.loadPageableProducts(
             nextPage,
             LOAD_PRODUCTS_SIZE,
         ) { result: Result<PageableProducts> ->
@@ -84,7 +84,7 @@ class ProductsViewModel(
 
                     _productItems.postValue(
                         listOf(recentViewedProducts) + currentProductItems + newProductItems +
-                            listOf(LoadItem(pageableProducts.hasNext)),
+                            listOf(LoadItem(pageableProducts.loadable)),
                     )
                     loadCartItemQuantity()
                 }.onFailure {
@@ -95,7 +95,7 @@ class ProductsViewModel(
     }
 
     private fun loadCartItemQuantity() {
-        shoppingCartRepository.quantity { result: Result<Int> ->
+        shoppingCartRepository.cartItemsSize { result: Result<Int> ->
             result
                 .onSuccess { quantity: Int ->
                     _shoppingCartSize.postValue(quantity)
@@ -107,7 +107,7 @@ class ProductsViewModel(
     }
 
     private fun loadShoppingCart(size: Int) {
-        shoppingCartRepository.load(0, size) { result: Result<PageableCartItems> ->
+        shoppingCartRepository.loadPageableCartItems(0, size) { result: Result<PageableCartItems> ->
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
                     shoppingCart = pageableCartItems.cartItems
