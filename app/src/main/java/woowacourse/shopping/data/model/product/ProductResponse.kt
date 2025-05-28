@@ -16,7 +16,7 @@ data class ProductResponse(
     @SerialName("price")
     val price: Int,
     @SerialName("category")
-    val category: String?,
+    val category: String,
 )
 
 fun ProductResponse.toDomain() =
