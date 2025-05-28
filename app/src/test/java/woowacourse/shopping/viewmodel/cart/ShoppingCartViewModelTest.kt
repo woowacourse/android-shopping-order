@@ -88,7 +88,7 @@ class ShoppingCartViewModelTest {
         val productToRemove = viewModel.products.getOrAwaitValue().first()
 
         // when
-        viewModel.onProductRemoveClick(productToRemove)
+        viewModel.onProductRemoveClick(productToRemove.cartProduct)
 
         // then
         assertEquals(false, viewModel.products.getOrAwaitValue().contains(productToRemove))
@@ -101,8 +101,18 @@ class ShoppingCartViewModelTest {
         viewModel.loadNextProducts()
 
         // when
-        viewModel.onProductRemoveClick(viewModel.products.getOrAwaitValue().last())
-        viewModel.onProductRemoveClick(viewModel.products.getOrAwaitValue().last())
+        viewModel.onProductRemoveClick(
+            viewModel.products
+                .getOrAwaitValue()
+                .last()
+                .cartProduct,
+        )
+        viewModel.onProductRemoveClick(
+            viewModel.products
+                .getOrAwaitValue()
+                .last()
+                .cartProduct,
+        )
 
         // then
         assertEquals(2, viewModel.page.getOrAwaitValue())
@@ -112,17 +122,20 @@ class ShoppingCartViewModelTest {
     @Test
     fun `상품 수량 증가 클릭 시 수량이 1 증가한다`() {
         // given
-        val cartProduct =
+        val cartProductItem =
             viewModel.products
                 .getOrAwaitValue()
                 .first()
-
+                .cartProduct
         // when
-        viewModel.onQuantityIncreaseClick(cartProduct)
+        viewModel.onQuantityIncreaseClick(cartProductItem)
 
         // then
         val updatedItem =
-            viewModel.products.getOrAwaitValue().first { it.product.id == cartProduct.product.id }
+            viewModel.products
+                .getOrAwaitValue()
+                .first { it.cartProduct.product.id == cartProductItem.product.id }
+                .cartProduct
         assertEquals(2, updatedItem.quantity)
     }
 
@@ -133,6 +146,7 @@ class ShoppingCartViewModelTest {
             viewModel.products
                 .getOrAwaitValue()
                 .first()
+                .cartProduct
         viewModel.onQuantityIncreaseClick(cartProduct)
 
         // when
@@ -140,7 +154,10 @@ class ShoppingCartViewModelTest {
 
         // then
         val updatedItem =
-            viewModel.products.getOrAwaitValue().first { it.product.id == cartProduct.product.id }
+            viewModel.products
+                .getOrAwaitValue()
+                .first { it.cartProduct.product.id == cartProduct.product.id }
+                .cartProduct
         assertEquals(1, updatedItem.quantity)
     }
 }

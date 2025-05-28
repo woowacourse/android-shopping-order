@@ -35,7 +35,7 @@
             android:background="@color/dark_gray"
             android:gravity="end|center"
             android:padding="12dp"
-            android:text="@string/product_price"
+            android:text="@{String.format(@string/product_price, viewmodel.totalPrice)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
