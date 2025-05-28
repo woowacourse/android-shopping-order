@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -36,7 +37,7 @@ class DetailViewModelTest {
     fun `상품 ID에 해당하는 상품을 조회한다`() {
         // When
         val result = viewModel.product.getOrAwaitValue().toProduct()
-        val expected = productsFixture.find { it.id == 1L }
+        val expected = productsFixture.find { it.id == 1L }?.toDomain()
 
         // Then
         assertThat(result).isEqualTo(expected)
@@ -47,7 +48,7 @@ class DetailViewModelTest {
         // When
         val result = viewModel.recentProduct.getOrAwaitValue().toProduct()
 
-        val expected = productsFixture.find { it.id == 1L }
+        val expected = productsFixture.find { it.id == 1L }?.toDomain()
 
         // Than
         assertThat(result).isEqualTo(expected)

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.productsFixture
@@ -18,7 +19,7 @@ class CartViewModelTest {
     private lateinit var viewModel: CartViewModel
     private val dummyCartProducts =
         productsFixture.take(10).map {
-            CartProduct(it, 2)
+            CartProduct(it.id, it.toDomain(), 2)
         }
 
     @BeforeEach
