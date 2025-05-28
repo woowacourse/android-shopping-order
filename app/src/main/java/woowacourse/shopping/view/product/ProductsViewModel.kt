@@ -106,8 +106,7 @@ class ProductsViewModel(
                 )
             }
 
-        val hasRecentWatching =
-            currentProducts.any { it is RecentWatchingItem }
+        val hasRecentWatching = currentProducts.any { it is RecentWatchingItem }
 
         updateRecentProducts(
             productsWithoutLoadItem,
@@ -173,7 +172,7 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         recentWatchingItem: ProductsItem?,
     ) {
-        if (productsWithoutLoadItem.isEmpty()) {
+        if (productsWithoutLoadItem.isEmpty() || page != 0) {
             _products.postValue(
                 buildList {
                     recentWatchingItem?.let { add(it) }
@@ -184,6 +183,7 @@ class ProductsViewModel(
             )
             return
         }
+
         val mergedProducts =
             productsWithoutLoadItem.map { item: ProductsItem ->
                 if (item is ProductItem) {
@@ -205,10 +205,9 @@ class ProductsViewModel(
 
     fun updateShoppingCartQuantity() {
         shoppingCartRepository.fetchAllQuantity { result ->
-            result
-                .onSuccess { quantity: Int ->
-                    _shoppingCartQuantity.postValue(quantity)
-                }
+            result.onSuccess { quantity: Int ->
+                _shoppingCartQuantity.postValue(quantity)
+            }
         }
     }
 
