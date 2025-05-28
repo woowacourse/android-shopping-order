@@ -3,8 +3,8 @@ package woowacourse.shopping.presentation.cart.viewHolder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.databinding.PaginationButtonItemBinding
+import woowacourse.shopping.presentation.cart.event.CartEventHandler
 
 class PaginationButtonViewHolder(
     private val binding: PaginationButtonItemBinding,

@@ -51,12 +51,12 @@ class DetailViewModel(
             result
                 .onSuccess { response ->
                     _uiState.postValue(
-                        CartUiState.SUCCESS
+                        CartUiState.SUCCESS,
                     )
                 }
                 .onFailure { response ->
                     _uiState.postValue(
-                        CartUiState.FAIL
+                        CartUiState.FAIL,
                     )
                 }
 
@@ -96,14 +96,15 @@ class DetailViewModel(
 //    }
 
     companion object {
-        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                DetailViewModel(
-                    productsRepository = RepositoryProvider.productsRepository,
-                    cartItemRepository = RepositoryProvider.cartItemRepository,
-                    viewedRepository = RepositoryProvider.viewedItemRepository,
-                )
+        val FACTORY: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    DetailViewModel(
+                        productsRepository = RepositoryProvider.productsRepository,
+                        cartItemRepository = RepositoryProvider.cartItemRepository,
+                        viewedRepository = RepositoryProvider.viewedItemRepository,
+                    )
+                }
             }
-        }
     }
 }

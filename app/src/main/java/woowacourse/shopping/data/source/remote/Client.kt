@@ -22,7 +22,7 @@ object Client {
 
     val getProductRetrofitService: ProductsApiService by lazy {
         productApiService.create(
-            ProductsApiService::class.java
+            ProductsApiService::class.java,
         )
     }
     val getCartRetrofitService: CartApiService by lazy { cartApiService.create(CartApiService::class.java) }

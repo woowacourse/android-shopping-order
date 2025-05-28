@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import woowacourse.shopping.RepositoryProvider
-import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
@@ -109,12 +109,13 @@ class CartViewModel(
         private const val PAGE_SIZE = 5
         private const val INITIAL_PAGE = 0
 
-        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                CartViewModel(
-                    RepositoryProvider.cartItemRepository
-                )
+        val FACTORY: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    CartViewModel(
+                        RepositoryProvider.cartItemRepository,
+                    )
+                }
             }
-        }
     }
 }

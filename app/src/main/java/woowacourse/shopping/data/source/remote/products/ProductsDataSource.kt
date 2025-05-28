@@ -7,7 +7,8 @@ interface ProductsDataSource {
     fun getProducts(
         page: Int,
         size: Int,
-        onResult: (Result<ProductsResponse>) -> Unit)
+        onResult: (Result<ProductsResponse>) -> Unit,
+    )
 
     fun getProductById(
         id: Int,

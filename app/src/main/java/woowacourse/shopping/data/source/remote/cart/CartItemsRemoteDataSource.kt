@@ -15,15 +15,26 @@ class CartItemsRemoteDataSource(
         api.getCartItems(page = page, size = size).enqueueResult(onResult)
     }
 
-    override fun addCartItem(id: Int, quantity: Int, onResult: (Result<Unit>) -> Unit) {
+    override fun addCartItem(
+        id: Int,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
         api.postCartItems(productId = id, quantity = quantity).enqueueResult(onResult)
     }
 
-    override fun deleteCartItem(id: Int, onResult: (Result<Unit>) -> Unit) {
+    override fun deleteCartItem(
+        id: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
         api.deleteCartItems(id = id).enqueueResult(onResult)
     }
 
-    override fun updateCartItem(id: Int, quantity: Int, onResult: (Result<Unit>) -> Unit) {
+    override fun updateCartItem(
+        id: Int,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
         api.patchCartItems(id = id, quantity = quantity).enqueueResult(onResult)
     }
 

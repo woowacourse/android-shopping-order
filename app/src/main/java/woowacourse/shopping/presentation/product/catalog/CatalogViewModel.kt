@@ -77,20 +77,20 @@ class CatalogViewModel(
 
     private fun applyProductChange(updated: ProductUiModel) {
         val currentPagingData = _pagingData.value ?: return
-        val updatedProducts = currentPagingData.products.map {
-            if (it.id == updated.id) updated else it
-        }
+        val updatedProducts =
+            currentPagingData.products.map {
+                if (it.id == updated.id) updated else it
+            }
 
         _pagingData.postValue(
             PagingData(
                 products = updatedProducts,
-                hasNext = currentPagingData.hasNext
-            )
+                hasNext = currentPagingData.hasNext,
+            ),
         )
 
         updateCartCount()
     }
-
 
     fun loadNextCatalogProducts() {
         currentPage++
@@ -101,7 +101,7 @@ class CatalogViewModel(
         productsRepository.getProducts(currentPage, pageSize) { result ->
             result.onSuccess { pagingData ->
                 _pagingData.postValue(
-                    pagingData
+                    pagingData,
                 )
             }
         }
@@ -115,7 +115,7 @@ class CatalogViewModel(
     }
 
     private fun updateCartCount() {
-        cartRepository.getCarItemsCount() { result ->
+        cartRepository.getCarItemsCount { result ->
             result.onSuccess { cartCount ->
                 _cartCount.postValue(cartCount)
             }
@@ -125,14 +125,15 @@ class CatalogViewModel(
     companion object {
         private const val PAGE_SIZE = 20
 
-        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                CatalogViewModel(
-                    productsRepository = RepositoryProvider.productsRepository,
-                    cartRepository = RepositoryProvider.cartItemRepository,
-                    viewedRepository = RepositoryProvider.viewedItemRepository
-                )
+        val FACTORY: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    CatalogViewModel(
+                        productsRepository = RepositoryProvider.productsRepository,
+                        cartRepository = RepositoryProvider.cartItemRepository,
+                        viewedRepository = RepositoryProvider.viewedItemRepository,
+                    )
+                }
             }
-        }
     }
 }

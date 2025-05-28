@@ -16,7 +16,7 @@ interface CartApiService {
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int = 5,
-        @Query("sort") sort: List<String> = listOf<String>(""),
+        @Query("sort") sort: List<String> = listOf(""),
     ): Call<CartItemResponse>
 
     @POST("/cart-items")

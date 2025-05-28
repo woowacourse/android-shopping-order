@@ -11,5 +11,5 @@ data class CartItemResponse(
     val size: Int,
     val sort: Sort,
     val totalElements: Long,
-    val totalPages: Int
+    val totalPages: Int,
 )

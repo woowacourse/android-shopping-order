@@ -19,7 +19,7 @@ class CartItemsRepositoryImpl(
                 .mapCatching { response ->
                     PagingData(
                         products = response.content.map { it.toUiModel() },
-                        hasNext = !response.last
+                        hasNext = !response.last,
                     )
                 }
                 .let(onResult)
@@ -61,16 +61,13 @@ class CartItemsRepositoryImpl(
         }
     }
 
-    override fun getCarItemsCount(
-        onResult: (Result<Int>) -> Unit,
-    ) {
-        cartItemsRemoteDataSource.getCarItemsCount() { result ->
+    override fun getCarItemsCount(onResult: (Result<Int>) -> Unit) {
+        cartItemsRemoteDataSource.getCarItemsCount { result ->
             result
                 .mapCatching { it.numberOfElements }
                 .let(onResult)
         }
     }
-
 
     private fun Content.toUiModel() =
         ProductUiModel(
@@ -78,6 +75,6 @@ class CartItemsRepositoryImpl(
             imageUrl = this.product.imageUrl,
             name = this.product.name,
             quantity = this.quantity,
-            price = this.product.price
+            price = this.product.price,
         )
 }

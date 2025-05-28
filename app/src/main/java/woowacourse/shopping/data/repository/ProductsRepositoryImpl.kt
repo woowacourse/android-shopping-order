@@ -21,7 +21,7 @@ class ProductsRepositoryImpl(
                 .mapCatching { response ->
                     PagingData(
                         products = response.content.map { it.toDomain().toUiModel() },
-                        hasNext = !response.last
+                        hasNext = !response.last,
                     )
                 }
                 .let(onResult)

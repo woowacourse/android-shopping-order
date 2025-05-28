@@ -62,8 +62,8 @@ class DetailActivity : AppCompatActivity() {
                 startActivity(
                     newIntent(
                         this,
-                        product.id
-                    )
+                        product.id,
+                    ),
                 )
                 finish()
             }
