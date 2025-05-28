@@ -23,8 +23,8 @@ android {
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
 
-        buildConfigField("String", "USER_ID", "\"${getApiKey("USER_ID")}\"")
-        buildConfigField("String", "PASSWORD", "\"${getApiKey("PASSWORD")}\"")
+        buildConfigField("String", "AUTHORIZATION_KEY", "\"${getApiKey("AUTHORIZATION_KEY")}\"")
+        buildConfigField("String", "BASE_URL", "\"${getApiKey("BASE_URL")}\"")
     }
 
     buildTypes {
@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
 
