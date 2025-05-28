@@ -16,8 +16,8 @@ class CartItemsRepositoryImpl(
     init {
         getInitialCartItems(null, null) { result ->
             result
-                .onSuccess { it ->
-                    cartItemsLocalDataSource.getCachedCartItem(it)
+                .onSuccess { cachedCartItems ->
+                    cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
                 }
         }
     }
@@ -93,15 +93,39 @@ class CartItemsRepositoryImpl(
         }
     }
 
-    override fun updateCartItem(
+    override fun updateCartItemQuantity(
         id: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
         val cartId = cartItemsLocalDataSource.findCachedCartId(id)
         if (cartId != null) {
+            cartItemsLocalDataSource.update(id, quantity)
             cartItemsRemoteDataSource.updateCartItem(cartId, quantity) { result ->
                 result.let(onResult)
+            }
+        }
+    }
+
+    override fun addCartItemQuantity(
+        id: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+        val updatedQuantity = cartItemsLocalDataSource.getQuantity(id) + quantity
+        if (cartId != null) {
+            cartItemsLocalDataSource.update(id, updatedQuantity)
+            cartItemsRemoteDataSource.updateCartItem(cartId, updatedQuantity) { result ->
+                result.let(onResult)
+            }
+        } else {
+            cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
+                result
+                    .mapCatching { cartId ->
+                        cartItemsLocalDataSource.add(cartId, id, quantity)
+                    }
+                    .let(onResult)
             }
         }
     }
