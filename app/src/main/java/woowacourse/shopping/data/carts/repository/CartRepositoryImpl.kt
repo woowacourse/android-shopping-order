@@ -76,7 +76,7 @@ class CartRepositoryImpl(
         onFail: (CartFetchError) -> Unit,
     ) {
         Log.d("updateQuantity리포지토리", "$cartId, $cartQuantity")
-        remoteDataSource.updateItemCount(
+        remoteDataSource.updateCartItemCount(
             cartId = cartId,
             cartQuantity = cartQuantity,
             onSuccess = { resultCode ->

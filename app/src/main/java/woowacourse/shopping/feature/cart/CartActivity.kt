@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
@@ -30,11 +29,11 @@ class CartActivity :
             quantityChangeListener =
                 object : QuantityChangeListener {
                     override fun onIncrease(cartItem: CartItem) {
-                        viewModel.addCartItemOrIncreaseQuantity(cartItem.copy(quantity = QUANTITY_UPDATE_UNIT))
+                        viewModel.increaseQuantity(cartItem)
                     }
 
                     override fun onDecrease(cartItem: CartItem) {
-                        viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = QUANTITY_UPDATE_UNIT))
+                        viewModel.removeCartItemOrDecreaseQuantity(cartItem)
                     }
                 },
         )

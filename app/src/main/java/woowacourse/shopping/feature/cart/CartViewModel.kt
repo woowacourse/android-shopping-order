@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
@@ -50,7 +51,8 @@ class CartViewModel(
         updateCartQuantity()
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
+        cartResponse.toCartItems()
 
 //    fun updateCartCache() {
 //        cartRepository.fetchAllCartItems({ cartResponse ->
@@ -79,10 +81,12 @@ class CartViewModel(
         return if (idx >= 0) idx else null
     }
 
-    fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
-//        cartRepository.updateQuantity(cartItem.goods, cartItem.quantity) {
-//            updateCartQuantity()
-//        }
+    fun increaseQuantity(cartItem: CartItem) {
+        cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity+1),{
+            updateCartQuantity()
+        }) {
+
+        }
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {

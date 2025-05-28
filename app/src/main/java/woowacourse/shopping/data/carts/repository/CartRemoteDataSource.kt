@@ -28,7 +28,7 @@ interface CartRemoteDataSource {
 
     fun fetchAuthCode(onResponse: (Int) -> Unit)
 
-    fun updateItemCount(
+    fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
         onSuccess: (resultCode: Int) -> Unit,

@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -119,7 +120,7 @@ class CartRemoteDataSourceImpl(
             )
     }
 
-    override fun updateItemCount(
+    override fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
         onSuccess: (resultCode: Int) -> Unit,
@@ -131,11 +132,12 @@ class CartRemoteDataSourceImpl(
                 requestBody = cartQuantity,
                 authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
-                object : Callback<CartQuantity> {
+                object : Callback<Unit> {
                     override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
+                        Log.d("onResponse",response.code().toString())
                         if (response.isSuccessful) {
                             onSuccess(response.code())
                         } else {
@@ -144,9 +146,10 @@ class CartRemoteDataSourceImpl(
                     }
 
                     override fun onFailure(
-                        call: Call<CartQuantity>,
+                        call: Call<Unit>,
                         t: Throwable,
                     ) {
+                        Log.d("onResponse",t.message.toString())
                         onFailure(CartFetchError.Network)
                     }
                 },

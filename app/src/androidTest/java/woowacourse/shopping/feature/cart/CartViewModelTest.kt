@@ -66,7 +66,7 @@ class CartViewModelTest {
         val initialSize = initialCart.size
 
         // When
-        viewModel.addCartItemOrIncreaseQuantity(CartItem(newGoods, 1))
+        viewModel.increaseQuantity(CartItem(newGoods, 1))
         waitForCartUpdate()
 
         // Then
@@ -87,7 +87,7 @@ class CartViewModelTest {
         val originalQuantity = targetItem.quantity
 
         // When
-        viewModel.addCartItemOrIncreaseQuantity(CartItem(targetItem.goods, 2))
+        viewModel.increaseQuantity(CartItem(targetItem.goods, 2))
         waitForCartUpdate()
 
         // Then
@@ -294,7 +294,7 @@ class CartViewModelTest {
             )
 
         additionalGoods.forEach { goods ->
-            viewModel.addCartItemOrIncreaseQuantity(CartItem(goods, 1))
+            viewModel.increaseQuantity(CartItem(goods, 1))
             waitForUpdate(200)
         }
     }

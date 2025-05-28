@@ -50,7 +50,7 @@ interface RetrofitService {
         @Body requestBody: CartQuantity,
         @Header("accept") accept: String = "*/*",
         @Header("Authorization") authorization: String,
-    ): Call<CartQuantity>
+    ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
