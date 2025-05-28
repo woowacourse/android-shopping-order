@@ -2,17 +2,27 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.ProductResponse
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
+import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductsRepository
+import woowacourse.shopping.mapper.toUiModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ProductsRepositoryImpl(
-    private val productsRemoteDataSource: ProductsRemoteDataSource
+    private val productsRemoteDataSource: ProductsRemoteDataSource,
 ) : ProductsRepository {
-    override fun getProducts(onResult: (Result<List<Product>>) -> Unit) {
-        productsRemoteDataSource.getProducts { result ->
+    override fun getProducts(
+        page: Int,
+        size: Int,
+        onResult: (Result<PagingData>) -> Unit,
+    ) {
+        productsRemoteDataSource.getProducts(page, size) { result ->
             result
                 .mapCatching { response ->
-                    response.content.map { it.toDomain() }
+                    PagingData(
+                        products = response.content.map { it.toDomain().toUiModel() },
+                        hasNext = !response.last
+                    )
                 }
                 .let(onResult)
         }
@@ -20,12 +30,12 @@ class ProductsRepositoryImpl(
 
     override fun getProductById(
         id: Int,
-        onResult: (Result<Product>) -> Unit,
+        onResult: (Result<ProductUiModel>) -> Unit,
     ) {
         productsRemoteDataSource.getProductById(id) { result ->
             result
                 .mapCatching { response ->
-                    response.toDomain()
+                    response.toDomain().toUiModel()
                 }
                 .let(onResult)
         }

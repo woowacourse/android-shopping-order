@@ -1,12 +1,16 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface ProductsRepository {
-    fun getProducts(onResult: (Result<List<Product>>) -> Unit)
+    fun getProducts(
+        page: Int,
+        pageSize: Int= 20,
+        onResult: (Result<PagingData>) -> Unit)
 
     fun getProductById(
         id: Int,
-        onResult: (Result<Product>) -> Unit,
+        onResult: (Result<ProductUiModel>) -> Unit,
     )
 }

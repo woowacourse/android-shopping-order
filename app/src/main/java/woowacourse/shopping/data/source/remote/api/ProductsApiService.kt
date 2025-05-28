@@ -13,7 +13,7 @@ interface ProductsApiService {
     fun getProducts(
         @Header("accept") accept: String = "*/*",
         @Query("size") size: Int = 20,
-        @Query("page") page: Int = 0,
+        @Query("page") page: Int,
     ): Call<ProductsResponse>
 
     @GET("/products/{id}")

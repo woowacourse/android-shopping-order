@@ -4,7 +4,10 @@ import woowacourse.shopping.data.model.ProductResponse
 import woowacourse.shopping.data.model.ProductsResponse
 
 interface ProductsDataSource {
-    fun getProducts(onResult: (Result<ProductsResponse>) -> Unit)
+    fun getProducts(
+        page: Int,
+        size: Int,
+        onResult: (Result<ProductsResponse>) -> Unit)
 
     fun getProductById(
         id: Int,

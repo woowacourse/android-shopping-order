@@ -6,10 +6,14 @@ import woowacourse.shopping.data.source.remote.api.ProductsApiService
 import woowacourse.shopping.data.source.remote.util.enqueueResult
 
 class ProductsRemoteDataSource(
-    private val api: ProductsApiService
+    private val api: ProductsApiService,
 ) : ProductsDataSource {
-    override fun getProducts(onResult: (Result<ProductsResponse>) -> Unit) {
-        api.getProducts().enqueueResult(onResult)
+    override fun getProducts(
+        page: Int,
+        size: Int,
+        onResult: (Result<ProductsResponse>) -> Unit,
+    ) {
+        api.getProducts(page = page, size = size).enqueueResult(onResult)
     }
 
     override fun getProductById(
