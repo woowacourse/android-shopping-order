@@ -12,6 +12,7 @@
         <variable
             name="onClickShoppingCartButton"
             type="kotlin.jvm.functions.Function0" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -92,6 +93,37 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/productsToolbar"
             tools:listitem="@layout/item_product" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerFrameLayout_main"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productsToolbar">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+                <include layout="@layout/item_product_skeleton" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

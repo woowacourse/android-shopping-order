@@ -97,6 +97,16 @@ class ProductsActivity :
         viewModel.event.observe(this) { event: ProductsEvent ->
             handleUiEvent(event)
         }
+
+        viewModel.isLoading.observe(this) { loading ->
+            if (loading) {
+                binding.shimmerFrameLayoutMain.visibility = View.VISIBLE
+                binding.shimmerFrameLayoutMain.startShimmer()
+            } else {
+                binding.shimmerFrameLayoutMain.stopShimmer()
+                binding.shimmerFrameLayoutMain.visibility = View.GONE
+            }
+        }
     }
 
     private fun handleShoppingCartQuantity(shoppingCartQuantity: Int) {

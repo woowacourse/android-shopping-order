@@ -31,6 +31,9 @@ class ProductsViewModel(
     private var loadable: Boolean = false
     private var page: Int = MINIMUM_PAGE
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     init {
         updateProducts()
         updateShoppingCartQuantity()
@@ -48,8 +51,10 @@ class ProductsViewModel(
                     val productsToShow = newProducts.take(LOAD_PRODUCTS_SIZE)
 
                     updateProductsShoppingCartQuantity(productsToShow, currentProducts)
+                    _isLoading.value = false
                 }.onFailure {
                     _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
+                    _isLoading.value = false
                 }
         }
     }

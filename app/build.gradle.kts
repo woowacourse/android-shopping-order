@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization.converter)
     implementation(libs.retrofit)
+    implementation(libs.shimmer)
     implementation(libs.converter.gson)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
