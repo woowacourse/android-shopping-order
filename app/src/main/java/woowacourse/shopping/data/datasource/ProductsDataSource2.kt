@@ -14,11 +14,11 @@ class ProductsDataSource2(private val service: ProductService) {
 //    }
 
     fun singlePage(
-        fromIndex: Int,
-        toIndex: Int,
+        page: Int,
+        size: Int,
         callback: (Result<ProductsResponse?>) -> Unit,
     ) {
-        service.requestProducts(fromIndex, toIndex).enqueue(
+        service.requestProducts(page, size).enqueue(
             object :
                 Callback<ProductsResponse> {
                 override fun onResponse(
