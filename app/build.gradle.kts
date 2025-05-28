@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
@@ -10,6 +12,20 @@ plugins {
 android {
     namespace = "woowacourse.shopping"
     compileSdk = 35
+
+    val localProperties =
+        gradle.rootProject
+            .file("local.properties")
+            .inputStream()
+            .use { Properties().apply { load(it) } }
+
+    val authUsername = localProperties["auth.username"] as String
+    val authPassword = localProperties["auth.password"] as String
+
+    defaultConfig {
+        buildConfigField("String", "AUTH_USERNAME", "\"$authUsername\"")
+        buildConfigField("String", "AUTH_PASSWORD", "\"$authPassword\"")
+    }
 
     defaultConfig {
         applicationId = "woowacourse.shopping"
@@ -47,6 +63,9 @@ android {
     dataBinding {
         enable = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -64,7 +83,6 @@ dependencies {
     implementation(libs.mockwebserver)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
-    implementation(libs.shimmer)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
@@ -82,5 +100,4 @@ dependencies {
     androidTestImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.mannodermaus.junit5.core)
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
-
 }
