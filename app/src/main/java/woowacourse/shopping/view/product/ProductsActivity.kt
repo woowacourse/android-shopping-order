@@ -29,6 +29,7 @@ class ProductsActivity : AppCompatActivity() {
             ::navigateToProductDetail,
             viewModel::loadMoreProducts,
             viewModel::plusCartItemQuantity,
+            viewModel::minusCartItemQuantity,
         )
     }
 
@@ -122,6 +123,8 @@ class ProductsActivity : AppCompatActivity() {
                 ProductsEvent.LOAD_SHOPPING_CART_FAILURE -> TODO()
                 ProductsEvent.ADD_CART_ITEM_FAILURE -> TODO()
                 ProductsEvent.PLUS_CART_ITEM_FAILURE -> TODO()
+                ProductsEvent.REMOVE_CART_ITEM_FAILURE -> TODO()
+                ProductsEvent.MINUS_CART_ITEM_FAILURE -> TODO()
             }
         }
     }

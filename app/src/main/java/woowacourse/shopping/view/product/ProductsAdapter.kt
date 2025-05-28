@@ -11,6 +11,10 @@ class ProductsAdapter(
         productId: Long,
         quantity: Int,
     ) -> Unit,
+    private val onMinusQuantity: (
+        productId: Long,
+        quantity: Int,
+    ) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var items: List<ProductsItem> = emptyList()
 
@@ -25,7 +29,7 @@ class ProductsAdapter(
                 RecentViewedProductsViewHolder.of(parent, onSelectProduct)
 
             ProductsItem.ItemType.PRODUCT ->
-                ProductViewHolder.of(parent, onSelectProduct, onPlusQuantity)
+                ProductViewHolder.of(parent, onSelectProduct, onPlusQuantity, onMinusQuantity)
 
             ProductsItem.ItemType.MORE ->
                 ProductMoreViewHolder.of(parent, onLoad)

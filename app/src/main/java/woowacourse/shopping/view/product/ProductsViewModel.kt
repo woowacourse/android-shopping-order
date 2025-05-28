@@ -145,6 +145,34 @@ class ProductsViewModel(
         }
     }
 
+    fun minusCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val cartItemId = cartItems.find { it.productId == productId }?.id ?: error("")
+        if (quantity == 0) {
+            cartRepository.remove(
+                cartItemId = cartItemId,
+            ) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(ProductsEvent.REMOVE_CART_ITEM_FAILURE)
+                    }
+            }
+        } else {
+            cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(ProductsEvent.MINUS_CART_ITEM_FAILURE)
+                    }
+            }
+        }
+    }
+
     fun getCartItemId(product: Product): Long = 0L
 
     fun updateRecentViewedProducts() {

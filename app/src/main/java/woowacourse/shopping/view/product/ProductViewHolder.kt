@@ -13,6 +13,10 @@ class ProductViewHolder(
         productId: Long,
         quantity: Int,
     ) -> Unit,
+    onMinusQuantity: (
+        productId: Long,
+        quantity: Int,
+    ) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.productItemActionListener =
@@ -23,13 +27,10 @@ class ProductViewHolder(
 
                 override fun onPlusProductQuantity(item: ProductsItem.ProductItem) {
                     onPlusQuantity(item.product.id, item.quantity.plus(1))
-//                    item.quantity++
-//                    binding.invalidateAll()
                 }
 
                 override fun onMinusProductQuantity(item: ProductsItem.ProductItem) {
-                    item.quantity--
-                    binding.invalidateAll()
+                    onMinusQuantity(item.product.id, item.quantity.minus(1))
                 }
             }
     }
@@ -46,10 +47,14 @@ class ProductViewHolder(
                 productId: Long,
                 quantity: Int,
             ) -> Unit,
+            onMinusQuantity: (
+                productId: Long,
+                quantity: Int,
+            ) -> Unit,
         ): ProductViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemProductBinding.inflate(layoutInflater, parent, false)
-            return ProductViewHolder(binding, onSelectProduct, onPlusQuantity)
+            return ProductViewHolder(binding, onSelectProduct, onPlusQuantity, onMinusQuantity)
         }
     }
 }
