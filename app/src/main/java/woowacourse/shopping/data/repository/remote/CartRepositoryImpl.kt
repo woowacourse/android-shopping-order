@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.remote
 
+import android.util.Log
 import woowacourse.shopping.data.datasource.remote.CartDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
@@ -43,10 +44,7 @@ class CartRepositoryImpl(
             }
         } else {
             insertProduct(product, productQuantity) { result ->
-                val cartId = result.getOrNull() ?: -1L
-                val cartItem =
-                    CartItem(cartId = cartId, product = product, quantity = productQuantity)
-                onResult(Result.success(Unit))
+                val a = result
             }
         }
     }
@@ -61,7 +59,7 @@ class CartRepositoryImpl(
             val cartItem =
                 CartItem(cartId = cartId, product = product, quantity = productQuantity)
             cachedCart = cachedCart.add(cartItem)
-
+            Log.d("CN_Log", "cacheCart = $cachedCart")
             onResult(result)
         }
     }
@@ -80,11 +78,48 @@ class CartRepositoryImpl(
         }
     }
 
+    override fun increaseQuantity(
+        productId: Long,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        val cartItem =
+            cachedCart.findCartItem(productId) ?: throw NoSuchElementException("존재하지 않는 아이디")
+        cartDataSource.updateQuantity(cartItem.cartId, cartItem.quantity + 1) { result ->
+            result.onSuccess {
+                onResult(result)
+                cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity + 1))
+            }
+        }
+    }
+
+    override fun decreaseQuantity(
+        productId: Long,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        val cartItem =
+            cachedCart.findCartItem(productId) ?: throw NoSuchElementException("존재하지 않는 아이디")
+        if (cartItem.quantity == 1) {
+            deleteProduct(productId) { result ->
+                result.onSuccess {
+                    onResult(result)
+                }
+            }
+        } else {
+            cartDataSource.updateQuantity(cartItem.cartId, cartItem.quantity - 1) { result ->
+                result.onSuccess {
+                    onResult(result)
+                    cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity - 1))
+                }
+            }
+        }
+    }
+
     override fun deleteProduct(
         productId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
         val cartId = cachedCart.findCartItem(productId)?.cartId ?: -1
+        Log.d("CN_Log", "cartId=$cartId")
         cartDataSource.deleteCartItemById(cartId) { result ->
             result.onSuccess {
                 onResult(result)

@@ -86,42 +86,27 @@ class ProductViewModel(
     }
 
     fun increaseQuantity(productId: Long) {
-//        cartRepository.increaseQuantity(productId, 1) { result ->
-//            result
-//                .onSuccess {
-//                    updateQuantity(productId, 1)
-//                    fetchCartItemCount()
-//                }.onFailure {
-//                    _toastMessage.value = R.string.product_toast_increase_fail
-//                }
-//        }
+        cartRepository.increaseQuantity(productId) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(productId, 1)
+                    fetchCartItemCount()
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_increase_fail
+                }
+        }
     }
 
     fun decreaseQuantity(productId: Long) {
-//        val currentItems = (_products.value as? ResultState.Success)?.data ?: return
-//        val item = currentItems.find { it.product.productId == productId } ?: return
-//
-//        if (item.quantity == 1) {
-//            cartRepository.deleteProduct(productId) { result ->
-//                result
-//                    .onSuccess {
-//                        updateQuantity(productId, -1)
-//                        fetchCartItemCount()
-//                    }.onFailure {
-//                        _toastMessage.value = R.string.product_toast_delete_fail
-//                    }
-//            }
-//        } else {
-//            cartRepository.decreaseQuantity(productId) { result ->
-//                result
-//                    .onSuccess {
-//                        updateQuantity(productId, -1)
-//                        fetchCartItemCount()
-//                    }.onFailure {
-//                        _toastMessage.value = R.string.product_toast_decrease_fail
-//                    }
-//            }
-//        }
+        cartRepository.decreaseQuantity(productId) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(productId, -1)
+                    fetchCartItemCount()
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_increase_fail
+                }
+        }
     }
 
     fun addToCart(cartItem: CartItem) {
