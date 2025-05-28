@@ -20,6 +20,8 @@ class CartViewModel(
 
     private var page: Int = MIN_PAGE
 
+    val loading: MutableLiveData<Boolean> = MutableLiveData(true)
+
     init {
         loadCartItems()
     }
@@ -43,6 +45,8 @@ class CartViewModel(
                 }.onFailure {
                     _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
                 }
+            Thread.sleep(1000)
+            loading.postValue(false)
         }
     }
 

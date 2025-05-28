@@ -45,6 +45,8 @@ class CartActivity :
             setResult(RESULT_OK)
             finish()
         }
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
     }
 
     private fun bindData() {
