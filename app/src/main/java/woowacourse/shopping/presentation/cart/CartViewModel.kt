@@ -17,13 +17,10 @@ class CartViewModel(
     private val cartRepository: CartItemRepository,
 ) : ViewModel(),
     CartEventHandler {
-//    private val _cartProducts = MutableLiveData<List<ProductUiModel>>()
-//    val cartProducts: LiveData<List<ProductUiModel>> = _cartProducts
-
-    private val _isNextButtonEnabled = MutableLiveData<Boolean>(false)
+    private val _isNextButtonEnabled = MutableLiveData(false)
     val isNextButtonEnabled: LiveData<Boolean> = _isNextButtonEnabled
 
-    private val _isPrevButtonEnabled = MutableLiveData<Boolean>(false)
+    private val _isPrevButtonEnabled = MutableLiveData(false)
     val isPrevButtonEnabled: LiveData<Boolean> = _isPrevButtonEnabled
 
     private val _pageEvent = SingleLiveEvent<Int>()
@@ -71,7 +68,7 @@ class CartViewModel(
 
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
-        cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
+        cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
             result
                 .onSuccess {
                     _product.postValue(newProduct)
@@ -82,7 +79,7 @@ class CartViewModel(
     fun decreaseQuantity(product: ProductUiModel) {
         val newQuantity = if (product.quantity > 1) product.quantity - 1 else 1
         val newProduct = product.copy(quantity = newQuantity)
-        cartRepository.updateCartItem(newProduct.id, newProduct.quantity) { result ->
+        cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
             result
                 .onSuccess {
                     _product.postValue(newProduct)
@@ -103,9 +100,7 @@ class CartViewModel(
         cartRepository.getCartItems(currentPage, pageSize) { response ->
             response
                 .onSuccess { pagingData ->
-                    _pagingData.postValue(
-                        pagingData,
-                    )
+                    _pagingData.postValue(pagingData)
                 }
         }
 //        repository.getAllCartItemSize { totalSize ->
