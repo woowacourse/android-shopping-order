@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.shoppingCart.storage
+package woowacourse.shopping.data.shoppingCart.source
 
 import android.content.Context
 import androidx.room.Room
 import woowacourse.shopping.data.product.entity.CartItemEntity
-import woowacourse.shopping.data.shoppingCart.PageableCartItems
+import woowacourse.shopping.data.shoppingCart.PageableCartItemData
 import woowacourse.shopping.data.shoppingCart.dao.ShoppingCartDao
 import woowacourse.shopping.data.shoppingCart.database.ShoppingCartDatabase
 
@@ -22,10 +22,10 @@ object LocalShoppingCartDataSource : ShoppingCartDataSource {
         dao = db.dao()
     }
 
-    override fun load(
+    override fun pageableCartItems(
         page: Int,
         size: Int,
-    ): PageableCartItems = TODO()
+    ): PageableCartItemData = TODO()
 
     override fun addCartItem(
         productId: Long,
@@ -40,12 +40,12 @@ object LocalShoppingCartDataSource : ShoppingCartDataSource {
 
     override fun updateCartItemQuantity(
         cartItemId: Long,
-        quantity: Int,
+        newQuantity: Int,
     ) {
         TODO("Not yet implemented")
     }
 
-    override fun quantity(): Int =
+    override fun cartItemsSize(): Int =
         dao.quantityOf(
             productId = TODO(),
         )

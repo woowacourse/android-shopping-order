@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.product.repository
 
-import woowacourse.shopping.data.product.dataSource.LocalRecentViewedProductsDataSource
-import woowacourse.shopping.data.product.dataSource.ProductsDataSource
-import woowacourse.shopping.data.product.dataSource.RecentViewedProductsDataSource
-import woowacourse.shopping.data.product.dataSource.RemoteProductsDataSource
 import woowacourse.shopping.data.product.entity.ProductEntity
 import woowacourse.shopping.data.product.entity.RecentViewedProductEntity
+import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
+import woowacourse.shopping.data.product.source.ProductsDataSource
+import woowacourse.shopping.data.product.source.RecentViewedProductsDataSource
+import woowacourse.shopping.data.product.source.RemoteProductsDataSource
 import woowacourse.shopping.domain.product.PageableProducts
 import woowacourse.shopping.domain.product.Product
 import java.time.LocalDateTime
@@ -21,9 +21,9 @@ class DefaultProductsRepository(
         onLoad: (Result<PageableProducts>) -> Unit,
     ) {
         {
-            val pageableProducts = productsDataSource.load(page, size)
+            val pageableProducts = productsDataSource.pageableProducts(page, size)
             val products = pageableProducts.products.map(ProductEntity::toDomain)
-            val hasNext = pageableProducts.hasNext
+            val hasNext = pageableProducts.loadable
 
             PageableProducts(products, hasNext)
         }.runAsync(onLoad)

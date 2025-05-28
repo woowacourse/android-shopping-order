@@ -1,13 +1,13 @@
-package woowacourse.shopping.data.product.dataSource
+package woowacourse.shopping.data.product.source
 
-import woowacourse.shopping.data.product.PageableProducts
+import woowacourse.shopping.data.product.PageableProductData
 import woowacourse.shopping.data.product.entity.ProductEntity
 
 interface ProductsDataSource {
-    fun load(
+    fun pageableProducts(
         page: Int,
         size: Int,
-    ): PageableProducts
+    ): PageableProductData
 
     fun getProductById(id: Long): ProductEntity?
 }

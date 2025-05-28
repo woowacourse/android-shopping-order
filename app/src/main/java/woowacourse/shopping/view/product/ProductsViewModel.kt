@@ -117,30 +117,11 @@ class ProductsViewModel(
         }
     }
 
-    fun updateShoppingCart(onUpdate: () -> Unit) {
-        val productItems: List<ProductItem> =
-            productItems.value?.filterIsInstance<ProductItem>() ?: return
-
-        val cartItemsToUpdate: List<CartItem> =
-            productItems
-                .map { productItem: ProductItem ->
-                    CartItem(productItem.product, productItem.quantity)
-                }.filter { cartItem -> cartItem.quantity != 0 }
-
-        shoppingCartRepository.update(cartItemsToUpdate) { result: Result<Unit> ->
-            result
-                .onSuccess {
-                }.onFailure {
-                    _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
-                }
-            onUpdate()
-        }
-    }
-
     fun getCartItemId(product: Product): Long {
         shoppingCart.find {
             it.productId == product.id
         }
+        TODO()
     }
 
     companion object {

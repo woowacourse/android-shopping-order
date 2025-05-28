@@ -9,6 +9,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import woowacourse.shopping.data.product.dto.CartRequest
 import woowacourse.shopping.data.product.dto.ProductResponse
+import woowacourse.shopping.data.product.dto.ProductsResponse
 import woowacourse.shopping.data.shoppingCart.dto.CartItemResponse
 import woowacourse.shopping.data.shoppingCart.dto.CartQuantityResponse
 import woowacourse.shopping.data.shoppingCart.dto.CartResponse
@@ -80,7 +81,11 @@ class ProductsHttpClient(
     fun getProducts(
         page: Int,
         size: Int,
-    ): Response = http(HttpMethod.Get, "/products?page=$page&size=$size")
+    ): ProductsResponse {
+        val response = http(HttpMethod.Get, "/products?page=$page&size=$size")
+        val jsonString: String = response.body?.string() ?: ""
+        return Json.decodeFromString(jsonString)
+    }
 
     fun getProductById(productId: Long): ProductResponse {
         val response =

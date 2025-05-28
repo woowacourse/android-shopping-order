@@ -2,8 +2,8 @@ package woowacourse.shopping.data.shoppingCart.repository
 
 import woowacourse.shopping.data.product.entity.CartItemEntity
 import woowacourse.shopping.data.product.entity.CartItemEntity.Companion.toEntity
-import woowacourse.shopping.data.shoppingCart.storage.RemoteShoppingCartDataSource
-import woowacourse.shopping.data.shoppingCart.storage.ShoppingCartDataSource
+import woowacourse.shopping.data.shoppingCart.source.RemoteShoppingCartDataSource
+import woowacourse.shopping.data.shoppingCart.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
 import kotlin.concurrent.thread
@@ -17,7 +17,7 @@ class DefaultShoppingCartRepository(
         onLoad: (Result<PageableCartItems>) -> Unit,
     ) {
         {
-            val response = shoppingCartDataSource.load(page, size)
+            val response = shoppingCartDataSource.pageableCartItems(page, size)
             PageableCartItems(
                 cartItems = response.cartItems.map(CartItemEntity::toDomain),
                 hasPrevious = response.hasPrevious,
@@ -50,7 +50,7 @@ class DefaultShoppingCartRepository(
     }
 
     override fun quantity(onResult: (Result<Int>) -> Unit) {
-        { shoppingCartDataSource.quantity() }.runAsync(onResult)
+        { shoppingCartDataSource.cartItemsSize() }.runAsync(onResult)
     }
 
     private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {

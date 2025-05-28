@@ -11,9 +11,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.product.dataSource.LocalProductsDataSource
-import woowacourse.shopping.data.product.dataSource.LocalRecentViewedProductsDataSource
-import woowacourse.shopping.data.shoppingCart.storage.LocalShoppingCartDataSource
+import woowacourse.shopping.data.product.source.LocalProductsDataSource
+import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
+import woowacourse.shopping.data.shoppingCart.source.LocalShoppingCartDataSource
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.productDetail.ProductDetailActivity

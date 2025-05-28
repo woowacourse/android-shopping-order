@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.product.dataSource
+package woowacourse.shopping.data.product.source
 
 import android.content.Context
 import androidx.room.Room

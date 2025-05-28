@@ -55,7 +55,7 @@ class ShoppingCartViewModel(
             productItems
                 .map { productItem: ShoppingCartItem.ProductItem ->
                     CartItem(
-                        productItem.cartItem.id,
+                        productItem.cartItem.productId,
                         productItem.cartItem.name,
                         productItem.cartItem.price,
                         productItem.quantity,

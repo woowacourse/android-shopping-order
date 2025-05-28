@@ -2,7 +2,7 @@ package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.product.entity.ProductEntity
 
-class PageableProducts(
+class PageableProductData(
     val products: List<ProductEntity>,
-    val hasNext: Boolean,
+    val loadable: Boolean,
 )
