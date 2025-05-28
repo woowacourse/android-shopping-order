@@ -10,7 +10,6 @@ import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class DetailViewModel(
@@ -34,21 +33,34 @@ class DetailViewModel(
         productsRepository.getProductById(id) { result ->
             result
                 .onSuccess { product ->
-                    _product.postValue(product.toUiModel())
+                    val loadedProduct = product.copy(quantity = 1)
+                    _product.postValue(loadedProduct)
+
+                    viewedRepository.insertViewedItem(loadedProduct) {
+                        onInserted()
+                    }
                 }
-        }
-        _product.value?.let {
-            viewedRepository.insertViewedItem(it) {
-                onInserted()
-            }
         }
     }
 
     fun addToCart() {
-//        val item = _product.value ?: return
-//        if (item.quantity <= 0) return
-//
-//        cartItemRepository.findCartItem(item) { exist ->
+        val item = _product.value ?: return
+        if (item.quantity <= 0) return
+
+        cartItemRepository.updateCartItem(item.id, item.quantity) { result ->
+            result
+                .onSuccess { response ->
+                    _uiState.postValue(
+                        CartUiState.SUCCESS
+                    )
+                }
+                .onFailure { response ->
+                    _uiState.postValue(
+                        CartUiState.FAIL
+                    )
+                }
+
+//            exist ->
 //            val updated =
 //                exist?.let {
 //                    it.copy(quantity = it.quantity + item.quantity).toUiModel()
@@ -61,7 +73,7 @@ class DetailViewModel(
 //            } else {
 //                cartItemRepository.insertCartItem(updated, callback)
 //            }
-//        }
+        }
     }
 
     fun loadLastViewedItem(currentProductId: Int) {
@@ -71,15 +83,17 @@ class DetailViewModel(
         }
     }
 
-    fun increaseQuantity() = updateQuantity(+1)
+//    fun increaseQuantity() = updateQuantity(+1)
+//
+//    fun decreaseQuantity() = updateQuantity(-1)
 
-    fun decreaseQuantity() = updateQuantity(-1)
-
-    private fun updateQuantity(diff: Int) {
-        val current = _product.value ?: return
-        val newQty = (current.quantity + diff).coerceAtLeast(0)
-        _product.postValue(current.copy(quantity = newQty))
-    }
+//    private fun updateQuantity(quantity: Int) {
+//        val current = _product.value ?: return
+//        val newQuantity = (current.quantity + quantity).coerceAtLeast(0)
+//        cartItemRepository.updateCartItem { }
+//        _product.postValue()
+//        _product.postValue(current.copy(quantity = newQuantity))
+//    }
 
     companion object {
         val FACTORY: ViewModelProvider.Factory = viewModelFactory {
