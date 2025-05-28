@@ -34,6 +34,10 @@ class ShoppingCartViewModel(
     private val _totalQuantity: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
+    private val _isAllSelected: MediatorLiveData<Boolean> =
+        MediatorLiveData<Boolean>().apply { value = false }
+    val isAllSelected: LiveData<Boolean> get() = _isAllSelected
+
     private var page: Int = MINIMUM_PAGE
     private var hasPreviousPage: Boolean = false
     private var hasNextPage: Boolean = false
@@ -53,6 +57,20 @@ class ShoppingCartViewModel(
                     .filterIsInstance<ShoppingCartProductItem>()
                     .filter { item -> item.isChecked }
                     .sumOf { item -> item.shoppingCartProduct.quantity }
+        }
+
+        _isAllSelected.addSource(_shoppingCart) {
+            _isAllSelected.value = isAllSelected(it)
+        }
+    }
+
+    private fun isAllSelected(items: List<ShoppingCartItem>): Boolean {
+        val shoppingCartProductItems = items.filterIsInstance<ShoppingCartProductItem>()
+        return if (shoppingCartProductItems.isEmpty()) {
+            false
+        } else {
+            shoppingCartProductItems
+                .all { item -> item.isChecked }
         }
     }
 
@@ -186,6 +204,15 @@ class ShoppingCartViewModel(
                     )
                 }
                 return@map item
+            }
+    }
+
+    fun selectAllShoppingCartProducts(isChecked: Boolean) {
+        _shoppingCart.value =
+            _shoppingCart.value?.filterIsInstance<ShoppingCartProductItem>()?.map { item ->
+                item.copy(
+                    isChecked = isChecked,
+                )
             }
     }
 

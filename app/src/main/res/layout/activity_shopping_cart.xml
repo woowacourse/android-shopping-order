@@ -10,8 +10,8 @@
             type="woowacourse.shopping.view.shoppingCart.ShoppingCartProductAdapter" />
 
         <variable
-            name="onClickBackButton"
-            type="kotlin.jvm.functions.Function0" />
+            name="shoppingCartListener"
+            type="woowacourse.shopping.view.shoppingCart.ShoppingCartClickListener" />
 
         <variable
             name="viewModel"
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:onClick="@{() -> onClickBackButton.invoke()}"
+                android:onClick="@{() -> shoppingCartListener.onBackButtonClick()}"
                 android:padding="16dp"
                 android:src="@drawable/ic_back"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -90,6 +90,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:checked="@{viewModel.isAllSelected}"
+                android:onClick="@{() -> shoppingCartListener.onAllSelectedButtonClick(!shoppingCartProductAllSelectCheckBox.checked)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -111,10 +113,10 @@
                 android:ellipsize="end"
                 android:gravity="end"
                 android:maxLines="1"
+                android:text="@{@string/product_price_format(viewModel.totalPrice)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:text="@{@string/product_price_format(viewModel.totalPrice)}"
                 app:layout_constraintBottom_toBottomOf="@id/shoppingCartOrderLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/shoppingCartProductAllSelectCheckBox"

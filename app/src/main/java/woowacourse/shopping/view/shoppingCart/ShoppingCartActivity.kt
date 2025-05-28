@@ -18,7 +18,8 @@ import woowacourse.shopping.view.common.showSnackBar
 
 class ShoppingCartActivity :
     AppCompatActivity(),
-    ShoppingCartProductAdapter.ShoppingCartListener {
+    ShoppingCartProductAdapter.ShoppingCartListener,
+    ShoppingCartClickListener {
     private val viewModel: ShoppingCartViewModel by viewModels()
     private val binding: ActivityShoppingCartBinding by lazy {
         ActivityShoppingCartBinding.inflate(layoutInflater)
@@ -45,16 +46,9 @@ class ShoppingCartActivity :
 
     private fun initDataBinding() {
         binding.adapter = shoppingCartProductAdapter
-        binding.viewModel = this@ShoppingCartActivity.viewModel
+        binding.viewModel = this.viewModel
         binding.lifecycleOwner = this@ShoppingCartActivity
-        binding.onClickBackButton = {
-            val intent =
-                Intent().apply {
-                    putExtra("updateProducts", viewModel.hasUpdatedProducts.value)
-                }
-            setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
-            finish()
-        }
+        binding.shoppingCartListener = this@ShoppingCartActivity
     }
 
     private fun setupObservers() {
@@ -113,6 +107,19 @@ class ShoppingCartActivity :
 
     override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
         viewModel.decreaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
+    }
+
+    override fun onBackButtonClick() {
+        val intent =
+            Intent().apply {
+                putExtra("updateProducts", viewModel.hasUpdatedProducts.value)
+            }
+        setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
+        finish()
+    }
+
+    override fun onAllSelectedButtonClick(isChecked: Boolean) {
+        viewModel.selectAllShoppingCartProducts(isChecked)
     }
 
     companion object {
