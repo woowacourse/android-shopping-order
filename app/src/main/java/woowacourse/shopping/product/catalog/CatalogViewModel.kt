@@ -106,7 +106,6 @@ class CatalogViewModel(
         allProductsSize: Int,
     ) {
         _loadingState.postValue(LoadingState.loading())
-        Thread.sleep(2000)
 
         remoteCatalogProductRepositoryImpl.getProductsByPage(
             page.value ?: 0,

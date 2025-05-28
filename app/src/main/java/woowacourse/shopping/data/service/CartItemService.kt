@@ -11,6 +11,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.dto.cartitem.ProductResponse
 import woowacourse.shopping.data.dto.cartitem.Quantity
+import woowacourse.shopping.data.dto.cartitem.UpdateCartItemRequest
 
 interface CartItemService {
     @GET("/cart-items")
@@ -24,8 +25,7 @@ interface CartItemService {
     @POST("/cart-items")
     fun postCartItems(
         @Header("accept") accept: String = "*/*",
-        @Query("productId") productId: Int,
-        @Query("quantity") quantity: Int = 1,
+        @Body request: UpdateCartItemRequest,
     ): Call<Void>
 
     @DELETE("/cart-items/{id}")

@@ -7,6 +7,7 @@ import retrofit2.Response
 import woowacourse.shopping.data.dto.cartitem.Content
 import woowacourse.shopping.data.dto.cartitem.ProductResponse
 import woowacourse.shopping.data.dto.cartitem.Quantity
+import woowacourse.shopping.data.dto.cartitem.UpdateCartItemRequest
 import woowacourse.shopping.data.service.CartItemService
 import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -20,8 +21,10 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     ) {
         retrofitService
             .postCartItems(
-                productId = cartProduct.id,
-                quantity = cartProduct.quantity,
+                request = UpdateCartItemRequest(
+                    productId = cartProduct.id,
+                    quantity = cartProduct.quantity,
+                )
             ).enqueue(
                 object : Callback<Void> {
                     override fun onResponse(
