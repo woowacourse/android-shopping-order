@@ -3,6 +3,7 @@ package woowacourse.shopping.view.product.catalog
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -112,6 +113,14 @@ class ProductCatalogActivity : AppCompatActivity() {
         viewModel.selectedProduct.observe(this) { value ->
             val intent = ProductDetailActivity.newIntent(this, value)
             startActivity(intent)
+        }
+
+        viewModel.onFinishLoading.observe(this) { value ->
+            if (value == true) {
+                binding.sfLoading.visibility = View.GONE
+            } else {
+                binding.sfLoading.startShimmer()
+            }
         }
     }
 

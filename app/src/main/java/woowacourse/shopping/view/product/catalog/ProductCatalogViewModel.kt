@@ -34,6 +34,9 @@ class ProductCatalogViewModel(
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
+    private val _onFinishLoading = MutableLiveData(false)
+    val onFinishLoading: LiveData<Boolean> get() = _onFinishLoading
+
     override fun onRecentProductClick(item: RecentProduct) {
         _selectedProduct.setValue(item.product)
     }
@@ -105,6 +108,7 @@ class ProductCatalogViewModel(
                 )
             }
             hasNext = result.hasNext
+            _onFinishLoading.postValue(true)
             _productCatalogItems.postValue(buildCatalogItems())
 
             if (result.items.isNotEmpty()) page++
