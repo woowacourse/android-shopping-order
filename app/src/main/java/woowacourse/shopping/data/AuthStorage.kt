@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import java.util.Base64
 
 object AuthStorage {
     private lateinit var storage: SharedPreferences
@@ -29,6 +30,11 @@ object AuthStorage {
     var pw: String?
         get() = storage.getString(KEY_PW, DEFAULT_PW)
         set(value) = storage.edit { putString(KEY_PW, value) }
+
+    val authorization by lazy {
+        val valueToEncode = "$id:$pw".toByteArray()
+        "Basic " + Base64.getEncoder().encodeToString(valueToEncode)
+    }
 
     private const val KEY_ID = "woowacourse.shopping.KEY_ID"
     private const val DEFAULT_ID = "jerry8282"

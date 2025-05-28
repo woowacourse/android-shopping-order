@@ -7,7 +7,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
-import woowacourse.shopping.data.cart.dto.CartItemResponse
+import woowacourse.shopping.data.cart.dto.CartItemRequest
 import woowacourse.shopping.data.cart.dto.CartQuantityResponse
 import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.product.dto.CartRequest
@@ -68,7 +68,7 @@ class ProductsHttpClient(
         cartItemId: Long,
         newQuantity: Int,
     ) {
-        val requestBody = CartItemResponse(newQuantity)
+        val requestBody = CartItemRequest(newQuantity)
         val jsonString: String = Json.encodeToString(requestBody)
 
         http(
