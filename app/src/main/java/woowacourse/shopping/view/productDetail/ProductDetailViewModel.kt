@@ -30,6 +30,8 @@ class ProductDetailViewModel(
     private val _latestViewedProduct: MutableLiveData<Product?> = MutableLiveData()
     val latestViewedProduct: LiveData<Product?> get() = _latestViewedProduct
 
+    val loading: MutableLiveData<Boolean> = MutableLiveData(true)
+
     init {
         loadCartItems()
         loadLatestViewedProduct()
@@ -58,6 +60,8 @@ class ProductDetailViewModel(
                 .onSuccess { product ->
                     _product.postValue(product)
                     if (product != null) addViewedProduct(product)
+                    Thread.sleep(1000)
+                    loading.postValue(false)
                 }.onFailure {
                     _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
                 }

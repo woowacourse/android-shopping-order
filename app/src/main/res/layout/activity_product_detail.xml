@@ -48,14 +48,31 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <ImageView
-                android:id="@+id/productDetailImage"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/productDetailImageLayout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:adjustViewBounds="true"
-                app:imageUrl="@{viewModel.product.imageUrl}"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintTop_toBottomOf="@id/productDetailToolbar" />
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/productDetailToolbar">
+
+                <ImageView
+                    android:id="@+id/productDetailImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:adjustViewBounds="true"
+                    android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+                    app:imageUrl="@{viewModel.product.imageUrl}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@color/gray_a"
+                    android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/productDetailName"
@@ -67,7 +84,7 @@
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/productDetailImage"
+                app:layout_constraintTop_toBottomOf="@id/productDetailImageLayout"
                 tools:text="[든든] 동원 스위트콘" />
 
             <View
@@ -209,6 +226,7 @@
                 android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@id/productDetailLastViewedProduct" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </ScrollView>
 
 </layout>
