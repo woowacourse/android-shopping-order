@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.local.CartProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
@@ -9,23 +8,30 @@ import kotlin.concurrent.thread
 
 class CartProductRepositoryImpl(
     private val remoteDataSource: CartProductRemoteDataSource,
-    private val localDataSource: CartProductLocalDataSource,
 ) : CartProductRepository {
+    override fun insert(
+        productId: Int,
+        quantity: Int,
+        onSuccess: (Int) -> Unit,
+    ) {
+        remoteDataSource.insert(productId, quantity, onSuccess)
+    }
+
     override fun getPagedProducts(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onSuccess: (PagedResult<CartProduct>) -> Unit,
     ) {
         remoteDataSource.getPagedProducts(page = page, size = size, onSuccess)
     }
 
-    override fun getQuantityByProductId(
+    override fun getCartProductByProductId(
         productId: Int,
-        onSuccess: (Int?) -> Unit,
+        onSuccess: (CartProduct?) -> Unit,
     ) {
-        thread {
-            val result = localDataSource.getQuantityByProductId(productId)
-            onSuccess(result)
+        getPagedProducts { result ->
+            val cartProduct = result.items.firstOrNull { it.product.id == productId }
+            onSuccess(cartProduct)
         }
     }
 
@@ -35,35 +41,25 @@ class CartProductRepositoryImpl(
 
     override fun updateQuantity(
         productId: Int,
-        currentQuantity: Int,
-        newQuantity: Int,
+        quantityToAdd: Int,
         onSuccess: () -> Unit,
     ) {
-        thread {
+        getCartProductByProductId(productId) { cartProduct ->
+            val newQuantity = cartProduct?.quantity?.plus(quantityToAdd) ?: quantityToAdd
             when {
-                currentQuantity == newQuantity -> onSuccess()
-                newQuantity == 0 -> {
-                    deleteByProductId(productId) { onSuccess() }
-                }
-
-                currentQuantity == 0 -> {
-                    remoteDataSource.insert(productId, newQuantity, onSuccess)
-                }
-
-                else -> {
-                    localDataSource.updateQuantity(productId, newQuantity)
-                    onSuccess()
-                }
+                cartProduct == null -> insert(productId, newQuantity) { onSuccess() }
+                newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
+                else -> remoteDataSource.updateQuantity(cartProduct.id, newQuantity) { onSuccess() }
             }
         }
     }
 
-    override fun deleteByProductId(
-        productId: Int,
+    override fun delete(
+        id: Int,
         onSuccess: () -> Unit,
     ) {
         thread {
-            remoteDataSource.deleteByProductId(productId, onSuccess)
+            remoteDataSource.delete(id, onSuccess)
         }
     }
 }

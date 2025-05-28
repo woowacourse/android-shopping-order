@@ -27,6 +27,7 @@ class ProductCatalogViewModelTest {
         productRepository = FakeProductRepository()
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
+        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
         viewModel =
             ProductCatalogViewModel(
                 productRepository,
@@ -86,13 +87,11 @@ class ProductCatalogViewModelTest {
     @Test
     fun `상품 수량 증가 클릭 시 수량이 1 증가한다`() {
         // given
-        val product =
+        val item =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
-                .product
-        val item = ProductCatalogItem.ProductItem(product, 1)
 
         // when
         viewModel.onQuantityIncreaseClick(item)
@@ -110,13 +109,12 @@ class ProductCatalogViewModelTest {
     @Test
     fun `상품 수량 감소 클릭 시 수량이 1 감소한다`() {
         // given
-        val product =
+        val item =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
-                .product
-        val item = ProductCatalogItem.ProductItem(product, 2)
+        viewModel.onQuantityIncreaseClick(item)
 
         // when
         viewModel.onQuantityDecreaseClick(item)
@@ -134,21 +132,19 @@ class ProductCatalogViewModelTest {
     @Test
     fun `상품 수량 변경 시 총 수량에 반영된다`() {
         // given
-        val product =
+        val item =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
-                .product
-        val item = ProductCatalogItem.ProductItem(product, 2)
         val totalQuantity = viewModel.totalQuantity.getOrAwaitValue()
 
         // when
         viewModel.onQuantityIncreaseClick(item)
-        viewModel.onQuantityIncreaseClick(item)
+        val actual = viewModel.totalQuantity.getOrAwaitValue() - totalQuantity
 
         // then
-        assertEquals(2, viewModel.totalQuantity.getOrAwaitValue() - totalQuantity)
+        assertEquals(1, actual)
     }
 
     @Test

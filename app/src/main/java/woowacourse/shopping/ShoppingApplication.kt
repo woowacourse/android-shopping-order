@@ -3,7 +3,6 @@ package woowacourse.shopping
 import android.app.Application
 import woowacourse.shopping.data.ShoppingCartDatabase
 import woowacourse.shopping.data.TokenProvider
-import woowacourse.shopping.data.datasource.local.CartProductLocalDataSource
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
@@ -24,7 +23,6 @@ class ShoppingApplication : Application() {
         by lazy {
             CartProductRepositoryImpl(
                 CartProductRemoteDataSource(retrofitInstance.cartProductService),
-                CartProductLocalDataSource(database.cartProductDao),
             )
         }
     val recentProductRepository

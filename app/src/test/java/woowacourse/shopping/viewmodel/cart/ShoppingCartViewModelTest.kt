@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.ShoppingCartViewModel
@@ -21,7 +20,7 @@ class ShoppingCartViewModelTest {
     @BeforeEach
     fun setup() {
         repository = FakeCartProductRepository()
-        repeat(12) { id -> repository.updateQuantity(id, 0, 1) {} }
+        repeat(12) { id -> repository.insert(id, 1) {} }
         viewModel = ShoppingCartViewModel(repository)
     }
 
@@ -113,12 +112,10 @@ class ShoppingCartViewModelTest {
     @Test
     fun `상품 수량 증가 클릭 시 수량이 1 증가한다`() {
         // given
-        val product =
+        val cartProduct =
             viewModel.products
                 .getOrAwaitValue()
                 .first()
-                .product
-        val cartProduct = CartProduct(product = product, quantity = 1)
 
         // when
         viewModel.onQuantityIncreaseClick(cartProduct)
@@ -132,12 +129,11 @@ class ShoppingCartViewModelTest {
     @Test
     fun `상품 수량 감소 클릭 시 수량이 1 감소한다`() {
         // given
-        val product =
+        val cartProduct =
             viewModel.products
                 .getOrAwaitValue()
                 .first()
-                .product
-        val cartProduct = CartProduct(product = product, quantity = 2)
+        viewModel.onQuantityIncreaseClick(cartProduct)
 
         // when
         viewModel.onQuantityDecreaseClick(cartProduct)

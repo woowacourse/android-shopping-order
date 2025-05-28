@@ -3,6 +3,7 @@ package woowacourse.shopping.view.product.catalog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -20,6 +21,7 @@ class ProductCatalogViewModel(
     ProductCatalogEventHandler {
     private val productItems = mutableListOf<ProductCatalogItem.ProductItem>()
     private var recentProducts = emptyList<RecentProduct>()
+    private val cartProducts = mutableSetOf<CartProduct>()
     private var page = FIRST_PAGE
     private var hasNext = false
 
@@ -41,15 +43,30 @@ class ProductCatalogViewModel(
     }
 
     override fun onAddClick(item: ProductCatalogItem.ProductItem) {
-        updateQuantity(item, 1)
+        cartProductRepository.insert(item.product.id, 1) { cartProductId ->
+            cartProducts.add(CartProduct(cartProductId, item.product, 1))
+            updateQuantity(item, 1)
+        }
     }
 
     override fun onQuantityIncreaseClick(item: ProductCatalogItem.ProductItem) {
-        updateQuantity(item, item.quantity + 1)
+        val cartProduct = cartProducts.first { it.product.id == item.product.id }
+        val newQuantity = cartProduct.quantity + 1
+        cartProductRepository.updateQuantity(cartProduct.product.id, 1) {
+            cartProducts.removeIf { it.product.id == item.product.id }
+            cartProducts.add(cartProduct.copy(quantity = newQuantity))
+            updateQuantity(item, newQuantity)
+        }
     }
 
     override fun onQuantityDecreaseClick(item: ProductCatalogItem.ProductItem) {
-        updateQuantity(item, item.quantity - 1)
+        val cartProduct = cartProducts.first { it.product.id == item.product.id }
+        val newQuantity = cartProduct.quantity - 1
+        cartProductRepository.updateQuantity(cartProduct.product.id, -1) {
+            cartProducts.removeIf { it.product.id == item.product.id }
+            if (newQuantity > 0) cartProducts.add(cartProduct.copy(quantity = newQuantity))
+            updateQuantity(item, newQuantity)
+        }
     }
 
     override fun onMoreClick() {
@@ -58,13 +75,17 @@ class ProductCatalogViewModel(
 
     fun loadCatalog() {
         loadRecentProducts()
-        if (productItems.isEmpty()) {
-            loadProducts()
-        } else {
-            syncProductQuantities()
-        }
+        loadCartProducts()
         cartProductRepository.getTotalQuantity {
             _totalQuantity.postValue(it)
+        }
+    }
+
+    private fun loadCartProducts() {
+        cartProductRepository.getPagedProducts {
+            cartProducts.clear()
+            cartProducts.addAll(it.items)
+            loadProducts()
         }
     }
 
@@ -77,39 +98,16 @@ class ProductCatalogViewModel(
 
     private fun loadProducts() {
         productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
-            val tempItems = mutableListOf<ProductCatalogItem.ProductItem>()
-            var completedCount = 0
             result.items.forEach { product ->
-                cartProductRepository.getQuantityByProductId(product.id) { quantity ->
-                    tempItems.add(ProductCatalogItem.ProductItem(product, quantity ?: 0))
-                    completedCount++
-
-                    if (completedCount == result.items.size) {
-                        productItems.addAll(tempItems)
-                        hasNext = result.hasNext
-                        _productCatalogItems.postValue(buildCatalogItems())
-                    }
-                }
+                val cartProduct = cartProducts.firstOrNull { it.product.id == product.id }
+                productItems.add(
+                    ProductCatalogItem.ProductItem(product, cartProduct?.quantity ?: 0),
+                )
             }
+            hasNext = result.hasNext
+            _productCatalogItems.postValue(buildCatalogItems())
+
             if (result.items.isNotEmpty()) page++
-        }
-    }
-
-    private fun syncProductQuantities() {
-        val updatedItems = mutableListOf<ProductCatalogItem.ProductItem>()
-        var completedCount = 0
-
-        productItems.forEach { item ->
-            cartProductRepository.getQuantityByProductId(item.product.id) { quantity ->
-                updatedItems.add(item.copy(quantity = quantity ?: 0))
-                completedCount++
-
-                if (completedCount == productItems.size) {
-                    productItems.clear()
-                    productItems.addAll(updatedItems)
-                    _productCatalogItems.postValue(buildCatalogItems())
-                }
-            }
         }
     }
 
@@ -117,14 +115,12 @@ class ProductCatalogViewModel(
         item: ProductCatalogItem.ProductItem,
         newQuantity: Int,
     ) {
-        cartProductRepository.updateQuantity(item.product.id, item.quantity, newQuantity) {
-            val index = productItems.indexOfFirst { it.product.id == item.product.id }
-            if (index != -1) {
-                productItems[index] = productItems[index].copy(quantity = newQuantity)
-            }
-            _totalQuantity.postValue((totalQuantity.value ?: 0) + (newQuantity - item.quantity))
-            _productCatalogItems.postValue(buildCatalogItems())
+        val index = productItems.indexOfFirst { it.product.id == item.product.id }
+        if (index != -1) {
+            productItems[index] = productItems[index].copy(quantity = newQuantity)
         }
+        _totalQuantity.postValue((totalQuantity.value ?: 0) + (newQuantity - item.quantity))
+        _productCatalogItems.postValue(buildCatalogItems())
     }
 
     private fun buildCatalogItems(): List<ProductCatalogItem> =
@@ -132,7 +128,7 @@ class ProductCatalogViewModel(
             if (recentProducts.isNotEmpty()) {
                 add(ProductCatalogItem.RecentProductsItem(recentProducts))
             }
-            addAll(productItems.sortedBy { it.product.id })
+            addAll(productItems)
             if (hasNext) {
                 add(ProductCatalogItem.LoadMoreItem)
             }

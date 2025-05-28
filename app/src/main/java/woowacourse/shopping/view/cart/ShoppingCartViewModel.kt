@@ -40,7 +40,7 @@ class ShoppingCartViewModel(
     }
 
     override fun onProductRemoveClick(item: CartProduct) {
-        repository.deleteByProductId(item.id) {
+        repository.delete(item.id) {
             val currentPage = page.value ?: FIRST_PAGE_NUMBER
 
             if (products.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
@@ -52,12 +52,17 @@ class ShoppingCartViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        updateQuantity(item, item.quantity + 1)
+        repository.updateQuantity(item.product.id, 1) {
+            loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+        }
     }
 
     override fun onQuantityDecreaseClick(item: CartProduct) {
-        if (item.quantity == 1) return
-        updateQuantity(item, item.quantity - 1)
+        val quantity = products.value?.firstOrNull { it.product.id == item.product.id }?.quantity
+        if (quantity == 1) return
+        repository.updateQuantity(item.product.id, -1) {
+            loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+        }
     }
 
     private fun loadPage(page: Int) {
@@ -77,15 +82,6 @@ class ShoppingCartViewModel(
         _hasPrevious.postValue(page > FIRST_PAGE_NUMBER)
         _hasNext.postValue(hasNext)
         _isSinglePage.postValue(!hasNext && !hasPrevious)
-    }
-
-    private fun updateQuantity(
-        item: CartProduct,
-        newQuantity: Int,
-    ) {
-        repository.updateQuantity(item.product.id, item.quantity, newQuantity) {
-            loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-        }
     }
 
     companion object {

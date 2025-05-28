@@ -4,9 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartProductRequestDto(
-    @SerialName("productId")
-    val productId: Int?,
+data class CartProductQuantityRequestDto(
     @SerialName("quantity")
-    val quantity: Int?,
+    val quantity: Int,
 )

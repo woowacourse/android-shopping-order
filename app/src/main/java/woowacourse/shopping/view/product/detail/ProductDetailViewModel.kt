@@ -16,8 +16,6 @@ class ProductDetailViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
     ProductDetailEventHandler {
-    private var shoppingCartQuantity = 0
-
     private val _lastViewedProduct = MutableLiveData<RecentProduct?>()
     val lastViewedProduct: LiveData<RecentProduct?> get() = _lastViewedProduct
 
@@ -34,22 +32,8 @@ class ProductDetailViewModel(
     val lastProductClickEvent: SingleLiveData<Unit> get() = _lastProductClickEvent
 
     init {
-        loadQuantity()
         loadLastViewedProduct()
         updateRecentProduct()
-    }
-
-    override fun onAddToCartClick() {
-        val addQuantity = quantity.value ?: return
-        cartProductRepository.updateQuantity(
-            product.id,
-            shoppingCartQuantity,
-            shoppingCartQuantity + addQuantity,
-        ) {
-            shoppingCartQuantity += addQuantity
-            updateQuantity(INITIAL_QUANTITY)
-        }
-        _addToCartEvent.setValue(Unit)
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
@@ -67,10 +51,17 @@ class ProductDetailViewModel(
         _lastProductClickEvent.setValue(Unit)
     }
 
-    private fun loadQuantity() {
-        cartProductRepository.getQuantityByProductId(product.id) {
-            shoppingCartQuantity = it ?: 0
+    override fun onAddToCartClick() {
+        val quantityToAdd = quantity.value ?: INITIAL_QUANTITY
+        cartProductRepository.updateQuantity(product.id, quantityToAdd) {
+            updateQuantity(INITIAL_QUANTITY)
         }
+        _addToCartEvent.setValue(Unit)
+    }
+
+    private fun updateQuantity(newQuantity: Int) {
+        _quantity.postValue(newQuantity)
+        _totalPrice.postValue(newQuantity * product.price)
     }
 
     private fun loadLastViewedProduct() {
@@ -82,11 +73,6 @@ class ProductDetailViewModel(
     private fun updateRecentProduct() {
         val recentProduct = RecentProduct(product = product)
         recentProductRepository.replaceRecentProduct(recentProduct) {}
-    }
-
-    private fun updateQuantity(newQuantity: Int) {
-        _quantity.postValue(newQuantity)
-        _totalPrice.postValue(newQuantity * product.price)
     }
 
     companion object {

@@ -3,6 +3,7 @@ package woowacourse.shopping.data.datasource.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.dto.request.CartProductQuantityRequestDto
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
 import woowacourse.shopping.data.dto.response.CartProductQuantityResponseDto
 import woowacourse.shopping.data.dto.response.CartProductResponseDto
@@ -15,8 +16,8 @@ class CartProductRemoteDataSource(
     private val cartProductService: CartProductApiService,
 ) {
     fun getPagedProducts(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onSuccess: (PagedResult<CartProduct>) -> Unit,
     ) {
         cartProductService.getPagedProducts(page = page, size = size).enqueue(
@@ -47,7 +48,7 @@ class CartProductRemoteDataSource(
     fun insert(
         id: Int,
         quantity: Int,
-        onSuccess: () -> Unit,
+        onSuccess: (Int) -> Unit,
     ) {
         cartProductService.insert(body = CartProductRequestDto(id, quantity)).enqueue(
             object : Callback<Unit> {
@@ -56,7 +57,10 @@ class CartProductRemoteDataSource(
                     response: Response<Unit>,
                 ) {
                     if (response.code() == SUCCESS_POST) {
-                        onSuccess()
+                        val cartProductId =
+                            response.headers()["location"]?.removePrefix("/cart-items/")?.toInt()
+                                ?: throw IllegalArgumentException()
+                        onSuccess(cartProductId)
                     }
                 }
 
@@ -70,11 +74,11 @@ class CartProductRemoteDataSource(
         )
     }
 
-    fun deleteByProductId(
+    fun delete(
         id: Int,
         onSuccess: () -> Unit,
     ) {
-        cartProductService.deleteByProductId(id = id).enqueue(
+        cartProductService.delete(id = id).enqueue(
             object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -119,7 +123,34 @@ class CartProductRemoteDataSource(
         )
     }
 
+    fun updateQuantity(
+        id: Int,
+        quantity: Int,
+        onSuccess: () -> Unit,
+    ) {
+        cartProductService
+            .updateQuantity(id = id, body = CartProductQuantityRequestDto(quantity))
+            .enqueue(
+                object : Callback<Unit> {
+                    override fun onResponse(
+                        call: Call<Unit>,
+                        response: Response<Unit>,
+                    ) {
+                        if (response.code() == SUCCESS_PATCH) onSuccess()
+                    }
+
+                    override fun onFailure(
+                        call: Call<Unit>,
+                        t: Throwable,
+                    ) {
+                        println("error : $t")
+                    }
+                },
+            )
+    }
+
     companion object {
+        private const val SUCCESS_PATCH = 200
         private const val SUCCESS_POST = 201
         private const val SUCCESS_DELETE = 204
     }

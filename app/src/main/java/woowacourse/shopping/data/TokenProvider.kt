@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.core.content.edit
 import java.util.Base64
 
-class TokenProvider(context: Context) {
+class TokenProvider(
+    context: Context,
+) {
     private val storage =
         context.getSharedPreferences(
             SHARED_NAME,
@@ -23,9 +25,7 @@ class TokenProvider(context: Context) {
     private fun encodeToken(
         name: String,
         password: String,
-    ): String {
-        return Base64.getEncoder().encodeToString("$name:$password".toByteArray())
-    }
+    ): String = Base64.getEncoder().encodeToString("$name:$password".toByteArray())
 
     companion object {
         private const val SHARED_NAME = "Authorization"
