@@ -38,7 +38,6 @@ class ProductsActivity :
                     val updateItem: Product =
                         result.data?.getSerializableExtraData("updateProduct")
                             ?: return@registerForActivityResult
-                    viewModel.updateSelectedQuantity(updateItem)
                     viewModel.updateRecentWatching()
                 }
 
@@ -46,7 +45,6 @@ class ProductsActivity :
                     val updateItems: Array<Product> =
                         result.data?.getSerializableExtraData("updateProducts")
                             ?: return@registerForActivityResult
-                    viewModel.updateSelectedQuantity(updateItems.toList())
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {
@@ -56,7 +54,6 @@ class ProductsActivity :
                     val recentProduct: Product =
                         result.data?.getSerializableExtraData("recentProduct")
                             ?: return@registerForActivityResult
-                    viewModel.updateSelectedQuantity(listOf(updateQuantityProduct, recentProduct))
                     navigateToRecentProduct(recentProduct)
                 }
             }

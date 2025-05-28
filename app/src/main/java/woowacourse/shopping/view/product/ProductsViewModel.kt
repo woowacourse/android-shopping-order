@@ -58,7 +58,15 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         currentProducts: List<ProductsItem>,
     ) {
-        val shoppingCartProducts = shoppingCartRepository.cachedCartItem
+        val offset = page - 1
+        val limit = LOAD_PRODUCTS_SIZE + 1
+        var shoppingCartProducts = emptyList<ShoppingCartProduct>()
+        shoppingCartRepository.load(offset, limit) { result ->
+            result.onSuccess {
+                shoppingCartProducts = it
+            }
+        }
+
         handleShoppingCartQuantitySuccess(currentProducts, productsToShow, shoppingCartProducts)
     }
 
@@ -273,50 +281,6 @@ class ProductsViewModel(
                     _shoppingCartQuantity.postValue(shoppingCartQuantity.value?.minus(1))
                 }.onFailure {
                     _event.postValue(ProductsEvent.NOT_MINUS_TO_SHOPPING_CART)
-                }
-        }
-    }
-
-    fun updateSelectedQuantity(product: Product) {
-        shoppingCartRepository.fetchSelectedQuantity(product) { result ->
-            result
-                .onSuccess { selectedQuantity: Int? ->
-                    if (selectedQuantity == null) return@fetchSelectedQuantity
-                    val currentList = products.value.orEmpty()
-                    val updatedList =
-                        currentList.map { item ->
-                            if (item is ProductItem && item.product.id == product.id) {
-                                val newItem = item.copy(selectedQuantity = selectedQuantity)
-                                newItem
-                            } else {
-                                item
-                            }
-                        }
-                    _products.postValue(updatedList)
-                    updateShoppingCartQuantity()
-                }
-        }
-    }
-
-    fun updateSelectedQuantity(products: List<Product>) {
-        shoppingCartRepository.fetchSelectedQuantity(products) { result ->
-            result
-                .onSuccess { fetchedList: List<ShoppingCartProduct> ->
-                    val updated =
-                        this.products.value.orEmpty().map { item ->
-                            if (item is ProductItem) {
-                                val match = fetchedList.find { it.product == item.product }
-                                if (match != null) {
-                                    item.copy(selectedQuantity = match.quantity)
-                                } else {
-                                    item
-                                }
-                            } else {
-                                item
-                            }
-                        }
-                    _products.postValue(updated)
-                    updateShoppingCartQuantity()
                 }
         }
     }

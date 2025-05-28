@@ -17,9 +17,6 @@ class DefaultShoppingCartRepository(
     private val shoppingCartDao: ShoppingCartDao,
     private val shoppingCartService: ShoppingCartService,
 ) : ShoppingCartRepository {
-    private val _cachedCartItems: MutableList<ShoppingCartProduct> = mutableListOf()
-    override val cachedCartItem: List<ShoppingCartProduct> get() = _cachedCartItems.map { it.copy() }
-
     override fun load(
         page: Int,
         size: Int,
@@ -33,14 +30,6 @@ class DefaultShoppingCartRepository(
                         call: Call<ShoppingCartItemsResponseDto>,
                         response: Response<ShoppingCartItemsResponseDto>,
                     ) {
-                        val items = response.body()?.toDomain().orEmpty()
-
-                        items.forEach { item ->
-                            if (_cachedCartItems.none { it.product.id == item.product.id }) {
-                                _cachedCartItems.add(item)
-                            }
-                        }
-
                         onResult(Result.success(response.body()?.toDomain() ?: emptyList()))
                     }
 
@@ -116,17 +105,7 @@ class DefaultShoppingCartRepository(
                         call: Call<Unit>,
                         response: Response<Unit>,
                     ) {
-                        if (response.isSuccessful) {
-                            val targetItem: ShoppingCartProduct =
-                                cachedCartItem.find { shoppingCartId == it.id } ?: return
-                            _cachedCartItems.remove(targetItem)
-                            if (quantity != 0) {
-                                _cachedCartItems.add(targetItem.copy(quantity = quantity))
-                            }
-                            onResult(Result.success(Unit))
-                        } else {
-                            onResult(Result.failure(IllegalStateException("")))
-                        }
+                        onResult(Result.success(Unit))
                     }
 
                     override fun onFailure(
@@ -148,43 +127,6 @@ class DefaultShoppingCartRepository(
                 shoppingCartDao.delete(product.id)
             }.onSuccess {
                 onResult(Result.success(Unit))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
-    }
-
-    override fun fetchSelectedQuantity(
-        product: Product,
-        onResult: (Result<Int?>) -> Unit,
-    ) {
-        thread {
-            runCatching {
-                shoppingCartDao.getQuantity(product.id)
-            }.onSuccess { quantity: Int? ->
-                onResult(Result.success(quantity))
-            }.onFailure { exception ->
-                onResult(Result.failure(exception))
-            }
-        }
-    }
-
-    override fun fetchSelectedQuantity(
-        products: List<Product>,
-        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
-    ) {
-        thread {
-            runCatching {
-                products.map { product ->
-                    val quantity = shoppingCartDao.getQuantity(product.id)
-                    ShoppingCartProduct(
-                        product = product,
-                        quantity = quantity,
-                        id = 0L,
-                    )
-                }
-            }.onSuccess { shoppingCartProducts ->
-                onResult(Result.success(shoppingCartProducts))
             }.onFailure { exception ->
                 onResult(Result.failure(exception))
             }
