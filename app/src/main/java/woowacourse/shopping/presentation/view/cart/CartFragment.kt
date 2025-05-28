@@ -30,18 +30,12 @@ class CartFragment :
         viewModel.deleteCartItem(cartId)
     }
 
-    override fun increaseQuantity(
-        cartId: Long,
-        quantity: Int,
-    ) {
-        viewModel.increaseProductQuantity(cartId, quantity)
+    override fun increaseQuantity(productId: Long) {
+        viewModel.increaseProductQuantity(productId)
     }
 
-    override fun decreaseQuantity(
-        cartId: Long,
-        quantity: Int,
-    ) {
-        viewModel.decreaseProductQuantity(cartId, quantity)
+    override fun decreaseQuantity(productId: Long) {
+        viewModel.decreaseProductQuantity(productId)
     }
 
     private fun setupActionBar() {

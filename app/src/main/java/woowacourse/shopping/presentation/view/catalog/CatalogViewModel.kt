@@ -52,26 +52,20 @@ class CatalogViewModel(
         }
     }
 
-    fun increaseProductQuantity(
-        cartId: Long,
-        quantity: Int,
-    ) {
-//        cartRepository.addCartItem(productId, QUANTITY_STEP) { result ->
-//            result
-//                .onSuccess { updateProductQuantityInList(productId) }
-//                .onFailure { emitToastMessage(CatalogMessageEvent.INCREASE_PRODUCT_TO_CART_FAILURE) }
-//        }
+    fun increaseProductQuantity(productId: Long) {
+        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
+            result
+                .onSuccess { updateProductQuantityInList(productId) }
+                .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+        }
     }
 
-    fun decreaseProductQuantity(
-        cartId: Long,
-        quantity: Int,
-    ) {
-//        cartRepository.decreaseCartItemQuantity(productId) { result ->
-//            result
-//                .onSuccess { updateProductQuantityInList(productId) }
-//                .onFailure { emitToastMessage(CatalogMessageEvent.DECREASE_PRODUCT_FROM_CART_FAILURE) }
-//        }
+    fun decreaseProductQuantity(productId: Long) {
+        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
+            result
+                .onSuccess { updateProductQuantityInList(productId) }
+                .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+        }
     }
 
     fun refreshCatalogItems() {
@@ -111,26 +105,26 @@ class CatalogViewModel(
         recentProductsItem: CatalogItem.RecentProducts,
         currentItems: List<CatalogItem> = _products.value.orEmpty(),
     ) {
-//        cartRepository.getAll { result ->
-//            result
-//                .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
-//                .onSuccess { cartItems ->
-//                    val updatedItems = applyCartQuantities(cartItems, currentItems)
-//                    val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
-//                    _products.postValue(finalCatalog)
-//                    updateCartItemCount()
-//                }
-//
-//            _isLoading.postValue(false)
-//        }
+        val ids = currentItems.filterIsInstance<CatalogItem.ProductItem>().map { it.productId }
+        val newCartProducts = cartRepository.findCartProductsByProductIds(ids)
+
+        newCartProducts
+            .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+            .onSuccess {
+                val updatedItems = applyCartQuantities(it, currentItems)
+                val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
+                _products.postValue(finalCatalog)
+                updateCartItemCount()
+            }
+
+        _isLoading.postValue(false)
     }
 
     private fun updateProductQuantityInList(productId: Long) {
-//        cartRepository.findQuantityByProductId(productId) { result ->
-//            result
-//                .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
-//                .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
-//        }
+        cartRepository
+            .findQuantityByProductId(productId)
+            .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
+            .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 
     private fun applyProductQuantityUpdate(
@@ -151,11 +145,11 @@ class CatalogViewModel(
     }
 
     private fun updateCartItemCount() {
-//        cartRepository.getTotalQuantity { result ->
-//            result
-//                .onSuccess { _cartItemCount.postValue(it) }
-//                .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
-//        }
+        cartRepository.fetchCartItemCount { result ->
+            result
+                .onSuccess { _cartItemCount.postValue(it) }
+                .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
+        }
     }
 
     private fun currentProductItems(): List<CatalogItem.ProductItem> = _products.value.orEmpty().filterIsInstance<CatalogItem.ProductItem>()

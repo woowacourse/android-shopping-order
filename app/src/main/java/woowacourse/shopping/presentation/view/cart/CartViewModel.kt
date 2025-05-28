@@ -61,27 +61,16 @@ class CartViewModel(
         }
     }
 
-    fun increaseProductQuantity(
-        cartId: Long,
-        currentQuantity: Int,
-    ) {
-        val increasedQuantity = currentQuantity + 1
-        patchCartItemQuantity(cartId, increasedQuantity)
+    fun increaseProductQuantity(productId: Long) {
+        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
+            result
+                .onSuccess { refreshProductQuantity() }
+                .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+        }
     }
 
-    fun decreaseProductQuantity(
-        cartId: Long,
-        currentQuantity: Int,
-    ) {
-        val decreasedQuantity = currentQuantity - 1
-        patchCartItemQuantity(cartId, decreasedQuantity)
-    }
-
-    private fun patchCartItemQuantity(
-        cartId: Long,
-        quantity: Int,
-    ) {
-        cartRepository.patchCartItemQuantity(cartId, quantity) { result ->
+    fun decreaseProductQuantity(productId: Long) {
+        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { refreshProductQuantity() }
                 .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -136,6 +125,7 @@ class CartViewModel(
     companion object {
         private const val DEFAULT_PAGE = 0
         private const val PAGE_STEP = 1
+        private const val QUANTITY_STEP = 1
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
