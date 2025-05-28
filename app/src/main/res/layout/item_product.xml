@@ -99,6 +99,8 @@
                 app:layout_constraintEnd_toEndOf="@id/image_view_product"
                 app:layout_constraintStart_toStartOf="@id/image_view_product"
                 bind:eventHandler="@{cartQuantityEventHandler}"
-                bind:model="@{model}" />
+                app:quantity="@{model.cartQuantityValue}"
+                app:containerVisibility="@{model.hasCartQuantity}"
+                app:cartId="@{model.cartId}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

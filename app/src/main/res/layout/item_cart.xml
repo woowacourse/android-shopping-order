@@ -9,7 +9,7 @@
 
         <variable
             name="model"
-            type="woowacourse.shopping.view.main.state.ProductState" />
+            type="woowacourse.shopping.view.cart.state.CartState" />
 
         <variable
             name="eventHandler"
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
-            android:text="@{model.item.name}"
+            android:text="@{model.name}"
             android:textColor="@color/gray"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -48,14 +48,14 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:padding="12dp"
-            android:onClick="@{() -> eventHandler.onClickDeleteItem(model.item.id)}"
+            android:onClick="@{() -> eventHandler.onClickDeleteItem(model.cartId)}"
             android:src="@drawable/ic_close_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/image_view_product"
-            setImage="@{model.item.imgUrl}"
+            setImage="@{model.imgUrl}"
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginStart="12dp"
@@ -74,7 +74,9 @@
             app:layout_constraintStart_toEndOf="@id/image_view_product"
             app:layout_constraintTop_toBottomOf="@id/image_view_delete"
             bind:eventHandler="@{cartQuantityEventHandler}"
-            bind:model="@{model}"
+            app:quantity="@{model.cartQuantityValue}"
+            app:containerVisibility="@{model.hasQuantity}"
+            app:cartId="@{model.cartId}"
             />
 
         <TextView
