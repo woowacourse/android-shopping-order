@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.adapter
+package woowacourse.shopping.view.cart.selection.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView

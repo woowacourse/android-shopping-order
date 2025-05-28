@@ -19,7 +19,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.cart.CartProductSelectionFragment">
+        tools:context=".view.cart.selection.CartProductSelectionFragment">
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/sf_loading"

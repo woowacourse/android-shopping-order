@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
+import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
+import woowacourse.shopping.view.cart.selection.CartProductSelectionFragmentFactory
 
 class ShoppingCartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityShoppingCartBinding.inflate(layoutInflater) }

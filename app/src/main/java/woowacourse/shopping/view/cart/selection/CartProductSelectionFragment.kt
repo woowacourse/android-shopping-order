@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.cart.selection
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import woowacourse.shopping.databinding.FragmentCartProductSelectionBinding
-import woowacourse.shopping.view.cart.adapter.CartProductAdapter
+import woowacourse.shopping.view.cart.ShoppingCartViewModel
+import woowacourse.shopping.view.cart.selection.adapter.CartProductAdapter
 
 class CartProductSelectionFragment(
     private val viewModel: ShoppingCartViewModel,
