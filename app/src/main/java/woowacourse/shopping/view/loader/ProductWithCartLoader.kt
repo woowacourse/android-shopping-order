@@ -23,7 +23,7 @@ class ProductWithCartLoader(
                 val productStates =
                     page.products.map { product ->
                         val quantity = cartMap[product.id]?.quantity ?: Quantity(0)
-                        ProductState(product, quantity)
+                        ProductState(item = product, cartQuantity = quantity)
                     }
 
                 onResult(productStates, page.hasNextPage)

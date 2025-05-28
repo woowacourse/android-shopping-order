@@ -44,7 +44,7 @@ class CartLoader(
     ): List<ProductState> {
         return carts.mapNotNull { cart ->
             products.find { it.id == cart.productId }?.let { product ->
-                ProductState(product, cart.quantity)
+                ProductState(item = product, cartQuantity = cart.quantity)
             }
         }
     }

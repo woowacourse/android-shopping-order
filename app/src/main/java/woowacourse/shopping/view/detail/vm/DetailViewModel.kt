@@ -35,7 +35,7 @@ class DetailViewModel(
                 productRepository.getProduct(lastSeenProductId) { lastSeenProduct ->
                     _uiState.postValue(
                         DetailUiState(
-                            product = ProductState(product, Quantity(1)),
+                            product = ProductState(item = product, cartQuantity = Quantity(1)),
                             lastSeenProduct = lastSeenProduct,
                         ),
                     )
@@ -43,7 +43,7 @@ class DetailViewModel(
             } else {
                 _uiState.postValue(
                     DetailUiState(
-                        product = ProductState(product, Quantity(1)),
+                        product = ProductState(item = product, cartQuantity = Quantity(1)),
                         lastSeenProduct = null,
                     ),
                 )

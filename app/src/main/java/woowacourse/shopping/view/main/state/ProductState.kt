@@ -4,6 +4,7 @@ import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.product.Product
 
 data class ProductState(
+    val cartId: Long? = null,
     val item: Product,
     val cartQuantity: Quantity,
 ) {
