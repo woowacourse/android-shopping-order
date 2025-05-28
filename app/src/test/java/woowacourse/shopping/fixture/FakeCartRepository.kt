@@ -1,98 +1,94 @@
 package woowacourse.shopping.fixture
 
+import woowacourse.shopping.data.model.product.ProductResponse
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.repository.CartRepository
+import kotlin.random.Random
 
 class FakeCartRepository(
     initialCartProducts: List<CartProduct> = emptyList(),
+    private val products: List<ProductResponse> = productsFixture,
 ) : CartRepository {
-    private val cartItems = initialCartProducts.toMutableList()
+    private val cartItems: MutableMap<Long, CartProduct> =
+        initialCartProducts.associateBy { it.product.id }.toMutableMap()
 
-    override fun getAll(onResult: (Result<List<CartProduct>>) -> Unit) {
-        onResult(Result.success(cartItems.toList()))
-    }
-
-    override fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
-        val total = cartItems.sumOf { it.quantity }
-        onResult(Result.success(total))
-    }
-
-    override fun loadCartItems(
-        offset: Int,
-        limit: Int,
+    override fun fetchCartItems(
+        page: Int,
+        size: Int,
         onResult: (Result<PageableItem<CartProduct>>) -> Unit,
     ) {
-        val pagedItems = cartItems.drop(offset).take(limit)
-        val hasMore = (offset + limit) < cartItems.size
+        val sortedItems = cartItems.values.sortedBy { it.cartId }
+        val offset = page * size
+        val pagedItems = sortedItems.drop(offset).take(size)
+        val hasMore = (offset + size) < sortedItems.size
         onResult(Result.success(PageableItem(pagedItems, hasMore)))
+        println("fetch: $pagedItems")
     }
 
-    override fun findCartItemByProductId(
-        productId: Long,
-        onResult: (Result<CartProduct>) -> Unit,
-    ) {
-        val item = cartItems.find { it.product.id == productId }
-        if (item != null) {
-            onResult(Result.success(item))
-        } else {
-            onResult(Result.failure(NoSuchElementException("CartItem not found for productId: $productId")))
-        }
-    }
-
-    override fun findQuantityByProductId(
-        productId: Long,
-        onResult: (Result<Int>) -> Unit,
-    ) {
-        val quantity = cartItems.find { it.product.id == productId }?.quantity ?: 0
-        onResult(Result.success(quantity))
-    }
-
-    override fun addCartItem(
-        productId: Long,
-        increaseQuantity: Int,
+    override fun deleteCartItem(
+        cartId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val product = productsFixture.find { it.id == productId }
-        if (product == null) {
-            onResult(Result.failure(IllegalArgumentException("Product not found: $productId")))
-            return
-        }
-
-        val existingItem = cartItems.find { it.product.id == productId }
-        if (existingItem != null) {
-            val updatedItem = existingItem.copy(quantity = existingItem.quantity + increaseQuantity)
-            cartItems.remove(existingItem)
-            cartItems.add(updatedItem)
-        } else {
-            cartItems.add(CartProduct(product, increaseQuantity))
+        val keyToRemove = cartItems.entries.find { it.value.cartId == cartId }?.key
+        if (keyToRemove != null) {
+            cartItems.remove(keyToRemove)
         }
         onResult(Result.success(Unit))
     }
 
-    override fun decreaseCartItemQuantity(
+    override fun findQuantityByProductId(productId: Long): Result<Int> {
+        val quantity = cartItems[productId]?.quantity ?: 0
+        return Result.success(quantity)
+    }
+
+    override fun insertCartProductQuantityToCart(
         productId: Long,
+        increaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val existingItem = cartItems.find { it.product.id == productId }
+        val existingItem = cartItems[productId]
         if (existingItem != null) {
-            val newQuantity = existingItem.quantity - 1
-            cartItems.remove(existingItem)
-            if (newQuantity > 0) {
-                cartItems.add(existingItem.copy(quantity = newQuantity))
+            cartItems[productId] =
+                existingItem.copy(quantity = existingItem.quantity + increaseCount)
+        } else {
+            val product = products.find { it.id == productId }?.toDomain()
+            if (product != null) {
+                cartItems[productId] =
+                    CartProduct(
+                        cartId = Random.nextLong(),
+                        product = product,
+                        quantity = increaseCount,
+                    )
             }
         }
         onResult(Result.success(Unit))
     }
 
-    override fun deleteCartItem(
+    override fun decreaseCartProductQuantityFromCart(
         productId: Long,
+        decreaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val existingItem = cartItems.find { it.product.id == productId }
+        val existingItem = cartItems[productId]
         if (existingItem != null) {
-            cartItems.remove(existingItem)
+            val newQuantity = existingItem.quantity - decreaseCount
+            if (newQuantity > 0) {
+                cartItems[productId] = existingItem.copy(quantity = newQuantity)
+            } else {
+                cartItems.remove(productId)
+            }
         }
         onResult(Result.success(Unit))
+    }
+
+    override fun fetchCartItemCount(onResult: (Result<Int>) -> Unit) {
+        onResult(Result.success(cartItems.size))
+    }
+
+    override fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> {
+        val foundCartProducts = cartItems.filterKeys { it in productIds }.values.toList()
+        return Result.success(foundCartProducts)
     }
 }

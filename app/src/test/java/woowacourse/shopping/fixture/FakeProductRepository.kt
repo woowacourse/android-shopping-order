@@ -1,15 +1,16 @@
 package woowacourse.shopping.fixture
 
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class FakeProductRepository : ProductRepository {
-    override fun findProductInfoById(
+    override fun fetchProduct(
         id: Long,
         onResult: (Result<Product>) -> Unit,
     ) {
-        val product = productsFixture.find { it.id == id }
+        val product = productsFixture.find { it.id == id }?.toDomain()
         if (product != null) {
             onResult(Result.success(product))
         } else {
@@ -17,13 +18,15 @@ class FakeProductRepository : ProductRepository {
         }
     }
 
-    override fun loadProducts(
-        offset: Int,
-        limit: Int,
+    override fun fetchProducts(
+        page: Int,
+        size: Int,
         onResult: (Result<PageableItem<Product>>) -> Unit,
     ) {
-        val pagedItems = productsFixture.drop(offset).take(limit)
-        val hasMore = (offset + limit) < productsFixture.size
-        onResult(Result.success(PageableItem(pagedItems, hasMore)))
+        val offset = page * size
+        val pagedItems = productsFixture.drop(offset).take(size).map { it.toDomain() }
+        val hasMore = (offset + size) < productsFixture.size
+        val pageableItem = PageableItem(pagedItems, hasMore)
+        onResult(Result.success(pageableItem))
     }
 }

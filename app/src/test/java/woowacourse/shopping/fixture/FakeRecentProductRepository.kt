@@ -1,5 +1,6 @@
 package woowacourse.shopping.fixture
 
+import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -16,7 +17,7 @@ class FakeRecentProductRepository(
         val products =
             recentProductIds
                 .take(limit)
-                .mapNotNull { id -> productsFixture.find { it.id == id } }
+                .mapNotNull { id -> productsFixture.find { it.id == id }?.toDomain() }
         onResult(Result.success(products))
     }
 
