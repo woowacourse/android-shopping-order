@@ -2,24 +2,24 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
 
-data class CatalogProducts(
-    val products: List<CatalogProduct>,
+data class Products(
+    val products: List<Product>,
     val page: Page,
 ) {
     val catalogProductsQuantity: Int get() = products.sumOf { it.quantity }
 
-    operator fun plus(other: CatalogProducts): CatalogProducts {
+    operator fun plus(other: Products): Products {
         val mergedProducts = products + other.products
-        return CatalogProducts(
+        return Products(
             products = mergedProducts,
             page = other.page,
         )
     }
 
-    fun updateCatalogProductQuantity(
+    fun updateProductQuantity(
         productId: Long,
         quantity: Int,
-    ): CatalogProducts {
+    ): Products {
         val updatedProducts =
             products.map { product ->
                 if (product.productDetail.id == productId) {
@@ -31,7 +31,7 @@ data class CatalogProducts(
         return copy(products = updatedProducts)
     }
 
-    fun updateCatalogProduct(newProduct: CatalogProduct): CatalogProducts {
+    fun updateProduct(newProduct: Product): Products {
         val updatedProducts =
             products.map { product ->
                 if (product.productDetail.id == newProduct.productDetail.id) {
@@ -43,7 +43,7 @@ data class CatalogProducts(
         return copy(products = updatedProducts)
     }
 
-    fun updateCatalogProducts(newProducts: List<CatalogProduct>): CatalogProducts {
+    fun updateProducts(newProducts: List<Product>): Products {
         val updatedProducts =
             products.map { product ->
                 newProducts.find { it.productDetail.id == product.productDetail.id } ?: product
@@ -52,6 +52,6 @@ data class CatalogProducts(
     }
 
     companion object {
-        val EMPTY_CATALOG_PRODUCTS = CatalogProducts(emptyList(), EMPTY_PAGE)
+        val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)
     }
 }

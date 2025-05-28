@@ -13,7 +13,6 @@ interface ProductApi {
         @Query("category") category: String? = null,
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("sort") sort: List<String>? = null,
     ): Call<ProductsResponse>
 
     @GET("/products/{id}")

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 
-class CatalogProductDetailTest {
+class ProductDetailTest {
     @Test
     fun `수량을 증가시키면 해당 수량만큼 증가된 객체를 반환한다`() {
         // given

@@ -2,10 +2,10 @@ package woowacourse.shopping.model
 
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
-import woowacourse.shopping.domain.model.CatalogProduct
-import woowacourse.shopping.domain.model.CatalogProducts
 import woowacourse.shopping.domain.model.HistoryProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductDetail
+import woowacourse.shopping.domain.model.Products
 
 val DUMMY_PRODUCT_DETAIL_1 =
     ProductDetail(
@@ -60,9 +60,9 @@ val DUMMY_HISTORY_PRODUCT_1 =
         imageUrl = DUMMY_PRODUCT_DETAIL_1.imageUrl,
     )
 
-val DUMMY_CATALOG_PRODUCT_1 = CatalogProduct(DUMMY_PRODUCT_DETAIL_1, quantity = 5)
-val DUMMY_CATALOG_PRODUCT_2 = CatalogProduct(DUMMY_PRODUCT_DETAIL_2, quantity = 6)
-val DUMMY_CATALOG_PRODUCT_3 = CatalogProduct(DUMMY_PRODUCT_DETAIL_3, quantity = 7)
+val DUMMY_CATALOG_PRODUCT_1 = Product(DUMMY_PRODUCT_DETAIL_1, quantity = 5)
+val DUMMY_CATALOG_PRODUCT_2 = Product(DUMMY_PRODUCT_DETAIL_2, quantity = 6)
+val DUMMY_CATALOG_PRODUCT_3 = Product(DUMMY_PRODUCT_DETAIL_3, quantity = 7)
 
 val DUMMY_CART_PRODUCTS_1 =
     CartProducts(
@@ -78,7 +78,7 @@ val DUMMY_CART_PRODUCTS_1 =
     )
 
 val DUMMY_CATALOG_PRODUCTS_1 =
-    CatalogProducts(
+    Products(
         products =
             listOf(
                 DUMMY_CATALOG_PRODUCT_1,
@@ -88,7 +88,7 @@ val DUMMY_CATALOG_PRODUCTS_1 =
         hasMore = true,
     )
 val DUMMY_CATALOG_PRODUCTS_2 =
-    CatalogProducts(
+    Products(
         products = listOf(DUMMY_CATALOG_PRODUCT_1),
         hasMore = true,
     )

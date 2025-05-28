@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.domain.model.CatalogProducts
-import woowacourse.shopping.domain.model.CatalogProducts.Companion.EMPTY_CATALOG_PRODUCTS
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Page.Companion.UNINITIALIZED_PAGE
+import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
@@ -26,9 +26,9 @@ class CatalogViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
 ) : ViewModel() {
-    private val _catalogProducts: MutableLiveData<CatalogProducts> =
-        MutableLiveData(EMPTY_CATALOG_PRODUCTS)
-    val catalogProducts: LiveData<CatalogProducts> get() = _catalogProducts
+    private val _Products: MutableLiveData<Products> =
+        MutableLiveData(EMPTY_PRODUCTS)
+    val products: LiveData<Products> get() = _Products
 
     private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
         MutableLiveData(emptyList())
@@ -39,20 +39,20 @@ class CatalogViewModel(
     }
 
     private fun loadCartProducts(
-        page: Int = catalogProducts.value?.page?.current ?: UNINITIALIZED_PAGE,
+        page: Int = products.value?.page?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
         getCatalogProductsUseCase(
             page = page,
             size = count,
         ) { newProducts ->
-            _catalogProducts.postValue(catalogProducts.value?.plus(newProducts))
+            _Products.postValue(products.value?.plus(newProducts))
         }
     }
 
     fun loadMoreCartProducts() {
         val currentPage =
-            catalogProducts.value
+            products.value
                 ?.page
                 ?.current
                 ?.plus(DEFAULT_PAGE_STEP) ?: UNINITIALIZED_PAGE
@@ -67,8 +67,8 @@ class CatalogViewModel(
 
     fun increaseCartProduct(id: Long) {
         increaseCartProductQuantityUseCase(id) { newQuantity ->
-            _catalogProducts.postValue(
-                catalogProducts.value?.updateCatalogProductQuantity(
+            _Products.postValue(
+                products.value?.updateProductQuantity(
                     id,
                     newQuantity,
                 ),
@@ -78,8 +78,8 @@ class CatalogViewModel(
 
     fun decreaseCartProduct(id: Long) {
         decreaseCartProductQuantityUseCase(id) { newQuantity ->
-            _catalogProducts.postValue(
-                catalogProducts.value?.updateCatalogProductQuantity(
+            _Products.postValue(
+                products.value?.updateProductQuantity(
                     id,
                     newQuantity,
                 ),
@@ -89,8 +89,8 @@ class CatalogViewModel(
 
     fun loadCartProduct(id: Long) {
         getCatalogProductUseCase(id) { cartProduct ->
-            _catalogProducts.postValue(
-                catalogProducts.value?.updateCatalogProduct(
+            _Products.postValue(
+                products.value?.updateProduct(
                     cartProduct ?: return@getCatalogProductUseCase,
                 ),
             )
@@ -99,7 +99,7 @@ class CatalogViewModel(
 
     fun loadCartProducts(ids: List<Int>) {
         getCatalogProductsByIdsUseCase(ids) { cartProducts ->
-            _catalogProducts.postValue(catalogProducts.value?.updateCatalogProducts(cartProducts))
+            _Products.postValue(products.value?.updateProducts(cartProducts))
         }
     }
 

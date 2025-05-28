@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
-import woowacourse.shopping.domain.model.CatalogProducts
+import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.concurrent.thread
 
@@ -10,7 +10,7 @@ class GetCatalogProductsUseCase(
     operator fun invoke(
         page: Int,
         size: Int,
-        callback: (CatalogProducts) -> Unit,
+        callback: (Products) -> Unit,
     ) {
         thread {
             callback(repository.fetchProducts(page, size))

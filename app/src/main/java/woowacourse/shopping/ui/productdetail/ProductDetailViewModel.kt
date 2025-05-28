@@ -7,10 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.CatalogProduct
-import woowacourse.shopping.domain.model.CatalogProduct.Companion.EMPTY_CATALOG_PRODUCT
 import woowacourse.shopping.domain.model.HistoryProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetProductDetailUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
@@ -24,9 +23,9 @@ class ProductDetailViewModel(
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
 ) : ViewModel() {
-    private val _catalogProduct: MutableLiveData<CatalogProduct> =
-        MutableLiveData(EMPTY_CATALOG_PRODUCT)
-    val catalogProduct: LiveData<CatalogProduct> get() = _catalogProduct
+    private val _product: MutableLiveData<Product> =
+        MutableLiveData(EMPTY_PRODUCT)
+    val product: LiveData<Product> get() = _product
 
     private val _lastHistoryProduct: MutableLiveData<HistoryProduct?> = MutableLiveData(null)
     val lastHistoryProduct: LiveData<HistoryProduct?> get() = _lastHistoryProduct
@@ -37,7 +36,7 @@ class ProductDetailViewModel(
 
     fun loadProductDetail(id: Long) {
         getProductDetailUseCase(id) { catalogProduct ->
-            _catalogProduct.postValue(catalogProduct)
+            _product.postValue(catalogProduct)
         }
     }
 
@@ -52,22 +51,20 @@ class ProductDetailViewModel(
     }
 
     fun decreaseCartProductQuantity() {
-        _catalogProduct.value = catalogProduct.value?.decreaseQuantity()
+        _product.value = product.value?.decreaseQuantity()
     }
 
     fun increaseCartProductQuantity() {
-        _catalogProduct.value = catalogProduct.value?.increaseQuantity()
+        _product.value = product.value?.increaseQuantity()
     }
 
     fun updateCartProduct() {
-        val catalogProduct: CatalogProduct = catalogProduct.value ?: return
+        val product: Product = product.value ?: return
         runCatching {
             updateCartProductUseCase(
-                CartProduct(
-                    catalogProduct.productDetail.id,
-                    catalogProduct.productDetail,
-                    catalogProduct.quantity,
-                ),
+                productId = product.productDetail.id,
+                cartId = product.cartId,
+                quantity = product.quantity,
             )
         }.onSuccess {
             _onCartProductAddSuccess.postValue(true)

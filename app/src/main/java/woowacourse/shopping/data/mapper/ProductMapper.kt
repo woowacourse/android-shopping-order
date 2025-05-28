@@ -3,7 +3,7 @@ package woowacourse.shopping.data.mapper
 import woowacourse.shopping.data.model.entity.ProductEntity
 import woowacourse.shopping.data.model.response.ProductDetailResponse
 import woowacourse.shopping.data.model.response.ProductsResponse
-import woowacourse.shopping.domain.model.CatalogProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductDetail
 
 fun ProductEntity.toDomain(): ProductDetail =
@@ -15,8 +15,8 @@ fun ProductEntity.toDomain(): ProductDetail =
         category = "",
     )
 
-fun ProductsResponse.Content.toDomain(): CatalogProduct =
-    CatalogProduct(
+fun ProductsResponse.Content.toDomain(): Product =
+    Product(
         productDetail =
             ProductDetail(
                 id = id,

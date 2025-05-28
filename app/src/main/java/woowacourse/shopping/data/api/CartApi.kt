@@ -18,7 +18,6 @@ interface CartApi {
     fun getCartItems(
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("sort") sort: List<String>? = null,
     ): Call<CartItemsResponse>
 
     @POST("/cart-items")

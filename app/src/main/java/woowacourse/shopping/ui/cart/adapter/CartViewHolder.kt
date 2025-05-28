@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.cart.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.ui.custom.CartCountView
 
 class CartViewHolder(
@@ -13,16 +13,16 @@ class CartViewHolder(
         binding.onClickHandler = onClickHandler
     }
 
-    fun bind(cartProduct: CartProduct) {
-        binding.cartProduct = cartProduct
+    fun bind(product: Product) {
+        binding.product = product
         binding.cartProductCount.setOnClickHandler(
             object : CartCountView.OnClickHandler {
                 override fun onIncreaseClick() {
-                    onClickHandler.onIncreaseClick(cartProduct.productDetail.id)
+                    onClickHandler.onIncreaseClick(product.productDetail.id)
                 }
 
                 override fun onDecreaseClick() {
-                    onClickHandler.onDecreaseClick(cartProduct.productDetail.id)
+                    onClickHandler.onDecreaseClick(product.productDetail.id)
                 }
             },
         )

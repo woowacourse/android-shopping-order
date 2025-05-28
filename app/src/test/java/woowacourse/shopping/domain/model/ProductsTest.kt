@@ -7,18 +7,22 @@ import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_2
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_3
 
-class CatalogProductsTest {
+class ProductsTest {
     @Test
     fun `두 상품 목록을 병합하면 기존 순서를 유지하며 결합되고 hasMore는 우측 값을 따른다`() {
         // given
-        val left = CatalogProducts(listOf(DUMMY_CATALOG_PRODUCT_1), hasMore = true)
-        val right = CatalogProducts(listOf(DUMMY_CATALOG_PRODUCT_2), hasMore = false)
+        val left = Products(listOf(DUMMY_CATALOG_PRODUCT_1), hasMore = true)
+        val right = Products(listOf(DUMMY_CATALOG_PRODUCT_2), hasMore = false)
 
         // when
         val result = left + right
 
         // then
-        assertThat(result.products).containsExactly(DUMMY_CATALOG_PRODUCT_1, DUMMY_CATALOG_PRODUCT_2).inOrder()
+        assertThat(result.products)
+            .containsExactly(
+                DUMMY_CATALOG_PRODUCT_1,
+                DUMMY_CATALOG_PRODUCT_2,
+            ).inOrder()
         assertThat(result.hasMore).isFalse()
     }
 
@@ -29,13 +33,19 @@ class CatalogProductsTest {
         val newQuantity = 100
 
         // when
-        val updated = original.updateCatalogProductQuantity(DUMMY_CATALOG_PRODUCT_2.productDetail.id, newQuantity)
+        val updated =
+            original.updateProductQuantity(
+                DUMMY_CATALOG_PRODUCT_2.productDetail.id,
+                newQuantity,
+            )
 
         // then
-        val modified = updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }
+        val modified =
+            updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }
         assertThat(modified.quantity).isEqualTo(newQuantity)
 
-        val unmodified = updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
+        val unmodified =
+            updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
         assertThat(unmodified.quantity).isEqualTo(DUMMY_CATALOG_PRODUCT_1.quantity)
     }
 
@@ -46,13 +56,15 @@ class CatalogProductsTest {
         val updatedProduct = DUMMY_CATALOG_PRODUCT_2.copy(quantity = 100)
 
         // when
-        val result = original.updateCatalogProduct(updatedProduct)
+        val result = original.updateProduct(updatedProduct)
 
         // then
-        val modified = result.products.first { it.productDetail.id == updatedProduct.productDetail.id }
+        val modified =
+            result.products.first { it.productDetail.id == updatedProduct.productDetail.id }
         assertThat(modified.quantity).isEqualTo(100)
 
-        val unmodified = result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
+        val unmodified =
+            result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
         assertThat(unmodified.quantity).isEqualTo(DUMMY_CATALOG_PRODUCT_1.quantity)
     }
 
@@ -68,20 +80,24 @@ class CatalogProductsTest {
             )
 
         // when
-        val result = original.updateCatalogProducts(updatedList)
+        val result = original.updateProducts(updatedList)
 
         // then
-        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }.quantity).isEqualTo(1)
+        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }.quantity).isEqualTo(
+            1,
+        )
         assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }.quantity)
             .isEqualTo(DUMMY_CATALOG_PRODUCT_2.quantity)
-        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_3.productDetail.id }.quantity).isEqualTo(2)
+        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_3.productDetail.id }.quantity).isEqualTo(
+            2,
+        )
     }
 
     @Test
     fun `총 수량은 모든 상품 수량의 합과 같다`() {
         // given
-        val catalogProducts =
-            CatalogProducts(
+        val products =
+            Products(
                 listOf(
                     DUMMY_CATALOG_PRODUCT_1.copy(quantity = 1),
                     DUMMY_CATALOG_PRODUCT_2.copy(quantity = 2),
@@ -91,6 +107,6 @@ class CatalogProductsTest {
             )
 
         // then
-        assertThat(catalogProducts.catalogProductsQuantity).isEqualTo(6)
+        assertThat(products.catalogProductsQuantity).isEqualTo(6)
     }
 }

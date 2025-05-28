@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.CatalogProduct
 import woowacourse.shopping.domain.model.HistoryProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetProductDetailUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
@@ -55,14 +55,14 @@ class ProductDetailDetailViewModelTest {
         every {
             getProductDetailUseCase.invoke(DUMMY_PRODUCT_Detail_1.id, any())
         } answers {
-            secondArg<(CatalogProduct?) -> Unit>().invoke(expected)
+            secondArg<(Product?) -> Unit>().invoke(expected)
         }
 
         // when
         viewModel.loadProductDetail(DUMMY_PRODUCT_Detail_1.id)
 
         // then
-        val actual = viewModel.catalogProduct.getOrAwaitValue()
+        val actual = viewModel.product.getOrAwaitValue()
         assertThat(actual).isEqualTo(expected)
     }
 
@@ -105,7 +105,7 @@ class ProductDetailDetailViewModelTest {
         viewModel.increaseCartProductQuantity()
 
         // then
-        val updated = viewModel.catalogProduct.getOrAwaitValue()
+        val updated = viewModel.product.getOrAwaitValue()
         assertThat(updated.quantity).isEqualTo(6)
     }
 
@@ -119,7 +119,7 @@ class ProductDetailDetailViewModelTest {
         viewModel.decreaseCartProductQuantity()
 
         // then
-        val updated = viewModel.catalogProduct.getOrAwaitValue()
+        val updated = viewModel.product.getOrAwaitValue()
         assertThat(updated.quantity).isEqualTo(4)
     }
 

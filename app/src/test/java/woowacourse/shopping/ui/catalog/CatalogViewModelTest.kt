@@ -8,9 +8,9 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.domain.model.CatalogProduct
-import woowacourse.shopping.domain.model.CatalogProducts
 import woowacourse.shopping.domain.model.HistoryProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
@@ -49,7 +49,7 @@ class CatalogViewModelTest {
         every {
             getCatalogProductsUseCase.invoke(any(), any(), any())
         } answers {
-            thirdArg<(CatalogProducts) -> Unit>().invoke(DUMMY_CATALOG_PRODUCTS_1)
+            thirdArg<(Products) -> Unit>().invoke(DUMMY_CATALOG_PRODUCTS_1)
         }
 
         viewModel =
@@ -69,19 +69,19 @@ class CatalogViewModelTest {
         setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
 
         val newProduct = DUMMY_CATALOG_PRODUCT_2
-        val newData = CatalogProducts(products = listOf(newProduct), hasMore = false)
+        val newData = Products(products = listOf(newProduct), hasMore = false)
 
         every {
             getCatalogProductsUseCase.invoke(any(), any(), any())
         } answers {
-            thirdArg<(CatalogProducts) -> Unit>().invoke(newData)
+            thirdArg<(Products) -> Unit>().invoke(newData)
         }
 
         // when
         viewModel.loadCartProducts()
 
         // then
-        val result = viewModel.catalogProducts.getOrAwaitValue()
+        val result = viewModel.products.getOrAwaitValue()
         assertThat(result.products).containsExactlyElementsIn(DUMMY_CATALOG_PRODUCTS_1.products + newProduct)
         assertThat(result.hasMore).isFalse()
     }
@@ -121,8 +121,10 @@ class CatalogViewModelTest {
         viewModel.increaseCartProduct(productId)
 
         // then
-        val updated = viewModel.catalogProducts.getOrAwaitValue()
-        assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(10)
+        val updated = viewModel.products.getOrAwaitValue()
+        assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(
+            10,
+        )
     }
 
     @Test
@@ -141,7 +143,7 @@ class CatalogViewModelTest {
         viewModel.decreaseCartProduct(productId)
 
         // then
-        val updated = viewModel.catalogProducts.getOrAwaitValue()
+        val updated = viewModel.products.getOrAwaitValue()
         assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(1)
     }
 
@@ -156,15 +158,17 @@ class CatalogViewModelTest {
         every {
             getCatalogProductUseCase.invoke(eq(productId), any())
         } answers {
-            secondArg<(CatalogProduct?) -> Unit>().invoke(updatedProduct)
+            secondArg<(Product?) -> Unit>().invoke(updatedProduct)
         }
 
         // when
         viewModel.loadCartProduct(productId)
 
         // then
-        val result = viewModel.catalogProducts.getOrAwaitValue()
-        assertThat(result.products.first { it.productDetail.id == productId }.quantity).isEqualTo(100)
+        val result = viewModel.products.getOrAwaitValue()
+        assertThat(result.products.first { it.productDetail.id == productId }.quantity).isEqualTo(
+            100,
+        )
     }
 
     @Test
@@ -177,14 +181,14 @@ class CatalogViewModelTest {
         every {
             getCatalogProductsByIdsUseCase.invoke(any(), any())
         } answers {
-            secondArg<(List<CatalogProduct>) -> Unit>().invoke(updatedProducts)
+            secondArg<(List<Product>) -> Unit>().invoke(updatedProducts)
         }
 
         // when
         viewModel.loadCartProducts(listOf(DUMMY_PRODUCT_Detail_1.id))
 
         // then
-        val result = viewModel.catalogProducts.getOrAwaitValue()
+        val result = viewModel.products.getOrAwaitValue()
         assertThat(result.products).containsExactlyElementsIn(updatedProducts)
     }
 

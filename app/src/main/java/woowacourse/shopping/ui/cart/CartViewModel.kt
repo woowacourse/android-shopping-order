@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.ShoppingApp
-import woowacourse.shopping.domain.model.CartProducts
-import woowacourse.shopping.domain.model.CartProducts.Companion.EMPTY_CART_PRODUCTS
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
+import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
@@ -22,8 +22,8 @@ class CartViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
 ) : ViewModel() {
-    private val _cartProducts: MutableLiveData<CartProducts> = MutableLiveData(EMPTY_CART_PRODUCTS)
-    val cartProducts: LiveData<CartProducts> get() = _cartProducts
+    private val _cartProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
+    val cartProducts: LiveData<Products> get() = _cartProducts
 
     private val _editedProductIds: MutableLiveData<Set<Long>> = MutableLiveData(emptySet())
     val editedProductIds: LiveData<Set<Long>> get() = _editedProductIds
@@ -59,7 +59,7 @@ class CartViewModel(
 
     fun increaseCartProductQuantity(id: Long) {
         increaseCartProductQuantityUseCase(id) { newQuantity ->
-            _cartProducts.postValue(cartProducts.value?.updateCartProductQuantity(id, newQuantity))
+            _cartProducts.postValue(cartProducts.value?.updateProductQuantity(id, newQuantity))
         }
         _editedProductIds.value = editedProductIds.value?.plus(id)
     }
@@ -68,10 +68,7 @@ class CartViewModel(
         decreaseCartProductQuantityUseCase(id) { newQuantity ->
             if (newQuantity > 0) {
                 _cartProducts.postValue(
-                    cartProducts.value?.updateCartProductQuantity(
-                        id,
-                        newQuantity,
-                    ),
+                    cartProducts.value?.updateProductQuantity(id, newQuantity),
                 )
             } else {
                 loadCartProducts()
