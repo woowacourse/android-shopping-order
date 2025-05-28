@@ -220,11 +220,25 @@ class ProductsViewModel(
                             currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
                         if (index != -1) {
-                            val productItem = currentProducts[index] as ProductItem
-                            val updatedItem =
-                                productItem.copy(selectedQuantity = productItem.selectedQuantity + 1)
-                            currentProducts[index] = updatedItem
-                            _products.value = currentProducts
+                            shoppingCartRepository.load(page - 1, LOAD_PRODUCTS_SIZE) { result ->
+                                result.onSuccess { shoppingCartProducts ->
+                                    val newShoppingCartId =
+                                        shoppingCartProducts
+                                            .find {
+                                                it.product.id == productItem.product.id
+                                            }?.id
+
+                                    val productItem = currentProducts[index] as ProductItem
+                                    val updatedItem =
+                                        productItem.copy(
+                                            selectedQuantity = productItem.selectedQuantity + 1,
+                                            shoppingCartId = newShoppingCartId,
+                                        )
+
+                                    currentProducts[index] = updatedItem
+                                    _products.value = currentProducts
+                                }
+                            }
                         }
                         _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
                     }.onFailure {
