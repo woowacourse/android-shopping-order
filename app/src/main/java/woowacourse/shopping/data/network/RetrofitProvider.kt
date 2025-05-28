@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
+import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.data.network.service.ProductService
 
 object RetrofitProvider {
@@ -24,6 +25,23 @@ object RetrofitProvider {
             .addInterceptor(logging)
             .build()
 
+    private val basicAuthOkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(BasicAuthentication())
+            .addInterceptor(logging)
+            .build()
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private val BASIC_AUTH_INSTANCE: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(basicAuthOkHttpClient)
+            .addConverterFactory(
+                Json.asConverterFactory(contentType),
+            )
+            .build()
+    }
+
     @OptIn(ExperimentalSerializationApi::class)
     private val INSTANCE: Retrofit by lazy {
         Retrofit.Builder()
@@ -36,4 +54,6 @@ object RetrofitProvider {
     }
 
     val productService: ProductService = INSTANCE.create(ProductService::class.java)
+
+    val cartService: CartService = BASIC_AUTH_INSTANCE.create(CartService::class.java)
 }
