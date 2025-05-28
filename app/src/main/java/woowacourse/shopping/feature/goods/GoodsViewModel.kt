@@ -86,10 +86,14 @@ class GoodsViewModel(
                         cartItem.goods.id to Pair(cartItem, index)
                     }.toMap()
 
-            _goodsWithCartQuantity.value =
-                goods.map { goods ->
-                    cashedCartItemWithIndex[goods.id]?.first ?: CartItem(goods = goods, quantity = 0)
-                }
+            val newList = goods.map { goods ->
+                cashedCartItemWithIndex[goods.id]?.first ?: CartItem(goods = goods, quantity = 0)
+            }
+
+            if (_goodsWithCartQuantity.value != newList) {
+                _goodsWithCartQuantity.value = newList
+            }
+
             setTotalCartItemSize(cartItems.sumOf { it.quantity })
         }, {})
     }
