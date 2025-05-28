@@ -36,56 +36,43 @@ class MainViewModel(
     val isLoading: SingleLiveData<Boolean> get() = _isLoading
 
     init {
-        loadNextPage(INITIAL_PAGE)
+        loadProductsAndCarts(INITIAL_PAGE)
     }
 
     fun loadPage() {
         withState(_uiState.value) { state ->
-            val pageIndex = state.productItems.size / PAGE_SIZE
-            loadNextPage(pageIndex)
+            val nextPageIndex = state.productItems.size / PAGE_SIZE
+            loadProductsAndCarts(nextPageIndex)
         }
     }
 
-    private fun loadNextPage(pageIndex: Int) {
-        handleLoading(true)
+    private fun loadProductsAndCarts(pageIndex: Int) {
+        setLoading(true)
 
         productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { productResult ->
             productResult.fold(
                 onSuccess = { productPage ->
-                    loadCartAndMerge(productPage, pageIndex)
+                    cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
+                        cartResult.fold(
+                            onSuccess = { cartPage ->
+                                mergeProductsWithCarts(productPage, cartPage.products)
+                            },
+                            onFailure = { handleError("CartLoad", it) },
+                        )
+                    }
                 },
-                onFailure = {
-                    logError("ProductLoad", it)
-                    handleLoading(false)
-                },
+                onFailure = { handleError("ProductLoad", it) },
             )
         }
     }
 
-    private fun loadCartAndMerge(
-        productPage: ProductSinglePage,
-        pageIndex: Int,
-    ) {
-        cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
-            cartResult.fold(
-                onSuccess = { cartPage ->
-                    mergeProductWithCart(productPage, cartPage.products)
-                },
-                onFailure = {
-                    logError("CartLoad", it)
-                    handleLoading(false)
-                },
-            )
-        }
-    }
-
-    private fun mergeProductWithCart(
+    private fun mergeProductsWithCarts(
         productPage: ProductSinglePage,
         cartItems: List<ShoppingCart>,
     ) {
-        val newProductStates =
+        val newStates =
             productPage.products.map { product ->
-                val cartItem = cartItems.find { cart -> cart.product.id == product.id }
+                val cartItem = cartItems.find { it.product.id == product.id }
                 ProductState(
                     cartId = cartItem?.id,
                     item = product,
@@ -93,29 +80,38 @@ class MainViewModel(
                 )
             }
 
-        val currentItems = _uiState.value?.productItems.orEmpty()
+        val updatedList = _uiState.value?.productItems.orEmpty() + newStates
 
         _uiState.value =
             ProductUiState(
-                productItems = currentItems + newProductStates,
+                productItems = updatedList,
                 load = LoadState.of(productPage.hasNextPage),
             )
-        handleLoading(false)
+        setLoading(false)
     }
 
     fun increaseCartQuantity(productId: Long) {
         withState(_uiState.value) { state ->
-            val increasedState = state.increaseCartQuantity(productId)
-            cartRepository.addCart(Cart(increasedState.cartQuantity, productId)) { result ->
-                result.fold(
-                    onSuccess = {
-                        val response = state.modifyUiState(increasedState)
-                        _uiState.value = response
-                    },
-                    onFailure = {
-                        logError("ProductQuantityIncrease", it)
-                    },
-                )
+            val updated = state.increaseCartQuantity(productId)
+
+            val updateUiState: () -> Unit = {
+                _uiState.value = state.modifyUiState(updated)
+            }
+
+            updated.cartId?.let { cartId ->
+                cartRepository.updateQuantity(cartId, updated.cartQuantity) { result ->
+                    result.fold(
+                        onSuccess = { updateUiState() },
+                        onFailure = { handleError("ProductQuantityIncrease", it) },
+                    )
+                }
+            } ?: run {
+                cartRepository.addCart(Cart(updated.cartQuantity, productId)) { result ->
+                    result.fold(
+                        onSuccess = { updateUiState() },
+                        onFailure = { handleError("ProductQuantityIncrease", it) },
+                    )
+                }
             }
         }
     }
@@ -125,23 +121,24 @@ class MainViewModel(
             val updated = state.decreaseCartQuantity(productId)
             _uiState.value = state.modifyUiState(updated)
 
-            if (!updated.cartQuantity.hasQuantity()) {
-                // cartRepository.delete(productId)
-            } else {
-                // cartRepository.upsert(productId, updated.cartQuantity)
-            }
+            // TODO: 아래 구현은 서버 연동 이후에 처리
+            // if (!updated.cartQuantity.hasQuantity()) {
+            //     cartRepository.delete(productId)
+            // } else {
+            //     cartRepository.upsert(productId, updated.cartQuantity)
+            // }
         }
     }
 
     fun syncCartQuantities() {
         withState(_uiState.value) { state ->
-            // cartRepository.getCarts(state.productIds) { ... } // 구현 예정
+            // TODO: cartRepository.getCarts(state.productIds) { ... }
         }
     }
 
     fun syncHistory() {
         historyLoader { historyStates ->
-            // 구현 예정
+            // TODO: implement UI 반영
         }
     }
 
@@ -153,19 +150,16 @@ class MainViewModel(
         }
     }
 
-    private fun handleLoading(isLoading: Boolean) {
+    private fun setLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)
     }
 
-    private fun logError(
+    private fun handleError(
         tag: String,
         throwable: Throwable,
     ) {
         Log.e(tag, "Error occurred", throwable)
-    }
-
-    private fun sendEvent(event: MainUiEvent) {
-        _uiEvent.setValue(event)
+        setLoading(false)
     }
 
     companion object {
