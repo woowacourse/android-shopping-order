@@ -2,7 +2,6 @@ package woowacourse.shopping.view.product
 
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.QuantityObservable
-import woowacourse.shopping.view.product.ProductsItem.ItemType.entries
 
 sealed interface ProductsItem {
     val viewType: ItemType

@@ -13,6 +13,10 @@
             name="onClickBackButton"
             type="kotlin.jvm.functions.Function0" />
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.shoppingCart.ShoppingCartViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -110,6 +114,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:text="@{@string/product_price_format(viewModel.totalPrice)}"
                 app:layout_constraintBottom_toBottomOf="@id/shoppingCartOrderLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/shoppingCartProductAllSelectCheckBox"
@@ -125,7 +130,7 @@
             android:background="@color/mint"
             android:gravity="center"
             android:paddingHorizontal="16dp"
-            android:text="@string/shopping_cart_order_button"
+            android:text="@{@string/shopping_cart_order_button(viewModel.totalQuantity)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"

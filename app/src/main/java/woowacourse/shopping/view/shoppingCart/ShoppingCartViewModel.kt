@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.shoppingCart
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -27,9 +28,33 @@ class ShoppingCartViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
+    val totalPrice: LiveData<Int> get() = _totalPrice
+
+    private val _totalQuantity: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
+    val totalQuantity: LiveData<Int> get() = _totalQuantity
+
     private var page: Int = MINIMUM_PAGE
     private var hasPreviousPage: Boolean = false
     private var hasNextPage: Boolean = false
+
+    init {
+        _totalPrice.addSource(_shoppingCart) { it ->
+            _totalPrice.value =
+                it
+                    .filterIsInstance<ShoppingCartProductItem>()
+                    .filter { item -> item.isChecked }
+                    .sumOf { item -> item.shoppingCartProduct.price }
+        }
+
+        _totalQuantity.addSource(_shoppingCart) {
+            _totalQuantity.value =
+                it
+                    .filterIsInstance<ShoppingCartProductItem>()
+                    .filter { item -> item.isChecked }
+                    .sumOf { item -> item.shoppingCartProduct.quantity }
+        }
+    }
 
     fun updateShoppingCart() {
         val size = COUNT_PER_PAGE + 1
@@ -126,6 +151,21 @@ class ShoppingCartViewModel(
     fun minusPage() {
         page = page.minus(1).coerceAtLeast(MINIMUM_PAGE)
         updateShoppingCart()
+    }
+
+    fun selectShoppingCartProduct(
+        shoppingCartProductItem: ShoppingCartProductItem,
+        selected: Boolean,
+    ) {
+        _shoppingCart.value =
+            _shoppingCart.value?.filterIsInstance<ShoppingCartProductItem>()?.map { item ->
+                if (item.shoppingCartProduct.id == shoppingCartProductItem.shoppingCartProduct.id) {
+                    return@map shoppingCartProductItem.copy(
+                        isChecked = selected,
+                    )
+                }
+                return@map item
+            }
     }
 
     companion object {

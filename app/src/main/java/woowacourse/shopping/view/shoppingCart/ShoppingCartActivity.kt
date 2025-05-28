@@ -45,6 +45,8 @@ class ShoppingCartActivity :
 
     private fun initDataBinding() {
         binding.adapter = shoppingCartProductAdapter
+        binding.viewModel = this@ShoppingCartActivity.viewModel
+        binding.lifecycleOwner = this@ShoppingCartActivity
         binding.onClickBackButton = {
             val intent =
                 Intent().apply {
@@ -96,6 +98,13 @@ class ShoppingCartActivity :
 
     override fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         viewModel.removeShoppingCartProduct(shoppingCartProductItem)
+    }
+
+    override fun onProductSelectedButton(
+        shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
+        isSelected: Boolean,
+    ) {
+        viewModel.selectShoppingCartProduct(shoppingCartProductItem, isSelected)
     }
 
     override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {

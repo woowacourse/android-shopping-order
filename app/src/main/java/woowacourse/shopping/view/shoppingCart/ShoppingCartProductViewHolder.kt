@@ -12,8 +12,7 @@ class ShoppingCartProductViewHolder(
     shoppingCartListener: ShoppingCartProductClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.onRemoveProduct = shoppingCartListener::onRemoveButton
-        binding.shoppingCartQuantityComponent.productQuantityClickListener = shoppingCartListener
+        binding.shoppingCartProductClickListener = shoppingCartListener
     }
 
     fun bind(item: ShoppingCartProductItem) {
@@ -34,5 +33,10 @@ class ShoppingCartProductViewHolder(
 
     interface ShoppingCartProductClickListener : ProductQuantityClickListener {
         fun onRemoveButton(shoppingCartProductItem: ShoppingCartProductItem)
+
+        fun onProductSelectedButton(
+            shoppingCartProductItem: ShoppingCartProductItem,
+            isSelected: Boolean,
+        )
     }
 }

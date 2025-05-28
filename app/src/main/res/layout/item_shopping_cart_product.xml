@@ -6,12 +6,13 @@
     <data>
 
         <variable
+            name="shoppingCartProductClickListener"
+            type="woowacourse.shopping.view.shoppingCart.ShoppingCartProductViewHolder.ShoppingCartProductClickListener" />
+
+        <variable
             name="shoppingCartProductItem"
             type="woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem" />
 
-        <variable
-            name="onRemoveProduct"
-            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,6 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:checked="@{shoppingCartProductItem.isChecked}"
+            android:onClick="@{()->shoppingCartProductClickListener.onProductSelectedButton(shoppingCartProductItem, !shoppingCartProductCheckBox.checked)}"
             app:layout_constraintEnd_toStartOf="@id/shoppingCartProductName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +53,7 @@
             android:id="@+id/shoppingCartProductDeleteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> onRemoveProduct.invoke(shoppingCartProductItem)}"
+            android:onClick="@{() -> shoppingCartProductClickListener.onRemoveButton(shoppingCartProductItem)}"
             android:padding="16dp"
             android:src="@drawable/ic_close"
             app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductName"
@@ -81,6 +84,7 @@
             <include
                 android:id="@+id/shoppingCartQuantityComponent"
                 layout="@layout/component_product_quantity"
+                app:productQuantityClickListener="@{shoppingCartProductClickListener}"
                 app:quantityObservable="@{shoppingCartProductItem}" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
