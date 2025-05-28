@@ -73,7 +73,7 @@ class CartActivity :
     }
 
     private fun observeViewModel() {
-        viewModel.products.observe(this) { result ->
+        viewModel.cartItems.observe(this) { result ->
             when (result) {
                 is ResultState.Success -> {
                     binding.root.postDelayed({

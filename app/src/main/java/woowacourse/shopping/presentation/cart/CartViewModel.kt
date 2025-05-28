@@ -12,8 +12,8 @@ import woowacourse.shopping.presentation.SingleLiveData
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _products: MutableLiveData<ResultState<List<CartItem>>> = MutableLiveData()
-    val products: LiveData<ResultState<List<CartItem>>> = _products
+    private val _cartItems: MutableLiveData<ResultState<List<CartItem>>> = MutableLiveData()
+    val cartItems: LiveData<ResultState<List<CartItem>>> = _cartItems
     private val _totalPages: MutableLiveData<Int> = MutableLiveData(0)
     val totalPages: LiveData<Int> = _totalPages
     private val _currentPage: MutableLiveData<Int> = MutableLiveData(0)
@@ -24,13 +24,13 @@ class CartViewModel(
     fun loadItems(currentPage: Int) {
         cartRepository.fetchPagedCartItems(currentPage, PAGE_SIZE) { result ->
             result
-                .onSuccess { pagedProducts -> _products.postValue(ResultState.Success(pagedProducts)) }
-                .onFailure { _products.postValue(ResultState.Failure()) }
+                .onSuccess { pagedProducts -> _cartItems.postValue(ResultState.Success(pagedProducts)) }
+                .onFailure { _cartItems.postValue(ResultState.Failure()) }
         }
         cartRepository.getTotalCount { result ->
             result
                 .onSuccess { count -> updateTotalPage(count) }
-                .onFailure { _products.postValue(ResultState.Failure()) }
+                .onFailure { _cartItems.postValue(ResultState.Failure()) }
         }
     }
 
@@ -77,10 +77,10 @@ class CartViewModel(
                     if (pagedProducts.isEmpty()) {
                         handleEmptyPage()
                     } else {
-                        _products.postValue(ResultState.Success(pagedProducts))
+                        _cartItems.postValue(ResultState.Success(pagedProducts))
                         updateTotalPageAsync()
                     }
-                }.onFailure { _products.postValue(ResultState.Failure()) }
+                }.onFailure { _cartItems.postValue(ResultState.Failure()) }
         }
     }
 
@@ -90,50 +90,50 @@ class CartViewModel(
             _currentPage.postValue(currentPage - 1)
             reloadProductsByPage(currentPage - 1)
         } else {
-            _products.postValue(ResultState.Success(emptyList()))
+            _cartItems.postValue(ResultState.Success(emptyList()))
         }
     }
 
     fun increaseQuantity(productId: Long) {
-//        cartRepository.increaseQuantity(productId, 1) { result ->
-//            result
-//                .onSuccess {
-//                    updateQuantity(productId, 1)
-//                }.onFailure {
-//                    _toastMessage.value = R.string.cart_toast_increase_fail
-//                }
-//        }
+        cartRepository.increaseQuantity(productId) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(productId, 1)
+                }.onFailure {
+                    _toastMessage.value = R.string.cart_toast_increase_fail
+                }
+        }
     }
 
     fun decreaseQuantity(productId: Long) {
-//        val currentItems = (_products.value as? ResultState.Success)?.data ?: return
-//        val item = currentItems.find { it.product.productId == productId } ?: return
-//
-//        if (item.quantity == 1) {
-//            _toastMessage.value = R.string.cart_toast_invalid_quantity
-//            return
-//        }
-//
-//        cartRepository.decreaseQuantity(productId) { result ->
-//            result
-//                .onSuccess {
-//                    updateQuantity(productId, -1)
-//                }.onFailure {
-//                    _toastMessage.value = R.string.cart_toast_decrease_fail
-//                }
-//        }
+        val currentItems = (cartItems.value as? ResultState.Success)?.data ?: return
+        val item = currentItems.find { it.product.productId == productId } ?: return
+
+        if (item.quantity == 1) {
+            _toastMessage.value = R.string.cart_toast_invalid_quantity
+            return
+        }
+
+        cartRepository.decreaseQuantity(productId) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(productId, -1)
+                }.onFailure {
+                    _toastMessage.value = R.string.cart_toast_decrease_fail
+                }
+        }
     }
 
     private fun updateQuantity(
         productId: Long,
         amount: Int,
     ) {
-        val currentItems = (_products.value as? ResultState.Success)?.data ?: return
+        val currentItems = (_cartItems.value as? ResultState.Success)?.data ?: return
         val updatedItem =
             currentItems.map {
                 if (it.product.productId == productId) it.copy(quantity = it.quantity + amount) else it
             }
-        _products.postValue(ResultState.Success(updatedItem))
+        _cartItems.postValue(ResultState.Success(updatedItem))
     }
 
     private fun updateTotalPageAsync(onComplete: (() -> Unit)? = null) {
@@ -142,7 +142,7 @@ class CartViewModel(
                 .onSuccess { count ->
                     updateTotalPage(count)
                     onComplete?.invoke()
-                }.onFailure { _products.postValue(ResultState.Failure()) }
+                }.onFailure { _cartItems.postValue(ResultState.Failure()) }
         }
     }
 
