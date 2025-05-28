@@ -75,12 +75,18 @@ class CartViewModel(
         product: ProductUiModel,
     ) {
         if (event == DECREASE_BUTTON) {
-            cartProductRepository.updateProduct(product, -1) {
-//                _updatedItem.postValue()
+            if (product.quantity != 1) {
+                cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
+                    if (result == true) {
+                        _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
+                    }
+                }
             }
         } else if (event == INCREASE_BUTTON) {
-            cartProductRepository.updateProduct(product, 1) { product ->
-//                _updatedItem.postValue(product)
+            cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
+                if (result == true) {
+                    _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
+                }
             }
         }
     }
@@ -107,21 +113,23 @@ class CartViewModel(
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
         _loadingState.postValue(LoadingState.loading())
 
-        cartProductRepository.getAllProductsSize { totalSize ->
+        cartProductRepository.getTotalElements { totalSize ->
             val currentPage = page.value ?: INITIAL_PAGE
             val startIndex = currentPage * pageSize
             val endIndex = minOf(startIndex + pageSize, totalSize)
 
             if (startIndex >= totalSize) {
-                return@getAllProductsSize
+                return@getTotalElements
             }
-            Thread.sleep(2000)
+            Thread.sleep(800)
 
             cartProductRepository
                 .getCartProductsInRange(currentPage, pageSize) { cartProducts ->
 
                     val pagedProducts: List<ProductUiModel> =
-                        cartProducts.map { it }
+                        cartProducts.map {
+                            it
+                        }
 
                     _cartProducts.postValue(pagedProducts)
                     checkNextButtonEnabled(totalSize)

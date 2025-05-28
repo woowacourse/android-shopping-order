@@ -99,6 +99,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                                         name = it.product.name,
                                         price = it.product.price,
                                         cartItemId = it.id.toInt(),
+                                        quantity = it.quantity,
                                     )
                                 }
                             callback(products)
