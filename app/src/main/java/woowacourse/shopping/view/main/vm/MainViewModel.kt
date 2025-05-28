@@ -64,7 +64,7 @@ class MainViewModel(
         cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
             cartResult.fold(
                 onSuccess = { cartPage ->
-                    applyMergedUiState(productPage, cartPage.products)
+                    applyMergedUiState(productPage, cartPage.carts)
                 },
                 onFailure = { handleError("CartLoad", it) },
             )
