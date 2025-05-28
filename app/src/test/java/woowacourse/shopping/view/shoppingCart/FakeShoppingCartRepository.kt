@@ -36,7 +36,7 @@ class FakeShoppingCartRepository : ShoppingCartRepository {
         onUpdate(runCatching { this.cartItems = cartItems })
     }
 
-    override fun quantityOf(
+    override fun quantity(
         product: Product,
         onResult: (Result<Int>) -> Unit,
     ) {

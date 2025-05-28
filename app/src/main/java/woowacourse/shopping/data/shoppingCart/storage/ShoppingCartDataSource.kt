@@ -15,5 +15,5 @@ interface ShoppingCartDataSource {
 
     fun update(products: List<CartItemEntity>)
 
-    fun quantityOf(productId: Long): Int
+    fun quantity(): Int
 }

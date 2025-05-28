@@ -36,8 +36,9 @@ class RemoteShoppingCartDataSource(
         TODO("Not yet implemented")
     }
 
-    override fun quantityOf(productId: Long): Int {
-        TODO("Not yet implemented")
+    override fun quantity(): Int {
+        val cartQuantityResponse = productsHttpClient.getCartItemQuantity()
+        return cartQuantityResponse.quantity ?: 0
     }
 }
 

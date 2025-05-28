@@ -90,6 +90,9 @@ class ProductsActivity : AppCompatActivity() {
 
                 ProductsEvent.UPDATE_SHOPPING_CART_FAILURE ->
                     showToast(R.string.products_update_shopping_cart_error_message)
+
+                ProductsEvent.LOAD_SHOPPING_CART_QUANTITY_FAILURE ->
+                    showToast(R.string.products_load_shopping_cart_quantity_error_message)
             }
         }
     }

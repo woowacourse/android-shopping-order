@@ -59,7 +59,7 @@ class ProductsViewModel(
                         listOf(recentViewedProducts) + currentProductItems + newProductItems +
                             listOf(LoadItem(pageableProducts.hasNext)),
                     )
-                    loadShoppingCart(1, 5)
+                    loadCartItemQuantity()
                 }.onFailure {
                     _productItems.postValue(emptyList())
                     _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
@@ -67,13 +67,26 @@ class ProductsViewModel(
         }
     }
 
-    private fun loadShoppingCart(
-        page: Int,
-        size: Int,
-    ) {
-        shoppingCartRepository.load(page, size) { result: Result<PageableCartItems> ->
-            shoppingCart = result.getOrNull()?.cartItems ?: emptyList()
-            _shoppingCartSize.postValue(shoppingCart.size)
+    private fun loadCartItemQuantity() {
+        shoppingCartRepository.quantity { result: Result<Int> ->
+            result
+                .onSuccess { quantity: Int ->
+                    _shoppingCartSize.postValue(quantity)
+                    loadShoppingCart(quantity)
+                }.onFailure {
+                    _event.postValue(ProductsEvent.LOAD_SHOPPING_CART_QUANTITY_FAILURE)
+                }
+        }
+    }
+
+    private fun loadShoppingCart(size: Int) {
+        shoppingCartRepository.load(0, size) { result: Result<PageableCartItems> ->
+            result
+                .onSuccess { pageableCartItems: PageableCartItems ->
+                    shoppingCart = pageableCartItems.cartItems
+                }.onFailure {
+                    shoppingCart = emptyList()
+                }
         }
     }
 

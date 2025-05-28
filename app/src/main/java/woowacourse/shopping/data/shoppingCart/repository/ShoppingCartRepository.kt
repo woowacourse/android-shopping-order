@@ -2,7 +2,6 @@ package woowacourse.shopping.data.shoppingCart.repository
 
 import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
-import woowacourse.shopping.domain.product.Product
 
 interface ShoppingCartRepository {
     fun load(
@@ -26,8 +25,5 @@ interface ShoppingCartRepository {
         onUpdate: (Result<Unit>) -> Unit,
     )
 
-    fun quantityOf(
-        product: Product,
-        onResult: (Result<Int>) -> Unit,
-    )
+    fun quantity(onResult: (Result<Int>) -> Unit)
 }

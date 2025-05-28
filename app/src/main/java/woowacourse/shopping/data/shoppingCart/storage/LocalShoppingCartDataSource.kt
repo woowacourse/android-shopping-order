@@ -33,5 +33,8 @@ object LocalShoppingCartDataSource : ShoppingCartDataSource {
 
     override fun update(cartItems: List<CartItemEntity>) = dao.replaceAll(cartItems)
 
-    override fun quantityOf(productId: Long): Int = dao.quantityOf(productId)
+    override fun quantity(): Int =
+        dao.quantityOf(
+            productId = TODO(),
+        )
 }

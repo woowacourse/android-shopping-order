@@ -1,6 +1,5 @@
 package woowacourse.shopping.data
 
-import android.util.Log
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -11,6 +10,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import woowacourse.shopping.data.product.dto.CartRequest
 import woowacourse.shopping.data.product.dto.ProductResponse
+import woowacourse.shopping.data.shoppingCart.dto.CartQuantityResponse
 import woowacourse.shopping.data.shoppingCart.dto.CartResponse
 import java.util.Base64
 
@@ -41,13 +41,18 @@ class ProductsHttpClient(
         return Json.decodeFromString(jsonString)
     }
 
+    fun getCartItemQuantity(): CartQuantityResponse {
+        val response = httpGet("$PATH_CART_ITEMS/counts", true)
+        val jsonString = response.body?.string() ?: ""
+        return Json.decodeFromString(jsonString)
+    }
+
     fun postShoppingCartItem(
         id: Long,
         quantity: Int,
     ): Response {
         val cartRequest = CartRequest(id, quantity)
         val jsonString: String = Json.encodeToString(cartRequest)
-        Log.e("TAG", "jsonString: $jsonString")
 
         return httpPost(
             PATH_CART_ITEMS,
