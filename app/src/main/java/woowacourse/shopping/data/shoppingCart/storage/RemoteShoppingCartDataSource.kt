@@ -28,7 +28,7 @@ class RemoteShoppingCartDataSource(
         productId: Long,
         quantity: Int,
     ) {
-        productsHttpClient.postShoppingCartItem(productId, quantity)
+        productsHttpClient.postCartItem(productId, quantity)
     }
 
     override fun remove(product: CartItemEntity) {

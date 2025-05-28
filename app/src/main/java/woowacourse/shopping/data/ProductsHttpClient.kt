@@ -17,25 +17,6 @@ import java.util.Base64
 class ProductsHttpClient(
     private val baseUrl: String = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
 ) {
-    private val client: OkHttpClient =
-        OkHttpClient
-            .Builder()
-            .addInterceptor(
-                HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                },
-            ).build()
-
-    fun getProductById(id: Long): ProductResponse {
-        val response =
-            http(
-                HttpMethod.Get,
-                "/products/$id",
-            )
-        val jsonString = response.body?.string() ?: ""
-        return Json.decodeFromString(jsonString)
-    }
-
     fun getCart(
         page: Int,
         size: Int,
@@ -50,6 +31,41 @@ class ProductsHttpClient(
         return Json.decodeFromString(jsonString)
     }
 
+    fun postCartItem(
+        productId: Long,
+        quantity: Int,
+    ): Response {
+        val cartRequest = CartRequest(productId, quantity)
+        val jsonString: String = Json.encodeToString(cartRequest)
+
+        return http(
+            HttpMethod.Post(jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull())),
+            PATH_CART_ITEMS,
+            true,
+        )
+    }
+
+    fun deleteShoppingCartItem(cartItemId: Long) =
+        http(
+            HttpMethod.Delete(),
+            "/cart-items/$cartItemId",
+            true,
+        )
+
+    fun patchCartItemQuantity(
+        cartItemId: Long,
+        newQuantity: Int,
+    ) {
+        val requestBody = CartItemResponse(newQuantity)
+        val jsonString: String = Json.encodeToString(requestBody)
+
+        http(
+            HttpMethod.Patch(jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull())),
+            path = "$PATH_CART_ITEMS/$cartItemId",
+            needAuthorization = true,
+        )
+    }
+
     fun getCartItemQuantity(): CartQuantityResponse {
         val response =
             http(
@@ -61,45 +77,29 @@ class ProductsHttpClient(
         return Json.decodeFromString(jsonString)
     }
 
-    fun postShoppingCartItem(
-        id: Long,
-        quantity: Int,
-    ): Response {
-        val cartRequest = CartRequest(id, quantity)
-        val jsonString: String = Json.encodeToString(cartRequest)
-
-        return http(
-            HttpMethod.Post(jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull())),
-            PATH_CART_ITEMS,
-            true,
-        )
-    }
-
-    fun deleteShoppingCartItem(id: Long) =
-        http(
-            HttpMethod.Delete(),
-            "/cart-items/$id",
-            true,
-        )
-
-    fun patchCartItemQuantity(
-        id: Long,
-        quantity: Int,
-    ) {
-        val requestBody = CartItemResponse(quantity)
-        val jsonString: String = Json.encodeToString(requestBody)
-
-        http(
-            HttpMethod.Patch(jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull())),
-            path = "$PATH_CART_ITEMS/$id",
-            needAuthorization = true,
-        )
-    }
-
     fun getProducts(
         page: Int,
         size: Int,
     ): Response = http(HttpMethod.Get, "/products?page=$page&size=$size")
+
+    fun getProductById(productId: Long): ProductResponse {
+        val response =
+            http(
+                HttpMethod.Get,
+                "/products/$productId",
+            )
+        val jsonString = response.body?.string() ?: ""
+        return Json.decodeFromString(jsonString)
+    }
+
+    private val client: OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                },
+            ).build()
 
     private fun http(
         httpMethod: HttpMethod,
