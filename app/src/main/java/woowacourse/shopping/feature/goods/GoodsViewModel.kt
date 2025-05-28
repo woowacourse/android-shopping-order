@@ -1,8 +1,10 @@
 package woowacourse.shopping.feature.goods
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.domain.model.Authorization
@@ -30,6 +32,8 @@ class GoodsViewModel(
 
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
+
+    var cashedCartItemWithIndex: Map<Long, Pair<CartItem, Int>> = mapOf()
 
     init {
         appendCartItemsWithZeroQuantity()
@@ -74,17 +78,23 @@ class GoodsViewModel(
         }
     }
 
-    fun updateCartQuantity() {
-//        cartRepository.fetchAllCartItems { cartItems ->
-//            val cartItemsMap = cartItems.associateBy { it.goods.id }
-//            _goodsWithCartQuantity.value =
-//                goods.map { goods ->
-//                    cartItemsMap[goods.id] ?: CartItem(goods = goods, quantity = 0)
-//                }
-//            setTotalCartItemSize(cartItems.sumOf { it.quantity })
-//        }
+    fun updateCartCache() {
+        cartRepository.fetchAllCartItems({ cartItems ->
+            cashedCartItemWithIndex =
+                cartItems
+                    .mapIndexed { index, cartItem ->
+                        cartItem.goods.id to Pair(cartItem, index)
+                    }.toMap()
+
+            _goodsWithCartQuantity.value =
+                goods.map { goods ->
+                    cashedCartItemWithIndex[goods.id]?.first ?: CartItem(goods = goods, quantity = 0)
+                }
+            setTotalCartItemSize(cartItems.sumOf { it.quantity })
+        }, {})
     }
 
+    // todo api의 totalsize로 수정
     private fun setTotalCartItemSize(totalCartQuantity: Int) {
         val sizeText =
             when {
@@ -104,15 +114,30 @@ class GoodsViewModel(
         if (!Authorization.isLogin) {
             _navigateToLogin.setValue(Unit)
         } else {
-            cartRepository.addOrIncreaseQuantity(cartItem.goods, cartItem.quantity) {
-                updateCartQuantity()
+            // 일단 증가만 구현
+            Log.d("카트아이템", "$cartItem")
+            Log.d("캐시", "$cashedCartItemWithIndex")
+            cashedCartItemWithIndex[cartItem.goods.id]?.first?.let {
+                Log.d("카트아이템2", "$cartItem")
+                increaseCartItem(it.id, cartItem.copy(quantity = it.quantity + 1))
             }
+            updateCartCache()
+//            cartRepository.addOrIncreaseQuantity(cartItem.goods, cartItem.quantity) {
+//
+//            }
         }
+    }
+
+    private fun increaseCartItem(
+        cartId: Int,
+        cartItem: CartItem,
+    ) {
+        cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity), {}, {})
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         cartRepository.removeOrDecreaseQuantity(cartItem.goods, cartItem.quantity) {
-            updateCartQuantity()
+            updateCartCache()
         }
     }
 

@@ -27,14 +27,14 @@ class CartRemoteDataSourceImpl(
         // Todo
     }
 
-    override fun fetchPageCartItem(
-        limit: Int,
-        offset: Int,
+    override fun fetchCartItemByPage(
+        page: Int,
+        size: Int,
         onSuccess: (CartResponse) -> Unit,
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
-            .requestCartProduct(page = offset / limit, size = limit, authorization = "Basic " + Authorization.basicKey)
+            .requestCartProduct(page = page, size = size, authorization = "Basic " + Authorization.basicKey)
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(
@@ -56,6 +56,15 @@ class CartRemoteDataSourceImpl(
                     }
                 },
             )
+    }
+
+    override fun fetchCartItemByOffset(
+        limit: Int,
+        offset: Int,
+        onSuccess: (CartResponse) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
+    ) {
+        fetchCartItemByPage(offset / limit, limit, onSuccess, onFailure)
     }
 
     override fun fetchCartCount(
@@ -104,6 +113,40 @@ class CartRemoteDataSourceImpl(
                         t: Throwable,
                     ) {
                         onResponse(-1)
+                    }
+                },
+            )
+    }
+
+    override fun updateItemCount(
+        cartId: Int,
+        cartQuantity: CartQuantity,
+        onSuccess: (resultCode: Int) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
+    ) {
+        retrofitService
+            .updateCartCounts(
+                cartId = cartId,
+                requestBody = cartQuantity,
+                authorization = "Basic " + Authorization.basicKey,
+            ).enqueue(
+                object : Callback<CartQuantity> {
+                    override fun onResponse(
+                        call: Call<CartQuantity>,
+                        response: Response<CartQuantity>,
+                    ) {
+                        if (response.isSuccessful) {
+                            onSuccess(response.code())
+                        } else {
+                            onFailure(CartFetchError.Server(response.code(), response.message()))
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<CartQuantity>,
+                        t: Throwable,
+                    ) {
+                        onFailure(CartFetchError.Network)
                     }
                 },
             )

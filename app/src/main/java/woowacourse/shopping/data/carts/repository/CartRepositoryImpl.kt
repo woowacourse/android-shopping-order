@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.carts.repository
 
+import android.util.Log
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
@@ -19,7 +21,7 @@ class CartRepositoryImpl(
         onComplete: (List<CartItem>) -> Unit,
         onFail: (Throwable) -> Unit,
     ) {
-        remoteDataSource.fetchPageCartItem(
+        remoteDataSource.fetchCartItemByOffset(
             Int.MAX_VALUE,
             0,
             { response ->
@@ -29,15 +31,33 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun fetchPageCartItems(
+    override fun fetchCartItemsByOffset(
         limit: Int,
         offset: Int,
         onComplete: (List<CartItem>) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
-        remoteDataSource.fetchPageCartItem(
+        remoteDataSource.fetchCartItemByOffset(
             limit,
             offset,
+            { response ->
+                onComplete(getCartItemByCartResponse(response))
+            },
+            { response ->
+                onFail(response)
+            },
+        )
+    }
+
+    override fun fetchCartItemsByPage(
+        page: Int,
+        size: Int,
+        onComplete: (List<CartItem>) -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    ) {
+        remoteDataSource.fetchCartItemByOffset(
+            page,
+            size,
             { response ->
                 onComplete(getCartItemByCartResponse(response))
             },
@@ -54,7 +74,39 @@ class CartRepositoryImpl(
         addQuantity: Int,
         onComplete: () -> Unit,
     ) {
-        // Todo
+        fetchAllCartItems({ cartItems: List<CartItem> ->
+            if (goods.id in cartItems.map { it.goods.id }) {
+            } else {
+                addCartItem(goods) {
+                }
+            }
+        }, {
+        })
+    }
+
+    override fun updateQuantity(
+        cartId: Int,
+        cartQuantity: CartQuantity,
+        onComplete: () -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    ) {
+        Log.d("updateQuantity리포지토리", "$cartId, $cartQuantity")
+        remoteDataSource.updateItemCount(
+            cartId = cartId,
+            cartQuantity = cartQuantity,
+            onSuccess = { resultCode ->
+                onComplete()
+            },
+            onFailure = { error ->
+                onFail(error)
+            },
+        )
+    }
+
+    private fun addCartItem(
+        goods: Goods,
+        onComplete: () -> Unit,
+    ) {
     }
 
     override fun removeOrDecreaseQuantity(

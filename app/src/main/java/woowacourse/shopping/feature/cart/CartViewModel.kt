@@ -72,7 +72,7 @@ class CartViewModel(
     }
 
     fun updateCartQuantity() {
-        cartRepository.fetchPageCartItems(
+        cartRepository.fetchCartItemsByOffset(
             PAGE_SIZE,
             (currentPage - 1) * PAGE_SIZE,
             { currentPageCartItems ->
@@ -87,7 +87,7 @@ class CartViewModel(
     }
 
     private fun updateCartData() {
-        cartRepository.fetchPageCartItems(
+        cartRepository.fetchCartItemsByOffset(
             PAGE_SIZE,
             (currentPage - 1) * PAGE_SIZE,
             { currentPageCartItems ->

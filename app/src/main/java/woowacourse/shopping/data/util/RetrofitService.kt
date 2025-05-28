@@ -1,8 +1,10 @@
 package woowacourse.shopping.data.util
 
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.carts.dto.CartQuantity
@@ -35,6 +37,14 @@ interface RetrofitService {
 
     @GET("/cart-items/counts")
     fun requestCartCounts(
+        @Header("accept") accept: String = "*/*",
+        @Header("Authorization") authorization: String,
+    ): Call<CartQuantity>
+
+    @PATCH("/cart-items/{id}")
+    fun updateCartCounts(
+        @Path("id") cartId: Int,
+        @Body requestBody: CartQuantity,
         @Header("accept") accept: String = "*/*",
         @Header("Authorization") authorization: String,
     ): Call<CartQuantity>

@@ -58,7 +58,7 @@ class GoodsActivity : AppCompatActivity() {
             quantityChangeListener =
                 object : QuantityChangeListener {
                     override fun onIncrease(cartItem: CartItem) {
-                        viewModel.addCartItemOrIncreaseQuantity(cartItem.copy(quantity = 1))
+                        viewModel.addCartItemOrIncreaseQuantity(cartItem)
                     }
 
                     override fun onDecrease(cartItem: CartItem) {
@@ -70,7 +70,7 @@ class GoodsActivity : AppCompatActivity() {
     private val moreButtonAdapter by lazy {
         MoreButtonAdapter {
             viewModel.addPage()
-            viewModel.updateCartQuantity()
+            viewModel.updateCartCache()
         }
     }
     private val concatAdapter by lazy {
@@ -98,7 +98,7 @@ class GoodsActivity : AppCompatActivity() {
         }
 
         viewModel.goodsWithCartQuantity.observe(this) {
-            viewModel.updateCartQuantity()
+            viewModel.updateCartCache()
         }
         binding.rvGoodsItems.addItemDecoration(
             GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING),
@@ -130,7 +130,7 @@ class GoodsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.updateCartQuantity()
+        viewModel.updateCartCache()
         viewModel.updateRecentlyViewedGoods()
     }
 
