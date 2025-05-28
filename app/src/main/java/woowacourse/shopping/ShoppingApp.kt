@@ -22,7 +22,7 @@ class ShoppingApp : Application() {
 
     private val cartRepository: woowacourse.shopping.domain.repository.CartRepository by lazy {
         woowacourse.shopping.data.repository
-            .CartRepository(database.cartDao(), cartApi)
+            .CartRepository(cartApi)
     }
 
     private val productRepository: woowacourse.shopping.domain.repository.ProductRepository by lazy {

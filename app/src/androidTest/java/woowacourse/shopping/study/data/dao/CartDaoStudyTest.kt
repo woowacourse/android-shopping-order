@@ -10,9 +10,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.dao.CartDao
 import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.model.entity.CartProductEntity
 
 @Suppress("ktlint:standard:function-naming")
 @RunWith(AndroidJUnit4::class)

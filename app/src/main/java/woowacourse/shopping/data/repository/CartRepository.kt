@@ -1,21 +1,20 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.api.CartApi
-import woowacourse.shopping.data.dao.CartDao
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.model.request.CartItemQuantityRequest
 import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.CartItemsResponse
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepository(
-    private val dao: CartDao,
     private val api: CartApi,
 ) : CartRepository {
-    override fun fetchCartProductDetail(productId: Long): Product? = dao.getCartProductDetailById(productId)?.toDomain()
+    override fun fetchCartProductDetail(productId: Long): Product? = EMPTY_PRODUCT
 
     override fun fetchCartProducts(
         page: Int,

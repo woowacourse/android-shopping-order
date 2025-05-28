@@ -26,7 +26,6 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
         initCartQuantityView()
         handleNavigateFromProducts()
         viewModel.loadProductDetail(productId)
-        viewModel.addHistoryProduct(productId)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -65,6 +64,9 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
     }
 
     private fun initObservers() {
+        viewModel.product.observe(this) { product ->
+            viewModel.addHistoryProduct(product.productDetail)
+        }
         viewModel.onCartProductAddSuccess.observe(this) { isSuccess ->
             isSuccess?.let { handleCartProductAddResult(it) }
         }

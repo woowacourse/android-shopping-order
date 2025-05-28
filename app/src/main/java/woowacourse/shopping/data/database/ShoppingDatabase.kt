@@ -4,19 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import woowacourse.shopping.data.dao.CartDao
 import woowacourse.shopping.data.dao.HistoryDao
-import woowacourse.shopping.data.model.entity.CartProductEntity
 import woowacourse.shopping.data.model.entity.HistoryProductEntity
-import woowacourse.shopping.data.model.entity.ProductEntity
 
 @Database(
-    entities = [ProductEntity::class, CartProductEntity::class, HistoryProductEntity::class],
-    version = 10001,
+    entities = [HistoryProductEntity::class],
+    version = 10002,
 )
 abstract class ShoppingDatabase : RoomDatabase() {
-    abstract fun cartDao(): CartDao
-
     abstract fun historyDao(): HistoryDao
 
     @Suppress("ktlint:standard:property-naming")

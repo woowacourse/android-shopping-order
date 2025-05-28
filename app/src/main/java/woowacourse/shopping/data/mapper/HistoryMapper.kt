@@ -1,16 +1,13 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.model.response.HistoryProductResponse
+import woowacourse.shopping.data.model.entity.HistoryProductEntity
 import woowacourse.shopping.domain.model.HistoryProduct
-import woowacourse.shopping.domain.model.HistoryProduct.Companion.EMPTY_HISTORY_PRODUCT
+import woowacourse.shopping.ui.catalog.adapter.product.CatalogItem.LoadMoreItem.id
 
-fun HistoryProductResponse.toDomain(): HistoryProduct =
-    if (product != null) {
-        HistoryProduct(
-            productId = product.id,
-            name = product.name,
-            imageUrl = product.imageUrl,
-        )
-    } else {
-        EMPTY_HISTORY_PRODUCT
-    }
+fun HistoryProductEntity.toDomain(): HistoryProduct =
+    HistoryProduct(
+        productId = id,
+        name = name,
+        imageUrl = imageUrl,
+        category = category,
+    )

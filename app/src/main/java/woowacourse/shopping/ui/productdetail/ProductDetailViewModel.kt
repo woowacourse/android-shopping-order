@@ -10,6 +10,7 @@ import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
+import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetProductDetailUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
@@ -46,8 +47,8 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addHistoryProduct(id: Long) {
-        addSearchHistoryUseCase(id)
+    fun addHistoryProduct(productDetail: ProductDetail) {
+        addSearchHistoryUseCase(productDetail)
     }
 
     fun decreaseCartProductQuantity() {
