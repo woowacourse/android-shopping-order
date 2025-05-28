@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewmodel"
             type="woowacourse.shopping.view.cart.ShoppingCartViewModel" />
@@ -47,15 +48,16 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_order"
-            android:layout_width="122dp"
+            android:layout_width="140dp"
             android:layout_height="78dp"
             android:background="@color/primary_color"
-            android:text="@string/order"
+            android:text="@{@string/order(viewmodel.totalCount)}"
             android:textColor="@color/white"
             android:textSize="21sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="주문하기(2)" />
 
         <LinearLayout
             android:id="@+id/ll_select_all_products"
@@ -68,12 +70,12 @@
             app:layout_constraintTop_toTopOf="@id/tv_total_price">
 
             <CheckBox
-                android:checked="@{viewmodel.isSelectedAll}"
-                android:onClick="@{() -> handler.onSelectAllItems()}"
                 android:id="@+id/cb_select_all_products"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
+                android:checked="@{viewmodel.isSelectedAll}"
+                android:onClick="@{() -> handler.onSelectAllItems()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

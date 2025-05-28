@@ -19,6 +19,9 @@ class ShoppingCartViewModel(
     private val _totalPrice = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
 
+    private val _totalCount = MutableLiveData(0)
+    val totalCount: LiveData<Int> get() = _totalCount
+
     private var _page = MutableLiveData(FIRST_PAGE_NUMBER)
     val page: LiveData<Int> get() = _page
 
@@ -63,6 +66,7 @@ class ShoppingCartViewModel(
         }
 
         if (item.id in selectedId) {
+            _totalCount.value = totalCount.value?.minus(item.quantity)
             _totalPrice.value = totalPrice.value?.minus(item.totalPrice)
         }
     }
@@ -74,6 +78,7 @@ class ShoppingCartViewModel(
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
         if (item.id in selectedId) {
+            _totalCount.value = totalCount.value?.plus(1)
             _totalPrice.value = totalPrice.value?.plus(item.product.price)
         }
     }
@@ -86,6 +91,7 @@ class ShoppingCartViewModel(
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
         if (item.id in selectedId) {
+            _totalCount.value = totalCount.value?.minus(1)
             _totalPrice.value = totalPrice.value?.minus(item.product.price)
         }
     }
@@ -94,9 +100,11 @@ class ShoppingCartViewModel(
         val isSelected = item.id in selectedId
         if (isSelected) {
             selectedId.remove(item.id)
+            _totalCount.value = totalCount.value?.minus(item.quantity)
             _totalPrice.value = totalPrice.value?.minus(item.totalPrice)
         } else {
             selectedId.add(item.id)
+            _totalCount.value = totalCount.value?.plus(item.quantity)
             _totalPrice.value = totalPrice.value?.plus(item.totalPrice)
         }
         _products.value =
@@ -119,6 +127,7 @@ class ShoppingCartViewModel(
             selectedId.removeAll(allIds.toSet())
             currentProducts.forEach {
                 if (it.isSelected) {
+                    _totalCount.value = totalCount.value?.minus(it.cartProduct.quantity)
                     _totalPrice.value = totalPrice.value?.minus(it.cartProduct.totalPrice)
                 }
             }
@@ -126,6 +135,7 @@ class ShoppingCartViewModel(
             selectedId.addAll(allIds)
             currentProducts.forEach {
                 if (!it.isSelected) {
+                    _totalCount.value = totalCount.value?.plus(it.cartProduct.quantity)
                     _totalPrice.value = totalPrice.value?.plus(it.cartProduct.totalPrice)
                 }
             }
