@@ -38,7 +38,7 @@ class CartItemsRemoteDataSource(
         api.patchCartItems(id = id, quantity = quantity).enqueueResult(onResult)
     }
 
-    override fun getCarItemsCount(onResult: (Result<CartItemResponse>) -> Unit) {
+    override fun getCarItemsCount(onResult: (Result<Int>) -> Unit) {
         api.getCartItemsCounts().enqueueResult(onResult)
     }
 }
