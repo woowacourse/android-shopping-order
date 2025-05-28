@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
 import woowacourse.shopping.data.model.common.PageableResponse
 import woowacourse.shopping.data.model.product.ProductResponse
 import woowacourse.shopping.data.service.ProductService
+import woowacourse.shopping.data.util.safeApiCall
 
 class ProductRemoteDataSourceImpl(
     private val productService: ProductService,
@@ -12,7 +12,13 @@ class ProductRemoteDataSourceImpl(
         category: String?,
         page: Int,
         size: Int,
-    ): Call<PageableResponse<ProductResponse>> = productService.fetchProducts(category, page, size)
+    ): Result<PageableResponse<ProductResponse>> =
+        safeApiCall {
+            productService.fetchProducts(category, page, size).execute()
+        }
 
-    override fun fetchProduct(productId: Int): Call<ProductResponse> = productService.fetchProduct(productId)
+    override fun fetchProduct(productId: Long): Result<ProductResponse> =
+        safeApiCall {
+            productService.fetchProduct(productId).execute()
+        }
 }

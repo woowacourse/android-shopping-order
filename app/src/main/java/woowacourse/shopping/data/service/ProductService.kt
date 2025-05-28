@@ -17,6 +17,6 @@ interface ProductService {
 
     @GET("/products/{id}")
     fun fetchProduct(
-        @Path("id") productId: Int,
+        @Path("id") productId: Long,
     ): Call<ProductResponse>
 }

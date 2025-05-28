@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     fun fetchProduct(
-        id: Int,
+        id: Long,
         onResult: (Result<Product>) -> Unit,
     )
 

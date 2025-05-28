@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource
 
-import retrofit2.Call
 import woowacourse.shopping.data.model.common.PageableResponse
 import woowacourse.shopping.data.model.product.ProductResponse
 
@@ -9,7 +8,7 @@ interface ProductRemoteDataSource {
         category: String?,
         page: Int,
         size: Int,
-    ): Call<PageableResponse<ProductResponse>>
+    ): Result<PageableResponse<ProductResponse>>
 
-    fun fetchProduct(productId: Int): Call<ProductResponse>
+    fun fetchProduct(productId: Long): Result<ProductResponse>
 }
