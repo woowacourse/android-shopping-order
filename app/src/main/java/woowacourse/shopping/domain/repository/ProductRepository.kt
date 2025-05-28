@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     fun loadProducts(
-        page : Int,
+        page: Int,
         loadSize: Int,
         callback: (List<Product>, Boolean) -> Unit,
     )

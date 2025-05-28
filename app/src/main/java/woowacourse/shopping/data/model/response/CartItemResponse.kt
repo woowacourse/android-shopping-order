@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.model.response
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,5 +26,5 @@ data class CartItemResponse(
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 )

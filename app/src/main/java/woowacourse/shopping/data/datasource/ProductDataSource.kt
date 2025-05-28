@@ -13,5 +13,5 @@ interface ProductDataSource {
         page: Int,
         size: Int,
         onResult: (ProductsResponse) -> Unit,
-        )
+    )
 }

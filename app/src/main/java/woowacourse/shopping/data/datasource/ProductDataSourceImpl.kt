@@ -10,7 +10,6 @@ import woowacourse.shopping.data.service.ProductService
 class ProductDataSourceImpl(
     private val productService: ProductService,
 ) : ProductDataSource {
-
     override fun fetchProduct(
         id: Long,
         onResult: (ProductResponse) -> Unit,
