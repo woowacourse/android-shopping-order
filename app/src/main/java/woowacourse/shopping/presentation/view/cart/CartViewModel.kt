@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,7 +40,6 @@ class CartViewModel(
         isNextPage: Boolean,
         isRefresh: Boolean = false,
     ) {
-        Log.d("tama_log", "${_page.value}")
         val currentPage = _page.value ?: DEFAULT_PAGE
         val newPage = (calculatePage(isNextPage, currentPage, isRefresh))
 
@@ -49,7 +47,6 @@ class CartViewModel(
             page = currentPage,
             limit = limit,
         ) { products, hasMore ->
-            Log.d("tama_log", "$products")
             _products.postValue(products.map { it })
             _page.postValue(newPage)
             _hasMore.postValue(hasMore)

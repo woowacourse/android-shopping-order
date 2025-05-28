@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -61,7 +60,6 @@ class CartItemDataSourceImpl(
                     call: Call<Unit>,
                     t: Throwable,
                 ) {
-                    Log.wtf("asdf", "$t")
                     println("error : $t")
                 }
             },

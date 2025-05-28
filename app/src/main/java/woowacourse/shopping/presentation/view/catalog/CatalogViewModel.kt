@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.catalog
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,8 +38,6 @@ class CatalogViewModel(
 
     fun fetchProducts() {
         productRepository.loadCartItems { cartItems ->
-            Log.d("tama_log", "$cartItems")
-
             val totalCount = cartItems?.sumOf { it.amount } ?: 0
             _totalCartCount.postValue(totalCount)
 
