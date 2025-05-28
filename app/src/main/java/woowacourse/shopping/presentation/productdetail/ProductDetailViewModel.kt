@@ -44,13 +44,17 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addToCart(productId: Long) {
-//        val quantity: Int = _productCount.value ?: return
-//        cartRepository.insertOrIncrease(productId, quantity) { result ->
-//            result
-//                .onSuccess { _insertProductResult.postValue(ResultState.Success(Unit)) }
-//                .onFailure { _insertProductResult.postValue(ResultState.Failure()) }
-//        }
+    fun addToCart() {
+        val product: Product = product.value ?: return
+        val productCount: Int = productCount.value ?: return
+        cartRepository.insertOrUpdate(product, productCount) { result ->
+            result
+                .onSuccess {
+                    _toastMessage.value = R.string.product_detail_add_cart_toast_insert_success
+                }.onFailure {
+                    _toastMessage.value = R.string.product_detail_add_cart_toast_insert_fail
+                }
+        }
     }
 
     override fun onClickMinus(id: Long) {

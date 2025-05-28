@@ -22,5 +22,11 @@ interface CartDataSource {
 //
 //    fun insertProduct(cartEntity: CartEntity)
 //
+    fun insertProduct(
+        productId: Long,
+        quantity: Int,
+        onResult: (Result<Long>) -> Unit,
+    )
+
 //    fun deleteProductById(productId: Long)
 }

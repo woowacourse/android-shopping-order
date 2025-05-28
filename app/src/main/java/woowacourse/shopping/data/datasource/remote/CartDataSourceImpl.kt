@@ -71,3 +71,31 @@ class CartDataSourceImpl(
 //
 //    override fun deleteProductById(productId: Long) = carItemService.deleteProductById(productId)
 }
+    override fun insertProduct(
+        productId: Long,
+        quantity: Int,
+        onResult: (Result<Long>) -> Unit,
+    ) {
+        val request = CartItemRequest(productId, quantity)
+        cartItemService.addCartItem(request).enqueue(
+            object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>,
+                ) {
+                    if (response.isSuccessful) {
+                        val cartId = response.toIdOrNull() ?: throw IllegalStateException("")
+                        onResult(Result.success(cartId))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<ResponseBody>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
+    }
+

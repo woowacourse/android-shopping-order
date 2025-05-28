@@ -19,7 +19,6 @@ import woowacourse.shopping.databinding.ActivityDetailProductBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
-import woowacourse.shopping.presentation.getSerializableExtraCompat
 import woowacourse.shopping.presentation.product.ItemClickListener
 
 class ProductDetailActivity :
@@ -39,9 +38,9 @@ class ProductDetailActivity :
         initInsets()
         setupToolbar()
 
-        val productId = intent.getSerializableExtraCompat<Long>(Extra.KEY_PRODUCT_DETAIL)
+        val productId = intent.getLongExtra(Extra.KEY_PRODUCT_ID, 0L)
 
-        initListeners(productId)
+        initListeners()
         observeViewModel()
         viewModel.fetchData(productId)
     }
@@ -75,9 +74,9 @@ class ProductDetailActivity :
         supportActionBar?.title = null
     }
 
-    private fun initListeners(productId: Long) {
+    private fun initListeners() {
         binding.btnProductDetailAddCart.setOnClickListener {
-            viewModel.addToCart(productId)
+            viewModel.addToCart()
         }
     }
 
@@ -106,16 +105,17 @@ class ProductDetailActivity :
             context: Context,
             productId: Long,
         ): Intent =
-            Intent(context, ProductDetailActivity::class.java)
-                .apply { putExtra(Extra.KEY_PRODUCT_DETAIL, productId) }
+            Intent(context, ProductDetailActivity::class.java).apply {
+                putExtra(Extra.KEY_PRODUCT_ID, productId)
+            }
     }
 
     override fun onClickProductItem(productId: Long) {
-        val intent =
-            newIntent(this, productId).apply {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-        startActivity(intent)
+//        val intent =
+//            newIntent(this, productId).apply {
+//                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//            }
+//        startActivity(intent)
     }
 
     override fun onClickAddToCart(cartItem: CartItem) {

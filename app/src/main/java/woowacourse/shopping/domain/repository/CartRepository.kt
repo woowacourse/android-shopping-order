@@ -35,6 +35,12 @@ interface CartRepository {
 //        onResult: (Result<Unit>) -> Unit,
 //    )
 //
+    fun insertProduct(
+        productId: Long,
+        productQuantity: Int,
+        onResult: (Result<Long>) -> Unit,
+    )
+
 //    fun deleteProduct(
 //        productId: Long,
 //        onResult: (Result<Unit>) -> Unit,

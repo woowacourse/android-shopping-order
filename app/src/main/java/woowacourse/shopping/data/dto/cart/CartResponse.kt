@@ -22,6 +22,6 @@ data class CartResponse(
 
 fun CartResponse.toDomain(quantity: Int): CartItem =
     CartItem(
-        Product(this.id, this.name, Price(this.price), this.imageUrl, this.category),
-        quantity,
+        product = Product(this.id, this.name, Price(this.price), this.imageUrl, this.category),
+        quantity = quantity,
     )

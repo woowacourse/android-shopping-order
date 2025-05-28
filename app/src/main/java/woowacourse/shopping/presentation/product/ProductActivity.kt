@@ -205,7 +205,8 @@ class ProductActivity :
     }
 
     override fun onClickProductItem(productId: Long) {
-        val intent = ProductDetailActivity.newIntent(this, productId)
+        val intent =
+            ProductDetailActivity.newIntent(this, productId = productId)
         startActivity(intent)
     }
 

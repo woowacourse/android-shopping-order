@@ -88,6 +88,16 @@ class CartRepositoryImpl(
 //        )
 //    }
 //
+    override fun insertProduct(
+        productId: Long,
+        productQuantity: Int,
+        onResult: (Result<Long>) -> Unit,
+    ) {
+        cartDataSource.insertProduct(productId, productQuantity) { result ->
+            onResult(result)
+        }
+    }
+
 //    override fun deleteProduct(
 //        productId: Long,
 //        onResult: (Result<Unit>) -> Unit,

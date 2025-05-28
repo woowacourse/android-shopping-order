@@ -21,6 +21,9 @@ interface CartItemService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
     ): Call<ProductsResponse>
+        @Body request: CartItemRequest,
+    ): Call<ResponseBody>
+
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
