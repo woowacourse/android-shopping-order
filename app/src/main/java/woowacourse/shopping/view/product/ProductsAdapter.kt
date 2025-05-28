@@ -7,6 +7,10 @@ import woowacourse.shopping.domain.product.Product
 class ProductsAdapter(
     private val onSelectProduct: (Product) -> Unit,
     private val onLoad: () -> Unit,
+    private val onPlusQuantity: (
+        productId: Long,
+        quantity: Int,
+    ) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var items: List<ProductsItem> = emptyList()
 
@@ -21,7 +25,7 @@ class ProductsAdapter(
                 RecentViewedProductsViewHolder.of(parent, onSelectProduct)
 
             ProductsItem.ItemType.PRODUCT ->
-                ProductViewHolder.of(parent, onSelectProduct)
+                ProductViewHolder.of(parent, onSelectProduct, onPlusQuantity)
 
             ProductsItem.ItemType.MORE ->
                 ProductMoreViewHolder.of(parent, onLoad)

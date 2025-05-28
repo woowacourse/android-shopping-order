@@ -9,6 +9,10 @@ import woowacourse.shopping.domain.product.Product
 class ProductViewHolder(
     private val binding: ItemProductBinding,
     onSelectProduct: (Product) -> Unit,
+    onPlusQuantity: (
+        productId: Long,
+        quantity: Int,
+    ) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.productItemActionListener =
@@ -18,8 +22,9 @@ class ProductViewHolder(
                 }
 
                 override fun onPlusProductQuantity(item: ProductsItem.ProductItem) {
-                    item.quantity++
-                    binding.invalidateAll()
+                    onPlusQuantity(item.product.id, item.quantity.plus(1))
+//                    item.quantity++
+//                    binding.invalidateAll()
                 }
 
                 override fun onMinusProductQuantity(item: ProductsItem.ProductItem) {
@@ -37,10 +42,14 @@ class ProductViewHolder(
         fun of(
             parent: ViewGroup,
             onSelectProduct: (Product) -> Unit,
+            onPlusQuantity: (
+                productId: Long,
+                quantity: Int,
+            ) -> Unit,
         ): ProductViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemProductBinding.inflate(layoutInflater, parent, false)
-            return ProductViewHolder(binding, onSelectProduct)
+            return ProductViewHolder(binding, onSelectProduct, onPlusQuantity)
         }
     }
 }

@@ -17,7 +17,7 @@ class ProductsViewModel(
     private val productsRepository: ProductsRepository = DefaultProductsRepository(),
     private val cartRepository: CartRepository = DefaultCartRepository(),
 ) : ViewModel() {
-    private val _cartItemsSize: MutableLiveData<Int> = MutableLiveData(MIN_PAGE)
+    private val _cartItemsSize: MutableLiveData<Int> = MutableLiveData(0)
     val cartItemsSize: LiveData<Int> get() = _cartItemsSize
 
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
@@ -31,19 +31,7 @@ class ProductsViewModel(
     private var page: Int = MIN_PAGE
 
     init {
-        loadCartItemsSize()
         loadCart()
-    }
-
-    private fun loadCartItemsSize() {
-        cartRepository.cartItemsSize { result ->
-            result
-                .onSuccess { size ->
-                    _cartItemsSize.postValue(size)
-                }.onFailure {
-                    _event.postValue(ProductsEvent.LOAD_SHOPPING_CART_QUANTITY_FAILURE)
-                }
-        }
     }
 
     private fun loadCart() {
@@ -51,6 +39,7 @@ class ProductsViewModel(
             result
                 .onSuccess { cartItems: List<CartItem> ->
                     this.cartItems = cartItems
+                    _cartItemsSize.postValue(cartItems.sumOf { it.quantity })
                     loadRecentViewedProducts()
                 }.onFailure {
                     _event.postValue(ProductsEvent.LOAD_SHOPPING_CART_FAILURE)
@@ -127,6 +116,32 @@ class ProductsViewModel(
                 }.onFailure {
                     _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
                 }
+        }
+    }
+
+    fun plusCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val cartItemId = cartItems.find { it.productId == productId }?.id
+        if (cartItemId == null) {
+            cartRepository.addCartItem(productId, quantity) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(ProductsEvent.ADD_CART_ITEM_FAILURE)
+                    }
+            }
+        } else {
+            cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(ProductsEvent.PLUS_CART_ITEM_FAILURE)
+                    }
+            }
         }
     }
 

@@ -25,7 +25,11 @@ class ProductsActivity : AppCompatActivity() {
     }
     private val viewModel: ProductsViewModel by viewModels()
     private val productsAdapter: ProductsAdapter by lazy {
-        ProductsAdapter(::navigateToProductDetail, viewModel::loadMoreProducts)
+        ProductsAdapter(
+            ::navigateToProductDetail,
+            viewModel::loadMoreProducts,
+            viewModel::plusCartItemQuantity,
+        )
     }
 
     private val detailActivityResultLauncher =
@@ -116,6 +120,8 @@ class ProductsActivity : AppCompatActivity() {
                     showToast(R.string.products_load_recent_products_error_message)
 
                 ProductsEvent.LOAD_SHOPPING_CART_FAILURE -> TODO()
+                ProductsEvent.ADD_CART_ITEM_FAILURE -> TODO()
+                ProductsEvent.PLUS_CART_ITEM_FAILURE -> TODO()
             }
         }
     }
