@@ -28,8 +28,6 @@ class DetailActivity : AppCompatActivity(), CartQuantityHandler {
         DetailViewModelFactory(
             container.productRepository2,
             container.cartRepository2,
-            container.productRepository,
-            container.cartRepository,
             container.historyRepository,
         )
     }

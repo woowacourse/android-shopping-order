@@ -25,7 +25,7 @@ data class ProductUiState(
     fun increaseCartQuantity(productId: Long): ProductState {
         val targetIndex = targetIndex(productId)
         val target = productItems[targetIndex]
-        val result = target.increaseCartQuantity2()
+        val result = target.increaseCartQuantity()
 
         return result
     }

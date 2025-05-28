@@ -8,27 +8,13 @@ data class ProductState(
     val item: Product,
     val cartQuantity: Quantity,
 ) {
-    val productPrice: Int
-        get() = item.priceValue * cartQuantityValue
-
     val hasCartQuantity: Boolean
         get() = cartQuantity.hasQuantity()
 
     val cartQuantityValue: Int
         get() = cartQuantity.value
 
-    fun increaseCartQuantity(): IncreaseState {
-        val increasedQuantity = cartQuantity + 1
-        val canIncrease = item.canIncrease(increasedQuantity)
-
-        return if (canIncrease) {
-            IncreaseState.CanIncrease(copy(cartQuantity = increasedQuantity))
-        } else {
-            IncreaseState.CannotIncrease(item.quantityValue)
-        }
-    }
-
-    fun increaseCartQuantity2(): ProductState {
+    fun increaseCartQuantity(): ProductState {
         val increasedQuantity = cartQuantity + 1
         return copy(cartQuantity = increasedQuantity)
     }
