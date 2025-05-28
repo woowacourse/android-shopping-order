@@ -37,6 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
             android:padding="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/btn_cart_previous"
@@ -54,9 +55,8 @@
             android:onClick="@{()-> vm.changePreviousPage()}"
             android:src="@drawable/ic_previous"
             app:isEnabledCyanOrGray="@{vm.currentPage > 0}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_cart_product" />
+            app:layout_constraintBottom_toTopOf="@id/layout_cart_total_price"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/tv_cart_page"
@@ -84,14 +84,83 @@
             android:src="@drawable/ic_next"
             app:isEnabledCyanOrGray="@{vm.currentPage &lt; vm.totalPages - 1}"
             app:layout_constraintBottom_toBottomOf="@id/btn_cart_previous"
+
             app:layout_constraintStart_toEndOf="@id/tv_cart_page"
             app:layout_constraintTop_toTopOf="@id/btn_cart_previous" />
+
+        <TextView
+            android:id="@+id/layout_cart_total_price"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/gray5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/layout_cart_recommend"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <CheckBox
+            android:id="@+id/checkbox_all_check"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="12dp"
+            android:buttonTint="@color/baemin"
+            android:checked="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/layout_cart_total_price" />
+
+        <TextView
+            android:id="@+id/tv_all_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="전체"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/checkbox_all_check"
+            app:layout_constraintStart_toStartOf="@id/checkbox_all_check"
+            app:layout_constraintTop_toBottomOf="@id/checkbox_all_check" />
+
+        <TextView
+            android:id="@+id/tv_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="184,200원"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/layout_cart_total_price"
+            app:layout_constraintEnd_toEndOf="@id/layout_cart_total_price"
+            app:layout_constraintTop_toTopOf="@id/layout_cart_total_price" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.66" />
+
+        <TextView
+            android:id="@+id/layout_cart_recommend"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/baemin"
+            android:gravity="center"
+            android:onClick="@{() -> clickListener.onClickRecommend()}"
+            android:text="주문하기 (99999999)"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmer_layout_cart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_cart_previous"
             app:layout_constraintTop_toBottomOf="@id/tb_cart">
 
             <LinearLayout

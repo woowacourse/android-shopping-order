@@ -27,17 +27,28 @@
         android:paddingTop="8dp"
         android:paddingBottom="12dp">
 
+        <CheckBox
+            android:id="@+id/checkbox_cart_item"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="12dp"
+            android:buttonTint="@color/baemin"
+            android:checked="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tv_cart_product_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginStart="4dp"
             android:text="@{cartItem.product.name}"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/checkbox_cart_item"
+            app:layout_constraintStart_toEndOf="@id/checkbox_cart_item"
+            app:layout_constraintTop_toTopOf="@id/checkbox_cart_item"
             tools:text="맥심 마일드" />
 
         <ImageView
@@ -48,7 +59,7 @@
             android:contentDescription="@null"
             android:scaleType="center"
             app:imageUrl="@{cartItem.product.imageUrl}"
-            app:layout_constraintStart_toStartOf="@id/tv_cart_product_name"
+            app:layout_constraintStart_toStartOf="@id/checkbox_cart_item"
             app:layout_constraintTop_toBottomOf="@id/tv_cart_product_name"
             tools:src="@drawable/ic_launcher_background" />
 

@@ -17,6 +17,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.ResultState
+import woowacourse.shopping.presentation.recommend.RecommendActivity
 
 class CartActivity :
     AppCompatActivity(),
@@ -37,6 +38,7 @@ class CartActivity :
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
         binding.vm = viewModel
+        binding.clickListener = this
         binding.lifecycleOwner = this
 
         showSampleData(true)
@@ -138,6 +140,11 @@ class CartActivity :
 
     override fun onClickDelete(cartItem: CartItem) {
         viewModel.deleteProduct(cartItem)
+    }
+
+    override fun onClickRecommend() {
+        val intent = RecommendActivity.newIntent(this)
+        startActivity(intent)
     }
 
     companion object {

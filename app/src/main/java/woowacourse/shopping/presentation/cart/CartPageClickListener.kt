@@ -8,4 +8,6 @@ interface CartPageClickListener {
     fun onClickNext()
 
     fun onClickDelete(cartItem: CartItem)
+
+    fun onClickRecommend()
 }
