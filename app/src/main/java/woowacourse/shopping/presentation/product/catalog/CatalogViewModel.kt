@@ -29,6 +29,9 @@ class CatalogViewModel(
     private val _hasRecentViewedItems = MutableLiveData(false)
     val hasRecentViewedItems: LiveData<Boolean> = _hasRecentViewedItems
 
+    private val _updatedProduct = MutableLiveData<ProductUiModel>()
+    val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
+
     //    private val loadedProducts = mutableListOf<ProductUiModel>()
     private var currentPage = 0
     val page: Int get() = currentPage
@@ -42,11 +45,14 @@ class CatalogViewModel(
     fun onQuantitySelectorToggled(product: ProductUiModel) {
         val toggled =
             product.copy(isExpanded = !product.isExpanded, quantity = product.quantity + 1)
+        _updatedProduct.value = toggled
         updateProduct(toggled)
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        updateProduct(product.copy(quantity = product.quantity + 1))
+        val newProduct = product.copy(quantity = product.quantity + 1)
+        updateProduct(newProduct)
+        _updatedProduct.value = newProduct
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
@@ -57,40 +63,33 @@ class CatalogViewModel(
                 isExpanded = newQuantity > 0,
             )
         updateProduct(updated)
+        _updatedProduct.value = updated
     }
 
     private fun updateProduct(updated: ProductUiModel) {
         if (updated.quantity == 0) {
             cartRepository.deleteCartItem(updated.id) { result ->
-                result
-                    .onSuccess {
-                        applyProductChange(updated)
-                    }
+                result.onSuccess {
+                    _updatedProduct.value = updated
+                    applyProductChange(updated)
+                }
             }
         } else {
             cartRepository.upsertCartItem(updated.id, updated.quantity) { result ->
-                result
-                    .onSuccess {
-                        applyProductChange(updated)
-                    }
+                result.onSuccess {
+                    _updatedProduct.value = updated
+                    applyProductChange(updated)
+                }
             }
         }
     }
 
     private fun applyProductChange(updated: ProductUiModel) {
         val currentPagingData = _pagingData.value ?: return
-        val updatedProducts =
-            currentPagingData.products.map {
-                if (it.id == updated.id) updated else it
-            }
-
-        _pagingData.postValue(
-            PagingData(
-                products = updatedProducts,
-                hasNext = currentPagingData.hasNext,
-            ),
-        )
-
+        val updatedProducts = currentPagingData.products.map {
+            if (it.id == updated.id) updated else it
+        }
+        _pagingData.postValue(currentPagingData.copy(products = updatedProducts))
         updateCartCount()
     }
 
@@ -103,7 +102,7 @@ class CatalogViewModel(
         productsRepository.getProducts(currentPage, pageSize) { result ->
             result.onSuccess { pagingData ->
                 _pagingData.postValue(
-                    pagingData,
+                    pagingData
                 )
             }
         }
@@ -117,7 +116,7 @@ class CatalogViewModel(
     }
 
     private fun updateCartCount() {
-        cartRepository.getCarItemsCount { result ->
+        cartRepository.getCarItemsCount() { result ->
             result.onSuccess { cartCount ->
                 _cartCount.postValue(cartCount)
             }
@@ -127,15 +126,14 @@ class CatalogViewModel(
     companion object {
         private const val PAGE_SIZE = 20
 
-        val FACTORY: ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    CatalogViewModel(
-                        productsRepository = RepositoryProvider.productsRepository,
-                        cartRepository = RepositoryProvider.cartItemRepository,
-                        viewedRepository = RepositoryProvider.viewedItemRepository,
-                    )
-                }
+        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                CatalogViewModel(
+                    productsRepository = RepositoryProvider.productsRepository,
+                    cartRepository = RepositoryProvider.cartItemRepository,
+                    viewedRepository = RepositoryProvider.viewedItemRepository
+                )
             }
+        }
     }
 }

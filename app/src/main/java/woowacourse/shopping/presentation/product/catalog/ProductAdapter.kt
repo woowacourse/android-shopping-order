@@ -63,7 +63,18 @@ class ProductAdapter(
         }
     }
 
-    fun isLoadMoreButtonPosition(position: Int): Boolean = showLoadMoreButton && position == products.size
+    fun updateProduct(updated: ProductUiModel) {
+        val index = products.indexOfFirst { it.id == updated.id }
+        if (index != -1) {
+            products = products.toMutableList().apply {
+                this[index] = updated
+            }
+            notifyItemChanged(index)
+        }
+    }
+
+    fun isLoadMoreButtonPosition(position: Int): Boolean =
+        showLoadMoreButton && position == products.size
 
     companion object {
         private const val PRODUCT = 1

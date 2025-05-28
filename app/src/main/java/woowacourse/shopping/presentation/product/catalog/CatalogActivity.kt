@@ -94,6 +94,10 @@ class CatalogActivity : AppCompatActivity() {
         viewModel.recentViewedItems.observe(this) { recentItems ->
             viewedAdapter.setData(recentItems)
         }
+
+        viewModel.updatedProduct.observe(this) { updatedItem ->
+            productAdapter.updateProduct(updatedItem)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
