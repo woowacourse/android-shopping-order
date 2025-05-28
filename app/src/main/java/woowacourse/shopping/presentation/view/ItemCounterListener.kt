@@ -1,7 +1,9 @@
 package woowacourse.shopping.presentation.view
 
-interface ItemCounterListener {
-    fun increase(productId: Long)
+import woowacourse.shopping.presentation.model.ProductUiModel
 
-    fun decrease(productId: Long)
+interface ItemCounterListener {
+    fun increase(product: ProductUiModel)
+
+    fun decrease(product: ProductUiModel)
 }

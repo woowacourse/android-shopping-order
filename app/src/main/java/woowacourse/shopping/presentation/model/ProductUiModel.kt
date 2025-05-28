@@ -8,6 +8,7 @@ import woowacourse.shopping.domain.model.Product
 
 @Parcelize
 data class ProductUiModel(
+    val cartId: Long = 0L,
     val id: Long,
     val name: String,
     val imageUrl: String,
@@ -25,6 +26,7 @@ fun Product.toUiModel() =
 
 fun CartItem.toUiModel() =
     ProductUiModel(
+        cartId = cartId,
         id = product.id,
         name = product.name,
         imageUrl = product.imageUrl,
@@ -42,6 +44,7 @@ fun ProductUiModel.toProduct() =
 
 fun ProductUiModel.toCartItem() =
     CartItem(
+        cartId = cartId,
         product = toProduct(),
         amount = amount,
     )

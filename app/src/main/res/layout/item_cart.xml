@@ -8,7 +8,9 @@
         <variable
             name="cartItem"
             type="woowacourse.shopping.domain.model.CartItem" />
-
+        <variable
+            name="product"
+            type="woowacourse.shopping.presentation.model.ProductUiModel" />
         <variable
             name="eventListener"
             type="woowacourse.shopping.presentation.view.cart.adapter.CartAdapter.CartEventListener" />
@@ -72,7 +74,7 @@
             app:layout_constraintBottom_toTopOf="@id/text_view_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image_view_product"
-            app:productId="@{cartItem.product.id}" />
+            app:product="@{product}" />
 
         <TextView
             android:id="@+id/text_view_price"

@@ -10,7 +10,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.CartItemsResponse
+import woowacourse.shopping.data.model.response.CartItemResponse
 import woowacourse.shopping.data.model.response.Quantity
 
 interface CartItemService {
@@ -19,7 +19,7 @@ interface CartItemService {
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
-    ): Call<CartItemsResponse>
+    ): Call<CartItemResponse>
 
     @POST("/cart-items")
     fun postCartItem(
@@ -28,12 +28,12 @@ interface CartItemService {
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
-        @Path("id") id: Int,
+        @Path("id") id: Long,
     ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItem(
-        @Path("id") id: Int,
+        @Path("id") id: Long,
         @Body body: Quantity,
     ): Call<Unit>
 

@@ -9,6 +9,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.base.BaseFragment
+import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
 
@@ -53,12 +54,12 @@ class CartFragment :
         viewModel.deleteProduct(cartItem)
     }
 
-    override fun increase(productId: Long) {
-        viewModel.increaseAmount(productId)
+    override fun increase(product: ProductUiModel) {
+        viewModel.increaseAmount(product)
     }
 
-    override fun decrease(productId: Long) {
-        viewModel.decreaseAmount(productId)
+    override fun decrease(product: ProductUiModel) {
+        viewModel.decreaseAmount(product)
     }
 
     private fun setCartAdapter() {

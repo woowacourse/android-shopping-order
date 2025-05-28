@@ -10,8 +10,8 @@
             type="woowacourse.shopping.presentation.view.ItemCounterListener" />
 
         <variable
-            name="productId"
-            type="Long" />
+            name="product"
+            type="woowacourse.shopping.presentation.model.ProductUiModel" />
         
         <variable
             name="amount"
@@ -35,7 +35,7 @@
             android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            android:onClick="@{() -> listener.decrease(productId)}"
+            android:onClick="@{() -> listener.decrease(product)}"
             app:layout_constraintBottom_toBottomOf="@id/text_view_detail_amount"
             app:layout_constraintEnd_toStartOf="@id/text_view_detail_amount"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -66,7 +66,7 @@
             android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            android:onClick="@{() -> listener.increase(productId)}"
+            android:onClick="@{() -> listener.increase(product)}"
             app:layout_constraintBottom_toBottomOf="@id/text_view_detail_amount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_detail_amount"

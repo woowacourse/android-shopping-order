@@ -1,21 +1,31 @@
 package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.CartItemsResponse
+import woowacourse.shopping.data.model.response.CartItemResponse
 import woowacourse.shopping.data.model.response.Quantity
 
 interface CartItemDataSource {
     fun fetchCartItems(
         page: Int,
         size: Int,
-        onResult: (CartItemsResponse?) -> Unit,
+        onResult: (CartItemResponse?) -> Unit,
     )
 
-    fun submitCartItem(cartItem: CartItemRequest)
+    fun submitCartItem(
+        cartItem: CartItemRequest,
+        callback: () -> Unit,
+    )
 
-    fun removeCartItem(id: Int)
+    fun removeCartItem(
+        cartId: Long,
+        callback: (Long) -> Unit,
+    )
 
-    fun updateCartItem(quantity: Quantity)
+    fun updateCartItem(
+        cartId: Long,
+        quantity: Quantity,
+        onResult: (Long) -> Unit,
+    )
 
     fun fetchCartItemsCount(onResult: (Quantity?) -> Unit)
 }

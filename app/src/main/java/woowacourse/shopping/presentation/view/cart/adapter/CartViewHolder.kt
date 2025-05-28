@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 
 class CartViewHolder(
@@ -19,6 +20,7 @@ class CartViewHolder(
 
     fun bind(cartItem: CartItem) {
         binding.cartItem = cartItem
+        binding.product = cartItem.toUiModel()
     }
 
     companion object {

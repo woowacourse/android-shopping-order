@@ -1,30 +1,25 @@
 package woowacourse.shopping.data
 
-import woowacourse.shopping.data.db.CartDao
-import woowacourse.shopping.data.mapper.toCartEntity
+import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.mapper.toCartItem
+import woowacourse.shopping.data.model.request.CartItemRequest
+import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
 
 class CartRepositoryImpl(
-    private val cartDao: CartDao,
+    private val cartItemDataSource: CartItemDataSource,
 ) : CartRepository {
     override fun getCartItems(
+        page: Int,
         limit: Int,
-        offset: Int,
         callback: (List<CartItem>, Boolean) -> Unit,
     ) {
-        thread {
-            val cartItems =
-                cartDao
-                    .getCartItemPaged(
-                        limit = limit,
-                        offset = offset,
-                    ).map { it.toCartItem() }
-            val hasMore =
-                cartItems.lastOrNull()?.let { cartDao.existsItemAfterId(it.product.id) } ?: false
-            callback(cartItems, hasMore)
+        cartItemDataSource.fetchCartItems(page, limit) { response ->
+            if (response != null) {
+                val cartItems = response.content.map { it.toCartItem() }
+                callback(cartItems, !response.last)
+            }
         }
     }
 
@@ -32,8 +27,8 @@ class CartRepositoryImpl(
         id: Long,
         callback: (Long) -> Unit,
     ) {
-        thread {
-            cartDao.delete(id).let { callback(id) }
+        cartItemDataSource.removeCartItem(id) {
+            callback(id)
         }
     }
 
@@ -41,33 +36,51 @@ class CartRepositoryImpl(
         cartItem: CartItem,
         callback: () -> Unit,
     ) {
-        thread {
-            cartDao.upsert(cartItem.toCartEntity()).let { callback() }
+        val item =
+            CartItemRequest(
+                productId = cartItem.product.id,
+                quantity = cartItem.amount,
+            )
+
+        cartItemDataSource.submitCartItem(item) {
+            callback()
         }
     }
 
     override fun increaseCartItem(
-        productId: Long,
-        callback: (CartItem?) -> Unit,
+        cartItem: CartItem,
+        callback: (Long) -> Unit,
     ) {
-        thread {
-            cartDao.increaseAmount(productId)
-            val item = cartDao.getByProductId(productId)
-            if (item != null) {
-                callback(item.toCartItem())
-            }
+        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount + 1)) {
+            callback(it)
         }
     }
 
     override fun decreaseCartItem(
-        productId: Long,
-        callback: (CartItem?) -> Unit,
+        cartItem: CartItem,
+        callback: (Long) -> Unit,
     ) {
-        thread {
-            cartDao.decreaseAmountOrDelete(productId)
+        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount - 1)) {
+            callback(it)
+        }
+    }
 
-            val item = cartDao.getByProductId(productId)
-            callback(item?.toCartItem())
+    override fun getAllCartItems(callback: (List<CartItem>?) -> Unit) {
+        cartItemDataSource.fetchCartItems(
+            page = 0,
+            size = Int.MAX_VALUE,
+        ) { it ->
+            callback(it?.content?.map { it.toCartItem() } ?: emptyList())
+        }
+    }
+
+    override fun updateCartItemQuantity(
+        cartId: Long,
+        quantity: Int,
+        callback: (Long) -> Unit,
+    ) {
+        cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
+            callback(cartId)
         }
     }
 }

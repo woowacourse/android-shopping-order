@@ -4,8 +4,8 @@ import woowacourse.shopping.domain.model.CartItem
 
 interface CartRepository {
     fun getCartItems(
+        page: Int,
         limit: Int,
-        offset: Int,
         callback: (List<CartItem>, Boolean) -> Unit,
     )
 
@@ -20,12 +20,20 @@ interface CartRepository {
     )
 
     fun increaseCartItem(
-        productId: Long,
-        callback: (CartItem?) -> (Unit),
+        cartItem: CartItem,
+        callback: (Long) -> (Unit),
     )
 
     fun decreaseCartItem(
-        productId: Long,
-        callback: (CartItem?) -> (Unit),
+        cartItem: CartItem,
+        callback: (Long) -> (Unit),
+    )
+
+    fun getAllCartItems(callback: (List<CartItem>?) -> (Unit))
+
+    fun updateCartItemQuantity(
+        cartId: Long,
+        quantity: Int,
+        callback: (Long) -> Unit,
     )
 }

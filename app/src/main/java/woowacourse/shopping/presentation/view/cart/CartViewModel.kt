@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.model.toCartItem
 import kotlin.math.max
 
 class CartViewModel(
@@ -38,13 +41,15 @@ class CartViewModel(
         isNextPage: Boolean,
         isRefresh: Boolean = false,
     ) {
+        Log.d("tama_log", "${_page.value}")
         val currentPage = _page.value ?: DEFAULT_PAGE
-
         val newPage = (calculatePage(isNextPage, currentPage, isRefresh))
 
-        val newOffset = (newPage - DEFAULT_PAGE) * limit
-
-        cartRepository.getCartItems(limit = limit, offset = newOffset) { products, hasMore ->
+        cartRepository.getCartItems(
+            page = currentPage,
+            limit = limit,
+        ) { products, hasMore ->
+            Log.d("tama_log", "$products")
             _products.postValue(products.map { it })
             _page.postValue(newPage)
             _hasMore.postValue(hasMore)
@@ -52,22 +57,31 @@ class CartViewModel(
     }
 
     fun deleteProduct(cartItem: CartItem) {
-        cartRepository.deleteCartItem(cartItem.product.id) {
+        cartRepository.deleteCartItem(cartItem.cartId) {
             _deleteState.postValue(it)
         }
     }
 
-    fun increaseAmount(productId: Long) {
-        cartRepository.increaseCartItem(productId) { updatedItem ->
-            updatedItem?.let { _itemUpdateEvent.postValue(it) }
+    fun increaseAmount(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+        cartRepository.increaseCartItem(cartItem) { id ->
+            getCartItemById(id) {
+                it?.let { item -> _itemUpdateEvent.postValue(item) }
+            }
         }
     }
 
-    fun decreaseAmount(productId: Long) {
-        cartRepository.decreaseCartItem(productId) { updatedItem ->
-            updatedItem?.let {
-                _itemUpdateEvent.postValue(it)
-            } ?: _deleteState.postValue(productId)
+    fun decreaseAmount(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+
+        if (cartItem.amount <= 1) {
+            deleteProduct(cartItem)
+        } else {
+            cartRepository.decreaseCartItem(cartItem) { id ->
+                getCartItemById(id) {
+                    it?.let { item -> _itemUpdateEvent.postValue(item) }
+                }
+            }
         }
     }
 
@@ -88,8 +102,18 @@ class CartViewModel(
         }
     }
 
+    private fun getCartItemById(
+        id: Long,
+        callback: (CartItem?) -> Unit,
+    ) {
+        cartRepository.getAllCartItems { items ->
+            val foundItem = items?.find { it.cartId == id }
+            callback(foundItem)
+        }
+    }
+
     companion object {
-        private const val DEFAULT_PAGE = 1
+        private const val DEFAULT_PAGE = 0
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
