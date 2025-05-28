@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.goods
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,7 +34,7 @@ class GoodsViewModel(
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
 
-    private var cashedCartItem: MutableMap<Int, CartItem> = mutableMapOf()
+    private var cashedCartItems: MutableMap<Int, CartItem> = mutableMapOf()
 
     init {
         appendCartItemsWithZeroQuantity()
@@ -85,27 +84,25 @@ class GoodsViewModel(
     fun fetchAndSetCartCache() {
         cartRepository.fetchAllCartItems({ cartResponse ->
             val cartItems = getCartItemByCartResponse(cartResponse)
-            cashedCartItem =
+            cashedCartItems =
                 cartItems
                     .associateBy(
                         { it.goods.id },
                         { it },
                     ).toMutableMap()
 
-            val newList =
-                goods.map { goods ->
-                    cashedCartItem[goods.id] ?: CartItem(goods = goods, quantity = 0)
-                }
-
-            if (_goodsWithCartQuantity.value != newList) {
-                _goodsWithCartQuantity.value = newList
-            }
-
             setTotalCartItemSize(cartItems.sumOf { it.quantity })
+            bindCartCache()
         }, {})
     }
 
-    // todo api의 totalsize로 수정
+    private fun bindCartCache() {
+        val newList = goods.map { cashedCartItems[it.id] ?: CartItem(goods = it, quantity = 0) }
+        if (_goodsWithCartQuantity.value != newList) {
+            _goodsWithCartQuantity.postValue(newList)
+        }
+    }
+
     private fun setTotalCartItemSize(totalCartQuantity: Int) {
         val sizeText =
             when {
@@ -125,40 +122,48 @@ class GoodsViewModel(
         if (!Authorization.isLogin) {
             _navigateToLogin.setValue(Unit)
         } else {
-            val cashedCartItem = cashedCartItem[cartItem.goods.id]
-            Log.d("Test", cashedCartItem.toString())
+            val cashedCartItem = cashedCartItems[cartItem.goods.id]
             if (cashedCartItem == null) {
-                addCartItem(cartItem.goods)
+                addCartItem(cartItem)
             } else {
                 updateCartItemQuantity(cashedCartItem.id, cartItem.copy(quantity = cashedCartItem.quantity + 1))
             }
-            fetchAndSetCartCache()
         }
-    }
-
-    private fun addCartItem(goods: Goods) {
-        cartRepository.addCartItem(goods)
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         if (!Authorization.isLogin) {
             _navigateToLogin.setValue(Unit)
         } else {
-            cashedCartItem[cartItem.goods.id]?.let {
-                if (it.quantity - 1 <= 0) {
-                    cartRepository.delete(it.id, { fetchAndSetCartCache() })
+            cashedCartItems[cartItem.goods.id]?.let { cartItemWillRemove ->
+                if (cartItemWillRemove.quantity - 1 <= 0) {
+                    cartRepository.delete(cartItemWillRemove.id, {
+                        cashedCartItems.remove(cartItemWillRemove.goods.id)
+                        bindCartCache()
+                    })
                 } else {
-                    updateCartItemQuantity(it.id, cartItem.copy(quantity = it.quantity - 1))
+                    updateCartItemQuantity(cartItemWillRemove.id, cartItem.copy(quantity = cartItemWillRemove.quantity - 1))
                 }
             }
         }
+    }
+
+    private fun addCartItem(cartItem: CartItem) {
+        cartRepository.addCartItem(cartItem.goods, {
+            cashedCartItems[cartItem.goods.id] = cartItem.copy(quantity = 1)
+            bindCartCache()
+        }, {})
     }
 
     private fun updateCartItemQuantity(
         cartId: Int,
         cartItem: CartItem,
     ) {
-        cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity), { fetchAndSetCartCache() }, {})
+        cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity), {
+            cashedCartItems.replace(cartItem.goods.id, cartItem)
+            bindCartCache()
+        }, {
+        })
     }
 
     companion object {

@@ -41,5 +41,9 @@ interface CartRepository {
 
     fun getAllItemsSize(onComplete: (Int) -> Unit)
 
-    fun addCartItem(goods: Goods)
+    fun addCartItem(
+        goods: Goods,
+        onComplete: (Int) -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    )
 }

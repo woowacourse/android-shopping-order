@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.carts.repository
 
-import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -137,7 +136,6 @@ class CartRemoteDataSourceImpl(
                         call: Call<Unit>,
                         response: Response<Unit>,
                     ) {
-                        Log.d("onResponse",response.code().toString())
                         if (response.isSuccessful) {
                             onSuccess(response.code())
                         } else {
@@ -149,24 +147,25 @@ class CartRemoteDataSourceImpl(
                         call: Call<Unit>,
                         t: Throwable,
                     ) {
-                        Log.d("onResponse",t.message.toString())
                         onFailure(CartFetchError.Network)
                     }
                 },
             )
     }
 
-
-    override fun deleteItem(cartId : Int ,onSuccess: (resultCode: Int) -> Unit) {
+    override fun deleteItem(
+        cartId: Int,
+        onSuccess: (resultCode: Int) -> Unit,
+    ) {
         retrofitService
             .deleteCartItem(
                 cartId = cartId,
                 authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
-                object : Callback<CartQuantity> {
+                object : Callback<Unit> {
                     override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
                         if (response.isSuccessful) {
                             onSuccess(response.code())
@@ -175,7 +174,7 @@ class CartRemoteDataSourceImpl(
                     }
 
                     override fun onFailure(
-                        call: Call<CartQuantity>,
+                        call: Call<Unit>,
                         t: Throwable,
                     ) {
                     }
@@ -183,30 +182,35 @@ class CartRemoteDataSourceImpl(
             )
     }
 
-    override fun addItem(itemId: Int) {
+    override fun addItem(
+        itemId: Int,
+        onSuccess: (resultCode: Int) -> Unit,
+        onFailure: (CartFetchError) -> Unit,
+    ) {
         retrofitService
             .addCartItem(
-                cartItem = CartItemRequest(itemId,1),
+                cartItem = CartItemRequest(itemId, 1),
                 authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
-                object : Callback<CartQuantity> {
+                object : Callback<Unit> {
                     override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
+                        call: Call<Unit>,
+                        response: Response<Unit>,
                     ) {
                         if (response.isSuccessful) {
-
+                            onSuccess(response.code())
                         } else {
+                            onFailure(CartFetchError.Server(response.code(), response.message()))
                         }
                     }
 
                     override fun onFailure(
-                        call: Call<CartQuantity>,
+                        call: Call<Unit>,
                         t: Throwable,
                     ) {
+                        onFailure(CartFetchError.Network)
                     }
                 },
             )
     }
-
 }

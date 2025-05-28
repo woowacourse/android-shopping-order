@@ -57,12 +57,12 @@ interface RetrofitService {
         @Path("id") cartId: Int,
         @Header("accept") accept: String = "*/*",
         @Header("Authorization") authorization: String,
-    ): Call<CartQuantity>
+    ): Call<Unit>
 
     @POST("/cart-items")
     fun addCartItem(
         @Header("accept") accept: String = "*/*",
         @Body cartItem: CartItemRequest,
         @Header("Authorization") authorization: String,
-    ): Call<CartQuantity>
+    ): Call<Unit>
 }

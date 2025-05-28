@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.carts.repository
 
-import android.util.Log
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
@@ -75,7 +74,6 @@ class CartRepositoryImpl(
         onComplete: () -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
-        Log.d("updateQuantity리포지토리", "$cartId, $cartQuantity")
         remoteDataSource.updateCartItemCount(
             cartId = cartId,
             cartQuantity = cartQuantity,
@@ -88,7 +86,6 @@ class CartRepositoryImpl(
         )
     }
 
-
     override fun delete(
         cartId: Int,
         onComplete: (Int) -> Unit,
@@ -99,8 +96,12 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun addCartItem(goods: Goods) {
-        remoteDataSource.addItem(goods.id)
+    override fun addCartItem(
+        goods: Goods,
+        onComplete: (Int) -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    ) {
+        remoteDataSource.addItem(goods.id, onComplete, onFail)
     }
 
     override fun getAllItemsSize(onComplete: (Int) -> Unit) {
