@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.Page.Companion.UNINITIALIZED_PAGE
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
@@ -25,6 +26,7 @@ class CatalogViewModel(
     private val getSearchHistoryUseCase: GetSearchHistoryUseCase,
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
+    private val getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase,
 ) : ViewModel() {
     private val _products: MutableLiveData<Products> =
         MutableLiveData(EMPTY_PRODUCTS)
@@ -33,6 +35,10 @@ class CatalogViewModel(
     private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
         MutableLiveData(emptyList())
     val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
+
+    private val _cartProductsQuantity: MutableLiveData<Int> =
+        MutableLiveData(0)
+    val cartProductsQuantity: LiveData<Int> get() = _cartProductsQuantity
 
     init {
         loadCartProducts()
@@ -107,6 +113,12 @@ class CatalogViewModel(
         }
     }
 
+    fun loadCartProductsQuantity() {
+        getCartProductsQuantityUseCase { quantity ->
+            _cartProductsQuantity.postValue(quantity)
+        }
+    }
+
     companion object {
         private const val DEFAULT_PAGE_STEP: Int = 1
         private const val SHOWN_PRODUCTS_COUNT: Int = 20
@@ -127,6 +139,7 @@ class CatalogViewModel(
                         getSearchHistoryUseCase = application.getSearchHistoryUseCase,
                         increaseCartProductQuantityUseCase = application.increaseCartProductQuantityUseCase,
                         decreaseCartProductQuantityUseCase = application.decreaseCartProductQuantityUseCase,
+                        getCartProductsQuantityUseCase = application.getCartProductsQuantityUseCase,
                     ) as T
                 }
             }

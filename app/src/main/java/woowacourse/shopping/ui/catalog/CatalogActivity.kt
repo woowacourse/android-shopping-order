@@ -113,6 +113,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     private fun initObservers() {
         viewModel.products.observe(this) { products ->
             catalogAdapter.submitItems(products.products, !products.page.isLast)
+            viewModel.loadCartProductsQuantity()
         }
 
         viewModel.historyProducts.observe(this) { products ->

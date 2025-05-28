@@ -6,8 +6,6 @@ data class Products(
     val products: List<Product>,
     val page: Page,
 ) {
-    val catalogProductsQuantity: Int get() = products.sumOf { it.quantity }
-
     operator fun plus(other: Products): Products {
         val mergedProducts = products + other.products
         return Products(
