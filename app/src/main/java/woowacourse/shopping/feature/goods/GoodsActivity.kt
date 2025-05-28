@@ -83,7 +83,6 @@ class GoodsActivity : AppCompatActivity() {
         ConcatAdapter(
             horizontalSelectionAdapter,
             goodsSkeletonAdapter,
-            goodsAdapter,
             moreButtonAdapter,
         )
     }
@@ -117,6 +116,16 @@ class GoodsActivity : AppCompatActivity() {
 
         viewModel.navigateToLogin.observe(this) {
             navigateGoodsLogin()
+        }
+        viewModel.isLoading.observe(this) { isLoading ->
+            if (!isLoading) {
+                concatAdapter.removeAdapter(goodsSkeletonAdapter)
+                concatAdapter.addAdapter(1,goodsAdapter)
+            } else {
+                if (concatAdapter.adapters.contains(goodsSkeletonAdapter).not()) {
+                    concatAdapter.addAdapter(1, goodsSkeletonAdapter)
+                }
+            }
         }
     }
 
