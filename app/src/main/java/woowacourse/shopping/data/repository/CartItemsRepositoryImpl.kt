@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.data.model.Content
 import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
 import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
@@ -11,9 +12,48 @@ class CartItemsRepositoryImpl(
     private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
     private val cartItemsLocalDataSource: CartItemsLocalDataSource,
 ) : CartItemRepository {
+
+    init {
+        getInitialCartItems(null, null) { result ->
+            result
+                .onSuccess { it ->
+                    cartItemsLocalDataSource.getCachedCartItem(it)
+                }
+        }
+    }
+
+    override fun getQuantity(pagingData: PagingData): PagingData {
+        val updatedProducts = pagingData.products.map { product ->
+            val quantity = cartItemsLocalDataSource.getQuantity(product.id)
+            val isExpanded = quantity > 0
+            product.copy(quantity = quantity, isExpanded = isExpanded)
+        }
+        return pagingData.copy(products = updatedProducts)
+    }
+
+    override fun getInitialCartItems(
+        page: Int?,
+        size: Int?,
+        onResult: (Result<List<CachedCartItem>>) -> Unit,
+    ) {
+        cartItemsRemoteDataSource.getCartItems(page, size) { result ->
+            result
+                .mapCatching { response ->
+                    response.content.map { content ->
+                        CachedCartItem(
+                            productId = content.product.id,
+                            cartId = content.id,
+                            quantity = content.quantity
+                        )
+                    }
+                }
+                .let(onResult)
+        }
+    }
+
     override fun getCartItems(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onResult: (Result<PagingData>) -> Unit,
     ) {
         cartItemsRemoteDataSource.getCartItems(page, size) { result ->
@@ -30,7 +70,7 @@ class CartItemsRepositoryImpl(
     }
 
     override fun deleteCartItem(
-        id: Int,
+        id: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
         cartItemsRemoteDataSource.deleteCartItem(id) { result ->
@@ -40,21 +80,21 @@ class CartItemsRepositoryImpl(
     }
 
     override fun addCartItem(
-        id: Int,
+        id: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
         cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
             result
                 .mapCatching { cartId ->
-                    cartItemsLocalDataSource.add(cartId, id)
+                    cartItemsLocalDataSource.add(cartId, id, quantity)
                 }
                 .let(onResult)
         }
     }
 
     override fun updateCartItem(
-        id: Int,
+        id: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
