@@ -4,6 +4,7 @@ import android.app.Application
 import woowacourse.shopping.data.repository.CartItemsRepositoryImpl
 import woowacourse.shopping.data.repository.ProductsRepositoryImpl
 import woowacourse.shopping.data.repository.ViewedItemRepositoryImpl
+import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
 import woowacourse.shopping.data.source.local.recent.ViewedItemDatabase
 import woowacourse.shopping.data.source.remote.Client.getCartRetrofitService
 import woowacourse.shopping.data.source.remote.Client.getProductRetrofitService
@@ -22,7 +23,10 @@ object RepositoryProvider {
         productsRepository =
             ProductsRepositoryImpl(ProductsRemoteDataSource(getProductRetrofitService))
         cartItemRepository =
-            CartItemsRepositoryImpl(CartItemsRemoteDataSource(getCartRetrofitService))
+            CartItemsRepositoryImpl(
+                CartItemsRemoteDataSource(getCartRetrofitService),
+                CartItemsLocalDataSource(),
+            )
         viewedItemRepository =
             ViewedItemRepositoryImpl(ViewedItemDatabase.getInstance(application).viewedItemDao())
     }
