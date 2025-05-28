@@ -18,5 +18,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "android-shopping-cart"
+rootProject.name = "android-shopping-order"
 include(":app")
