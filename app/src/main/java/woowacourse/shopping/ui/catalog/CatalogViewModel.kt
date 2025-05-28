@@ -28,8 +28,7 @@ class CatalogViewModel(
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase,
 ) : ViewModel() {
-    private val _products: MutableLiveData<Products> =
-        MutableLiveData(EMPTY_PRODUCTS)
+    private val _products: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val products: LiveData<Products> get() = _products
 
     private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
@@ -37,8 +36,11 @@ class CatalogViewModel(
     val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
 
     private val _cartProductsQuantity: MutableLiveData<Int> =
-        MutableLiveData(0)
+        MutableLiveData(INITIAL_PRODUCT_QUANTITY)
     val cartProductsQuantity: LiveData<Int> get() = _cartProductsQuantity
+
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     init {
         loadCartProducts()
@@ -48,11 +50,16 @@ class CatalogViewModel(
         page: Int = products.value?.page?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
-        getCatalogProductsUseCase(
-            page = page,
-            size = count,
-        ) { newProducts ->
-            _products.postValue(products.value?.plus(newProducts))
+        runCatching {
+            _isLoading.value = true
+            getCatalogProductsUseCase(
+                page = page,
+                size = count,
+            ) { newProducts ->
+                _products.postValue(products.value?.plus(newProducts))
+            }
+        }.onSuccess {
+            _isLoading.value = false
         }
     }
 
@@ -116,6 +123,7 @@ class CatalogViewModel(
     companion object {
         private const val DEFAULT_PAGE_STEP: Int = 1
         private const val SHOWN_PRODUCTS_COUNT: Int = 20
+        private const val INITIAL_PRODUCT_QUANTITY: Int = 0
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

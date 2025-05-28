@@ -17,8 +17,8 @@ class GetCatalogProductsUseCase(
     ) {
         thread {
             val catalogProducts: Products = productRepository.fetchProducts(page, size)
-            val cartProducts: Map<Long, Product> = cartRepository.fetchAllCartProducts().products.associateBy { it.productDetail.id }
-
+            val cartProducts: Map<Long, Product> =
+                cartRepository.fetchAllCartProducts().products.associateBy { it.productDetail.id }
             val updatedProducts =
                 catalogProducts.products.map { catalogProduct ->
                     val cartProduct = cartProducts[catalogProduct.productDetail.id]
