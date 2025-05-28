@@ -1,3 +1,9 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val properties = Properties()
+properties.load(FileInputStream("local.properties"))
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
@@ -20,6 +26,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
+        buildConfigField("String", "USER_ID", properties.getProperty("id"))
+        buildConfigField("String", "USER_PASSWORD", properties.getProperty("password"))
     }
 
     buildTypes {
@@ -45,6 +54,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         dataBinding = true
     }
 }
