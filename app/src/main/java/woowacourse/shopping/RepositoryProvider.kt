@@ -3,8 +3,10 @@ package woowacourse.shopping
 import android.content.Context
 import woowacourse.shopping.data.CartRepositoryImpl
 import woowacourse.shopping.data.ProductRepositoryImpl
+import woowacourse.shopping.data.api.ApiClient
+import woowacourse.shopping.data.datasource.CartItemDataSourceImpl
+import woowacourse.shopping.data.datasource.ProductDataSourceImpl
 import woowacourse.shopping.data.db.ShoppingDatabase
-import woowacourse.shopping.data.dummyProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -38,8 +40,16 @@ object RepositoryProvider {
         val cartDao = database.cartDao()
         val recentProductDao = database.recentProductDao()
 
-        _cartRepository = CartRepositoryImpl(cartDao)
-        _productRepository = ProductRepositoryImpl(dummyProducts, cartDao, recentProductDao)
+        val productDataSource = ProductDataSourceImpl(ApiClient.productService)
+        val cartItemDataSource = CartItemDataSourceImpl(ApiClient.cartItemService)
+
+        _cartRepository = CartRepositoryImpl(cartItemDataSource)
+        _productRepository =
+            ProductRepositoryImpl(
+                recentProductDao,
+                productDataSource,
+                cartItemDataSource,
+            )
 
         isInitialized = true
     }
