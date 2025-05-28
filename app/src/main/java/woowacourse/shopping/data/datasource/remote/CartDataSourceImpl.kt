@@ -1,9 +1,13 @@
 package woowacourse.shopping.data.datasource.remote
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.dto.cart.CartItemCountResponse
+import woowacourse.shopping.data.dto.cart.CartItemRequest
 import woowacourse.shopping.data.dto.cart.CartsResponse
+import woowacourse.shopping.data.dto.cart.UpdateCartRequest
 import woowacourse.shopping.data.dto.cart.toDomain
 import woowacourse.shopping.data.remote.CartItemService
 import woowacourse.shopping.domain.model.CartItem
@@ -11,25 +15,26 @@ import woowacourse.shopping.domain.model.CartItem
 class CartDataSourceImpl(
     private val cartItemService: CartItemService,
 ) : CartDataSource {
-    override fun getTotalCount(
-        onResult: (Result<Int>) -> Unit
-    ) = cartItemService.requestCartItemCount().enqueue(
-        object : Callback<CartItemCountResponse> {
-            override fun onResponse(
-                call: Call<CartItemCountResponse>,
-                response: Response<CartItemCountResponse>
-            ) {
-                if (response.isSuccessful) {
-                    onResult(Result.success(response.body()?.quantity ?: 0))
+    override fun getTotalCount(onResult: (Result<Int>) -> Unit) =
+        cartItemService.requestCartItemCount().enqueue(
+            object : Callback<CartItemCountResponse> {
+                override fun onResponse(
+                    call: Call<CartItemCountResponse>,
+                    response: Response<CartItemCountResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        onResult(Result.success(response.body()?.quantity ?: 0))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<CartItemCountResponse>, t: Throwable) {
-                onResult(Result.failure(t))
-            }
-
-        }
-    )
+                override fun onFailure(
+                    call: Call<CartItemCountResponse>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
 
     override fun getPagedCartProducts(
         page: Int,
@@ -57,20 +62,7 @@ class CartDataSourceImpl(
             }
         },
     )
-//
-//    override fun existsByProductId(productId: Long): Boolean = carItemService.existsByProductId(productId)
-//
-//    override fun increaseQuantity(
-//        productId: Long,
-//        quantity: Int,
-//    ) = carItemService.increaseQuantity(productId, quantity)
-//
-//    override fun decreaseQuantity(productId: Long) = carItemService.decreaseQuantity(productId)
-//
-//    override fun insertProduct(cartEntity: CartEntity) = carItemService.insertProduct(cartEntity)
-//
-//    override fun deleteProductById(productId: Long) = carItemService.deleteProductById(productId)
-}
+
     override fun insertProduct(
         productId: Long,
         quantity: Int,
@@ -99,3 +91,33 @@ class CartDataSourceImpl(
         )
     }
 
+    override fun updateQuantity(
+        cartId: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        val request = UpdateCartRequest(quantity)
+        cartItemService.updateCartItem(cartId, request).enqueue(
+            object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>,
+                ) {
+                    if (response.isSuccessful) {
+                        onResult(Result.success(Unit))
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<ResponseBody>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
+    }
+
+    //    override fun deleteProductById(productId: Long) = cartItemService.deleteProductById(productId)
+    private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
+}

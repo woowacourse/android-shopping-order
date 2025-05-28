@@ -3,12 +3,13 @@ package woowacourse.shopping.data.repository.remote
 import woowacourse.shopping.data.datasource.remote.CartDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
     private val cartDataSource: CartDataSource,
 ) : CartRepository {
-    private var cachedCart = Cart()
+    private var cachedCart: Cart = Cart()
 
     init {
         fetchAllCartItems()
@@ -30,70 +31,45 @@ class CartRepositoryImpl(
         }
     }
 
-//    override fun getTotalQuantity(onResult: (Result<Int?>) -> Unit) {
-//        runThread(
-//            block = { cartDataSource.getTotalQuantity() },
-//            onResult = onResult,
-//        )
-//    }
-//
-//    override fun insertProduct(
-//        cartItem: CartItem,
-//        onResult: (Result<Unit>) -> Unit,
-//    ) {
-//        runThread(
-//            block = { cartDataSource.insertProduct(cartItemMapper.toData(cartItem)) },
-//            onResult = onResult,
-//        )
-//    }
-//
-//    override fun insertOrIncrease(
-//        productId: Long,
-//        quantity: Int,
-//        onResult: (Result<Unit>) -> Unit,
-//    ) {
-//        runThread(
-//            block = {
-//                val exists = cartDataSource.existsByProductId(productId)
-//                if (exists) {
-//                    cartDataSource.increaseQuantity(productId, quantity)
-//                } else {
-//                    cartDataSource.insertProduct(
-//                        CartEntity(productId = productId, quantity = quantity),
-//                    )
-//                }
-//            },
-//            onResult = onResult,
-//        )
-//    }
-//
-//    override fun increaseQuantity(
-//        productId: Long,
-//        quantity: Int,
-//        onResult: (Result<Unit>) -> Unit,
-//    ) {
-//        runThread(
-//            block = { cartDataSource.increaseQuantity(productId, quantity) },
-//            onResult = onResult,
-//        )
-//    }
-//
-//    override fun decreaseQuantity(
-//        productId: Long,
-//        onResult: (Result<Unit>) -> Unit,
-//    ) {
-//        runThread(
-//            block = { cartDataSource.decreaseQuantity(productId) },
-//            onResult = onResult,
-//        )
-//    }
-//
+    override fun insertOrUpdate(
+        product: Product,
+        productQuantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        if (cachedCart.exist(productId = product.productId)) {
+            val cartItem =
+                cachedCart.findCartItem(product.productId) ?: throw NoSuchElementException("")
+
+            updateProduct(cartItem.cartId, cartItem.quantity + productQuantity) {
+                onResult(Result.success(Unit))
+            }
+        } else {
+            insertProduct(productId = product.productId, productQuantity) { result ->
+                val cartId = result.getOrNull() ?: -1L
+                val cartItem =
+                    CartItem(cartId = cartId, product = product, quantity = productQuantity)
+                cachedCart = cachedCart.add(cartItem)
+                onResult(Result.success(Unit))
+            }
+        }
+    }
+
     override fun insertProduct(
         productId: Long,
         productQuantity: Int,
         onResult: (Result<Long>) -> Unit,
     ) {
         cartDataSource.insertProduct(productId, productQuantity) { result ->
+            onResult(result)
+        }
+    }
+
+    override fun updateProduct(
+        cartId: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        cartDataSource.updateQuantity(cartId, quantity) { result ->
             onResult(result)
         }
     }

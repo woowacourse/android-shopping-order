@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
 
 interface CartRepository {
     fun getTotalCount(onResult: (Result<Int>) -> Unit)
@@ -10,35 +11,23 @@ interface CartRepository {
         pageSize: Int,
         onResult: (Result<List<CartItem>>) -> Unit,
     )
-//
-//    fun getTotalQuantity(onResult: (Result<Int?>) -> Unit)
-//
-//    fun insertProduct(
-//        cartItem: CartItem,
-//        onResult: (Result<Unit>) -> Unit,
-//    )
-//
-//    fun insertOrIncrease(
-//        productId: Long,
-//        quantity: Int,
-//        onResult: (Result<Unit>) -> Unit,
-//    )
-//
-//    fun increaseQuantity(
-//        productId: Long,
-//        quantity: Int,
-//        onResult: (Result<Unit>) -> Unit,
-//    )
-//
-//    fun decreaseQuantity(
-//        productId: Long,
-//        onResult: (Result<Unit>) -> Unit,
-//    )
-//
+
+    fun insertOrUpdate(
+        product: Product,
+        productQuantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    )
+
     fun insertProduct(
         productId: Long,
         productQuantity: Int,
         onResult: (Result<Long>) -> Unit,
+    )
+
+    fun updateProduct(
+        cartId: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
     )
 
 //    fun deleteProduct(
