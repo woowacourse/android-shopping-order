@@ -44,37 +44,12 @@ class CartViewModel(
     private val _loginErrorEvent: MutableSingleLiveData<CartFetchError> = MutableSingleLiveData()
     val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
 
-    private var cashedCartItemWithIndex: Map<Int, Pair<CartItem, Int>> = mapOf()
-
     init {
-//        updateCartCache()
         updateCartQuantity()
     }
 
     private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
         cartResponse.toCartItems()
-
-//    fun updateCartCache() {
-//        cartRepository.fetchAllCartItems({ cartResponse ->
-//            val cartItems = getCartItemByCartResponse(cartResponse)
-//            cashedCartItemWithIndex =
-//                cartItems
-//                    .mapIndexed { index, cartItem ->
-//                        cartItem.goods.id to Pair(cartItem, index)
-//                    }.toMap()
-//
-//            _cart.postValue(cartItems)
-//            totalCartSizeData = cartItems.size
-//        }, {})
-//    }
-
-    fun onLoginInput(
-        id: String,
-        pw: String,
-    ) {
-        Authorization.getBasicKey(id, pw)
-        updateCartQuantity()
-    }
 
     fun getPosition(cartItem: CartItem): Int? {
         val idx = cart.value?.indexOf(cartItem) ?: return null
@@ -91,8 +66,8 @@ class CartViewModel(
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         cartRepository.removeOrDecreaseQuantity(cartItem.goods, cartItem.quantity) {
-            updateCartQuantity()
             updatePage()
+            updateCartQuantity()
         }
     }
 
@@ -111,17 +86,6 @@ class CartViewModel(
         )
     }
 
-    private fun updateCartData() {
-//        cartRepository.fetchCartItemsByPage(
-//            currentPage - 1,
-//            PAGE_SIZE,
-//            { currentPageCartItems ->
-//                _cart.postValue(currentPageCartItems)
-//            },
-//            {},
-//        )
-    }
-
     private fun updateCartDataSize(response: CartResponse) {
         totalCartSizeData = response.totalElements
         _isMultiplePages.postValue(totalCartSizeData > PAGE_SIZE)
@@ -129,9 +93,11 @@ class CartViewModel(
 
     fun delete(cartItem: CartItem) {
         cartRepository.delete(cartItem.id) {
-            updatePage()
+            updateCartQuantity()
         }
     }
+
+
 
     private fun updatePage() {
         cartRepository.getAllItemsSize { totalCartSize ->
@@ -142,6 +108,8 @@ class CartViewModel(
             _isMultiplePages.postValue(totalCartSize > PAGE_SIZE)
             updateCartQuantity()
         }
+        cartRepository.fetchCartItemsByPage(currentPage, PAGE_SIZE,{},{})
+
     }
 
     fun plusPage() {

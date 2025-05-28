@@ -74,8 +74,6 @@ class CartActivity :
     }
 
     companion object {
-        private const val QUANTITY_UPDATE_UNIT = 1
-
         fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
     }
 }
