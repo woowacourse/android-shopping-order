@@ -19,6 +19,9 @@ class CatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private val _items = MutableLiveData<List<CatalogItem>>()
     val items: LiveData<List<CatalogItem>> = _items
 
@@ -37,6 +40,8 @@ class CatalogViewModel(
     }
 
     fun fetchProducts() {
+        _isLoading.value = true
+
         productRepository.loadCartItems { cartItems ->
             val totalCount = cartItems?.sumOf { it.amount } ?: 0
             _totalCartCount.postValue(totalCount)
@@ -88,6 +93,7 @@ class CatalogViewModel(
                     currentPage++
                 }
             }
+            _isLoading.value = false
         }
     }
 

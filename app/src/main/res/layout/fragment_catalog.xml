@@ -52,14 +52,68 @@
 
         </Toolbar>
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/layout_catalog_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:shimmer_auto_start="true"
+            app:shimmer_duration="1500"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_products"
+            <GridLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
-                tools:listitem="@layout/item_product" />
+                android:layout_height="match_parent"
+                android:alignmentMode="alignMargins"
+                android:rowCount="4"
+                android:columnCount="2"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:useDefaultMargins="true">
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+
+
+            </GridLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_products"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
+            tools:listitem="@layout/item_product" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
