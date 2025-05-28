@@ -27,7 +27,13 @@ interface CartItemRepository {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun updateCartItem(
+    fun updateCartItemQuantity(
+        id: Long,
+        quantity: Int,
+        onResult: (Result<Unit>) -> Unit,
+    )
+
+    fun addCartItemQuantity(
         id: Long,
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
