@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -60,6 +61,16 @@ class ShoppingCartActivity : AppCompatActivity() {
     private fun initObservers() {
         viewModel.products.observe(this) { value ->
             adapter.updateItems(value)
+        }
+
+        viewModel.onFinishLoading.observe(this) { value ->
+            when (value) {
+                true -> binding.sfLoading.visibility = View.GONE
+                false -> {
+                    binding.sfLoading.visibility = View.VISIBLE
+                    binding.sfLoading.startShimmer()
+                }
+            }
         }
     }
 

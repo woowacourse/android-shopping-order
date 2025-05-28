@@ -25,6 +25,9 @@ class ShoppingCartViewModel(
     private val _isSinglePage = MutableLiveData(true)
     val isSinglePage: LiveData<Boolean> = _isSinglePage
 
+    private val _onFinishLoading = MutableLiveData(false)
+    val onFinishLoading: LiveData<Boolean> get() = _onFinishLoading
+
     init {
         loadPage(FIRST_PAGE_NUMBER)
     }
@@ -67,7 +70,9 @@ class ShoppingCartViewModel(
     }
 
     private fun loadPage(page: Int) {
+        _onFinishLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
+            _onFinishLoading.value = true
             _products.postValue(result.items)
             val hasNext = result.hasNext
             updatePageState(page, hasNext)
