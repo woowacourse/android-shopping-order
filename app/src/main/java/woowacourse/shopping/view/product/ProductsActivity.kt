@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.product.source.LocalProductsDataSource
 import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
-import woowacourse.shopping.data.shoppingCart.source.LocalShoppingCartDataSource
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
@@ -28,6 +27,7 @@ class ProductsActivity : AppCompatActivity() {
     private val productsAdapter: ProductsAdapter by lazy {
         ProductsAdapter(::navigateToProductDetail, viewModel::loadMoreProducts)
     }
+
     private val detailActivityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -57,12 +57,12 @@ class ProductsActivity : AppCompatActivity() {
         }
 
         LocalProductsDataSource.init(applicationContext)
-        LocalShoppingCartDataSource.init(applicationContext)
+//        LocalShoppingCartDataSource.init(applicationContext)
         LocalRecentViewedProductsDataSource.init(applicationContext)
 
         initDataBinding()
         handleEventsFromViewModel()
-        bindData()
+//        bindData()
 
         binding.products.layoutManager =
             GridLayoutManager(this, spanCount).apply {
@@ -118,11 +118,11 @@ class ProductsActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindData() {
-        viewModel.productItems.observe(this) { productsItems: List<ProductsItem> ->
-            productsAdapter.submitList(productsItems)
-        }
-    }
+//    private fun bindData() {
+//        viewModel.productItems.observe(this) { productsItems: List<ProductsItem> ->
+//            productsAdapter.submitList(productsItems)
+//        }
+//    }
 
     private fun navigateToShoppingCart() {
         shoppingCartActivityResultLauncher.launch(ShoppingCartActivity.newIntent(this))

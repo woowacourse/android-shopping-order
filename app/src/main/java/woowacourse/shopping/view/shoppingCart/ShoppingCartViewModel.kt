@@ -3,15 +3,15 @@ package woowacourse.shopping.view.shoppingCart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
+import woowacourse.shopping.data.shoppingCart.repository.CartRepository
+import woowacourse.shopping.data.shoppingCart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
 class ShoppingCartViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository(),
+    private val cartRepository: CartRepository = DefaultCartRepository(),
 ) : ViewModel() {
     private var page: Int = FIRST_PAGE
 
@@ -26,7 +26,7 @@ class ShoppingCartViewModel(
     }
 
     private fun loadShoppingCart() {
-        shoppingCartRepository.loadPageableCartItems(
+        cartRepository.loadPageableCartItems(
             page - 1,
             COUNT_PER_PAGE,
         ) { result: Result<PageableCartItems> ->
@@ -50,33 +50,8 @@ class ShoppingCartViewModel(
         return this.cartItems.map(ShoppingCartItem::ProductItem) + paginationItem
     }
 
-    fun updateShoppingCart() {
-        val productItems: List<ShoppingCartItem.ProductItem> =
-            shoppingCartItems.value?.filterIsInstance<ShoppingCartItem.ProductItem>() ?: return
-
-        val cartItemsToUpdate: List<CartItem> =
-            productItems
-                .map { productItem: ShoppingCartItem.ProductItem ->
-                    CartItem(
-                        productItem.cartItem.productId,
-                        productItem.cartItem.name,
-                        productItem.cartItem.price,
-                        productItem.quantity,
-                    )
-                }.filter { cartItem -> cartItem.quantity != 0 }
-
-        shoppingCartRepository.update(cartItemsToUpdate) { result ->
-            result
-                .onSuccess {
-                    _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_PRODUCT_SUCCESS)
-                }.onFailure {
-                    _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_PRODUCT_FAILURE)
-                }
-        }
-    }
-
     fun removeShoppingCartProduct(cartItem: CartItem) {
-        shoppingCartRepository.remove(cartItem) { result: Result<Unit> ->
+        cartRepository.remove(cartItem.id) { result: Result<Unit> ->
             result
                 .onSuccess {
                     loadShoppingCart()
@@ -97,6 +72,8 @@ class ShoppingCartViewModel(
             loadShoppingCart()
         }
     }
+
+    fun updateShoppingCart(): Any? = TODO()
 
     companion object {
         private const val FIRST_PAGE = 1

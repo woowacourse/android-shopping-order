@@ -6,15 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
-import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
+import woowacourse.shopping.data.shoppingCart.repository.CartRepository
+import woowacourse.shopping.data.shoppingCart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
 class ProductDetailViewModel(
     private val productsRepository: ProductsRepository = DefaultProductsRepository(),
-    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository(),
+    private val cartRepository: CartRepository = DefaultCartRepository(),
 ) : ViewModel() {
     private val _product: MutableLiveData<Product> = MutableLiveData()
     val product: LiveData<Product> get() = _product
@@ -61,7 +61,7 @@ class ProductDetailViewModel(
                 return
             }
 
-        shoppingCartRepository.addCartItem(
+        cartRepository.addCartItem(
             product.id,
             quantity.value ?: 1,
         ) { result: Result<Unit> ->

@@ -6,9 +6,9 @@ import woowacourse.shopping.data.shoppingCart.source.ShoppingCartDataSource
 import woowacourse.shopping.domain.cart.PageableCartItems
 import kotlin.concurrent.thread
 
-class DefaultShoppingCartRepository(
+class DefaultCartRepository(
     private val shoppingCartDataSource: ShoppingCartDataSource = RemoteShoppingCartDataSource(),
-) : ShoppingCartRepository {
+) : CartRepository {
     override fun loadPageableCartItems(
         page: Int,
         size: Int,

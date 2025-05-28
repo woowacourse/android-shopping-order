@@ -2,7 +2,7 @@ package woowacourse.shopping.data.shoppingCart.repository
 
 import woowacourse.shopping.domain.cart.PageableCartItems
 
-interface ShoppingCartRepository {
+interface CartRepository {
     fun loadPageableCartItems(
         page: Int,
         size: Int,
