@@ -35,7 +35,7 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
         uids: List<Int>,
         callback: (List<ProductUiModel>) -> Unit
     ) {
-        val results = mutableListOf<ProductUiModel>()
+        val resultsMap = mutableMapOf<Int, ProductUiModel>()
         var completedCount = 0
 
         if (uids.isEmpty()) {
@@ -45,11 +45,13 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
 
         uids.forEach { uid ->
             getProduct(uid) { product ->
-                results.add(product)
+                resultsMap[uid] = product
                 completedCount++
 
                 if (completedCount == uids.size) {
-                    callback(results)
+                    // uids 순서대로 결과 리스트 만들기
+                    val orderedResults = uids.mapNotNull { resultsMap[it] }
+                    callback(orderedResults)
                 }
             }
         }
