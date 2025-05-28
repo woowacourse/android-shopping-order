@@ -7,17 +7,17 @@ import woowacourse.shopping.ui.catalog.adapter.product.CatalogItemViewType.PRODU
 sealed class CatalogItem(
     val viewType: CatalogItemViewType,
 ) {
-    abstract val id: Long
+    abstract val catalogItemId: Long
 
     data class ProductItem(
         val value: Product,
     ) : CatalogItem(PRODUCT) {
-        override val id: Long
+        override val catalogItemId: Long
             get() = value.productDetail.id
     }
 
     data object LoadMoreItem : CatalogItem(LOAD_MORE) {
         private const val LOAD_MORE_ITEM_ID = -1L
-        override val id: Long = LOAD_MORE_ITEM_ID
+        override val catalogItemId: Long = LOAD_MORE_ITEM_ID
     }
 }
