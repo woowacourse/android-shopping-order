@@ -60,7 +60,7 @@ class CartActivity : AppCompatActivity() {
             binding.frCartShimmer.visibility = View.GONE
             binding.recyclerViewCart.visibility = View.VISIBLE
 
-            adapter.setData(it.products)
+            adapter.setData(it.products, it)
         }
 
         viewModel.product.observe(this) {

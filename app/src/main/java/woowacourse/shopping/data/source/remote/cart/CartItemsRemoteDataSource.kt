@@ -59,7 +59,22 @@ class CartItemsRemoteDataSource(
         id: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        api.deleteCartItems(id = id).enqueueResult(onResult)
+        api.deleteCartItems(id = id).enqueue(object : Callback<Void> {
+            override fun onResponse(
+                call: Call<Void?>,
+                response: Response<Void?>,
+            ) {
+                if (response.isSuccessful) {
+                    onResult(Result.success(Unit))
+                } else {
+                    onResult(Result.failure(Exception(DELETE_ERROR_MESSAGE)))
+                }
+            }
+
+            override fun onFailure(call: Call<Void?>, t: Throwable) {
+                onResult(Result.failure(t))
+            }
+        })
     }
 
     override fun updateCartItem(
@@ -76,5 +91,6 @@ class CartItemsRemoteDataSource(
 
     companion object {
         private const val POST_ERROR_MESSAGE = "[ERROR] 장바구니 ID가 존재하지 않습니다."
+        private const val DELETE_ERROR_MESSAGE = "[ERROR] 상품을 삭제하는 도중 오류가 발생했습니다."
     }
 }

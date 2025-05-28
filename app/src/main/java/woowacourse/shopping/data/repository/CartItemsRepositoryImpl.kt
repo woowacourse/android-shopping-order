@@ -73,9 +73,13 @@ class CartItemsRepositoryImpl(
         id: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        cartItemsRemoteDataSource.deleteCartItem(id) { result ->
-            cartItemsLocalDataSource.remove(id)
-            result.let(onResult)
+        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+
+        if(cartId!=null){
+            cartItemsRemoteDataSource.deleteCartItem(cartId) { result ->
+                cartItemsLocalDataSource.remove(cartId)
+                result.let(onResult)
+            }
         }
     }
 

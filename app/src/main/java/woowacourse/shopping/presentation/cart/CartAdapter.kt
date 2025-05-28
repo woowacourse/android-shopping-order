@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.cart
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
+import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.cart.viewHolder.CartViewHolder
 import woowacourse.shopping.presentation.cart.viewHolder.PaginationButtonViewHolder
@@ -14,6 +15,7 @@ class CartAdapter(
     private val cartHandler: CartEventHandler,
     private val handler: ProductQuantityHandler,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var pagingData: PagingData? = null
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -42,32 +44,29 @@ class CartAdapter(
         return VIEW_TYPE_CART_PRODUCT
     }
 
-    fun setData(newCartProducts: List<ProductUiModel>) {
-        val startPosition = cartProducts.size
-        cartProducts = cartProducts + newCartProducts
+    fun setData(newCartProducts: List<ProductUiModel>, pagingData: PagingData) {
+        val hadPagination = shouldShowPagination()
+        val oldSize = cartProducts.size
+        val oldTotalCount = oldSize + if (hadPagination) 1 else 0
 
-        notifyItemRangeInserted(startPosition, newCartProducts.size)
+        val newSize = newCartProducts.size
+        val newTotalCount = newSize + if (shouldShowPagination()) 1 else 0
+
+        this.cartProducts = newCartProducts
+        this.pagingData = pagingData
+
+        if (oldTotalCount != newTotalCount) {
+            notifyDataSetChanged()
+        } else {
+            notifyItemRangeChanged(0, newTotalCount)
+        }
     }
 
-//        val hadPagination = shouldShowPagination()
-//        val oldSize = cartProducts.size
-//        cartProducts = newCartProducts
-//        val hasPagination = shouldShowPagination()
-//        val newSize = cartProducts.size
-//
-//        val oldTotalCount = oldSize + if (hadPagination) 1 else 0
-//        val newTotalCount = newSize + if (hasPagination) 1 else 0
-//
-//        if (oldTotalCount != newTotalCount) {
-//            notifyDataSetChanged()
-//        } else {
-//            notifyItemRangeChanged(0, newTotalCount)
-//        }
-//    }
+    private fun shouldShowPagination(): Boolean =
+        pagingData?.hasPrevious == true || pagingData?.hasNext == true
 
-    private fun shouldShowPagination(): Boolean = cartHandler.isNextButtonEnabled() || cartHandler.isPrevButtonEnabled()
-
-    override fun getItemCount(): Int = cartProducts.size + if (shouldShowPagination()) 1 else 0
+    override fun getItemCount(): Int =
+        cartProducts.size + if (shouldShowPagination()) 1 else 0
 
     fun updateProduct(product: ProductUiModel) {
         val index = cartProducts.indexOfFirst { it.id == product.id }

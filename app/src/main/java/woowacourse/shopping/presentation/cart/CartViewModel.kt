@@ -48,14 +48,12 @@ class CartViewModel(
     }
 
     override fun onNextPage() {
-//        repository.getAllCartItemSize { size ->
-//            val lastPage = (size - 1) / PAGE_SIZE
-//            if (currentPage < lastPage) {
-//                currentPage++
-//                _pageEvent.postValue(currentPage)
-//                loadCartProducts()
-//            }
-//        }
+        val hasNext = pagingData.value?.hasNext == true
+        if (currentPage >= 0 && hasNext) {
+            currentPage++
+            _pageEvent.postValue(currentPage)
+            loadCartProducts()
+        }
     }
 
     override fun onPrevPage() {
@@ -87,9 +85,9 @@ class CartViewModel(
         }
     }
 
-    override fun isNextButtonEnabled(): Boolean = _isNextButtonEnabled.value == true
+    override fun isNextButtonEnabled(): Boolean = _pagingData.value?.hasNext == true
 
-    override fun isPrevButtonEnabled(): Boolean = _isPrevButtonEnabled.value == true
+    override fun isPrevButtonEnabled(): Boolean = _pagingData.value?.hasPrevious == true
 
     override fun isPaginationEnabled(): Boolean =
         (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
@@ -97,29 +95,17 @@ class CartViewModel(
     override fun getPage(): Int = currentPage
 
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
-        cartRepository.getCartItems(currentPage, pageSize) { response ->
-            response
-                .onSuccess { pagingData ->
+        cartRepository.getCartItems(currentPage, pageSize) { result ->
+            result.onSuccess { pagingData ->
+                if (pagingData.products.isEmpty() && currentPage > 0) {
+                    currentPage--
+                    _pageEvent.postValue(currentPage)
+                    loadCartProducts()
+                } else {
                     _pagingData.postValue(pagingData)
                 }
+            }
         }
-//        repository.getAllCartItemSize { totalSize ->
-//            var current = currentPage
-//            while (current > 0 && current * pageSize >= totalSize) {
-//                current--
-//            }
-//            currentPage = current
-//            _pageEvent.postValue(current)
-//
-//            val startIndex = current * pageSize
-//            val endIndex = minOf(startIndex + pageSize, totalSize)
-//
-//            repository.subListCartItems(startIndex, endIndex) { products ->
-//                _cartProducts.postValue(products)
-//                _isNextButtonEnabled.postValue(current < (totalSize - 1) / pageSize)
-//                _isPrevButtonEnabled.postValue(current > 0)
-//            }
-//        }
     }
 
     companion object {

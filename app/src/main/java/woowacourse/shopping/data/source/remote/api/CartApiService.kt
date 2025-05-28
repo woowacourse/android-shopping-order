@@ -32,7 +32,7 @@ interface CartApiService {
     fun deleteCartItems(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long,
-    ): Call<Unit>
+    ): Call<Void>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItems(
