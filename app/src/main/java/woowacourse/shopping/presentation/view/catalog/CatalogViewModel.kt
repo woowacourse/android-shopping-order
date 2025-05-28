@@ -32,7 +32,6 @@ class CatalogViewModel(
     private var lastId: Long = DEFAULT_ID
     private var currentPage: Int = 0
 
-
     init {
         fetchProducts()
     }
@@ -148,10 +147,12 @@ class CatalogViewModel(
         updateRecentProducts()
     }
 
-    private fun handleUpdatedCartItem(updatedCartItem: CartItem?) {
-        updatedCartItem?.let {
-            _itemUpdateEvent.postValue(it.toUiModel())
-            calculateTotalCartCount()
+    private fun handleUpdatedCartItem(id: Long) {
+        getCartItemById(id) { cartItem ->
+            cartItem.let {
+                _itemUpdateEvent.postValue(it.toUiModel())
+                calculateTotalCartCount()
+            }
         }
     }
 
@@ -181,6 +182,16 @@ class CatalogViewModel(
                 }
 
             _items.postValue(updatedItems)
+        }
+    }
+
+    private fun getCartItemById(
+        id: Long,
+        callback: (CartItem) -> Unit,
+    ) {
+        cartRepository.getAllCartItems { it ->
+            val foundItem = it.find { it.product.id == id }!!
+            callback(foundItem)
         }
     }
 
