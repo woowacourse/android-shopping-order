@@ -3,7 +3,6 @@ package woowacourse.shopping.data.shoppingCart.repository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.shoppingCart.local.dao.ShoppingCartDao
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsResponseDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
@@ -13,7 +12,6 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 class DefaultShoppingCartRepository(
-    private val shoppingCartDao: ShoppingCartDao,
     private val shoppingCartService: ShoppingCartService,
 ) : ShoppingCartRepository {
     override fun load(
@@ -165,14 +163,10 @@ class DefaultShoppingCartRepository(
     companion object {
         private var INSTANCE: ShoppingCartRepository? = null
 
-        fun initialize(
-            shoppingCartDao: ShoppingCartDao,
-            shoppingCartService: ShoppingCartService,
-        ) {
+        fun initialize(shoppingCartService: ShoppingCartService) {
             if (INSTANCE == null) {
                 INSTANCE =
                     DefaultShoppingCartRepository(
-                        shoppingCartDao = shoppingCartDao,
                         shoppingCartService = shoppingCartService,
                     )
             }

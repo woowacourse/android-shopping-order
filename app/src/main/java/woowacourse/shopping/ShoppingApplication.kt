@@ -8,22 +8,11 @@ import woowacourse.shopping.data.network.ApiClient
 import woowacourse.shopping.data.product.local.database.ProductDatabase
 import woowacourse.shopping.data.product.remote.service.ProductService
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
-import woowacourse.shopping.data.shoppingCart.local.database.ShoppingCartDatabase
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.authentication.UserAuthentication
 
 class ShoppingApplication : Application() {
-    private val shoppingCartDatabase: ShoppingCartDatabase by lazy {
-        Room
-            .databaseBuilder(
-                applicationContext,
-                ShoppingCartDatabase::class.java,
-                "shoppingCart",
-            ).fallbackToDestructiveMigration()
-            .build()
-    }
-
     private val productDatabase: ProductDatabase by lazy {
         Room
             .databaseBuilder(
@@ -56,10 +45,7 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         DefaultAuthenticationRepository.initialize(authDataSource)
-        DefaultShoppingCartRepository.initialize(
-            shoppingCartDatabase.shoppingCartDao(),
-            shoppingCartService,
-        )
+        DefaultShoppingCartRepository.initialize(shoppingCartService)
         DefaultProductsRepository.initialize(
             productDatabase.recentWatchingDao(),
             productService,
