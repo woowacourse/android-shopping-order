@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.fixture.productFixture2
-import woowacourse.shopping.view.main.state.IncreaseState
 import woowacourse.shopping.view.main.state.ProductState
 
 class ProductStateTest {

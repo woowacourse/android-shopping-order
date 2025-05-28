@@ -29,7 +29,7 @@ class DefaultProductRepository(private val dataSource: ProductsDataSource2) {
 
     fun loadProduct(
         productId: Long,
-        callback: (Result<Product>) -> Unit
+        callback: (Result<Product>) -> Unit,
     ) {
         dataSource.getProduct(productId) { result ->
             result.fold(

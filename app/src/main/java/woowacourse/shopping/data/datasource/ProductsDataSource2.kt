@@ -9,12 +9,6 @@ import woowacourse.shopping.data.network.response.products.ProductsResponse
 import woowacourse.shopping.data.network.service.ProductService
 
 class ProductsDataSource2(private val service: ProductService) {
-    // fun getProduct(productId: Long): ProductEntity = service.getProduct(productId)
-
-//    fun getProducts(productIds: List<Long>): List<ProductEntity> {
-//        //return service.getProducts(productIds)
-//    }
-
     fun singlePage(
         page: Int,
         size: Int,
@@ -53,7 +47,7 @@ class ProductsDataSource2(private val service: ProductService) {
             object : Callback<ProductResponse> {
                 override fun onResponse(
                     call: Call<ProductResponse>,
-                    response: Response<ProductResponse>
+                    response: Response<ProductResponse>,
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body()
@@ -63,11 +57,13 @@ class ProductsDataSource2(private val service: ProductService) {
                     }
                 }
 
-                override fun onFailure(call: Call<ProductResponse>, t: Throwable) {
+                override fun onFailure(
+                    call: Call<ProductResponse>,
+                    t: Throwable,
+                ) {
                     callback(Result.failure(t))
                 }
-
-            }
+            },
         )
     }
 }

@@ -10,8 +10,5 @@ data class Product(
     private val price: Price,
     val quantity: Quantity = Quantity(0),
 ) {
-    fun canIncrease(other: Quantity): Boolean = !quantity.isExceeded(other)
-
     val priceValue: Int = price.value
-    val quantityValue: Int = quantity.value
 }
