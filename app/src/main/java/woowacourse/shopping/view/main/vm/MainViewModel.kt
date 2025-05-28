@@ -39,34 +39,39 @@ class MainViewModel(
         loadProductsAndCarts(INITIAL_PAGE)
     }
 
-    fun loadPage() {
+    fun loadPage() =
         withState(_uiState.value) { state ->
             val nextPageIndex = state.productItems.size / PAGE_SIZE
             loadProductsAndCarts(nextPageIndex)
         }
-    }
 
     private fun loadProductsAndCarts(pageIndex: Int) {
         setLoading(true)
-
         productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { productResult ->
             productResult.fold(
                 onSuccess = { productPage ->
-                    cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
-                        cartResult.fold(
-                            onSuccess = { cartPage ->
-                                mergeProductsWithCarts(productPage, cartPage.products)
-                            },
-                            onFailure = { handleError("CartLoad", it) },
-                        )
-                    }
+                    loadCartsAndMerge(productPage, pageIndex)
                 },
                 onFailure = { handleError("ProductLoad", it) },
             )
         }
     }
 
-    private fun mergeProductsWithCarts(
+    private fun loadCartsAndMerge(
+        productPage: ProductSinglePage,
+        pageIndex: Int,
+    ) {
+        cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
+            cartResult.fold(
+                onSuccess = { cartPage ->
+                    applyMergedUiState(productPage, cartPage.products)
+                },
+                onFailure = { handleError("CartLoad", it) },
+            )
+        }
+    }
+
+    private fun applyMergedUiState(
         productPage: ProductSinglePage,
         cartItems: List<ShoppingCart>,
     ) {
@@ -81,60 +86,66 @@ class MainViewModel(
             }
 
         val updatedList = _uiState.value?.productItems.orEmpty() + newStates
+        _uiState.value = ProductUiState(updatedList, load = LoadState.of(productPage.hasNextPage))
 
-        _uiState.value =
-            ProductUiState(
-                productItems = updatedList,
-                load = LoadState.of(productPage.hasNextPage),
-            )
         setLoading(false)
     }
 
-    fun increaseCartQuantity(productId: Long) {
+    fun increaseCartQuantity(productId: Long) =
         withState(_uiState.value) { state ->
             val updated = state.increaseCartQuantity(productId)
 
-            val updateUiState: () -> Unit = {
-                _uiState.value = state.modifyUiState(updated)
-            }
+            val updateUiState = { _uiState.value = state.modifyUiState(updated) }
 
-            updated.cartId?.let { cartId ->
-                cartRepository.updateQuantity(cartId, updated.cartQuantity) { result ->
-                    result.fold(
-                        onSuccess = { updateUiState() },
-                        onFailure = { handleError("ProductQuantityIncrease", it) },
-                    )
+            when (val cartId = updated.cartId) {
+                null -> {
+                    cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
+                        it.fold(
+                            onSuccess = { updateUiState() },
+                            onFailure = { handleError(TAG_INCREASE, it) },
+                        )
+                    }
                 }
-            } ?: run {
-                cartRepository.addCart(Cart(updated.cartQuantity, productId)) { result ->
-                    result.fold(
-                        onSuccess = { updateUiState() },
-                        onFailure = { handleError("ProductQuantityIncrease", it) },
-                    )
+
+                else -> {
+                    cartRepository.updateQuantity(cartId, updated.cartQuantity) {
+                        it.fold(
+                            onSuccess = { updateUiState() },
+                            onFailure = { handleError(TAG_INCREASE, it) },
+                        )
+                    }
                 }
             }
         }
-    }
 
-    fun decreaseCartQuantity(productId: Long) {
+    fun decreaseCartQuantity(productId: Long) =
         withState(_uiState.value) { state ->
             val updated = state.decreaseCartQuantity(productId)
-            _uiState.value = state.modifyUiState(updated)
+            val cartId = updated.cartId ?: return
 
-            // TODO: 아래 구현은 서버 연동 이후에 처리
-            // if (!updated.cartQuantity.hasQuantity()) {
-            //     cartRepository.delete(productId)
-            // } else {
-            //     cartRepository.upsert(productId, updated.cartQuantity)
-            // }
+            val updateUiState = { _uiState.value = state.modifyUiState(updated) }
+
+            if (updated.hasCartQuantity) {
+                cartRepository.updateQuantity(cartId, updated.cartQuantity) {
+                    it.fold(
+                        onSuccess = { updateUiState() },
+                        onFailure = { handleError(TAG_DECREASE, it) },
+                    )
+                }
+            } else {
+                cartRepository.deleteCart(cartId) {
+                    it.fold(
+                        onSuccess = { updateUiState() },
+                        onFailure = { handleError(TAG_DECREASE, it) },
+                    )
+                }
+            }
         }
-    }
 
-    fun syncCartQuantities() {
+    fun syncCartQuantities() =
         withState(_uiState.value) { state ->
             // TODO: cartRepository.getCarts(state.productIds) { ... }
         }
-    }
 
     fun syncHistory() {
         historyLoader { historyStates ->
@@ -142,13 +153,12 @@ class MainViewModel(
         }
     }
 
-    fun saveHistory(productId: Long) {
+    fun saveHistory(productId: Long) =
         withState(_uiState.value) { state ->
             historyRepository.saveHistory(productId) {
                 _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
             }
         }
-    }
 
     private fun setLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)
@@ -165,5 +175,8 @@ class MainViewModel(
     companion object {
         private const val INITIAL_PAGE = 0
         private const val PAGE_SIZE = 20
+
+        private const val TAG_INCREASE = "ProductQuantityIncrease"
+        private const val TAG_DECREASE = "ProductQuantityDecrease"
     }
 }
