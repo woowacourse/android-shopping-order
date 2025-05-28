@@ -12,7 +12,7 @@ class DefaultCartRepository(
 ) {
     fun addCart(
         cart: Cart,
-        callback: (Result<Unit>) -> Unit,
+        callback: (Result<String?>) -> Unit,
     ) {
         dataSource.addCart(cart.toRequest()) { response ->
             response.fold(

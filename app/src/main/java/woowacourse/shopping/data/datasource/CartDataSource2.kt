@@ -13,7 +13,7 @@ class CartDataSource2(
 ) {
     fun addCart(
         request: CartItemRequest,
-        callback: (Result<Unit?>) -> Unit,
+        callback: (Result<String?>) -> Unit,
     ) {
         val result = service.addCart(request)
         result.enqueue(
@@ -23,7 +23,13 @@ class CartDataSource2(
                     response: Response<Unit>,
                 ) {
                     if (response.isSuccessful) {
-                        callback(Result.success(Unit))
+                        val cartId =
+                            response
+                                .headers()["Location"]
+                                ?.split("/")
+                                ?.last()
+
+                        callback(Result.success(cartId))
                     } else {
                         callback(Result.failure(NullPointerException()))
                     }

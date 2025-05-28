@@ -95,13 +95,13 @@ class MainViewModel(
         withState(_uiState.value) { state ->
             val updated = state.increaseCartQuantity(productId)
 
-            val updateUiState = { _uiState.value = state.modifyUiState(updated) }
-
             when (val cartId = updated.cartId) {
                 null -> {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
                         it.fold(
-                            onSuccess = { updateUiState() },
+                            onSuccess = { value ->
+                                _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
+                            },
                             onFailure = { handleError(TAG_INCREASE, it) },
                         )
                     }
@@ -110,7 +110,9 @@ class MainViewModel(
                 else -> {
                     cartRepository.updateQuantity(cartId, updated.cartQuantity) {
                         it.fold(
-                            onSuccess = { updateUiState() },
+                            onSuccess = {
+                                _uiState.value = state.modifyUiState(updated)
+                            },
                             onFailure = { handleError(TAG_INCREASE, it) },
                         )
                     }
