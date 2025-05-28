@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
+import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -29,8 +30,10 @@ class ProductViewModel(
     private var currentPage = FIRST_PAGE
 
     init {
-        fetchData()
-        fetchCartItemCount()
+        (cartRepository as CartRepositoryImpl).fetchAllCartItems {
+            fetchData()
+            fetchCartItemCount()
+        }
     }
 
     fun fetchData(currentPage: Int = FIRST_PAGE) {
@@ -44,14 +47,14 @@ class ProductViewModel(
                 }
         }
 
-        recentProductRepository.getRecentProducts { result ->
-            result
-                .onSuccess { products ->
-                    _recentProducts.postValue(ResultState.Success(products))
-                }.onFailure {
-                    _toastMessage.postValue(R.string.product_toast_load_failure)
-                }
-        }
+//        recentProductRepository.getRecentProducts { result ->
+//            result
+//                .onSuccess { products ->
+//                    _recentProducts.postValue(ResultState.Success(products))
+//                }.onFailure {
+//                    _toastMessage.postValue(R.string.product_toast_load_failure)
+//                }
+//        }
     }
 
     fun fetchCartItemCount() {

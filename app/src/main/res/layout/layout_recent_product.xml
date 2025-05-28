@@ -21,8 +21,7 @@
         android:id="@+id/layout_recent_product"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_cart_item"
-        android:onClick="@{() -> clickListener.onClickProductItem(id)}">
+        android:background="@drawable/bg_cart_item">
 
         <TextView
             android:id="@+id/tv_recent_product_text"
