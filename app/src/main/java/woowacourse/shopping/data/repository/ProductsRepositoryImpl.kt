@@ -22,6 +22,7 @@ class ProductsRepositoryImpl(
                     PagingData(
                         products = response.content.map { it.toDomain().toUiModel() },
                         hasNext = !response.last,
+                        hasPrevious = !response.first,
                     )
                 }
                 .let(onResult)

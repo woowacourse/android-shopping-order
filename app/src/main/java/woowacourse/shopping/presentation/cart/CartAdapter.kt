@@ -43,21 +43,27 @@ class CartAdapter(
     }
 
     fun setData(newCartProducts: List<ProductUiModel>) {
-        val hadPagination = shouldShowPagination()
-        val oldSize = cartProducts.size
-        cartProducts = newCartProducts
-        val hasPagination = shouldShowPagination()
-        val newSize = cartProducts.size
+        val startPosition = cartProducts.size
+        cartProducts = cartProducts + newCartProducts
 
-        val oldTotalCount = oldSize + if (hadPagination) 1 else 0
-        val newTotalCount = newSize + if (hasPagination) 1 else 0
-
-        if (oldTotalCount != newTotalCount) {
-            notifyDataSetChanged()
-        } else {
-            notifyItemRangeChanged(0, newTotalCount)
-        }
+        notifyItemRangeInserted(startPosition, newCartProducts.size)
     }
+
+//        val hadPagination = shouldShowPagination()
+//        val oldSize = cartProducts.size
+//        cartProducts = newCartProducts
+//        val hasPagination = shouldShowPagination()
+//        val newSize = cartProducts.size
+//
+//        val oldTotalCount = oldSize + if (hadPagination) 1 else 0
+//        val newTotalCount = newSize + if (hasPagination) 1 else 0
+//
+//        if (oldTotalCount != newTotalCount) {
+//            notifyDataSetChanged()
+//        } else {
+//            notifyItemRangeChanged(0, newTotalCount)
+//        }
+//    }
 
     private fun shouldShowPagination(): Boolean = cartHandler.isNextButtonEnabled() || cartHandler.isPrevButtonEnabled()
 

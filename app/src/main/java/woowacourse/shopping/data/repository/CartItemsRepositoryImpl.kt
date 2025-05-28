@@ -22,6 +22,7 @@ class CartItemsRepositoryImpl(
                     PagingData(
                         products = response.content.map { it.toUiModel() },
                         hasNext = !response.last,
+                        hasPrevious = !response.first,
                     )
                 }
                 .let(onResult)
