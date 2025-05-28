@@ -3,7 +3,6 @@ package woowacourse.shopping.feature.goods
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +26,7 @@ import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.goods.adapter.horizontal.HorizontalSectionAdapter
 import woowacourse.shopping.feature.goods.adapter.horizontal.RecentlyViewedGoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
+import woowacourse.shopping.feature.goods.adapter.vertical.GoodsSkeletonAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.CART_KEY
@@ -70,6 +70,9 @@ class GoodsActivity : AppCompatActivity() {
                 },
         )
     }
+    private val goodsSkeletonAdapter by lazy {
+        GoodsSkeletonAdapter()
+    }
     private val moreButtonAdapter by lazy {
         MoreButtonAdapter {
             viewModel.addPage()
@@ -79,6 +82,7 @@ class GoodsActivity : AppCompatActivity() {
     private val concatAdapter by lazy {
         ConcatAdapter(
             horizontalSelectionAdapter,
+            goodsSkeletonAdapter,
             goodsAdapter,
             moreButtonAdapter,
         )
@@ -124,6 +128,7 @@ class GoodsActivity : AppCompatActivity() {
                     val (adapter, _) = concatAdapter.getWrappedAdapterAndPosition(position)
                     return when (adapter) {
                         is GoodsAdapter -> 1
+                        is GoodsSkeletonAdapter -> 1
                         else -> 2
                     }
                 }
@@ -151,7 +156,7 @@ class GoodsActivity : AppCompatActivity() {
     private fun navigateGoodsDetails(goods: Goods) {
         val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
         intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
-        intent.putExtra(CART_KEY,viewModel.findCart(goods)?.toUiModel())
+        intent.putExtra(CART_KEY, viewModel.findCart(goods)?.toUiModel())
         startActivity(intent)
     }
 

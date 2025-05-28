@@ -36,6 +36,9 @@ class GoodsViewModel(
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
 
+    private val _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private var cashedCartItems: MutableMap<Int, CartItem> = mutableMapOf()
 
     init {
@@ -43,11 +46,9 @@ class GoodsViewModel(
         updateRecentlyViewedGoods()
     }
 
-    fun findCart(goods: Goods): CartItem? =
-        cashedCartItems.values.find { it.goods.id == goods.id }
+    fun findCart(goods: Goods): CartItem? = cashedCartItems.values.find { it.goods.id == goods.id }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
-        cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
@@ -71,9 +72,9 @@ class GoodsViewModel(
             onComplete = { goodsResponse ->
                 val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
                 goods.addAll(fetchedGoods)
-
                 _isFullLoaded.postValue(goodsResponse.last)
                 _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
+                _isLoading.postValue(false)
             },
             onFail = { throwable ->
                 throw (throwable)
@@ -134,7 +135,7 @@ class GoodsViewModel(
             } else {
                 updateCartItemQuantity(
                     cashedCartItem.id,
-                    cartItem.copy(quantity = cashedCartItem.quantity + 1)
+                    cartItem.copy(quantity = cashedCartItem.quantity + 1),
                 )
             }
         }
@@ -153,7 +154,7 @@ class GoodsViewModel(
                 } else {
                     updateCartItemQuantity(
                         cartItemWillRemove.id,
-                        cartItem.copy(quantity = cartItemWillRemove.quantity - 1)
+                        cartItem.copy(quantity = cartItemWillRemove.quantity - 1),
                     )
                 }
             }
