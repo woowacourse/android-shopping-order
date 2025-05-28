@@ -3,16 +3,15 @@ package woowacourse.shopping.view.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.view.cart.adapter.CartProductAdapter
 
 class ShoppingCartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityShoppingCartBinding.inflate(layoutInflater) }
@@ -24,16 +23,18 @@ class ShoppingCartActivity : AppCompatActivity() {
         )[ShoppingCartViewModel::class.java]
     }
 
-    private lateinit var adapter: CartProductAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        supportFragmentManager.fragmentFactory = CartProductSelectionFragmentFactory(viewModel)
         super.onCreate(savedInstanceState)
-        setUpView()
-        initRecyclerView()
-        initBindings()
-        initObservers()
 
+        setUpView()
         supportActionBar?.title = ACTION_BAR_TITLE
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                add(R.id.fragment, CartProductSelectionFragment::class.java, null)
+            }
+        }
     }
 
     private fun setUpView() {
@@ -43,34 +44,6 @@ class ShoppingCartActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
-        }
-    }
-
-    private fun initRecyclerView() {
-        adapter = CartProductAdapter(eventHandler = viewModel)
-        binding.rvProducts.adapter = adapter
-        binding.rvProducts.itemAnimator = null
-    }
-
-    private fun initBindings() {
-        binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
-        binding.handler = viewModel
-    }
-
-    private fun initObservers() {
-        viewModel.products.observe(this) { value ->
-            adapter.updateItems(value)
-        }
-
-        viewModel.onFinishLoading.observe(this) { value ->
-            when (value) {
-                true -> binding.sfLoading.visibility = View.GONE
-                false -> {
-                    binding.sfLoading.visibility = View.VISIBLE
-                    binding.sfLoading.startShimmer()
-                }
-            }
         }
     }
 

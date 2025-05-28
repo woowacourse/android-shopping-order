@@ -3,108 +3,76 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="viewmodel"
-            type="woowacourse.shopping.view.cart.ShoppingCartViewModel" />
-
-        <variable
-            name="handler"
-            type="woowacourse.shopping.view.cart.ShoppingCartEventHandler" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.cart.ShoppingCartActivity">
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/sf_loading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:shimmer_auto_start="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <include layout="@layout/item_cart_product_skeleton" />
-
-                <include layout="@layout/item_cart_product_skeleton" />
-
-            </LinearLayout>
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_products"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:padding="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/paging"
+            app:layout_constraintBottom_toTopOf="@id/tv_total_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/paging"
+        <TextView
+            android:id="@+id/tv_total_price"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/dark_gray"
+            android:gravity="end|center"
+            android:padding="12dp"
+            android:text="@string/product_price"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_order"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fragment"
+            tools:text="180,000원" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_order"
+            android:layout_width="122dp"
+            android:layout_height="78dp"
+            android:background="@color/primary_color"
+            android:text="@string/order"
+            android:textColor="@color/white"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/ll_select_all_products"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:visibility="@{viewmodel.isSinglePage ? View.GONE : View.VISIBLE}"
+            android:layout_marginStart="15dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_total_price">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_left"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/style_left_arrow"
-                android:enabled="@{viewmodel.hasPrevious}"
-                android:onClick="@{() -> handler.loadPreviousProducts()}"
-                android:text="@string/left_arrow"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toStartOf="@id/tv_page_number"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <CheckBox
+                android:id="@+id/cb_select_all_products"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/tv_page_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:text="@{viewmodel.page.toString()}"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btn_right"
-                app:layout_constraintStart_toEndOf="@id/btn_left"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="1" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_right"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/style_right_arrow"
-                android:enabled="@{viewmodel.hasNext}"
-                android:onClick="@{() -> handler.loadNextProducts()}"
-                android:text="@string/right_arrow"
+                android:layout_gravity="center"
+                android:text="@string/select_all"
                 android:textColor="@color/white"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/tv_page_number"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>
