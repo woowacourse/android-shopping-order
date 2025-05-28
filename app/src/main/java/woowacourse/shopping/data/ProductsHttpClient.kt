@@ -9,6 +9,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import woowacourse.shopping.data.product.dto.CartRequest
 import woowacourse.shopping.data.product.dto.ProductResponse
+import woowacourse.shopping.data.shoppingCart.dto.CartItemResponse
 import woowacourse.shopping.data.shoppingCart.dto.CartQuantityResponse
 import woowacourse.shopping.data.shoppingCart.dto.CartResponse
 import java.util.Base64
@@ -80,6 +81,20 @@ class ProductsHttpClient(
             "/cart-items/$id",
             true,
         )
+
+    fun patchCartItemQuantity(
+        id: Long,
+        quantity: Int,
+    ) {
+        val requestBody = CartItemResponse(quantity)
+        val jsonString: String = Json.encodeToString(requestBody)
+
+        http(
+            HttpMethod.Patch(jsonString.toRequestBody(MEDIA_TYPE_JSON.toMediaTypeOrNull())),
+            path = "$PATH_CART_ITEMS/$id",
+            needAuthorization = true,
+        )
+    }
 
     fun getProducts(
         page: Int,

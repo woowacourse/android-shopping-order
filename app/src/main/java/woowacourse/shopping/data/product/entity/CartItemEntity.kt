@@ -8,6 +8,7 @@ import woowacourse.shopping.domain.product.CartItem
 class CartItemEntity(
     @PrimaryKey
     val id: Long,
+    val productId: Long,
     val name: String,
     val price: Int,
     val quantity: Int,
@@ -15,6 +16,7 @@ class CartItemEntity(
     fun toDomain(): CartItem =
         CartItem(
             id,
+            productId,
             name,
             price,
             quantity,
@@ -44,6 +46,7 @@ class CartItemEntity(
         fun CartItem.toEntity(): CartItemEntity =
             CartItemEntity(
                 id,
+                productId,
                 name,
                 price,
                 quantity,

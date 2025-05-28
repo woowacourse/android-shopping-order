@@ -27,11 +27,23 @@ object LocalShoppingCartDataSource : ShoppingCartDataSource {
         size: Int,
     ): PageableCartItems = TODO()
 
-    override fun upsert(cartItem: CartItemEntity) = dao.upsert(cartItem)
+    override fun addCartItem(
+        productId: Long,
+        quantity: Int,
+    ) {
+        TODO()
+    }
 
     override fun remove(cartItem: CartItemEntity) = dao.remove(cartItem)
 
     override fun update(cartItems: List<CartItemEntity>) = dao.replaceAll(cartItems)
+
+    override fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
+    ) {
+        TODO("Not yet implemented")
+    }
 
     override fun quantity(): Int =
         dao.quantityOf(

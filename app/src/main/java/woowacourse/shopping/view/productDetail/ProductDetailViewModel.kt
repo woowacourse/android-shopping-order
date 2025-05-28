@@ -8,7 +8,6 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
@@ -61,9 +60,11 @@ class ProductDetailViewModel(
                 _event.setValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
                 return
             }
-        val cartItem = CartItem(product, quantity.value ?: 1)
 
-        shoppingCartRepository.upsert(cartItem) { result: Result<Unit> ->
+        shoppingCartRepository.addCartItem(
+            product.id,
+            quantity.value ?: 1,
+        ) { result: Result<Unit> ->
             result
                 .onSuccess {
                     _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)

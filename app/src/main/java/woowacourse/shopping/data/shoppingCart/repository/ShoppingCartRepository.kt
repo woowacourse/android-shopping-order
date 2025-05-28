@@ -10,8 +10,9 @@ interface ShoppingCartRepository {
         onLoad: (Result<PageableCartItems>) -> Unit,
     )
 
-    fun upsert(
-        cartItem: CartItem,
+    fun addCartItem(
+        productId: Long,
+        quantity: Int,
         onAdd: (Result<Unit>) -> Unit,
     )
 
@@ -20,8 +21,9 @@ interface ShoppingCartRepository {
         onRemove: (Result<Unit>) -> Unit,
     )
 
-    fun update(
-        cartItems: List<CartItem>,
+    fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
         onUpdate: (Result<Unit>) -> Unit,
     )
 

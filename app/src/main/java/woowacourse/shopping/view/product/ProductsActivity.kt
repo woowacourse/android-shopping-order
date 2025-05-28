@@ -125,14 +125,16 @@ class ProductsActivity : AppCompatActivity() {
     }
 
     private fun navigateToShoppingCart() {
-        viewModel.updateShoppingCart {
-            shoppingCartActivityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
-        }
+        shoppingCartActivityResultLauncher.launch(ShoppingCartActivity.newIntent(this))
     }
 
     private fun navigateToProductDetail(product: Product) {
-        viewModel.updateShoppingCart {
-            detailActivityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
-        }
+        detailActivityResultLauncher.launch(
+            ProductDetailActivity.newIntent(
+                this,
+                product.id,
+                viewModel.getCartItemId(product),
+            ),
+        )
     }
 }

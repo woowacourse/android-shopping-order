@@ -76,7 +76,7 @@ class ProductsViewModel(
                     val newProductItems: List<ProductItem> =
                         pageableProducts.products.map { product: Product ->
                             val quantity: Int =
-                                shoppingCart.find { it.id == product.id }?.quantity ?: 0
+                                shoppingCart.find { it.productId == product.id }?.quantity ?: 0
                             ProductItem(product, quantity)
                         }
                     val currentProductItems: List<ProductItem> =
@@ -134,6 +134,12 @@ class ProductsViewModel(
                     _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
                 }
             onUpdate()
+        }
+    }
+
+    fun getCartItemId(product: Product): Long {
+        shoppingCart.find {
+            it.productId == product.id
         }
     }
 

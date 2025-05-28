@@ -26,11 +26,12 @@ class DefaultShoppingCartRepository(
         }.runAsync(onLoad)
     }
 
-    override fun upsert(
-        cartItem: CartItem,
+    override fun addCartItem(
+        productId: Long,
+        quantity: Int,
         onAdd: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.upsert(cartItem.toEntity()) }.runAsync(onAdd)
+        { shoppingCartDataSource.addCartItem(productId, quantity) }.runAsync(onAdd)
     }
 
     override fun remove(
@@ -40,11 +41,12 @@ class DefaultShoppingCartRepository(
         { shoppingCartDataSource.remove(cartItem.toEntity()) }.runAsync(onRemove)
     }
 
-    override fun update(
-        cartItems: List<CartItem>,
+    override fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
         onUpdate: (Result<Unit>) -> Unit,
     ) {
-        { shoppingCartDataSource.update(cartItems.map { it.toEntity() }) }.runAsync(onUpdate)
+        { shoppingCartDataSource.updateCartItemQuantity(cartItemId, quantity) }.runAsync(onUpdate)
     }
 
     override fun quantity(onResult: (Result<Int>) -> Unit) {

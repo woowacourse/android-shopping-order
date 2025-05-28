@@ -24,8 +24,11 @@ class RemoteShoppingCartDataSource(
         )
     }
 
-    override fun upsert(cartItem: CartItemEntity) {
-        productsHttpClient.postShoppingCartItem(cartItem.id, cartItem.quantity)
+    override fun addCartItem(
+        productId: Long,
+        quantity: Int,
+    ) {
+        productsHttpClient.postShoppingCartItem(productId, quantity)
     }
 
     override fun remove(product: CartItemEntity) {
@@ -36,6 +39,13 @@ class RemoteShoppingCartDataSource(
         TODO("Not yet implemented")
     }
 
+    override fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
+    ) {
+        productsHttpClient.patchCartItemQuantity(cartItemId, quantity)
+    }
+
     override fun quantity(): Int {
         val cartQuantityResponse = productsHttpClient.getCartItemQuantity()
         return cartQuantityResponse.quantity ?: 0
@@ -43,11 +53,12 @@ class RemoteShoppingCartDataSource(
 }
 
 private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
-    if (id == null || product?.name == null || product.price == null || quantity == null) {
+    if (id == null || product?.id == null || product.name == null || product.price == null || quantity == null) {
         null
     } else {
         CartItemEntity(
             id = id,
+            productId = product.id,
             name = product.name,
             price = product.price,
             quantity = quantity,

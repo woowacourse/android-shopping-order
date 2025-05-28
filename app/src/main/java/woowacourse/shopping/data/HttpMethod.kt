@@ -22,4 +22,10 @@ sealed interface HttpMethod {
     ) : HttpMethod {
         override val name: String = "DELETE"
     }
+
+    class Patch(
+        override val body: RequestBody,
+    ) : HttpMethod {
+        override val name: String = "PATCH"
+    }
 }

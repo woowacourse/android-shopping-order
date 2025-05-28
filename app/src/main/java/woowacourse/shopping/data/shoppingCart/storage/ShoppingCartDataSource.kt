@@ -9,11 +9,19 @@ interface ShoppingCartDataSource {
         size: Int,
     ): PageableCartItems
 
-    fun upsert(cartItem: CartItemEntity)
+    fun addCartItem(
+        productId: Long,
+        quantity: Int,
+    )
 
     fun remove(product: CartItemEntity)
 
     fun update(products: List<CartItemEntity>)
+
+    fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
+    )
 
     fun quantity(): Int
 }
