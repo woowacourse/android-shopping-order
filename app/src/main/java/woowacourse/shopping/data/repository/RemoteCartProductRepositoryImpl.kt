@@ -14,27 +14,38 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class RemoteCartProductRepositoryImpl : CartProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(CartItemService::class.java)
 
-    override fun insertCartProduct(cartProduct: ProductUiModel,
-                                   callback: (ProductUiModel) -> Unit) {
-        retrofitService.postCartItems(
-            productId = cartProduct.id,
-            quantity = cartProduct.quantity
-        ).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    val locationHeader = response.headers()["location"]  // "/cart-items/8844"
-                    val id = locationHeader?.substringAfterLast("/")?.toIntOrNull()
-                    callback(cartProduct.copy(cartItemId = id))
-                    println("생성된 cartItem id: $id")
-                } else {
-                    println("실패한 응답: ${response.code()}")
-                }
-            }
+    override fun insertCartProduct(
+        cartProduct: ProductUiModel,
+        callback: (ProductUiModel) -> Unit,
+    ) {
+        retrofitService
+            .postCartItems(
+                productId = cartProduct.id,
+                quantity = cartProduct.quantity,
+            ).enqueue(
+                object : Callback<Void> {
+                    override fun onResponse(
+                        call: Call<Void>,
+                        response: Response<Void>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val locationHeader = response.headers()["location"]
+                            val id = locationHeader?.substringAfterLast("/")?.toIntOrNull()
+                            callback(cartProduct.copy(cartItemId = id))
+                            println("생성된 cartItem id: $id")
+                        } else {
+                            println("실패한 응답: ${response.code()}")
+                        }
+                    }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                println("에러 발생: $t")
-            }
-        })
+                    override fun onFailure(
+                        call: Call<Void>,
+                        t: Throwable,
+                    ) {
+                        println("에러 발생: $t")
+                    }
+                },
+            )
     }
 
     override fun deleteCartProduct(cartProduct: ProductUiModel) {
@@ -66,7 +77,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                                         imageUrl = it.product.imageUrl,
                                         name = it.product.name,
                                         price = it.product.price,
-                                        cartItemId = it.id.toInt()
+                                        cartItemId = it.id.toInt(),
                                     )
                                 }
                             callback(products)
@@ -92,7 +103,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
         retrofitService
             .patchCartItemQuantity(
                 cartItemId = cartProduct.cartItemId!!,
-                quantity = quantity,
+                quantity = Quantity(quantity),
             ).enqueue(
                 object : Callback<Quantity> {
                     override fun onResponse(
@@ -185,7 +196,6 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         response: Response<ProductResponse>,
                     ) {
                         if (response.isSuccessful) {
-
                             Log.d("test", "하잇 ${response.body()}")
                             val body: ProductResponse = response.body() ?: return
                             val totalElements = body.totalElements.toInt()
@@ -198,7 +208,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                         call: Call<ProductResponse>,
                         t: Throwable,
                     ) {
-                        Log.d("test", "실패 ${t}")
+                        Log.d("test", "실패 $t")
                         println("error : $t")
                     }
                 },
@@ -230,7 +240,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                                         name = it.product.name,
                                         price = it.product.price,
                                         quantity = it.quantity,
-                                        cartItemId = it.id.toInt()
+                                        cartItemId = it.id.toInt(),
                                     )
                                 }
                             callback(products)

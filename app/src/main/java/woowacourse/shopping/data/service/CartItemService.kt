@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.service
 
-
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -38,7 +38,7 @@ interface CartItemService {
     fun patchCartItemQuantity(
         @Header("accept") accept: String = "*/*",
         @Path("id") cartItemId: Int,
-        @Query("quantity") quantity: Int,
+        @Body quantity: Quantity,
     ): Call<Quantity>
 
     @PATCH("/cart-items/counts")

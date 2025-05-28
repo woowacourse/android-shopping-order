@@ -9,21 +9,12 @@ import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class DetailViewModel(
-    productId: Int,
+    product: ProductUiModel,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val catalogProductRepository: CatalogProductRepository,
 ) : ViewModel() {
-    private val _product =
-        MutableLiveData<ProductUiModel>(
-            ProductUiModel(
-                id = 1,
-                imageUrl = "https://www.google.com/#q=ea",
-                name = "Krista Ochoa",
-                price = 1712,
-                quantity = 2646,
-            ),
-        )
+    private val _product = MutableLiveData<ProductUiModel>(product)
     val product: LiveData<ProductUiModel> = _product
 
     private val _quantity = MutableLiveData<Int>(1)
@@ -34,16 +25,6 @@ class DetailViewModel(
 
     private val _latestViewedProduct = MutableLiveData<ProductUiModel>()
     val latestViewedProduct: LiveData<ProductUiModel> = _latestViewedProduct
-
-    init {
-        loadProduct(productId)
-    }
-
-    fun loadProduct(id: Int) {
-        catalogProductRepository.getProduct(id) {
-            _product.postValue(it)
-        }
-    }
 
     fun increaseQuantity() {
         _quantity.value = _quantity.value?.plus(1)
@@ -66,9 +47,14 @@ class DetailViewModel(
 
     fun addToCart() {
         val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
-        addedProduct?.let { cartProductRepository.insertCartProduct(addedProduct) {
 
-        } }
+        if (addedProduct?.cartItemId != null) {
+            cartProductRepository.updateProduct(addedProduct, addedProduct.quantity) {}
+        } else {
+            addedProduct?.let {
+                cartProductRepository.insertCartProduct(it) {}
+            }
+        }
     }
 
     fun addToRecentlyViewedProduct() {

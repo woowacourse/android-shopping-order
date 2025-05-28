@@ -120,7 +120,14 @@ class CatalogViewModel(
                     val mergedProducts =
                         pagedProducts.map { product ->
                             val cartProduct = cartProductMap[product.id]
-                            if (cartProduct != null) product.copy(quantity = cartProduct.quantity) else product
+                            if (cartProduct != null) {
+                                product.copy(
+                                    quantity = cartProduct.quantity,
+                                    cartItemId = cartProduct.cartItemId,
+                                )
+                            } else {
+                                product
+                            }
                         }
 
                     val items = mergedProducts.map { ProductItem(it) }

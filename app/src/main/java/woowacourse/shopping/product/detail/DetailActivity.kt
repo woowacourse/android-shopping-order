@@ -33,8 +33,9 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar()
         setAddToCartClickListener()
 
-        val productId = intent.getIntExtra(KEY_PRODUCT_DETAIL, 0)
-        setViewModel(productId)
+        val product: ProductUiModel? =
+            intent.intentParcelableExtra(KEY_PRODUCT_DETAIL, ProductUiModel::class.java)
+        product?.let { setViewModel(product) }
         observeProduct()
         binding.vm = viewModel
         binding.lifecycleOwner = this
@@ -48,18 +49,18 @@ class DetailActivity : AppCompatActivity() {
             }
         binding.layoutLatestViewedProduct.latestViewedProductClickListener =
             LatestViewedProductClickListener { product ->
-                val intent = DetailActivity.newIntent(this, product.id)
+                val intent = DetailActivity.newIntent(this, product)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
             }
         viewModel.setLatestViewedProduct()
     }
 
-    private fun setViewModel(productId: Int) {
+    private fun setViewModel(product: ProductUiModel) {
         viewModel =
             ViewModelProvider(
                 this,
-                DetailViewModelFactory(productId, application as ShoppingApplication),
+                DetailViewModelFactory(product, application as ShoppingApplication),
             )[DetailViewModel::class.java]
     }
 
@@ -81,7 +82,6 @@ class DetailActivity : AppCompatActivity() {
         viewModel.latestViewedProduct.observe(this) { product ->
             binding.layoutLatestViewedProduct.product = product
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -128,17 +128,17 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-//    private fun productFromIntent(): ProductUiModel? = intent.intentParcelableExtra(KEY_PRODUCT_DETAIL, ::class.java)
+    private fun productFromIntent(): ProductUiModel? = intent.intentParcelableExtra(KEY_PRODUCT_DETAIL, ProductUiModel::class.java)
 
     companion object {
         private const val KEY_PRODUCT_DETAIL = "productDetail"
 
         fun newIntent(
             context: Context,
-            productId: Int,
+            product: ProductUiModel,
         ): Intent =
             Intent(context, DetailActivity::class.java).apply {
-                putExtra(KEY_PRODUCT_DETAIL, productId)
+                putExtra(KEY_PRODUCT_DETAIL, product)
             }
     }
 }

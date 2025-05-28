@@ -1,6 +1,7 @@
 package woowacourse.shopping.product.catalog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -16,7 +17,6 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.cart.CartActivity
 import woowacourse.shopping.databinding.ActivityCatalogBinding
 import woowacourse.shopping.databinding.MenuCartLayoutBinding
-import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.detail.DetailActivity
 
 class CatalogActivity : AppCompatActivity() {
@@ -79,7 +79,7 @@ class CatalogActivity : AppCompatActivity() {
                 productActionListener =
                     object : ProductActionListener {
                         override fun onProductClick(product: ProductUiModel) {
-                            val intent = DetailActivity.newIntent(this@CatalogActivity, product.id)
+                            val intent = DetailActivity.newIntent(this@CatalogActivity, product)
                             startActivity(intent)
                         }
 
@@ -104,8 +104,7 @@ class CatalogActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int =
-                    spanSizeByPosition(position, adapter.itemCount)
+                override fun getSpanSize(position: Int): Int = spanSizeByPosition(position, adapter.itemCount)
             }
         binding.recyclerViewProducts.layoutManager = gridLayoutManager
     }
@@ -115,7 +114,7 @@ class CatalogActivity : AppCompatActivity() {
             RecentlyViewedProductAdapter(
                 products = emptyList(),
             ) {
-                val intent = DetailActivity.newIntent(this@CatalogActivity, it.id)
+                val intent = DetailActivity.newIntent(this@CatalogActivity, it)
                 startActivity(intent)
             }
         binding.recyclerViewRecentlyViewedProducts.adapter = adapter
@@ -123,6 +122,7 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun observeCatalogProducts() {
         viewModel.catalogItems.observe(this) { value ->
+            Log.d("CATALOG", "$value")
             (binding.recyclerViewProducts.adapter as ProductAdapter).setItems(value)
         }
         viewModel.updatedItem.observe(this) { product ->

@@ -7,16 +7,17 @@ import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
+import woowacourse.shopping.product.catalog.ProductUiModel
 
 class DetailViewModelFactory(
-    private val productId: Int,
+    private val product: ProductUiModel,
     private val application: ShoppingApplication,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return DetailViewModel(
-                productId = productId,
+                product = product,
                 cartProductRepository = RemoteCartProductRepositoryImpl(),
                 recentlyViewedProductRepository =
                     RecentlyViewedProductRepositoryImpl(
