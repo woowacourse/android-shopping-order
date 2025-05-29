@@ -10,6 +10,7 @@ data class CartState(
     val imgUrl: String,
     val price: Price,
     val quantity: Quantity,
+    val checked: Boolean,
 ) {
     val priceValue: Int
         get() = price.value
@@ -22,6 +23,10 @@ data class CartState(
 
     val productPrice: Int
         get() = priceValue * cartQuantityValue
+
+    fun modifyChecked(checked: Boolean): CartState {
+        return copy(checked = checked)
+    }
 
     fun increaseCartQuantity(): CartState {
         val increasedQuantity = quantity + 1
@@ -44,5 +49,6 @@ fun ShoppingCart.toCartState(): CartState {
         imgUrl = product.imgUrl,
         price = Price(product.priceValue),
         quantity = quantity,
+        checked = false,
     )
 }

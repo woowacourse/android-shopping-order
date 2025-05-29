@@ -96,6 +96,13 @@ class CartActivity : AppCompatActivity(), CartQuantityHandler, CartAdapter.Handl
         viewModel.deleteProduct(cardId)
     }
 
+    override fun onCheckedChanged(
+        cartId: Long,
+        isChecked: Boolean,
+    ) {
+        viewModel.updateCheckedState(cartId, isChecked)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {

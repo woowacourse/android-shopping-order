@@ -90,6 +90,15 @@ class CartViewModel(
         }
     }
 
+    fun updateCheckedState(
+        cartId: Long,
+        isChecked: Boolean,
+    ) {
+        withState(_uiState.value) { state ->
+            _uiState.value = state.modifyCheckedState(cartId, isChecked)
+        }
+    }
+
     private fun refresh() {
         cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
             result.fold(

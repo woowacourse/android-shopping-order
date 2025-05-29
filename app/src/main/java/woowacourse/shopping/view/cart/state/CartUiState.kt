@@ -6,6 +6,19 @@ data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
 ) {
+    fun modifyCheckedState(
+        cartId: Long,
+        check: Boolean,
+    ): CartUiState  {
+        val targetIndex = targetIndex(cartId)
+        val targetItem = items[targetIndex]
+
+        val mutableItems = items.toMutableList()
+        mutableItems[targetIndex] = targetItem.modifyChecked(check)
+
+        return copy(items = mutableItems)
+    }
+
     fun modifyUiState(newState: CartState): CartUiState {
         val targetIndex = targetIndex(newState.cartId)
         val mutableItems = items.toMutableList()
