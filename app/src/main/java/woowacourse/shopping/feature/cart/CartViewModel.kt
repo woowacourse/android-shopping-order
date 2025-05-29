@@ -73,7 +73,8 @@ class CartViewModel(
     fun increaseQuantity(cartItem: CartItem) {
         cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
             updateCartQuantity()
-            selectedCartMap[cartItem.id]?.quantity=(selectedCartMap[cartItem.id]?.quantity?:0)+1
+            selectedCartMap[cartItem.id]?.quantity =
+                (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
         }, {})
     }
 
@@ -83,7 +84,8 @@ class CartViewModel(
         } else {
             cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
                 updateCartQuantity()
-                selectedCartMap[cartItem.id]?.quantity=(selectedCartMap[cartItem.id]?.quantity?:0)-1
+                selectedCartMap[cartItem.id]?.quantity =
+                    (selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
             }, {})
         }
     }
@@ -139,13 +141,16 @@ class CartViewModel(
         cartItem: CartItem,
         isSelected: Boolean,
     ) {
-        if (isSelected) {
-            selectedCartMap[cartItem.id] = cartItem
-        } else {
-            selectedCartMap.remove(cartItem.id)
+        val foundItem = _visibleCart.value?.find { it.id == cartItem.id }
+        foundItem?.let {
+            if (isSelected) {
+                selectedCartMap[cartItem.id] = it
+            } else {
+                selectedCartMap.remove(cartItem.id)
+            }
+            updateAllSelected()
+            updateTotalPriceAndCount()
         }
-        updateAllSelected()
-        updateTotalPriceAndCount()
     }
 
     fun isItemSelected(cartItem: CartItem): Boolean = selectedCartMap.containsKey(cartItem.id)
