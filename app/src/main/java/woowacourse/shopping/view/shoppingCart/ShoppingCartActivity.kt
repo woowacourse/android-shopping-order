@@ -17,6 +17,7 @@ import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
 
 class ShoppingCartActivity :
     AppCompatActivity(),
@@ -107,6 +108,8 @@ class ShoppingCartActivity :
                 binding.shoppingCartSkeletonLayout.visibility = View.GONE
             }
         }
+
+        viewModel.shoppingCartProductsToOrder.observe(this) { }
     }
 
     override fun onMinusPage() {
@@ -147,6 +150,15 @@ class ShoppingCartActivity :
 
     override fun onAllSelectedButtonClick(isChecked: Boolean) {
         viewModel.selectAllShoppingCartProducts(isChecked)
+    }
+
+    override fun onOrderButtonClick() {
+        startActivity(
+            ShoppingCartRecommendActivity.newIntent(
+                this,
+                viewModel.shoppingCartProductsToOrder.value?.toTypedArray() ?: emptyArray(),
+            ),
+        )
     }
 
     companion object {

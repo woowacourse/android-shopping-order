@@ -131,6 +131,7 @@
             android:layout_height="0dp"
             android:background="@color/mint"
             android:gravity="center"
+            android:onClick="@{() -> shoppingCartListener.onOrderButtonClick()}"
             android:paddingHorizontal="16dp"
             android:text="@{@string/shopping_cart_order_button(viewModel.totalQuantity)}"
             android:textColor="@color/white"

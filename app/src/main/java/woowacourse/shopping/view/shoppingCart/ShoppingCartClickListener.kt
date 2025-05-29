@@ -4,4 +4,6 @@ interface ShoppingCartClickListener {
     fun onBackButtonClick()
 
     fun onAllSelectedButtonClick(isChecked: Boolean)
+
+    fun onOrderButtonClick()
 }

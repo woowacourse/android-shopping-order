@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,9 +78,9 @@
             android:id="@+id/shoppingCartRecommendProducts"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:clipToPadding="false"
             android:orientation="horizontal"
-            android:layout_marginTop="30dp"
             android:paddingStart="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
@@ -122,6 +125,7 @@
                 android:ellipsize="end"
                 android:gravity="end"
                 android:maxLines="1"
+                android:text="@{@string/product_price_format(viewModel.totalPrice)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -140,7 +144,7 @@
             android:background="@color/mint"
             android:gravity="center"
             android:paddingHorizontal="16dp"
-            android:text="@string/shopping_cart_order_button"
+            android:text="@{@string/shopping_cart_order_button(viewModel.totalQuantity)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
