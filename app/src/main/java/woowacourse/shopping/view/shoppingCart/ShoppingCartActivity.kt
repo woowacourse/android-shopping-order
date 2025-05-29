@@ -98,7 +98,8 @@ class ShoppingCartActivity :
                 when (event) {
                     ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE -> R.string.shopping_cart_update_shopping_cart_error_message
 
-                    ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE -> R.string.shopping_cart_remove_shopping_cart_product_error_message
+                    ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE ->
+                        R.string.shopping_cart_remove_shopping_cart_product_error_message
 
                     ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE -> R.string.products_minus_shopping_cart_product_error_message
 

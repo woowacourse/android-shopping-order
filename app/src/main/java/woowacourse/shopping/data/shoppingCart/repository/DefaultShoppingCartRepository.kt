@@ -165,6 +165,7 @@ class DefaultShoppingCartRepository(
     }
 
     companion object {
+        @Suppress("ktlint:standard:property-naming")
         private var INSTANCE: ShoppingCartRepository? = null
 
         fun initialize(shoppingCartService: ShoppingCartService) {

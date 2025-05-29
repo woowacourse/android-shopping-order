@@ -7,5 +7,6 @@ enum class ResultFrom {
     RECOMMEND_PRODUCT_BACK,
     ;
 
+    @Suppress("ktlint:standard:property-naming")
     val RESULT_OK: Int = ordinal + 1
 }
