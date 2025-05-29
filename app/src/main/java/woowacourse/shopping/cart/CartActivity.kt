@@ -21,7 +21,12 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-
+    private val viewModel: CartViewModel by lazy {
+        ViewModelProvider(
+            this,
+            CartViewModelFactory(application as ShoppingApplication),
+        )[CartViewModel::class.java]
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,6 +38,10 @@ class CartActivity : AppCompatActivity() {
                 replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
             }
         }
+
+        binding.vm = viewModel
+        binding.lifecycleOwner = this
+
         applyWindowInsets()
         setSupportActionBar()
     }

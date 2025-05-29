@@ -32,11 +32,35 @@ class CartViewModel(
 
     private val productSelections = mutableMapOf<Int, Boolean>()
 
+    private val _totalCount = MutableLiveData<Int>(0)
+    val totalCount: LiveData<Int> get() = _totalCount
+
+    private val _totalProducts = MutableLiveData<MutableSet<ProductUiModel>>()
+    val totalProducts: LiveData<MutableSet<ProductUiModel>> get() = _totalProducts
+
+   private val _totalAmount = MutableLiveData<Int>(0)
+   val totalAmount: LiveData<Int> get() = _totalAmount
+
     init {
+        loadAllCartProducts()
         loadCartProducts()
     }
 
+    fun postTotalAmount() {
+        val amount = totalProducts.value?.sumOf { it.price * it.quantity } ?: 0
+        _totalAmount.postValue(amount)
+    }
+
+    fun postTotalCount() {
+        val count = totalProducts.value?.size ?: 0
+        _totalCount.postValue(count)
+    }
+
     fun deleteCartProduct(cartProduct: ProductItem) {
+        val set = _totalProducts.value ?: mutableSetOf()
+        set.remove(cartProduct.productItem)
+        _totalProducts.postValue(set)
+        postTotalAmount()
         cartProductRepository.deleteCartProduct(cartProduct.productItem)
 
         cartProductRepository.getTotalElements { updatedSize ->
@@ -81,6 +105,11 @@ class CartViewModel(
                 cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
                     if (result == true) {
                         _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
+                        val set = _totalProducts.value ?: mutableSetOf()
+                        set.remove(product)
+                        set.add(product.copy(quantity =product.quantity - 1))
+                        _totalProducts.postValue(set)
+                        postTotalAmount()
                     }
                 }
             }
@@ -88,6 +117,11 @@ class CartViewModel(
             cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
+                    val set = _totalProducts.value ?: mutableSetOf()
+                    set.remove(product)
+                    set.add(product.copy(quantity =product.quantity + 1))
+                    _totalProducts.postValue(set)
+                    postTotalAmount()
                 }
             }
         }
@@ -116,6 +150,16 @@ class CartViewModel(
         _page.postValue(page.value?.minus(1))
     }
 
+    private fun loadAllCartProducts() {
+        cartProductRepository.getTotalElements { totalSize ->
+            cartProductRepository
+                .getCartProductsInRange(0, totalSize) { cartProducts ->
+                    _totalProducts.postValue(cartProducts.toMutableSet())
+                    postTotalAmount()
+                }
+        }
+    }
+
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
         _loadingState.postValue(LoadingState.loading())
 
@@ -142,6 +186,7 @@ class CartViewModel(
                     _cartProducts.postValue(pagedProducts)
                     checkNextButtonEnabled(totalSize)
                     checkPrevButtonEnabled()
+                    postTotalCount()
 
                     _loadingState.postValue(LoadingState.loaded())
                 }
