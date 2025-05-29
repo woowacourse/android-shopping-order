@@ -22,17 +22,22 @@ class RecommendViewModel(
     ItemClickListener,
     CartCounterClickListener {
     private lateinit var recentCategory: String
-
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val recommendProducts: LiveData<List<CartItemUiModel>> = _recommendProducts
+    private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedTotalPrice: LiveData<Int> = _selectedTotalPrice
+    private val _selectedTotalCount: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedTotalCount: LiveData<Int> = _selectedTotalCount
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
-    init {
-        fetchData()
-    }
+    fun fetchData(
+        price: Int,
+        count: Int,
+    ) {
+        _selectedTotalPrice.value = price
+        _selectedTotalCount.value = count
 
-    fun fetchData() {
         recentProductRepository.getMostRecentProduct { result ->
             result.onSuccess { recentProduct ->
                 recentCategory = recentProduct?.category ?: ""

@@ -81,13 +81,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="184,200원"
+            android:text="@{@string/product_price(vm.selectedTotalPrice)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/layout_cart_total_price"
             app:layout_constraintEnd_toEndOf="@id/layout_cart_total_price"
-            app:layout_constraintTop_toTopOf="@id/layout_cart_total_price" />
+            app:layout_constraintTop_toTopOf="@id/layout_cart_total_price"
+            tools:text="184,200원" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_vertical"
@@ -102,13 +103,14 @@
             android:layout_height="78dp"
             android:background="@color/baemin"
             android:gravity="center"
-            android:text="주문하기 (99999999)"
+            android:text="@{@string/cart_order_text(vm.selectedTotalCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/guideline_vertical" />
+            app:layout_constraintStart_toEndOf="@id/guideline_vertical"
+            tools:text="주문하기 (99999999)" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

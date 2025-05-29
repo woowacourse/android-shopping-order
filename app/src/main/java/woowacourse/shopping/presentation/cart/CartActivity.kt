@@ -47,6 +47,12 @@ class CartActivity :
         observeViewModel()
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        viewModel.loadItems()
+        viewModel.fetchSelectedInfo()
+    }
+
     private fun initInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.clCart) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -119,7 +125,12 @@ class CartActivity :
     }
 
     override fun onClickRecommend() {
-        val intent = RecommendActivity.newIntent(this)
+        val intent =
+            RecommendActivity.newIntent(
+                this,
+                viewModel.selectedTotalPrice.value ?: 0,
+                viewModel.selectedTotalCount.value ?: 0,
+            )
         startActivity(intent)
     }
 

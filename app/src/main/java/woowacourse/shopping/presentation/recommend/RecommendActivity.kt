@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
+import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.product.ItemClickListener
 
@@ -28,6 +29,10 @@ class RecommendActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_recommend)
         binding.lifecycleOwner = this
         binding.vm = viewModel
+
+        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
+        val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
+        viewModel.fetchData(price, count)
 
         initInsets()
         setupToolbar()
@@ -67,8 +72,15 @@ class RecommendActivity : AppCompatActivity() {
         }
     }
 
-
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, RecommendActivity::class.java)
+        fun newIntent(
+            context: Context,
+            selectedPrice: Int,
+            selectedCount: Int,
+        ): Intent =
+            Intent(context, RecommendActivity::class.java).apply {
+                putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
+                putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
+            }
     }
 }
