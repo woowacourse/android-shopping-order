@@ -28,19 +28,17 @@ class CartViewModel(
     val selectedCartItems: LiveData<Set<CartItemType.ProductItem>>
         get() = _selectedCartItems
 
-//    val totalPrice: LiveData<Int> =
-//        selectedCartItems.map { productItems: Set<CartItemType.ProductItem> ->
-//            productItems.sumOf { productItem: CartItemType.ProductItem ->
-//                productItem.price
-//            }
-//        }
+    private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val totalPrice: LiveData<Int> get() = _totalPrice
 
     init {
         loadCartItems()
     }
 
     fun select(cartItem: CartItemType.ProductItem) {
+        _selectedCartItems.value = selectedCartItems.value?.minus(cartItem) ?: emptySet()
         _selectedCartItems.value = selectedCartItems.value?.plus(cartItem) ?: setOf(cartItem)
+        _totalPrice.value = selectedCartItems.value?.sumOf { it.price }
     }
 
     fun unselect(cartItem: CartItemType.ProductItem) {
@@ -88,7 +86,7 @@ class CartViewModel(
         cartRepository.loadPageableCartItems(page - 1, COUNT_PER_PAGE) { result ->
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
-                    val cartItems: List<CartItemType> =
+                    val cartItems: List<CartItemType.ProductItem> =
                         pageableCartItems.cartItems.map { cartItem: CartItem ->
                             CartItemType.ProductItem(cartItem)
                         }
