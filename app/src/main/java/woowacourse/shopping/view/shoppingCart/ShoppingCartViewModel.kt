@@ -9,7 +9,6 @@ import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.PaginationItem
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
 
 class ShoppingCartViewModel(
@@ -39,8 +38,8 @@ class ShoppingCartViewModel(
     val isAllSelected: LiveData<Boolean> get() = _isAllSelected
 
     private var page: Int = MINIMUM_PAGE
-    private var hasPreviousPage: Boolean = false
-    private var hasNextPage: Boolean = false
+
+    private var loadable: Boolean = false
 
     init {
         _totalPrice.addSource(_shoppingCart) { it ->
@@ -82,14 +81,13 @@ class ShoppingCartViewModel(
                 .onSuccess { shoppingCartProducts: List<ShoppingCartProduct> ->
                     if (isEmptyPage(shoppingCartProducts)) return@load
 
-                    updatePaginationState(shoppingCartProducts)
+                    updateShoppingCartItems(
+                        shoppingCartProducts,
+                        shoppingCart.value ?: emptyList(),
+                    )
 
-                    val items =
-                        createShoppingCartItems(
-                            shoppingCartProducts,
-                            shoppingCart.value ?: emptyList(),
-                        )
-                    _shoppingCart.value = items
+                    loadable = shoppingCartProducts.size == COUNT_PER_PAGE + 1
+
                     _isLoading.value = false
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE)
@@ -106,38 +104,33 @@ class ShoppingCartViewModel(
             false
         }
 
-    private fun updatePaginationState(products: List<ShoppingCartProduct>) {
-        hasNextPage = products.size > COUNT_PER_PAGE
-        hasPreviousPage = page > MINIMUM_PAGE
-    }
-
-    private fun createShoppingCartItems(
+    private fun updateShoppingCartItems(
         products: List<ShoppingCartProduct>,
         currentShoppingCartItems: List<ShoppingCartItem>,
-    ): List<ShoppingCartItem> {
+    ) {
         val shoppingCartProductsToShow = products.take(COUNT_PER_PAGE)
 
-        val productItems =
-            shoppingCartProductsToShow.map { product ->
-                val existing =
-                    currentShoppingCartItems
-                        .filterIsInstance<ShoppingCartProductItem>()
-                        .find { it.shoppingCartProduct.id == product.id }
+        if (currentShoppingCartItems.isEmpty() || page != 1) {
+            _shoppingCart.value =
+                buildList {
+                    addAll(currentShoppingCartItems)
+                    addAll(products.map(::ShoppingCartProductItem))
+                }
+        } else {
+            val productItems =
+                shoppingCartProductsToShow.map { product ->
+                    val existing =
+                        currentShoppingCartItems
+                            .filterIsInstance<ShoppingCartProductItem>()
+                            .find { it.shoppingCartProduct.id == product.id }
 
-                ShoppingCartProductItem(
-                    shoppingCartProduct = product,
-                    isChecked = existing?.isChecked == true,
-                )
-            }
-
-        val paginationItem =
-            PaginationItem(
-                page = page,
-                nextEnabled = hasNextPage,
-                previousEnabled = hasPreviousPage,
-            )
-
-        return productItems + paginationItem
+                    ShoppingCartProductItem(
+                        shoppingCartProduct = product,
+                        isChecked = existing?.isChecked == true,
+                    )
+                }
+            _shoppingCart.value = productItems
+        }
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartProductItem) {

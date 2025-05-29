@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.common.QuantityObservable
@@ -42,10 +43,27 @@ class ShoppingCartActivity :
         setupObservers()
 
         viewModel.updateShoppingCart()
+
+        binding.shoppingCartProducts.apply {
+            adapter = shoppingCartProductAdapter
+            addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(
+                        recyclerView: RecyclerView,
+                        dx: Int,
+                        dy: Int,
+                    ) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        if (!recyclerView.canScrollVertically(1)) {
+                            onPlusPage()
+                        }
+                    }
+                },
+            )
+        }
     }
 
     private fun initDataBinding() {
-        binding.adapter = shoppingCartProductAdapter
         binding.viewModel = this.viewModel
         binding.lifecycleOwner = this@ShoppingCartActivity
         binding.shoppingCartListener = this@ShoppingCartActivity
