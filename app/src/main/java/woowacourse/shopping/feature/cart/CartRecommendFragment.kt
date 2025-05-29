@@ -7,15 +7,16 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartRecommendBinding
-import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
 import kotlin.getValue
 
 class CartRecommendFragment : Fragment() {
     private lateinit var binding: FragmentCartRecommendBinding
     private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
-    private lateinit var adapter: CartAdapter
+    private val adapter: RecommendAdapter = RecommendAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,8 +27,13 @@ class CartRecommendFragment : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_cart_recommend, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-//        setupAdapter()
-//        binding.rvGoods.adapter = adapter
+        binding.rvRecommend.adapter = adapter
+        binding.rvRecommend.layoutManager =
+            LinearLayoutManager(
+                binding.root.context,
+                LinearLayoutManager.HORIZONTAL,
+                false,
+            )
         return binding.root
     }
 }

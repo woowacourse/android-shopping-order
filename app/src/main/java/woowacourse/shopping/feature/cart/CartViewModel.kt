@@ -6,14 +6,18 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository,
+    private val historyRepository: HistoryRepository,
 ) : ViewModel() {
     private var currentPage: Int = 0
 
@@ -33,6 +37,8 @@ class CartViewModel(
     val checkedItemsPrice: LiveData<Int> get() = _checkedItemsPrice
     private val _isLoading = MutableLiveData<Boolean>(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
+    private val _recommendItems = MutableLiveData<List<Cart>>()
+    val recommendItems: LiveData<List<Cart>> get() = _recommendItems
 
     private val selectedItems = MutableLiveData<List<Cart>>(emptyList())
     private val totalItemsCount = MutableLiveData(0)
@@ -40,6 +46,7 @@ class CartViewModel(
     init {
         fetchTotalItemsCount()
         loadCarts()
+        loadProductsByCategory()
     }
 
     fun plusPage() {
@@ -187,6 +194,26 @@ class CartViewModel(
             )
             _isLoading.postValue(false)
         }, 1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
+    }
+
+    fun loadProductsByCategory() {
+        historyRepository.findLatest { latestProduct ->
+
+            productRepository.fetchAllProducts(
+                onSuccess = { response ->
+                    val matchedProduct = response.content.find { it.id.toInt() == latestProduct.product.id }
+                    val category = matchedProduct?.category
+
+                    val recommendProducts =
+                        response.content
+                            .filter { it.category == category && it.id.toInt() != latestProduct.product.id }
+                            .take(10)
+
+                    _recommendItems.value = recommendProducts.map { Cart(id = 0, product = it.toDomain(), quantity = 0) }
+                },
+                onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
+            )
+        }
     }
 
     companion object {

@@ -37,6 +37,8 @@ class ShoppingApplication : Application() {
         ViewModelFactory {
             CartViewModel(
                 CartRepository(),
+                ProductRepository(),
+                HistoryRepositoryImpl(database.historyDao()),
             )
         }
     }

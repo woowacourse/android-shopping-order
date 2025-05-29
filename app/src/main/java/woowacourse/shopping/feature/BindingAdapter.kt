@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature
 
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -9,17 +8,14 @@ import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
-
-//@BindingAdapter("imgUrl")
-//fun ImageView.loadImageFromUrl(url: String) {
-//    Glide.with(this.context).load(url).into(this)
-//}
 
 @BindingAdapter("imgUrl")
 fun ImageView.loadImageFromUrl(url: String?) {
     if (url != null && url.isNotEmpty()) {
-        Glide.with(this.context)
+        Glide
+            .with(this.context)
             .load(url)
             .into(this)
     } else {
@@ -27,11 +23,13 @@ fun ImageView.loadImageFromUrl(url: String?) {
     }
 }
 
-
 @BindingAdapter("cartItems")
 fun RecyclerView.bindCartItems(items: List<Cart>?) {
     if (adapter is CartAdapter && items != null) {
         (adapter as CartAdapter).setItems(items)
+    }
+    if (adapter is RecommendAdapter && items != null) {
+        (adapter as RecommendAdapter).setItems(items)
     }
 }
 
