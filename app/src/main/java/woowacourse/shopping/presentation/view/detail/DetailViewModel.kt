@@ -53,7 +53,7 @@ class DetailViewModel(
             result
                 .onSuccess {
                     _product.postValue(it.toUiModel())
-                    updateRecentProduct(productId)
+                    updateRecentProduct(productId, it.category)
                 }.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
@@ -87,8 +87,11 @@ class DetailViewModel(
         }
     }
 
-    private fun updateRecentProduct(productId: Long) {
-        recentProductRepository.insertAndTrimToLimit(productId) { result ->
+    private fun updateRecentProduct(
+        productId: Long,
+        category: String,
+    ) {
+        recentProductRepository.insertAndTrimToLimit(productId, category) { result ->
             result.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }

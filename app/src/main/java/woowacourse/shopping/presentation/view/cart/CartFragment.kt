@@ -31,11 +31,11 @@ class CartFragment :
     }
 
     override fun increaseQuantity(productId: Long) {
-        viewModel.increaseProductQuantity(productId)
+        viewModel.increaseProductQuantity(productId, RefreshTarget.CART)
     }
 
     override fun decreaseQuantity(productId: Long) {
-        viewModel.decreaseProductQuantity(productId)
+        viewModel.decreaseProductQuantity(productId, RefreshTarget.CART)
     }
 
     override fun onCheckOrder(cartId: Long) {
@@ -79,5 +79,8 @@ class CartFragment :
 
             CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE ->
                 R.string.cart_screen_event_message_find_quantity_failure
+
+            CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE ->
+                R.string.cart_screen_event_message_fetch_suggestion_product_failure
         }
 }

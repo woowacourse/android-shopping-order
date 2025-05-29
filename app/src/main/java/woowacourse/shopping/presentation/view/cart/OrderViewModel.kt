@@ -10,10 +10,14 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartProductUiModel
 import woowacourse.shopping.presentation.model.FetchPageDirection
+import woowacourse.shopping.presentation.model.SuggestionProductUiModel
 import woowacourse.shopping.presentation.model.toCartItemUiModel
+import woowacourse.shopping.presentation.model.toSuggestionUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.cart.event.CartMessageEvent
@@ -21,12 +25,16 @@ import kotlin.math.max
 
 class OrderViewModel(
     private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _toastEvent = MutableSingleLiveData<CartMessageEvent>()
     val toastEvent: SingleLiveData<CartMessageEvent> = _toastEvent
 
     private val _cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     val cartItems: LiveData<List<CartProductUiModel>> = _cartItems
+
+    private val _suggestionProducts = MutableLiveData<List<SuggestionProductUiModel>>(emptyList())
+    val suggestionProducts: LiveData<List<SuggestionProductUiModel>> = _suggestionProducts
 
     private val selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
 
@@ -76,18 +84,24 @@ class OrderViewModel(
         }
     }
 
-    fun increaseProductQuantity(productId: Long) {
+    fun increaseProductQuantity(
+        productId: Long,
+        refreshTarget: RefreshTarget,
+    ) {
         cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
             result
-                .onSuccess { refreshProductQuantity() }
+                .onSuccess { refreshProductQuantity(refreshTarget) }
                 .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
-    fun decreaseProductQuantity(productId: Long) {
+    fun decreaseProductQuantity(
+        productId: Long,
+        refreshTarget: RefreshTarget,
+    ) {
         cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
             result
-                .onSuccess { refreshProductQuantity() }
+                .onSuccess { refreshProductQuantity(refreshTarget) }
                 .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
@@ -102,6 +116,43 @@ class OrderViewModel(
         selectedCartItems.value = selectedItems + foundCartProduct
     }
 
+    fun fetchSuggestionProducts() {
+        val excludedProductIds =
+            _cartItems.value
+                .orEmpty()
+                .filter { it.quantity != 0 }
+                .map { it.productId }
+
+        productRepository.fetchSuggestionProducts(SUGGESTION_LIMIT, excludedProductIds) { result ->
+            result
+                .onSuccess { combine(it) }
+                .onFailure { postFailureEvent(CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
+        }
+    }
+
+    private fun combine(suggestionProducts: List<Product>) {
+        val ids = suggestionProducts.map { it.id }
+        cartRepository
+            .findCartProductsByProductIds(ids)
+            .onFailure { CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE }
+            .onSuccess {
+                val updatedItems = applyCartQuantities(it, suggestionProducts)
+                _suggestionProducts.postValue(updatedItems)
+            }
+    }
+
+    private fun applyCartQuantities(
+        cartProducts: List<CartProduct>,
+        suggestionProducts: List<Product>,
+    ): List<SuggestionProductUiModel> {
+        val cartItemMap = cartProducts.associateBy { it.product.id }
+        return suggestionProducts.map { product ->
+            val found = cartItemMap[product.id]
+            if (found != null) return@map product.toSuggestionUiModel(found.quantity)
+            product.toSuggestionUiModel(DEFAULT_QUANTITY)
+        }
+    }
+
     private fun calculatePage(direction: FetchPageDirection): Int {
         val currentPage = _page.value ?: DEFAULT_PAGE
         return when (direction) {
@@ -111,7 +162,14 @@ class OrderViewModel(
         }
     }
 
-    private fun refreshProductQuantity() {
+    private fun refreshProductQuantity(refreshTarget: RefreshTarget) {
+        when (refreshTarget) {
+            RefreshTarget.CART -> refreshFetchItem()
+            RefreshTarget.SUGGESTION -> fetchSuggestionProducts()
+        }
+    }
+
+    private fun refreshFetchItem() {
         val newPage = calculatePage(FetchPageDirection.CURRENT)
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
@@ -180,13 +238,19 @@ class OrderViewModel(
         private const val DEFAULT_PAGE = 0
         private const val PAGE_STEP = 1
         private const val QUANTITY_STEP = 1
+        private const val DEFAULT_QUANTITY = 0
+        private const val SUGGESTION_LIMIT = 10
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
-                ): T = OrderViewModel(RepositoryProvider.cartRepository) as T
+                ): T {
+                    val cartRepository = RepositoryProvider.cartRepository
+                    val productRepository = RepositoryProvider.productRepository
+                    return OrderViewModel(cartRepository, productRepository) as T
+                }
             }
     }
 }

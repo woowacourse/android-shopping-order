@@ -23,7 +23,8 @@ class ShoppingApplication : Application() {
 
     private fun initProductRepository() {
         val productDataSource = DataSourceProvider.productRemoteDataSource
-        val repository = ProductRepositoryImpl(productDataSource)
+        val recentProductLocalDataSource = DataSourceProvider.recentProductLocalDataSource
+        val repository = ProductRepositoryImpl(productDataSource, recentProductLocalDataSource)
         RepositoryProvider.initProductRepository(repository)
     }
 

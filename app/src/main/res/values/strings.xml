@@ -20,6 +20,7 @@
     <string name="cart_screen_event_message_delete_cart_item_failure">해당 상품을 제거하는데 실패했습니다</string>
     <string name="cart_screen_event_message_patch_cart_product_quantity_failure">장바구니 수량 변경 실패</string>
     <string name="cart_screen_event_message_find_quantity_failure">장바구니 담은 수량 조회 실패</string>
+    <string name="cart_screen_event_message_fetch_suggestion_product_failure">추천 상품 조회 실패</string>
 
     <!-- Catalog Screen -->
     <string name="toolbar_catalog_title">Shopping</string>
@@ -36,6 +37,7 @@
     <string name="plus">+</string>
     <string name="order_count_text_format">주문하기(%d)</string>
     <string name="order_checkbox_title">전체</string>
+
     <string name="suggestion_screen_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="suggestion_screen_title">이런 상품은 어떠세요?</string>
 </resources>

@@ -9,7 +9,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.presentation.model.CatalogItem.ProductItem" />
+            type="woowacourse.shopping.presentation.model.SuggestionProductUiModel" />
 
         <variable
             name="adapterPosition"
@@ -17,14 +17,13 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter.CatalogEventListener" />
+            type="woowacourse.shopping.presentation.view.cart.adapter.SuggestionAdapter.SuggestionEventListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
-        android:onClick="@{() -> eventListener.onProductClick(product.productId)}">
+        android:layout_marginHorizontal="16dp">
 
         <ImageView
             android:id="@+id/image_view_product"
