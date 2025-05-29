@@ -120,22 +120,17 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         hasRecentWatching: Boolean,
     ) {
-        if (hasRecentWatching) {
-            handleRecentProductsSuccess(
-                emptyList(),
-                productsWithoutLoadItem,
-                updatedProductItems,
-            )
-            return
-        }
-
         productsRepository.getRecentWatchingProducts(10) { result ->
             result
                 .onSuccess { recentWatchingProducts ->
+                    var updatedProducts = emptyList<ProductsItem>()
+                    if (hasRecentWatching) {
+                        updatedProducts = productsWithoutLoadItem.drop(1)
+                    }
                     handleRecentProductsSuccess(
-                        recentWatchingProducts,
-                        productsWithoutLoadItem,
-                        updatedProductItems,
+                        recentWatchingProducts = recentWatchingProducts,
+                        productsWithoutLoadItem = updatedProducts,
+                        updatedProductItems = updatedProductItems,
                     )
                 }.onFailure {
                     handleRecentProductsSuccess(
