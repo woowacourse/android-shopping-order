@@ -70,7 +70,6 @@ class CartViewModel(
                 },
                 onFailure = {},
             )
-            Thread.sleep(3000)
             setLoading(false)
         }
     }

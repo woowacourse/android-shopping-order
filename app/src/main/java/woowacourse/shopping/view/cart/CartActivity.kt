@@ -85,11 +85,10 @@ class CartActivity : AppCompatActivity(), CartQuantityHandler, CartAdapter.Handl
         }
 
         viewModel.isLoading.observe(this) {
-            if (!it)
-                {
-                    binding.recyclerViewCart.visibility = View.VISIBLE
-                    binding.shimmerLayout.visibility = View.GONE
-                }
+            if (!it) {
+                binding.recyclerViewCart.visibility = View.VISIBLE
+                binding.shimmerLayout.visibility = View.GONE
+            }
         }
     }
 

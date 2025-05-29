@@ -2,7 +2,6 @@ package woowacourse.shopping.view.loader
 
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.main.state.HistoryState
 
 class HistoryLoader(
@@ -30,8 +29,8 @@ class HistoryLoader(
                                 HistoryState(
                                     product.id,
                                     product.name,
-                                    product.imgUrl
-                                )
+                                    product.imgUrl,
+                                ),
                             )
                             remaining--
                             if (remaining == 0) {
@@ -41,7 +40,7 @@ class HistoryLoader(
                         onFailure = { throwable ->
                             isErrorOccurred = true
                             onResult(Result.failure(throwable))
-                        }
+                        },
                     )
                 }
             }
