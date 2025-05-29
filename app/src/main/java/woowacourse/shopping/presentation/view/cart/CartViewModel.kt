@@ -33,7 +33,8 @@ class CartViewModel(
     val totalPrice: LiveData<Int> =
         selectedCartItems.map { it.sumOf { cartProduct -> cartProduct.totalPrice } }
 
-    val totalCount: LiveData<Int> = selectedCartItems.map { it.count() }
+    val totalCount: LiveData<Int> =
+        selectedCartItems.map { selectedCartItems -> selectedCartItems.sumOf { it.quantity } }
 
     val isCheckAll: LiveData<Boolean> =
         MediatorLiveData<Boolean>().apply {
