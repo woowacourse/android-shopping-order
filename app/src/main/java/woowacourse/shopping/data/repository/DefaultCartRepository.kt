@@ -31,8 +31,8 @@ class DefaultCartRepository(
     }
 
     fun loadSinglePage(
-        page: Int,
-        pageSize: Int,
+        page: Int?,
+        pageSize: Int?,
         callback: (Result<CartsSinglePage>) -> Unit,
     ) {
         dataSource.singlePage(page, pageSize) { result ->
