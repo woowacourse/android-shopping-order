@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.shimmer)
     implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)

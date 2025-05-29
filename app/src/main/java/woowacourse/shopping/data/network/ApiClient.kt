@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
 
@@ -20,9 +21,16 @@ object ApiClient {
                 Json.asConverterFactory("application/json".toMediaType()),
             ).build()
 
-    private fun provideOkHttpClient(interceptor: AppInterceptor): OkHttpClient =
-        OkHttpClient.Builder().run {
+    private fun provideOkHttpClient(interceptor: AppInterceptor): OkHttpClient {
+        val loggingInterceptor =
+            HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }
+
+        return OkHttpClient.Builder().run {
+            addInterceptor(loggingInterceptor)
             addInterceptor(interceptor)
             build()
         }
+    }
 }
