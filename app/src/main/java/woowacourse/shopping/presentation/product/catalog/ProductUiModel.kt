@@ -11,4 +11,5 @@ data class ProductUiModel(
     val price: Int,
     val quantity: Int = 0,
     val isExpanded: Boolean = false,
+    val isChecked: Boolean = false,
 ) : Parcelable

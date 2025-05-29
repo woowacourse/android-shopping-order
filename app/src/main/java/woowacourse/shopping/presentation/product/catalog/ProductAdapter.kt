@@ -42,16 +42,29 @@ class ProductAdapter(
             PRODUCT
         }
 
+    //    fun setData(newProducts: List<ProductUiModel>) {
+//        if (newProducts.size == products.size) {
+//            products = newProducts
+//            notifyItemRangeChanged(0, newProducts.size)
+//        } else {
+//            val startPosition = products.size
+//            products = products + newProducts
+//            notifyItemRangeInserted(startPosition, newProducts.size)
+//        }
+//    }
     fun setData(newProducts: List<ProductUiModel>) {
-        if (newProducts.size == products.size) {
-            products = newProducts
-            notifyItemRangeChanged(0, newProducts.size)
-        } else {
-            val startPosition = products.size
-            products = products + newProducts
-            notifyItemRangeInserted(startPosition, newProducts.size)
+        val oldList = products
+        val updatedList = oldList + newProducts
+        val oldSize = oldList.size
+
+        products = updatedList
+
+        newProducts.forEachIndexed { index, newItem ->
+            val globalIndex = oldSize + index
+            notifyItemInserted(globalIndex)
         }
     }
+
 
     override fun getItemCount(): Int = products.size + if (showLoadMoreButton) 1 else 0
 
@@ -78,7 +91,8 @@ class ProductAdapter(
         }
     }
 
-    fun isLoadMoreButtonPosition(position: Int): Boolean = showLoadMoreButton && position == products.size
+    fun isLoadMoreButtonPosition(position: Int): Boolean =
+        showLoadMoreButton && position == products.size
 
     companion object {
         private const val PRODUCT = 1
