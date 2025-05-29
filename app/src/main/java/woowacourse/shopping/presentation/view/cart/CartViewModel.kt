@@ -8,17 +8,23 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toCartItemUiModel
+import woowacourse.shopping.presentation.model.toUiModel
 import kotlin.math.max
 
 class CartViewModel(
+    private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _cartItems = MutableLiveData<List<CartItemUiModel>>()
     val cartItems: LiveData<List<CartItemUiModel>> = _cartItems
+
+    private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>()
+    val recommendedProducts: LiveData<List<ProductUiModel>> = _recommendedProducts
 
     private val _deleteState = MutableLiveData<Long>()
     val deleteState: LiveData<Long> = _deleteState
@@ -148,6 +154,21 @@ class CartViewModel(
         }
     }
 
+    fun fetchRecommendedProducts() {
+        productRepository.getMostRecentProduct {
+            val recommendedCategory = it?.category
+            productRepository.loadProductsByCategory(recommendedCategory.orEmpty()) {
+                cartRepository.getAllCartItems { allCartItems ->
+                    val products =
+                        it
+                            .filter { !allCartItems.orEmpty().map { it.product.id }.contains(it.id) }
+                            .take(10)
+                    _recommendedProducts.postValue(products.map { it.toUiModel() })
+                }
+            }
+        }
+    }
+
     private fun calculatePage(
         isNextPage: Boolean,
         currentPage: Int,
@@ -203,8 +224,9 @@ class CartViewModel(
                     modelClass: Class<T>,
                     extras: CreationExtras,
                 ): T {
-                    val repository = RepositoryProvider.cartRepository
-                    return CartViewModel(repository) as T
+                    val productRepository = RepositoryProvider.productRepository
+                    val cartRepository = RepositoryProvider.cartRepository
+                    return CartViewModel(productRepository, cartRepository) as T
                 }
             }
     }

@@ -77,6 +77,7 @@ class CartFragment :
             replace(R.id.cart_fragment_container, CartRecommendationFragment())
         }
         binding.checkboxWrapper.isVisible = false
+        viewModel.fetchRecommendedProducts()
     }
 
     override fun onDestroyView() {

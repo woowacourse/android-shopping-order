@@ -33,6 +33,9 @@ class CartItemFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
         setCartAdapter()
         initObserver()
     }
@@ -45,9 +48,6 @@ class CartItemFragment :
     }
 
     private fun initObserver() {
-        binding.vm = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-
         viewModel.cartItems.observe(viewLifecycleOwner) {
             cartItemAdapter.updateCartItems(it)
         }
@@ -74,10 +74,6 @@ class CartItemFragment :
     ) {
         viewModel.setCartItemSelection(cartItem, isChecked)
     }
-
-//    override fun onBatchSelect(isChecked: Boolean) {
-//        viewModel.setAllSelections(isChecked)
-//    }
 
     override fun increase(product: ProductUiModel) {
         viewModel.increaseAmount(product)
