@@ -127,8 +127,18 @@ class ShoppingCartRecommendViewModel(
                             quantity = uploaded.quantity,
                         )
 
-                    _shoppingCartProductsToOrder.value =
-                        _shoppingCartProductsToOrder.value?.plus(productToOrder)
+                    val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
+
+                    val existingIndex =
+                        currentList.indexOfFirst { it.product.id == productToOrder.product.id }
+
+                    if (existingIndex >= 0) {
+                        currentList[existingIndex] = productToOrder
+                    } else {
+                        currentList.add(productToOrder)
+                    }
+
+                    _shoppingCartProductsToOrder.value = currentList
 
                     _recommendProducts.value
                         ?.indexOfFirst {
