@@ -16,7 +16,6 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.CartItemUiModel
-import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
 class CartActivity :
@@ -75,20 +74,11 @@ class CartActivity :
     }
 
     private fun observeViewModel() {
-        viewModel.cartItems.observe(this) { result ->
-            when (result) {
-                is ResultState.Success -> {
-                    binding.root.postDelayed({
-                        showSampleData(false)
-                    }, 1_000L)
-
-                    cartAdapter.submitList(result.data)
-                }
-
-                is ResultState.Failure -> {
-                    showToast(R.string.cart_toast_load_fail)
-                }
-            }
+        viewModel.cartItems.observe(this) { cartItems ->
+            binding.root.postDelayed({
+                showSampleData(false)
+            }, 1_000L)
+            cartAdapter.submitList(cartItems)
         }
 
         viewModel.toastMessage.observe(this) { resId ->
