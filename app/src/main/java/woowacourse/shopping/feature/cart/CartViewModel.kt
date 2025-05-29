@@ -12,7 +12,6 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import kotlin.math.max
-
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
@@ -27,8 +26,8 @@ class CartViewModel(
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
 
-    private val _cart = MutableLiveData<List<CartItem>>()
-    val cart: LiveData<List<CartItem>> get() = _cart
+    private val _visibleCart = MutableLiveData<List<CartItem>>()
+    val cart: LiveData<List<CartItem>> get() = _visibleCart
 
     private var totalCartSizeData: Int = 0
 
@@ -42,17 +41,16 @@ class CartViewModel(
 
     private val endPage: Int get() = max(1, (totalCartSizeData + PAGE_SIZE - 1) / PAGE_SIZE)
 
-    private val _loginErrorEvent: MutableSingleLiveData<CartFetchError> = MutableSingleLiveData()
+    private val _loginErrorEvent = MutableSingleLiveData<CartFetchError>()
     val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
 
-    private val _removeItemEvent: MutableSingleLiveData<CartItem> = MutableSingleLiveData()
+    private val _removeItemEvent = MutableSingleLiveData<CartItem>()
     val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
 
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _selectedItems = MutableLiveData<Set<Int>>(emptySet())
-    val selectedItems: LiveData<Set<Int>> get() = _selectedItems
+    private val selectedCartMap = mutableMapOf<Int, CartItem>()
 
     private val _isAllSelected = MutableLiveData(false)
     val isAllSelected: LiveData<Boolean> get() = _isAllSelected
@@ -69,20 +67,16 @@ class CartViewModel(
 
     private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
-    fun getPosition(cartItem: CartItem): Int? {
-        val idx = cart.value?.indexOf(cartItem) ?: return null
-        return if (idx >= 0) idx else null
-    }
+    fun getPosition(cartItem: CartItem): Int? = _visibleCart.value?.indexOf(cartItem)?.takeIf { it >= 0 }
 
     fun increaseQuantity(cartItem: CartItem) {
         cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
             updateCartQuantity()
-        }) {
-        }
+        }, {})
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
-        if (cartItem.quantity - 1 <= 0) {
+        if (cartItem.quantity <= 1) {
             _removeItemEvent.setValue(cartItem)
         } else {
             cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
@@ -91,40 +85,33 @@ class CartViewModel(
         }
     }
 
+    fun delete(cartItem: CartItem) {
+        selectedCartMap.remove(cartItem.id)
+        cartRepository.delete(cartItem.id) {
+            updateCartQuantity()
+        }
+    }
+
     fun updateCartQuantity() {
+        _isLoading.value = true
         cartRepository.fetchCartItemsByPage(
             currentPage - 1,
             PAGE_SIZE,
             { cartResponse ->
-                updateCartDataSize(response = cartResponse)
-                _cart.value = getCartItemByCartResponse(cartResponse)
+                updateCartDataSize(cartResponse)
+                val pageItems = getCartItemByCartResponse(cartResponse)
+                _visibleCart.value = pageItems
                 updatePageMoveAvailability(cartResponse)
-                if (cartResponse.totalPages in MINIMUM_PAGE..<currentPage) {
-                    currentPage = cartResponse.totalPages
-                    updateCartQuantity()
-                }
                 _isLoading.value = false
                 updateTotalPriceAndCount()
             },
-            { cartFetchError ->
-                _loginErrorEvent.setValue(cartFetchError)
-            },
+            { _loginErrorEvent.setValue(it) }
         )
     }
 
     private fun updateCartDataSize(response: CartResponse) {
         totalCartSizeData = response.totalElements
         _isMultiplePages.postValue(totalCartSizeData > PAGE_SIZE)
-    }
-
-    fun delete(cartItem: CartItem) {
-        val currentSelected = _selectedItems.value?.toMutableSet() ?: mutableSetOf()
-        currentSelected.remove(cartItem.id)
-        _selectedItems.value = currentSelected
-
-        cartRepository.delete(cartItem.id) {
-            updateCartQuantity()
-        }
     }
 
     fun plusPage() {
@@ -137,54 +124,52 @@ class CartViewModel(
         updateCartQuantity()
     }
 
-    private fun updatePageMoveAvailability(cartResponse: CartResponse) {
-        _isLeftPageEnable.postValue(!cartResponse.first)
-        _isRightPageEnable.postValue(!cartResponse.last)
+    private fun updatePageMoveAvailability(response: CartResponse) {
+        _isLeftPageEnable.value = !response.first
+        _isRightPageEnable.value = !response.last
+    }
+
+    fun setItemSelection(cartItem: CartItem, isSelected: Boolean) {
+        if (isSelected) {
+            selectedCartMap[cartItem.id] = cartItem
+        } else {
+            selectedCartMap.remove(cartItem.id)
+        }
+        updateAllSelected()
+        updateTotalPriceAndCount()
+    }
+
+
+
+    fun isItemSelected(cartItem: CartItem): Boolean = selectedCartMap.containsKey(cartItem.id)
+
+    fun selectAllItemsFromServer() {
+        cartRepository.fetchAllCartItems({ allItems ->
+            selectedCartMap.clear()
+            allItems.toCartItems().forEach { selectedCartMap[it.id] = it }
+            _isAllSelected.value = true
+            updateTotalPriceAndCount()
+        }, {})
     }
 
     fun selectAllItems(isSelected: Boolean) {
-        val currentCart = _cart.value ?: emptyList()
-        if (isSelected) {
-            _selectedItems.value = currentCart.map { it.id }.toSet()
+        if (!isSelected) {
+            selectedCartMap.clear()
+            _isAllSelected.value = false
+            updateTotalPriceAndCount()
         } else {
-            _selectedItems.value = emptySet()
+            selectAllItemsFromServer()
         }
-        _isAllSelected.value = isSelected
-        updateTotalPriceAndCount()
     }
 
-    fun toggleItemSelection(cartItem: CartItem) {
-        val currentSelected = _selectedItems.value?.toMutableSet() ?: mutableSetOf()
-        if (currentSelected.contains(cartItem.id)) {
-            currentSelected.remove(cartItem.id)
-        } else {
-            currentSelected.add(cartItem.id)
-        }
-        _selectedItems.value = currentSelected
-
-        val currentCart = _cart.value ?: emptyList()
-        _isAllSelected.value = currentSelected.size == currentCart.size && currentCart.isNotEmpty()
-
-        updateTotalPriceAndCount()
+    private fun updateAllSelected() {
+        val currentPageItems = _visibleCart.value ?: return
+        _isAllSelected.value = currentPageItems.all { selectedCartMap.containsKey(it.id) }
     }
-
-    fun isItemSelected(cartItem: CartItem): Boolean = _selectedItems.value?.contains(cartItem.id) == true
-
     private fun updateTotalPriceAndCount() {
-        val currentCart = _cart.value ?: emptyList()
-        val selectedIds = _selectedItems.value ?: emptySet()
-
-        val selectedCartItems = currentCart.filter { selectedIds.contains(it.id) }
-
-        val totalPrice =
-            selectedCartItems
-                .sumOf { item: CartItem ->
-                    (item.goods.price * item.quantity).toLong()
-                }.toInt()
-        val selectedCount = selectedCartItems.size
-
-        _totalPrice.value = totalPrice
-        _selectedItemCount.value = selectedCount
+        val total = selectedCartMap.values.sumOf { it.goods.price * it.quantity }
+        _totalPrice.value = total
+        _selectedItemCount.value = selectedCartMap.size
     }
 
     companion object {

@@ -31,20 +31,21 @@ class CartFragment :
 
     private val cartAdapter: CartAdapter by lazy {
         CartAdapter(
-            this,
-            quantityChangeListener =
-                object : QuantityChangeListener {
-                    override fun onIncrease(cartItem: CartItem) {
-                        viewModel.increaseQuantity(cartItem)
-                    }
+            cartClickListener = this,
+            quantityChangeListener = object : QuantityChangeListener {
+                override fun onIncrease(cartItem: CartItem) {
+                    viewModel.increaseQuantity(cartItem)
+                }
 
-                    override fun onDecrease(cartItem: CartItem) {
-                        viewModel.removeCartItemOrDecreaseQuantity(cartItem)
-                    }
-                },
+                override fun onDecrease(cartItem: CartItem) {
+                    viewModel.removeCartItemOrDecreaseQuantity(cartItem)
+                }
+            },
+            onItemCheckedChange = { item, isChecked ->
+                viewModel.setItemSelection(item, isChecked) },
+            isItemChecked = { item -> viewModel.isItemSelected(item) }
         )
     }
-
     private val cartSkeletonAdapter: CartSkeletonAdapter by lazy {
         CartSkeletonAdapter()
     }
@@ -83,37 +84,41 @@ class CartFragment :
         binding.rvCartItems.adapter = concatAdapter
     }
 
-    private fun setupBottomBar() {
-        binding.bottomBar.orderButton.setOnClickListener {
-            (requireActivity() as CartActivity).navigateToRecommend()
-        }
 
+    private fun setupBottomBar() {
+        // 전체선택 체크박스 누를 때
+        binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, isChecked ->
             viewModel.selectAllItems(isChecked)
+            cartAdapter.notifyDataSetChanged()  // ① 전체선택 후 즉시 개별 체크박스 갱신
         }
 
-        viewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
-            val formattedPrice =
-                java.text.NumberFormat
-                    .getNumberInstance(java.util.Locale.KOREA)
-                    .format(totalPrice)
-            binding.bottomBar.totalPrice.text = "총 ${formattedPrice}원"
-        }
-
-        viewModel.selectedItemCount.observe(viewLifecycleOwner) { count ->
-            binding.bottomBar.orderButton.text = "주문하기($count)"
-        }
-
-        viewModel.isAllSelected.observe(viewLifecycleOwner) { isAllSelected ->
-            binding.bottomBar.checkboxAll.isChecked = isAllSelected
+        // 뷰모델이 isAllSelected 변경될 때
+        viewModel.isAllSelected.observe(viewLifecycleOwner) { isAll ->
+            binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
+            binding.bottomBar.checkboxAll.isChecked = isAll
+            binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, checked ->
+                viewModel.selectAllItems(checked)
+                cartAdapter.notifyDataSetChanged()  // ② “전체선택” 에서 해제 시에도 반영
+            }
+            cartAdapter.notifyDataSetChanged()    // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
         }
     }
 
     private fun observeViewModel() {
         viewModel.loginErrorEvent.observe(viewLifecycleOwner) { result ->
             when (result) {
-                CartFetchError.Network -> Toast.makeText(requireContext(), "네트워크 에러 발생", Toast.LENGTH_SHORT).show()
-                is CartFetchError.Server -> Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
+                CartFetchError.Network -> Toast.makeText(
+                    requireContext(),
+                    "네트워크 에러 발생",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                is CartFetchError.Server -> Toast.makeText(
+                    requireContext(),
+                    "로그인 실패",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             requireActivity().finish()
         }
