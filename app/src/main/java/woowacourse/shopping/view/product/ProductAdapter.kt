@@ -1,14 +1,35 @@
 package woowacourse.shopping.view.product
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class ProductAdapter(
     private val productListener: ProductListener,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val items: MutableList<ProductsItem> = mutableListOf()
+) : ListAdapter<ProductsItem, RecyclerView.ViewHolder>(
+        object : DiffUtil.ItemCallback<ProductsItem>() {
+            override fun areItemsTheSame(
+                oldItem: ProductsItem,
+                newItem: ProductsItem,
+            ): Boolean =
+                when {
+                    oldItem is ProductsItem.ProductItem && newItem is ProductsItem.ProductItem ->
+                        oldItem.product.id == newItem.product.id
 
-    override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
+                    oldItem is ProductsItem.RecentWatchingItem && newItem is ProductsItem.RecentWatchingItem ->
+                        oldItem.products.map { it.product.id } == newItem.products.map { it.product.id }
+
+                    else -> false
+                }
+
+            override fun areContentsTheSame(
+                oldItem: ProductsItem,
+                newItem: ProductsItem,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
+    override fun getItemViewType(position: Int): Int = getItem(position).viewType.ordinal
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -29,40 +50,9 @@ class ProductAdapter(
         position: Int,
     ) {
         when (holder) {
-            is ProductViewHolder -> holder.bind(items[position] as ProductsItem.ProductItem)
-            is ProductRecentWatchingViewHolder -> holder.bind((items[position] as ProductsItem.RecentWatchingItem))
+            is ProductViewHolder -> holder.bind(getItem(position) as ProductsItem.ProductItem)
+            is ProductRecentWatchingViewHolder -> holder.bind((getItem(position) as ProductsItem.RecentWatchingItem))
         }
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    fun submitList(items: List<ProductsItem>) {
-        if (items.size > this.items.size) {
-            appendItems(items)
-            return
-        }
-
-        changeItems(items)
-    }
-
-    private fun changeItems(items: List<ProductsItem>) {
-        items.forEachIndexed { index, newItem ->
-            val oldItem = this.items[index]
-            if (oldItem != newItem) {
-                this.items[index] = newItem
-                notifyItemChanged(index)
-            }
-        }
-    }
-
-    private fun appendItems(items: List<ProductsItem>) {
-        val previousSize = this.items.size
-        val insertedCount = items.size - previousSize
-
-        this.items.clear()
-        this.items.addAll(items)
-
-        notifyItemRangeInserted(previousSize, insertedCount)
     }
 
     interface ProductListener :
