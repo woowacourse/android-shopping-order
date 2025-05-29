@@ -9,8 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
+import woowacourse.shopping.view.product.ProductItemActions
+import woowacourse.shopping.view.product.ProductsItem
 
-class RecommendActivity : AppCompatActivity() {
+class RecommendActivity :
+    AppCompatActivity(),
+    ProductItemActions {
     private val binding by lazy { ActivityRecommnedBinding.inflate(layoutInflater) }
     private val viewModel: RecommendViewModel by viewModels()
 
@@ -23,6 +27,14 @@ class RecommendActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val adapter =
+            RecommendProductsAdapter(
+                productItemActions = this,
+            )
+
+        binding.lifecycleOwner = this
+        binding.recommendCartItems.adapter = adapter
     }
 
     companion object {
@@ -30,5 +42,17 @@ class RecommendActivity : AppCompatActivity() {
             val intent = Intent(context, RecommendActivity::class.java)
             return intent
         }
+    }
+
+    override fun onSelectProduct(item: ProductsItem.ProductItem) {
+        // TODO
+    }
+
+    override fun onPlusProductQuantity(item: ProductsItem.ProductItem) {
+        // TODO
+    }
+
+    override fun onMinusProductQuantity(item: ProductsItem.ProductItem) {
+        // TODO
     }
 }
