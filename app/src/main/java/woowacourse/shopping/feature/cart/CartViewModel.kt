@@ -73,6 +73,7 @@ class CartViewModel(
     fun increaseQuantity(cartItem: CartItem) {
         cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
             updateCartQuantity()
+            selectedCartMap[cartItem.id]?.quantity=(selectedCartMap[cartItem.id]?.quantity?:0)+1
         }, {})
     }
 
@@ -82,6 +83,7 @@ class CartViewModel(
         } else {
             cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
                 updateCartQuantity()
+                selectedCartMap[cartItem.id]?.quantity=(selectedCartMap[cartItem.id]?.quantity?:0)-1
             }, {})
         }
     }
