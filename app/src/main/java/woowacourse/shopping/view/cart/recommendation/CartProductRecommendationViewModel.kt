@@ -75,6 +75,7 @@ class CartProductRecommendationViewModel(
                                         .asSequence()
                                         .filter { it.category == recentProduct.product.category }
                                         .filter { it.id !in cartProductIds }
+                                        .shuffled()
                                         .take(RECOMMEND_SIZE)
                                         .map { ProductItem(it) }
                                         .toList()
