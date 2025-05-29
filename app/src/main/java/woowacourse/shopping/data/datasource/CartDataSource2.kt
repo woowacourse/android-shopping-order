@@ -46,8 +46,8 @@ class CartDataSource2(
     }
 
     fun singlePage(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         callback: (Result<CartsResponse?>) -> Unit,
     ) {
         service.getCartSinglePage(page, size).enqueue(

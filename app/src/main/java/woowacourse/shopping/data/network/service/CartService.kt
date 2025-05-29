@@ -19,8 +19,8 @@ interface CartService {
 
     @GET("/cart-items")
     fun getCartSinglePage(
-        @Query("page") page: Int,
-        @Query("size") size: Int,
+        @Query("page") page: Int?,
+        @Query("size") size: Int?,
     ): Call<CartsResponse>
 
     @PATCH("/cart-items/{id}")
