@@ -68,16 +68,31 @@ class CartViewModel(
     val recommendedGoods: LiveData<List<CartItem>> = _recommendedGoods
 
     fun loadRecommendedGoods() {
-        goodsRepository.fetchPageGoods(
-            10,1,
-            { response ->
-
-                val goodsList = response.content.map{CartItem(it.toDomain(),1)}
-                _recommendedGoods.value = goodsList
-            },
-            {  }
-        )
+        goodsRepository.fetchMostRecentGoods { goods ->
+            if (goods != null) {
+                goodsRepository.fetchCategoryGoods(
+                    10,
+                    goods.category,
+                    { response ->
+                        val goodsList = response.content.map { CartItem(it.toDomain(), 0) }
+                        _recommendedGoods.value = goodsList
+                    },
+                    { },
+                )
+            } else {
+                goodsRepository.fetchPageGoods(
+                    10,
+                    1,
+                    { response ->
+                        val goodsList = response.content.map { CartItem(it.toDomain(), 0) }
+                        _recommendedGoods.value = goodsList
+                    },
+                    { },
+                )
+            }
+        }
     }
+
     init {
         updateCartQuantity()
     }
