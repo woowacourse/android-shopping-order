@@ -18,7 +18,7 @@ class CartSelectionFragment : Fragment() {
     private lateinit var binding: FragmentCartSelectionBinding
     private val viewModel: CartViewModel by lazy {
         ViewModelProvider(
-            this,
+            requireActivity(),
             CartViewModelFactory(requireActivity().application as ShoppingApplication),
         )[CartViewModel::class.java]
     }

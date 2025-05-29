@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils.replace
 import android.util.Log
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,18 +14,17 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.cart.CartItem.PaginationButtonItem
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    private val viewModel: CartViewModel by lazy {
+    val viewModel: CartViewModel by lazy {
         ViewModelProvider(
             this,
             CartViewModelFactory(application as ShoppingApplication),
         )[CartViewModel::class.java]
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -42,6 +40,14 @@ class CartActivity : AppCompatActivity() {
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
+        viewModel.totalProducts.observe(this) {
+            viewModel.postTotalCount()
+            viewModel.postTotalAmount()
+        }
+        viewModel.totalAmount.observe(this) { it ->
+            Log.d("POSTTC", "$it")
+        }
+
         applyWindowInsets()
         setSupportActionBar()
     }
@@ -50,7 +56,6 @@ class CartActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.text_cart_action_bar)
     }
-
 
     override fun onSupportNavigateUp(): Boolean {
         finish()

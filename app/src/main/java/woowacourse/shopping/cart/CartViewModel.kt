@@ -1,5 +1,6 @@
 package woowacourse.shopping.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,8 +39,8 @@ class CartViewModel(
     private val _totalProducts = MutableLiveData<MutableSet<ProductUiModel>>()
     val totalProducts: LiveData<MutableSet<ProductUiModel>> get() = _totalProducts
 
-   private val _totalAmount = MutableLiveData<Int>(0)
-   val totalAmount: LiveData<Int> get() = _totalAmount
+    private val _totalAmount = MutableLiveData<Int>(0)
+    val totalAmount: LiveData<Int> get() = _totalAmount
 
     init {
         loadAllCartProducts()
@@ -48,19 +49,20 @@ class CartViewModel(
 
     fun postTotalAmount() {
         val amount = totalProducts.value?.sumOf { it.price * it.quantity } ?: 0
+        Log.d("COUNT", "amount : $amount")
         _totalAmount.postValue(amount)
     }
 
     fun postTotalCount() {
         val count = totalProducts.value?.size ?: 0
+        Log.d("COUNT", "count : $count")
         _totalCount.postValue(count)
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
         val set = _totalProducts.value ?: mutableSetOf()
         set.remove(cartProduct.productItem)
-        _totalProducts.postValue(set)
-        postTotalAmount()
+        _totalProducts.postValue(set.toMutableSet())
         cartProductRepository.deleteCartProduct(cartProduct.productItem)
 
         cartProductRepository.getTotalElements { updatedSize ->
@@ -107,8 +109,8 @@ class CartViewModel(
                         _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                         val set = _totalProducts.value ?: mutableSetOf()
                         set.remove(product)
-                        set.add(product.copy(quantity =product.quantity - 1))
-                        _totalProducts.postValue(set)
+                        set.add(product.copy(quantity = product.quantity - 1))
+                        _totalProducts.postValue(set.toMutableSet())
                         postTotalAmount()
                     }
                 }
@@ -119,8 +121,8 @@ class CartViewModel(
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                     val set = _totalProducts.value ?: mutableSetOf()
                     set.remove(product)
-                    set.add(product.copy(quantity =product.quantity + 1))
-                    _totalProducts.postValue(set)
+                    set.add(product.copy(quantity = product.quantity + 1))
+                    _totalProducts.postValue(set.toMutableSet())
                     postTotalAmount()
                 }
             }
@@ -155,7 +157,6 @@ class CartViewModel(
             cartProductRepository
                 .getCartProductsInRange(0, totalSize) { cartProducts ->
                     _totalProducts.postValue(cartProducts.toMutableSet())
-                    postTotalAmount()
                 }
         }
     }
