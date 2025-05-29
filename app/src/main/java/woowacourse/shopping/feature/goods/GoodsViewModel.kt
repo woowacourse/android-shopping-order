@@ -215,7 +215,7 @@ class GoodsViewModel(
                     _isLoading.postValue(false)
                 },
             )
-        }, 2000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
+        }, 1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
     }
 
     private fun loadHistories() {

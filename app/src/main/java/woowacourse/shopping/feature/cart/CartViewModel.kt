@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.cart
 
+import android.os.Handler
+import android.os.Looper.getMainLooper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,6 +31,8 @@ class CartViewModel(
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
     private val _checkedItemsPrice = MutableLiveData(0)
     val checkedItemsPrice: LiveData<Int> get() = _checkedItemsPrice
+    private val _isLoading = MutableLiveData<Boolean>(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     private val selectedItems = MutableLiveData<List<Cart>>(emptyList())
     private val totalItemsCount = MutableLiveData(0)
@@ -158,19 +162,31 @@ class CartViewModel(
     }
 
     private fun loadCarts() {
-        cartRepository.fetchCart(
-            onSuccess = { response ->
-                val cartList =
-                    response.content.map {
-                        Cart(id = it.id, product = it.product.toDomain(), quantity = it.quantity)
-                    }
-                _carts.postValue(cartList)
-                _page.postValue(response.number)
-                updatePageButtonStates(response.first, response.last, response.totalElements.toInt())
-            },
-            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
-            page = currentPage,
-        )
+        _isLoading.postValue(true)
+        Handler(getMainLooper()).postDelayed({
+            cartRepository.fetchCart(
+                onSuccess = { response ->
+                    val cartList =
+                        response.content.map {
+                            Cart(
+                                id = it.id,
+                                product = it.product.toDomain(),
+                                quantity = it.quantity,
+                            )
+                        }
+                    _carts.postValue(cartList)
+                    _page.postValue(response.number)
+                    updatePageButtonStates(
+                        response.first,
+                        response.last,
+                        response.totalElements.toInt(),
+                    )
+                },
+                onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
+                page = currentPage,
+            )
+            _isLoading.postValue(false)
+        }, 1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
     }
 
     companion object {
