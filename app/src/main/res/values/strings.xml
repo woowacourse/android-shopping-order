@@ -43,4 +43,7 @@
     <string name="layout_cart_box_minus">−</string>
     <string name="layout_cart_box_plus">+</string>
     <string name="layout_recent_product_text">마지막으로 본 상품</string>
+
+    <string name="recommend_question_text">이런 상품은 어떠세요?</string>
+    <string name="recommend_text">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
 </resources>

@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="이런 상품은 어떠세요?"
+            android:text="@string/recommend_question_text"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
+            android:text="@string/recommend_text"
             android:textColor="@color/gray5"
             app:layout_constraintStart_toStartOf="@id/tv_recommend_title"
             app:layout_constraintTop_toBottomOf="@id/tv_recommend_title" />
@@ -58,12 +58,13 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_recommend"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_marginTop="28dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="24dp"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@id/tv_recommend_desc"
             tools:itemCount="4"
+            tools:layout_editor_absoluteX="0dp"
             tools:listitem="@layout/item_product" />
 
         <TextView
