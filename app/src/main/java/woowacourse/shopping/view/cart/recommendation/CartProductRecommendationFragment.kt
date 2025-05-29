@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.cart.recommendation.adapter.RecommendationAdapter
+import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
 class CartProductRecommendationFragment(
     private val productRepository: ProductRepository,
@@ -70,6 +71,11 @@ class CartProductRecommendationFragment(
     private fun initObservers() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { value ->
             adapter.updateItems(value)
+        }
+
+        viewModel.selectedProduct.observe(viewLifecycleOwner) { value ->
+            val intent = ProductDetailActivity.newIntent(requireContext(), value)
+            startActivity(intent)
         }
     }
 

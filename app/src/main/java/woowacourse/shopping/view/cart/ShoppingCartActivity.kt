@@ -30,7 +30,6 @@ class ShoppingCartActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                addToBackStack(null)
                 add(
                     R.id.fragment,
                     CartProductSelectionFragment::class.java,

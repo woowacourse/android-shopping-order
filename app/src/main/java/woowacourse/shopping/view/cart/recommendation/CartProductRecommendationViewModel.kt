@@ -3,12 +3,14 @@ package woowacourse.shopping.view.cart.recommendation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.cart.recommendation.adapter.ProductItem
-import woowacourse.shopping.view.cart.selection.adapter.CartProductItem
+import woowacourse.shopping.view.util.MutableSingleLiveData
+import woowacourse.shopping.view.util.SingleLiveData
 
 class CartProductRecommendationViewModel(
     private val productRepository: ProductRepository,
@@ -16,7 +18,7 @@ class CartProductRecommendationViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
     CartProductRecommendationEventHandler {
-    private val cartProducts: MutableSet<CartProductItem> = mutableSetOf()
+    private val cartProducts: MutableSet<CartProduct> = mutableSetOf()
 
     private val _recommendedProducts = MutableLiveData<List<ProductItem>>()
     val recommendedProducts: LiveData<List<ProductItem>> get() = _recommendedProducts
@@ -29,9 +31,12 @@ class CartProductRecommendationViewModel(
     private val _totalCount = MutableLiveData(0)
     val totalCount: LiveData<Int> get() = _totalCount
 
+    private val _selectedProduct = MutableSingleLiveData<Product>()
+    val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
+
     init {
         cartProductRepository.getPagedProducts { result ->
-            cartProducts.addAll(result.items.map { CartProductItem(it, false) })
+            cartProducts.addAll(result.items)
             loadRecommendedProducts()
         }
     }
@@ -51,7 +56,7 @@ class CartProductRecommendationViewModel(
             recentProduct ?: return@getLastViewedProduct
             productRepository.getPagedProducts { products ->
                 val cartProductIds =
-                    cartProducts.map { it.cartProduct.product.id }.toSet()
+                    cartProducts.map { it.product.id }.toSet()
                 val recommended =
                     products.items
                         .asSequence()
@@ -66,19 +71,56 @@ class CartProductRecommendationViewModel(
         }
     }
 
-    companion object {
-        private const val RECOMMEND_SIZE = 10
-    }
-
     override fun onProductClick(item: Product) {
+        _selectedProduct.setValue(item)
     }
 
     override fun onAddClick(item: Product) {
+        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { cartProductId ->
+            cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+            updateQuantity(item, QUANTITY_TO_ADD)
+        }
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
+        val cartProduct = cartProducts.first { it.product.id == item.id }
+        cartProductRepository.updateQuantity(cartProduct, QUANTITY_TO_ADD) {
+            cartProducts.remove(cartProduct)
+            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
+            updateQuantity(item, QUANTITY_TO_ADD)
+        }
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
+        val cartProduct = cartProducts.first { it.product.id == item.id }
+        cartProductRepository.updateQuantity(cartProduct, -QUANTITY_TO_ADD) {
+            cartProducts.remove(cartProduct)
+            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+            if (newQuantity > 0) cartProducts.add(cartProduct.copy(quantity = newQuantity))
+            updateQuantity(item, -QUANTITY_TO_ADD)
+        }
+    }
+
+    private fun updateQuantity(
+        item: Product,
+        quantityToAdd: Int,
+    ) {
+        val updatedList =
+            _recommendedProducts.value.orEmpty().map { recommendedProduct ->
+                if (recommendedProduct.product.id == item.id) {
+                    recommendedProduct.copy(quantity = recommendedProduct.quantity + quantityToAdd)
+                } else {
+                    recommendedProduct
+                }
+            }
+
+        _recommendedProducts.postValue(updatedList)
+        _totalCount.postValue((totalCount.value ?: 0) + quantityToAdd)
+        _totalPrice.value = totalPrice.value?.plus(item.price * quantityToAdd)
+    }
+
+    companion object {
+        private const val RECOMMEND_SIZE = 10
+        private const val QUANTITY_TO_ADD = 1
     }
 }

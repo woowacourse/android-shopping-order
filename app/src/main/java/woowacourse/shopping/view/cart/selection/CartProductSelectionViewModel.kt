@@ -41,10 +41,6 @@ class CartProductSelectionViewModel(
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
 
-    init {
-        loadPage(FIRST_PAGE_NUMBER)
-    }
-
     override fun loadNextProducts() {
         val nextPage = page.value?.plus(1) ?: FIRST_PAGE_NUMBER
         if (hasNext.value == true) loadPage(nextPage)
@@ -146,7 +142,7 @@ class CartProductSelectionViewModel(
         _products.value = updatedProducts
     }
 
-    private fun loadPage(page: Int) {
+    fun loadPage(page: Int) {
         _isFinishedLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
             _isFinishedLoading.value = true

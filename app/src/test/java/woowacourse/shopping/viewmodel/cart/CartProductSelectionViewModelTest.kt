@@ -22,6 +22,7 @@ class CartProductSelectionViewModelTest {
         cartProductRepository = FakeCartProductRepository()
         repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
         viewModel = CartProductSelectionViewModel(cartProductRepository)
+        viewModel.loadPage(1)
     }
 
     @Test

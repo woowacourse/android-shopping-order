@@ -46,6 +46,11 @@ class CartProductSelectionFragment(
         initObservers()
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.loadPage(1)
+    }
+
     private fun initRecyclerView() {
         adapter = CartProductAdapter(eventHandler = viewModel)
         binding.rvProducts.adapter = adapter
