@@ -25,7 +25,7 @@ class ProductDetailActivityTest {
                 fakeContext,
                 ProductDetailActivity::class.java,
             ).apply {
-                putExtra(Extra.KEY_PRODUCT_DETAIL, Fixture.dummyProduct)
+                putExtra(Extra.KEY_PRODUCT_ID, Fixture.dummyProduct.productId)
             }
         scenario = ActivityScenario.launch(intent)
     }

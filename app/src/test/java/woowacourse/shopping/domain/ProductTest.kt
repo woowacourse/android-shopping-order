@@ -11,7 +11,7 @@ class ProductTest {
 
     @BeforeEach
     fun setUp() {
-        product = Product(0, "coffee", Price(100), "aa@aa.com")
+        product = Product(0, "coffee", Price(100), "aa@aa.com", "패션잡화")
     }
 
     @Test
@@ -32,5 +32,10 @@ class ProductTest {
     @Test
     fun `상품은 이미지Url을 가진다`() {
         assertThat(product.imageUrl).isEqualTo("aa@aa.com")
+    }
+
+    @Test
+    fun `상품은 카테고리를 가진다`() {
+        assertThat(product.category).isEqualTo("패션잡화")
     }
 }

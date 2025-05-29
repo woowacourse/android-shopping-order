@@ -6,11 +6,12 @@ import woowacourse.shopping.domain.repository.ProductRepository
 
 class FakeProductRepository : ProductRepository {
     override fun fetchPagingProducts(
-        page: Int,
-        pageSize: Int,
+        page: Int?,
+        pageSize: Int?,
+        category: String?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        val pagedItems = ProductsFixture.dummyProducts.drop(page).take(pageSize)
+        val pagedItems = ProductsFixture.dummyProducts.drop(page!!).take(pageSize!!)
         val result = pagedItems.toCartItems()
         onResult(Result.success(result))
     }
@@ -27,6 +28,6 @@ class FakeProductRepository : ProductRepository {
 
     private fun List<Product>.toCartItems(): List<CartItem> =
         this.map { product ->
-            CartItem(product, 1)
+            CartItem(1111, product, 1)
         }
 }

@@ -32,21 +32,6 @@ class CartActivityTest {
         onView(withId(R.id.rv_cart_product)).checkIsDisplayed()
     }
 
-    @Test
-    fun 이전_페이지로_이동하는_버튼이_표시된다() {
-        onView(withId(R.id.btn_cart_previous)).checkIsDisplayed()
-    }
-
-    @Test
-    fun 다음_페이지로_이동하는_버튼이_표시된다() {
-        onView(withId(R.id.btn_cart_next)).checkIsDisplayed()
-    }
-
-    @Test
-    fun 현재_페이지가_표시된다() {
-        onView(withId(R.id.tv_cart_page)).checkIsDisplayed()
-    }
-
     @After
     fun finish() {
         Intents.release()

@@ -49,7 +49,7 @@ class CartDaoTest {
     @Test
     fun `상품을_추가할_수_있다`() {
         // when
-        dao.insertProduct(Fixture.dummyCartEntity)
+        dao.insertProduct(Fixture.dummyCartEntity2)
         val result = dao.getAllProducts()
 
         // then

@@ -27,28 +27,28 @@ class ProductViewModelTest {
     }
 
     @Test
-    fun `fetchData 초기 호출 시 상품 10개를 반환한다`() {
+    fun `fetchData 초기 호출 시 상품 12개를 반환한다`() {
         viewModel.fetchData(0)
 
         val products = viewModel.products.getOrAwaitValue()
         val data = (products as ResultState.Success).data
-        assertThat(data).hasSize(10)
+        assertThat(data).hasSize(12)
     }
 
     @Test
-    fun `loadMore 호출 시 상품 10개가 추가된다`() {
+    fun `loadMore 호출 시 상품 12개가 추가된다`() {
         viewModel.fetchData(0)
         viewModel.loadMore()
 
         val products = viewModel.products.getOrAwaitValue()
         val data = (products as ResultState.Success).data
-        assertThat(data).hasSize(20)
+        assertThat(data).hasSize(24)
     }
 
     @Test
     fun `모든 데이터를 불러오지 않으면 더보기 버튼은 true가 된다`() {
         viewModel.fetchData(0)
-        repeat(3) { viewModel.loadMore() }
+        repeat(1) { viewModel.loadMore() }
 
         val showLoadMore = viewModel.showLoadMore.getOrAwaitValue()
         assertThat(showLoadMore).isTrue()
@@ -57,7 +57,7 @@ class ProductViewModelTest {
     @Test
     fun `모든 데이터를 불러오면 더보기 버튼은 false가 된다`() {
         viewModel.fetchData(0)
-        repeat(4) { viewModel.loadMore() }
+        repeat(10) { viewModel.loadMore() }
 
         val showLoadMore = viewModel.showLoadMore.getOrAwaitValue()
         assertThat(showLoadMore).isFalse()
