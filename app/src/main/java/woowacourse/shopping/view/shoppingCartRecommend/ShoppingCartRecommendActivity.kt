@@ -10,14 +10,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityShoppingCartRecommendBinding
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.view.common.ProductQuantityClickListener
 import woowacourse.shopping.view.common.QuantityObservable
+import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.product.ProductsItem
 
 class ShoppingCartRecommendActivity :
     AppCompatActivity(),
-    ProductQuantityClickListener {
+    RecommendProductListener {
     private val binding: ActivityShoppingCartRecommendBinding by lazy {
         ActivityShoppingCartRecommendBinding.inflate(layoutInflater)
     }
@@ -52,6 +52,7 @@ class ShoppingCartRecommendActivity :
         binding.lifecycleOwner = this
         binding.viewModel = this.viewModel
         binding.adapter = recommendProductAdapter
+        binding.recommendListener = this
     }
 
     private fun setUpObservers() {
@@ -68,6 +69,15 @@ class ShoppingCartRecommendActivity :
     override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
         val item = quantityObservable as ProductsItem.ProductItem
         viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
+    }
+
+    override fun onBackButtonClick() {
+        setResult(ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK)
+        finish()
+    }
+
+    override fun onOrderButtonClick() {
+        // TOOD: 주문하기 api 연동
     }
 
     companion object {

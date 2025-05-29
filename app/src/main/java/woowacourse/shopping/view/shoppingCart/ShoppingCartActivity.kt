@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +31,14 @@ class ShoppingCartActivity :
     private val shoppingCartProductAdapter by lazy {
         ShoppingCartProductAdapter(this)
     }
+    private val activityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            when (result.resultCode) {
+                ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK -> viewModel.updateShoppingCart()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,7 +162,7 @@ class ShoppingCartActivity :
     }
 
     override fun onOrderButtonClick() {
-        startActivity(
+        activityResultLauncher.launch(
             ShoppingCartRecommendActivity.newIntent(
                 this,
                 viewModel.shoppingCartProductsToOrder.value?.toTypedArray() ?: emptyArray(),
