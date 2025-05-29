@@ -5,50 +5,70 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import woowacourse.shopping.data.ShoppingDatabase
+import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
+import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
+import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
+import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.FragmentRecommendBinding
+import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
+import woowacourse.shopping.feature.QuantityChangeListener
+import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.cart.CartViewModelFactory
 
 class RecommendFragment : Fragment() {
-    @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentRecommendBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: CartViewModel by viewModels {
+        CartViewModelFactory(CartRepositoryImpl(CartRemoteDataSourceImpl()),GoodsRepositoryImpl(GoodsRemoteDataSourceImpl(),
+            GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(requireContext()))
+        ))
+    }
+
+    val recommendAdapter by lazy {
+        RecommendAdapter(
+            lifecycleOwner = viewLifecycleOwner,
+            quantityChangeListener = object : QuantityChangeListener {
+                override fun onIncrease(cartItem: CartItem) {
+                    viewModel.addCartItemOrIncreaseQuantity(cartItem)
+                }
+
+                override fun onDecrease(cartItem: CartItem) {
+                    viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
+                }
+            }
+        )
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRecommendBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupViews()
-        setupBottomBar()
-    }
-
-    private fun setupViews() {
-        binding.tvRecommendItemsTitle.text = "이런 상품은 어떠세요?"
-        binding.tvRecommendItemsDescription.text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
-
-        // Todo (추천 상품 어댑터 설정)
-        // binding.rvRecommendItems.adapter = recommendAdapter
-    }
-
-    private fun setupBottomBar() {
-        binding.bottomBar.orderButton.text = "돌아가기"
-        binding.bottomBar.orderButton.setOnClickListener {
-            parentFragmentManager.popBackStack()
+        // RecyclerView 세팅
+        binding.rvRecommendItems.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = recommendAdapter
         }
 
-        binding.bottomBar.checkboxAll.visibility = View.GONE
-        binding.bottomBar.tvAll.visibility = View.GONE
-    }
+        // ViewModel의 recommendedGoods를 구독
+        viewModel.recommendedGoods.observe(viewLifecycleOwner) { goodsList ->
+            recommendAdapter.setItems(goodsList)
+        }
 
+        // 데이터 로드 요청
+        viewModel.loadRecommendedGoods()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -7,7 +7,9 @@ import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
+import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
+import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -15,6 +17,7 @@ import kotlin.math.max
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
     private val _isMultiplePages = MutableLiveData(false)
     val isMultiplePages: LiveData<Boolean> get() = _isMultiplePages
@@ -61,9 +64,34 @@ class CartViewModel(
 
     private val _selectedItemCount = MutableLiveData(0)
     val selectedItemCount: LiveData<Int> get() = _selectedItemCount
+    private val _recommendedGoods = MutableLiveData<List<CartItem>>()
+    val recommendedGoods: LiveData<List<CartItem>> = _recommendedGoods
 
+    fun loadRecommendedGoods() {
+        goodsRepository.fetchPageGoods(
+            10,1,
+            { response ->
+
+                val goodsList = response.content.map{CartItem(it.toDomain(),1)}
+                _recommendedGoods.value = goodsList
+            },
+            {  }
+        )
+    }
     init {
         updateCartQuantity()
+    }
+
+    fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
+        val existing = selectedCartMap[cartItem.id]
+        if (existing != null) {
+            existing.quantity = existing.quantity + 1
+        } else {
+            val toAdd = cartItem.copy(quantity = 1)
+            selectedCartMap[cartItem.id] = toAdd
+        }
+        updateAllSelected()
+        updateTotalPriceAndCount()
     }
 
     private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()

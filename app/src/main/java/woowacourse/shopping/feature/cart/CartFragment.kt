@@ -8,9 +8,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ConcatAdapter
+import woowacourse.shopping.data.ShoppingDatabase
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
+import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
+import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
+import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
@@ -26,7 +31,12 @@ class CartFragment :
     private val binding get() = _binding!!
 
     private val viewModel: CartViewModel by viewModels {
-        CartViewModelFactory(CartRepositoryImpl(CartRemoteDataSourceImpl()))
+        CartViewModelFactory(
+            CartRepositoryImpl(CartRemoteDataSourceImpl()), GoodsRepositoryImpl(
+                GoodsRemoteDataSourceImpl(),
+                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(requireContext()))
+            )
+        )
     }
 
     private val cartAdapter: CartAdapter by lazy {
@@ -42,7 +52,8 @@ class CartFragment :
                 }
             },
             onItemCheckedChange = { item, isChecked ->
-                viewModel.setItemSelection(item, isChecked) },
+                viewModel.setItemSelection(item, isChecked)
+            },
             isItemChecked = { item -> viewModel.isItemSelected(item) }
         )
     }
@@ -142,6 +153,9 @@ class CartFragment :
                     concatAdapter.addAdapter(0, cartSkeletonAdapter)
                 }
             }
+        }
+        binding.bottomBar.orderButton.setOnClickListener {
+            (requireActivity() as CartActivity).navigateToRecommend()
         }
     }
 
