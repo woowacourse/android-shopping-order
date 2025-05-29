@@ -4,14 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendProductBinding
-import woowacourse.shopping.view.product.ProductItemActions
 
 class RecommendProductsViewHolder(
     private val binding: ItemRecommendProductBinding,
-    productItemActions: ProductItemActions,
+    recommendProductItemActions: RecommendProductItemActions,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.productItemActionListener = productItemActions
+        binding.recommendProductItemActions = recommendProductItemActions
     }
 
     fun bind(item: RecommendProduct) {
@@ -21,11 +20,11 @@ class RecommendProductsViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            productItemActions: ProductItemActions,
+            recommendProductItemActions: RecommendProductItemActions,
         ): RecommendProductsViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemRecommendProductBinding.inflate(layoutInflater, parent, false)
-            return RecommendProductsViewHolder(binding, productItemActions)
+            return RecommendProductsViewHolder(binding, recommendProductItemActions)
         }
     }
 }

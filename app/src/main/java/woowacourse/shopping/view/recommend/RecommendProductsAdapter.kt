@@ -2,10 +2,9 @@ package woowacourse.shopping.view.recommend
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.view.product.ProductItemActions
 
 class RecommendProductsAdapter(
-    private val productItemActions: ProductItemActions,
+    private val recommendProductItemActions: RecommendProductItemActions,
 ) : RecyclerView.Adapter<RecommendProductsViewHolder>() {
     private val items: List<RecommendProduct> = emptyList()
 
@@ -15,7 +14,7 @@ class RecommendProductsAdapter(
     ): RecommendProductsViewHolder =
         RecommendProductsViewHolder.of(
             parent = parent,
-            productItemActions = productItemActions,
+            recommendProductItemActions = recommendProductItemActions,
         )
 
     override fun onBindViewHolder(
