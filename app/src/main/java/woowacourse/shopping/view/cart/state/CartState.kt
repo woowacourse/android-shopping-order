@@ -42,13 +42,13 @@ data class CartState(
     }
 }
 
-fun ShoppingCart.toCartState(): CartState {
+fun ShoppingCart.toCartState(allChecked: Boolean): CartState {
     return CartState(
         cartId = id,
         name = product.name,
         imgUrl = product.imgUrl,
         price = Price(product.priceValue),
         quantity = quantity,
-        checked = false,
+        checked = allChecked,
     )
 }

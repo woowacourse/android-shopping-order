@@ -5,6 +5,7 @@ import woowacourse.shopping.domain.Quantity
 data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
+    val allChecked: Boolean = false,
 ) {
     val totalPrice: Int
         get() = items.filter { it.checked }.sumOf { it.productPrice }
@@ -15,7 +16,7 @@ data class CartUiState(
     fun setAllItemsChecked(isChecked: Boolean): CartUiState {
         val result = items.map { it.copy(checked = isChecked) }
 
-        return copy(items = result)
+        return copy(items = result, allChecked = isChecked)
     }
 
     fun modifyCheckedState(

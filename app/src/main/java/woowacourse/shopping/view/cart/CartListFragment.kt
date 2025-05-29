@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.cart
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -21,11 +22,14 @@ class CartListFragment :
     CartAdapter.Handler {
     private val viewModel: CartViewModel by activityViewModels {
         val container = (requireActivity().application as App).container
-        CartViewModelFactory(container.cartRepository)
+        CartViewModelFactory(
+            container.cartRepository,
+            container.historyLoader,
+        )
     }
 
     private val cartAdapter by lazy {
-        CartAdapter(items = emptyList(), handler = this, cartQuantityHandler = this)
+        CartAdapter(handler = this, cartQuantityHandler = this)
     }
 
     override fun onViewCreated(
@@ -41,6 +45,7 @@ class CartListFragment :
 
     private fun setUpBinding(binding: FragmentCartListBinding) {
         with(binding) {
+            lifecycleOwner = viewLifecycleOwner
             adapter = cartAdapter
             vm = viewModel
         }
@@ -54,7 +59,8 @@ class CartListFragment :
 
     private fun observeViewModel(binding: FragmentCartListBinding) {
         viewModel.uiState.observe(viewLifecycleOwner) { value ->
-            cartAdapter.submitList(value.items)
+            Log.d("dsadsadas", "${value.checkedProductCount}")
+            cartAdapter.submitList(value.items, value.pageState.page)
         }
 
         viewModel.event.observe(viewLifecycleOwner) { value ->

@@ -22,6 +22,7 @@ class CartActivity : AppCompatActivity() {
         val container = (application as App).container
         CartViewModelFactory(
             container.cartRepository,
+            container.historyLoader,
         )
     }
 
@@ -31,11 +32,9 @@ class CartActivity : AppCompatActivity() {
 
         setUpBinding()
         setUpSystemBars()
-
-        viewModel.loadCarts()
     }
 
-    private fun setUpBinding()  {
+    private fun setUpBinding() {
         with(binding) {
             vm = viewModel
             lifecycleOwner = this@CartActivity

@@ -12,9 +12,11 @@ import woowacourse.shopping.view.cart.vm.Paging.Companion.PAGE_SIZE
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
+import woowacourse.shopping.view.loader.HistoryLoader
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val historyLoader: HistoryLoader,
 ) : ViewModel() {
     private val paging = Paging(initialPage = INITIAL_PAGE_NO, pageSize = PAGE_SIZE)
 
@@ -26,6 +28,10 @@ class CartViewModel(
 
     private val _isLoading = MutableSingleLiveData(true)
     val isLoading: SingleLiveData<Boolean> get() = _isLoading
+
+    init {
+        loadCarts()
+    }
 
     fun decreaseCartQuantity(productId: Long) {
         withState(_uiState.value) { state ->
@@ -65,12 +71,21 @@ class CartViewModel(
             result.fold(
                 onSuccess = { value ->
                     val pageState = paging.createPageState(!value.hasNextPage)
-                    val carts = value.carts.map { it.toCartState() }
-                    _uiState.value = CartUiState(items = carts, pageState = pageState)
+                    val newItems = value.carts.map { it.toCartState(_uiState.value?.allChecked ?: false) }
+
+                    val currentItems = _uiState.value?.items ?: emptyList()
+                    val combinedItems = currentItems + newItems
+
+                    _uiState.value = CartUiState(items = combinedItems, pageState = pageState)
                 },
                 onFailure = {},
             )
             setLoading(false)
+        }
+    }
+
+    private fun loadHistories() {
+        historyLoader.invoke {
         }
     }
 
@@ -106,21 +121,23 @@ class CartViewModel(
     }
 
     private fun refresh() {
-        cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
-            result.fold(
-                onSuccess = { value ->
-                    if (paging.resetToLastPageIfEmpty(value.carts)) {
-                        refresh()
-                        return@loadSinglePage
-                    }
+        withState(_uiState.value) { state ->
+            cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
+                result.fold(
+                    onSuccess = { value ->
+                        if (paging.resetToLastPageIfEmpty(value.carts)) {
+                            refresh()
+                            return@loadSinglePage
+                        }
 
-                    val pageState = paging.createPageState(!value.hasNextPage)
-                    val carts = value.carts.map { it.toCartState() }
+                        val pageState = paging.createPageState(!value.hasNextPage)
+                        val carts = value.carts.map { it.toCartState(state.allChecked) }
 
-                    _uiState.postValue(CartUiState(items = carts, pageState = pageState))
-                },
-                onFailure = {},
-            )
+                        _uiState.postValue(CartUiState(items = carts, pageState = pageState))
+                    },
+                    onFailure = {},
+                )
+            }
         }
     }
 
