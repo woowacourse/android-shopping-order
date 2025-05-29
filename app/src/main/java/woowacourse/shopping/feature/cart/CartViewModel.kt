@@ -27,6 +27,8 @@ class CartViewModel(
     val carts: LiveData<List<Cart>> get() = _carts
     private val _totalCheckedItemsCount = MutableLiveData(0)
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
+    private val _checkedItemsPrice = MutableLiveData(0)
+    val checkedItemsPrice: LiveData<Int> get() = _checkedItemsPrice
 
     private val selectedItems = MutableLiveData<List<Cart>>(emptyList())
     private val totalItemsCount = MutableLiveData(0)
@@ -53,9 +55,11 @@ class CartViewModel(
         if (currentList.contains(cart)) {
             selectedItems.value = currentList.minus(cart)
             _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.minus(cart.quantity)
+            _checkedItemsPrice.value = _checkedItemsPrice.value?.minus(cart.product.price * cart.quantity)
         } else {
             selectedItems.value = currentList.plus(cart)
             _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.plus(cart.quantity)
+            _checkedItemsPrice.value = _checkedItemsPrice.value?.plus(cart.product.price * cart.quantity)
         }
     }
 
