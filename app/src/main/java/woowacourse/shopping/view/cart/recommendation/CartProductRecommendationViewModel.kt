@@ -58,27 +58,32 @@ class CartProductRecommendationViewModel(
     }
 
     private fun loadRecommendedProducts() {
-        recentProductRepository.getLastViewedProduct { recentProduct ->
-            recentProduct ?: return@getLastViewedProduct
-            productRepository.getPagedProducts { result ->
-                result
-                    .onSuccess { products ->
-                        val cartProductIds =
-                            cartProducts.map { it.product.id }.toSet()
-                        val recommended =
-                            products.items
-                                .asSequence()
-                                .filter { it.category == recentProduct.product.category }
-                                .filter { it.id !in cartProductIds }
-                                .take(RECOMMEND_SIZE)
-                                .map { ProductItem(it) }
-                                .toList()
+        recentProductRepository.getLastViewedProduct { result ->
+            result
+                .onSuccess { recentProduct ->
+                    recentProduct ?: return@getLastViewedProduct
+                    productRepository.getPagedProducts { result ->
+                        result
+                            .onSuccess { products ->
+                                val cartProductIds =
+                                    cartProducts.map { it.product.id }.toSet()
+                                val recommended =
+                                    products.items
+                                        .asSequence()
+                                        .filter { it.category == recentProduct.product.category }
+                                        .filter { it.id !in cartProductIds }
+                                        .take(RECOMMEND_SIZE)
+                                        .map { ProductItem(it) }
+                                        .toList()
 
-                        _recommendedProducts.postValue(recommended)
-                    }.onFailure {
-                        Log.e("error", it.message.toString())
+                                _recommendedProducts.postValue(recommended)
+                            }.onFailure {
+                                Log.e("error", it.message.toString())
+                            }
                     }
-            }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
