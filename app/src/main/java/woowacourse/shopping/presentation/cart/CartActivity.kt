@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.cart.event.CartEventHandlerImpl
+import woowacourse.shopping.presentation.recommend.RecommendActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -34,6 +35,15 @@ class CartActivity : AppCompatActivity() {
     private fun initBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        binding.buttonOrder.setOnClickListener {
+            val intent =
+                RecommendActivity.newIntent(
+                    this@CartActivity,
+                    viewModel.totalOrderPrice.value!!,
+                    viewModel.checkedProductCount.value!!
+                )
+            startActivity(intent)
+        }
     }
 
     private fun setupToolbar() {
