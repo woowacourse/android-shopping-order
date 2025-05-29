@@ -47,5 +47,7 @@ class CartViewHolder(
         fun addToCart(cart: Cart)
 
         fun removeFromCart(cart: Cart)
+
+        fun toggleCheckedItem(cart: Cart)
     }
 }

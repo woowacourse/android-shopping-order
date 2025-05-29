@@ -13,8 +13,8 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".feature.cart.CartActivity"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        tools:context=".feature.cart.CartActivity">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_goods"
@@ -23,22 +23,22 @@
             android:paddingHorizontal="18dp"
             app:cartItems="@{viewModel.carts}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/paging"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/paging"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             tools:listitem="@layout/item_cart" />
 
         <LinearLayout
             android:id="@+id/paging"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/rv_goods"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/total_cart_price"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:visible="@{viewModel.showPageButton}"
-            android:orientation="horizontal">
+            app:visible="@{viewModel.showPageButton}">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_left_page"
@@ -49,18 +49,20 @@
                 android:onClick="@{() -> viewModel.minusPage()}"
                 android:text="@string/cart_left_page_button"
                 android:textColor="@color/white"
-                android:textSize="22sp"/>
+                android:textSize="22sp" />
+
             <TextView
                 android:id="@+id/page_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:gravity="center"
-                android:text="@{String.valueOf(viewModel.page)}"
+                android:text="@{String.valueOf(viewModel.page + 1)}"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 tools:text="0" />
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_right_page"
                 android:layout_width="42dp"
@@ -70,7 +72,46 @@
                 android:onClick="@{() -> viewModel.plusPage()}"
                 android:text="@string/cart_right_page_button"
                 android:textColor="@color/white"
-                android:textSize="22sp"/>
+                android:textSize="22sp" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/total_cart_price"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@color/gray_700">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="12dp"
+                    android:gravity="right"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="184,200원" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="@color/baemin_mint"
+                android:text="@{@string/cart_order_button(viewModel.totalCheckedItemsCount)}"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

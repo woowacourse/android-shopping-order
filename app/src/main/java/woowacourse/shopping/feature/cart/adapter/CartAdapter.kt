@@ -10,11 +10,9 @@ class CartAdapter(
     private val items: MutableList<Cart> = mutableListOf()
 
     fun setItems(newItems: List<Cart>) {
-        val maxSize = maxOf(items.size, newItems.size)
-
         items.clear()
         items.addAll(newItems)
-        notifyItemRangeChanged(ITEM_START_POSITION, maxSize)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -31,8 +29,4 @@ class CartAdapter(
     }
 
     override fun getItemCount(): Int = items.size
-
-    companion object {
-        private const val ITEM_START_POSITION = 0
-    }
 }

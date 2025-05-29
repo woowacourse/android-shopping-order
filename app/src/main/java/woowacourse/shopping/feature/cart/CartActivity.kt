@@ -62,6 +62,10 @@ class CartActivity : AppCompatActivity() {
                         viewModel.removeFromCart(cart)
                         sendCartResult(cart, cart.quantity - 1)
                     }
+
+                    override fun toggleCheckedItem(cart: Cart) {
+                        viewModel.toggleCheck(cart)
+                    }
                 },
             )
     }
