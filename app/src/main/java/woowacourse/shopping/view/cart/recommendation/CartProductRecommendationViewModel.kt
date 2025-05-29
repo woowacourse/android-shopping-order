@@ -9,18 +9,19 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.cart.recommendation.adapter.ProductItem
 import woowacourse.shopping.view.cart.selection.adapter.CartProductItem
-import woowacourse.shopping.view.util.product.ProductViewHolder
 
 class CartProductRecommendationViewModel(
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
-    ProductViewHolder.EventHandler {
+    CartProductRecommendationEventHandler {
     private val cartProducts: MutableSet<CartProductItem> = mutableSetOf()
 
     private val _recommendedProducts = MutableLiveData<List<ProductItem>>()
     val recommendedProducts: LiveData<List<ProductItem>> get() = _recommendedProducts
+
+    private val selectedProductIds: MutableSet<Int> = mutableSetOf()
 
     private val _totalPrice = MutableLiveData(0)
     val totalPrice: LiveData<Int> get() = _totalPrice
@@ -33,6 +34,16 @@ class CartProductRecommendationViewModel(
             cartProducts.addAll(result.items.map { CartProductItem(it, false) })
             loadRecommendedProducts()
         }
+    }
+
+    fun initShoppingCartInfo(
+        selectedIds: Set<Int>,
+        totalPrice: Int,
+        totalCount: Int,
+    ) {
+        selectedProductIds.addAll(selectedIds)
+        _totalPrice.value = totalPrice
+        _totalCount.value = totalCount
     }
 
     private fun loadRecommendedProducts() {

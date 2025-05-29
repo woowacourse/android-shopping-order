@@ -11,7 +11,8 @@ class CartProductSelectionViewModel(
     private val repository: CartProductRepository,
 ) : ViewModel(),
     CartProductSelectionEventHandler {
-    private val selectedId: MutableSet<Int> = mutableSetOf()
+    private val _selectedIds: MutableSet<Int> = mutableSetOf()
+    val selectedIds: Set<Int> get() = _selectedIds
 
     private val _products = MutableLiveData<List<CartProductItem>>()
     val products: LiveData<List<CartProductItem>> get() = _products
@@ -65,7 +66,7 @@ class CartProductSelectionViewModel(
             }
         }
 
-        if (item.id in selectedId) {
+        if (item.id in _selectedIds) {
             _totalCount.value = totalCount.value?.minus(item.quantity)
             _totalPrice.value = totalPrice.value?.minus(item.totalPrice)
         }
@@ -77,7 +78,7 @@ class CartProductSelectionViewModel(
         repository.updateQuantity(cartProductItem.cartProduct, 1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
-        if (item.id in selectedId) {
+        if (item.id in _selectedIds) {
             _totalCount.value = totalCount.value?.plus(1)
             _totalPrice.value = totalPrice.value?.plus(item.product.price)
         }
@@ -90,20 +91,20 @@ class CartProductSelectionViewModel(
         repository.updateQuantity(cartProductItem.cartProduct, -1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
-        if (item.id in selectedId) {
+        if (item.id in _selectedIds) {
             _totalCount.value = totalCount.value?.minus(1)
             _totalPrice.value = totalPrice.value?.minus(item.product.price)
         }
     }
 
     override fun onSelectItem(item: CartProduct) {
-        val isSelected = item.id in selectedId
+        val isSelected = item.id in _selectedIds
         if (isSelected) {
-            selectedId.remove(item.id)
+            _selectedIds.remove(item.id)
             _totalCount.value = totalCount.value?.minus(item.quantity)
             _totalPrice.value = totalPrice.value?.minus(item.totalPrice)
         } else {
-            selectedId.add(item.id)
+            _selectedIds.add(item.id)
             _totalCount.value = totalCount.value?.plus(item.quantity)
             _totalPrice.value = totalPrice.value?.plus(item.totalPrice)
         }
@@ -124,7 +125,7 @@ class CartProductSelectionViewModel(
         val isSelectedAll = isSelectedAll.value ?: false
 
         if (isSelectedAll) {
-            selectedId.removeAll(allIds.toSet())
+            _selectedIds.removeAll(allIds.toSet())
             currentProducts.forEach {
                 if (it.isSelected) {
                     _totalCount.value = totalCount.value?.minus(it.cartProduct.quantity)
@@ -132,7 +133,7 @@ class CartProductSelectionViewModel(
                 }
             }
         } else {
-            selectedId.addAll(allIds)
+            _selectedIds.addAll(allIds)
             currentProducts.forEach {
                 if (!it.isSelected) {
                     _totalCount.value = totalCount.value?.plus(it.cartProduct.quantity)
@@ -149,7 +150,7 @@ class CartProductSelectionViewModel(
         _isFinishedLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
             _isFinishedLoading.value = true
-            _products.value = (result.items.map { CartProductItem(it, it.id in selectedId) })
+            _products.value = (result.items.map { CartProductItem(it, it.id in _selectedIds) })
             val hasNext = result.hasNext
             updatePageState(page, hasNext)
             updateIsSelectedAll()

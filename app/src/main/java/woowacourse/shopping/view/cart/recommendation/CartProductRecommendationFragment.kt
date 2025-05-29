@@ -49,8 +49,25 @@ class CartProductRecommendationFragment(
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.rvRecommendedProducts.adapter = adapter
+        initInformation()
+        initBindings()
+        initObservers()
+    }
 
+    private fun initInformation() {
+        val selectedIds = arguments?.getIntArray(KEY_SELECTED_IDS)?.toSet() ?: emptySet()
+        val totalPrice = arguments?.getInt(KEY_TOTAL_PRICE) ?: 0
+        val totalCount = arguments?.getInt(KEY_TOTAL_COUNT) ?: 0
+        viewModel.initShoppingCartInfo(selectedIds, totalPrice, totalCount)
+    }
+
+    private fun initBindings() {
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
+        binding.rvRecommendedProducts.adapter = adapter
+    }
+
+    private fun initObservers() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { value ->
             adapter.updateItems(value)
         }
@@ -59,5 +76,22 @@ class CartProductRecommendationFragment(
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val KEY_SELECTED_IDS = "selectedIds"
+        private const val KEY_TOTAL_PRICE = "totalPrice"
+        private const val KEY_TOTAL_COUNT = "totalCount"
+
+        fun newBundle(
+            selectedIds: Set<Int>,
+            totalPrice: Int,
+            totalCount: Int,
+        ): Bundle =
+            Bundle().apply {
+                putIntArray(KEY_SELECTED_IDS, selectedIds.toIntArray())
+                putInt(KEY_TOTAL_PRICE, totalPrice)
+                putInt(KEY_TOTAL_COUNT, totalCount)
+            }
     }
 }

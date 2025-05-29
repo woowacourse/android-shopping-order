@@ -63,7 +63,11 @@ class CartProductSelectionFragment(
                 add(
                     R.id.fragment,
                     CartProductRecommendationFragment::class.java,
-                    null,
+                    CartProductRecommendationFragment.newBundle(
+                        viewModel.selectedIds,
+                        viewModel.totalPrice.value ?: 0,
+                        viewModel.totalCount.value ?: 0,
+                    ),
                 )
             }
         }
