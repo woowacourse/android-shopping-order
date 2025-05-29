@@ -75,6 +75,7 @@ class ProductCatalogViewModel(
     }
 
     override fun onMoreClick() {
+        page++
         loadProducts()
     }
 
@@ -113,8 +114,6 @@ class ProductCatalogViewModel(
             hasNext = result.hasNext
             _onFinishLoading.postValue(true)
             _productCatalogItems.postValue(buildCatalogItems())
-
-            if (result.items.isNotEmpty()) page++
         }
     }
 

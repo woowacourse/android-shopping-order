@@ -142,7 +142,7 @@ class CartProductSelectionViewModel(
         _products.value = updatedProducts
     }
 
-    fun loadPage(page: Int) {
+    fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
         _isFinishedLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
             _isFinishedLoading.value = true

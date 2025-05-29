@@ -48,7 +48,7 @@ class CartProductSelectionFragment(
 
     override fun onStart() {
         super.onStart()
-        viewModel.loadPage(1)
+        viewModel.loadPage()
     }
 
     private fun initRecyclerView() {
@@ -62,16 +62,14 @@ class CartProductSelectionFragment(
         binding.lifecycleOwner = this
         binding.handler = viewModel
         binding.btnOrder.setOnClickListener {
-            binding.llSelectAllProducts.visibility = View.INVISIBLE
             parentFragmentManager.commit {
-                addToBackStack(null)
-                add(
+                replace(
                     R.id.fragment,
                     CartProductRecommendationFragment::class.java,
                     CartProductRecommendationFragment.newBundle(
                         viewModel.selectedIds,
-                        viewModel.totalPrice.value ?: 0,
-                        viewModel.totalCount.value ?: 0,
+                        viewModel.totalPrice.value,
+                        viewModel.totalCount.value,
                     ),
                 )
             }
