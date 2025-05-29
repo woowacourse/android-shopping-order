@@ -245,6 +245,6 @@ class ShoppingCartViewModel(
 
     companion object {
         private const val MINIMUM_PAGE = 1
-        private const val COUNT_PER_PAGE: Int = 5
+        private const val COUNT_PER_PAGE: Int = Int.MAX_VALUE
     }
 }
