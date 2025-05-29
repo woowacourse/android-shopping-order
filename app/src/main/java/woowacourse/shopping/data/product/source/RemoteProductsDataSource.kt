@@ -35,6 +35,7 @@ class RemoteProductsDataSource(
             id = id ?: return null,
             name = name ?: return null,
             price = price ?: return null,
+            category = category ?: return null,
             imageUrl = imageUrl,
         )
     }
@@ -46,6 +47,7 @@ class RemoteProductsDataSource(
             id = id ?: return null,
             name = name ?: return null,
             price = price ?: return null,
+            category = category ?: return null,
             imageUrl = imageUrl,
         )
     }

@@ -3,8 +3,8 @@ package woowacourse.shopping.data.cart.repository
 import woowacourse.shopping.data.cart.PageableCartItemData
 import woowacourse.shopping.data.cart.source.CartDataSource
 import woowacourse.shopping.data.cart.source.RemoteCartDataSource
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PageableCartItems
-import woowacourse.shopping.domain.product.CartItem
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(

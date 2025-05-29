@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.cart
 
-import woowacourse.shopping.domain.product.CartItem
+import woowacourse.shopping.domain.cart.CartItem
 
 sealed interface CartItemType {
     val viewType: ItemType

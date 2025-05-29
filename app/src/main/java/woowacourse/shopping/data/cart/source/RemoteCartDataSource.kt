@@ -33,7 +33,13 @@ class RemoteCartDataSource(
     }
 
     private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
-        if (id == null || product?.id == null || product.name == null || product.price == null || quantity == null) {
+        if (id == null ||
+            product?.id == null ||
+            product.name == null ||
+            product.price == null ||
+            product.category == null ||
+            quantity == null
+        ) {
             null
         } else {
             CartItemEntity(
@@ -41,6 +47,7 @@ class RemoteCartDataSource(
                 productId = product.id,
                 name = product.name,
                 price = product.price,
+                category = product.category,
                 imageUrl = product.imageUrl,
                 quantity = quantity,
             )

@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PageableCartItems
-import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 

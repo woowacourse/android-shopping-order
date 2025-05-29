@@ -1,5 +1,6 @@
-package woowacourse.shopping.domain.product
+package woowacourse.shopping.domain.cart
 
+import woowacourse.shopping.domain.product.Product
 import java.io.Serializable
 
 data class CartItem(
@@ -18,10 +19,11 @@ data class CartItem(
         productId: Long,
         productName: String,
         productPrice: Int,
+        category: String,
         imageUrl: String? = null,
         quantity: Int = 0,
     ) :
-        this(id, Product(productId, productName, productPrice, imageUrl), quantity)
+        this(id, Product(productId, productName, productPrice, category, imageUrl), quantity)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

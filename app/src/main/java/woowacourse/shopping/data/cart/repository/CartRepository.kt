@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.cart.repository
 
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PageableCartItems
-import woowacourse.shopping.domain.product.CartItem
 
 interface CartRepository {
     fun loadPageableCartItems(
