@@ -65,7 +65,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.okhttp)
     implementation(libs.mockwebserver)
-    implementation(libs.converter.gson)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
