@@ -47,9 +47,14 @@ class ProductCatalogViewModel(
     }
 
     override fun onAddClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { cartProductId ->
-            cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-            updateQuantity(item, QUANTITY_TO_ADD)
+        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
+            result
+                .onSuccess { cartProductId ->
+                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+                    updateQuantity(item, QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -81,16 +86,26 @@ class ProductCatalogViewModel(
         _onFinishLoading.value = false
         loadRecentProducts()
         loadCartProducts()
-        cartProductRepository.getTotalQuantity {
-            _totalQuantity.postValue(it)
+        cartProductRepository.getTotalQuantity { result ->
+            result
+                .onSuccess {
+                    _totalQuantity.postValue(it)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
     private fun loadCartProducts() {
-        cartProductRepository.getPagedProducts {
-            cartProducts.clear()
-            cartProducts.addAll(it.items)
-            loadProducts()
+        cartProductRepository.getPagedProducts { result ->
+            result
+                .onSuccess {
+                    cartProducts.clear()
+                    cartProducts.addAll(it.items)
+                    loadProducts()
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 

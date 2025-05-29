@@ -11,7 +11,7 @@ class FakeCartProductRepository : CartProductRepository {
     override fun insert(
         productId: Int,
         quantity: Int,
-        onSuccess: (Int) -> Unit,
+        onResult: (Result<Int>) -> Unit,
     ) {
         val product =
             Product(
@@ -26,41 +26,41 @@ class FakeCartProductRepository : CartProductRepository {
     override fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onSuccess: (PagedResult<CartProduct>) -> Unit,
+        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
     ) {
         if (page == null || size == null) {
-            onSuccess(PagedResult(cartProducts, false))
+            onResult(Result.success(PagedResult(cartProducts, false)))
             return
         }
         val pagedItems = cartProducts.drop(page * size).take(size)
         val hasNext = page * size + pagedItems.size < cartProducts.size
-        onSuccess(PagedResult(pagedItems, hasNext))
+        onResult(Result.success(PagedResult(pagedItems, hasNext)))
     }
 
     override fun getCartProductByProductId(
         productId: Int,
-        onSuccess: (CartProduct?) -> Unit,
+        onResult: (Result<CartProduct?>) -> Unit,
     ) {
-        onSuccess(cartProducts.find { it.product.id == productId })
+        onResult(Result.success(cartProducts.find { it.product.id == productId }))
     }
 
-    override fun getTotalQuantity(onSuccess: (Int) -> Unit) {
-        onSuccess(cartProducts.sumOf { it.quantity })
+    override fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
+        onResult(Result.success(cartProducts.sumOf { it.quantity }))
     }
 
     override fun updateQuantity(
         cartProduct: CartProduct,
         quantityToAdd: Int,
-        onSuccess: () -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     ) {
         val newQuantity = cartProduct.quantity + quantityToAdd
         when {
-            newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
+            newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
             else -> {
                 cartProducts.replaceAll {
                     if (it.product.id == cartProduct.product.id) it.copy(quantity = newQuantity) else it
                 }
-                onSuccess()
+                onResult(Result.success(Unit))
             }
         }
         return
@@ -68,9 +68,9 @@ class FakeCartProductRepository : CartProductRepository {
 
     override fun delete(
         id: Int,
-        onSuccess: () -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     ) {
         cartProducts.removeIf { it.product.id == id }
-        onSuccess()
+        onResult(Result.success(Unit))
     }
 }

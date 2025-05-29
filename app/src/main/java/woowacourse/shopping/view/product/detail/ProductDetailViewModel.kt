@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.product.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,16 +54,21 @@ class ProductDetailViewModel(
 
     override fun onAddToCartClick() {
         val quantityToAdd = quantity.value ?: INITIAL_QUANTITY
-        cartProductRepository.getCartProductByProductId(product.id) { cartProduct ->
-            if (cartProduct == null) {
-                cartProductRepository.insert(product.id, quantityToAdd) {
-                    updateQuantity(INITIAL_QUANTITY)
+        cartProductRepository.getCartProductByProductId(product.id) { result ->
+            result
+                .onSuccess { cartProduct ->
+                    if (cartProduct == null) {
+                        cartProductRepository.insert(product.id, quantityToAdd) {
+                            updateQuantity(INITIAL_QUANTITY)
+                        }
+                    } else {
+                        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+                            updateQuantity(INITIAL_QUANTITY)
+                        }
+                    }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
                 }
-            } else {
-                cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
-                    updateQuantity(INITIAL_QUANTITY)
-                }
-            }
         }
         _addToCartEvent.setValue(Unit)
     }

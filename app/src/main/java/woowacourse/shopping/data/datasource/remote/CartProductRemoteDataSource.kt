@@ -18,7 +18,7 @@ class CartProductRemoteDataSource(
     fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onSuccess: (PagedResult<CartProduct>) -> Unit,
+        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
     ) {
         cartProductService.getPagedProducts(page = page, size = size).enqueue(
             object : Callback<CartProductResponseDto> {
@@ -30,8 +30,10 @@ class CartProductRemoteDataSource(
                         response.body()?.let { body ->
                             val products = body.content.map { it.toCartProduct() }
                             val hasNext = body.last.not()
-                            onSuccess(PagedResult(products, hasNext))
-                        } ?: onSuccess(PagedResult(emptyList(), false))
+                            onResult(Result.success(PagedResult(products, hasNext)))
+                        } ?: onResult(Result.success(PagedResult(emptyList(), false)))
+                    } else {
+                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
                     }
                 }
 
@@ -39,7 +41,7 @@ class CartProductRemoteDataSource(
                     call: Call<CartProductResponseDto>,
                     t: Throwable,
                 ) {
-                    println("error : $t")
+                    onResult(Result.failure(t))
                 }
             },
         )
@@ -48,7 +50,7 @@ class CartProductRemoteDataSource(
     fun insert(
         id: Int,
         quantity: Int,
-        onSuccess: (Int) -> Unit,
+        onResult: (Result<Int>) -> Unit,
     ) {
         cartProductService.insert(body = CartProductRequestDto(id, quantity)).enqueue(
             object : Callback<Unit> {
@@ -60,7 +62,9 @@ class CartProductRemoteDataSource(
                         val cartProductId =
                             response.headers()["location"]?.removePrefix("/cart-items/")?.toInt()
                                 ?: throw IllegalArgumentException()
-                        onSuccess(cartProductId)
+                        onResult(Result.success(cartProductId))
+                    } else {
+                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
                     }
                 }
 
@@ -68,7 +72,7 @@ class CartProductRemoteDataSource(
                     call: Call<Unit>,
                     t: Throwable,
                 ) {
-                    println("error : $t")
+                    onResult(Result.failure(t))
                 }
             },
         )
@@ -76,7 +80,7 @@ class CartProductRemoteDataSource(
 
     fun delete(
         id: Int,
-        onSuccess: () -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     ) {
         cartProductService.delete(id = id).enqueue(
             object : Callback<Unit> {
@@ -85,7 +89,9 @@ class CartProductRemoteDataSource(
                     response: Response<Unit>,
                 ) {
                     if (response.code() == SUCCESS_DELETE) {
-                        onSuccess()
+                        onResult(Result.success(Unit))
+                    } else {
+                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
                     }
                 }
 
@@ -93,13 +99,13 @@ class CartProductRemoteDataSource(
                     call: Call<Unit>,
                     t: Throwable,
                 ) {
-                    println("error : $t")
+                    onResult(Result.failure(t))
                 }
             },
         )
     }
 
-    fun getTotalQuantity(onSuccess: (Int) -> Unit) {
+    fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
         cartProductService.getTotalQuantity().enqueue(
             object : Callback<CartProductQuantityResponseDto> {
                 override fun onResponse(
@@ -108,8 +114,10 @@ class CartProductRemoteDataSource(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { body ->
-                            onSuccess(body.quantity)
+                            onResult(Result.success(body.quantity))
                         }
+                    } else {
+                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
                     }
                 }
 
@@ -117,7 +125,7 @@ class CartProductRemoteDataSource(
                     call: Call<CartProductQuantityResponseDto>,
                     t: Throwable,
                 ) {
-                    println("error : $t")
+                    onResult(Result.failure(t))
                 }
             },
         )
@@ -126,7 +134,7 @@ class CartProductRemoteDataSource(
     fun updateQuantity(
         id: Int,
         quantity: Int,
-        onSuccess: () -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     ) {
         cartProductService
             .updateQuantity(id = id, body = CartProductQuantityRequestDto(quantity))
@@ -136,14 +144,18 @@ class CartProductRemoteDataSource(
                         call: Call<Unit>,
                         response: Response<Unit>,
                     ) {
-                        if (response.code() == SUCCESS_PATCH) onSuccess()
+                        if (response.code() == SUCCESS_PATCH) {
+                            onResult(Result.success(Unit))
+                        } else {
+                            onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
+                        }
                     }
 
                     override fun onFailure(
                         call: Call<Unit>,
                         t: Throwable,
                     ) {
-                        println("error : $t")
+                        onResult(Result.failure(t))
                     }
                 },
             )

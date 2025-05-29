@@ -11,54 +11,59 @@ class CartProductRepositoryImpl(
     override fun insert(
         productId: Int,
         quantity: Int,
-        onSuccess: (Int) -> Unit,
+        onResult: (Result<Int>) -> Unit,
     ) {
-        remoteDataSource.insert(productId, quantity, onSuccess)
+        remoteDataSource.insert(productId, quantity, onResult)
     }
 
     override fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onSuccess: (PagedResult<CartProduct>) -> Unit,
+        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
     ) {
-        remoteDataSource.getPagedProducts(page = page, size = size, onSuccess)
+        remoteDataSource.getPagedProducts(page = page, size = size, onResult)
     }
 
     override fun getCartProductByProductId(
         productId: Int,
-        onSuccess: (CartProduct?) -> Unit,
+        onResult: (Result<CartProduct?>) -> Unit,
     ) {
         getPagedProducts { result ->
-            val cartProduct = result.items.firstOrNull { it.product.id == productId }
-            onSuccess(cartProduct)
+            result
+                .onSuccess { pagedResult ->
+                    val cartProduct = pagedResult.items.firstOrNull { it.product.id == productId }
+                    onResult(Result.success(cartProduct))
+                }.onFailure {
+                    onResult(Result.failure(it))
+                }
         }
     }
 
-    override fun getTotalQuantity(onSuccess: (Int) -> Unit) {
-        remoteDataSource.getTotalQuantity(onSuccess)
+    override fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
+        remoteDataSource.getTotalQuantity(onResult)
     }
 
     override fun updateQuantity(
         cartProduct: CartProduct,
         quantityToAdd: Int,
-        onSuccess: () -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     ) {
         val newQuantity = cartProduct.quantity + quantityToAdd
         when {
-            newQuantity == 0 -> delete(cartProduct.id) { onSuccess() }
+            newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
             else ->
                 remoteDataSource.updateQuantity(
                     cartProduct.id,
                     newQuantity,
-                ) { onSuccess() }
+                ) { onResult(Result.success(Unit)) }
         }
         return
     }
 
     override fun delete(
         id: Int,
-        onSuccess: () -> Unit,
+        onResult: (Result<Unit>) -> Unit,
     ) {
-        remoteDataSource.delete(id, onSuccess)
+        remoteDataSource.delete(id, onResult)
     }
 }

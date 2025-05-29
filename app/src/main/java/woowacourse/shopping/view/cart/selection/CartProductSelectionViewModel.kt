@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.cart.selection
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -145,11 +146,17 @@ class CartProductSelectionViewModel(
     fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
         _isFinishedLoading.value = false
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
-            _isFinishedLoading.value = true
-            _products.value = (result.items.map { CartProductItem(it, it.id in _selectedIds) })
-            val hasNext = result.hasNext
-            updatePageState(page, hasNext)
-            updateIsSelectedAll()
+            result
+                .onSuccess { pagedResult ->
+                    _isFinishedLoading.value = true
+                    _products.value =
+                        (pagedResult.items.map { CartProductItem(it, it.id in _selectedIds) })
+                    val hasNext = pagedResult.hasNext
+                    updatePageState(page, hasNext)
+                    updateIsSelectedAll()
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 

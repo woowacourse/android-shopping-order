@@ -53,7 +53,7 @@ class RecentProductRepositoryImpl(
                                 }
                             }
                         onSuccess(recentProducts)
-                    }.onFailure { }
+                    }.onFailure {}
             }
         }
     }

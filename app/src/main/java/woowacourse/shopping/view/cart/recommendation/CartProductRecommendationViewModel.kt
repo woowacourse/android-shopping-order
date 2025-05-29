@@ -37,8 +37,13 @@ class CartProductRecommendationViewModel(
 
     init {
         cartProductRepository.getPagedProducts { result ->
-            cartProducts.addAll(result.items)
-            loadRecommendedProducts()
+            result
+                .onSuccess {
+                    cartProducts.addAll(it.items)
+                    loadRecommendedProducts()
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -82,10 +87,15 @@ class CartProductRecommendationViewModel(
     }
 
     override fun onAddClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { cartProductId ->
-            cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-            selectedCartIds.add(cartProductId)
-            updateQuantity(item, QUANTITY_TO_ADD)
+        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
+            result
+                .onSuccess { cartProductId ->
+                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+                    selectedCartIds.add(cartProductId)
+                    updateQuantity(item, QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
