@@ -9,5 +9,6 @@ fun Product.toUiModel() =
         imageUrl = this.imageUrl,
         name = this.name,
         price = this.price,
+        category = this.category,
         quantity = 0,
     )

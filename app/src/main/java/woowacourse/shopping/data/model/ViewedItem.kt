@@ -9,5 +9,6 @@ data class ViewedItem(
     val imageUrl: String,
     val name: String,
     val price: Int,
+    val category: String,
     val viewedAt: Long = System.currentTimeMillis(),
 )

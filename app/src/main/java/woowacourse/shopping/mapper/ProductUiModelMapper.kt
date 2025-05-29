@@ -9,4 +9,5 @@ fun ProductUiModel.toViewedItem() =
         imageUrl = this.imageUrl,
         name = this.name,
         price = this.price,
+        category = this.category,
     )

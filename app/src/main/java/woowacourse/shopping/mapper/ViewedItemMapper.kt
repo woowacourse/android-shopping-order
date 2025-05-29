@@ -9,4 +9,5 @@ fun ViewedItem.toUiModel() =
         imageUrl = this.imageUrl,
         name = this.name,
         price = this.price,
+        category = this.category,
     )
