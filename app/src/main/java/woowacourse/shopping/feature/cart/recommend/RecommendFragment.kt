@@ -25,7 +25,6 @@ class RecommendFragment : Fragment() {
     val recommendAdapter by lazy {
         RecommendAdapter(
             lifecycleOwner = viewLifecycleOwner,
-            quantityChangeListener =
                 object : QuantityChangeListener {
                     override fun onIncrease(cartItem: CartItem) {
                         viewModel.addCartItemOrIncreaseQuantity(cartItem)
@@ -53,18 +52,15 @@ class RecommendFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // RecyclerView 세팅
         binding.rvRecommendItems.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = recommendAdapter
         }
 
-        // ViewModel의 recommendedGoods를 구독
         viewModel.recommendedGoods.observe(viewLifecycleOwner) { goodsList ->
             recommendAdapter.setItems(goodsList)
         }
 
-        // 데이터 로드 요청
         viewModel.loadRecommendedGoods()
         setupBinding()
     }

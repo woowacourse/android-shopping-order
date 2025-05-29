@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -100,10 +101,10 @@ class CartViewModel(
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
         val existing = selectedCartMap[cartItem.id]
         if (existing != null) {
-            existing.quantity = existing.quantity + 1
+            existing.quantity += 1
         } else {
             val toAdd = cartItem.copy(quantity = 1)
-            selectedCartMap[cartItem.id] = toAdd
+            selectedCartMap[toAdd.id] =toAdd
         }
         updateAllSelected()
         updateTotalPriceAndCount()

@@ -8,54 +8,75 @@ import woowacourse.shopping.feature.QuantityChangeListener
 
 class RecommendAdapter(
     private val lifecycleOwner: LifecycleOwner,
-    private val quantityChangeListener: QuantityChangeListener,
+    private val externalQuantityChange: QuantityChangeListener
 ) : RecyclerView.Adapter<RecommendViewHolder>() {
+
     private val items = mutableListOf<CartItem>()
 
     fun setItems(newItems: List<CartItem>) {
         val old = items.toList()
         items.clear()
         items.addAll(newItems)
-        if (old.isEmpty()) {
-            notifyDataSetChanged()
-        } else {
-            if (newItems.size > old.size) {
+        when {
+            old.isEmpty() -> {
+                @Suppress("NotifyDataSetChanged")
+                notifyDataSetChanged()
+            }
+            newItems.size > old.size -> {
                 notifyItemRangeInserted(old.size, newItems.size - old.size)
             }
-            newItems.forEachIndexed { i, it ->
-                if (i < old.size && it != old[i]) {
-                    notifyItemChanged(i)
+            else -> {
+                newItems.forEachIndexed { idx, newItem ->
+                    if (idx < old.size && newItem != old[idx]) {
+                        notifyItemChanged(idx)
+                    }
                 }
             }
         }
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int,
-    ): RecommendViewHolder =
-        RecommendViewHolder.from(
-            parent,
-            quantityChangeListener,
-            lifecycleOwner,
-        )
 
-    override fun onBindViewHolder(
-        holder: RecommendViewHolder,
-        position: Int,
-    ) {
-        holder.bind(items[position])
+    private fun incrementItemQuantity(itemId: Int) {
+        val pos = items.indexOfFirst { it.goods.id == itemId }
+        if (pos != -1) {
+            val old = items[pos]
+            items[pos] = old.copy(quantity = old.quantity + 1)
+            notifyItemChanged(pos)
+        }
+    }
 
-        val displayMetrics = holder.itemView.context.resources.displayMetrics
-        val screenWidth = displayMetrics.widthPixels
-        val itemWidth = screenWidth * 0.4f
-
-        val params = holder.itemView.layoutParams
-        if (params != null) {
-            params.width = itemWidth.toInt()
-            holder.itemView.layoutParams = params
+    private fun decrementItemQuantity(itemId: Int) {
+        val pos = items.indexOfFirst { it.goods.id == itemId }
+        if (pos != -1) {
+            val old = items[pos]
+            items[pos] = old.copy(quantity = old.quantity - 1)
+            if(items[pos].quantity<0) items[pos].quantity =0
+            notifyItemChanged(pos)
         }
     }
 
     override fun getItemCount(): Int = items.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecommendViewHolder {
+        val wrappedListener = object : QuantityChangeListener {
+            override fun onIncrease(cartItem: CartItem) {
+                externalQuantityChange.onIncrease(cartItem)
+                incrementItemQuantity(cartItem.goods.id)
+            }
+            override fun onDecrease(cartItem: CartItem) {
+                externalQuantityChange.onDecrease(cartItem)
+                decrementItemQuantity(cartItem.goods.id)
+            }
+        }
+        return RecommendViewHolder.from(parent, wrappedListener, lifecycleOwner)
+    }
+
+    override fun onBindViewHolder(holder: RecommendViewHolder, position: Int) {
+        val item = items[position]
+        holder.bind(item)
+        val screenWidth = holder.itemView.context.resources.displayMetrics.widthPixels
+        holder.itemView.layoutParams = holder.itemView.layoutParams.apply {
+            width = screenWidth / 3
+        }
+    }
 }
