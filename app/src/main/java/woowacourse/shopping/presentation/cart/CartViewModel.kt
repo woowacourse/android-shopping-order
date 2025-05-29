@@ -43,7 +43,6 @@ class CartViewModel(
         }
     }
 
-
     fun increaseQuantity(productId: Long) {
         cartRepository.increaseQuantity(productId) { result ->
             result
@@ -80,8 +79,15 @@ class CartViewModel(
     ) {
         val currentItems = cartItems.value ?: emptyList()
         val updatedItem =
-            currentItems.map {
-                if (it.product.id == productId) it.copy(quantity = it.quantity + amount) else it
+            currentItems.map { cartItem ->
+                if (cartItem.product.id == productId) {
+                    cartItem.copy(
+                        quantity = cartItem.quantity + amount,
+                        totalPrice = (cartItem.quantity + amount) * (cartItem.totalPrice / cartItem.quantity),
+                    )
+                } else {
+                    cartItem
+                }
             }
         _cartItems.postValue(updatedItem)
     }
