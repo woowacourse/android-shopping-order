@@ -5,13 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
+import androidx.lifecycle.ViewModelProvider
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartProductSelectionBinding
-import woowacourse.shopping.view.cart.ShoppingCartViewModel
+import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
 import woowacourse.shopping.view.cart.selection.adapter.CartProductAdapter
 
 class CartProductSelectionFragment(
-    private val viewModel: ShoppingCartViewModel,
+    repository: CartProductRepository,
 ) : Fragment() {
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            CartProductSelectionViewModelFactory(repository),
+        )[CartProductSelectionViewModel::class.java]
+    }
     private var _binding: FragmentCartProductSelectionBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: CartProductAdapter
@@ -46,6 +56,17 @@ class CartProductSelectionFragment(
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
         binding.handler = viewModel
+        binding.btnOrder.setOnClickListener {
+            binding.llSelectAllProducts.visibility = View.INVISIBLE
+            parentFragmentManager.commit {
+                addToBackStack(null)
+                add(
+                    R.id.fragment,
+                    CartProductRecommendationFragment::class.java,
+                    null,
+                )
+            }
+        }
     }
 
     private fun initObservers() {

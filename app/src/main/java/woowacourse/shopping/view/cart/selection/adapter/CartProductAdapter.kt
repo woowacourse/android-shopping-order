@@ -2,11 +2,11 @@ package woowacourse.shopping.view.cart.selection.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.view.cart.ShoppingCartEventHandler
+import woowacourse.shopping.view.cart.selection.CartProductSelectionEventHandler
 
 class CartProductAdapter(
     items: List<CartProductItem> = emptyList(),
-    private val eventHandler: ShoppingCartEventHandler,
+    private val eventHandler: CartProductSelectionEventHandler,
 ) : RecyclerView.Adapter<CartProductViewHolder>() {
     private val items = items.toMutableList()
 

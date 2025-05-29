@@ -1,8 +1,8 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.cart.selection
 
 import woowacourse.shopping.view.cart.selection.adapter.CartProductViewHolder
 
-interface ShoppingCartEventHandler : CartProductViewHolder.EventHandler {
+interface CartProductSelectionEventHandler : CartProductViewHolder.EventHandler {
     fun loadPreviousProducts()
 
     fun loadNextProducts()
