@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="14dp"
+            app:visible="@{!viewModel.isLoading}"
             app:items="@{viewModel.items}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:shimmer_auto_start="true"
-            android:visibility="invisible"
+            app:visible="@{viewModel.isLoading}"
             android:padding="16dp">
 
             <LinearLayout
