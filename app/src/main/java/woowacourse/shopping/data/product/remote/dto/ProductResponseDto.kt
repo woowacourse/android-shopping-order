@@ -23,5 +23,6 @@ data class ProductResponseDto(
             name = name,
             price = price,
             imageUrl = imageUrl,
+            category = category,
         )
 }
