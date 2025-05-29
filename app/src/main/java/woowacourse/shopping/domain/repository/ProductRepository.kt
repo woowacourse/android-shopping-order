@@ -14,4 +14,10 @@ interface ProductRepository {
         size: Int,
         onResult: (Result<PageableItem<Product>>) -> Unit,
     )
+
+    fun fetchSuggestionProducts(
+        limit: Int,
+        excludedProductIds: List<Long>,
+        onResult: (Result<List<Product>>) -> Unit,
+    )
 }

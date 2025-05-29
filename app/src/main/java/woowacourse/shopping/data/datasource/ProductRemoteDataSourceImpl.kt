@@ -10,8 +10,8 @@ class ProductRemoteDataSourceImpl(
 ) : ProductRemoteDataSource {
     override fun fetchProducts(
         category: String?,
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
     ): Result<PageableResponse<ProductResponse>> =
         safeApiCall {
             productService.fetchProducts(category, page, size).execute()

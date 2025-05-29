@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
 import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.data.util.runCatchingInThread
 import woowacourse.shopping.domain.model.PageableItem
@@ -9,6 +10,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
+    private val recentProductLocalDataSource: RecentProductLocalDataSource,
 ) : ProductRepository {
     override fun fetchProduct(
         id: Long,
@@ -26,5 +28,17 @@ class ProductRepositoryImpl(
         val products = response.content.map { it.toDomain() }
         val hasMore = !response.last
         PageableItem(products, hasMore)
+    }
+
+    override fun fetchSuggestionProducts(
+        limit: Int,
+        excludedProductIds: List<Long>,
+        onResult: (Result<List<Product>>) -> Unit,
+    ) = runCatchingInThread(onResult) {
+        val category = recentProductLocalDataSource.getRecentViewedProductCategory()
+        val response = productRemoteDataSource.fetchProducts(category, null, null).getOrNull()
+        val allProducts = response?.content ?: emptyList()
+        val filteredProducts = allProducts.filterNot { excludedProductIds.contains(it.id) }
+        filteredProducts.take(limit).map { it.toDomain() }
     }
 }
