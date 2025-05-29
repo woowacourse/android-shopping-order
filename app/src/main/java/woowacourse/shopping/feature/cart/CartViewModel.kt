@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -74,24 +73,53 @@ class CartViewModel(
                 goodsRepository.fetchCategoryGoods(
                     10,
                     goods.category,
-                    { response ->
-                        val goodsList = response.content.map { CartItem(it.toDomain(), 0) }
-                        _recommendedGoods.value = goodsList
+                    { goodsResponse ->
+                        val allGoodsList = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
+
+                        filterRecommendedGoods(allGoodsList)
                     },
-                    { },
+                    {
+                        loadDefaultRecommendedGoods()
+                    },
                 )
             } else {
-                goodsRepository.fetchPageGoods(
-                    10,
-                    1,
-                    { response ->
-                        val goodsList = response.content.map { CartItem(it.toDomain(), 0) }
-                        _recommendedGoods.value = goodsList
-                    },
-                    { },
-                )
+                loadDefaultRecommendedGoods()
             }
         }
+    }
+
+    private fun filterRecommendedGoods(allGoodsList: List<CartItem>) {
+        cartRepository.fetchAllCartItems(
+            { cartResponse: CartResponse ->
+                val cartItems = cartResponse.toCartItems()
+                val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
+
+                val filteredGoodsList =
+                    allGoodsList.filter { recommendItem ->
+                        !cartGoodsIds.contains(recommendItem.goods.id)
+                    }
+
+                _recommendedGoods.value = filteredGoodsList
+            },
+            {
+                _recommendedGoods.value = allGoodsList
+            },
+        )
+    }
+
+    private fun loadDefaultRecommendedGoods() {
+        goodsRepository.fetchPageGoods(
+            10,
+            1,
+            { response ->
+                val allGoodsList = response.content.map { CartItem(it.toDomain(), 0) }
+
+                filterRecommendedGoods(allGoodsList)
+            },
+            {
+                _recommendedGoods.value = emptyList()
+            },
+        )
     }
 
     init {
@@ -104,7 +132,7 @@ class CartViewModel(
             existing.quantity += 1
         } else {
             val toAdd = cartItem.copy(quantity = 1)
-            selectedCartMap[toAdd.id] =toAdd
+            selectedCartMap[toAdd.id] = toAdd
         }
         updateAllSelected()
         updateTotalPriceAndCount()
