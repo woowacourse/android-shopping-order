@@ -85,13 +85,13 @@ class CartViewModel(
     }
 
     fun delete(cart: Cart) {
-//        val total = totalItemsCount.value ?: 0
-//        val endPage = ((total - 1) / PAGE_SIZE) + 1
-//
-//        if (currentPage == endPage && (total - 1) == ((currentPage - 1) * PAGE_SIZE)) {
-//            currentPage--
-//            _page.value = currentPage
-//        }
+        val total = totalItemsCount.value ?: 0
+        val endPage = ((total - 1) / PAGE_SIZE) + 1
+
+        if (currentPage == endPage && (total - 1) == ((currentPage - 1) * PAGE_SIZE)) {
+            currentPage--
+            _page.value = currentPage
+        }
 
         cartRepository.deleteCart(cart.id) { result ->
             result
@@ -198,20 +198,37 @@ class CartViewModel(
 
     fun loadProductsByCategory() {
         historyRepository.findLatest { latestProduct ->
+            cartRepository.fetchAllCart(
+                onSuccess = { cartResponse ->
+                    val cartProductIds = cartResponse.content.map { it.product.id }
 
-            productRepository.fetchAllProducts(
-                onSuccess = { response ->
-                    val matchedProduct = response.content.find { it.id.toInt() == latestProduct.product.id }
-                    val category = matchedProduct?.category
+                    productRepository.fetchAllProducts(
+                        onSuccess = { response ->
+                            val matchedProduct =
+                                response.content.find { it.id.toInt() == latestProduct.product.id }
+                            val category = matchedProduct?.category
 
-                    val recommendProducts =
-                        response.content
-                            .filter { it.category == category && it.id.toInt() != latestProduct.product.id }
-                            .take(10)
+                            val recommendProducts =
+                                response.content
+                                    .filter {
+                                        it.category == category &&
+                                            it.id.toInt() != latestProduct.product.id &&
+                                            it.id !in cartProductIds
+                                    }.take(10)
 
-                    _recommendItems.value = recommendProducts.map { Cart(id = 0, product = it.toDomain(), quantity = 0) }
+                            _recommendItems.value =
+                                recommendProducts.map {
+                                    Cart(id = 0, product = it.toDomain(), quantity = 0)
+                                }
+                        },
+                        onError = {
+                            Log.e("loadProductsInRange", "상품 요청 실패", it)
+                        },
+                    )
                 },
-                onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
+                onError = {
+                    Log.e("loadProductsInRange", "장바구니 요청 실패", it)
+                },
             )
         }
     }
