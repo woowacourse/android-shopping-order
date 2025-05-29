@@ -1,10 +1,13 @@
 package woowacourse.shopping.feature.goodsdetails
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.util.MutableSingleLiveData
@@ -12,8 +15,10 @@ import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.updateQuantity
 
 class GoodsDetailsViewModel(
-    private val cartRepository: LocalCartRepository,
+    private val localCartRepository: LocalCartRepository,
+    private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
+    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _cart = MutableLiveData<Cart>()
     val cart: LiveData<Cart> get() = _cart
@@ -28,10 +33,37 @@ class GoodsDetailsViewModel(
     private val _navigateToLastViewedCart = MutableSingleLiveData<Cart>()
     val navigateToLastViewedCart: SingleLiveData<Cart> get() = _navigateToLastViewedCart
 
-    fun setInitialCart(cart: Cart) {
-        _cart.value = cart
-        insertToHistory(cart)
+    fun setInitialCart(id: Long) {
+        loadProductDetails(productId = id)
         loadLastViewed()
+    }
+
+    fun loadProductDetails(productId: Long) {
+        productRepository.requestProductDetails(
+            productId = productId,
+            onSuccess = { content ->
+                val currentCart = _cart.value
+                Log.d("currentCart", currentCart.toString())
+                _cart.value =
+                    Cart(
+                        id = currentCart?.id ?: 0,
+                        product =
+                            Product(
+                                id = content.id.toInt(),
+                                name = content.name,
+                                price = content.price,
+                                imageUrl = content.imageUrl,
+                                category = content.category,
+                            ),
+                        quantity = currentCart?.quantity ?: 1,
+                    )
+                if (cart.value != null) insertToHistory(cart.value as Cart)
+                Log.d("cart", cart.value.toString())
+            },
+            onError = {
+                _isFail.setValue(Unit)
+            },
+        )
     }
 
     fun increaseQuantity() {
@@ -53,7 +85,7 @@ class GoodsDetailsViewModel(
     fun commitCart() {
         runCatching {
             _cart.value?.let {
-                cartRepository.insertAll(it)
+                localCartRepository.insertAll(it)
             }
         }.onSuccess {
             _isSuccess.setValue(Unit)
@@ -82,7 +114,17 @@ class GoodsDetailsViewModel(
 
     private fun insertToHistory(cart: Cart) {
         historyRepository.insert(
-            Cart(cart.id, Product(cart.product.id, cart.product.name, cart.product.price, cart.product.imageUrl, ""), cart.quantity),
+            Cart(
+                cart.id,
+                Product(
+                    cart.product.id,
+                    cart.product.name,
+                    cart.product.price,
+                    cart.product.imageUrl,
+                    "",
+                ),
+                cart.quantity,
+            ),
         )
     }
 }

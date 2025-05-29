@@ -28,7 +28,9 @@ class ShoppingApplication : Application() {
         ViewModelFactory {
             GoodsDetailsViewModel(
                 LocalCartRepositoryImpl(database.cartDao()),
+                CartRepository(),
                 HistoryRepositoryImpl(database.historyDao()),
+                ProductRepository(),
             )
         }
     }

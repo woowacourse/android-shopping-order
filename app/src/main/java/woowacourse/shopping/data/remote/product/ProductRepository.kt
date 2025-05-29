@@ -37,4 +37,37 @@ class ProductRepository {
                 },
             )
     }
+
+    fun requestProductDetails(
+        onSuccess: (ProductResponse.Content) -> Unit,
+        onError: (Throwable) -> Unit,
+        productId: Long,
+    ) {
+        ProductClient
+            .getRetrofitService()
+            .requestProductDetails(productId = productId)
+            .enqueue(
+                object : Callback<ProductResponse.Content> {
+                    override fun onResponse(
+                        call: Call<ProductResponse.Content?>,
+                        response: Response<ProductResponse.Content?>,
+                    ) {
+                        if (response.isSuccessful) {
+                            response.body()?.let {
+                                onSuccess(it)
+                            } ?: onError(Throwable("응답 본문 없음"))
+                        } else {
+                            onError(Throwable("응답 실패: ${response.code()}"))
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<ProductResponse.Content?>,
+                        t: Throwable,
+                    ) {
+                        onError(t)
+                    }
+                },
+            )
+    }
 }
