@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import kotlin.math.max
+
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
@@ -93,7 +94,6 @@ class CartViewModel(
     }
 
     fun updateCartQuantity() {
-        _isLoading.value = true
         cartRepository.fetchCartItemsByPage(
             currentPage - 1,
             PAGE_SIZE,
@@ -104,8 +104,12 @@ class CartViewModel(
                 updatePageMoveAvailability(cartResponse)
                 _isLoading.value = false
                 updateTotalPriceAndCount()
+                if (cartResponse.totalPages >= MINIMUM_PAGE && cartResponse.totalPages < currentPage) {
+                    currentPage = cartResponse.totalPages
+                    updateCartQuantity()
+                }
             },
-            { _loginErrorEvent.setValue(it) }
+            { _loginErrorEvent.setValue(it) },
         )
     }
 
@@ -129,7 +133,10 @@ class CartViewModel(
         _isRightPageEnable.value = !response.last
     }
 
-    fun setItemSelection(cartItem: CartItem, isSelected: Boolean) {
+    fun setItemSelection(
+        cartItem: CartItem,
+        isSelected: Boolean,
+    ) {
         if (isSelected) {
             selectedCartMap[cartItem.id] = cartItem
         } else {
@@ -138,8 +145,6 @@ class CartViewModel(
         updateAllSelected()
         updateTotalPriceAndCount()
     }
-
-
 
     fun isItemSelected(cartItem: CartItem): Boolean = selectedCartMap.containsKey(cartItem.id)
 
@@ -166,6 +171,7 @@ class CartViewModel(
         val currentPageItems = _visibleCart.value ?: return
         _isAllSelected.value = currentPageItems.all { selectedCartMap.containsKey(it.id) }
     }
+
     private fun updateTotalPriceAndCount() {
         val total = selectedCartMap.values.sumOf { it.goods.price * it.quantity }
         _totalPrice.value = total
