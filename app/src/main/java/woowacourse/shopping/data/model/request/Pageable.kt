@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class Pageable(
     @SerialName("page") val page: Int,
     @SerialName("size") val size: Int,
-    @SerialName("sort") val sort: List<String>
+    @SerialName("sort") val sort: List<String>,
 )

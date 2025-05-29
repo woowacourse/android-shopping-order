@@ -5,10 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [CartEntity::class, RecentProductEntity::class], version = 1)
+@Database(entities = [RecentProductEntity::class], version = 1)
 abstract class ShoppingDatabase : RoomDatabase() {
-    abstract fun cartDao(): CartDao
-
     abstract fun recentProductDao(): RecentProductDao
 
     companion object {

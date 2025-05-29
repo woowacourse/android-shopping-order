@@ -7,8 +7,8 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.base.BaseFragment
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
@@ -50,8 +50,19 @@ class CartFragment :
         backCallback.remove()
     }
 
-    override fun onProductDeletion(cartItem: CartItem) {
+    override fun onProductDeletion(cartItem: CartItemUiModel) {
         viewModel.deleteProduct(cartItem)
+    }
+
+    override fun onProductSelectionToggle(
+        cartItem: CartItemUiModel,
+        isChecked: Boolean,
+    ) {
+        viewModel.setCartItemSelection(cartItem, isChecked)
+    }
+
+    override fun onSelectAllToggle(isChecked: Boolean) {
+        viewModel.setAllSelections(isChecked)
     }
 
     override fun increase(product: ProductUiModel) {
@@ -74,7 +85,7 @@ class CartFragment :
             binding.recyclerViewCart.smoothScrollToPosition(0)
         }
 
-        viewModel.products.observe(viewLifecycleOwner) {
+        viewModel.cartItems.observe(viewLifecycleOwner) {
             cartAdapter.updateCartItems(it)
         }
 
@@ -88,12 +99,21 @@ class CartFragment :
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
             cartAdapter.updateItem(it)
         }
+
+        viewModel.totalPrice.observe(viewLifecycleOwner) {
+            it.let { binding.textViewCartTotalPrice.text = it.toString() }
+        }
+
+        viewModel.allSelected.observe(viewLifecycleOwner) {
+            binding.selectAll.isChecked = it
+        }
     }
 
     private fun initListener() {
         binding.btnBack.setOnClickListener {
             navigateToScreen()
         }
+        binding.eventListener = this
     }
 
     private fun navigateToScreen() {

@@ -23,6 +23,21 @@ class CartRepositoryImpl(
         }
     }
 
+    override fun getAllCartItems(callback: (List<CartItem>?) -> Unit) {
+        cartItemDataSource.fetchCartItems(
+            page = 0,
+            size = Int.MAX_VALUE,
+        ) { it ->
+            callback(it?.content?.map { it.toCartItem() }.orEmpty())
+        }
+    }
+
+    override fun getAllCartItemsCount(callBack: (Quantity?) -> Unit) {
+        cartItemDataSource.fetchCartItemsCount {
+            callBack(it)
+        }
+    }
+
     override fun deleteCartItem(
         id: Long,
         callback: (Long) -> Unit,
@@ -62,15 +77,6 @@ class CartRepositoryImpl(
     ) {
         cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount - 1)) {
             callback(it)
-        }
-    }
-
-    override fun getAllCartItems(callback: (List<CartItem>?) -> Unit) {
-        cartItemDataSource.fetchCartItems(
-            page = 0,
-            size = Int.MAX_VALUE,
-        ) { it ->
-            callback(it?.content?.map { it.toCartItem() } ?: emptyList())
         }
     }
 

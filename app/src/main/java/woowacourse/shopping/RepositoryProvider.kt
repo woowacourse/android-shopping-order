@@ -37,7 +37,6 @@ object RepositoryProvider {
         if (isInitialized) return
 
         val database = ShoppingDatabase.getDatabase(context.applicationContext)
-        val cartDao = database.cartDao()
         val recentProductDao = database.recentProductDao()
 
         val productDataSource = ProductDataSourceImpl(ApiClient.productService)

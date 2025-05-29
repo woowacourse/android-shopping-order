@@ -2,11 +2,11 @@ package woowacourse.shopping.presentation.view.cart.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 
 class CartAdapter(
-    cartItems: List<CartItem> = emptyList(),
+    cartItems: List<CartItemUiModel> = emptyList(),
     private val eventListener: CartEventListener,
     private val itemCounterListener: ItemCounterListener,
 ) : RecyclerView.Adapter<CartViewHolder>() {
@@ -26,15 +26,14 @@ class CartAdapter(
         holder.bind(cartItems[position])
     }
 
-    fun updateCartItems(cartItems: List<CartItem>) {
+    fun updateCartItems(cartItems: List<CartItemUiModel>) {
         this.cartItems.clear()
         this.cartItems.addAll(cartItems)
-
         notifyDataSetChanged()
     }
 
-    fun updateItem(updatedItem: CartItem) {
-        val index = cartItems.indexOfFirst { it.cartId == updatedItem.cartId }
+    fun updateItem(updatedItem: CartItemUiModel) {
+        val index = cartItems.indexOfFirst { it.cartItem.cartId == updatedItem.cartItem.cartId }
         if (index != -1) {
             cartItems[index] = updatedItem
             notifyItemChanged(index)
@@ -42,12 +41,19 @@ class CartAdapter(
     }
 
     fun removeProduct(id: Long) {
-        val index = cartItems.indexOfFirst { it.cartId == id }
+        val index = cartItems.indexOfFirst { it.cartItem.cartId == id }
         cartItems.removeAt(index)
         notifyItemRemoved(index)
     }
 
     interface CartEventListener {
-        fun onProductDeletion(cartItem: CartItem)
+        fun onProductDeletion(cartItem: CartItemUiModel)
+
+        fun onProductSelectionToggle(
+            cartItem: CartItemUiModel,
+            isChecked: Boolean,
+        )
+
+        fun onSelectAllToggle(isChecked: Boolean)
     }
 }

@@ -57,12 +57,10 @@ class CatalogViewModel(
                 val recentItem = CatalogItem.RecentProductItem(recentUiModels)
 
                 productRepository.loadProducts(currentPage, loadSize) { fetchedProducts, hasMore ->
-
                     val fetchedUiModels =
                         fetchedProducts.map { product ->
                             cartItemState?.get(product.id) ?: product.toUiModel()
                         }
-
                     lastId = fetchedUiModels.lastOrNull()?.id ?: DEFAULT_ID
 
                     val currentUiModels =
@@ -76,15 +74,12 @@ class CatalogViewModel(
                             .distinctBy { it.id }
 
                     val updatedItems = mutableListOf<CatalogItem>()
-
                     if (recentUiModels.isNotEmpty()) {
                         updatedItems.add(recentItem)
                     }
-
                     updatedItems.addAll(
                         combinedUiModels.map { CatalogItem.ProductItem(it) },
                     )
-
                     if (hasMore && updatedItems.none { it is CatalogItem.LoadMoreItem }) {
                         updatedItems.add(CatalogItem.LoadMoreItem)
                     }
@@ -112,18 +107,18 @@ class CatalogViewModel(
 
             val updatedItems =
                 _items.value
-                    ?.map {
-                        if (it is CatalogItem.ProductItem) {
-                            val updatedProduct = updatedCartState?.get(it.product.id)
+                    ?.map { updatedItem ->
+                        if (updatedItem is CatalogItem.ProductItem) {
+                            val updatedProduct = updatedCartState?.get(updatedItem.product.id)
                             CatalogItem.ProductItem(
-                                updatedProduct ?: it.product.copy(amount = 0),
+                                updatedProduct ?: updatedItem.product.copy(amount = 0),
                             )
                         } else {
-                            it
+                            updatedItem
                         }
                     }
 
-            _items.postValue(updatedItems ?: emptyList())
+            _items.postValue(updatedItems.orEmpty())
         }
     }
 
@@ -132,9 +127,9 @@ class CatalogViewModel(
         cartRepository.addCartItem(updatedProduct.toCartItem()) {
             cartRepository.getAllCartItems { cartItems ->
                 val found = cartItems?.find { it.product.id == updatedProduct.id }
-
                 if (found != null) {
                     _itemUpdateEvent.postValue(found.toUiModel())
+                    handleUpdatedCartItem(found.cartId)
                 } else {
                     _itemUpdateEvent.postValue(updatedProduct)
                     refreshCartState()
@@ -175,14 +170,14 @@ class CatalogViewModel(
             if (cartItem != null) {
                 _itemUpdateEvent.postValue(cartItem.toUiModel())
             }
+            cartRepository
             calculateTotalCartCount()
         }
     }
 
     private fun calculateTotalCartCount() {
-        productRepository.loadCartItems { cartItems ->
-            val totalCount = cartItems?.sumOf { it.amount } ?: 0
-            _totalCartCount.postValue(totalCount)
+        cartRepository.getAllCartItemsCount { count ->
+            _totalCartCount.postValue(count?.quantity)
         }
     }
 
