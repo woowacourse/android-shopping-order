@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.detail.DetailViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Toolbar
+            android:id="@+id/toolbar_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_55"
+            android:contentInsetEnd="12dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btn_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_close"
+                app:tint="@color/white" />
+        </Toolbar>
+
+        <ImageView
+            android:id="@+id/image_view_detail_product"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            app:imageUrl="@{vm.product.imageUrl}"
+            app:layout_constraintDimensionRatio="1:0.8"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_detail" />
+
+        <TextView
+            android:id="@+id/text_view_detail_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@{vm.product.name}"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/divider"
+            app:layout_constraintTop_toBottomOf="@id/image_view_detail_product"
+            tools:text="나이키 에어포스" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toTopOf="@id/text_view_detail_price"
+            app:layout_constraintTop_toBottomOf="@id/text_view_detail_product_name" />
+
+        <TextView
+            android:id="@+id/text_view_detail_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@{String.format(@string/product_price_format, (vm.product.price * vm.quantity))}"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@id/view_quantity_selector"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            tools:text="10,000원" />
+
+        <include
+            android:id="@+id/view_quantity_selector"
+            layout="@layout/view_quantity_selector"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_detail_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_detail_price"
+            app:layout_constraintTop_toTopOf="@id/text_view_detail_price"
+            app:onDecreaseClick="@{() -> vm.decreaseQuantity() }"
+            app:onIncreaseClick="@{() -> vm.increaseQuantity() }"
+            app:quantity="@{vm.quantity}" />
+
+        <LinearLayout
+            android:id="@+id/view_recent_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@drawable/shape_cart_item"
+            android:onClick="@{() -> vm.loadProduct(vm.recentProduct.id)}"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="@{vm.isRecentProductVisible ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toTopOf="@id/btn_add_cart"
+            app:layout_constraintTop_toBottomOf="@id/text_view_detail_price">
+
+            <TextView
+                android:id="@+id/tv_recent_product_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_recent_product_title"
+                android:textColor="@color/mint"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
+
+            <TextView
+                android:id="@+id/tv_recent_product_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{vm.recentProduct.name}"
+                android:textColor="@color/gray_55"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="최근 본 상품" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_cart"
+            style="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/mint"
+            android:onClick="@{() -> vm.addProductToCart()}"
+            android:text="@string/detail_add_cart_button_text"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
