@@ -2,10 +2,11 @@ package woowacourse.shopping.cart
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
@@ -24,17 +25,19 @@ class CartSelectionFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FragmentCartSelectionBinding.inflate(layoutInflater)
-        binding.lifecycleOwner = this
-        setCartProductAdapter()
-        observeCartViewModel()
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_cart_selection, container, false)
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_cart_selection, container, false)
+        binding.lifecycleOwner = this
+        setCartProductAdapter()
+        observeCartViewModel()
+        return binding.root
     }
 
     private fun setCartProductAdapter() {
@@ -51,16 +54,17 @@ class CartSelectionFragment : Fragment() {
     }
 
     private fun observeCartViewModel() {
-        viewModel.cartProducts.observe(this) { updateCartItems()
-        Log.d("test", "Cart Products: $it")
+        viewModel.cartProducts.observe(viewLifecycleOwner) {
+            updateCartItems()
+            Log.d("test", "Cart Products: $it")
         }
-        viewModel.isNextButtonEnabled.observe(this) { updateCartItems() }
-        viewModel.isPrevButtonEnabled.observe(this) { updateCartItems() }
-        viewModel.page.observe(this) { updateCartItems() }
-        viewModel.updatedItem.observe(this) { item ->
+        viewModel.isNextButtonEnabled.observe(viewLifecycleOwner) { updateCartItems() }
+        viewModel.isPrevButtonEnabled.observe(viewLifecycleOwner) { updateCartItems() }
+        viewModel.page.observe(viewLifecycleOwner) { updateCartItems() }
+        viewModel.updatedItem.observe(viewLifecycleOwner) { item ->
             (binding.recyclerViewCart.adapter as CartAdapter).setCartItem(item)
         }
-        viewModel.loadingState.observe(this) {
+        viewModel.loadingState.observe(viewLifecycleOwner) {
             Log.d("LOADING_STATE", "State : $it")
             when (it.isLoading) {
                 true -> {
@@ -69,7 +73,7 @@ class CartSelectionFragment : Fragment() {
                 }
 
                 false -> {
-                    Log.d("LOADING_STATE", "${it}")
+                    Log.d("LOADING_STATE", "$it")
                     binding.shimmerFrameLayoutCartProducts.stopShimmer()
                     binding.shimmerFrameLayoutCartProducts.visibility = View.GONE
                 }
@@ -87,6 +91,7 @@ class CartSelectionFragment : Fragment() {
         val cartItems: List<CartItem> = products.map { CartItem.ProductItem(it) }
         val cartItemsWithPaginationBtn =
             if (cartItems.isEmpty()) cartItems else cartItems + paginationItem
+        Log.d("UPDATE", "$cartItemsWithPaginationBtn")
         (binding.recyclerViewCart.adapter as CartAdapter).setCartItems(cartItemsWithPaginationBtn)
     }
 }
