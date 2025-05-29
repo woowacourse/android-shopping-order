@@ -7,6 +7,7 @@ import woowacourse.shopping.di.RepositoryModule
 class RecommendViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val productRepository = RepositoryModule.provideProductRepository()
-        return RecommendViewModel(productRepository) as T
+        val recentProductRepository = RepositoryModule.provideRecentProductRepository()
+        return RecommendViewModel(productRepository, recentProductRepository) as T
     }
 }

@@ -6,6 +6,7 @@ interface ProductDataSource {
     fun fetchPagingProducts(
         page: Int,
         pageSize: Int,
+        category: String?,
         onResult: (List<Product>) -> Unit,
     )
 

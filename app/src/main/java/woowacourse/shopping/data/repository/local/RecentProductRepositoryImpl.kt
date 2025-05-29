@@ -27,7 +27,6 @@ class RecentProductRepositoryImpl(
         runThread(
             block = {
                 recentProductDataSource.getMostRecentProduct()?.toDomain()
-                null
             },
             onResult = onResult,
         )

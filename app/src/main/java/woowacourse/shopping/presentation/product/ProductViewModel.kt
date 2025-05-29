@@ -137,6 +137,6 @@ class ProductViewModel(
 
     companion object {
         private const val FIRST_PAGE = 0
-        private const val PAGE_SIZE = 10
+        private const val PAGE_SIZE = 12
     }
 }

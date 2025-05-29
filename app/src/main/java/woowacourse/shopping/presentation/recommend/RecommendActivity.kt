@@ -12,27 +12,41 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
+import woowacourse.shopping.presentation.cart.CartCounterClickListener
+import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRecommendBinding
     private val viewModel: RecommendViewModel by viewModels { RecommendViewModelFactory() }
+    private val recommendAdapter: RecommendAdapter by lazy {
+        RecommendAdapter(viewModel as ItemClickListener, viewModel as CartCounterClickListener)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_recommend)
         binding.lifecycleOwner = this
+        binding.vm = viewModel
 
         initInsets()
         setupToolbar()
 
-//        binding.vm = viewModel
-//        binding.itemClickListener = this
-
-//        initListeners()
-//        observeViewModel()
         initAdapter()
-        viewModel.fetchData()
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.recommendProducts.observe(this) {
+            recommendAdapter.submitList(it)
+        }
+    }
+
+    private fun initAdapter() {
+        binding.rvRecommend.apply {
+            adapter = recommendAdapter
+            itemAnimator = null
+        }
     }
 
     private fun initInsets() {
@@ -52,10 +66,6 @@ class RecommendActivity : AppCompatActivity() {
                 finish()
             }
         }
-    }
-
-    private fun initAdapter() {
-//        adapter = OrderAdapter()
     }
 
     companion object {

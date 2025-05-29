@@ -15,9 +15,10 @@ class ProductDataSourceImpl(
     override fun fetchPagingProducts(
         page: Int,
         pageSize: Int,
+        category: String?,
         onResult: (List<Product>) -> Unit,
     ) {
-        productService.requestProducts(page = page).enqueue(
+        productService.requestProducts(page, pageSize, category).enqueue(
             object : Callback<ProductsResponse> {
                 override fun onResponse(
                     call: Call<ProductsResponse>,

@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.recommend.RecommendViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,7 +60,6 @@
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:layout_marginTop="28dp"
-            android:background="@color/shimmer_light_gray"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@id/tv_recommend_desc"

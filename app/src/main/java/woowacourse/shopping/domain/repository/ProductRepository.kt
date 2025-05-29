@@ -7,6 +7,7 @@ interface ProductRepository {
     fun fetchPagingProducts(
         page: Int,
         pageSize: Int,
+        category: String? = null,
         onResult: (Result<List<CartItem>>) -> Unit,
     )
 
