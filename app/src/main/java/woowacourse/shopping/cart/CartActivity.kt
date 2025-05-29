@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils.replace
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -24,19 +24,13 @@ class CartActivity : AppCompatActivity() {
             CartViewModelFactory(application as ShoppingApplication),
         )[CartViewModel::class.java]
     }
+    private var hasHandledTotalCount = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
-            }
-        }
-
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
@@ -44,8 +38,26 @@ class CartActivity : AppCompatActivity() {
             viewModel.postTotalCount()
             viewModel.postTotalAmount()
         }
-        viewModel.totalAmount.observe(this) { it ->
-            Log.d("POSTTC", "$it")
+
+        viewModel.totalCount.observe(this) {
+            if (it != -1) {
+                if (!hasHandledTotalCount && it != 0) {
+                    hasHandledTotalCount = true
+                    supportFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
+                    }
+                } else {
+                    hasHandledTotalCount = true
+                    supportFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        replace(
+                            R.id.fragment_container_cart_selection,
+                            CartRecommendationFragment(),
+                        )
+                    }
+                }
+            }
         }
 
         applyWindowInsets()
