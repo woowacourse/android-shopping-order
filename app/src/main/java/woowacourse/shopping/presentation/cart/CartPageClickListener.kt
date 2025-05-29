@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.cart
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.CartItemUiModel
 
 interface CartPageClickListener {
-    fun onClickDelete(cartItem: CartItem)
+    fun onClickDelete(cartItem: CartItemUiModel)
 
     fun onClickRecommend()
 }

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
@@ -31,16 +30,18 @@ class CartViewModel(
         }
     }
 
-    fun deleteProduct(cartItem: CartItem) {
-        cartRepository.deleteProduct(cartItem.product.productId) { result ->
+    fun deleteProduct(cartItem: CartItemUiModel) {
+        cartRepository.deleteProduct(cartItem.product.id) { result ->
             result
                 .onSuccess {
                     _toastMessage.value = R.string.cart_toast_delete_success
+                    loadItems()
                 }.onFailure {
                     _toastMessage.value = R.string.cart_toast_delete_fail
                 }
         }
     }
+
 
     fun increaseQuantity(productId: Long) {
         cartRepository.increaseQuantity(productId) { result ->

@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartProductBinding
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.CartItemUiModel
 
 class CartAdapter(
     private val cartCounterClickListener: CartCounterClickListener,
     private val cartPageClickListener: CartPageClickListener,
 ) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
-    private var products: MutableList<CartItem> = mutableListOf()
+    private var products: MutableList<CartItemUiModel> = mutableListOf()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -34,7 +34,7 @@ class CartAdapter(
 
     override fun getItemCount(): Int = products.size
 
-    fun submitList(newProducts: List<CartItem>) {
+    fun submitList(newProducts: List<CartItemUiModel>) {
         val oldSize = products.size
         val newSize = newProducts.size
 
@@ -57,7 +57,7 @@ class CartAdapter(
             binding.counterClickListener = cartCounterClickListener
         }
 
-        fun bind(cartItem: CartItem) {
+        fun bind(cartItem: CartItemUiModel) {
             binding.cartItem = cartItem
 
             binding.executePendingBindings()
