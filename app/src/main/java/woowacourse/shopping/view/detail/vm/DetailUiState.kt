@@ -12,7 +12,7 @@ data class DetailUiState(
         get() = product.cartQuantity
 
     val productId: Long
-        get() = product.item.id
+        get() = product.productId
 
     val productPrice: Int
         get() = product.item.priceValue * product.cartQuantity.value

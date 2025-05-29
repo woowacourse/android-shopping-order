@@ -96,7 +96,7 @@ class DetailViewModel(
             defaultCartRepository.loadSinglePage(null, null) { result ->
                 result.fold(
                     onSuccess = { value ->
-                        val savedCart = value.carts.find { it.product.id == productId }
+                        val savedCart = value.carts.find { it.productId == productId }
 
                         savedCart?.let {
                             defaultCartRepository.updateQuantity(

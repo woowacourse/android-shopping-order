@@ -8,6 +8,9 @@ data class ProductState(
     val item: Product,
     val cartQuantity: Quantity,
 ) {
+    val productId: Long
+        get() = item.id
+
     val hasCartQuantity: Boolean
         get() = cartQuantity.hasQuantity()
 
