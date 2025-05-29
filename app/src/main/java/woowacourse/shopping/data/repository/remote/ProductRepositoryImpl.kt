@@ -11,8 +11,8 @@ class ProductRepositoryImpl(
     private val cartRepository: CartRepository,
 ) : ProductRepository {
     override fun fetchPagingProducts(
-        page: Int,
-        pageSize: Int,
+        page: Int?,
+        pageSize: Int?,
         category: String?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {

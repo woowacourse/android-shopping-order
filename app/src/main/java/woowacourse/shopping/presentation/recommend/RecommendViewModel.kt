@@ -34,9 +34,15 @@ class RecommendViewModel(
             result.onSuccess { recentProduct ->
                 recentCategory = recentProduct?.category ?: ""
 
-                productRepository.fetchPagingProducts(0, 10, recentCategory) { result ->
+                productRepository.fetchPagingProducts(category = recentCategory) { result ->
                     result.onSuccess { products ->
-                        val recommendProductsUiModel = products.map { it.toPresentation() }
+                        val recommendProductsUiModel =
+                            products
+                                .asSequence()
+                                .filter { it.quantity == 0 }
+                                .map { it.toPresentation() }
+                                .take(10)
+                                .toList()
                         _recommendProducts.postValue(recommendProductsUiModel)
                     }
                 }

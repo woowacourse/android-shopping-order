@@ -13,8 +13,8 @@ class ProductDataSourceImpl(
     private val productService: ProductService,
 ) : ProductDataSource {
     override fun fetchPagingProducts(
-        page: Int,
-        pageSize: Int,
+        page: Int?,
+        pageSize: Int?,
         category: String?,
         onResult: (List<Product>) -> Unit,
     ) {

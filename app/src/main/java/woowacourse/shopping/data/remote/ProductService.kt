@@ -15,8 +15,8 @@ interface ProductService {
 
     @GET("/products")
     fun requestProducts(
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
         @Query("category") category: String? = null,
     ): Call<ProductsResponse>
 }

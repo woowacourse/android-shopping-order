@@ -89,9 +89,9 @@
                 android:id="@+id/shimmer_layout_product"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:shimmer_auto_start="true"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tb_product"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:shimmer_auto_start="true">
 
                 <GridLayout
                     android:layout_width="match_parent"
