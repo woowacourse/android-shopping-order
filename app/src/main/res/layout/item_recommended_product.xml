@@ -34,6 +34,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <include
+            android:id="@+id/recommend_item_counter"
+            layout="@layout/view_select_amount"
+            app:layout_constraintBottom_toBottomOf="@+id/image_view_product"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btn_open_select_amount"
             android:layout_width="wrap_content"
@@ -47,20 +54,6 @@
             android:visibility="@{product.amount != 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/image_view_product"
             app:layout_constraintEnd_toEndOf="@id/image_view_product" />
-
-        <include
-            android:id="@+id/recommend_item_counter"
-            layout="@layout/view_select_amount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="@{product.amount == 0 ? View.GONE : View.VISIBLE}"
-            app:amount="@{product.amount}"
-            app:layout_constraintBottom_toBottomOf="@id/image_view_product"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:product="@{product}" />
 
 
         <TextView

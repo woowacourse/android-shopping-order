@@ -29,8 +29,8 @@ class CartViewModel(
     private val _deleteState = MutableLiveData<Long>()
     val deleteState: LiveData<Long> = _deleteState
 
-    private val _itemUpdateEvent = MutableLiveData<CartItemUiModel>()
-    val itemUpdateEvent: LiveData<CartItemUiModel> = _itemUpdateEvent
+    private val _itemUpdateEvent = MutableLiveData<ProductUiModel>()
+    val itemUpdateEvent: LiveData<ProductUiModel> = _itemUpdateEvent
 
     private val _page = MutableLiveData(START_PAGE)
     val page: LiveData<Int> = _page
@@ -83,9 +83,10 @@ class CartViewModel(
                 if (found != null) {
                     val newUiModel =
                         found.toCartItemUiModel().copy(
-                            isSelected = selectedStates[found.cartId] ?: false,
+                            isSelected = true,
                         )
-                    _itemUpdateEvent.postValue(newUiModel)
+                    updateProductAmountInLists(found.cartId, newUiModel.cartItem.amount)
+                    _itemUpdateEvent.postValue(newUiModel.cartItem.toUiModel())
                     _cartItems.postValue((_cartItems.value ?: emptyList()) + newUiModel)
                     updateSelectionInfo()
                 } else {
@@ -102,6 +103,34 @@ class CartViewModel(
         }
     }
 
+    private fun updateProductAmountInLists(
+        cartId: Long,
+        newAmount: Int,
+    ) {
+        _recommendedProducts.value =
+            _recommendedProducts.value
+                ?.map { product ->
+                    if (product.cartId == cartId) {
+                        val updated = product.copy(amount = newAmount)
+                        _itemUpdateEvent.postValue(updated) // 상품 수량 변경 시 이벤트 발생
+                        updated
+                    } else {
+                        product
+                    }
+                }
+
+        _cartItems.postValue(
+            _cartItems.value
+                ?.map {
+                    if (it.cartItem.cartId == cartId) {
+                        it.copy(cartItem = it.cartItem.copy(amount = newAmount))
+                    } else {
+                        it
+                    }
+                }?.toList(),
+        )
+    }
+
     fun increaseAmount(product: ProductUiModel) {
         val cartItem = product.toCartItem()
         cartRepository.increaseCartItem(cartItem) { id ->
@@ -111,7 +140,8 @@ class CartViewModel(
                         item.toCartItemUiModel().copy(
                             isSelected = selectedStates[item.cartId] ?: false,
                         )
-                    _itemUpdateEvent.postValue(updatedItem)
+                    updateProductAmountInLists(item.cartId, updatedItem.cartItem.amount)
+                    _itemUpdateEvent.postValue(updatedItem.cartItem.toUiModel()) // 변경: ProductUiModel 이벤트 발행
                     updateProducts(updatedItem)
                 }
             }
@@ -119,18 +149,22 @@ class CartViewModel(
     }
 
     fun decreaseAmount(product: ProductUiModel) {
-        val cartItem = product.toCartItem().toCartItemUiModel()
-        if (cartItem.cartItem.amount <= 1) {
-            deleteProduct(cartItem)
+        val cartItem = product.toCartItem()
+        if (cartItem.amount <= 1) {
+            deleteProduct(cartItem.toCartItemUiModel())
+            updateProductAmountInLists(cartItem.cartId, 0)
         } else {
-            cartRepository.decreaseCartItem(cartItem.cartItem) { id ->
+            cartRepository.decreaseCartItem(cartItem) { id ->
                 getCartItemById(id) {
                     it?.let { item ->
                         val updatedItem =
                             item.toCartItemUiModel().copy(
                                 isSelected = selectedStates[item.cartId] ?: false,
                             )
-                        _itemUpdateEvent.postValue(updatedItem)
+
+                        updateProductAmountInLists(item.cartId, updatedItem.cartItem.amount)
+
+                        _itemUpdateEvent.postValue(updatedItem.cartItem.toUiModel()) // 변경: ProductUiModel 이벤트 발행
                         updateProducts(updatedItem)
                     }
                 }

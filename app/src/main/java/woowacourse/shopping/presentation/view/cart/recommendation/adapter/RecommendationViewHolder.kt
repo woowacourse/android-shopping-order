@@ -20,6 +20,8 @@ class RecommendationViewHolder(
 
     fun bind(product: ProductUiModel) {
         binding.product = product
+        binding.recommendItemCounter.amount = product.amount
+        binding.recommendItemCounter.product = product
     }
 
     companion object {

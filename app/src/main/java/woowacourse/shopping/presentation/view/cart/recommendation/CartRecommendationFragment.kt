@@ -39,22 +39,6 @@ class CartRecommendationFragment :
         initObserver()
     }
 
-    private fun initObserver() {
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            recommendationAdapter.updateRecommendedProducts(products)
-        }
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { product ->
-            recommendationAdapter.updateItem(product)
-        }
-    }
-
-    private fun initRecommendationAdapter() {
-        binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) {
-            recommendationAdapter.updateRecommendedProducts(it)
-        }
-    }
-
     override fun increase(product: ProductUiModel) {
         viewModel.increaseAmount(product)
     }
@@ -65,6 +49,23 @@ class CartRecommendationFragment :
 
     override fun onInitialAddToCart(product: ProductUiModel) {
         viewModel.initialAddToCart(product)
+    }
+
+    private fun initObserver() {
+        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
+            if (!products.isNullOrEmpty()) {
+                recommendationAdapter.updateRecommendedProducts(products)
+            } else {
+                recommendationAdapter.updateRecommendedProducts(emptyList())
+            }
+        }
+        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { updatedProduct ->
+            recommendationAdapter.updateItem(updatedProduct)
+        }
+    }
+
+    private fun initRecommendationAdapter() {
+        binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
     }
 }
 

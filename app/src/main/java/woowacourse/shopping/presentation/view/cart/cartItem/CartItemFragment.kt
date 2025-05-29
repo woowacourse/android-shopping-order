@@ -8,6 +8,8 @@ import woowacourse.shopping.databinding.FragmentCartItemBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.model.toCartItem
+import woowacourse.shopping.presentation.model.toCartItemUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.CartViewModel
 import woowacourse.shopping.presentation.view.cart.adapter.CartItemAdapter
@@ -60,7 +62,7 @@ class CartItemFragment :
         }
 
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
-            cartItemAdapter.updateItem(it)
+            cartItemAdapter.updateItem(it.toCartItem().toCartItemUiModel())
         }
     }
 

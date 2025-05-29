@@ -2,9 +2,7 @@ package woowacourse.shopping.presentation.view.cart.recommendation.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
 
@@ -13,9 +11,9 @@ class RecommendationAdapter(
     private val recommendEventListener: RecommendEventListener,
     private val itemCounterListener: ItemCounterListener,
 ) : RecyclerView.Adapter<RecommendationViewHolder>() {
-    private val recommendedProducts = recommendedProducts.toMutableList()
+    private val items = mutableListOf<ProductUiModel>()
 
-    override fun getItemCount(): Int = recommendedProducts.size
+    override fun getItemCount(): Int = items.size
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -26,20 +24,21 @@ class RecommendationAdapter(
         holder: RecommendationViewHolder,
         position: Int,
     ) {
-        holder.bind(recommendedProducts[position])
+        holder.bind(items[position])
     }
 
-    fun updateRecommendedProducts(recommendedProducts: List<ProductUiModel>) {
-        this.recommendedProducts.clear()
-        this.recommendedProducts.addAll(recommendedProducts)
+    fun updateRecommendedProducts(newProducts: List<ProductUiModel>) {
+        items.clear()
+        items.addAll(newProducts)
         notifyDataSetChanged()
     }
 
-    fun updateItem(updatedItem: CartItemUiModel) {
-        val index = recommendedProducts.indexOfFirst { it.cartId == updatedItem.cartItem.cartId }
+    fun updateItem(updatedProduct: ProductUiModel) {
+        val index = items.indexOfFirst { it.id == updatedProduct.id }
         if (index != -1) {
-            recommendedProducts[index] = updatedItem.cartItem.toUiModel()
+            items[index] = updatedProduct
             notifyItemChanged(index)
+        } else {
         }
     }
 }
