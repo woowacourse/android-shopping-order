@@ -12,8 +12,8 @@ interface ProductsApiService {
     @GET("/products")
     fun getProducts(
         @Header("accept") accept: String = "*/*",
-        @Query("size") size: Int = 20,
-        @Query("page") page: Int,
+        @Query("size") size: Int? = 20,
+        @Query("page") page: Int?,
     ): Call<ProductsResponse>
 
     @GET("/products/{id}")
@@ -21,4 +21,12 @@ interface ProductsApiService {
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long,
     ): Call<ProductResponse>
+
+    @GET("/products")
+    fun getProductsByCategory(
+        @Header("accept") accept: String = "*/*",
+        @Query("size") size: Int? = null,
+        @Query("page") page: Int? = null,
+        @Query("category") category: String,
+    ): Call<ProductsResponse>
 }
