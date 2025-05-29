@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
+import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
 
 data class Products(
     val products: List<Product>,
@@ -65,11 +66,20 @@ data class Products(
                 },
         )
 
-    fun getPurchasePrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
+    fun getSelectedCartProductsPrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
+
+    fun getSelectedCartRecommendProductsPrice(): Int =
+        products.filter { it.quantity > MINIMUM_QUANTITY }.sumOf { it.productDetail.price * it.quantity }
 
     fun updateAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
 
-    fun getSelectedProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
+    fun getSelectedCartProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
+
+    fun getSelectedCartProductQuantity(): Int = products.filter { it.isSelected }.sumOf { it.quantity }
+
+    fun getSelectedCartRecommendProductIds(): List<Long> = products.filter { it.quantity > MINIMUM_QUANTITY }.map { it.productDetail.id }
+
+    fun getSelectedCartRecommendProductQuantity(): Int = products.filter { it.quantity > MINIMUM_QUANTITY }.sumOf { it.quantity }
 
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)

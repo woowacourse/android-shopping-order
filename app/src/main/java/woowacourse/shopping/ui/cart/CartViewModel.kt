@@ -143,8 +143,10 @@ class CartViewModel(
         _cartProducts.value = cartProducts.value?.updateAllSelection()
     }
 
-    fun updateOrderPrice() {
-        _totalOrderPrice.value = (cartProducts.value?.getPurchasePrice() ?: 0) + (recommendedProducts.value?.getPurchasePrice() ?: 0)
+    fun updateOrderInfo() {
+        _totalOrderPrice.value =
+            (cartProducts.value?.getSelectedCartProductsPrice() ?: 0) +
+            (recommendedProducts.value?.getSelectedCartRecommendProductsPrice() ?: 0)
     }
 
     fun loadRecommendedProducts() {
@@ -201,15 +203,16 @@ class CartViewModel(
     }
 
     fun orderProducts() {
-        val selectedCartProductsIds: Set<Long> = cartProducts.value?.getSelectedProductIds()?.toSet() ?: emptySet()
-        val selectedRecommendedProductsIds: Set<Long> = recommendedProducts.value?.getSelectedProductIds()?.toSet() ?: emptySet()
-        val selectedProductIds: Set<Long> = selectedCartProductsIds + selectedRecommendedProductsIds
+        val selectedCartProductsIds: List<Long> = cartProducts.value?.getSelectedCartProductIds() ?: emptyList()
+        val selectedRecommendedProductsIds: List<Long> = recommendedProducts.value?.getSelectedCartRecommendProductIds() ?: emptyList()
+        val selectedProductIds: Set<Long> = (selectedCartProductsIds + selectedRecommendedProductsIds).toSet()
 
         if (selectedProductIds.isEmpty()) return
 
         orderProductsUseCase.invoke(selectedProductIds) { result ->
             result
                 .onSuccess {
+                    _editedProductIds.postValue(selectedProductIds)
                     _isOrdered.postValue(Unit)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
