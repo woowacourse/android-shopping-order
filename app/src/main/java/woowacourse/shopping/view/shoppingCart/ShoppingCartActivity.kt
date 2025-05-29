@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
@@ -40,26 +41,10 @@ class ShoppingCartActivity :
         }
 
         initDataBinding()
+        setupAdapter()
         setupObservers()
 
         viewModel.updateShoppingCart()
-
-        binding.shoppingCartProducts.apply {
-            addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(
-                        recyclerView: RecyclerView,
-                        dx: Int,
-                        dy: Int,
-                    ) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        if (!recyclerView.canScrollVertically(1)) {
-                            onPlusPage()
-                        }
-                    }
-                },
-            )
-        }
     }
 
     private fun initDataBinding() {
@@ -67,6 +52,30 @@ class ShoppingCartActivity :
         binding.viewModel = this.viewModel
         binding.lifecycleOwner = this@ShoppingCartActivity
         binding.shoppingCartListener = this@ShoppingCartActivity
+    }
+
+    private fun setupAdapter() {
+        binding.shoppingCartProducts.apply {
+            addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrollStateChanged(
+                        recyclerView: RecyclerView,
+                        newState: Int,
+                    ) {
+                        super.onScrollStateChanged(recyclerView, newState)
+
+                        val totalItemCount: Int =
+                            recyclerView.adapter?.itemCount ?: throw IllegalStateException()
+                        val visibleLastItemPosition: Int =
+                            (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+
+                        if (visibleLastItemPosition in totalItemCount - 1..totalItemCount) {
+                            onPlusPage()
+                        }
+                    }
+                },
+            )
+        }
     }
 
     private fun setupObservers() {

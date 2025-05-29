@@ -74,21 +74,20 @@ class ShoppingCartViewModel(
     }
 
     fun updateShoppingCart() {
-        val size = COUNT_PER_PAGE + 1
         val page = this.page - 1
+        val size = COUNT_PER_PAGE + 1
         shoppingCartRepository.load(page, size) { result ->
             result
                 .onSuccess { shoppingCartProducts: List<ShoppingCartProduct> ->
+                    _isLoading.value = false
                     if (isEmptyPage(shoppingCartProducts)) return@load
-
-                    updateShoppingCartItems(
-                        shoppingCartProducts,
-                        shoppingCart.value ?: emptyList(),
-                    )
 
                     loadable = shoppingCartProducts.size == COUNT_PER_PAGE + 1
 
-                    _isLoading.value = false
+                    updateShoppingCartItems(
+                        shoppingCartProducts.take(5),
+                        shoppingCart.value ?: emptyList(),
+                    )
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE)
                     _isLoading.value = false
@@ -108,17 +107,17 @@ class ShoppingCartViewModel(
         products: List<ShoppingCartProduct>,
         currentShoppingCartItems: List<ShoppingCartItem>,
     ) {
-        val shoppingCartProductsToShow = products.take(COUNT_PER_PAGE)
-
-        if (currentShoppingCartItems.isEmpty() || page != 1) {
+        if (currentShoppingCartItems.isEmpty()) {
             _shoppingCart.value =
                 buildList {
                     addAll(currentShoppingCartItems)
                     addAll(products.map(::ShoppingCartProductItem))
                 }
-        } else {
+            return
+        }
+        if (page == 1) {
             val productItems =
-                shoppingCartProductsToShow.map { product ->
+                products.map { product ->
                     val existing =
                         currentShoppingCartItems
                             .filterIsInstance<ShoppingCartProductItem>()
@@ -130,7 +129,40 @@ class ShoppingCartViewModel(
                     )
                 }
             _shoppingCart.value = productItems
+            return
         }
+        val updatedItems =
+            currentShoppingCartItems
+                .map { item ->
+                    if (item is ShoppingCartProductItem) {
+                        val updatedProduct =
+                            products.find { it.id == item.shoppingCartProduct.id }
+                        if (updatedProduct != null) {
+                            item.copy(
+                                shoppingCartProduct = updatedProduct,
+                                isChecked = item.isChecked,
+                            )
+                        } else {
+                            item
+                        }
+                    } else {
+                        item
+                    }
+                }.toMutableList()
+
+        val existingIds =
+            updatedItems
+                .filterIsInstance<ShoppingCartProductItem>()
+                .map { it.shoppingCartProduct.id }
+
+        val newItems =
+            products
+                .filter { it.id !in existingIds }
+                .map { ShoppingCartProductItem(shoppingCartProduct = it) }
+
+        updatedItems.addAll(newItems)
+
+        _shoppingCart.value = updatedItems
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartProductItem) {
