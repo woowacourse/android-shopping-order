@@ -4,5 +4,5 @@ import woowacourse.shopping.domain.model.Product
 
 data class ProductItem(
     val product: Product,
-    val quantity: Int,
+    val quantity: Int = 0,
 )

@@ -24,4 +24,24 @@ class RecommendationAdapter(
         val item = items[position]
         holder.bind(item.product, item.quantity)
     }
+
+    fun updateItems(newItems: List<ProductItem>) {
+        if (newItems.size > items.size) {
+            items.addAll(newItems.subList(items.size, newItems.size))
+            notifyItemRangeInserted(0, newItems.size)
+            return
+        }
+        val oldItems = items.toList()
+        items.clear()
+        items.addAll(newItems)
+
+        for (i in items.indices) {
+            val oldItem = oldItems[i]
+            val newItem = newItems[i]
+
+            if (oldItem != newItem) {
+                notifyItemChanged(i)
+            }
+        }
+    }
 }
