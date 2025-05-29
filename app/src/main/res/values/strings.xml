@@ -32,5 +32,8 @@
     <string name="login_alert_success_login">로그인에 성공했습니다.</string>
     <string name="login_alert_network_error">네트워크 오류입니다.</string>
     <string name="login_alert_wrong_account">아이디 또는 비밀번호 오류입니다.</string>
+    <string name="recommend_item_title">이런 상품은 어떠세요?</string>
+    <string name="recomment_item_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+
 
 </resources>

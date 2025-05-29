@@ -6,16 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ConcatAdapter
-import woowacourse.shopping.data.ShoppingDatabase
 import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
-import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
-import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
-import woowacourse.shopping.data.goods.repository.GoodsRepository
-import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
@@ -30,31 +23,27 @@ class CartFragment :
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: CartViewModel by viewModels {
-        CartViewModelFactory(
-            CartRepositoryImpl(CartRemoteDataSourceImpl()), GoodsRepositoryImpl(
-                GoodsRemoteDataSourceImpl(),
-                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(requireContext()))
-            )
-        )
+    private val viewModel: CartViewModel by activityViewModels {
+        (requireActivity() as CartActivity).sharedViewModelFactory
     }
 
     private val cartAdapter: CartAdapter by lazy {
         CartAdapter(
             cartClickListener = this,
-            quantityChangeListener = object : QuantityChangeListener {
-                override fun onIncrease(cartItem: CartItem) {
-                    viewModel.increaseQuantity(cartItem)
-                }
+            quantityChangeListener =
+                object : QuantityChangeListener {
+                    override fun onIncrease(cartItem: CartItem) {
+                        viewModel.increaseQuantity(cartItem)
+                    }
 
-                override fun onDecrease(cartItem: CartItem) {
-                    viewModel.removeCartItemOrDecreaseQuantity(cartItem)
-                }
-            },
+                    override fun onDecrease(cartItem: CartItem) {
+                        viewModel.removeCartItemOrDecreaseQuantity(cartItem)
+                    }
+                },
             onItemCheckedChange = { item, isChecked ->
                 viewModel.setItemSelection(item, isChecked)
             },
-            isItemChecked = { item -> viewModel.isItemSelected(item) }
+            isItemChecked = { item -> viewModel.isItemSelected(item) },
         )
     }
     private val cartSkeletonAdapter: CartSkeletonAdapter by lazy {
@@ -95,13 +84,12 @@ class CartFragment :
         binding.rvCartItems.adapter = concatAdapter
     }
 
-
     private fun setupBottomBar() {
         // 전체선택 체크박스 누를 때
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, isChecked ->
             viewModel.selectAllItems(isChecked)
-            cartAdapter.notifyDataSetChanged()  // ① 전체선택 후 즉시 개별 체크박스 갱신
+            cartAdapter.notifyDataSetChanged() // ① 전체선택 후 즉시 개별 체크박스 갱신
         }
 
         // 뷰모델이 isAllSelected 변경될 때
@@ -110,26 +98,30 @@ class CartFragment :
             binding.bottomBar.checkboxAll.isChecked = isAll
             binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, checked ->
                 viewModel.selectAllItems(checked)
-                cartAdapter.notifyDataSetChanged()  // ② “전체선택” 에서 해제 시에도 반영
+                cartAdapter.notifyDataSetChanged() // ② “전체선택” 에서 해제 시에도 반영
             }
-            cartAdapter.notifyDataSetChanged()    // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
+            cartAdapter.notifyDataSetChanged() // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
         }
     }
 
     private fun observeViewModel() {
         viewModel.loginErrorEvent.observe(viewLifecycleOwner) { result ->
             when (result) {
-                CartFetchError.Network -> Toast.makeText(
-                    requireContext(),
-                    "네트워크 에러 발생",
-                    Toast.LENGTH_SHORT
-                ).show()
+                CartFetchError.Network ->
+                    Toast
+                        .makeText(
+                            requireContext(),
+                            "네트워크 에러 발생",
+                            Toast.LENGTH_SHORT,
+                        ).show()
 
-                is CartFetchError.Server -> Toast.makeText(
-                    requireContext(),
-                    "로그인 실패",
-                    Toast.LENGTH_SHORT
-                ).show()
+                is CartFetchError.Server ->
+                    Toast
+                        .makeText(
+                            requireContext(),
+                            "로그인 실패",
+                            Toast.LENGTH_SHORT,
+                        ).show()
             }
             requireActivity().finish()
         }

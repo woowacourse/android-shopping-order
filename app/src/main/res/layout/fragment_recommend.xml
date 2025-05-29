@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.feature.cart.CartViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,14 +23,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="4dp"
+            android:text="@string/recommend_item_title"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/tv_recommend_items_description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="이런 상품은 어떠세요?" />
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
             android:id="@+id/tv_recommend_items_description"
@@ -34,12 +38,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="29dp"
+            android:text="@string/recomment_item_description"
             android:textColor="@color/gray_800"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/rv_recommend_items"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_recommend_items_title"
-            tools:text="* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요." />
+            app:layout_constraintTop_toBottomOf="@id/tv_recommend_items_title" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_recommend_items"
@@ -60,7 +64,8 @@
             android:layout_height="78dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:viewModel="@{viewModel}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

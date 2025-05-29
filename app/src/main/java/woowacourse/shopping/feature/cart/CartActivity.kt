@@ -6,11 +6,27 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.data.ShoppingDatabase
+import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
+import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
+import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
+import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.cart.recommend.RecommendFragment
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
+
+    val sharedViewModelFactory by lazy {
+        CartViewModelFactory(
+            CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            GoodsRepositoryImpl(
+                GoodsRemoteDataSourceImpl(),
+                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
+            ),
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

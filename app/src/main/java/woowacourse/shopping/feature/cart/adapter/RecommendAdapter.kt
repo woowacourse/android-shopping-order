@@ -5,13 +5,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
-import woowacourse.shopping.feature.goods.adapter.vertical.GoodsClickListener
 
 class RecommendAdapter(
     private val lifecycleOwner: LifecycleOwner,
-    private val quantityChangeListener: QuantityChangeListener
+    private val quantityChangeListener: QuantityChangeListener,
 ) : RecyclerView.Adapter<RecommendViewHolder>() {
-
     private val items = mutableListOf<CartItem>()
 
     fun setItems(newItems: List<CartItem>) {
@@ -32,16 +30,31 @@ class RecommendAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecommendViewHolder {
-        return RecommendViewHolder.from(
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecommendViewHolder =
+        RecommendViewHolder.from(
             parent,
             quantityChangeListener,
-            lifecycleOwner
+            lifecycleOwner,
         )
-    }
 
-    override fun onBindViewHolder(holder: RecommendViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecommendViewHolder,
+        position: Int,
+    ) {
         holder.bind(items[position])
+
+        val displayMetrics = holder.itemView.context.resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val itemWidth = screenWidth * 0.4f
+
+        val params = holder.itemView.layoutParams
+        if (params != null) {
+            params.width = itemWidth.toInt()
+            holder.itemView.layoutParams = params
+        }
     }
 
     override fun getItemCount(): Int = items.size
