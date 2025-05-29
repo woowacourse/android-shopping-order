@@ -1,106 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <import type="android.view.View" />
-
         <variable
             name="vm"
             type="woowacourse.shopping.view.cart.vm.CartViewModel" />
-
-        <variable
-            name="adapter"
-            type="woowacourse.shopping.view.cart.adapter.CartAdapter" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingHorizontal="18dp"
-        android:paddingTop="24dp"
         tools:context=".view.cart.CartActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_cart"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="60dp"
-            android:adapter="@{adapter}"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/pager"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:name="woowacourse.shopping.view.cart.CartListFragment"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/linear_bottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/shimmer_layout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:shimmer_auto_start="true"
-            app:layout_constraintBottom_toTopOf="@id/pager"
-            app:layout_constraintTop_toBottomOf="@id/recycler_view_cart"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <include layout="@layout/item_shimmer_cart" />
-
-                <include layout="@layout/item_shimmer_cart" />
-                <include layout="@layout/item_shimmer_cart" />
-                <include layout="@layout/item_shimmer_cart" />
-            </LinearLayout>
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-
-        <LinearLayout
-            android:id="@+id/pager"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:gravity="center"
-            android:visibility="@{vm.uiState.pageState.pageVisibility ? View.VISIBLE : View.GONE}"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linear_bottom"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/gray"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <ImageButton
-                android:id="@+id/button_previous"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/previous_button_shape"
-                android:enabled="@{vm.uiState.pageState.previousPageEnabled}"
-                android:inset="0dp"
-                android:onClick="@{() -> vm.subPage()}"
-                android:src="@drawable/ic_previous" />
+            <CheckBox
+                android:id="@+id/checkbox_all_check"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onCheckedChanged="@{(button, isChecked) -> vm.changeAllStateChecked(isChecked)}"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                android:layout_marginStart="10dp"/>
 
             <TextView
-                android:id="@+id/text_view_page"
+                android:id="@+id/text_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="11dp"
-                android:text="@{String.valueOf(vm.uiState.pageState.page)}"
-                android:textColor="@color/gray"
-                android:textSize="22sp" />
+                android:text="전체"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@id/checkbox_all_check"
+                app:layout_constraintTop_toBottomOf="@id/checkbox_all_check"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0"
+                android:layout_marginStart="4dp"/>
 
-            <ImageButton
-                android:id="@+id/button_forward"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@drawable/forward_button_shape"
-                android:enabled="@{vm.uiState.pageState.nextPageEnabled}"
-                android:inset="0dp"
-                android:onClick="@{() -> vm.addPage()}"
-                android:src="@drawable/ic_forward" />
-        </LinearLayout>
+            <TextView
+                android:id="@+id/text_total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="@{@string/format_thousand_won(vm.uiState.totalPrice)}"
+                tools:text="184,200원"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/text_order"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/text_order"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/turquoise"
+                android:padding="10dp"
+                android:gravity="center"
+                android:text="@{@string/text_order(vm.uiState.checkedProductCount)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="주문하기"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>
