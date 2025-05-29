@@ -111,11 +111,11 @@ class ProductDetailActivity :
     }
 
     override fun onClickProductItem(productId: Long) {
-//        val intent =
-//            newIntent(this, productId).apply {
-//                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//            }
-//        startActivity(intent)
+        val intent =
+            newIntent(this, productId).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        startActivity(intent)
     }
 
     override fun onClickAddToCart(cartItem: CartItem) {
