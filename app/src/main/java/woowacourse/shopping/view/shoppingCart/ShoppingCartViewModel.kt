@@ -176,6 +176,7 @@ class ShoppingCartViewModel(
     }
 
     fun plusPage() {
+        if (loadable == false) return
         page++
         updateShoppingCart()
     }
