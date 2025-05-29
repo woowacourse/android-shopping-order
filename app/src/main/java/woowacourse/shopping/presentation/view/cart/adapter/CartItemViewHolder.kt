@@ -7,10 +7,11 @@ import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
 
-class CartViewHolder(
+class CartItemViewHolder(
     private val binding: ItemCartBinding,
-    private val eventListener: CartAdapter.CartEventListener,
+    private val eventListener: CartItemEventListener,
     itemCounterListener: ItemCounterListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
@@ -31,12 +32,12 @@ class CartViewHolder(
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: CartAdapter.CartEventListener,
+            eventListener: CartItemEventListener,
             itemCounterListener: ItemCounterListener,
-        ): CartViewHolder {
+        ): CartItemViewHolder {
             val binding =
                 ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return CartViewHolder(binding, eventListener, itemCounterListener)
+            return CartItemViewHolder(binding, eventListener, itemCounterListener)
         }
     }
 }

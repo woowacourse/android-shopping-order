@@ -8,61 +8,78 @@ import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
-import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
+import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
 
 class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
-    CartAdapter.CartEventListener,
+    CartEventListener,
     ItemCounterListener {
-    private val cartAdapter: CartAdapter by lazy {
-        CartAdapter(
-            eventListener = this,
-            itemCounterListener = this,
-        )
-    }
-
     private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
     private val backCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                navigateToScreen()
+                navigateBack()
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        navigateToScreen()
+    }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         initObserver()
         initListener()
-        setCartAdapter()
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
         binding.selectAll.setOnClickListener { view ->
             onBatchSelect(binding.selectAll.isChecked)
         }
+        binding.btnPlaceOrder.setOnClickListener {
+            navigateToRecommendation()
+        }
+    }
+
+    private fun navigateToScreen() {
+        childFragmentManager.commit {
+            setReorderingAllowed(true)
+            add(R.id.cart_fragment_container, CartItemFragment::class.java, null)
+        }
+    }
+
+    private fun navigateBack() {
+        parentFragmentManager.popBackStack()
+        parentFragmentManager.commit {
+            remove(this@CartFragment)
+        }
+    }
+
+    private fun initObserver() {
+        viewModel.allSelected.observe(viewLifecycleOwner) {
+            binding.selectAll.isChecked = it
+        }
+    }
+
+    private fun navigateToRecommendation() {
+        childFragmentManager.commit {
+            replace(R.id.cart_fragment_container, CartRecommendationFragment())
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         backCallback.remove()
-    }
-
-    override fun onProductDeletion(cartItem: CartItemUiModel) {
-        viewModel.deleteProduct(cartItem)
-    }
-
-    override fun onProductSelectionToggle(
-        cartItem: CartItemUiModel,
-        isChecked: Boolean,
-    ) {
-        viewModel.setCartItemSelection(cartItem, isChecked)
     }
 
     override fun onBatchSelect(isChecked: Boolean) {
@@ -77,53 +94,14 @@ class CartFragment :
         viewModel.decreaseAmount(product)
     }
 
-    private fun setCartAdapter() {
-        binding.recyclerViewCart.adapter = cartAdapter
-    }
-
-    private fun initObserver() {
-        binding.vm = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-
-        viewModel.page.observe(viewLifecycleOwner) {
-            binding.recyclerViewCart.smoothScrollToPosition(0)
-        }
-
-        viewModel.cartItems.observe(viewLifecycleOwner) {
-            cartAdapter.updateCartItems(it)
-        }
-
-        viewModel.deleteState.observe(viewLifecycleOwner) {
-            it?.let {
-                cartAdapter.removeProduct(it)
-                viewModel.fetchShoppingCart(isNextPage = false, isRefresh = true)
-            }
-        }
-
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
-            cartAdapter.updateItem(it)
-        }
-
-        viewModel.totalPrice.observe(viewLifecycleOwner) {
-            it.let { binding.textViewCartTotalPrice.text = it.toString() }
-        }
-
-        viewModel.allSelected.observe(viewLifecycleOwner) {
-            binding.selectAll.isChecked = it
-        }
-    }
-
     private fun initListener() {
         binding.btnBack.setOnClickListener {
-            navigateToScreen()
+            navigateBack()
         }
         binding.eventListener = this
     }
+}
 
-    private fun navigateToScreen() {
-        parentFragmentManager.popBackStack()
-        parentFragmentManager.commit {
-            remove(this@CartFragment)
-        }
-    }
+interface CartEventListener {
+    fun onBatchSelect(isChecked: Boolean)
 }

@@ -4,12 +4,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
 
-class CartAdapter(
+class CartItemAdapter(
     cartItems: List<CartItemUiModel> = emptyList(),
-    private val eventListener: CartEventListener,
+    private val eventListener: CartItemEventListener,
     private val itemCounterListener: ItemCounterListener,
-) : RecyclerView.Adapter<CartViewHolder>() {
+) : RecyclerView.Adapter<CartItemViewHolder>() {
     private val cartItems = cartItems.toMutableList()
 
     override fun getItemCount(): Int = cartItems.size
@@ -17,10 +18,10 @@ class CartAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CartViewHolder = CartViewHolder.from(parent, eventListener, itemCounterListener)
+    ): CartItemViewHolder = CartItemViewHolder.from(parent, eventListener, itemCounterListener)
 
     override fun onBindViewHolder(
-        holder: CartViewHolder,
+        holder: CartItemViewHolder,
         position: Int,
     ) {
         holder.bind(cartItems[position])
@@ -44,16 +45,5 @@ class CartAdapter(
         val index = cartItems.indexOfFirst { it.cartItem.cartId == id }
         cartItems.removeAt(index)
         notifyItemRemoved(index)
-    }
-
-    interface CartEventListener {
-        fun onProductDeletion(cartItem: CartItemUiModel)
-
-        fun onProductSelectionToggle(
-            cartItem: CartItemUiModel,
-            isChecked: Boolean,
-        )
-
-        fun onBatchSelect(isChecked: Boolean)
     }
 }
