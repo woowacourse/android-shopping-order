@@ -48,7 +48,7 @@ class CartViewModel(
     }
 
     fun postTotalAmount() {
-        val amount = totalProducts.value?.sumOf { it.price * it.quantity } ?: 0
+        val amount = totalProducts.value?.filter { it.isChecked == true }?.sumOf { it.price * it.quantity } ?: 0
         Log.d("COUNT", "amount : $amount")
         _totalAmount.postValue(amount)
     }
@@ -130,7 +130,12 @@ class CartViewModel(
     }
 
     fun changeProductSelection(productUiModel: ProductUiModel) {
+        val set = _totalProducts.value ?: mutableSetOf()
+        set.remove(productUiModel.copy(isChecked = productSelections[productUiModel.id] ?: true))
         productSelections[productUiModel.id] = productSelections[productUiModel.id]?.not() == true
+        set.add(productUiModel.copy(isChecked = productSelections[productUiModel.id] ?: true))
+        _totalProducts.postValue(set.toMutableSet())
+        postTotalAmount()
     }
 
     private fun checkNextButtonEnabled(totalSize: Int) {
