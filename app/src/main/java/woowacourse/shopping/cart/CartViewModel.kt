@@ -6,11 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.data.repository.CartProductRepository
+import woowacourse.shopping.data.repository.CatalogProductRepository
+import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartViewModel(
     private val cartProductRepository: CartProductRepository,
+    private val catalogProductRepository: CatalogProductRepository,
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository
 ) : ViewModel() {
     private val _cartProducts = MutableLiveData<List<ProductUiModel>>()
     val cartProducts: LiveData<List<ProductUiModel>> = _cartProducts
@@ -42,9 +46,30 @@ class CartViewModel(
     private val _totalAmount = MutableLiveData<Int>(0)
     val totalAmount: LiveData<Int> get() = _totalAmount
 
+    private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
+    val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
+
+    private var category: String? = null
     init {
+        loadRecentlyViewedProduct()
+        loadRecommendedProducts(category)
         loadAllCartProducts()
         loadCartProducts()
+    }
+
+    fun loadRecentlyViewedProduct() {
+        recentlyViewedProductRepository.getLatestViewedProduct { product ->
+            catalogProductRepository.getProduct(product.id) { categoryProduct ->
+                category = categoryProduct.category
+            }
+        }
+    }
+
+    fun loadRecommendedProducts(category: String?) {
+        if (category == null) return
+        catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
+            _recommendedProducts.postValue(products)
+        }
     }
 
     fun postTotalAmount() {

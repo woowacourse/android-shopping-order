@@ -11,6 +11,49 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 
 class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
+    override fun getRecommendedProducts(
+        category: String,
+        page: Int,
+        size: Int,
+        callback: (List<ProductUiModel>) -> Unit
+    ) {
+        retrofitService
+            .requestProducts(
+                category = category,
+                page = page,
+                size = size,
+            ).enqueue(
+                object : Callback<ProductResponse> {
+                    override fun onResponse(
+                        call: Call<ProductResponse>,
+                        response: Response<ProductResponse>,
+                    ) {
+                        if (response.isSuccessful) {
+                            val body: ProductResponse? = response.body()
+                            val content: List<Content>? = body?.content
+                            val products: List<ProductUiModel>? =
+                                content?.mapNotNull {
+                                    ProductUiModel(
+                                        id = it.id.toInt(),
+                                        imageUrl = it.imageUrl,
+                                        name = it.name,
+                                        price = it.price,
+                                    )
+                                }
+                            callback(products ?: emptyList())
+                            println("body : $body")
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<ProductResponse>,
+                        t: Throwable,
+                    ) {
+                        println("error : $t")
+                    }
+                },
+            )
+    }
 
     override fun getAllProductsSize(callback: (Int) -> Unit) {
         retrofitService.requestProducts().enqueue(
@@ -124,6 +167,7 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                                     imageUrl = body.imageUrl,
                                     name = body.name,
                                     price = body.price,
+                                    category = body.category,
                                 )
                             callback(product)
                             println("body : $body")
