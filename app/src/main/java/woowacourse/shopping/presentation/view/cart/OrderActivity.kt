@@ -80,13 +80,16 @@ class OrderActivity :
         binding.viewOrder.buttonOrder.setOnClickListener {
             orderButtonHandler()
         }
+        binding.viewOrder.checkboxSelectAll.setOnCheckedChangeListener { _, checked ->
+            viewModel.selectCurrentPageCartProduct(checked)
+        }
     }
 
     private fun orderButtonHandler() {
         when (currentFragmentTag) {
             CartFragment::class.simpleName -> showFragment(SuggestionFragment::class.java)
             SuggestionFragment::class.simpleName -> {
-                // TODO: 추천 아이템 로드
+                // TODO: 주문 기능 구현
             }
         }
     }

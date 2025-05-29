@@ -223,6 +223,25 @@ class OrderViewModel(
         _toastEvent.postValue(event)
     }
 
+    fun selectCurrentPageCartProduct(checked: Boolean) {
+        if (checked == isCheckAll.value) return
+        val currentCartItems = _cartItems.value.orEmpty()
+        val currentSelectedItems = selectedCartItems.value.orEmpty()
+        _cartItems.value = currentCartItems.map { it.copy(isSelected = checked) }
+
+        if (checked) {
+            selectedCartItems.value =
+                (currentSelectedItems + currentCartItems).distinctBy { it.productId }
+            return
+        }
+
+        selectedCartItems.value =
+            currentSelectedItems
+                .filterNot { item ->
+                    _cartItems.value.orEmpty().any { it.productId == item.productId }
+                }
+    }
+
     private fun CartProduct.isSelected(): Boolean {
         val selectedItems = selectedCartItems.value
         return selectedItems?.any { it.cartId == cartId } ?: false
