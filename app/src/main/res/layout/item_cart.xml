@@ -34,6 +34,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <CheckBox
+            android:id="@+id/checkbox_select"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/selector_checkbox"
+            android:button="@null"
+            android:checked="@{cartItem.isSelected}"
+            android:onClick="@{() -> eventListener.onCheckOrder(cartItem.cartId)}"
+            app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
+            app:layout_constraintEnd_toStartOf="@id/cart_item_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cart_item_name" />
+
         <TextView
             android:id="@+id/cart_item_name"
             android:layout_width="0dp"
@@ -43,7 +57,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/btn_remove_cart"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkbox_select"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="나이키 에어 포스" />
 

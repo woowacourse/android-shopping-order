@@ -65,5 +65,7 @@ class CartAdapter(
 
     interface CartEventListener : QuantityChangeListener {
         fun onDeleteProduct(cartId: Long)
+
+        fun onCheckOrder(cartId: Long)
     }
 }

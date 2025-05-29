@@ -38,6 +38,10 @@ class CartFragment :
         viewModel.decreaseProductQuantity(productId)
     }
 
+    override fun onCheckOrder(cartId: Long) {
+        viewModel.switchCartItemSelection(cartId)
+    }
+
     private fun setupActionBar() {
         binding.toolbarCart.setNavigationIcon(R.drawable.ic_arrow)
         binding.toolbarCart.setNavigationOnClickListener {

@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.view.cart
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -27,17 +28,17 @@ class CartViewModel(
     private val _cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     val cartItems: LiveData<List<CartProductUiModel>> = _cartItems
 
-    private val _selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
-    val selectedCartItems: LiveData<List<CartProductUiModel>> = _selectedCartItems
+    private val selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
 
     val totalPrice: LiveData<Int> =
-        _selectedCartItems.map { it.sumOf { cartProduct -> cartProduct.totalPrice } }
+        selectedCartItems.map { it.sumOf { cartProduct -> cartProduct.totalPrice } }
 
-    val totalCount: LiveData<Int> = _selectedCartItems.map { it.count() }
+    val totalCount: LiveData<Int> = selectedCartItems.map { it.count() }
 
     val isCheckAll: LiveData<Boolean> =
-        _selectedCartItems.map { selectedCartItems ->
-            cartItems.value?.all { selectedCartItems.contains(it) } ?: false
+        MediatorLiveData<Boolean>().apply {
+            addSource(_cartItems) { updateCheckBoxChecked() }
+            addSource(selectedCartItems) { updateCheckBoxChecked() }
         }
 
     private val _page = MutableLiveData(DEFAULT_PAGE)
@@ -61,7 +62,7 @@ class CartViewModel(
 
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
-                .onSuccess { handleFetchCartItemsSuccess(it, newPage) }
+                .onSuccess { onFetchCartItemsSuccess(it, newPage) }
                 .onFailure { postFailureEvent(CartMessageEvent.FETCH_CART_ITEMS_FAILURE) }
         }
     }
@@ -90,6 +91,16 @@ class CartViewModel(
         }
     }
 
+    fun switchCartItemSelection(cartId: Long) {
+        val selectedItems = selectedCartItems.value.orEmpty()
+        if (selectedItems.find { it.cartId == cartId } != null) {
+            selectedCartItems.value = selectedItems.filter { it.cartId != cartId }
+            return
+        }
+        val foundCartProduct = _cartItems.value?.find { it.cartId == cartId } ?: return
+        selectedCartItems.value = selectedItems + foundCartProduct
+    }
+
     private fun calculatePage(direction: FetchPageDirection): Int {
         val currentPage = _page.value ?: DEFAULT_PAGE
         return when (direction) {
@@ -99,40 +110,69 @@ class CartViewModel(
         }
     }
 
-    private fun handleFetchCartItemsSuccess(
-        pageableItem: PageableItem<CartProduct>,
-        newPage: Int,
-    ) {
-        _cartItems.postValue(pageableItem.items.map { it.toCartItemUiModel() })
-        _hasMore.postValue(pageableItem.hasMore)
-        _page.postValue(newPage)
-        _isLoading.postValue(false)
-    }
-
     private fun refreshProductQuantity() {
         val newPage = calculatePage(FetchPageDirection.CURRENT)
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
-                .onSuccess { pageableItem ->
-                    val (cartItems, hasMore) = pageableItem
-                    val uiModels = cartItems.map { it.toCartItemUiModel() }
-                    _cartItems.postValue(uiModels)
-                    _hasMore.postValue(hasMore)
-                }.onFailure {
-                    postFailureEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE)
-                }
+                .onSuccess { onRefreshProductQuantitySuccess(it) }
+                .onFailure { postFailureEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
     private fun handleFetchCartItemDeleted(deletedCartId: Long) {
+        val selectedItems = selectedCartItems.value.orEmpty().toMutableList()
+        selectedItems.removeIf { it.cartId == deletedCartId }
+        selectedCartItems.postValue(selectedItems)
+
         val items = _cartItems.value.orEmpty()
         val isLastItem = items.size == 1 && items.first().cartId == deletedCartId
 
         fetchCartItems(if (isLastItem) FetchPageDirection.PREVIOUS else FetchPageDirection.CURRENT)
     }
 
+    private fun onFetchCartItemsSuccess(
+        pageableItem: PageableItem<CartProduct>,
+        newPage: Int,
+    ) {
+        _cartItems.postValue(pageableItem.items.map { it.toCartItemUiModel(it.isSelected()) })
+        _hasMore.postValue(pageableItem.hasMore)
+        _page.postValue(newPage)
+        _isLoading.postValue(false)
+    }
+
+    private fun onRefreshProductQuantitySuccess(pageableItem: PageableItem<CartProduct>) {
+        val (cartItems, hasMore) = pageableItem
+        val uiModels = cartItems.map { it.toCartItemUiModel(it.isSelected()) }
+        _cartItems.postValue(uiModels)
+        _hasMore.postValue(hasMore)
+
+        updateSelectedCartProducts(uiModels)
+    }
+
+    private fun updateSelectedCartProducts(uiModels: List<CartProductUiModel>) {
+        val currentSelectedItems = selectedCartItems.value.orEmpty()
+        val updatedSelectedItems =
+            currentSelectedItems.map { item ->
+                val foundItem = uiModels.find { it.productId == item.productId }
+                if (foundItem == null) return@map item
+                foundItem
+            }
+        selectedCartItems.postValue(updatedSelectedItems)
+    }
+
     private fun postFailureEvent(event: CartMessageEvent) {
         _toastEvent.postValue(event)
+    }
+
+    private fun CartProduct.isSelected(): Boolean {
+        val selectedItems = selectedCartItems.value
+        return selectedItems?.any { it.cartId == cartId } ?: false
+    }
+
+    private fun MediatorLiveData<Boolean>.updateCheckBoxChecked() {
+        val cartItems = cartItems.value
+        val selectedItems = selectedCartItems.value
+        value = cartItems?.all { selectedItems?.contains(it) ?: false }
     }
 
     companion object {
