@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="product"
+            type="woowacourse.shopping.domain.model.Product" />
+
+        <variable
+            name="onClickHandler"
+            type="woowacourse.shopping.ui.cart.adapter.CartRecommendViewHolder.OnClickHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="166dp"
+        android:layout_height="match_parent"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/cartRecommendProductPreviewImage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:imageUrl="@{product.productDetail.imageUrl}"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/cartRecommendProductNameText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="9dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{product.productDetail.name}"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cartRecommendProductPreviewImage"
+            tools:text="PET 보틀 - 정사각형 어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구" />
+
+        <TextView
+            android:id="@+id/cartRecommendProductPriceText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="9dp"
+            android:text="@{@string/catalog_price(product.productDetail.price)}"
+            android:textColor="@color/gray_5"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cartRecommendProductNameText"
+            tools:text="10,000원" />
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:onClick="@{() -> onClickHandler.onIncreaseClick(product.productDetail.id)}"
+            android:src="@drawable/ic_products_cart_add"
+            app:isGone="@{product.quantity != 0}"
+            app:layout_constraintBottom_toBottomOf="@id/cartRecommendProductPreviewImage"
+            app:layout_constraintEnd_toEndOf="@id/cartRecommendProductPreviewImage" />
+
+        <woowacourse.shopping.ui.custom.CartCountView
+            android:id="@+id/cartRecommendProductCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginBottom="8dp"
+            app:count="@{product.quantity}"
+            app:isGone="@{product.quantity == 0}"
+            app:layout_constraintBottom_toBottomOf="@id/cartRecommendProductPreviewImage"
+            app:layout_constraintEnd_toEndOf="@id/cartRecommendProductPreviewImage"
+            app:layout_constraintStart_toStartOf="@id/cartRecommendProductPreviewImage" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
