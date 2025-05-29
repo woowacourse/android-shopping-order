@@ -25,6 +25,7 @@ room = "2.7.1"
 kotlinx-serialization-json = "1.8.1"
 security-crypto = "1.0.0"
 shimmer = "0.5.0"
+activity = "1.10.1"
 
 [libraries]
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity-ktx" }
@@ -53,6 +54,7 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 
 
 [plugins]
