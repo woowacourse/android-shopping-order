@@ -3,6 +3,7 @@ package woowacourse.shopping.view.main
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -22,6 +23,15 @@ import woowacourse.shopping.view.main.vm.MainViewModel
 import woowacourse.shopping.view.main.vm.MainViewModelFactory
 
 class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
+    private val activityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.syncCartQuantities()
+            }
+        }
+
     private val viewModel: MainViewModel by viewModels {
         val container = (application as App).container
         MainViewModelFactory(
@@ -124,7 +134,7 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
 
     private fun setUpListener() {
         binding.cartContainer.setOnClickListener {
-            startActivity(CartActivity.newIntent(this))
+            activityResultLauncher.launch(CartActivity.newIntent(this))
         }
     }
 
@@ -158,11 +168,5 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
 
     override fun onClickDecrease(productId: Long) {
         viewModel.decreaseCartQuantity(productId)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.syncHistory()
-        viewModel.syncCartQuantities()
     }
 }

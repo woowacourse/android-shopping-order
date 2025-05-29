@@ -17,6 +17,10 @@ data class ProductState(
     val cartQuantityValue: Int
         get() = cartQuantity.value
 
+    fun modifyQuantity(quantity: Quantity): ProductState {
+        return copy(cartQuantity = quantity)
+    }
+
     fun increaseCartQuantity(): ProductState {
         val increasedQuantity = cartQuantity + 1
         return copy(cartQuantity = increasedQuantity)

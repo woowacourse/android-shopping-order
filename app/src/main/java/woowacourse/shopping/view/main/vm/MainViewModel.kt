@@ -41,7 +41,7 @@ class MainViewModel(
 
     fun loadPage() =
         withState(_uiState.value) { state ->
-            val nextPageIndex = state.productItems.size / PAGE_SIZE
+            val nextPageIndex = state.productItemSize / PAGE_SIZE
             loadProductsAndCarts(nextPageIndex)
         }
 
@@ -80,7 +80,7 @@ class MainViewModel(
                 onSuccess = { historyStates ->
                     val newStates =
                         productPage.products.map { product ->
-                            val cartItem = cartItems.find { it.product.id == product.id }
+                            val cartItem = cartItems.find { it.productId == product.id }
                             ProductState(
                                 cartId = cartItem?.id,
                                 item = product,
@@ -163,14 +163,15 @@ class MainViewModel(
 
     fun syncCartQuantities() =
         withState(_uiState.value) { state ->
-            // TODO: cartRepository.getCarts(state.productIds) { ... }
+            cartRepository.loadSinglePage(null, null) { result ->
+                result.fold(
+                    onSuccess = { value ->
+                        _uiState.value = state.modifyQuantity(value.carts)
+                    },
+                    onFailure = {},
+                )
+            }
         }
-
-    fun syncHistory() {
-        historyLoader { historyStates ->
-            // TODO: implement UI 반영
-        }
-    }
 
     fun saveHistory(productId: Long) =
         withState(_uiState.value) { state ->

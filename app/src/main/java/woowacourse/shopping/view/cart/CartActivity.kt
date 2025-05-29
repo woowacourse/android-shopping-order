@@ -99,6 +99,8 @@ class CartActivity : AppCompatActivity(), CartQuantityHandler, CartAdapter.Handl
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                val resultIntent = Intent()
+                setResult(RESULT_OK, resultIntent)
                 finish()
                 true
             }
