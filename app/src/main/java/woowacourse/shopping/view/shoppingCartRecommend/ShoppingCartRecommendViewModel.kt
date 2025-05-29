@@ -104,7 +104,7 @@ class ShoppingCartRecommendViewModel(
                 ) { result ->
                     result
                         .onSuccess {
-                            initShoppingCartProducts()
+                            loadShoppingCartProducts(item)
                         }
                 }
             }
