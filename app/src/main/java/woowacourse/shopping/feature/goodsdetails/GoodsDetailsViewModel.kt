@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
@@ -93,8 +94,16 @@ class GoodsDetailsViewModel(
 
     fun commitCart() {
         runCatching {
-            _cart.value?.let {
-                localCartRepository.insertAll(it)
+            _cart.value?.let { it ->
+//                localCartRepository.insertAll(it)
+                cartRepository.updateCart(it.id, CartQuantity(it.quantity)) { result ->
+                    result
+                        .onSuccess {
+                            insertToHistory(cart.value as Cart)
+                        }.onFailure { error ->
+                            Log.e("commitCartError", "$error")
+                        }
+                }
             }
         }.onSuccess {
             _isSuccess.setValue(Unit)
