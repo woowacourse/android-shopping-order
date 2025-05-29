@@ -31,13 +31,11 @@ class RecommendViewModel(
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
-    fun fetchData(
-        price: Int,
-        count: Int,
-    ) {
-        _selectedTotalPrice.value = price
-        _selectedTotalCount.value = count
+    init {
+        fetchData()
+    }
 
+    private fun fetchData() {
         recentProductRepository.getMostRecentProduct { result ->
             result.onSuccess { recentProduct ->
                 recentCategory = recentProduct?.category ?: ""
@@ -56,6 +54,14 @@ class RecommendViewModel(
                 }
             }
         }
+    }
+
+    fun fetchSelectedInfo(
+        price: Int,
+        count: Int,
+    ) {
+        _selectedTotalPrice.value = price
+        _selectedTotalCount.value = count
     }
 
     override fun onClickProductItem(productId: Long) {
@@ -99,9 +105,16 @@ class RecommendViewModel(
         delta: Int,
     ) {
         val currentItems = _recommendProducts.value ?: return
+        val oldPrice = _selectedTotalPrice.value ?: 0
+        val oldCount = _selectedTotalCount.value ?: 0
         val updatedItem =
             currentItems.map {
-                if (it.product.id == productId) it.copy(quantity = it.quantity + delta) else it
+                if (it.product.id == productId) {
+                    fetchSelectedInfo(oldPrice + (it.product.price * delta), oldCount + delta)
+                    it.copy(isSelected = true, quantity = it.quantity + delta)
+                } else {
+                    it
+                }
             }
         _recommendProducts.postValue(updatedItem)
     }

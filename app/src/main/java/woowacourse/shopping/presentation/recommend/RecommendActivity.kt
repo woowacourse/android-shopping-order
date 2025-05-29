@@ -32,7 +32,7 @@ class RecommendActivity : AppCompatActivity() {
 
         val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
         val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
-        viewModel.fetchData(price, count)
+        viewModel.fetchSelectedInfo(price, count)
 
         initInsets()
         setupToolbar()
