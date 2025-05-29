@@ -28,4 +28,11 @@ interface ProductRepository {
         id: Long,
         callback: (Product?) -> Unit,
     )
+
+    fun getMostRecentProduct(callback: (Product?) -> Unit)
+
+    fun loadProductsByCategory(
+        category: String,
+        callback: (List<Product>) -> Unit,
+    )
 }

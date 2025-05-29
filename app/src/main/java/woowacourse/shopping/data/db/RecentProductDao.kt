@@ -32,4 +32,7 @@ interface RecentProductDao {
     """,
     )
     fun getLastViewedProduct(currentProductId: Long): RecentProductEntity?
+
+    @Query("SELECT * FROM RecentProductEntity ORDER BY viewedAt DESC LIMIT 1")
+    fun getMostRecentProduct(): RecentProductEntity?
 }

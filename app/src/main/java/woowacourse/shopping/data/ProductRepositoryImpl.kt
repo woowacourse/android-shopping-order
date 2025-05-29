@@ -78,4 +78,26 @@ class ProductRepositoryImpl(
             callback(product)
         }
     }
+
+    override fun getMostRecentProduct(callback: (Product?) -> Unit) {
+        thread {
+            val entity = recentProductDao.getMostRecentProduct()
+            val product = entity?.toProduct()
+            callback(product)
+        }
+    }
+
+    override fun loadProductsByCategory(
+        category: String,
+        callback: (List<Product>) -> Unit,
+    ) {
+        productDataSource.fetchProducts(
+            page = 0,
+            size = Int.MAX_VALUE,
+        ) {
+            val products: List<Product> = it.productContent.map { it.toProduct() }
+            val filteredProducts = products.filter { it.category == category }
+            callback(filteredProducts)
+        }
+    }
 }
