@@ -30,9 +30,21 @@ class CartViewModel(
     fun loadItems(currentPage: Int = 0) {
         cartRepository.fetchPagedCartItems(currentPage) { result ->
             result
-                .onSuccess {
-                    _cartItems.postValue(it.map { cartItem -> cartItem.toPresentation() })
-                }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
+                .onSuccess { loadedItems ->
+                    val oldItemsMap =
+                        cartItems.value
+                            .orEmpty()
+                            .associateBy { cartItemUiModel -> cartItemUiModel.id }
+
+                    val newItems =
+                        loadedItems.map { newItem ->
+                            oldItemsMap[newItem.cartId] ?: newItem.toPresentation()
+                        }
+
+                    _cartItems.postValue(newItems)
+                }.onFailure {
+                    _toastMessage.postValue(R.string.cart_toast_load_fail)
+                }
         }
     }
 
