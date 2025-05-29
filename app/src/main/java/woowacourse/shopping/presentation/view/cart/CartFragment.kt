@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.view.cart
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
@@ -14,7 +14,7 @@ class CartFragment :
     CartAdapter.CartEventListener {
     private val cartAdapter: CartAdapter by lazy { CartAdapter(eventListener = this) }
 
-    private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
+    private val viewModel: OrderViewModel by activityViewModels()
 
     override fun onViewCreated(
         view: View,
@@ -45,7 +45,7 @@ class CartFragment :
     private fun setupActionBar() {
         binding.toolbarCart.setNavigationIcon(R.drawable.ic_arrow)
         binding.toolbarCart.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            requireActivity().finish()
         }
     }
 

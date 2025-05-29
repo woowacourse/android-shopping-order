@@ -19,7 +19,7 @@ import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.cart.event.CartMessageEvent
 import kotlin.math.max
 
-class CartViewModel(
+class OrderViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _toastEvent = MutableSingleLiveData<CartMessageEvent>()
@@ -186,7 +186,7 @@ class CartViewModel(
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
-                ): T = CartViewModel(RepositoryProvider.cartRepository) as T
+                ): T = OrderViewModel(RepositoryProvider.cartRepository) as T
             }
     }
 }

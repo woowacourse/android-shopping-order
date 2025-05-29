@@ -25,6 +25,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.view.cart.OrderActivity"
+            android:exported="false" />
         <activity android:name="androidx.fragment.app.testing.EmptyFragmentActivity" />
     </application>
 

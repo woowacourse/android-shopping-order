@@ -9,7 +9,7 @@
 
         <variable
             name="vm"
-            type="woowacourse.shopping.presentation.view.cart.CartViewModel" />
+            type="woowacourse.shopping.presentation.view.cart.OrderViewModel" />
 
     </data>
 
@@ -62,7 +62,7 @@
             android:text="@{String.valueOf(vm.page)}"
             android:textSize="22sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/view_order"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_right"
             app:layout_constraintStart_toEndOf="@id/btn_left"
             tools:text="1" />
@@ -81,17 +81,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_page"
             app:layout_constraintTop_toTopOf="@id/text_view_page" />
-
-        <include
-            android:id="@+id/view_order"
-            layout="@layout/view_order"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:isCheckedAll="@{vm.isCheckAll}"
-            app:isShowCheckBox="@{true}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:totalCount="@{vm.totalCount}"
-            app:totalPrice="@{vm.totalPrice}" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmer_cart"

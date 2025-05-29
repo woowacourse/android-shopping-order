@@ -10,13 +10,13 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.model.FetchPageDirection
-import woowacourse.shopping.presentation.view.cart.CartViewModel
+import woowacourse.shopping.presentation.view.cart.OrderViewModel
 import woowacourse.shopping.presentation.view.util.InstantTaskExecutorExtension
 import woowacourse.shopping.presentation.view.util.getOrAwaitValue
 
 @ExtendWith(InstantTaskExecutorExtension::class)
-class CartViewModelTest {
-    private lateinit var viewModel: CartViewModel
+class OrderViewModelTest {
+    private lateinit var viewModel: OrderViewModel
     private val dummyCartProducts =
         productsFixture.take(10).map {
             CartProduct(it.id, it.toDomain(), 2)
@@ -26,7 +26,7 @@ class CartViewModelTest {
     fun setUp() {
         val fakeCartRepository = FakeCartRepository(dummyCartProducts)
         viewModel =
-            CartViewModel(fakeCartRepository)
+            OrderViewModel(fakeCartRepository)
     }
 
     @Test
