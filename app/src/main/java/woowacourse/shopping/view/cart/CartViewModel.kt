@@ -3,6 +3,7 @@ package woowacourse.shopping.view.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.PageableCartItems
@@ -29,7 +30,12 @@ class CartViewModel(
         get() = _selectedCartItems
 
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
-    val totalPrice: LiveData<Int> get() = _totalPrice
+    val totalPrice: LiveData<Int> =
+        selectedCartItems.map { selectedCartItems ->
+            selectedCartItems.sumOf { productItem: CartItemType.ProductItem ->
+                productItem.price
+            }
+        }
 
     init {
         loadCartItems()
@@ -66,6 +72,11 @@ class CartViewModel(
                 result
                     .onSuccess {
                         loadCartItems()
+                        val oldSelectedCartItems: Set<CartItemType.ProductItem> =
+                            selectedCartItems.value ?: emptySet()
+                        val newSelectedCartItems: Set<CartItemType.ProductItem> =
+                            (oldSelectedCartItems - cartItem)
+                        _selectedCartItems.postValue(newSelectedCartItems)
                     }.onFailure {
                         _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
                     }
@@ -87,10 +98,25 @@ class CartViewModel(
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
                     val cartItems: List<CartItemType.ProductItem> =
-                        pageableCartItems.cartItems.map { cartItem: CartItem ->
-                            CartItemType.ProductItem(cartItem)
-                        }
+                        pageableCartItems.cartItems.map { newCartItem: CartItem ->
+                            val checked =
+                                selectedCartItems.value?.any { selectedProductItem: CartItemType.ProductItem ->
+                                    newCartItem == selectedProductItem.cartItem
+                                } ?: false
 
+                            val newProductItem: CartItemType.ProductItem =
+                                CartItemType.ProductItem(newCartItem, checked)
+
+                            if (checked) {
+                                val oldSelectedCartItems: Set<CartItemType.ProductItem> =
+                                    selectedCartItems.value ?: emptySet()
+                                val newSelectedCartItems: Set<CartItemType.ProductItem> =
+                                    oldSelectedCartItems.minus(newProductItem).plus(newProductItem)
+                                _selectedCartItems.postValue(newSelectedCartItems)
+                            }
+
+                            newProductItem
+                        }
                     val paginationItem: CartItemType.PaginationItem =
                         CartItemType.PaginationItem(
                             page = page,
@@ -107,8 +133,8 @@ class CartViewModel(
         }
     }
 
-    fun removeCartItem(cartItemId: Long) {
-        cartRepository.remove(cartItemId) { result ->
+    fun removeCartItem(cartItem: CartItemType.ProductItem) {
+        cartRepository.remove(cartItem.cartItemId) { result ->
             result
                 .onSuccess {
                     if (_cartItems.value?.size == 1) {
@@ -116,6 +142,11 @@ class CartViewModel(
                     } else {
                         loadCartItems()
                     }
+                    val oldSelectedCartItems: Set<CartItemType.ProductItem> =
+                        selectedCartItems.value ?: emptySet()
+                    val newSelectedCartItems: Set<CartItemType.ProductItem> =
+                        (oldSelectedCartItems - cartItem)
+                    _selectedCartItems.postValue(newSelectedCartItems)
                 }.onFailure {
                     _event.postValue(CartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
                 }

@@ -7,17 +7,17 @@ import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
 
 class CartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
-    onRemoveProduct: (cartItemId: Long) -> Unit,
+    onRemoveProduct: (cartItem: CartItemType.ProductItem) -> Unit,
     private val onSelect: (productItem: CartItemType.ProductItem) -> Unit,
     private val onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
-    private val onPlusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
-    private val onMinusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
+    onPlusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
+    onMinusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.shoppingCartItemActionListener =
             object : CartItemActionListener {
                 override fun onRemoveProduct(item: CartItemType.ProductItem) {
-                    onRemoveProduct(item.cartItem.id)
+                    onRemoveProduct(item)
                 }
 
                 override fun onPlusProductQuantity(item: CartItemType.ProductItem) {
@@ -44,7 +44,7 @@ class CartProductViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            onRemoveProduct: (cartItemId: Long) -> Unit,
+            onRemoveProduct: (cartItem: CartItemType.ProductItem) -> Unit,
             onSelect: (productItem: CartItemType.ProductItem) -> Unit,
             onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
             onPlusQuantity: (CartItemType.ProductItem) -> Unit,

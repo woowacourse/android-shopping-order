@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class CartProductAdapter(
-    private val onRemoveProduct: (cartItemId: Long) -> Unit,
+    private val onRemoveProduct: (cartItem: CartItemType.ProductItem) -> Unit,
     private val onCartPaginationListener: OnCartPaginationListener,
     private val onSelect: (productItem: CartItemType.ProductItem) -> Unit,
     private val onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
