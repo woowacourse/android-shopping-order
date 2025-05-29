@@ -4,10 +4,12 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.recommend.RecommendAdapter
 
 @BindingAdapter("loadImage")
 fun loadImage(
@@ -53,4 +55,9 @@ fun View.visibleIfNotSameProduct(
     current: ProductUiModel?,
 ) {
     visibility = if (recentItem != null && recentItem.id != current?.id) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("recommendProducts")
+fun RecyclerView.setRecommendProducts(products: List<ProductUiModel>?) {
+    (adapter as? RecommendAdapter)?.setItems(products.orEmpty())
 }

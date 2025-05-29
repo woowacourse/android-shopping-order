@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.recommend.RecommendViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -36,11 +40,13 @@
             app:layout_constraintTop_toBottomOf="@id/textView_recommend_main_info" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_recommend_products"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal"
+            app:recommendProducts="@{vm.items}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textView_recommend_sub_info" />
