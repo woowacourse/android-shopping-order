@@ -173,7 +173,7 @@ class ShoppingCartRecommendViewModel(
     ) {
         shoppingCartRepository.decreaseQuantity(
             item.shoppingCartId ?: return,
-            selectedQuantity,
+            selectedQuantity - 1,
         ) { result ->
             result.onSuccess {
                 loadShoppingCartProducts(item)
