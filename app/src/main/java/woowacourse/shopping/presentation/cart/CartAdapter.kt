@@ -16,6 +16,7 @@ class CartAdapter(
     private val handler: ProductQuantityHandler,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var pagingData: PagingData? = null
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -44,7 +45,10 @@ class CartAdapter(
         return VIEW_TYPE_CART_PRODUCT
     }
 
-    fun setData(newCartProducts: List<ProductUiModel>, pagingData: PagingData) {
+    fun setData(
+        newCartProducts: List<ProductUiModel>,
+        pagingData: PagingData,
+    ) {
         val hadPagination = shouldShowPagination()
         val oldSize = cartProducts.size
         val oldTotalCount = oldSize + if (hadPagination) 1 else 0
@@ -62,11 +66,9 @@ class CartAdapter(
         }
     }
 
-    private fun shouldShowPagination(): Boolean =
-        pagingData?.hasPrevious == true || pagingData?.hasNext == true
+    private fun shouldShowPagination(): Boolean = pagingData?.hasPrevious == true || pagingData?.hasNext == true
 
-    override fun getItemCount(): Int =
-        cartProducts.size + if (shouldShowPagination()) 1 else 0
+    override fun getItemCount(): Int = cartProducts.size + if (shouldShowPagination()) 1 else 0
 
     fun updateProduct(product: ProductUiModel) {
         val index = cartProducts.indexOfFirst { it.id == product.id }

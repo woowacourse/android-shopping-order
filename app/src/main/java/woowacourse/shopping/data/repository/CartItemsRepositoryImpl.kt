@@ -12,7 +12,6 @@ class CartItemsRepositoryImpl(
     private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
     private val cartItemsLocalDataSource: CartItemsLocalDataSource,
 ) : CartItemRepository {
-
     init {
         getInitialCartItems(null, null) { result ->
             result
@@ -23,11 +22,12 @@ class CartItemsRepositoryImpl(
     }
 
     override fun getQuantity(pagingData: PagingData): PagingData {
-        val updatedProducts = pagingData.products.map { product ->
-            val quantity = cartItemsLocalDataSource.getQuantity(product.id)
-            val isExpanded = quantity > 0
-            product.copy(quantity = quantity, isExpanded = isExpanded)
-        }
+        val updatedProducts =
+            pagingData.products.map { product ->
+                val quantity = cartItemsLocalDataSource.getQuantity(product.id)
+                val isExpanded = quantity > 0
+                product.copy(quantity = quantity, isExpanded = isExpanded)
+            }
         return pagingData.copy(products = updatedProducts)
     }
 
@@ -43,7 +43,7 @@ class CartItemsRepositoryImpl(
                         CachedCartItem(
                             productId = content.product.id,
                             cartId = content.id,
-                            quantity = content.quantity
+                            quantity = content.quantity,
                         )
                     }
                 }
@@ -75,7 +75,7 @@ class CartItemsRepositoryImpl(
     ) {
         val cartId = cartItemsLocalDataSource.findCachedCartId(id)
 
-        if(cartId!=null){
+        if (cartId != null) {
             cartItemsRemoteDataSource.deleteCartItem(cartId) { result ->
                 cartItemsLocalDataSource.remove(cartId)
                 result.let(onResult)

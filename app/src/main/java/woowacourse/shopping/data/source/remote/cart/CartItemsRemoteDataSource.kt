@@ -59,22 +59,27 @@ class CartItemsRemoteDataSource(
         id: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        api.deleteCartItems(id = id).enqueue(object : Callback<Void> {
-            override fun onResponse(
-                call: Call<Void?>,
-                response: Response<Void?>,
-            ) {
-                if (response.isSuccessful) {
-                    onResult(Result.success(Unit))
-                } else {
-                    onResult(Result.failure(Exception(DELETE_ERROR_MESSAGE)))
+        api.deleteCartItems(id = id).enqueue(
+            object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void?>,
+                    response: Response<Void?>,
+                ) {
+                    if (response.isSuccessful) {
+                        onResult(Result.success(Unit))
+                    } else {
+                        onResult(Result.failure(Exception(DELETE_ERROR_MESSAGE)))
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Void?>, t: Throwable) {
-                onResult(Result.failure(t))
-            }
-        })
+                override fun onFailure(
+                    call: Call<Void?>,
+                    t: Throwable,
+                ) {
+                    onResult(Result.failure(t))
+                }
+            },
+        )
     }
 
     override fun updateCartItem(
