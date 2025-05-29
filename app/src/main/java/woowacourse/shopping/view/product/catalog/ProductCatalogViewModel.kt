@@ -31,7 +31,7 @@ class ProductCatalogViewModel(
     private val _selectedProduct = MutableSingleLiveData<Product>()
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
-    private val _totalQuantity = MutableLiveData(0)
+    private val _totalQuantity = MutableLiveData(MINIMUM_QUANTITY)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
     private val _onFinishLoading = MutableLiveData(false)
@@ -46,31 +46,28 @@ class ProductCatalogViewModel(
     }
 
     override fun onAddClick(item: Product) {
-        val quantityToAdd = 1
-        cartProductRepository.insert(item.id, quantityToAdd) { cartProductId ->
-            cartProducts.add(CartProduct(cartProductId, item, quantityToAdd))
-            updateQuantity(item, quantityToAdd)
+        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { cartProductId ->
+            cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+            updateQuantity(item, QUANTITY_TO_ADD)
         }
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
         val cartProduct = cartProducts.first { it.product.id == item.id }
-        val quantityToAdd = 1
-        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+        cartProductRepository.updateQuantity(cartProduct, QUANTITY_TO_ADD) {
             cartProducts.removeIf { it.product.id == item.id }
-            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + quantityToAdd))
-            updateQuantity(item, quantityToAdd)
+            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
+            updateQuantity(item, QUANTITY_TO_ADD)
         }
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
         val cartProduct = cartProducts.first { it.product.id == item.id }
-        val quantityToAdd = -1
-        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+        cartProductRepository.updateQuantity(cartProduct, -QUANTITY_TO_ADD) {
             cartProducts.removeIf { it.product.id == item.id }
-            val newQuantity = cartProduct.quantity + quantityToAdd
-            if (newQuantity > 0) cartProducts.add(cartProduct.copy(quantity = newQuantity))
-            updateQuantity(item, quantityToAdd)
+            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+            if (newQuantity > MINIMUM_QUANTITY) cartProducts.add(cartProduct.copy(quantity = newQuantity))
+            updateQuantity(item, -QUANTITY_TO_ADD)
         }
     }
 
@@ -108,7 +105,7 @@ class ProductCatalogViewModel(
             result.items.forEach { product ->
                 val cartProduct = cartProducts.firstOrNull { it.product.id == product.id }
                 productItems.add(
-                    ProductCatalogItem.ProductItem(product, cartProduct?.quantity ?: 0),
+                    ProductCatalogItem.ProductItem(product, cartProduct?.quantity ?: MINIMUM_QUANTITY),
                 )
             }
             hasNext = result.hasNext
@@ -127,7 +124,7 @@ class ProductCatalogViewModel(
             val updatedItem = currentItem.copy(quantity = currentItem.quantity + quantityToAdd)
             productItems[index] = updatedItem
         }
-        _totalQuantity.postValue((totalQuantity.value ?: 0) + quantityToAdd)
+        _totalQuantity.postValue((totalQuantity.value ?: MINIMUM_QUANTITY) + quantityToAdd)
         _productCatalogItems.postValue(buildCatalogItems())
     }
 
@@ -146,5 +143,7 @@ class ProductCatalogViewModel(
         private const val FIRST_PAGE = 0
         private const val PRODUCT_SIZE_LIMIT = 20
         private const val RECENT_PRODUCT_SIZE_LIMIT = 10
+        private const val QUANTITY_TO_ADD = 1
+        private const val MINIMUM_QUANTITY = 0
     }
 }
