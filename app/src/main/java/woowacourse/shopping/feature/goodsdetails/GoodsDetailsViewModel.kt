@@ -39,30 +39,39 @@ class GoodsDetailsViewModel(
     }
 
     fun loadProductDetails(productId: Long) {
-        productRepository.requestProductDetails(
-            productId = productId,
-            onSuccess = { content ->
-                val currentCart = _cart.value
-                Log.d("currentCart", currentCart.toString())
-                _cart.value =
-                    Cart(
-                        id = currentCart?.id ?: 0,
-                        product =
-                            Product(
-                                id = content.id.toInt(),
-                                name = content.name,
-                                price = content.price,
-                                imageUrl = content.imageUrl,
-                                category = content.category,
-                            ),
-                        quantity = currentCart?.quantity ?: 1,
-                    )
-                if (cart.value != null) insertToHistory(cart.value as Cart)
-                Log.d("cart", cart.value.toString())
+        cartRepository.fetchAllCart(
+            onSuccess = { response ->
+                productRepository.requestProductDetails(
+                    productId = productId,
+                    onSuccess = { content ->
+                        _cart.value =
+                            Cart(
+                                id =
+                                    response.content
+                                        .find {
+                                            it.product.id == content.id
+                                        }?.id ?: 0,
+                                product =
+                                    Product(
+                                        id = content.id.toInt(),
+                                        name = content.name,
+                                        price = content.price,
+                                        imageUrl = content.imageUrl,
+                                        category = content.category,
+                                    ),
+                                quantity =
+                                    response.content.find { it.product.id == content.id }?.quantity
+                                        ?: 1,
+                            )
+                        if (cart.value != null) insertToHistory(cart.value as Cart)
+                        Log.d("cart", cart.value.toString())
+                    },
+                    onError = {
+                        _isFail.setValue(Unit)
+                    },
+                )
             },
-            onError = {
-                _isFail.setValue(Unit)
-            },
+            onError = {},
         )
     }
 
