@@ -10,4 +10,6 @@ interface ProductsDataSource {
     ): PageableProductData
 
     fun getProductById(id: Long): ProductEntity?
+
+    fun getProductsByCategory(category: String): List<ProductEntity>?
 }

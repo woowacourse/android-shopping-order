@@ -18,4 +18,9 @@ interface ProductService {
     fun getProductById(
         @Path("id") id: Long,
     ): Call<ProductResponse>
+
+    @GET("/products")
+    fun getProductsByCategory(
+        @Query("category") category: String,
+    ): Call<ProductsResponse>
 }

@@ -10,6 +10,11 @@ interface ProductsRepository {
         onLoad: (Result<PageableProducts>) -> Unit,
     )
 
+    fun loadProductsByCategory(
+        category: String,
+        onLoad: (Result<List<Product>>) -> Unit,
+    )
+
     fun getProductById(
         id: Long,
         onLoad: (Result<Product?>) -> Unit,

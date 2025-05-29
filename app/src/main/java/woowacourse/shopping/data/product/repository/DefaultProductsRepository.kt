@@ -34,6 +34,17 @@ class DefaultProductsRepository(
         }.runAsync(onLoad)
     }
 
+    override fun loadProductsByCategory(
+        category: String,
+        onLoad: (Result<List<Product>>) -> Unit,
+    ) {
+        {
+            val productsEntity: List<ProductEntity>? =
+                productsDataSource.getProductsByCategory(category)
+            productsEntity?.map { it.toDomain() } ?: emptyList()
+        }.runAsync(onLoad)
+    }
+
     override fun getProductById(
         id: Long,
         onLoad: (Result<Product?>) -> Unit,

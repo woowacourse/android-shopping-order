@@ -28,4 +28,8 @@ object LocalProductsDataSource : ProductsDataSource {
     ): PageableProductData = PageableProductData(emptyList(), false)
 
     override fun getProductById(id: Long): ProductEntity? = dao.load(id)
+
+    override fun getProductsByCategory(category: String): List<ProductEntity>? {
+        TODO("Not yet implemented")
+    }
 }

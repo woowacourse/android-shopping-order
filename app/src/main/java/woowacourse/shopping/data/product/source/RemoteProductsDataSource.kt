@@ -30,6 +30,15 @@ class RemoteProductsDataSource(
         return response.toEntityOrNull()
     }
 
+    override fun getProductsByCategory(category: String): List<ProductEntity> {
+        val response: ProductsResponse? =
+            productService.getProductsByCategory(category).execute().body()
+
+        return response?.content?.mapNotNull {
+            it.toEntityOrNull()
+        } ?: emptyList()
+    }
+
     private fun Content.toEntityOrNull(): ProductEntity? {
         return ProductEntity(
             id = id ?: return null,
