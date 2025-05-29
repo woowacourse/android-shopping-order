@@ -19,4 +19,8 @@ data class DetailUiState(
 
     val hasLastSeenProduct: Boolean
         get() = lastSeenProduct != null
+
+    fun addQuantity(quantity: Quantity): Quantity {
+        return quantity + cartQuantity.value
+    }
 }

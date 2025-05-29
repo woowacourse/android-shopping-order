@@ -93,8 +93,37 @@ class DetailViewModel(
 
     fun saveCart(productId: Long) {
         withState(_uiState.value) { state ->
-            defaultCartRepository.addCart(Cart(state.cartQuantity, productId)) {
-                sendEvent(DetailUiEvent.MoveToCart)
+            defaultCartRepository.loadSinglePage(null, null) { result ->
+                result.fold(
+                    onSuccess = { value ->
+                        val savedCart = value.carts.find { it.product.id == productId }
+
+                        savedCart?.let {
+                            defaultCartRepository.updateQuantity(
+                                it.id,
+                                state.addQuantity(it.quantity),
+                            ) { result ->
+                                result.fold(
+                                    onSuccess = { sendEvent(DetailUiEvent.MoveToCart) },
+                                    onFailure = {},
+                                )
+                            }
+                        } ?: run {
+                            defaultCartRepository.addCart(
+                                Cart(
+                                    state.cartQuantity,
+                                    productId,
+                                ),
+                            ) { result ->
+                                result.fold(
+                                    onSuccess = { sendEvent(DetailUiEvent.MoveToCart) },
+                                    onFailure = {},
+                                )
+                            }
+                        }
+                    },
+                    onFailure = {},
+                )
             }
         }
     }
