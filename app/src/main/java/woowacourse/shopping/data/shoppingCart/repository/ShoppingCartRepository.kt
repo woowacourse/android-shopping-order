@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
 import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 interface ShoppingCartRepository {
     fun load(
         page: Int,
         size: Int,
-        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
+        onResult: (Result<ShoppingCarts>) -> Unit,
     )
 
     fun add(

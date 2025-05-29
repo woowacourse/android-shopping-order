@@ -9,7 +9,7 @@ import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.ShoppingCartItemsResponseDto
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 class DefaultShoppingCartRepository(
     private val shoppingCartService: ShoppingCartService,
@@ -17,7 +17,7 @@ class DefaultShoppingCartRepository(
     override fun load(
         page: Int,
         size: Int,
-        onResult: (Result<List<ShoppingCartProduct>>) -> Unit,
+        onResult: (Result<ShoppingCarts>) -> Unit,
     ) {
         shoppingCartService
             .getCartItems(page, size)
@@ -27,7 +27,11 @@ class DefaultShoppingCartRepository(
                         call: Call<ShoppingCartItemsResponseDto>,
                         response: Response<ShoppingCartItemsResponseDto>,
                     ) {
-                        onResult(Result.success(response.body()?.toDomain() ?: emptyList()))
+                        onResult(
+                            Result.success(
+                                response.body()?.toDomain() ?: ShoppingCarts(false, emptyList()),
+                            ),
+                        )
                     }
 
                     override fun onFailure(

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
@@ -75,17 +76,17 @@ class ShoppingCartViewModel(
 
     fun updateShoppingCart() {
         val page = this.page - 1
-        val size = COUNT_PER_PAGE + 1
+        val size = COUNT_PER_PAGE
         shoppingCartRepository.load(page, size) { result ->
             result
-                .onSuccess { shoppingCartProducts: List<ShoppingCartProduct> ->
+                .onSuccess { shoppingCarts: ShoppingCarts ->
                     _isLoading.value = false
-                    if (isEmptyPage(shoppingCartProducts)) return@load
+                    if (isEmptyPage(shoppingCarts.shoppingCartItems)) return@load
 
-                    loadable = shoppingCartProducts.size == COUNT_PER_PAGE + 1
+                    loadable = !shoppingCarts.last
 
                     updateShoppingCartItems(
-                        shoppingCartProducts.take(5),
+                        shoppingCarts.shoppingCartItems,
                         shoppingCart.value ?: emptyList(),
                     )
                 }.onFailure {

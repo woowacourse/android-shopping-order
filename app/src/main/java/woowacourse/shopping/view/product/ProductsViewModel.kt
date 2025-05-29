@@ -67,7 +67,7 @@ class ProductsViewModel(
         shoppingCartRepository.load(0, 20) { result ->
             result
                 .onSuccess {
-                    shoppingCartProducts = it
+                    shoppingCartProducts = it.shoppingCartItems
                     handleShoppingCartQuantitySuccess(
                         currentProducts,
                         productsToShow,
@@ -258,7 +258,7 @@ class ProductsViewModel(
                             shoppingCartRepository.load(page - 1, LOAD_PRODUCTS_SIZE) { result ->
                                 result.onSuccess { shoppingCartProducts ->
                                     val newShoppingCartId =
-                                        shoppingCartProducts
+                                        shoppingCartProducts.shoppingCartItems
                                             .find {
                                                 it.product.id == productItem.product.id
                                             }?.id
