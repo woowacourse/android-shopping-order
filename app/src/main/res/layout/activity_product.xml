@@ -111,11 +111,9 @@
 
                     <include layout="@layout/layout_product_shimmer" />
 
-
                 </GridLayout>
 
             </com.facebook.shimmer.ShimmerFrameLayout>
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
