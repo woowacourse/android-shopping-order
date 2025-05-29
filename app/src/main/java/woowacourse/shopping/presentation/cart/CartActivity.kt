@@ -124,6 +124,10 @@ class CartActivity :
         viewModel.toggleItemChecked(cartId)
     }
 
+    override fun onClickCheckAll() {
+        viewModel.toggleItemCheckAll()
+    }
+
     override fun onClickRecommend() {
         val intent =
             RecommendActivity.newIntent(

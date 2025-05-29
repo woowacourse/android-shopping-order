@@ -7,5 +7,7 @@ interface CartPageClickListener {
 
     fun onClickSelect(cartId: Long)
 
+    fun onClickCheckAll()
+
     fun onClickRecommend()
 }

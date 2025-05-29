@@ -59,7 +59,8 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="12dp"
             android:buttonTint="@color/baemin"
-            android:checked="true"
+            android:checked="@{vm.isCheckAll}"
+            android:onClick="@{() -> clickListener.onClickCheckAll()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/layout_cart_total_price" />
 

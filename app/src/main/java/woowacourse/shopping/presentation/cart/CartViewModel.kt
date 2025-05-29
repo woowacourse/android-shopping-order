@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,7 +19,7 @@ class CartViewModel(
     val selectedTotalPrice: LiveData<Int> = _selectedTotalPrice
     private val _selectedTotalCount: MutableLiveData<Int> = MutableLiveData(0)
     val selectedTotalCount: LiveData<Int> = _selectedTotalCount
-    private val _isCheckAll: MutableLiveData<Boolean> = MutableLiveData()
+    private val _isCheckAll: MutableLiveData<Boolean> = MutableLiveData(false)
     val isCheckAll: LiveData<Boolean> = _isCheckAll
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
@@ -123,5 +124,14 @@ class CartViewModel(
             }
         _cartItems.postValue(updatedItem)
         fetchSelectedInfo()
+    }
+
+    fun toggleItemCheckAll() {
+        Log.d("CN_Log", "toggleItemCheckAll")
+        val currentCheckState = _isCheckAll.value ?: return
+        Log.d("CN_Log", "current =$currentCheckState")
+        val toggledState = !currentCheckState
+        _isCheckAll.value = toggledState
+        _cartItems.value = _cartItems.value?.map { it.copy(isSelected = toggledState) }.orEmpty()
     }
 }
