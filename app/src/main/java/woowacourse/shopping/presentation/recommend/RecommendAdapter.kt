@@ -2,8 +2,8 @@ package woowacourse.shopping.presentation.recommend
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendAdapter(

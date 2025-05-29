@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendProductBinding
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
+import woowacourse.shopping.presentation.model.CartItemUiModel
+import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.product.ItemClickListener
-import woowacourse.shopping.presentation.toDomain
 
 class RecommendViewHolder(
     private val binding: ItemRecommendProductBinding,

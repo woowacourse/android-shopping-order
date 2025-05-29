@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartProductBinding
-import woowacourse.shopping.presentation.CartItemUiModel
+import woowacourse.shopping.presentation.model.CartItemUiModel
 
 class CartAdapter(
     private val cartCounterClickListener: CartCounterClickListener,

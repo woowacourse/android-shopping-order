@@ -8,11 +8,11 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
+import woowacourse.shopping.presentation.model.CartItemUiModel
+import woowacourse.shopping.presentation.model.toPresentation
 import woowacourse.shopping.presentation.product.ItemClickListener
-import woowacourse.shopping.presentation.toPresentation
 
 class RecommendViewModel(
     private val productRepository: ProductRepository,
