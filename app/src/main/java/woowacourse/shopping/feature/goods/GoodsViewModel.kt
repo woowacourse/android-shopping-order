@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.goods
 
+import android.os.Handler
+import android.os.Looper.getMainLooper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,6 +36,8 @@ class GoodsViewModel(
     val isSuccess: SingleLiveData<Unit> get() = _isSuccess
     private val _isFail = MutableSingleLiveData<Unit>()
     val isFail: SingleLiveData<Unit> get() = _isFail
+    private val _isLoading = MutableLiveData<Boolean>(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
     private var page: Int = INITIAL_PAGE
 
     init {
@@ -172,36 +176,46 @@ class GoodsViewModel(
     }
 
     private fun loadProducts() {
-        cartRepository.fetchAllCart(
-            onSuccess = { cartList ->
-                val cartByProductId = cartList.content.associateBy { it.product.id }
+        _isLoading.postValue(true)
+        Handler(getMainLooper()).postDelayed({
+            cartRepository.fetchAllCart(
+                onSuccess = { cartList ->
+                    val cartByProductId = cartList.content.associateBy { it.product.id }
 
-                productRepository.fetchProducts(
-                    onSuccess = { response ->
-                        val newCarts =
-                            response.content.map { product ->
-                                val matchedCart = cartByProductId[product.id]
-                                Cart(
-                                    id = matchedCart?.id?.toLong() ?: 0,
-                                    product = product.toDomain(),
-                                    quantity = matchedCart?.quantity ?: 0,
-                                )
-                            }
+                    productRepository.fetchProducts(
+                        onSuccess = { response ->
+                            val newCarts =
+                                response.content.map { product ->
+                                    val matchedCart = cartByProductId[product.id]
+                                    Cart(
+                                        id = matchedCart?.id?.toLong() ?: 0,
+                                        product = product.toDomain(),
+                                        quantity = matchedCart?.quantity ?: 0,
+                                    )
+                                }
 
-                        val currentProducts = products.value.orEmpty()
-                        val combinedCarts = currentProducts + newCarts
-                        products.value = combinedCarts
+                            val currentProducts = products.value.orEmpty()
+                            val combinedCarts = currentProducts + newCarts
+                            products.value = combinedCarts
 
-                        _hasNextPage.value = !response.last
+                            _hasNextPage.value = !response.last
 
-                        refreshItems()
-                    },
-                    onError = { Log.e("loadProductsInRange", "상품 API 실패", it) },
-                    page = page,
-                )
-            },
-            onError = { Log.e("loadProductsInRange", "장바구니 API 실패", it) },
-        )
+                            refreshItems()
+                            _isLoading.postValue(false)
+                        },
+                        onError = {
+                            Log.e("loadProductsInRange", "상품 API 실패", it)
+                            _isLoading.postValue(false)
+                        },
+                        page = page,
+                    )
+                },
+                onError = {
+                    Log.e("loadProductsInRange", "장바구니 API 실패", it)
+                    _isLoading.postValue(false)
+                },
+            )
+        }, 2000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
     }
 
     private fun loadHistories() {
