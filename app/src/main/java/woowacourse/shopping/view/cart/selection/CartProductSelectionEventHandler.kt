@@ -3,9 +3,9 @@ package woowacourse.shopping.view.cart.selection
 import woowacourse.shopping.view.cart.selection.adapter.CartProductViewHolder
 
 interface CartProductSelectionEventHandler : CartProductViewHolder.EventHandler {
-    fun loadPreviousProducts()
+    fun onPreviousPageClick()
 
-    fun loadNextProducts()
+    fun onNextPageClick()
 
-    fun onSelectAllItems()
+    fun onSelectAllClick()
 }

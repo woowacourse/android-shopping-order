@@ -19,7 +19,7 @@
             android:id="@+id/btn_load_more"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> handler.onMoreClick()}"
+            android:onClick="@{() -> handler.onLoadMoreClick()}"
             android:padding="12dp"
             android:text="@string/load_more"
             android:textColor="@color/white"

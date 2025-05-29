@@ -40,7 +40,7 @@ class CartProductSelectionViewModelTest {
     @Test
     fun `다음 페이지 로드 시 페이지 번호가 증가하고 상품이 로드된다`() {
         // when
-        viewModel.loadNextProducts()
+        viewModel.onNextPageClick()
 
         // then
         val products = viewModel.products.getOrAwaitValue()
@@ -55,8 +55,8 @@ class CartProductSelectionViewModelTest {
     @Test
     fun `마지막 페이지 로드 시 다음 페이지는 없다`() {
         // when
-        viewModel.loadNextProducts()
-        viewModel.loadNextProducts()
+        viewModel.onNextPageClick()
+        viewModel.onNextPageClick()
 
         // then
         assertAll(
@@ -70,8 +70,8 @@ class CartProductSelectionViewModelTest {
     @Test
     fun `이전 페이지 로드 시 페이지 번호가 감소하고 상품이 로드된다`() {
         // when
-        viewModel.loadNextProducts()
-        viewModel.loadPreviousProducts()
+        viewModel.onNextPageClick()
+        viewModel.onPreviousPageClick()
 
         // then
         val products = viewModel.products.value
@@ -98,8 +98,8 @@ class CartProductSelectionViewModelTest {
     @Test
     fun `마지막 아이템을 삭제하면 이전 페이지로 이동한다`() {
         // given
-        viewModel.loadNextProducts()
-        viewModel.loadNextProducts()
+        viewModel.onNextPageClick()
+        viewModel.onNextPageClick()
 
         // when
         viewModel.onProductRemoveClick(

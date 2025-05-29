@@ -42,12 +42,12 @@ class CartProductSelectionViewModel(
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
 
-    override fun loadNextProducts() {
+    override fun onNextPageClick() {
         val nextPage = page.value?.plus(1) ?: FIRST_PAGE_NUMBER
         if (hasNext.value == true) loadPage(nextPage)
     }
 
-    override fun loadPreviousProducts() {
+    override fun onPreviousPageClick() {
         val prevPage = page.value?.minus(1) ?: FIRST_PAGE_NUMBER
         if (_hasPrevious.value == true) loadPage(prevPage)
     }
@@ -116,7 +116,7 @@ class CartProductSelectionViewModel(
         updateIsSelectedAll()
     }
 
-    override fun onSelectAllItems() {
+    override fun onSelectAllClick() {
         val currentProducts = products.value.orEmpty()
         val allIds = currentProducts.map { it.cartProduct.id }
         val isSelectedAll = isSelectedAll.value ?: false

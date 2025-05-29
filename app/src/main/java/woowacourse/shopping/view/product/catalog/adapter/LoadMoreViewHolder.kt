@@ -14,7 +14,7 @@ class LoadMoreViewHolder(
     }
 
     interface EventHandler {
-        fun onMoreClick()
+        fun onLoadMoreClick()
     }
 
     companion object {

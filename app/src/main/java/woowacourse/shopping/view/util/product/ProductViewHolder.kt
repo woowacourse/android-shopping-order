@@ -34,7 +34,7 @@ class ProductViewHolder(
     interface EventHandler : QuantityControlEventHandler<Product> {
         fun onProductClick(item: Product)
 
-        fun onAddClick(item: Product)
+        fun onPlusClick(item: Product)
     }
 
     companion object {

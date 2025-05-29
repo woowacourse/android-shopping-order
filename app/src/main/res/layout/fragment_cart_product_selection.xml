@@ -66,7 +66,7 @@
                 android:layout_height="42dp"
                 android:background="@drawable/style_left_arrow"
                 android:enabled="@{viewmodel.hasPrevious}"
-                android:onClick="@{() -> handler.loadPreviousProducts()}"
+                android:onClick="@{() -> handler.onPreviousPageClick()}"
                 android:text="@string/left_arrow"
                 android:textColor="@color/white"
                 android:textSize="20sp"
@@ -94,7 +94,7 @@
                 android:layout_height="42dp"
                 android:background="@drawable/style_right_arrow"
                 android:enabled="@{viewmodel.hasNext}"
-                android:onClick="@{() -> handler.loadNextProducts()}"
+                android:onClick="@{() -> handler.onNextPageClick()}"
                 android:text="@string/right_arrow"
                 android:textColor="@color/white"
                 android:textSize="20sp"
@@ -149,7 +149,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:checked="@{viewmodel.isSelectedAll}"
-                android:onClick="@{() -> handler.onSelectAllItems()}"
+                android:onClick="@{() -> handler.onSelectAllClick()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

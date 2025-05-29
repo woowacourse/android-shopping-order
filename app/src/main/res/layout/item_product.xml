@@ -82,7 +82,7 @@
             android:layout_height="42dp"
             android:layout_margin="8dp"
             android:background="@drawable/style_round_white"
-            android:onClick="@{() -> handler.onAddClick(product)}"
+            android:onClick="@{() -> handler.onPlusClick(product)}"
             android:padding="4dp"
             android:src="@drawable/ic_add"
             android:text="@string/plus"

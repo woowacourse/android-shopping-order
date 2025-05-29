@@ -47,7 +47,7 @@ class ProductCatalogViewModel(
         _selectedProduct.setValue(item)
     }
 
-    override fun onAddClick(item: Product) {
+    override fun onPlusClick(item: Product) {
         cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
             result
                 .onSuccess { cartProductId ->
@@ -78,7 +78,7 @@ class ProductCatalogViewModel(
         }
     }
 
-    override fun onMoreClick() {
+    override fun onLoadMoreClick() {
         page++
         loadMoreProducts()
     }

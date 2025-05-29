@@ -51,7 +51,7 @@ class ProductCatalogViewModelTest {
     @Test
     fun `더보기 버튼 클릭 시 다음 페이지의 상품이 추가되고 더보기 버튼이 포함된다`() {
         // when
-        viewModel.onMoreClick()
+        viewModel.onLoadMoreClick()
         val items = viewModel.productCatalogItems.getOrAwaitValue()
 
         // then
@@ -62,7 +62,7 @@ class ProductCatalogViewModelTest {
     @Test
     fun `마지막 페이지 이후에는 더보기 버튼이 없다`() {
         // when
-        repeat(4) { viewModel.onMoreClick() }
+        repeat(4) { viewModel.onLoadMoreClick() }
         val items = viewModel.productCatalogItems.getOrAwaitValue()
 
         // then
@@ -72,7 +72,7 @@ class ProductCatalogViewModelTest {
 
     @Test
     fun `더보기 후에도 이전 페이지 상품이 유지된다`() {
-        viewModel.onMoreClick()
+        viewModel.onLoadMoreClick()
 
         val items =
             viewModel.productCatalogItems
