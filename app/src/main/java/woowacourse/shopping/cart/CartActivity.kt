@@ -41,7 +41,7 @@ class CartActivity : AppCompatActivity() {
 
         viewModel.totalCount.observe(this) {
             if (it != -1) {
-                if (!hasHandledTotalCount && it != 0) {
+                if (it != 0) {
                     hasHandledTotalCount = true
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
