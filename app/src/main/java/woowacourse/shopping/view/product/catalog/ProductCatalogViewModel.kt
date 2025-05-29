@@ -41,34 +41,36 @@ class ProductCatalogViewModel(
         _selectedProduct.setValue(item.product)
     }
 
-    override fun onProductClick(item: ProductCatalogItem.ProductItem) {
-        _selectedProduct.setValue(item.product)
+    override fun onProductClick(item: Product) {
+        _selectedProduct.setValue(item)
     }
 
-    override fun onAddClick(item: ProductCatalogItem.ProductItem) {
-        cartProductRepository.insert(item.product.id, 1) { cartProductId ->
-            cartProducts.add(CartProduct(cartProductId, item.product, 1))
-            updateQuantity(item, 1)
+    override fun onAddClick(item: Product) {
+        val quantityToAdd = 1
+        cartProductRepository.insert(item.id, quantityToAdd) { cartProductId ->
+            cartProducts.add(CartProduct(cartProductId, item, quantityToAdd))
+            updateQuantity(item, quantityToAdd)
         }
     }
 
-    override fun onQuantityIncreaseClick(item: ProductCatalogItem.ProductItem) {
-        val cartProduct = cartProducts.first { it.product.id == item.product.id }
-        val newQuantity = cartProduct.quantity + 1
-        cartProductRepository.updateQuantity(cartProduct, 1) {
-            cartProducts.removeIf { it.product.id == item.product.id }
-            cartProducts.add(cartProduct.copy(quantity = newQuantity))
-            updateQuantity(item, newQuantity)
+    override fun onQuantityIncreaseClick(item: Product) {
+        val cartProduct = cartProducts.first { it.product.id == item.id }
+        val quantityToAdd = 1
+        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+            cartProducts.removeIf { it.product.id == item.id }
+            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + quantityToAdd))
+            updateQuantity(item, quantityToAdd)
         }
     }
 
-    override fun onQuantityDecreaseClick(item: ProductCatalogItem.ProductItem) {
-        val cartProduct = cartProducts.first { it.product.id == item.product.id }
-        val newQuantity = cartProduct.quantity - 1
-        cartProductRepository.updateQuantity(cartProduct, -1) {
-            cartProducts.removeIf { it.product.id == item.product.id }
+    override fun onQuantityDecreaseClick(item: Product) {
+        val cartProduct = cartProducts.first { it.product.id == item.id }
+        val quantityToAdd = -1
+        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+            cartProducts.removeIf { it.product.id == item.id }
+            val newQuantity = cartProduct.quantity + quantityToAdd
             if (newQuantity > 0) cartProducts.add(cartProduct.copy(quantity = newQuantity))
-            updateQuantity(item, newQuantity)
+            updateQuantity(item, quantityToAdd)
         }
     }
 
@@ -117,14 +119,16 @@ class ProductCatalogViewModel(
     }
 
     private fun updateQuantity(
-        item: ProductCatalogItem.ProductItem,
-        newQuantity: Int,
+        item: Product,
+        quantityToAdd: Int,
     ) {
-        val index = productItems.indexOfFirst { it.product.id == item.product.id }
+        val index = productItems.indexOfFirst { it.product.id == item.id }
         if (index != -1) {
-            productItems[index] = productItems[index].copy(quantity = newQuantity)
+            val currentItem = productItems[index]
+            val updatedItem = currentItem.copy(quantity = currentItem.quantity + quantityToAdd)
+            productItems[index] = updatedItem
         }
-        _totalQuantity.postValue((totalQuantity.value ?: 0) + (newQuantity - item.quantity))
+        _totalQuantity.postValue((totalQuantity.value ?: 0) + quantityToAdd)
         _productCatalogItems.postValue(buildCatalogItems())
     }
 

@@ -87,21 +87,22 @@ class ProductCatalogViewModelTest {
     @Test
     fun `상품 수량 증가 클릭 시 수량이 1 증가한다`() {
         // given
-        val item =
+        val product =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
+                .product
 
         // when
-        viewModel.onQuantityIncreaseClick(item)
+        viewModel.onQuantityIncreaseClick(product)
 
         // then
         val updatedItem =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
-                .first { it.product.id == item.product.id }
+                .first { it.product.id == product.id }
 
         assertEquals(2, updatedItem.quantity)
     }
@@ -109,22 +110,23 @@ class ProductCatalogViewModelTest {
     @Test
     fun `상품 수량 감소 클릭 시 수량이 1 감소한다`() {
         // given
-        val item =
+        val product =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
-        viewModel.onQuantityIncreaseClick(item)
+                .product
+        viewModel.onQuantityIncreaseClick(product)
 
         // when
-        viewModel.onQuantityDecreaseClick(item)
+        viewModel.onQuantityDecreaseClick(product)
 
         // then
         val updatedItem =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
-                .first { it.product.id == item.product.id }
+                .first { it.product.id == product.id }
 
         assertEquals(1, updatedItem.quantity)
     }
@@ -132,15 +134,16 @@ class ProductCatalogViewModelTest {
     @Test
     fun `상품 수량 변경 시 총 수량에 반영된다`() {
         // given
-        val item =
+        val product =
             viewModel.productCatalogItems
                 .getOrAwaitValue()
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
+                .product
         val totalQuantity = viewModel.totalQuantity.getOrAwaitValue()
 
         // when
-        viewModel.onQuantityIncreaseClick(item)
+        viewModel.onQuantityIncreaseClick(product)
         val actual = viewModel.totalQuantity.getOrAwaitValue() - totalQuantity
 
         // then
@@ -156,10 +159,9 @@ class ProductCatalogViewModelTest {
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
                 .product
-        val item = ProductCatalogItem.ProductItem(product, 0)
 
         // when
-        viewModel.onProductClick(item)
+        viewModel.onProductClick(product)
 
         // then
         assertEquals(product, viewModel.selectedProduct.getValue())

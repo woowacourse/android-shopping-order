@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartProductBinding
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.view.util.QuantityControlEventHandler
+import woowacourse.shopping.view.util.product.QuantityControlEventHandler
 
 class CartProductViewHolder(
     private val binding: ItemCartProductBinding,

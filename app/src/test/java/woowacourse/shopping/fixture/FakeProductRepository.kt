@@ -31,10 +31,14 @@ class FakeProductRepository : ProductRepository {
     }
 
     override fun getPagedProducts(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onSuccess: (PagedResult<Product>) -> Unit,
     ) {
+        if (page == null || size == null) {
+            onSuccess(PagedResult(emptyList(), false))
+            return
+        }
         val pagedItems = fakeProducts.drop(page * size).take(size)
         val hasNext = page * size + pagedItems.size < fakeProducts.size
         onSuccess(PagedResult(pagedItems, hasNext))

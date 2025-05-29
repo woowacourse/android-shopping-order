@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.fixture.FakeCartProductRepository
+import woowacourse.shopping.fixture.FakeProductRepository
+import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.cart.ShoppingCartViewModel
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
@@ -15,13 +19,18 @@ import woowacourse.shopping.viewmodel.getOrAwaitValue
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ShoppingCartViewModelTest {
     private lateinit var viewModel: ShoppingCartViewModel
-    private lateinit var repository: CartProductRepository
+    private lateinit var productRepository: ProductRepository
+    private lateinit var cartProductRepository: CartProductRepository
+    private lateinit var recentProductRepository: RecentProductRepository
 
     @BeforeEach
     fun setup() {
-        repository = FakeCartProductRepository()
-        repeat(12) { id -> repository.insert(id, 1) {} }
-        viewModel = ShoppingCartViewModel(repository)
+        productRepository = FakeProductRepository()
+        cartProductRepository = FakeCartProductRepository()
+        recentProductRepository = FakeRecentProductRepository()
+        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
+        viewModel =
+            ShoppingCartViewModel(cartProductRepository, recentProductRepository, productRepository)
     }
 
     @Test
