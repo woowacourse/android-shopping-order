@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.model.Product
 fun RecentProductEntity.toProduct() =
     Product(
         id = productId,
+        category = category,
         name = name,
         imageUrl = imageUrl,
         price = Price(price),
@@ -25,6 +26,7 @@ fun RecentProductEntity.toProduct() =
 fun Product.toRecentEntity() =
     RecentProductEntity(
         productId = id,
+        category = category,
         name = name,
         imageUrl = imageUrl,
         price = price.value,
@@ -33,6 +35,7 @@ fun Product.toRecentEntity() =
 fun ProductContent.toProduct() =
     Product(
         id = id,
+        category = category,
         name = name,
         imageUrl = imageUrl,
         price = Price(price),
@@ -44,6 +47,7 @@ fun CartItemContent.toCartItem() =
         product =
             Product(
                 id = product.id,
+                category = product.category,
                 name = product.name,
                 imageUrl = product.imageUrl,
                 price = Price(product.price),
@@ -54,6 +58,7 @@ fun CartItemContent.toCartItem() =
 fun ProductResponse.toProduct() =
     Product(
         id = id,
+        category = category,
         name = name,
         imageUrl = imageUrl,
         price = Price(price),
