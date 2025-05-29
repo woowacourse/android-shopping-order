@@ -7,11 +7,9 @@ import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.network.RetrofitInstance
-import woowacourse.shopping.data.network.ShoppingServer
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import kotlin.concurrent.thread
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
@@ -32,11 +30,4 @@ class ShoppingApplication : Application() {
                 productRepository,
             )
         }
-
-    override fun onCreate() {
-        super.onCreate()
-        thread {
-            ShoppingServer().startMockWebServer()
-        }
-    }
 }
