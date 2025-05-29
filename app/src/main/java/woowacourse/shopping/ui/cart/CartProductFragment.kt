@@ -34,6 +34,7 @@ class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.la
     private fun initObservers() {
         viewModel.cartProducts.observe(requireActivity()) { products ->
             cartProductAdapter.submitItems(products.products)
+            viewModel.updateOrderPrice()
         }
     }
 
@@ -55,7 +56,7 @@ class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.la
             }
 
             override fun onSelectClick(cartId: Long) {
-                viewModel.updateCartProductSelection(cartId)
+                viewModel.toggleCartProductSelection(cartId)
             }
         }
 }

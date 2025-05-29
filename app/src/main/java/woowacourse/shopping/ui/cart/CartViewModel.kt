@@ -27,11 +27,17 @@ class CartViewModel(
     private val _cartProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val cartProducts: LiveData<Products> get() = _cartProducts
 
+    private val _recommendedProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
+    val recommendedProducts: LiveData<Products> get() = _recommendedProducts
+
     private val _editedProductIds: MutableLiveData<Set<Long>> = MutableLiveData(emptySet())
     val editedProductIds: LiveData<Set<Long>> get() = _editedProductIds
 
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
 
     init {
         loadCartProducts()
@@ -47,7 +53,9 @@ class CartViewModel(
                 .onSuccess { cartProducts ->
                     _cartProducts.postValue(cartProducts)
                     _isLoading.postValue(false)
-                }.onFailure { }
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
         }
     }
 
@@ -60,7 +68,9 @@ class CartViewModel(
                 .onSuccess {
                     _editedProductIds.postValue(editedProductIds.value?.plus(productId))
                     loadCartProducts()
-                }.onFailure { }
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
         }
     }
 
@@ -116,8 +126,16 @@ class CartViewModel(
         }
     }
 
-    fun updateCartProductSelection(cartId: Long) {
+    fun toggleCartProductSelection(cartId: Long) {
         _cartProducts.value = cartProducts.value?.toggleSelectionByCartId(cartId)
+    }
+
+    fun toggleAllCartProductsSelection() {
+        _cartProducts.value = cartProducts.value?.updateAllSelection()
+    }
+
+    fun updateOrderPrice() {
+        _totalOrderPrice.value = (cartProducts.value?.getPurchasePrice() ?: 0) + (recommendedProducts.value?.getPurchasePrice() ?: 0)
     }
 
     companion object {

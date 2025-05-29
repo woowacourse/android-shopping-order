@@ -65,6 +65,10 @@ data class Products(
                 },
         )
 
+    fun getPurchasePrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
+
+    fun updateAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
+
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)
     }
