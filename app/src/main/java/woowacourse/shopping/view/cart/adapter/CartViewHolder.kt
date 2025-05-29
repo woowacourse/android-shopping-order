@@ -20,5 +20,10 @@ class CartViewHolder(
 
     interface Handler {
         fun onClickDeleteItem(cartId: Long)
+
+        fun onCheckedChanged(
+            cartId: Long,
+            isChecked: Boolean,
+        )
     }
 }
