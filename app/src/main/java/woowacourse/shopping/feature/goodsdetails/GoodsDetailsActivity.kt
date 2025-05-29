@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.goodsdetails
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -28,10 +29,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
         binding = ActivityGoodsDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        cart = IntentCompat.getParcelableExtra(intent, GOODS_KEY, CartUiModel::class.java) ?: return
-//        viewModel.setInitialCart(cart.toDomain())
         id = intent.getLongExtra(GOODS_KEY, 0)
-//        viewModel.loadProductDetails(id)
         viewModel.setInitialCart(id)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
@@ -77,6 +75,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
                 Intent().apply {
                     putExtra("GOODS_ID", id)
                     putExtra("GOODS_QUANTITY", viewModel.cart.value?.quantity)
+                    Log.e("123451", "${viewModel.cart.value?.quantity}")
                 },
             )
         }

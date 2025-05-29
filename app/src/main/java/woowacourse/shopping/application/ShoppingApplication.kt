@@ -2,7 +2,6 @@ package woowacourse.shopping.application
 
 import android.app.Application
 import woowacourse.shopping.data.local.ShoppingDatabase
-import woowacourse.shopping.data.local.cart.repository.LocalCartRepositoryImpl
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
@@ -27,7 +26,6 @@ class ShoppingApplication : Application() {
     val goodsDetailsFactory by lazy {
         ViewModelFactory {
             GoodsDetailsViewModel(
-                LocalCartRepositoryImpl(database.cartDao()),
                 CartRepository(),
                 HistoryRepositoryImpl(database.historyDao()),
                 ProductRepository(),
