@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.view.cart
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
@@ -75,6 +76,7 @@ class CartFragment :
         childFragmentManager.commit {
             replace(R.id.cart_fragment_container, CartRecommendationFragment())
         }
+        binding.checkboxWrapper.isVisible = false
     }
 
     override fun onDestroyView() {
