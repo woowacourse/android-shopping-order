@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
+    implementation(libs.androidx.fragment.ktx)
 
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)

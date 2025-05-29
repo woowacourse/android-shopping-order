@@ -10,6 +10,7 @@ androidx-test-ext-junit = "1.2.1"
 androidx-test-runner = "1.6.2"
 assertj-core = "3.27.3"
 core-testing = "2.2.0"
+fragment-ktx = "1.8.7"
 glide = "4.16.0"
 google-material = "1.12.0"
 gson = "2.11.0"
@@ -31,6 +32,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "core-testing" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room-runtime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room-runtime" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }

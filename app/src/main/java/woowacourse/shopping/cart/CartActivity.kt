@@ -3,6 +3,7 @@ package woowacourse.shopping.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils.replace
 import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
@@ -19,26 +21,20 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    private lateinit var viewModel: CartViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
-        binding.lifecycleOwner = this
-        applyWindowInsets()
-        setViewModel()
-        setSupportActionBar()
-        setCartProductAdapter()
-        observeCartViewModel()
-    }
 
-    private fun setViewModel() {
-        viewModel =
-            ViewModelProvider(
-                this,
-                CartViewModelFactory(application as ShoppingApplication),
-            )[CartViewModel::class.java]
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
+            }
+        }
+        applyWindowInsets()
+        setSupportActionBar()
     }
 
     private fun setSupportActionBar() {
@@ -46,55 +42,6 @@ class CartActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.text_cart_action_bar)
     }
 
-    private fun setCartProductAdapter() {
-        binding.recyclerViewCart.adapter =
-            CartAdapter(
-                cartItems = emptyList(),
-                onDeleteProductClick =
-                    DeleteProductClickListener { product ->
-                        viewModel.deleteCartProduct(CartItem.ProductItem(product))
-                    },
-                onPaginationButtonClick = viewModel::onPaginationButtonClick,
-                quantityControlListener = viewModel::updateQuantity,
-            )
-    }
-
-    private fun observeCartViewModel() {
-        viewModel.cartProducts.observe(this) { updateCartItems() }
-        viewModel.isNextButtonEnabled.observe(this) { updateCartItems() }
-        viewModel.isPrevButtonEnabled.observe(this) { updateCartItems() }
-        viewModel.page.observe(this) { updateCartItems() }
-        viewModel.updatedItem.observe(this) { item ->
-            (binding.recyclerViewCart.adapter as CartAdapter).setCartItem(item)
-        }
-        viewModel.loadingState.observe(this) {
-            Log.d("LOADING_STATE", "State : $it")
-            when (it.isLoading) {
-                true -> {
-                    binding.shimmerFrameLayoutCartProducts.startShimmer()
-                    binding.shimmerFrameLayoutCartProducts.visibility = View.VISIBLE
-                }
-
-                false -> {
-                    binding.shimmerFrameLayoutCartProducts.stopShimmer()
-                    binding.shimmerFrameLayoutCartProducts.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    private fun updateCartItems() {
-        val products: List<ProductUiModel> = viewModel.cartProducts.value ?: return
-        val isNext: Boolean = viewModel.isNextButtonEnabled.value == true
-        val isPrev: Boolean = viewModel.isPrevButtonEnabled.value == true
-        val page: Int = viewModel.page.value ?: 0
-        val paginationItem = PaginationButtonItem(page + 1, isNext, isPrev)
-
-        val cartItems: List<CartItem> = products.map { CartItem.ProductItem(it) }
-        val cartItemsWithPaginationBtn =
-            if (cartItems.isEmpty()) cartItems else cartItems + paginationItem
-        (binding.recyclerViewCart.adapter as CartAdapter).setCartItems(cartItemsWithPaginationBtn)
-    }
 
     override fun onSupportNavigateUp(): Boolean {
         finish()
