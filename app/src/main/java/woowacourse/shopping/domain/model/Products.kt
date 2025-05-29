@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
 
 data class Products(
     val products: List<Product>,
-    val page: Page,
+    val page: Page = EMPTY_PAGE,
 ) {
     val isAllSelected: Boolean get() = products.all { it.isSelected }
 
@@ -68,6 +68,8 @@ data class Products(
     fun getPurchasePrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
 
     fun updateAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
+
+    fun getSelectedProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
 
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)

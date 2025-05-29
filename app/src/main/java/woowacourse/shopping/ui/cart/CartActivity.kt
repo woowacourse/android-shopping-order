@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
@@ -48,8 +49,18 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
         binding.viewModel = viewModel
         binding.onClickHandler =
             OnClickHandler {
-                supportFragmentManager.commit {
-                    replace(R.id.cartContainer, CartRecommendFragment())
+                val currentFragment = supportFragmentManager.findFragmentById(R.id.cartContainer)
+
+                when (currentFragment) {
+                    is CartProductFragment -> {
+                        supportFragmentManager.commit {
+                            replace(R.id.cartContainer, CartRecommendFragment())
+                        }
+                        binding.cartCheckAllButton.visibility = View.GONE
+                        binding.cartCheckAllButtonText.visibility = View.GONE
+                    }
+
+                    is CartRecommendFragment -> viewModel.orderProducts()
                 }
             }
     }
@@ -65,6 +76,9 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                     )
                 },
             )
+        }
+        viewModel.isOrdered.observe(this) {
+            finish()
         }
     }
 

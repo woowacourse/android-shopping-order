@@ -5,6 +5,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.api.CartApi
+import woowacourse.shopping.data.api.OrderApi
 import woowacourse.shopping.data.api.ProductApi
 import woowacourse.shopping.data.interceptor.ShoppingAuthInterceptor
 
@@ -30,5 +31,8 @@ object NetworkModule {
     }
     val cartApi: CartApi by lazy {
         retrofit.create(CartApi::class.java)
+    }
+    val orderApi: OrderApi by lazy {
+        retrofit.create(OrderApi::class.java)
     }
 }

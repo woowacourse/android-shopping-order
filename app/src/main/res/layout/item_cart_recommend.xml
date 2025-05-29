@@ -20,7 +20,7 @@
         android:padding="6dp">
 
         <ImageView
-            android:id="@+id/productPreviewImage"
+            android:id="@+id/cartRecommendProductPreviewImage"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
@@ -32,7 +32,7 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/productNameText"
+            android:id="@+id/cartRecommendProductNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
@@ -47,11 +47,11 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/productPreviewImage"
+            app:layout_constraintTop_toBottomOf="@id/cartRecommendProductPreviewImage"
             tools:text="PET 보틀 - 정사각형 어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구" />
 
         <TextView
-            android:id="@+id/productPriceText"
+            android:id="@+id/cartRecommendProductPriceText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
@@ -61,7 +61,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/productNameText"
+            app:layout_constraintTop_toBottomOf="@id/cartRecommendProductNameText"
             tools:text="10,000원" />
 
         <ImageView
@@ -72,19 +72,19 @@
             android:onClick="@{() -> onClickHandler.onIncreaseClick(product.productDetail.id)}"
             android:src="@drawable/ic_products_cart_add"
             app:isGone="@{product.quantity != 0}"
-            app:layout_constraintBottom_toBottomOf="@id/productPreviewImage"
-            app:layout_constraintEnd_toEndOf="@id/productPreviewImage" />
+            app:layout_constraintBottom_toBottomOf="@id/cartRecommendProductPreviewImage"
+            app:layout_constraintEnd_toEndOf="@id/cartRecommendProductPreviewImage" />
 
         <woowacourse.shopping.ui.custom.CartCountView
-            android:id="@+id/productCartProductCount"
+            android:id="@+id/cartRecommendProductCount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="14dp"
             android:layout_marginBottom="8dp"
             app:count="@{product.quantity}"
             app:isGone="@{product.quantity == 0}"
-            app:layout_constraintBottom_toBottomOf="@id/productPreviewImage"
-            app:layout_constraintEnd_toEndOf="@id/productPreviewImage"
-            app:layout_constraintStart_toStartOf="@id/productPreviewImage" />
+            app:layout_constraintBottom_toBottomOf="@id/cartRecommendProductPreviewImage"
+            app:layout_constraintEnd_toEndOf="@id/cartRecommendProductPreviewImage"
+            app:layout_constraintStart_toStartOf="@id/cartRecommendProductPreviewImage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

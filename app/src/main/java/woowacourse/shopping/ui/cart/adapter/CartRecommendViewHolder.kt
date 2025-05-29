@@ -5,14 +5,29 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartRecommendBinding
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.ui.custom.CartCountView
 
 class CartRecommendViewHolder private constructor(
     private val binding: ItemCartRecommendBinding,
     private val onClickHandler: OnClickHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
+    private lateinit var item: Product
+
     fun bind(item: Product) {
-        binding.product = item
+        this.item = item
+        binding.product = this.item
         binding.onClickHandler = onClickHandler
+        binding.cartRecommendProductCount.setOnClickHandler(
+            object : CartCountView.OnClickHandler {
+                override fun onIncreaseClick() {
+                    onClickHandler.onIncreaseClick(item.productDetail.id)
+                }
+
+                override fun onDecreaseClick() {
+                    onClickHandler.onDecreaseClick(item.productDetail.id)
+                }
+            },
+        )
     }
 
     interface OnClickHandler {

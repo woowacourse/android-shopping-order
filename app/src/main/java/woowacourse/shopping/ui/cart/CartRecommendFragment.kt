@@ -11,18 +11,11 @@ import woowacourse.shopping.ui.common.DataBindingFragment
 
 class CartRecommendFragment : DataBindingFragment<FragmentCartRecommandBinding>(R.layout.fragment_cart_recommand) {
     private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
-    private val adapter: CartRecommendAdapter by lazy {
-        CartRecommendAdapter(
-            object : CartRecommendViewHolder.OnClickHandler {
-                override fun onIncreaseClick(productId: Long) {
-                    TODO("Not yet implemented")
-                }
+    private val adapter: CartRecommendAdapter by lazy { CartRecommendAdapter(createAdapterOnClickHandler()) }
 
-                override fun onDecreaseClick(productId: Long) {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.loadRecommendedProducts()
     }
 
     override fun onViewCreated(
@@ -31,6 +24,20 @@ class CartRecommendFragment : DataBindingFragment<FragmentCartRecommandBinding>(
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.cartItemsRecommendContainer.adapter = adapter
-        adapter.submitList(viewModel.cartProducts.value?.products!!)
+        viewModel.recommendedProducts.observe(requireActivity()) { recommendedProducts ->
+            adapter.submitList(recommendedProducts.products)
+            viewModel.updateOrderPrice()
+        }
     }
+
+    private fun createAdapterOnClickHandler() =
+        object : CartRecommendViewHolder.OnClickHandler {
+            override fun onIncreaseClick(productId: Long) {
+                viewModel.increaseRecommendedProductQuantity(productId)
+            }
+
+            override fun onDecreaseClick(productId: Long) {
+                viewModel.decreaseRecommendedProductQuantity(productId)
+            }
+        }
 }

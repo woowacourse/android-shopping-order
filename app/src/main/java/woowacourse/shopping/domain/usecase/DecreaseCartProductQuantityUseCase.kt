@@ -9,11 +9,11 @@ class DecreaseCartProductQuantityUseCase(
 ) {
     operator fun invoke(
         product: Product,
-        quantityStep: Int = DEFAULT_QUANTITY_STEP,
+        step: Int = DEFAULT_QUANTITY_STEP,
         callback: (quantity: Result<Int>) -> Unit = {},
     ) {
         if (product.cartId == null) return
-        val newQuantity = (product.quantity - quantityStep).coerceAtLeast(MINIMUM_QUANTITY)
+        val newQuantity = (product.quantity - step).coerceAtLeast(MINIMUM_QUANTITY)
 
         if (newQuantity <= MINIMUM_QUANTITY) {
             deleteCartProduct(product.cartId, callback)

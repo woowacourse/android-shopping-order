@@ -8,10 +8,10 @@ class IncreaseCartProductQuantityUseCase(
 ) {
     operator fun invoke(
         product: Product,
-        quantityStep: Int = DEFAULT_QUANTITY_STEP,
+        step: Int = DEFAULT_QUANTITY_STEP,
         callback: (quantity: Result<Int>) -> Unit = {},
     ) {
-        val newQuantity = product.quantity + quantityStep
+        val newQuantity = product.quantity + step
 
         if (product.cartId == null) {
             addCartProduct(product, newQuantity, callback)

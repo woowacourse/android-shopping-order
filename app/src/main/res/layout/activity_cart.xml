@@ -53,6 +53,7 @@
                 tools:checked="true" />
 
             <TextView
+                android:id="@+id/cartCheckAllButtonText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="-8dp"
