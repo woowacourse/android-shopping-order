@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.product.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -102,15 +103,23 @@ class ProductCatalogViewModel(
 
     private fun loadProducts() {
         productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
-            result.items.forEach { product ->
-                val cartProduct = cartProducts.firstOrNull { it.product.id == product.id }
-                productItems.add(
-                    ProductCatalogItem.ProductItem(product, cartProduct?.quantity ?: MINIMUM_QUANTITY),
-                )
-            }
-            hasNext = result.hasNext
-            _onFinishLoading.postValue(true)
-            _productCatalogItems.postValue(buildCatalogItems())
+            result
+                .onSuccess { pagedResult ->
+                    pagedResult.items.forEach { product ->
+                        val cartProduct = cartProducts.firstOrNull { it.product.id == product.id }
+                        productItems.add(
+                            ProductCatalogItem.ProductItem(
+                                product,
+                                cartProduct?.quantity ?: MINIMUM_QUANTITY,
+                            ),
+                        )
+                    }
+                    hasNext = pagedResult.hasNext
+                    _onFinishLoading.postValue(true)
+                    _productCatalogItems.postValue(buildCatalogItems())
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 

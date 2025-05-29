@@ -17,30 +17,30 @@ class FakeProductRepository : ProductRepository {
 
     override fun getProductById(
         id: Int,
-        onSuccess: (Product?) -> Unit,
+        onResult: (Result<Product?>) -> Unit,
     ) {
-        onSuccess(fakeProducts.find { it.id == id })
+        onResult(Result.success(fakeProducts.find { it.id == id }))
     }
 
     override fun getProductsByIds(
         ids: List<Int>,
-        onSuccess: (List<Product>?) -> Unit,
+        onResult: (Result<List<Product>?>) -> Unit,
     ) {
         val result = ids.mapNotNull { id -> fakeProducts.find { it.id == id } }
-        onSuccess(result)
+        onResult(Result.success(result))
     }
 
     override fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onSuccess: (PagedResult<Product>) -> Unit,
+        onResult: (Result<PagedResult<Product>>) -> Unit,
     ) {
         if (page == null || size == null) {
-            onSuccess(PagedResult(emptyList(), false))
+            onResult(Result.success(PagedResult(emptyList(), false)))
             return
         }
         val pagedItems = fakeProducts.drop(page * size).take(size)
         val hasNext = page * size + pagedItems.size < fakeProducts.size
-        onSuccess(PagedResult(pagedItems, hasNext))
+        onResult(Result.success(PagedResult(pagedItems, hasNext)))
     }
 }

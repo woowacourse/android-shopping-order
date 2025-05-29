@@ -16,9 +16,9 @@ class ProductRemoteDataSource(
 ) {
     fun getProductById(
         id: Int,
-        onSuccess: (Product?) -> Unit,
+        onResult: (Result<Product?>) -> Unit,
     ) {
-        productService.getProductById(id = id.toInt()).enqueue(
+        productService.getProductById(id = id).enqueue(
             object : Callback<ProductDto> {
                 override fun onResponse(
                     call: Call<ProductDto>,
@@ -26,8 +26,10 @@ class ProductRemoteDataSource(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { body ->
-                            onSuccess(body.toProduct())
-                        } ?: onSuccess(null)
+                            onResult(Result.success(body.toProduct()))
+                        } ?: onResult(Result.success(null))
+                    } else {
+                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
                     }
                 }
 
@@ -35,7 +37,7 @@ class ProductRemoteDataSource(
                     call: Call<ProductDto>,
                     t: Throwable,
                 ) {
-                    println("error : $t")
+                    onResult(Result.failure(t))
                 }
             },
         )
@@ -43,24 +45,29 @@ class ProductRemoteDataSource(
 
     fun getProductsByIds(
         ids: List<Int>,
-        onSuccess: (List<Product>?) -> Unit,
+        onResult: (Result<List<Product>?>) -> Unit,
     ) {
         val latch = CountDownLatch(ids.size)
-        val result = mutableListOf<Product>()
+        val products = mutableListOf<Product>()
         ids.forEach { id ->
-            getProductById(id) { product ->
-                product?.let { result.add(it) }
-                latch.countDown()
+            getProductById(id) { result ->
+                result
+                    .onSuccess { product ->
+                        product?.let { products.add(it) }
+                        latch.countDown()
+                    }.onFailure {
+                        onResult(Result.failure(it))
+                    }
             }
         }
         latch.await()
-        onSuccess(result)
+        onResult(Result.success(products))
     }
 
     fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onSuccess: (PagedResult<Product>) -> Unit,
+        onResult: (Result<PagedResult<Product>>) -> Unit,
     ) {
         productService.getPagedProducts(page = page, size = size).enqueue(
             object :
@@ -73,8 +80,10 @@ class ProductRemoteDataSource(
                         response.body()?.let { body ->
                             val products = body.content.map { it.toProduct() }
                             val hasNext = body.last.not()
-                            onSuccess(PagedResult(products, hasNext))
-                        } ?: onSuccess(PagedResult(emptyList(), false))
+                            onResult(Result.success(PagedResult(products, hasNext)))
+                        } ?: onResult(Result.success(PagedResult(emptyList(), false)))
+                    } else {
+                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
                     }
                 }
 
@@ -82,7 +91,7 @@ class ProductRemoteDataSource(
                     call: Call<ProductResponseDto>,
                     t: Throwable,
                 ) {
-                    println("error : $t")
+                    onResult(Result.failure(t))
                 }
             },
         )

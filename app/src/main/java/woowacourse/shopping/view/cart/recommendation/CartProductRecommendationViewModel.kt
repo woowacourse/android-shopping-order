@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.cart.recommendation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -54,19 +55,24 @@ class CartProductRecommendationViewModel(
     private fun loadRecommendedProducts() {
         recentProductRepository.getLastViewedProduct { recentProduct ->
             recentProduct ?: return@getLastViewedProduct
-            productRepository.getPagedProducts { products ->
-                val cartProductIds =
-                    cartProducts.map { it.product.id }.toSet()
-                val recommended =
-                    products.items
-                        .asSequence()
-                        .filter { it.category == recentProduct.product.category }
-                        .filter { it.id !in cartProductIds }
-                        .take(RECOMMEND_SIZE)
-                        .map { ProductItem(it) }
-                        .toList()
+            productRepository.getPagedProducts { result ->
+                result
+                    .onSuccess { products ->
+                        val cartProductIds =
+                            cartProducts.map { it.product.id }.toSet()
+                        val recommended =
+                            products.items
+                                .asSequence()
+                                .filter { it.category == recentProduct.product.category }
+                                .filter { it.id !in cartProductIds }
+                                .take(RECOMMEND_SIZE)
+                                .map { ProductItem(it) }
+                                .toList()
 
-                _recommendedProducts.postValue(recommended)
+                        _recommendedProducts.postValue(recommended)
+                    }.onFailure {
+                        Log.e("error", it.message.toString())
+                    }
             }
         }
     }

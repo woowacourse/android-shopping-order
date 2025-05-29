@@ -10,23 +10,23 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override fun getProductById(
         id: Int,
-        onSuccess: (Product?) -> Unit,
+        onResult: (Result<Product?>) -> Unit,
     ) {
-        remoteDataSource.getProductById(id, onSuccess)
+        remoteDataSource.getProductById(id, onResult)
     }
 
     override fun getProductsByIds(
         ids: List<Int>,
-        onSuccess: (List<Product>?) -> Unit,
+        onResult: (Result<List<Product>?>) -> Unit,
     ) {
-        remoteDataSource.getProductsByIds(ids, onSuccess)
+        remoteDataSource.getProductsByIds(ids, onResult)
     }
 
     override fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onSuccess: (PagedResult<Product>) -> Unit,
+        onResult: (Result<PagedResult<Product>>) -> Unit,
     ) {
-        remoteDataSource.getPagedProducts(page, size, onSuccess)
+        remoteDataSource.getPagedProducts(page, size, onResult)
     }
 }
