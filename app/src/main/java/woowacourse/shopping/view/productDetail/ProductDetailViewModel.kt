@@ -66,7 +66,7 @@ class ProductDetailViewModel(
         productsRepository.getRecentWatchingProducts(1) { result ->
             result
                 .onSuccess { recentProducts: List<Product> ->
-                    if (recentProducts.isEmpty()) return@getRecentWatchingProducts
+                    if (recentProducts.isEmpty()) return@getRecentWatchingProducts updateRecentWatching()
                     val isLastWatchingProduct =
                         recentProducts.first() == this.product.value?.product
                     if (isLastWatchingProduct) {
