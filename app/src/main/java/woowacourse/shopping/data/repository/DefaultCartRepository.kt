@@ -1,16 +1,17 @@
 package woowacourse.shopping.data.repository
 
 import retrofit2.HttpException
-import woowacourse.shopping.data.datasource.CartDataSource2
+import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
+import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
-    private val dataSource: CartDataSource2,
-) {
-    fun addCart(
+    private val dataSource: CartDataSource,
+) : CartRepository {
+    override fun addCart(
         cart: Cart,
         callback: (Result<String?>) -> Unit,
     ) {
@@ -30,7 +31,7 @@ class DefaultCartRepository(
         }
     }
 
-    fun loadSinglePage(
+    override fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
         callback: (Result<CartsSinglePage>) -> Unit,
@@ -53,7 +54,7 @@ class DefaultCartRepository(
         }
     }
 
-    fun updateQuantity(
+    override fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
         callback: (Result<Unit>) -> Unit,
@@ -74,7 +75,7 @@ class DefaultCartRepository(
         }
     }
 
-    fun deleteCart(
+    override fun deleteCart(
         cartId: Long,
         callback: (Result<Unit>) -> Unit,
     ) {

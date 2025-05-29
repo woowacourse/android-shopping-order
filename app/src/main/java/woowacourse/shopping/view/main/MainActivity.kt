@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         MainViewModelFactory(
             container.historyRepository,
             container.historyLoader,
-            container.cartRepository2,
-            container.productRepository2,
+            container.cartRepository,
+            container.productRepository,
         )
     }
 

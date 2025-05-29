@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.fake
 
-import woowacourse.shopping.data.datasource.ProductsDataSource
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository

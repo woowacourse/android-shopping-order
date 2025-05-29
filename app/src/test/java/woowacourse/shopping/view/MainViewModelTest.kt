@@ -26,7 +26,6 @@ import woowacourse.shopping.fixture.productFixture2
 import woowacourse.shopping.fixture.productFixture3
 import woowacourse.shopping.fixture.productFixture4
 import woowacourse.shopping.view.loader.HistoryLoader
-import woowacourse.shopping.view.loader.ProductWithCartLoader
 import woowacourse.shopping.view.main.MainUiEvent
 import woowacourse.shopping.view.main.state.LoadState
 import woowacourse.shopping.view.main.vm.MainViewModel

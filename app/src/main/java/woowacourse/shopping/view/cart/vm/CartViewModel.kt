@@ -3,7 +3,7 @@ package woowacourse.shopping.view.cart.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.view.cart.CartUiEvent
 import woowacourse.shopping.view.cart.state.CartUiState
 import woowacourse.shopping.view.cart.state.toCartState
@@ -14,7 +14,7 @@ import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 
 class CartViewModel(
-    private val cartRepository: DefaultCartRepository,
+    private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val paging = Paging(initialPage = INITIAL_PAGE_NO, pageSize = PAGE_SIZE)
 

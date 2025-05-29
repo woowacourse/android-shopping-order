@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
-import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.db.entity.CartEntity
 import woowacourse.shopping.data.fake.FakeCartRepositoryImpl
 import woowacourse.shopping.domain.Quantity

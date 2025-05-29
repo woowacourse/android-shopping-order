@@ -1,11 +1,14 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.ProductsDataSource2
+import woowacourse.shopping.data.datasource.ProductsDataSource
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
+import woowacourse.shopping.domain.repository.ProductRepository
 
-class DefaultProductRepository(private val dataSource: ProductsDataSource2) {
-    fun loadSinglePage(
+class DefaultProductRepository(
+    private val dataSource: ProductsDataSource,
+) : ProductRepository {
+    override fun loadSinglePage(
         page: Int,
         pageSize: Int,
         callback: (Result<ProductSinglePage>) -> Unit,
@@ -27,7 +30,7 @@ class DefaultProductRepository(private val dataSource: ProductsDataSource2) {
         }
     }
 
-    fun loadProduct(
+    override fun loadProduct(
         productId: Long,
         callback: (Result<Product>) -> Unit,
     ) {

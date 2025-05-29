@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.fake
 
-import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.db.entity.CartEntity
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart

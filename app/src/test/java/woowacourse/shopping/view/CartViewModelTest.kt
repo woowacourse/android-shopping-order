@@ -18,7 +18,6 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ext.getOrAwaitValue
 import woowacourse.shopping.view.cart.vm.CartViewModel
-import woowacourse.shopping.view.loader.CartLoader
 import woowacourse.shopping.view.main.state.ProductState
 
 @ExtendWith(InstantTaskExecutorExtension::class)

@@ -3,11 +3,11 @@ package woowacourse.shopping.view.detail.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
@@ -16,8 +16,8 @@ import woowacourse.shopping.view.detail.DetailUiEvent
 import woowacourse.shopping.view.main.state.ProductState
 
 class DetailViewModel(
-    private val defaultProductRepository: DefaultProductRepository,
-    private val defaultCartRepository: DefaultCartRepository,
+    private val defaultProductRepository: ProductRepository,
+    private val defaultCartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
 ) : ViewModel() {
     private val _uiState = MutableLiveData<DetailUiState>()

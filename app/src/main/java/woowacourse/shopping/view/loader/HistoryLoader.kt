@@ -1,11 +1,11 @@
 package woowacourse.shopping.view.loader
 
-import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.main.state.HistoryState
 
 class HistoryLoader(
-    private val productRepository: DefaultProductRepository,
+    private val productRepository: ProductRepository,
     private val historyRepository: HistoryRepository,
 ) {
     operator fun invoke(onResult: (Result<List<HistoryState>>) -> Unit) {
