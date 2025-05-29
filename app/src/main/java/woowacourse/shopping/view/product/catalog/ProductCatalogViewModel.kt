@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
@@ -79,7 +80,7 @@ class ProductCatalogViewModel(
 
     override fun onMoreClick() {
         page++
-        loadProducts()
+        loadMoreProducts()
     }
 
     fun loadCatalog() {
@@ -119,25 +120,41 @@ class ProductCatalogViewModel(
     }
 
     private fun loadProducts() {
-        productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
+        productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1)) { result ->
             result
                 .onSuccess { pagedResult ->
-                    pagedResult.items.forEach { product ->
-                        val cartProduct = cartProducts.firstOrNull { it.product.id == product.id }
-                        productItems.add(
-                            ProductCatalogItem.ProductItem(
-                                product,
-                                cartProduct?.quantity ?: MINIMUM_QUANTITY,
-                            ),
-                        )
-                    }
-                    hasNext = pagedResult.hasNext
-                    _onFinishLoading.postValue(true)
-                    _productCatalogItems.postValue(buildCatalogItems())
+                    productItems.clear()
+                    applyLoadedProducts(pagedResult)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
+    }
+
+    private fun loadMoreProducts() {
+        productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
+            result
+                .onSuccess { pagedResult ->
+                    applyLoadedProducts(pagedResult)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
+        }
+    }
+
+    private fun applyLoadedProducts(pagedResult: PagedResult<Product>) {
+        productItems.addAll(
+            pagedResult.items.map { product ->
+                val cartProduct = cartProducts.firstOrNull { it.product.id == product.id }
+                ProductCatalogItem.ProductItem(
+                    product,
+                    cartProduct?.quantity ?: MINIMUM_QUANTITY,
+                )
+            },
+        )
+        hasNext = pagedResult.hasNext
+        _onFinishLoading.postValue(true)
+        _productCatalogItems.postValue(buildCatalogItems())
     }
 
     private fun updateQuantity(
