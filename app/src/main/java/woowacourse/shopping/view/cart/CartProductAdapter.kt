@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 class CartProductAdapter(
     private val onRemoveProduct: (cartItemId: Long) -> Unit,
     private val onCartPaginationListener: OnCartPaginationListener,
-    private val onSelect: (cartItemId: Long) -> Unit,
-    private val onUnselect: (cartItemId: Long) -> Unit,
+    private val onSelect: (productItem: CartItemType.ProductItem) -> Unit,
+    private val onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
+    private val onPlusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
+    private val onMinusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var items: List<CartItemType> = emptyList()
 
@@ -26,6 +28,8 @@ class CartProductAdapter(
                     onRemoveProduct,
                     onSelect,
                     onUnselect,
+                    onPlusQuantity,
+                    onMinusQuantity,
                 )
 
             CartItemType.ItemType.PAGINATION ->
@@ -49,18 +53,20 @@ class CartProductAdapter(
     override fun getItemCount(): Int = items.size
 
     fun submitList(items: List<CartItemType>) {
-        val isProductItemEmpty = items.size == 1
-        if (isProductItemEmpty) {
-            onCartPaginationListener.onMinusPage()
-        }
-
-        val oldItems = this.items.size
-        notifyItemRangeRemoved(0, oldItems - 1)
-
         this.items = items
-        notifyItemRangeInserted(0, items.size - 1)
-
-        val paginationItemPosition = itemCount - 1
-        notifyItemChanged(paginationItemPosition)
+        notifyDataSetChanged()
+//        val isProductItemEmpty = items.size == 1
+//        if (isProductItemEmpty) {
+//            onCartPaginationListener.onMinusPage()
+//        }
+//
+//        val oldItems = this.items.size
+//        notifyItemRangeRemoved(0, oldItems - 1)
+//
+//        this.items = items
+//        notifyItemRangeInserted(0, items.size - 1)
+//
+//        val paginationItemPosition = itemCount - 1
+//        notifyItemChanged(paginationItemPosition)
     }
 }

@@ -73,7 +73,7 @@
             android:paddingTop="24dp"
             android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/shoppingCartOrderButton"
             app:layout_constraintTop_toBottomOf="@id/shoppingCartToolbar"
             tools:listitem="@layout/item_shopping_cart_product" />
 
@@ -82,7 +82,8 @@
             android:layout_height="0dp"
             android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/shoppingCartToolbar">
+            app:layout_constraintTop_toBottomOf="@id/shoppingCartToolbar"
+            tools:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -103,5 +104,60 @@
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
+        <TextView
+            android:id="@+id/shoppingCartOrderButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/mint"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="30dp"
+            android:paddingBottom="27dp"
+            android:text="@{@string/shopping_cart_order(viewModel.selectedCartItems.size)}"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="주문하기(2)" />
+
+        <TextView
+            android:id="@+id/shoppingCartOrderPrice"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/gray_5"
+            android:gravity="center|end"
+            android:paddingStart="0dp"
+            android:paddingEnd="12dp"
+            android:text="@{@string/shopping_cart_total_price(0)}"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/shoppingCartOrderButton"
+            app:layout_constraintEnd_toStartOf="@id/shoppingCartOrderButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/shoppingCartOrderButton"
+            tools:text="184,200원" />
+
+        <CheckBox
+            android:id="@+id/shoppingCartSelectAllCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/shoppingCartOrderPrice"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/shoppingCartOrderPrice"
+            app:layout_constraintVertical_bias="0.542" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-12dp"
+            android:text="전체"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/shoppingCartSelectAllCheckBox"
+            app:layout_constraintStart_toStartOf="@id/shoppingCartSelectAllCheckBox"
+            app:layout_constraintTop_toBottomOf="@id/shoppingCartSelectAllCheckBox" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -9,7 +9,8 @@ data class CartItem(
 ) : Serializable {
     val imageUrl: String? = product.imageUrl
     val name = product.name
-    val price = product.price
+    val productPrice = product.price
+    val price get() = productPrice * quantity
     val productId = product.id
 
     constructor(

@@ -8,8 +8,10 @@ import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
 class CartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
     onRemoveProduct: (cartItemId: Long) -> Unit,
-    private val onSelect: (cartItemId: Long) -> Unit,
-    private val onUnselect: (cartItemId: Long) -> Unit,
+    private val onSelect: (productItem: CartItemType.ProductItem) -> Unit,
+    private val onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
+    private val onPlusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
+    private val onMinusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.shoppingCartItemActionListener =
@@ -19,18 +21,11 @@ class CartProductViewHolder(
                 }
 
                 override fun onPlusProductQuantity(item: CartItemType.ProductItem) {
-                    item.quantity++
-                    binding.invalidateAll()
+                    onPlusQuantity(item)
                 }
 
                 override fun onMinusProductQuantity(item: CartItemType.ProductItem) {
-                    if (item.quantity == 1) {
-                        onRemoveProduct(item)
-                        return
-                    }
-
-                    item.quantity--
-                    binding.invalidateAll()
+                    onMinusQuantity(item)
                 }
             }
     }
@@ -39,9 +34,9 @@ class CartProductViewHolder(
         binding.productItem = item
         binding.shoppingCartProductCheckBox.setOnClickListener {
             if (binding.shoppingCartProductCheckBox.isChecked) {
-                onSelect(item.cartItem.id)
+                onSelect(item)
             } else {
-                onUnselect(item.cartItem.id)
+                onUnselect(item)
             }
         }
     }
@@ -50,12 +45,21 @@ class CartProductViewHolder(
         fun of(
             parent: ViewGroup,
             onRemoveProduct: (cartItemId: Long) -> Unit,
-            onSelect: (cartItemId: Long) -> Unit,
-            onUnselect: (cartItemId: Long) -> Unit,
+            onSelect: (productItem: CartItemType.ProductItem) -> Unit,
+            onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
+            onPlusQuantity: (CartItemType.ProductItem) -> Unit,
+            onMinusQuantity: (CartItemType.ProductItem) -> Unit,
         ): CartProductViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemShoppingCartProductBinding.inflate(layoutInflater, parent, false)
-            return CartProductViewHolder(binding, onRemoveProduct, onSelect, onUnselect)
+            return CartProductViewHolder(
+                binding,
+                onRemoveProduct,
+                onSelect,
+                onUnselect,
+                onPlusQuantity,
+                onMinusQuantity,
+            )
         }
     }
 }

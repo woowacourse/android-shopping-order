@@ -7,10 +7,12 @@ sealed interface CartItemType {
 
     data class ProductItem(
         val cartItem: CartItem,
+        var checked: Boolean = false,
     ) : CartItemType {
         override val viewType: ItemType = ItemType.PRODUCT
         val imageUrl = cartItem.imageUrl
         var quantity = cartItem.quantity
+        val price get() = cartItem.productPrice * quantity
     }
 
     data class PaginationItem(

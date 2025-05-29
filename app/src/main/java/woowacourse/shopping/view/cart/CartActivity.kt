@@ -21,7 +21,14 @@ class CartActivity :
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
     private val cartProductAdapter by lazy {
-        CartProductAdapter(viewModel::removeCartItem, this, viewModel::select, viewModel::unselect)
+        CartProductAdapter(
+            viewModel::removeCartItem,
+            this,
+            viewModel::select,
+            viewModel::unselect,
+            viewModel::plusCartItemQuantity,
+            viewModel::minusCartItemQuantity,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +80,9 @@ class CartActivity :
                     showToast(R.string.shopping_cart_update_shopping_cart_error_message)
                     finish()
                 }
+
+                CartEvent.PLUS_CART_ITEM_QUANTITY_FAILURE -> TODO()
+                CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE -> TODO()
             }
         }
 

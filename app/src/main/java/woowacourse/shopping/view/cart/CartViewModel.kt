@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.PageableCartItems
+import woowacourse.shopping.domain.product.CartItem
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
@@ -22,18 +23,65 @@ class CartViewModel(
 
     val loading: MutableLiveData<Boolean> = MutableLiveData(true)
 
-    private var selectedCartItemIds: Set<Long> = emptySet()
+    private val _selectedCartItems: MutableLiveData<Set<CartItemType.ProductItem>> =
+        MutableLiveData(emptySet())
+    val selectedCartItems: LiveData<Set<CartItemType.ProductItem>>
+        get() = _selectedCartItems
+
+//    val totalPrice: LiveData<Int> =
+//        selectedCartItems.map { productItems: Set<CartItemType.ProductItem> ->
+//            productItems.sumOf { productItem: CartItemType.ProductItem ->
+//                productItem.price
+//            }
+//        }
 
     init {
         loadCartItems()
     }
 
-    fun select(cartItemId: Long) {
-        selectedCartItemIds += cartItemId
+    fun select(cartItem: CartItemType.ProductItem) {
+        _selectedCartItems.value = selectedCartItems.value?.plus(cartItem) ?: setOf(cartItem)
     }
 
-    fun unselect(cartItemId: Long) {
-        selectedCartItemIds -= cartItemId
+    fun unselect(cartItem: CartItemType.ProductItem) {
+        _selectedCartItems.value = selectedCartItems.value?.minus(cartItem) ?: emptySet()
+    }
+
+    fun plusCartItemQuantity(cartItem: CartItemType.ProductItem) {
+        cartRepository.updateCartItemQuantity(
+            cartItem.cartItem.id,
+            cartItem.quantity + 1,
+        ) { result ->
+            result
+                .onSuccess {
+                    loadCartItems()
+                }.onFailure {
+                    _event.postValue(CartEvent.PLUS_CART_ITEM_QUANTITY_FAILURE)
+                }
+        }
+    }
+
+    fun minusCartItemQuantity(cartItem: CartItemType.ProductItem) {
+        val cartItemId = cartItem.cartItem.id
+        if (cartItem.quantity == 1) {
+            cartRepository.remove(cartItemId) { result ->
+                result
+                    .onSuccess {
+                        loadCartItems()
+                    }.onFailure {
+                        _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
+                    }
+            }
+        } else {
+            cartRepository.updateCartItemQuantity(cartItemId, cartItem.quantity - 1) { result ->
+                result
+                    .onSuccess {
+                        loadCartItems()
+                    }.onFailure {
+                        _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
+                    }
+            }
+        }
     }
 
     private fun loadCartItems() {
@@ -41,9 +89,10 @@ class CartViewModel(
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
                     val cartItems: List<CartItemType> =
-                        pageableCartItems.cartItems.map {
-                            CartItemType.ProductItem(it)
+                        pageableCartItems.cartItems.map { cartItem: CartItem ->
+                            CartItemType.ProductItem(cartItem)
                         }
+
                     val paginationItem: CartItemType.PaginationItem =
                         CartItemType.PaginationItem(
                             page = page,

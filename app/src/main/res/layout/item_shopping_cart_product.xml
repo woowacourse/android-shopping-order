@@ -26,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:checked="@{productItem.checked}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,6 +79,7 @@
             android:background="@drawable/background_product_quantity_selector"
             app:layout_constraintBottom_toTopOf="@id/shoppingCartProductPrice"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/shoppingCartProductImage"
             app:layout_constraintTop_toTopOf="@id/shoppingCartProductImage">
 
             <TextView
@@ -92,8 +94,6 @@
                 android:textColor="@color/gray_5"
                 android:textSize="22sp"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
@@ -107,9 +107,9 @@
                 app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductQuantityMinusButton"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toStartOf="@id/shoppingCartProductQuantityPlusButton"
+                app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toEndOf="@id/shoppingCartProductQuantityMinusButton"
                 app:layout_constraintTop_toTopOf="@id/shoppingCartProductQuantityMinusButton"
-                app:layout_constraintVertical_chainStyle="spread"
                 tools:text="1" />
 
             <TextView
