@@ -26,9 +26,10 @@ class RecentProductRepositoryImpl(
 
     override fun insertAndTrimToLimit(
         productId: Long,
+        category: String,
         onResult: (Result<Unit>) -> Unit,
     ) = runCatchingInThread(onResult) {
-        recentProductLocalDataSource.insertRecentProduct(RecentProductEntity(productId))
+        recentProductLocalDataSource.insertRecentProduct(RecentProductEntity(productId, category))
         recentProductLocalDataSource.trimToLimit(recentProductLimit)
     }
 }

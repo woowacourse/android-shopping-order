@@ -10,5 +10,6 @@ import androidx.room.PrimaryKey
 )
 data class RecentProductEntity(
     @PrimaryKey val productId: Long,
+    val category: String,
     val lastViewedAt: Long = System.currentTimeMillis(),
 )

@@ -16,6 +16,9 @@ interface RecentProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertRecentProduct(recentProduct: RecentProductEntity)
 
+    @Query("SELECT category FROM RecentViewedProducts ORDER BY lastViewedAt DESC LIMIT 1")
+    fun getRecentViewedProductCategory(): String?
+
     @Query(
         """
             DELETE FROM RecentViewedProducts 

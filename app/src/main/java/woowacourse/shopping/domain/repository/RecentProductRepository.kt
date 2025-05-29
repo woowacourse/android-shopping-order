@@ -10,6 +10,7 @@ interface RecentProductRepository {
 
     fun insertAndTrimToLimit(
         productId: Long,
+        category: String,
         onResult: (Result<Unit>) -> Unit,
     )
 }

@@ -8,6 +8,8 @@ class RecentProductLocalDataSourceImpl(
 ) : RecentProductLocalDataSource {
     override fun getRecentProducts(limit: Int): List<RecentProductEntity> = recentProductDao.getRecentProducts(limit)
 
+    override fun getRecentViewedProductCategory(): String? = recentProductDao.getRecentViewedProductCategory()
+
     override fun insertRecentProduct(recentProduct: RecentProductEntity) {
         recentProductDao.insertRecentProduct(recentProduct)
     }
