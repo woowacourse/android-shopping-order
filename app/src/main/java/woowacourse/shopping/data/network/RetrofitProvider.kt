@@ -8,11 +8,12 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.data.network.service.ProductService
 
 object RetrofitProvider {
-    private const val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
+    private const val BASE_URL = BuildConfig.BASE_URL
     private val contentType = "application/json".toMediaType()
 
     private val logging =

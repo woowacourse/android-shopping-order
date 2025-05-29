@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.network
 
 import android.util.Base64
+import com.facebook.shimmer.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -18,13 +19,11 @@ class BasicAuthentication : Interceptor {
     }
 
     private fun basicAuthenticationHeader(): String {
-        val valueToEncode = "$USER_ID:$USER_PASSWORD"
+        val userId = woowacourse.shopping.BuildConfig.USER_ID
+        val userPassword = woowacourse.shopping.BuildConfig.USER_PASSWORD
+
+        val valueToEncode = "$userId:$userPassword"
         val encode = Base64.encodeToString(valueToEncode.toByteArray(), Base64.NO_WRAP)
         return "Basic $encode"
-    }
-
-    private companion object {
-        const val USER_ID = "chanho0908"
-        const val USER_PASSWORD = "password"
     }
 }

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
@@ -7,6 +9,19 @@ plugins {
 }
 
 android {
+    val properties = Properties()
+    properties.load(project.rootProject.file("local.properties").inputStream())
+
+    val userId = properties.getProperty("user_id") ?: ""
+    val userPassword = properties.getProperty("user_password") ?: ""
+    val baseUrl = properties.getProperty("base_url") ?: ""
+
+    defaultConfig {
+        buildConfigField("String", "USER_ID", "\"$userId\"")
+        buildConfigField("String", "USER_PASSWORD", "\"$userPassword\"")
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+    }
+
     namespace = "woowacourse.shopping"
     compileSdk = 35
 
@@ -46,6 +61,10 @@ android {
     }
     buildFeatures {
         dataBinding = true
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
