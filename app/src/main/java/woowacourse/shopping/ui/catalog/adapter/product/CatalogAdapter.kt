@@ -34,7 +34,7 @@ class CatalogAdapter(
 
     fun submitItems(
         newItems: List<Product>,
-        hasMore: Boolean,
+        hasMore: Boolean = false,
     ) {
         val newProductItems = newItems.map { CatalogItem.ProductItem(it) }
         val oldProductItems = items.toList()
