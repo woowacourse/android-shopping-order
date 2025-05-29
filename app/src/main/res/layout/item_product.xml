@@ -13,7 +13,7 @@
 
         <variable
             name="productItemActionListener"
-            type="woowacourse.shopping.view.product.ProductItemActionListener" />
+            type="woowacourse.shopping.view.product.ProductItemActions" />
 
     </data>
 

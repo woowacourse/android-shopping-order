@@ -20,7 +20,7 @@ class ProductViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.productItemActionListener =
-            object : ProductItemActionListener {
+            object : ProductItemActions {
                 override fun onSelectProduct(item: ProductsItem.ProductItem) {
                     onSelectProduct(item.product)
                 }
