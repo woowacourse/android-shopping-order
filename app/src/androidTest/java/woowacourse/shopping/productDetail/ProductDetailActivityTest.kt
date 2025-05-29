@@ -9,7 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.R
-import woowacourse.shopping.fixture.PRODUCT_LUCKY
+import woowacourse.shopping.fixture.PRODUCT_AIR_FORCE
 import woowacourse.shopping.fixture.fakeContext
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
 
@@ -24,7 +24,7 @@ class ProductDetailActivityTest {
                 fakeContext,
                 ProductDetailActivity::class.java,
             ).apply {
-                putExtra("woowacourse.shopping.EXTRA_PRODUCT", PRODUCT_LUCKY)
+                putExtra("woowacourse.shopping.EXTRA_PRODUCT_ID", PRODUCT_AIR_FORCE.id)
             }
         ActivityScenario.launch<ProductDetailActivity>(intent)
 
@@ -33,13 +33,11 @@ class ProductDetailActivityTest {
 
     @Test
     fun `인텐트로_넘겨받은_상품의_이름이_보인다`() {
-        onView(withId(R.id.productDetailName))
-            .check(matches(withText(PRODUCT_LUCKY.name)))
+        onView(withId(R.id.productDetailName)).check(matches(withText("에어포스1")))
     }
 
     @Test
     fun `인텐트로_넘겨받은_상품의_가격이_보인다`() {
-        onView(withId(R.id.productDetailPrice))
-            .check(matches(withText("4,000원")))
+        onView(withId(R.id.productDetailPrice)).check(matches(withText("100,000원")))
     }
 }
