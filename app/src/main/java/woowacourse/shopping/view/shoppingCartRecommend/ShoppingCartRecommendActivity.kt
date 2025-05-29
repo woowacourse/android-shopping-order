@@ -10,13 +10,22 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityShoppingCartRecommendBinding
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.view.common.ProductQuantityClickListener
+import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.getSerializableExtraData
+import woowacourse.shopping.view.product.ProductsItem
 
-class ShoppingCartRecommendActivity : AppCompatActivity() {
+class ShoppingCartRecommendActivity :
+    AppCompatActivity(),
+    ProductQuantityClickListener {
     private val binding: ActivityShoppingCartRecommendBinding by lazy {
         ActivityShoppingCartRecommendBinding.inflate(layoutInflater)
     }
     private val viewModel: ShoppingCartRecommendViewModel by viewModels()
+
+    private val recommendProductAdapter: RecommendProductAdapter by lazy {
+        RecommendProductAdapter(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +45,29 @@ class ShoppingCartRecommendActivity : AppCompatActivity() {
                 )?.toList() ?: emptyList()
 
         viewModel.updateShoppingCartProductsToOrder(shoppingCartProductsToOrder)
+        setUpObservers()
     }
 
     private fun bindViewModel() {
         binding.lifecycleOwner = this
         binding.viewModel = this.viewModel
+        binding.adapter = recommendProductAdapter
+    }
+
+    private fun setUpObservers() {
+        viewModel.recommendProducts.observe(this) { recommendItems ->
+            recommendProductAdapter.submitList(recommendItems)
+        }
+    }
+
+    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
+        val item = quantityObservable as ProductsItem.ProductItem
+        viewModel.addProductToShoppingCart(item, item.selectedQuantity)
+    }
+
+    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
+        val item = quantityObservable as ProductsItem.ProductItem
+        viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
     }
 
     companion object {

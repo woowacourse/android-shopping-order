@@ -56,6 +56,21 @@ class DefaultProductsRepository(
         }
     }
 
+    override fun getRecentRecommendWatchingProducts(
+        size: Int,
+        onResult: (Result<List<Product>>) -> Unit,
+    ) {
+        thread {
+            runCatching {
+                recentWatchingDao.getRecentRecommendWatchingProducts(size)
+            }.onSuccess { recentWatchingProducts: List<RecentWatchingEntity> ->
+                onResult(Result.success(recentWatchingProducts.map { it.product }))
+            }.onFailure { exception ->
+                onResult(Result.failure(exception))
+            }
+        }
+    }
+
     override fun updateRecentWatchingProduct(
         product: Product,
         onResult: (Result<Unit>) -> Unit,
