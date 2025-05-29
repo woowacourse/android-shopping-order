@@ -21,7 +21,6 @@ import woowacourse.shopping.feature.goods.adapter.GoodsClickListener
 import woowacourse.shopping.feature.goods.adapter.GoodsSpanSizeLookup
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
 import woowacourse.shopping.feature.model.ResultCode
-import woowacourse.shopping.util.toUi
 
 class GoodsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsBinding
@@ -88,10 +87,20 @@ class GoodsActivity : AppCompatActivity() {
 
     private fun observeCartInsertResult() {
         viewModel.isSuccess.observe(this) { cart ->
-            Toast.makeText(this, R.string.goods_detail_cart_insert_success_toast_message, Toast.LENGTH_SHORT).show()
+            Toast
+                .makeText(
+                    this,
+                    R.string.goods_detail_cart_insert_success_toast_message,
+                    Toast.LENGTH_SHORT,
+                ).show()
         }
         viewModel.isFail.observe(this) {
-            Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
+            Toast
+                .makeText(
+                    this,
+                    R.string.goods_detail_cart_insert_fail_toast_message,
+                    Toast.LENGTH_SHORT,
+                ).show()
         }
     }
 
@@ -145,7 +154,7 @@ class GoodsActivity : AppCompatActivity() {
     }
 
     private fun navigate(cart: Cart) {
-        val intent = GoodsDetailsActivity.newIntent(this, cart.toUi())
+        val intent = GoodsDetailsActivity.newIntent(this, cart.product.id.toLong())
         activityResultLauncher.launch(intent)
     }
 }

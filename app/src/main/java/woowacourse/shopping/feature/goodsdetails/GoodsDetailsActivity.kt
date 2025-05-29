@@ -8,21 +8,17 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.IntentCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.feature.CustomCartQuantity
 import woowacourse.shopping.feature.CustomLastViewed
-import woowacourse.shopping.feature.model.CartUiModel
 import woowacourse.shopping.feature.model.ResultCode
-import woowacourse.shopping.util.toDomain
-import woowacourse.shopping.util.toUi
 import kotlin.getValue
 
 class GoodsDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsDetailsBinding
-    private lateinit var cart: CartUiModel
+    private var id: Long = 0
     private val viewModel: GoodsDetailsViewModel by viewModels {
         (application as ShoppingApplication).goodsDetailsFactory
     }
@@ -32,8 +28,11 @@ class GoodsDetailsActivity : AppCompatActivity() {
         binding = ActivityGoodsDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        cart = IntentCompat.getParcelableExtra(intent, GOODS_KEY, CartUiModel::class.java) ?: return
-        viewModel.setInitialCart(cart.toDomain())
+//        cart = IntentCompat.getParcelableExtra(intent, GOODS_KEY, CartUiModel::class.java) ?: return
+//        viewModel.setInitialCart(cart.toDomain())
+        id = intent.getLongExtra(GOODS_KEY, 0)
+//        viewModel.loadProductDetails(id)
+        viewModel.setInitialCart(id)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
@@ -63,7 +62,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private fun navigateToLastViewed() {
         viewModel.navigateToLastViewedCart.observe(this) { lastViewedCart ->
             lastViewedCart.let {
-                val intent = newIntent(this@GoodsDetailsActivity, it.toUi())
+                val intent = newIntent(this@GoodsDetailsActivity, it.product.id.toLong())
                 startActivity(intent)
                 finish()
             }
@@ -76,7 +75,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
             setResult(
                 ResultCode.GOODS_DETAIL_INSERT.code,
                 Intent().apply {
-                    putExtra("GOODS_ID", cart.id)
+                    putExtra("GOODS_ID", id)
                     putExtra("GOODS_QUANTITY", viewModel.cart.value?.quantity)
                 },
             )
@@ -87,7 +86,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
         setResult(
             ResultCode.GOODS_DETAIL_INSERT.code,
             Intent().apply {
-                putExtra("HISTORY_ID", cart.id)
+                putExtra("HISTORY_ID", id)
             },
         )
     }
@@ -118,10 +117,10 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
         fun newIntent(
             context: Context,
-            cart: CartUiModel,
+            id: Long,
         ): Intent =
             Intent(context, GoodsDetailsActivity::class.java).apply {
-                putExtra(GOODS_KEY, cart)
+                putExtra(GOODS_KEY, id)
             }
     }
 }
