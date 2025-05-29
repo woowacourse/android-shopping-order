@@ -31,22 +31,8 @@ class RecommendActivity : AppCompatActivity() {
 
         initInsets()
         setupToolbar()
-
         initAdapter()
         observeViewModel()
-    }
-
-    private fun observeViewModel() {
-        viewModel.recommendProducts.observe(this) {
-            recommendAdapter.submitList(it)
-        }
-    }
-
-    private fun initAdapter() {
-        binding.rvRecommend.apply {
-            adapter = recommendAdapter
-            itemAnimator = null
-        }
     }
 
     private fun initInsets() {
@@ -67,6 +53,20 @@ class RecommendActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun initAdapter() {
+        binding.rvRecommend.apply {
+            adapter = recommendAdapter
+            itemAnimator = null
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.recommendProducts.observe(this) {
+            recommendAdapter.submitList(it)
+        }
+    }
+
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, RecommendActivity::class.java)

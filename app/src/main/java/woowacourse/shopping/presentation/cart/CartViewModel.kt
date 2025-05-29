@@ -6,14 +6,16 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
+import woowacourse.shopping.presentation.toPresentation
 
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _cartItems: MutableLiveData<ResultState<List<CartItem>>> = MutableLiveData()
-    val cartItems: LiveData<ResultState<List<CartItem>>> = _cartItems
+    private val _cartItems: MutableLiveData<ResultState<List<CartItemUiModel>>> = MutableLiveData()
+    val cartItems: LiveData<ResultState<List<CartItemUiModel>>> = _cartItems
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
@@ -24,7 +26,7 @@ class CartViewModel(
     fun loadItems(currentPage: Int = 0) {
         cartRepository.fetchPagedCartItems(currentPage) { result ->
             result
-                .onSuccess { pagedProducts -> _cartItems.postValue(ResultState.Success(pagedProducts)) }
+                .onSuccess { cartItems -> _cartItems.postValue(ResultState.Success(cartItems.map { it.toPresentation() })) }
                 .onFailure { _cartItems.postValue(ResultState.Failure()) }
         }
     }
@@ -53,7 +55,7 @@ class CartViewModel(
 
     fun decreaseQuantity(productId: Long) {
         val currentItems = (cartItems.value as? ResultState.Success)?.data ?: return
-        val item = currentItems.find { it.product.productId == productId } ?: return
+        val item = currentItems.find { it.product.id == productId } ?: return
 
         if (item.quantity == 1) {
             _toastMessage.value = R.string.cart_toast_invalid_quantity
@@ -77,7 +79,7 @@ class CartViewModel(
         val currentItems = (_cartItems.value as? ResultState.Success)?.data ?: return
         val updatedItem =
             currentItems.map {
-                if (it.product.productId == productId) it.copy(quantity = it.quantity + amount) else it
+                if (it.product.id == productId) it.copy(quantity = it.quantity + amount) else it
             }
         _cartItems.postValue(ResultState.Success(updatedItem))
     }
