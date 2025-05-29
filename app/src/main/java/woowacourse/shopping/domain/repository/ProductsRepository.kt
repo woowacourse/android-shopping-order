@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface ProductsRepository {
@@ -13,5 +14,10 @@ interface ProductsRepository {
     fun getProductById(
         id: Long,
         onResult: (Result<ProductUiModel>) -> Unit,
+    )
+
+    fun getProductsByCategory(
+        category: String,
+        onResult: (Result<List<Product>>) -> Unit,
     )
 }

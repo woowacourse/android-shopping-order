@@ -42,6 +42,19 @@ class ProductsRepositoryImpl(
         }
     }
 
+    override fun getProductsByCategory(
+        category: String,
+        onResult: (Result<List<Product>>) -> Unit,
+    ) {
+        productsRemoteDataSource.getProductsByCategory(category = category) { result ->
+            result
+                .mapCatching { response ->
+                    response.content.map { it.toDomain() }
+                }
+                .let(onResult)
+        }
+    }
+
     private fun ProductResponse.toDomain(): Product {
         return Product(
             id = this.id,

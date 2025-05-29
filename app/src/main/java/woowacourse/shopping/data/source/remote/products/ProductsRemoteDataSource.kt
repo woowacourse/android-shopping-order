@@ -9,8 +9,8 @@ class ProductsRemoteDataSource(
     private val api: ProductsApiService,
 ) : ProductsDataSource {
     override fun getProducts(
-        page: Int,
-        size: Int,
+        page: Int?,
+        size: Int?,
         onResult: (Result<ProductsResponse>) -> Unit,
     ) {
         api.getProducts(page = page, size = size).enqueueResult(onResult)
@@ -21,5 +21,12 @@ class ProductsRemoteDataSource(
         onResult: (Result<ProductResponse>) -> Unit,
     ) {
         api.getProductById(id = id).enqueueResult(onResult)
+    }
+
+    override fun getProductsByCategory(
+        category: String,
+        onResult: (Result<ProductsResponse>) -> Unit,
+    ) {
+        api.getProductsByCategory(category = category).enqueueResult(onResult)
     }
 }
