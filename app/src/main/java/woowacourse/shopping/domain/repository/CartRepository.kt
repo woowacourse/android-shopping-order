@@ -1,14 +1,8 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 
 interface CartRepository {
-    fun fetchCartProductDetail(
-        productId: Long,
-        callback: (Result<Product?>) -> Unit,
-    )
-
     fun fetchCartProducts(
         page: Int,
         size: Int,

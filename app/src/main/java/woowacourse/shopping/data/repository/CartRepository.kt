@@ -10,22 +10,12 @@ import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.CartItemsQuantityResponse
 import woowacourse.shopping.data.model.response.CartItemsResponse
 import woowacourse.shopping.domain.model.Page
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepository(
     private val api: CartApi,
 ) : CartRepository {
-    override fun fetchCartProductDetail(
-        productId: Long,
-        callback: (Result<Product?>) -> Unit,
-    ) {
-        // 임시 로직: 실제 API 없음
-        callback(Result.success(EMPTY_PRODUCT))
-    }
-
     override fun fetchCartProducts(
         page: Int,
         size: Int,
