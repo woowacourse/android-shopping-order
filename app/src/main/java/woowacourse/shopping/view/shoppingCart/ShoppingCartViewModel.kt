@@ -42,6 +42,10 @@ class ShoppingCartViewModel(
         MediatorLiveData(emptyList<ShoppingCartProduct>())
     val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
 
+    private val _isOrderEnabled: MediatorLiveData<Boolean> =
+        MediatorLiveData<Boolean>().apply { value = false }
+    val isOrderEnabled: LiveData<Boolean> get() = _isOrderEnabled
+
     private var page: Int = MINIMUM_PAGE
 
     private var loadable: Boolean = false
@@ -73,6 +77,10 @@ class ShoppingCartViewModel(
                     .filterIsInstance<ShoppingCartProductItem>()
                     .filter { it.isChecked == true }
                     .map { it.shoppingCartProduct }
+        }
+
+        _isOrderEnabled.addSource(totalQuantity) {
+            _isOrderEnabled.value = it > 0
         }
     }
 
