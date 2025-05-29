@@ -43,6 +43,10 @@ class CartFragment :
         setCartAdapter()
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
+
+        binding.selectAll.setOnClickListener { view ->
+            onBatchSelect(binding.selectAll.isChecked)
+        }
     }
 
     override fun onDestroyView() {
@@ -61,7 +65,7 @@ class CartFragment :
         viewModel.setCartItemSelection(cartItem, isChecked)
     }
 
-    override fun onSelectAllToggle(isChecked: Boolean) {
+    override fun onBatchSelect(isChecked: Boolean) {
         viewModel.setAllSelections(isChecked)
     }
 

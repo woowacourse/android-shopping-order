@@ -130,7 +130,6 @@
                     android:gravity="center_horizontal|bottom"
                     android:textColor="@color/white"
                     android:textSize="12sp"
-                    android:onCheckedChanged="@{(_, isChecked) -> eventListener.onSelectAllToggle(isChecked)}"
                     app:layout_constraintBottom_toTopOf="@id/tv_select_all_description"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

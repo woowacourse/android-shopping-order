@@ -29,7 +29,7 @@ class CartViewModel(
     private val _page = MutableLiveData(START_PAGE)
     val page: LiveData<Int> = _page
 
-    private val _hasMore = MutableLiveData<Boolean>()
+    private var _hasMore = MutableLiveData<Boolean>()
     val hasMore: LiveData<Boolean> = _hasMore
 
     private val _totalPrice = MutableLiveData<Int>()

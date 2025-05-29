@@ -54,6 +54,6 @@ class CartAdapter(
             isChecked: Boolean,
         )
 
-        fun onSelectAllToggle(isChecked: Boolean)
+        fun onBatchSelect(isChecked: Boolean)
     }
 }
