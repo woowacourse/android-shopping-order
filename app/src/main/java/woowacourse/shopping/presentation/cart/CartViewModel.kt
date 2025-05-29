@@ -6,12 +6,15 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.CartItemUiModel
+import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.toPresentation
 
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
+    private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
+    val uiState: LiveData<ResultState<Unit>> = _uiState
     private val _cartItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val cartItems: LiveData<List<CartItemUiModel>> = _cartItems
     private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
@@ -28,6 +31,8 @@ class CartViewModel(
     }
 
     fun loadItems(currentPage: Int = 0) {
+        _uiState.value = ResultState.Loading
+
         cartRepository.fetchPagedCartItems(currentPage) { result ->
             result
                 .onSuccess { loadedItems ->
@@ -42,6 +47,7 @@ class CartViewModel(
                         }
 
                     _cartItems.postValue(newItems)
+                    _uiState.postValue(ResultState.Success(Unit))
                 }.onFailure {
                     _toastMessage.postValue(R.string.cart_toast_load_fail)
                 }

@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.presentation.CartItemUiModel
+import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
 class CartActivity :
@@ -40,7 +41,7 @@ class CartActivity :
         binding.clickListener = this
         binding.lifecycleOwner = this
 
-        showSampleData(true)
+        showSkeleton(true)
         initInsets()
         initAdapter()
         setupToolbar()
@@ -80,9 +81,25 @@ class CartActivity :
     }
 
     private fun observeViewModel() {
+        viewModel.uiState.observe(this) { result ->
+            when (result) {
+                is ResultState.Loading -> {
+                    showSkeleton(true)
+                }
+
+                is ResultState.Success -> {
+                    showSkeleton(false)
+                }
+
+                is ResultState.Failure -> {
+                    showSkeleton(true)
+                }
+            }
+        }
+
         viewModel.cartItems.observe(this) { cartItems ->
             binding.root.postDelayed({
-                showSampleData(false)
+                showSkeleton(false)
             }, 1_000L)
             cartAdapter.submitList(cartItems)
             viewModel.fetchSelectedInfo()
@@ -93,7 +110,7 @@ class CartActivity :
         }
     }
 
-    private fun showSampleData(isLoading: Boolean) {
+    private fun showSkeleton(isLoading: Boolean) {
         if (isLoading) {
             binding.rvCartProduct.visibility = View.GONE
         } else {

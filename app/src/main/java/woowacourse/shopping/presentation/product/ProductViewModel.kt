@@ -18,10 +18,12 @@ class ProductViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
-    private val _products: MutableLiveData<ResultState<List<CartItem>>> = MutableLiveData()
-    val products: LiveData<ResultState<List<CartItem>>> = _products
-    private val _recentProducts: MutableLiveData<ResultState<List<Product>>> = MutableLiveData()
-    val recentProducts: LiveData<ResultState<List<Product>>> = _recentProducts
+    private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
+    val uiState: LiveData<ResultState<Unit>> = _uiState
+    private val _products: MutableLiveData<List<CartItem>> = MutableLiveData()
+    val products: LiveData<List<CartItem>> = _products
+    private val _recentProducts: MutableLiveData<List<Product>> = MutableLiveData()
+    val recentProducts: LiveData<List<Product>> = _recentProducts
     private val _cartItemCount = MutableLiveData<Int>()
     val cartItemCount: LiveData<Int> = _cartItemCount
     private val _showLoadMore: MutableLiveData<Boolean> = MutableLiveData(true)
@@ -39,11 +41,14 @@ class ProductViewModel(
     }
 
     fun fetchData(currentPage: Int = FIRST_PAGE) {
+        _uiState.value = ResultState.Loading
+
         productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) { result ->
             result
                 .onSuccess { cartItems ->
-                    _products.postValue(ResultState.Success(cartItems))
                     this.currentPage = currentPage
+                    _products.postValue(cartItems)
+                    _uiState.value = ResultState.Success(Unit)
                 }.onFailure {
                     _toastMessage.postValue(R.string.product_toast_load_failure)
                 }
@@ -52,7 +57,7 @@ class ProductViewModel(
         recentProductRepository.getRecentProducts { result ->
             result
                 .onSuccess { products ->
-                    _recentProducts.postValue(ResultState.Success(products))
+                    _recentProducts.postValue(products)
                 }.onFailure {
                     _toastMessage.postValue(R.string.product_toast_load_failure)
                 }
@@ -75,13 +80,13 @@ class ProductViewModel(
         productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) { result ->
             result.fold(
                 onSuccess = { newItems ->
-                    val currentList = (_products.value as? ResultState.Success)?.data.orEmpty()
+                    val currentList = _products.value.orEmpty()
                     val updatedList = currentList + newItems
-                    _products.postValue(ResultState.Success(updatedList))
+                    _products.postValue(updatedList)
                     _showLoadMore.postValue(updatedList.size < 100)
                 },
                 onFailure = {
-                    _products.postValue(ResultState.Failure())
+                    _toastMessage.postValue(R.string.product_toast_load_failure)
                 },
             )
         }
@@ -127,12 +132,12 @@ class ProductViewModel(
         productId: Long,
         delta: Int,
     ) {
-        val currentItems = (_products.value as? ResultState.Success)?.data ?: return
+        val currentItems = _products.value ?: return
         val updatedItem =
             currentItems.map {
                 if (it.product.productId == productId) it.copy(quantity = it.quantity + delta) else it
             }
-        _products.postValue(ResultState.Success(updatedItem))
+        _products.postValue(updatedItem)
     }
 
     companion object {

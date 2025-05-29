@@ -47,7 +47,7 @@ class ProductActivity :
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product)
         binding.lifecycleOwner = this
 
-        showSampleData(true)
+        showSkeleton(true)
 
         initInsets()
         setupToolbar()
@@ -125,33 +125,29 @@ class ProductActivity :
     }
 
     private fun observeViewModel() {
-        viewModel.products.observe(this) { result ->
+        viewModel.uiState.observe(this) { result ->
             when (result) {
-                is ResultState.Success -> {
-                    binding.root.postDelayed({
-                        showSampleData(false)
-                    }, 1_000L)
+                is ResultState.Loading -> {
+                    showSkeleton(true)
+                }
 
-                    val showLoadMore = viewModel.showLoadMore.value == true
-                    productAdapter.setData(result.data, showLoadMore)
+                is ResultState.Success -> {
+                    showSkeleton(false)
                 }
 
                 is ResultState.Failure -> {
-                    showToast(R.string.product_toast_load_failure)
+                    showSkeleton(true)
                 }
             }
         }
 
-        viewModel.recentProducts.observe(this) { result ->
-            when (result) {
-                is ResultState.Success -> {
-                    recentAdapter.submitList(result.data)
-                }
+        viewModel.products.observe(this) { products ->
+            val showLoadMore = viewModel.showLoadMore.value == true
+            productAdapter.setData(products, showLoadMore)
+        }
 
-                is ResultState.Failure -> {
-                    showToast(R.string.product_toast_load_failure)
-                }
-            }
+        viewModel.recentProducts.observe(this) { recentProducts ->
+            recentAdapter.submitList(recentProducts)
         }
 
         viewModel.cartItemCount.observe(this) { count ->
@@ -162,10 +158,8 @@ class ProductActivity :
         }
 
         viewModel.showLoadMore.observe(this) { showLoadMore ->
-            val productsState = viewModel.products.value
-            if (productsState is ResultState.Success) {
-                productAdapter.setData(productsState.data, showLoadMore)
-            }
+            val productsState = viewModel.products.value ?: return@observe
+            productAdapter.setData(productsState, showLoadMore)
         }
 
         viewModel.toastMessage.observe(this) { resId ->
@@ -173,7 +167,7 @@ class ProductActivity :
         }
     }
 
-    private fun showSampleData(isLoading: Boolean) {
+    private fun showSkeleton(isLoading: Boolean) {
         if (isLoading) {
             binding.rvProducts.visibility = View.GONE
             binding.rvRecentProducts.visibility = View.GONE

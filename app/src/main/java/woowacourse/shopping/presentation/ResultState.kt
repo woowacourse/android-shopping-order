@@ -8,4 +8,6 @@ sealed class ResultState<out T> {
     data class Failure(
         val throwable: Throwable? = null,
     ) : ResultState<Nothing>()
+
+    data object Loading : ResultState<Nothing>()
 }
