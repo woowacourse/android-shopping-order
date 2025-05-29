@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
@@ -16,7 +16,6 @@ import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.updateQuantity
 
 class GoodsDetailsViewModel(
-    private val localCartRepository: LocalCartRepository,
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
@@ -65,7 +64,6 @@ class GoodsDetailsViewModel(
                                         ?: 1,
                             )
                         if (cart.value != null) insertToHistory(cart.value as Cart)
-                        Log.d("cart", cart.value.toString())
                     },
                     onError = {
                         _isFail.setValue(Unit)
@@ -92,10 +90,9 @@ class GoodsDetailsViewModel(
         }
     }
 
-    fun commitCart() {
+    fun commitCart2() {
         runCatching {
             _cart.value?.let { it ->
-//                localCartRepository.insertAll(it)
                 cartRepository.updateCart(it.id, CartQuantity(it.quantity)) { result ->
                     result
                         .onSuccess {
@@ -109,6 +106,51 @@ class GoodsDetailsViewModel(
             _isSuccess.setValue(Unit)
         }.onFailure {
             _isFail.setValue(Unit)
+        }
+    }
+
+    fun commitCart() {
+        if (cart.value != null) {
+            val newQuantity = cart.value?.quantity ?: 0
+
+            if (cart.value?.quantity == 1) {
+                val cartRequest =
+                    CartRequest(
+                        productId = cart.value?.product?.id ?: 0,
+                        quantity = newQuantity,
+                    )
+
+                cartRepository.addToCart(cartRequest) { result ->
+                    result
+                        .onSuccess { response ->
+                            val locationHeader = response.headers()["Location"]
+                            val newId = locationHeader?.substringAfterLast("/")?.toLongOrNull() ?: 0
+                            val updatedCart = cart.value?.copy(id = newId, quantity = newQuantity)
+
+                            insertToHistory(cart.value as Cart)
+                            updateCart(updatedCart)
+                            _isSuccess.setValue(Unit)
+                        }.onFailure {
+                            _isFail.setValue(Unit)
+                        }
+                }
+            } else {
+                cartRepository.updateCart(
+                    id = cart.value?.id ?: 0,
+                    cartQuantity = CartQuantity(newQuantity),
+                ) { result ->
+                    result
+                        .onSuccess {
+                            val updatedCart = cart.value?.copy(quantity = newQuantity)
+
+                            insertToHistory(cart.value as Cart)
+                            updateCart(updatedCart)
+                            _isSuccess.setValue(Unit)
+                        }.onFailure { error ->
+                            _isFail.setValue(Unit)
+                        }
+                }
+            }
         }
     }
 
@@ -128,6 +170,10 @@ class GoodsDetailsViewModel(
     fun emitLastViewedCart() {
         val history = _lastViewed.value
         if (history != null) _navigateToLastViewedCart.postValue(history)
+    }
+
+    private fun updateCart(updatedCart: Cart?) {
+        if (updatedCart != null) _cart.value = updatedCart
     }
 
     private fun insertToHistory(cart: Cart) {
