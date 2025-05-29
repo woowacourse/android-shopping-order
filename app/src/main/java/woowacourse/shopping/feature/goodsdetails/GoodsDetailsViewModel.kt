@@ -56,7 +56,6 @@ class GoodsDetailsViewModel(
     }
 
     fun addToCart() {
-
         cartItem.value?.let { item ->
 
             if (cartUiModel != null) {
@@ -65,7 +64,7 @@ class GoodsDetailsViewModel(
                     cartUiModel.cartId,
                     CartQuantity(cartUiModel.cartQuantity + item.quantity),
                     { addedCart(item.quantity) },
-                    { Log.d("test", "fail") }
+                    { Log.d("test", "fail") },
                 )
             } else {
                 cartRepository.addCartItem(item.goods, item.quantity, { addedCart(item.quantity) }, {})
@@ -77,8 +76,8 @@ class GoodsDetailsViewModel(
         _alertEvent.setValue(
             GoodsDetailsAlertMessage(
                 R.string.goods_detail_cart_insert_complete_toast_message,
-                quantity
-            )
+                quantity,
+            ),
         )
         _cartItem.value = _cartItem.value?.copy(quantity = 1)
     }

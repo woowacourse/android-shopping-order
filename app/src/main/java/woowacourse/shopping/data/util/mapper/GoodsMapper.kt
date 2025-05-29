@@ -9,7 +9,7 @@ fun GoodsDto.toDomain(): Goods =
         name = name,
         price = price,
         thumbnailUrl = imageUrl,
-        category = ""
+        category = "",
     )
 
 fun List<GoodsDto>.toDomain(): List<Goods> = map { it.toDomain() }

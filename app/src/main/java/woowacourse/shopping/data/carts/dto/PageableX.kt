@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.carts.dto
 
-
 import com.google.gson.annotations.SerializedName
 
 data class PageableX(
@@ -15,5 +14,5 @@ data class PageableX(
     @SerializedName("sort")
     val sort: SortXX,
     @SerializedName("unpaged")
-    val unpaged: Boolean
+    val unpaged: Boolean,
 )

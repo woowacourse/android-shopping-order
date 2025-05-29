@@ -25,15 +25,15 @@ class RecommendFragment : Fragment() {
     val recommendAdapter by lazy {
         RecommendAdapter(
             lifecycleOwner = viewLifecycleOwner,
-                object : QuantityChangeListener {
-                    override fun onIncrease(cartItem: CartItem) {
-                        viewModel.addCartItemOrIncreaseQuantity(cartItem)
-                    }
+            object : QuantityChangeListener {
+                override fun onIncrease(cartItem: CartItem) {
+                    viewModel.addCartItemOrIncreaseQuantity(cartItem)
+                }
 
-                    override fun onDecrease(cartItem: CartItem) {
-                        viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
-                    }
-                },
+                override fun onDecrease(cartItem: CartItem) {
+                    viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
+                }
+            },
         )
     }
 

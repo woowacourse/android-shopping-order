@@ -5,5 +5,5 @@ data class Goods(
     val price: Int,
     val thumbnailUrl: String,
     val id: Int = 0,
-    val category: String
+    val category: String,
 )

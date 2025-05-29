@@ -6,9 +6,8 @@ import woowacourse.shopping.domain.model.CartItem
 
 @Parcelize
 data class CartUiModel(
-    val cartId : Int,
+    val cartId: Int,
     val cartQuantity: Int,
 ) : Parcelable
 
-fun CartItem.toUiModel() =
-    CartUiModel(this.id,this.quantity)
+fun CartItem.toUiModel() = CartUiModel(this.id, this.quantity)

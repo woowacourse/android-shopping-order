@@ -35,7 +35,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
         val goodsUiModel =
             IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java) ?: return
         val cartUiModel =
-            IntentCompat.getParcelableExtra(intent, CART_KEY ,CartUiModel::class.java)
+            IntentCompat.getParcelableExtra(intent, CART_KEY, CartUiModel::class.java)
 
         viewModel =
             GoodsDetailsViewModel(

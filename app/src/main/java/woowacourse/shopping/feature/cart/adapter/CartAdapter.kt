@@ -11,8 +11,9 @@ class CartAdapter(
     private val cartClickListener: CartViewHolder.CartClickListener,
     private val quantityChangeListener: QuantityChangeListener,
     private val onItemCheckedChange: (CartItem, Boolean) -> Unit,
-    private val isItemChecked: (CartItem) -> Boolean
-) : RecyclerView.Adapter<CartViewHolder>() {    private val cartItems: MutableList<CartItem> = mutableListOf()
+    private val isItemChecked: (CartItem) -> Boolean,
+) : RecyclerView.Adapter<CartViewHolder>() {
+    private val cartItems: MutableList<CartItem> = mutableListOf()
 
     fun removeItem(position: Int) {
         cartItems.removeAt(position)
@@ -60,7 +61,10 @@ class CartAdapter(
         return CartViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CartViewHolder,
+        position: Int,
+    ) {
         val item = cartItems[position]
         holder.bind(item)
 
@@ -69,7 +73,6 @@ class CartAdapter(
         holder.binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
             onItemCheckedChange(item, isChecked)
         }
-
     }
 
     override fun onBindViewHolder(

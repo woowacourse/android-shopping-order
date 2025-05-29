@@ -9,9 +9,8 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 
 class RecommendViewHolder(
-    private val binding: ItemRecommendGoodsBinding
+    private val binding: ItemRecommendGoodsBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
-
     fun bind(cartItem: CartItem) {
         binding.cartItem = cartItem
         binding.executePendingBindings()
@@ -21,7 +20,7 @@ class RecommendViewHolder(
         fun from(
             parent: ViewGroup,
             quantityChangeListener: QuantityChangeListener,
-            lifecycleOwner: LifecycleOwner
+            lifecycleOwner: LifecycleOwner,
         ): RecommendViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemRecommendGoodsBinding.inflate(inflater, parent, false)

@@ -13,6 +13,6 @@ fun Goods.toEntity(quantity: Int = 0): CartEntity =
         quantity = quantity,
     )
 
-fun CartEntity.toDomainGoods(): Goods = Goods(name = name, price = price, thumbnailUrl = thumbnailUrl, id = id , category = "")
+fun CartEntity.toDomainGoods(): Goods = Goods(name = name, price = price, thumbnailUrl = thumbnailUrl, id = id, category = "")
 
 fun CartEntity.toDomainCartItem(): CartItem = CartItem(goods = this.toDomainGoods(), quantity = quantity)
