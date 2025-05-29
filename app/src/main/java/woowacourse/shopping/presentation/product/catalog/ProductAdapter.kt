@@ -42,16 +42,6 @@ class ProductAdapter(
             PRODUCT
         }
 
-    //    fun setData(newProducts: List<ProductUiModel>) {
-//        if (newProducts.size == products.size) {
-//            products = newProducts
-//            notifyItemRangeChanged(0, newProducts.size)
-//        } else {
-//            val startPosition = products.size
-//            products = products + newProducts
-//            notifyItemRangeInserted(startPosition, newProducts.size)
-//        }
-//    }
     fun setData(newProducts: List<ProductUiModel>) {
         val oldList = products
         val updatedList = oldList + newProducts

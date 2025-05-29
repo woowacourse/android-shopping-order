@@ -54,14 +54,20 @@ class CartViewModel(
             result
                 .onSuccess {
                     loadCartProducts()
-                    setOrderData()
+                    setCheckedProducts(cartProduct)
                 }
         }
     }
 
+    private fun setCheckedProducts(cartProduct: ProductUiModel){
+        _checkedProducts.value = _checkedProducts.value?.filterNot { it.id == cartProduct.id }
+        val newTotalOrderPrice = _checkedProducts.value?.sumOf { it.quantity * it.price } ?: 0
+        _totalOrderPrice.postValue(newTotalOrderPrice)
+        _checkedProductCount.postValue(_checkedProducts.value?.count() ?: 0)
+    }
+
     override fun onNextPage() {
-        val hasNext = pagingData.value?.hasNext == true
-        if (currentPage >= 0 && hasNext) {
+        if (currentPage >= 0 && _pagingData.value?.hasNext == true) {
             currentPage++
             _pageEvent.postValue(currentPage)
             loadCartProducts()
@@ -153,6 +159,7 @@ class CartViewModel(
         _checkedProducts.postValue(newCheckedProducts)
         _totalOrderPrice.postValue(newCheckedProducts.sumOf { it.quantity * it.price })
         _checkedProductCount.postValue(newCheckedProducts.count())
+        isAllChecked.value = currentProducts.isNotEmpty() && currentProducts.all { it.isChecked }
     }
 
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
@@ -162,8 +169,15 @@ class CartViewModel(
                     currentPage--
                     _pageEvent.postValue(currentPage)
                     loadCartProducts()
+                    isAllChecked.value = pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
                 } else {
-                    _pagingData.postValue(pagingData)
+                    val checkedProductIds = _checkedProducts.value?.map { it.id } ?: emptyList()
+                    val updatedProducts = pagingData.products.map { product ->
+                        product.copy(isChecked = product.id in checkedProductIds)
+                    }
+
+                    isAllChecked.value = false
+                    _pagingData.postValue(pagingData.copy(products = updatedProducts))
                 }
             }
         }
