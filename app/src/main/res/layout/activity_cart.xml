@@ -80,13 +80,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="184,200원"
+            android:text="@{@string/product_price(vm.selectedTotalPrice)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/layout_cart_total_price"
             app:layout_constraintEnd_toEndOf="@id/layout_cart_total_price"
-            app:layout_constraintTop_toTopOf="@id/layout_cart_total_price" />
+            app:layout_constraintTop_toTopOf="@id/layout_cart_total_price"
+            tools:text="9,111,184,200원" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
@@ -102,13 +103,14 @@
             android:background="@color/baemin"
             android:gravity="center"
             android:onClick="@{() -> clickListener.onClickRecommend()}"
-            android:text="주문하기 (99999999)"
+            android:text="@{@string/cart_order_text(vm.selectedTotalCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/guideline" />
+            app:layout_constraintStart_toEndOf="@id/guideline"
+            tools:text="주문하기 (9999999)" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmer_layout_cart"

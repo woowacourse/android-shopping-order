@@ -26,6 +26,7 @@
 
     <string name="cart_toolbar_text">Cart</string>
     <string name="cart_product_price">%,d원</string>
+    <string name="cart_order_text">주문하기 (%d)</string>
     <string name="cart_delete_complete">상품이 삭제되었습니다.</string>
     <string name="cart_toast_first_page">첫번째 페이지입니다.</string>
     <string name="cart_toast_last_page">마지막 페이지입니다.</string>

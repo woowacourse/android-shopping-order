@@ -79,6 +79,7 @@ class CartActivity :
                 showSampleData(false)
             }, 1_000L)
             cartAdapter.submitList(cartItems)
+            viewModel.fetchSelectedInfo()
         }
 
         viewModel.toastMessage.observe(this) { resId ->
@@ -111,6 +112,10 @@ class CartActivity :
 
     override fun onClickDelete(cartItem: CartItemUiModel) {
         viewModel.deleteProduct(cartItem)
+    }
+
+    override fun onClickSelect(cartId: Long) {
+        viewModel.toggleItemChecked(cartId)
     }
 
     override fun onClickRecommend() {

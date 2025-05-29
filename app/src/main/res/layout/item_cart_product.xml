@@ -32,6 +32,8 @@
             android:layout_height="32dp"
             android:layout_marginTop="12dp"
             android:buttonTint="@color/baemin"
+            android:checked="@{cartItem.isSelected}"
+            android:onClick="@{() -> cartPageClickListener.onClickSelect(cartItem.id)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:checked="true" />

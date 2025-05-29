@@ -14,6 +14,10 @@ class CartViewModel(
 ) : ViewModel() {
     private val _cartItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val cartItems: LiveData<List<CartItemUiModel>> = _cartItems
+    private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedTotalPrice: LiveData<Int> = _selectedTotalPrice
+    private val _selectedTotalCount: MutableLiveData<Int> = MutableLiveData(0)
+    val selectedTotalCount: LiveData<Int> = _selectedTotalCount
     private val _isCheckAll: MutableLiveData<Boolean> = MutableLiveData()
     val isCheckAll: LiveData<Boolean> = _isCheckAll
     private val _toastMessage = SingleLiveData<Int>()
@@ -26,9 +30,16 @@ class CartViewModel(
     fun loadItems(currentPage: Int = 0) {
         cartRepository.fetchPagedCartItems(currentPage) { result ->
             result
-                .onSuccess { cartItems -> _cartItems.postValue(cartItems.map { it.toPresentation() }) }
-                .onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
+                .onSuccess {
+                    _cartItems.postValue(it.map { cartItem -> cartItem.toPresentation() })
+                }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
         }
+    }
+
+    fun fetchSelectedInfo() {
+        val checkedItem = cartItems.value?.filter { it.isSelected } ?: return
+        _selectedTotalCount.postValue(checkedItem.sumOf { it.quantity })
+        _selectedTotalPrice.postValue(checkedItem.sumOf { it.totalPrice })
     }
 
     fun deleteProduct(cartItem: CartItemUiModel) {
@@ -73,6 +84,15 @@ class CartViewModel(
         }
     }
 
+    fun toggleItemChecked(cartId: Long) {
+        val newCartItems =
+            _cartItems.value?.map { if (it.id == cartId) it.copy(isSelected = !it.isSelected) else it }
+                ?: return
+        _cartItems.postValue(newCartItems)
+
+        fetchSelectedInfo()
+    }
+
     private fun updateQuantity(
         productId: Long,
         amount: Int,
@@ -90,5 +110,6 @@ class CartViewModel(
                 }
             }
         _cartItems.postValue(updatedItem)
+        fetchSelectedInfo()
     }
 }
