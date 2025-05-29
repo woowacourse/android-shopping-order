@@ -45,7 +45,6 @@ class ShoppingCartActivity :
         viewModel.updateShoppingCart()
 
         binding.shoppingCartProducts.apply {
-            adapter = shoppingCartProductAdapter
             addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(
@@ -64,6 +63,7 @@ class ShoppingCartActivity :
     }
 
     private fun initDataBinding() {
+        binding.adapter = shoppingCartProductAdapter
         binding.viewModel = this.viewModel
         binding.lifecycleOwner = this@ShoppingCartActivity
         binding.shoppingCartListener = this@ShoppingCartActivity
