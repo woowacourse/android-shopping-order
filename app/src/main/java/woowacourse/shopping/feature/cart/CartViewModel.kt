@@ -13,19 +13,23 @@ import woowacourse.shopping.util.updateQuantity
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
+    private var currentPage: Int = 0
+
     private val _showPageButton = MutableLiveData(false)
     val showPageButton: LiveData<Boolean> get() = _showPageButton
-    private var currentPage: Int = 0
-    private val _page = MutableLiveData(currentPage)
-    val page: LiveData<Int> get() = _page
-    private val _carts = MutableLiveData<List<Cart>>()
-    val carts: LiveData<List<Cart>> get() = _carts
-    private val _totalItemsCount = MutableLiveData(0)
-    val totalItemsCount: LiveData<Int> get() = _totalItemsCount
     private val _isLeftPageEnable = MutableLiveData(false)
     val isLeftPageEnable: LiveData<Boolean> get() = _isLeftPageEnable
     private val _isRightPageEnable = MutableLiveData(false)
     val isRightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
+    private val _page = MutableLiveData(currentPage)
+    val page: LiveData<Int> get() = _page
+    private val _carts = MutableLiveData<List<Cart>>()
+    val carts: LiveData<List<Cart>> get() = _carts
+    private val _totalCheckedItemsCount = MutableLiveData(0)
+    val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
+
+    private val selectedItems = MutableLiveData<List<Cart>>(emptyList())
+    private val totalItemsCount = MutableLiveData(0)
 
     init {
         fetchTotalItemsCount()
@@ -42,6 +46,17 @@ class CartViewModel(
         currentPage--
         _page.value = currentPage
         loadCarts()
+    }
+
+    fun toggleCheck(cart: Cart) {
+        val currentList = selectedItems.value ?: emptyList()
+        if (currentList.contains(cart)) {
+            selectedItems.value = currentList.minus(cart)
+            _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.minus(cart.quantity)
+        } else {
+            selectedItems.value = currentList.plus(cart)
+            _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.plus(cart.quantity)
+        }
     }
 
     fun updatePageButtonStates(
@@ -132,7 +147,7 @@ class CartViewModel(
     private fun fetchTotalItemsCount() {
         cartRepository.getCartCounts(
             onSuccess = { count ->
-                _totalItemsCount.postValue(count.toInt())
+                totalItemsCount.postValue(count.toInt())
             },
             onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
         )
@@ -147,7 +162,7 @@ class CartViewModel(
                     }
                 _carts.postValue(cartList)
                 _page.postValue(response.number)
-                updatePageButtonStates(response.first, response.last, totalItemsCount.value ?: 0)
+                updatePageButtonStates(response.first, response.last, response.totalElements.toInt())
             },
             onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
             page = currentPage,

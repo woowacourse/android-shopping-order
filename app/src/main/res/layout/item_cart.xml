@@ -18,12 +18,20 @@
         android:layout_marginTop="24dp"
         android:background="@drawable/cart_item_background">
 
+        <CheckBox
+            android:id="@+id/cb_cart_item_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:onClick="@{() -> cartClickListener.toggleCheckedItem(cart)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/tv_cart_item_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="44dp"
             android:layout_marginTop="18dp"
             android:layout_marginEnd="60dp"
             android:ellipsize="end"
@@ -32,7 +40,7 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="[굿즈-키홀더] 봇치 더 록! 애니판 테쿠토코 쵸이데카 아크릴키홀더B" />
 
@@ -41,10 +49,11 @@
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginTop="20dp"
+            android:layout_marginStart="12dp"
             android:contentDescription="@string/cart_item_image_description"
             android:scaleType="centerCrop"
             app:imgUrl="@{cart.product.imageUrl}"
-            app:layout_constraintStart_toStartOf="@+id/tv_cart_item_name"
+            app:layout_constraintStart_toStartOf="@+id/cb_cart_item_select"
             app:layout_constraintTop_toBottomOf="@+id/tv_cart_item_name"
             app:srcCompat="@drawable/ic_launcher_background" />
 
