@@ -34,9 +34,11 @@ class CartViewModel(
 
     private val _isLeftPageEnable = MutableLiveData(false)
     val isLeftPageEnable: LiveData<Boolean> get() = _isLeftPageEnable
+    val leftPageEnable: LiveData<Boolean> get() = _isLeftPageEnable
 
     private val _isRightPageEnable = MutableLiveData(false)
     val isRightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
+    val rightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
 
     private val endPage: Int get() = max(1, (totalCartSizeData + PAGE_SIZE - 1) / PAGE_SIZE)
 
@@ -48,6 +50,18 @@ class CartViewModel(
 
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _selectedItems = MutableLiveData<Set<Int>>(emptySet())
+    val selectedItems: LiveData<Set<Int>> get() = _selectedItems
+
+    private val _isAllSelected = MutableLiveData(false)
+    val isAllSelected: LiveData<Boolean> get() = _isAllSelected
+
+    private val _totalPrice = MutableLiveData(0)
+    val totalPrice: LiveData<Int> get() = _totalPrice
+
+    private val _selectedItemCount = MutableLiveData(0)
+    val selectedItemCount: LiveData<Int> get() = _selectedItemCount
 
     init {
         updateCartQuantity()
@@ -82,15 +96,15 @@ class CartViewModel(
             currentPage - 1,
             PAGE_SIZE,
             { cartResponse ->
-
+                updateCartDataSize(response = cartResponse)
                 _cart.value = getCartItemByCartResponse(cartResponse)
                 updatePageMoveAvailability(cartResponse)
-                updateCartDataSize(cartResponse)
                 if (cartResponse.totalPages in MINIMUM_PAGE..<currentPage) {
                     currentPage = cartResponse.totalPages
                     updateCartQuantity()
                 }
                 _isLoading.value = false
+                updateTotalPriceAndCount()
             },
             { cartFetchError ->
                 _loginErrorEvent.setValue(cartFetchError)
@@ -104,21 +118,13 @@ class CartViewModel(
     }
 
     fun delete(cartItem: CartItem) {
+        val currentSelected = _selectedItems.value?.toMutableSet() ?: mutableSetOf()
+        currentSelected.remove(cartItem.id)
+        _selectedItems.value = currentSelected
+
         cartRepository.delete(cartItem.id) {
             updateCartQuantity()
         }
-    }
-
-    private fun updatePage() {
-        cartRepository.getAllItemsSize { totalCartSize ->
-            totalCartSizeData = totalCartSize
-            if (currentPage > endPage) {
-                currentPage = endPage
-            }
-            _isMultiplePages.postValue(totalCartSize > PAGE_SIZE)
-            updateCartQuantity()
-        }
-        cartRepository.fetchCartItemsByPage(currentPage, PAGE_SIZE, {}, {})
     }
 
     fun plusPage() {
@@ -134,6 +140,51 @@ class CartViewModel(
     private fun updatePageMoveAvailability(cartResponse: CartResponse) {
         _isLeftPageEnable.postValue(!cartResponse.first)
         _isRightPageEnable.postValue(!cartResponse.last)
+    }
+
+    fun selectAllItems(isSelected: Boolean) {
+        val currentCart = _cart.value ?: emptyList()
+        if (isSelected) {
+            _selectedItems.value = currentCart.map { it.id }.toSet()
+        } else {
+            _selectedItems.value = emptySet()
+        }
+        _isAllSelected.value = isSelected
+        updateTotalPriceAndCount()
+    }
+
+    fun toggleItemSelection(cartItem: CartItem) {
+        val currentSelected = _selectedItems.value?.toMutableSet() ?: mutableSetOf()
+        if (currentSelected.contains(cartItem.id)) {
+            currentSelected.remove(cartItem.id)
+        } else {
+            currentSelected.add(cartItem.id)
+        }
+        _selectedItems.value = currentSelected
+
+        val currentCart = _cart.value ?: emptyList()
+        _isAllSelected.value = currentSelected.size == currentCart.size && currentCart.isNotEmpty()
+
+        updateTotalPriceAndCount()
+    }
+
+    fun isItemSelected(cartItem: CartItem): Boolean = _selectedItems.value?.contains(cartItem.id) == true
+
+    private fun updateTotalPriceAndCount() {
+        val currentCart = _cart.value ?: emptyList()
+        val selectedIds = _selectedItems.value ?: emptySet()
+
+        val selectedCartItems = currentCart.filter { selectedIds.contains(it.id) }
+
+        val totalPrice =
+            selectedCartItems
+                .sumOf { item: CartItem ->
+                    (item.goods.price * item.quantity).toLong()
+                }.toInt()
+        val selectedCount = selectedCartItems.size
+
+        _totalPrice.value = totalPrice
+        _selectedItemCount.value = selectedCount
     }
 
     companion object {

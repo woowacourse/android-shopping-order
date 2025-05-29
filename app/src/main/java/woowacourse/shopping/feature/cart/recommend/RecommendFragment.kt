@@ -1,60 +1,56 @@
 package woowacourse.shopping.feature.cart.recommend
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import woowacourse.shopping.R
+import androidx.fragment.app.Fragment
+import woowacourse.shopping.databinding.FragmentRecommendBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RecommendFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RecommendFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    @Suppress("ktlint:standard:backing-property-naming")
+    private var _binding: FragmentRecommendBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recommend, container, false)
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        _binding = FragmentRecommendBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RecommendFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RecommendFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupViews()
+        setupBottomBar()
+    }
+
+    private fun setupViews() {
+        binding.tvRecommendItemsTitle.text = "이런 상품은 어떠세요?"
+        binding.tvRecommendItemsDescription.text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
+
+        // Todo (추천 상품 어댑터 설정)
+        // binding.rvRecommendItems.adapter = recommendAdapter
+    }
+
+    private fun setupBottomBar() {
+        binding.bottomBar.orderButton.text = "돌아가기"
+        binding.bottomBar.orderButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
+        binding.bottomBar.checkboxAll.visibility = View.GONE
+        binding.bottomBar.tvAll.visibility = View.GONE
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
