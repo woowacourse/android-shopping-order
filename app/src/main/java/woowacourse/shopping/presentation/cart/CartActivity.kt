@@ -33,6 +33,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun initBinding() {
         binding.lifecycleOwner = this
+        binding.viewModel = viewModel
     }
 
     private fun setupToolbar() {

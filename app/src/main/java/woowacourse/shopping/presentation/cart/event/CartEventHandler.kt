@@ -16,4 +16,6 @@ interface CartEventHandler {
     fun isPaginationEnabled(): Boolean
 
     fun getPage(): Int
+
+    fun onCheckProduct(product: ProductUiModel)
 }
