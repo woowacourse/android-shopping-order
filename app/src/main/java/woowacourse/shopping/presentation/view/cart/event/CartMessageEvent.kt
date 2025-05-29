@@ -1,0 +1,9 @@
+package woowacourse.shopping.presentation.view.cart.event
+
+enum class CartMessageEvent {
+    FETCH_CART_ITEMS_FAILURE,
+    DELETE_CART_ITEM_FAILURE,
+    PATCH_CART_PRODUCT_QUANTITY_FAILURE,
+    FIND_PRODUCT_QUANTITY_FAILURE,
+    FETCH_SUGGESTION_PRODUCT_FAILURE,
+}
