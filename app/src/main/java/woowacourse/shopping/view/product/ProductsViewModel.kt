@@ -123,7 +123,7 @@ class ProductsViewModel(
         productsRepository.getRecentWatchingProducts(10) { result ->
             result
                 .onSuccess { recentWatchingProducts ->
-                    var updatedProducts = emptyList<ProductsItem>()
+                    var updatedProducts = productsWithoutLoadItem
                     if (hasRecentWatching) {
                         updatedProducts = productsWithoutLoadItem.drop(1)
                     }
@@ -171,7 +171,6 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         recentWatchingItem: ProductsItem?,
     ) {
-        //
         if (productsWithoutLoadItem.isEmpty() || page != 1) {
             _products.postValue(
                 buildList {
@@ -184,7 +183,6 @@ class ProductsViewModel(
             return
         }
 
-        // 이게 업데이트 로직
         val mergedProducts =
             productsWithoutLoadItem.map { item: ProductsItem ->
                 if (item is ProductItem) {
