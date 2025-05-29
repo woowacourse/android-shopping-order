@@ -13,6 +13,13 @@ interface GoodsRepository {
         onFail: (Throwable) -> Unit,
     )
 
+    fun fetchCategoryGoods(
+        limit: Int,
+        category: String,
+        onComplete: (GoodsResponse) -> Unit,
+        onFail: (Throwable) -> Unit,
+    )
+
     fun fetchGoodsById(
         id: Int,
         onComplete: (Goods?) -> Unit,

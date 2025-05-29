@@ -13,6 +13,13 @@ interface GoodsRemoteDataSource {
         onFailure: (Throwable) -> Unit,
     )
 
+    fun fetchGoodsByCategory(
+        limit: Int,
+        category: String,
+        onSuccess: (GoodsResponse) -> Unit,
+        onFailure: (Throwable) -> Unit,
+    )
+
     fun fetchGoodsById(
         id: Int,
         onComplete: (Content) -> Unit,

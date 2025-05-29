@@ -21,6 +21,7 @@ interface RetrofitService {
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
+        @Query("category") category: String? = null,
     ): Call<GoodsResponse>
 
     @GET("/products/{id}")

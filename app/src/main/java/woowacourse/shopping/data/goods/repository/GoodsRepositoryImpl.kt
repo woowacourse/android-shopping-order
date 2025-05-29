@@ -28,6 +28,22 @@ class GoodsRepositoryImpl(
         )
     }
 
+    override fun fetchCategoryGoods(
+        limit: Int,
+        category: String,
+        onComplete: (GoodsResponse) -> Unit,
+        onFail: (Throwable) -> Unit,
+    ) {
+        remoteDataSource.fetchGoodsByCategory(
+            limit,
+            category,
+            { response ->
+                onComplete(response)
+            },
+            onFail,
+        )
+    }
+
     override fun fetchGoodsById(
         id: Int,
         onComplete: (Goods?) -> Unit,
