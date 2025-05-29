@@ -14,7 +14,7 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class CartViewModel(
     private val cartProductRepository: CartProductRepository,
     private val catalogProductRepository: CatalogProductRepository,
-    private val recentlyViewedProductRepository: RecentlyViewedProductRepository
+    private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : ViewModel() {
     private val _cartProducts = MutableLiveData<List<ProductUiModel>>()
     val cartProducts: LiveData<List<ProductUiModel>> = _cartProducts
@@ -49,26 +49,22 @@ class CartViewModel(
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
     val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
 
-    private var category: String? = null
     init {
         loadRecentlyViewedProduct()
-        loadRecommendedProducts(category)
         loadAllCartProducts()
         loadCartProducts()
     }
 
     fun loadRecentlyViewedProduct() {
         recentlyViewedProductRepository.getLatestViewedProduct { product ->
+            Log.d("TESTT", "마지막 상품 $product")
             catalogProductRepository.getProduct(product.id) { categoryProduct ->
-                category = categoryProduct.category
+                val category = categoryProduct.category ?: ""
+                catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
+                    Log.d("TESTT", "추천 품 $products")
+                    _recommendedProducts.postValue(products)
+                }
             }
-        }
-    }
-
-    fun loadRecommendedProducts(category: String?) {
-        if (category == null) return
-        catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
-            _recommendedProducts.postValue(products)
         }
     }
 
