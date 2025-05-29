@@ -18,7 +18,7 @@ interface CartItemService {
     @GET("/cart-items")
     fun requestCartItems(
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 5,
+        @Query("size") size: Int?,
     ): Call<CartsResponse>
 
     @POST("/cart-items")

@@ -14,83 +14,29 @@ class CartViewModel(
 ) : ViewModel() {
     private val _cartItems: MutableLiveData<ResultState<List<CartItem>>> = MutableLiveData()
     val cartItems: LiveData<ResultState<List<CartItem>>> = _cartItems
-    private val _totalPages: MutableLiveData<Int> = MutableLiveData(0)
-    val totalPages: LiveData<Int> = _totalPages
-    private val _currentPage: MutableLiveData<Int> = MutableLiveData(0)
-    val currentPage: LiveData<Int> = _currentPage
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
-    fun loadItems(currentPage: Int) {
-        cartRepository.fetchPagedCartItems(currentPage, PAGE_SIZE) { result ->
+    init {
+        loadItems()
+    }
+
+    fun loadItems(currentPage: Int = 0) {
+        cartRepository.fetchPagedCartItems(currentPage) { result ->
             result
                 .onSuccess { pagedProducts -> _cartItems.postValue(ResultState.Success(pagedProducts)) }
                 .onFailure { _cartItems.postValue(ResultState.Failure()) }
         }
-        cartRepository.getTotalCount { result ->
-            result
-                .onSuccess { count -> updateTotalPage(count) }
-                .onFailure { _cartItems.postValue(ResultState.Failure()) }
-        }
-    }
-
-    fun changeNextPage() {
-        val currentPage = _currentPage.value ?: 0
-        val totalPages = _totalPages.value ?: 0
-
-        if (currentPage >= totalPages - 1) {
-            _toastMessage.value = R.string.cart_toast_last_page
-            return
-        }
-
-        _currentPage.value = currentPage + 1
-    }
-
-    fun changePreviousPage() {
-        val currentPage = _currentPage.value ?: 0
-
-        if (currentPage == 0) {
-            _toastMessage.value = R.string.cart_toast_first_page
-            return
-        }
-
-        _currentPage.value = currentPage - 1
     }
 
     fun deleteProduct(cartItem: CartItem) {
-        val currentPage = _currentPage.value ?: 0
-
         cartRepository.deleteProduct(cartItem.product.productId) { result ->
             result
                 .onSuccess {
-                    reloadProductsByPage(currentPage)
+                    _toastMessage.value = R.string.cart_toast_delete_success
                 }.onFailure {
                     _toastMessage.value = R.string.cart_toast_delete_fail
                 }
-        }
-    }
-
-    private fun reloadProductsByPage(currentPage: Int) {
-        cartRepository.fetchPagedCartItems(currentPage, PAGE_SIZE) { result ->
-            result
-                .onSuccess { pagedProducts ->
-                    if (pagedProducts.isEmpty()) {
-                        handleEmptyPage()
-                    } else {
-                        _cartItems.postValue(ResultState.Success(pagedProducts))
-                        updateTotalPageAsync()
-                    }
-                }.onFailure { _cartItems.postValue(ResultState.Failure()) }
-        }
-    }
-
-    private fun handleEmptyPage() {
-        val currentPage = _currentPage.value ?: 0
-        if (currentPage > 0) {
-            _currentPage.postValue(currentPage - 1)
-            reloadProductsByPage(currentPage - 1)
-        } else {
-            _cartItems.postValue(ResultState.Success(emptyList()))
         }
     }
 
@@ -134,25 +80,5 @@ class CartViewModel(
                 if (it.product.productId == productId) it.copy(quantity = it.quantity + amount) else it
             }
         _cartItems.postValue(ResultState.Success(updatedItem))
-    }
-
-    private fun updateTotalPageAsync(onComplete: (() -> Unit)? = null) {
-        cartRepository.getTotalCount { result ->
-            result
-                .onSuccess { count ->
-                    updateTotalPage(count)
-                    onComplete?.invoke()
-                }.onFailure { _cartItems.postValue(ResultState.Failure()) }
-        }
-    }
-
-    private fun updateTotalPage(totalSize: Int?) {
-        if (totalSize == null) return
-        _totalPages.postValue((totalSize + PAGE_SIZE - 1) / PAGE_SIZE)
-    }
-
-    companion object {
-        private const val FIRST_PAGE = 1
-        private const val PAGE_SIZE = 5
     }
 }

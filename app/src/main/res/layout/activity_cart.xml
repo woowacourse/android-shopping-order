@@ -36,57 +36,11 @@
             android:id="@+id/rv_cart_product"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
-            android:padding="16dp"
+            android:paddingHorizontal="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/btn_cart_previous"
+            app:layout_constraintBottom_toTopOf="@id/layout_cart_total_price"
             app:layout_constraintTop_toBottomOf="@id/tb_cart"
             tools:listitem="@layout/item_cart_product" />
-
-        <ImageButton
-            android:id="@+id/btn_cart_previous"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginVertical="20dp"
-            android:layout_marginStart="150dp"
-            android:background="@drawable/round_btn_cart_previous"
-            android:contentDescription="@null"
-            android:onClick="@{()-> vm.changePreviousPage()}"
-            android:src="@drawable/ic_previous"
-            app:isEnabledCyanOrGray="@{vm.currentPage > 0}"
-            app:layout_constraintBottom_toTopOf="@id/layout_cart_total_price"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_cart_page"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/textview_margin"
-            android:text="@{String.valueOf(vm.currentPage + 1)}"
-            android:textColor="@color/gray5"
-            android:textSize="22sp"
-            android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="@id/btn_cart_previous"
-            app:layout_constraintEnd_toStartOf="@id/btn_cart_next"
-            app:layout_constraintStart_toEndOf="@id/btn_cart_previous"
-            app:layout_constraintTop_toTopOf="@id/btn_cart_previous"
-            tools:text="1" />
-
-        <ImageButton
-            android:id="@+id/btn_cart_next"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="20dp"
-            android:background="@drawable/round_btn_cart_next"
-            android:contentDescription="@null"
-            android:onClick="@{()-> vm.changeNextPage()}"
-            android:src="@drawable/ic_next"
-            app:isEnabledCyanOrGray="@{vm.currentPage &lt; vm.totalPages - 1}"
-            app:layout_constraintBottom_toBottomOf="@id/btn_cart_previous"
-
-            app:layout_constraintStart_toEndOf="@id/tv_cart_page"
-            app:layout_constraintTop_toTopOf="@id/btn_cart_previous" />
 
         <TextView
             android:id="@+id/layout_cart_total_price"
@@ -160,7 +114,7 @@
             android:id="@+id/shimmer_layout_cart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/btn_cart_previous"
+            app:layout_constraintBottom_toTopOf="@id/layout_cart_total_price"
             app:layout_constraintTop_toBottomOf="@id/tb_cart">
 
             <LinearLayout

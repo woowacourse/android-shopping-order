@@ -8,7 +8,7 @@ interface CartRepository {
 
     fun fetchPagedCartItems(
         page: Int,
-        pageSize: Int,
+        pageSize: Int? = null,
         onResult: (Result<List<CartItem>>) -> Unit,
     )
 

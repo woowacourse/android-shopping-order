@@ -91,10 +91,6 @@ class CartActivity :
             }
         }
 
-        viewModel.currentPage.observe(this) { currentPage ->
-            viewModel.loadItems(currentPage)
-        }
-
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
         }
@@ -103,15 +99,8 @@ class CartActivity :
     private fun showSampleData(isLoading: Boolean) {
         if (isLoading) {
             binding.rvCartProduct.visibility = View.GONE
-            binding.btnCartNext.visibility = View.GONE
-            binding.btnCartPrevious.visibility = View.GONE
-            binding.tvCartPage.visibility = View.GONE
         } else {
             binding.rvCartProduct.visibility = View.VISIBLE
-            binding.btnCartNext.visibility = View.VISIBLE
-            binding.btnCartPrevious.visibility = View.VISIBLE
-            binding.tvCartPage.visibility = View.VISIBLE
-
             binding.shimmerLayoutCart.visibility = View.GONE
         }
     }
@@ -128,14 +117,6 @@ class CartActivity :
 
     override fun onClickPlus(id: Long) {
         viewModel.increaseQuantity(id)
-    }
-
-    override fun onClickPrevious() {
-        viewModel.changePreviousPage()
-    }
-
-    override fun onClickNext() {
-        viewModel.changeNextPage()
     }
 
     override fun onClickDelete(cartItem: CartItem) {

@@ -38,7 +38,7 @@ class CartDataSourceImpl(
 
     override fun getPagedCartItems(
         page: Int,
-        size: Int,
+        size: Int?,
         onResult: (List<CartItem>) -> Unit,
     ) = cartItemService.requestCartItems(page = page, size = size).enqueue(
         object : Callback<CartsResponse> {
@@ -141,5 +141,6 @@ class CartDataSourceImpl(
         },
     )
 
-    private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
+    private fun <T> Response<T>.toIdOrNull(): Long? =
+        headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
 }

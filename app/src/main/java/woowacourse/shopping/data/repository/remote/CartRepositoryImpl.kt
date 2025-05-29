@@ -20,7 +20,7 @@ class CartRepositoryImpl(
 
     override fun fetchPagedCartItems(
         page: Int,
-        pageSize: Int,
+        pageSize: Int?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
         cartDataSource.getPagedCartItems(page, pageSize) { cartItems ->

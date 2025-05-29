@@ -7,7 +7,7 @@ interface CartDataSource {
 
     fun getPagedCartItems(
         page: Int,
-        size: Int,
+        size: Int?,
         onResult: (List<CartItem>) -> Unit,
     )
 
