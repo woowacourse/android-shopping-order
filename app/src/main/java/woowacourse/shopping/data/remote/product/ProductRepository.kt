@@ -38,6 +38,38 @@ class ProductRepository {
             )
     }
 
+    fun fetchAllProducts(
+        onSuccess: (ProductResponse) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        ProductClient
+            .getRetrofitService()
+            .requestGoods(size = Int.MAX_VALUE)
+            .enqueue(
+                object : Callback<ProductResponse> {
+                    override fun onResponse(
+                        call: Call<ProductResponse>,
+                        response: Response<ProductResponse>,
+                    ) {
+                        if (response.isSuccessful) {
+                            response.body()?.let {
+                                onSuccess(it)
+                            } ?: onError(Throwable("응답 본문 없음"))
+                        } else {
+                            onError(Throwable("응답 실패: ${response.code()}"))
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<ProductResponse>,
+                        t: Throwable,
+                    ) {
+                        onError(t)
+                    }
+                },
+            )
+    }
+
     fun requestProductDetails(
         onSuccess: (ProductResponse.Content) -> Unit,
         onError: (Throwable) -> Unit,
