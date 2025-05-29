@@ -86,8 +86,11 @@ class CartActivity :
                     finish()
                 }
 
-                CartEvent.PLUS_CART_ITEM_QUANTITY_FAILURE -> TODO()
-                CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE -> TODO()
+                CartEvent.PLUS_CART_ITEM_QUANTITY_FAILURE ->
+                    showToast(R.string.shopping_cart_update_shopping_cart_quantity_error_message)
+
+                CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE ->
+                    showToast(R.string.shopping_cart_update_shopping_cart_quantity_error_message)
             }
         }
 
