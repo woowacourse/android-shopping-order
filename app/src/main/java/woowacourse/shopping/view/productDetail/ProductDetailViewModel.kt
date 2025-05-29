@@ -37,7 +37,6 @@ class ProductDetailViewModel(
 
     fun updateProduct(
         productId: Long,
-        isLastWatching: Boolean,
         shoppingCartQuantity: Int,
         shoppingCartId: Long?,
     ) {
@@ -55,13 +54,6 @@ class ProductDetailViewModel(
                             )
                         _price.value = product.price
 
-                        productsRepository.updateRecentWatchingProduct(product) { result ->
-                            result.onFailure {
-                                _event.setValue(ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE)
-                            }
-                        }
-
-                        if (isLastWatching) return@getProduct
                         updateRecentWatchingProduct()
                     }
                 }.onFailure {
@@ -74,16 +66,27 @@ class ProductDetailViewModel(
         productsRepository.getRecentWatchingProducts(1) { result ->
             result
                 .onSuccess { recentProducts: List<Product> ->
-                    val isLastWatchingProduct = recentProducts[0] == this.product.value
-                    if (recentProducts.isEmpty() || isLastWatchingProduct) {
+                    if (recentProducts.isEmpty()) return@getRecentWatchingProducts
+                    val isLastWatchingProduct =
+                        recentProducts.first() == this.product.value?.product
+                    if (isLastWatchingProduct) {
                         _recentProductBoxVisible.postValue(false)
                         return@getRecentWatchingProducts
                     }
                     _recentWatchingProduct.postValue(recentProducts[0])
                     _recentProductBoxVisible.postValue(true)
+                    updateRecentWatching()
                 }.onFailure {
                     _event.postValue(ProductDetailEvent.GET_RECENT_WATCHING_FAILURE)
                 }
+        }
+    }
+
+    private fun updateRecentWatching() {
+        productsRepository.updateRecentWatchingProduct(product.value?.product ?: return) { result ->
+            result.onFailure {
+                _event.setValue(ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE)
+            }
         }
     }
 

@@ -39,15 +39,11 @@ class ProductDetailActivity :
                 binding.root.showSnackBar(getString(R.string.product_not_provided_error_message))
                 return finish()
             }
-
-        val isLastWatching: Boolean =
-            intent.getSerializableExtraData(EXTRA_IS_LAST_WATCHING) ?: false
-
         val shoppingCartId: Long? = intent.getSerializableExtraData(EXTRA_SHOPPING_CART_ID)
 
         val shoppingCartQuantity: Int =
             intent.getSerializableExtraData(EXTRA_SHOPPING_CART_QUANTITY) ?: 0
-        viewModel.updateProduct(productId, isLastWatching, shoppingCartQuantity, shoppingCartId)
+        viewModel.updateProduct(productId, shoppingCartQuantity, shoppingCartId)
         bindViewModel()
         setupObservers()
     }
@@ -108,7 +104,6 @@ class ProductDetailActivity :
 
     companion object {
         private const val EXTRA_PRODUCT_ID = "woowacourse.shopping.EXTRA_PRODUCT_ID"
-        private const val EXTRA_IS_LAST_WATCHING = "woowacourse.shopping.EXTRA_IS_LAST_WATCHING"
         private const val EXTRA_SHOPPING_CART_ID = "woowacourse.shopping.EXTRA_SHOPPING_CART_ID"
         private const val EXTRA_SHOPPING_CART_QUANTITY =
             "woowacourse.shopping.EXTRA_SHOPPING_CART_QUANTITY"
@@ -116,7 +111,6 @@ class ProductDetailActivity :
         fun newIntent(
             context: Context,
             productId: Long,
-            isLastWatching: Boolean = false,
             shoppingCartId: Long? = 0,
             quantity: Int = 0,
         ): Intent =
@@ -125,7 +119,6 @@ class ProductDetailActivity :
                     EXTRA_PRODUCT_ID,
                     productId,
                 )
-                putExtra(EXTRA_IS_LAST_WATCHING, isLastWatching)
                 putExtra(EXTRA_SHOPPING_CART_ID, shoppingCartId)
                 putExtra(EXTRA_SHOPPING_CART_QUANTITY, quantity)
             }
