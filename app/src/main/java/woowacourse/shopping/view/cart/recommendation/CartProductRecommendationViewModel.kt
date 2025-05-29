@@ -35,6 +35,9 @@ class CartProductRecommendationViewModel(
     private val _selectedProduct = MutableSingleLiveData<Product>()
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
+    private val _finishOrderEvent = MutableSingleLiveData<Unit>()
+    val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
+
     init {
         cartProductRepository.getPagedProducts { result ->
             result
@@ -145,11 +148,11 @@ class CartProductRecommendationViewModel(
         _totalPrice.value = totalPrice.value?.plus(item.price * quantityToAdd)
     }
 
-    fun finishOrder() {
+    override fun onOrderClick() {
         selectedCartIds.forEach { id ->
-            cartProductRepository.delete(id) {
-            }
+            cartProductRepository.delete(id) {}
         }
+        _finishOrderEvent.postValue(Unit)
     }
 
     companion object {

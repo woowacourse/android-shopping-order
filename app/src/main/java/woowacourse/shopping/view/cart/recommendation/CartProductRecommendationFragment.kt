@@ -85,12 +85,8 @@ class CartProductRecommendationFragment(
     private fun initBindings() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
+        binding.handler = viewModel
         binding.rvRecommendedProducts.adapter = adapter
-        binding.btnOrder.setOnClickListener {
-            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
-            viewModel.finishOrder()
-            requireActivity().finish()
-        }
     }
 
     private fun initObservers() {
@@ -101,6 +97,11 @@ class CartProductRecommendationFragment(
         viewModel.selectedProduct.observe(viewLifecycleOwner) { value ->
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
             startActivity(intent)
+        }
+
+        viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
+            requireActivity().finish()
         }
     }
 
