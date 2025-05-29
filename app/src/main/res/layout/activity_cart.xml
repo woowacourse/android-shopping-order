@@ -80,6 +80,7 @@
                 android:background="@color/turquoise"
                 android:padding="10dp"
                 android:gravity="center"
+                android:onClick="@{() -> vm.onChangeScreen()}"
                 android:text="@{@string/text_order(vm.uiState.checkedProductCount)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"

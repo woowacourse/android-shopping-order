@@ -26,8 +26,8 @@ class CartViewModel(
     private val _event = MutableSingleLiveData<CartUiEvent>()
     val event: SingleLiveData<CartUiEvent> get() = _event
 
-    private val _isLoading = MutableSingleLiveData(true)
-    val isLoading: SingleLiveData<Boolean> get() = _isLoading
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     init {
         loadCarts()
@@ -84,11 +84,6 @@ class CartViewModel(
         }
     }
 
-    private fun loadHistories() {
-        historyLoader.invoke {
-        }
-    }
-
     fun addPage() {
         paging.moveToNextPage()
         loadCarts()
@@ -141,11 +136,12 @@ class CartViewModel(
         }
     }
 
-    private fun sendEvent(event: CartUiEvent) {
-        _event.setValue(event)
+    fun onChangeScreen(){
+        _event.setValue(CartUiEvent.ChangeScreen)
     }
 
+
     private fun setLoading(isLoading: Boolean) {
-        _isLoading.postValue(isLoading)
+        _isLoading.value = isLoading
     }
 }

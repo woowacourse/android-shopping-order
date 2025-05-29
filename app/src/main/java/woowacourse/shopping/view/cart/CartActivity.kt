@@ -10,11 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.commit
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
+import woowacourse.shopping.view.core.ext.showToast
+import kotlin.io.path.Path
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -32,6 +35,7 @@ class CartActivity : AppCompatActivity() {
 
         setUpBinding()
         setUpSystemBars()
+        observeViewModel()
     }
 
     private fun setUpBinding() {
@@ -53,16 +57,49 @@ class CartActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.action_bar_title_cart_screen)
     }
 
+    private fun observeViewModel() {
+        viewModel.event.observe(this) {
+            when (it) {
+                is CartUiEvent.ShowCannotIncrease -> {
+                    showToast(getString(R.string.text_over_quantity).format(it.quantity))
+                }
+
+                CartUiEvent.ChangeScreen -> onClickOrderButton()
+            }
+        }
+    }
+
+    private fun onClickOrderButton() {
+        when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
+            is CartListFragment -> {
+                supportFragmentManager.commit {
+                    replace(R.id.fragment_container_view, OrderCompleteFragment())
+                }
+            }
+            is OrderCompleteFragment -> {}
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                onClickHomeButton()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun onClickHomeButton(){
+        when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
+            is CartListFragment -> {
                 val resultIntent = Intent()
                 setResult(RESULT_OK, resultIntent)
                 finish()
-                true
             }
-
-            else -> super.onOptionsItemSelected(item)
+            is OrderCompleteFragment -> supportFragmentManager.commit {
+                replace(R.id.fragment_container_view, CartListFragment())
+            }
         }
     }
 

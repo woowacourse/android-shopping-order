@@ -59,22 +59,12 @@ class CartListFragment :
 
     private fun observeViewModel(binding: FragmentCartListBinding) {
         viewModel.uiState.observe(viewLifecycleOwner) { value ->
-            Log.d("dsadsadas", "${value.checkedProductCount}")
             cartAdapter.submitList(value.items, value.pageState.page)
         }
 
-        viewModel.event.observe(viewLifecycleOwner) { value ->
-            when (value) {
-                is CartUiEvent.ShowCannotIncrease ->
-                    requireContext().showToast(
-                        getString(R.string.text_over_quantity)
-                            .format(value.quantity),
-                    )
-            }
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) {
-            if (!it) {
+        viewModel.isLoading.observe(viewLifecycleOwner) { value ->
+            Log.d("Dasdsa", "isLoading: $value ")
+            if (!value) {
                 binding.recyclerViewCart.visibility = View.VISIBLE
                 binding.shimmerLayout.visibility = View.GONE
             }
