@@ -6,10 +6,22 @@ data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
 ) {
+    val totalPrice: Int
+        get() = items.filter { it.checked }.sumOf { it.productPrice }
+
+    val checkedProductCount: Int
+        get() = items.filter { it.checked }.sumOf { it.cartQuantityValue }
+
+    fun setAllItemsChecked(isChecked: Boolean): CartUiState {
+        val result = items.map { it.copy(checked = isChecked) }
+
+        return copy(items = result)
+    }
+
     fun modifyCheckedState(
         cartId: Long,
         check: Boolean,
-    ): CartUiState  {
+    ): CartUiState {
         val targetIndex = targetIndex(cartId)
         val targetItem = items[targetIndex]
 
