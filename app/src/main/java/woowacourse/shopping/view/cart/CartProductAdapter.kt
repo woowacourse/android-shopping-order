@@ -55,18 +55,5 @@ class CartProductAdapter(
     fun submitList(items: List<CartItemType>) {
         this.items = items
         notifyDataSetChanged()
-//        val isProductItemEmpty = items.size == 1
-//        if (isProductItemEmpty) {
-//            onCartPaginationListener.onMinusPage()
-//        }
-//
-//        val oldItems = this.items.size
-//        notifyItemRangeRemoved(0, oldItems - 1)
-//
-//        this.items = items
-//        notifyItemRangeInserted(0, items.size - 1)
-//
-//        val paginationItemPosition = itemCount - 1
-//        notifyItemChanged(paginationItemPosition)
     }
 }
