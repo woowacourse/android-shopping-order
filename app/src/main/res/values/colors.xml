@@ -36,6 +36,7 @@
     <color name="gray_700">#FF616161</color>
     <color name="gray_800">#FF424242</color>
     <color name="gray_900">#FF212121</color>
+    <color name="custom_gray">#555555</color>
 
     <!-- 기능적 색상 -->
     <color name="error">#FFB00020</color>

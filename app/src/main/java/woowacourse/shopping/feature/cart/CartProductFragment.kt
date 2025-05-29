@@ -33,6 +33,23 @@ class CartProductFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.tvOrderButton.setOnClickListener {
+            val cartRecommendFragment = CartRecommendFragment()
+            requireActivity()
+                .supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fcv_cart, cartRecommendFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+
     private fun setupAdapter() {
         adapter =
             CartAdapter(

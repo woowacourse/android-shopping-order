@@ -4,17 +4,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.databinding.FragmentCartRecommendBinding
+import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import kotlin.getValue
 
 class CartRecommendFragment : Fragment() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var binding: FragmentCartRecommendBinding
+    private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
+    private lateinit var adapter: CartAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? = inflater.inflate(R.layout.fragment_cart_recommend, container, false)
+    ): View? {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_cart_recommend, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+//        setupAdapter()
+//        binding.rvGoods.adapter = adapter
+        return binding.root
+    }
 }
