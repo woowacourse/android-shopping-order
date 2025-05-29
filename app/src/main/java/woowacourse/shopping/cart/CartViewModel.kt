@@ -30,6 +30,8 @@ class CartViewModel(
         MutableLiveData(LoadingState.loading())
     val loadingState: LiveData<LoadingState> get() = _loadingState
 
+    private val productSelections = mutableMapOf<Int, Boolean>()
+
     init {
         loadCartProducts()
     }
@@ -91,6 +93,10 @@ class CartViewModel(
         }
     }
 
+    fun changeProductSelection(productUiModel: ProductUiModel) {
+        productSelections[productUiModel.id] = productSelections[productUiModel.id]?.not() == true
+    }
+
     private fun checkNextButtonEnabled(totalSize: Int) {
         val currentPage = page.value ?: INITIAL_PAGE
         val lastPage = (totalSize - 1) / PAGE_SIZE
@@ -121,20 +127,22 @@ class CartViewModel(
             if (startIndex >= totalSize) {
                 return@getTotalElements
             }
-            Thread.sleep(800)
 
             cartProductRepository
                 .getCartProductsInRange(currentPage, pageSize) { cartProducts ->
-
                     val pagedProducts: List<ProductUiModel> =
                         cartProducts.map {
-                            it
+                            if (productSelections.contains(it.id)) {
+                                it.copy(isChecked = productSelections[it.id] == true)
+                            } else {
+                                it
+                            }
                         }
 
                     _cartProducts.postValue(pagedProducts)
                     checkNextButtonEnabled(totalSize)
                     checkPrevButtonEnabled()
-                }.also {
+
                     _loadingState.postValue(LoadingState.loaded())
                 }
         }

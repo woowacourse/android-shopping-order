@@ -50,6 +50,7 @@ class CartSelectionFragment : Fragment() {
                     },
                 onPaginationButtonClick = viewModel::onPaginationButtonClick,
                 quantityControlListener = viewModel::updateQuantity,
+                onCheckClick = viewModel::changeProductSelection,
             )
     }
 

@@ -17,6 +17,10 @@
         <variable
             name="productActionListener"
             type="woowacourse.shopping.product.catalog.ProductActionListener" />
+
+        <variable
+            name="checkClickListener"
+            type="woowacourse.shopping.cart.CheckClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,17 +30,31 @@
         android:layout_marginVertical="12dp"
         android:background="@drawable/cart_item_background">
 
+        <CheckBox
+            android:id="@+id/checkbox_selection"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:onClick="@{() -> checkClickListener.onClick(cartProduct)}"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/mint_blue"
+            android:foregroundTint="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textView_cart_product_name"
+            app:layout_constraintBottom_toBottomOf="@id/textView_cart_product_name" />
+
+
         <TextView
             android:id="@+id/textView_cart_product_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
             android:text="@{cartProduct.name}"
             android:textColor="@color/gray_5"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkbox_selection"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="아이스 카페 아메리카노" />
 
@@ -46,10 +64,11 @@
             android:layout_height="72dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="18dp"
+            android:layout_marginStart="12dp"
             android:scaleType="centerCrop"
             app:imageUrl="@{cartProduct}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@id/textView_cart_product_name"
+            app:layout_constraintStart_toStartOf="@id/checkbox_selection"
             app:layout_constraintTop_toBottomOf="@id/textView_cart_product_name"
             tools:src="@drawable/iced_americano" />
 
