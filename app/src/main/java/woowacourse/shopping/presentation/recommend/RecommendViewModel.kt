@@ -3,7 +3,9 @@ package woowacourse.shopping.presentation.recommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.CartItemUiModel
@@ -15,6 +17,7 @@ import woowacourse.shopping.presentation.toPresentation
 class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val cartRepository: CartRepository,
 ) : ViewModel(),
     ItemClickListener,
     CartCounterClickListener {
@@ -54,11 +57,47 @@ class RecommendViewModel(
     }
 
     override fun onClickAddToCart(cartItem: CartItem) {
+        cartRepository.insertProduct(cartItem.product, 1) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(productId = cartItem.product.productId, 1)
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_add_cart_fail
+                }
+        }
     }
 
     override fun onClickMinus(id: Long) {
+        cartRepository.decreaseQuantity(id) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(id, -1)
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_decrease_fail
+                }
+        }
     }
 
     override fun onClickPlus(id: Long) {
+        cartRepository.increaseQuantity(id) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(id, 1)
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_increase_fail
+                }
+        }
+    }
+
+    private fun updateQuantity(
+        productId: Long,
+        delta: Int,
+    ) {
+        val currentItems = _recommendProducts.value ?: return
+        val updatedItem =
+            currentItems.map {
+                if (it.product.id == productId) it.copy(quantity = it.quantity + delta) else it
+            }
+        _recommendProducts.postValue(updatedItem)
     }
 }

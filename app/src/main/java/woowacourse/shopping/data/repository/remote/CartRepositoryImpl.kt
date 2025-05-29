@@ -43,9 +43,7 @@ class CartRepositoryImpl(
                 onResult(Result.success(Unit))
             }
         } else {
-            insertProduct(product, productQuantity) { result ->
-                val a = result
-            }
+            insertProduct(product, productQuantity) { Unit }
         }
     }
 
@@ -59,7 +57,6 @@ class CartRepositoryImpl(
             val cartItem =
                 CartItem(cartId = cartId, product = product, quantity = productQuantity)
             cachedCart = cachedCart.add(cartItem)
-            Log.d("CN_Log", "cacheCart = $cachedCart")
             onResult(result)
         }
     }
