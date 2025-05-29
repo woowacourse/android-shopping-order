@@ -13,14 +13,14 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter.CatalogEventListener" />
+            type="woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:onClick="@{() -> eventListener.onProductClicked(product)}">
+        android:layout_margin="10dp">
 
         <ImageView
             android:id="@+id/image_view_product"
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="@drawable/shape_bg_circle"
-            android:onClick="@{() -> eventListener.onInitialAddToCartClicked(product)}"
+            android:onClick="@{() -> eventListener.onInitialAddToCart(product)}"
             android:padding="16dp"
             android:src="@drawable/ic_add"
             android:elevation="5dp"
@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toEndOf="@id/image_view_product" />
 
         <include
-            android:id="@+id/category_item_counter"
+            android:id="@+id/recommend_item_counter"
             layout="@layout/view_select_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

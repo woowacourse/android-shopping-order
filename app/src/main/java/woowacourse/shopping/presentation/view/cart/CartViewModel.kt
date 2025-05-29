@@ -75,6 +75,26 @@ class CartViewModel(
         }
     }
 
+    fun initialAddToCart(product: ProductUiModel) {
+        val updatedProduct = product.copy(amount = 1)
+        cartRepository.addCartItem(updatedProduct.toCartItem()) {
+            cartRepository.getAllCartItems { cartItems ->
+                val found = cartItems?.find { it.product.id == updatedProduct.id }
+                if (found != null) {
+                    val newUiModel =
+                        found.toCartItemUiModel().copy(
+                            isSelected = selectedStates[found.cartId] ?: false,
+                        )
+                    _itemUpdateEvent.postValue(newUiModel)
+                    _cartItems.postValue((_cartItems.value ?: emptyList()) + newUiModel)
+                    updateSelectionInfo()
+                } else {
+                    fetchShoppingCart(isNextPage = false, isRefresh = true)
+                }
+            }
+        }
+    }
+
     fun deleteProduct(cartItem: CartItemUiModel) {
         selectedStates.remove(cartItem.cartItem.cartId)
         cartRepository.deleteCartItem(cartItem.cartItem.cartId) {

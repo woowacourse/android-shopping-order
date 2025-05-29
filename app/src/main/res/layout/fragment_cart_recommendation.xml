@@ -50,7 +50,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:listitem="@layout/item_recent_product"/>
+            tools:listitem="@layout/item_recommended_product"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

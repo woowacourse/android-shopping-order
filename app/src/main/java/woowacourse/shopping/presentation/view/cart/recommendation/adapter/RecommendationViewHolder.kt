@@ -6,11 +6,18 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendedProductBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
 
 class RecommendationViewHolder(
     private val binding: ItemRecommendedProductBinding,
+    eventListener: RecommendEventListener,
     itemCounterListener: ItemCounterListener,
 ) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.eventListener = eventListener
+        binding.recommendItemCounter.listener = itemCounterListener
+    }
+
     fun bind(product: ProductUiModel) {
         binding.product = product
     }
@@ -18,11 +25,12 @@ class RecommendationViewHolder(
     companion object {
         fun from(
             parent: ViewGroup,
+            eventListener: RecommendEventListener,
             itemCounterListener: ItemCounterListener,
         ): RecommendationViewHolder {
             val binding =
                 ItemRecommendedProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return RecommendationViewHolder(binding, itemCounterListener)
+            return RecommendationViewHolder(binding, eventListener, itemCounterListener)
         }
     }
 }

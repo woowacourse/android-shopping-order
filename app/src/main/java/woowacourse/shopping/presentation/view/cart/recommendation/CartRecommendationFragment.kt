@@ -13,6 +13,7 @@ import woowacourse.shopping.presentation.view.cart.recommendation.adapter.Recomm
 
 class CartRecommendationFragment :
     BaseFragment<FragmentCartRecommendationBinding>(R.layout.fragment_cart_recommendation),
+    RecommendEventListener,
     ItemCounterListener {
     private val viewModel: CartViewModel by viewModels(
         ownerProducer = { requireParentFragment() },
@@ -20,7 +21,10 @@ class CartRecommendationFragment :
     )
 
     private val recommendationAdapter: RecommendationAdapter by lazy {
-        RecommendationAdapter(itemCounterListener = this)
+        RecommendationAdapter(
+            itemCounterListener = this,
+            recommendEventListener = this,
+        )
     }
 
     override fun onViewCreated(
@@ -32,6 +36,16 @@ class CartRecommendationFragment :
         binding.lifecycleOwner = viewLifecycleOwner
 
         initRecommendationAdapter()
+        initObserver()
+    }
+
+    private fun initObserver() {
+        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
+            recommendationAdapter.updateRecommendedProducts(products)
+        }
+        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { product ->
+            recommendationAdapter.updateItem(product)
+        }
     }
 
     private fun initRecommendationAdapter() {
@@ -42,10 +56,18 @@ class CartRecommendationFragment :
     }
 
     override fun increase(product: ProductUiModel) {
-        TODO("Not yet implemented")
+        viewModel.increaseAmount(product)
     }
 
     override fun decrease(product: ProductUiModel) {
-        TODO("Not yet implemented")
+        viewModel.decreaseAmount(product)
     }
+
+    override fun onInitialAddToCart(product: ProductUiModel) {
+        viewModel.initialAddToCart(product)
+    }
+}
+
+interface RecommendEventListener {
+    fun onInitialAddToCart(product: ProductUiModel)
 }

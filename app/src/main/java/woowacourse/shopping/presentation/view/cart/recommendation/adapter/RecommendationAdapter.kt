@@ -2,11 +2,15 @@ package woowacourse.shopping.presentation.view.cart.recommendation.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
 
 class RecommendationAdapter(
     recommendedProducts: List<ProductUiModel> = emptyList(),
+    private val recommendEventListener: RecommendEventListener,
     private val itemCounterListener: ItemCounterListener,
 ) : RecyclerView.Adapter<RecommendationViewHolder>() {
     private val recommendedProducts = recommendedProducts.toMutableList()
@@ -16,7 +20,7 @@ class RecommendationAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecommendationViewHolder = RecommendationViewHolder.from(parent, itemCounterListener)
+    ): RecommendationViewHolder = RecommendationViewHolder.from(parent, recommendEventListener, itemCounterListener)
 
     override fun onBindViewHolder(
         holder: RecommendationViewHolder,
@@ -31,10 +35,10 @@ class RecommendationAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateItem(updatedItem: ProductUiModel) {
-        val index = recommendedProducts.indexOfFirst { it.id == updatedItem.id }
+    fun updateItem(updatedItem: CartItemUiModel) {
+        val index = recommendedProducts.indexOfFirst { it.cartId == updatedItem.cartItem.cartId }
         if (index != -1) {
-            recommendedProducts[index] = updatedItem
+            recommendedProducts[index] = updatedItem.cartItem.toUiModel()
             notifyItemChanged(index)
         }
     }
