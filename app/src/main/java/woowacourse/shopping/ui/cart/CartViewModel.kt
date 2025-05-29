@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,16 +38,16 @@ class CartViewModel(
     }
 
     private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
-        runCatching {
-            _isLoading.value = true
-            getCartProductsUseCase(
-                page = page.current,
-                size = DEFAULT_PAGE_SIZE,
-            ) { cartProducts ->
-                _cartProducts.postValue(cartProducts)
-            }
-        }.onSuccess {
-            _isLoading.value = false
+        _isLoading.value = true
+        getCartProductsUseCase(
+            page = page.current,
+            size = DEFAULT_PAGE_SIZE,
+        ) { result ->
+            result
+                .onSuccess { cartProducts ->
+                    _cartProducts.postValue(cartProducts)
+                    _isLoading.postValue(false)
+                }.onFailure { }
         }
     }
 
@@ -54,9 +55,13 @@ class CartViewModel(
         cartId: Long,
         productId: Long,
     ) {
-        removeCartProductUseCase(cartId)
-        _editedProductIds.postValue(editedProductIds.value?.plus(productId))
-        loadCartProducts()
+        removeCartProductUseCase(cartId) { result ->
+            result
+                .onSuccess {
+                    _editedProductIds.postValue(editedProductIds.value?.plus(productId))
+                    loadCartProducts()
+                }.onFailure { }
+        }
     }
 
     fun increasePage(step: Int = DEFAULT_PAGE_STEP) {
@@ -72,33 +77,43 @@ class CartViewModel(
     fun increaseCartProductQuantity(productId: Long) {
         increaseCartProductQuantityUseCase(
             product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { newQuantity ->
-            _cartProducts.postValue(
-                cartProducts.value?.updateProductQuantity(
-                    productId,
-                    newQuantity,
-                ),
-            )
+        ) { result ->
+            result
+                .onSuccess { newQuantity ->
+                    _cartProducts.postValue(
+                        cartProducts.value?.updateProductQuantity(
+                            productId,
+                            newQuantity,
+                        ),
+                    )
+                    _editedProductIds.value = editedProductIds.value?.plus(productId)
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
         }
-        _editedProductIds.value = editedProductIds.value?.plus(productId)
     }
 
     fun decreaseCartProductQuantity(productId: Long) {
         decreaseCartProductQuantityUseCase(
             product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { newQuantity ->
-            if (newQuantity > MINIMUM_QUANTITY) {
-                _cartProducts.postValue(
-                    cartProducts.value?.updateProductQuantity(
-                        productId,
-                        newQuantity,
-                    ),
-                )
-            } else {
-                loadCartProducts()
-            }
+        ) { result ->
+            result
+                .onSuccess { newQuantity ->
+                    if (newQuantity > MINIMUM_QUANTITY) {
+                        _cartProducts.postValue(
+                            cartProducts.value?.updateProductQuantity(
+                                productId,
+                                newQuantity,
+                            ),
+                        )
+                    } else {
+                        loadCartProducts()
+                    }
+                    _editedProductIds.value = editedProductIds.value?.plus(productId)
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
         }
-        _editedProductIds.value = editedProductIds.value?.plus(productId)
     }
 
     fun updateCartProductSelection(cartId: Long) {

@@ -4,7 +4,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import kotlin.concurrent.thread
 
 class GetCatalogProductsUseCase(
     private val productRepository: ProductRepository,
@@ -13,26 +12,50 @@ class GetCatalogProductsUseCase(
     operator fun invoke(
         page: Int,
         size: Int,
-        callback: (Products) -> Unit,
+        callback: (products: Result<Products>) -> Unit,
     ) {
-        thread {
-            val catalogProducts: Products = productRepository.fetchProducts(page, size)
-            val cartProducts: Map<Long, Product> =
-                cartRepository.fetchAllCartProducts().products.associateBy { it.productDetail.id }
-            val updatedProducts =
-                catalogProducts.products.map { catalogProduct ->
-                    val cartProduct = cartProducts[catalogProduct.productDetail.id]
-                    if (cartProduct != null) {
-                        catalogProduct.copy(
-                            cartId = cartProduct.cartId,
-                            quantity = cartProduct.quantity,
-                        )
-                    } else {
-                        catalogProduct
-                    }
+        productRepository.fetchProducts(page, size) { result ->
+            result
+                .onSuccess { catalogProducts ->
+                    combineCartProducts(catalogProducts, callback)
+                }.onFailure {
+                    callback(Result.failure(it))
                 }
+        }
+    }
 
-            callback(catalogProducts.copy(products = updatedProducts))
+    private fun combineCartProducts(
+        catalogProducts: Products,
+        callback: (products: Result<Products>) -> Unit,
+    ) {
+        cartRepository.fetchAllCartProducts { result ->
+            result
+                .onSuccess { cartProducts ->
+                    val cartProductsByProductId =
+                        cartProducts.products.associateBy { product ->
+                            product.productDetail.id
+                        }
+                    val updatedProducts = getUpdatedProducts(catalogProducts, cartProductsByProductId)
+
+                    callback(Result.success(catalogProducts.copy(products = updatedProducts)))
+                }.onFailure {
+                    callback(Result.failure(it))
+                }
+        }
+    }
+
+    private fun getUpdatedProducts(
+        catalogProducts: Products,
+        cartProducts: Map<Long, Product>,
+    ) = catalogProducts.products.map { catalogProduct ->
+        val cartProduct = cartProducts[catalogProduct.productDetail.id]
+        if (cartProduct != null) {
+            catalogProduct.copy(
+                cartId = cartProduct.cartId,
+                quantity = cartProduct.quantity,
+            )
+        } else {
+            catalogProduct
         }
     }
 }

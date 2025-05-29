@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
 
 class UpdateCartProductUseCase(
     private val repository: CartRepository,
@@ -10,12 +9,15 @@ class UpdateCartProductUseCase(
         productId: Long,
         cartId: Long?,
         quantity: Int,
+        callback: (Result<Unit>) -> Unit,
     ) {
-        thread {
-            if (cartId == null) {
-                repository.addCartProduct(productId, quantity)
-            } else {
-                repository.updateCartProduct(cartId, quantity)
+        if (cartId == null) {
+            repository.addCartProduct(productId, quantity) { result ->
+                callback(result)
+            }
+        } else {
+            repository.updateCartProduct(cartId, quantity) { result ->
+                callback(result)
             }
         }
     }

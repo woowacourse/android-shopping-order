@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -50,16 +51,18 @@ class CatalogViewModel(
         page: Int = products.value?.page?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
-        runCatching {
-            _isLoading.value = true
-            getCatalogProductsUseCase(
-                page = page,
-                size = count,
-            ) { newProducts ->
-                _products.postValue(products.value?.plus(newProducts))
-            }
-        }.onSuccess {
-            _isLoading.value = false
+        _isLoading.value = true
+        getCatalogProductsUseCase(
+            page = page,
+            size = count,
+        ) { result ->
+            result
+                .onSuccess { newProducts ->
+                    _products.postValue(products.value?.plus(newProducts))
+                    _isLoading.value = false
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 
@@ -99,24 +102,39 @@ class CatalogViewModel(
     }
 
     fun loadCartProduct(productId: Long) {
-        getCatalogProductUseCase(productId) { cartProduct ->
-            _products.postValue(
-                products.value?.updateProduct(
-                    cartProduct ?: return@getCatalogProductUseCase,
-                ),
-            )
+        getCatalogProductUseCase(productId) { result ->
+            result
+                .onSuccess { cartProduct ->
+                    _products.postValue(
+                        products.value?.updateProduct(
+                            cartProduct ?: return@getCatalogProductUseCase,
+                        ),
+                    )
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 
     fun loadCartProductsByIds(ids: List<Long>) {
-        getCatalogProductsByIdsUseCase(ids) { cartProducts ->
-            _products.postValue(products.value?.updateProducts(cartProducts))
+        getCatalogProductsByIdsUseCase(ids) { result ->
+            result
+                .onSuccess { cartProducts ->
+                    _products.postValue(products.value?.updateProducts(cartProducts))
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 
     fun loadCartProductsQuantity() {
-        getCartProductsQuantityUseCase { quantity ->
-            _cartProductsQuantity.postValue(quantity)
+        getCartProductsQuantityUseCase { result ->
+            result
+                .onSuccess { quantity ->
+                    _cartProductsQuantity.postValue(quantity)
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 

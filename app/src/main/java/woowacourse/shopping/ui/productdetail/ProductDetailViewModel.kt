@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -36,8 +37,13 @@ class ProductDetailViewModel(
     val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
 
     fun loadProductDetail(id: Long) {
-        getCatalogProductUseCase(id) { catalogProduct ->
-            _product.postValue(catalogProduct)
+        getCatalogProductUseCase(id) { result ->
+            result
+                .onSuccess { catalogProduct ->
+                    _product.postValue(catalogProduct ?: EMPTY_PRODUCT)
+                }.onFailure {
+                    Log.e("ProductDetailViewModel", it.message.toString())
+                }
         }
     }
 
@@ -61,14 +67,17 @@ class ProductDetailViewModel(
 
     fun updateCartProduct() {
         val product: Product = product.value ?: return
-        runCatching {
-            updateCartProductUseCase(
-                productId = product.productDetail.id,
-                cartId = product.cartId,
-                quantity = product.quantity,
-            )
-        }.onSuccess {
-            _onCartProductAddSuccess.postValue(true)
+        updateCartProductUseCase(
+            productId = product.productDetail.id,
+            cartId = product.cartId,
+            quantity = product.quantity,
+        ) { result ->
+            result
+                .onSuccess {
+                    _onCartProductAddSuccess.postValue(true)
+                }.onFailure {
+                    Log.e("ProductDetailViewModel", it.message.toString())
+                }
         }
     }
 

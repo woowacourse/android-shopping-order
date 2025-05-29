@@ -3,7 +3,6 @@ package woowacourse.shopping.domain.usecase
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
 
 class DecreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
@@ -11,21 +10,44 @@ class DecreaseCartProductQuantityUseCase(
     operator fun invoke(
         product: Product,
         quantityStep: Int = DEFAULT_QUANTITY_STEP,
-        callback: (Int) -> Unit = {},
+        callback: (quantity: Result<Int>) -> Unit = {},
     ) {
-        thread {
-            if (product.cartId == null) return@thread
-            val newQuantity = (product.quantity - quantityStep).coerceAtLeast(MINIMUM_QUANTITY)
+        if (product.cartId == null) return
+        val newQuantity = (product.quantity - quantityStep).coerceAtLeast(MINIMUM_QUANTITY)
 
-            if (newQuantity <= MINIMUM_QUANTITY) {
-                repository.deleteCartProduct(product.cartId)
-                callback(MINIMUM_QUANTITY)
-                return@thread
-            } else {
-                repository.updateCartProduct(product.cartId, newQuantity)
-            }
+        if (newQuantity <= MINIMUM_QUANTITY) {
+            deleteCartProduct(product.cartId, callback)
+        } else {
+            updateCartProduct(product.cartId, newQuantity, callback)
+        }
+    }
 
-            callback(newQuantity)
+    private fun deleteCartProduct(
+        cartId: Long,
+        callback: (Result<Int>) -> Unit,
+    ) {
+        repository.deleteCartProduct(cartId) { result ->
+            result
+                .onSuccess {
+                    callback(Result.success(MINIMUM_QUANTITY))
+                }.onFailure {
+                    callback(Result.failure(it))
+                }
+        }
+    }
+
+    private fun updateCartProduct(
+        cartId: Long,
+        newQuantity: Int,
+        callback: (Result<Int>) -> Unit,
+    ) {
+        repository.updateCartProduct(cartId, newQuantity) { result ->
+            result
+                .onSuccess {
+                    callback(Result.success(newQuantity))
+                }.onFailure {
+                    callback(Result.failure(it))
+                }
         }
     }
 

@@ -2,7 +2,6 @@ package woowacourse.shopping.domain.usecase
 
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
 
 class IncreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
@@ -10,18 +9,44 @@ class IncreaseCartProductQuantityUseCase(
     operator fun invoke(
         product: Product,
         quantityStep: Int = DEFAULT_QUANTITY_STEP,
-        callback: (Int) -> Unit = {},
+        callback: (quantity: Result<Int>) -> Unit = {},
     ) {
-        thread {
-            val newQuantity = product.quantity + quantityStep
+        val newQuantity = product.quantity + quantityStep
 
-            if (product.cartId == null) {
-                repository.addCartProduct(product.productDetail.id, newQuantity)
-            } else {
-                repository.updateCartProduct(product.cartId, newQuantity)
-            }
+        if (product.cartId == null) {
+            addCartProduct(product, newQuantity, callback)
+        } else {
+            updateCartProduct(product.cartId, newQuantity, callback)
+        }
+    }
 
-            callback(newQuantity)
+    private fun addCartProduct(
+        product: Product,
+        newQuantity: Int,
+        callback: (quantity: Result<Int>) -> Unit,
+    ) {
+        repository.addCartProduct(product.productDetail.id, newQuantity) { result ->
+            result
+                .onSuccess {
+                    callback(Result.success(newQuantity))
+                }.onFailure {
+                    callback(Result.failure(it))
+                }
+        }
+    }
+
+    private fun updateCartProduct(
+        cartId: Long,
+        newQuantity: Int,
+        callback: (quantity: Result<Int>) -> Unit,
+    ) {
+        repository.updateCartProduct(cartId, newQuantity) { result ->
+            result
+                .onSuccess {
+                    callback(Result.success(newQuantity))
+                }.onFailure {
+                    callback(Result.failure(it))
+                }
         }
     }
 
