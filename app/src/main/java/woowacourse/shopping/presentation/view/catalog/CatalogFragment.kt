@@ -29,6 +29,7 @@ class CatalogFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        binding.vm = viewModel
 
         initObserver()
         initListener()

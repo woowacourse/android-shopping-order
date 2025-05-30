@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.catalog.CatalogViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_catalog"
         android:layout_width="match_parent"
@@ -29,9 +36,12 @@
             <TextView
                 android:id="@+id/text_view_cart_total_amount"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:background="@drawable/shape_bg_circle"
+                android:layout_margin="10dp"
+                android:text="@{vm.totalCartCount.toString()}"
+                android:visibility="@{(vm.totalCartCount == 0) ? View.GONE : View.VISIBLE}"
+                android:background="@drawable/shape_bg_cart_counter"
                 android:backgroundTint="@color/mint"
                 android:gravity="center"
                 android:padding="4dp"
@@ -49,26 +59,25 @@
                 android:contentDescription="@null"
                 android:src="@drawable/ic_cart" />
 
-
         </Toolbar>
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/layout_catalog_shimmer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:shimmer_auto_start="true"
-            app:shimmer_duration="1500"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:shimmer_auto_start="true"
+            app:shimmer_duration="1500">
 
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alignmentMode="alignMargins"
-                android:rowCount="4"
                 android:columnCount="2"
                 android:orientation="horizontal"
                 android:padding="8dp"
+                android:rowCount="4"
                 android:useDefaultMargins="true">
 
                 <include
@@ -76,26 +85,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
