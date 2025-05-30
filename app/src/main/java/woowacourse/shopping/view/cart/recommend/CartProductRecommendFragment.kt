@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.recommendation
+package woowacourse.shopping.view.cart.recommend
 
 import android.content.Context
 import android.os.Bundle
@@ -11,35 +11,35 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
-import woowacourse.shopping.databinding.FragmentCartProductRecommendationBinding
+import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.view.cart.recommendation.adapter.RecommendationAdapter
-import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
+import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapter
+import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
-class CartProductRecommendationFragment(
+class CartProductRecommendFragment(
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : Fragment() {
-    private var _binding: FragmentCartProductRecommendationBinding? = null
+    private var _binding: FragmentCartProductRecommendBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
         ViewModelProvider(
             this,
-            CartProductRecommendationViewModelFactory(
+            CartProductRecommendViewModelFactory(
                 productRepository,
                 cartProductRepository,
                 recentProductRepository,
             ),
-        )[CartProductRecommendationViewModel::class.java]
+        )[CartProductRecommendViewModel::class.java]
     }
 
-    private val adapter: RecommendationAdapter by lazy {
-        RecommendationAdapter(eventHandler = viewModel)
+    private val adapter: RecommendedProductAdapter by lazy {
+        RecommendedProductAdapter(eventHandler = viewModel)
     }
 
     override fun onAttach(context: Context) {
@@ -48,8 +48,8 @@ class CartProductRecommendationFragment(
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             parentFragmentManager.commit {
                 replace(
-                    this@CartProductRecommendationFragment.id,
-                    CartProductSelectionFragment::class.java,
+                    this@CartProductRecommendFragment.id,
+                    CartProductSelectFragment::class.java,
                     null,
                 )
             }
@@ -61,7 +61,7 @@ class CartProductRecommendationFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentCartProductRecommendationBinding.inflate(inflater, container, false)
+        _binding = FragmentCartProductRecommendBinding.inflate(inflater, container, false)
         return binding.root
     }
 

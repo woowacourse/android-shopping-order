@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.selection
+package woowacourse.shopping.view.cart.select
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -6,12 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.view.cart.selection.adapter.CartProductItem
+import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
-class CartProductSelectionViewModel(
+class CartProductSelectViewModel(
     private val repository: CartProductRepository,
 ) : ViewModel(),
-    CartProductSelectionEventHandler {
+    CartProductSelectEventHandler {
     private val _selectedIds: MutableSet<Int> = mutableSetOf()
     val selectedIds: Set<Int> get() = _selectedIds
 

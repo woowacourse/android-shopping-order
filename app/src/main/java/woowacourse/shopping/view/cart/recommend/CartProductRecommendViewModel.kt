@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.recommendation
+package woowacourse.shopping.view.cart.recommend
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -9,20 +9,20 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.view.cart.recommendation.adapter.ProductItem
+import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
-class CartProductRecommendationViewModel(
+class CartProductRecommendViewModel(
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
-    CartProductRecommendationEventHandler {
+    CartProductRecommendEventHandler {
     private val cartProducts: MutableSet<CartProduct> = mutableSetOf()
 
-    private val _recommendedProducts = MutableLiveData<List<ProductItem>>()
-    val recommendedProducts: LiveData<List<ProductItem>> get() = _recommendedProducts
+    private val _recommendedProducts = MutableLiveData<List<RecommendedProductItem>>()
+    val recommendedProducts: LiveData<List<RecommendedProductItem>> get() = _recommendedProducts
 
     private val selectedCartIds: MutableSet<Int> = mutableSetOf()
 
@@ -77,7 +77,7 @@ class CartProductRecommendationViewModel(
                                         .filter { it.id !in cartProductIds }
                                         .shuffled()
                                         .take(RECOMMEND_SIZE)
-                                        .map { ProductItem(it) }
+                                        .map { RecommendedProductItem(it) }
                                         .toList()
 
                                 _recommendedProducts.postValue(recommended)

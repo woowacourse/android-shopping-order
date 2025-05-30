@@ -1,11 +1,11 @@
-package woowacourse.shopping.view.cart.recommendation.adapter
+package woowacourse.shopping.view.cart.recommend.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.view.util.product.ProductViewHolder
 
-class RecommendationAdapter(
-    items: List<ProductItem> = emptyList(),
+class RecommendedProductAdapter(
+    items: List<RecommendedProductItem> = emptyList(),
     private val eventHandler: ProductViewHolder.EventHandler,
 ) : RecyclerView.Adapter<ProductViewHolder>() {
     private val items = items.toMutableList()
@@ -25,7 +25,7 @@ class RecommendationAdapter(
         holder.bind(item.product, item.quantity)
     }
 
-    fun updateItems(newItems: List<ProductItem>) {
+    fun updateItems(newItems: List<RecommendedProductItem>) {
         if (newItems.size > items.size) {
             items.addAll(newItems.subList(items.size, newItems.size))
             notifyItemRangeInserted(0, newItems.size)

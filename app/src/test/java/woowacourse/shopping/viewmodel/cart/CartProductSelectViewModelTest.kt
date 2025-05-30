@@ -8,20 +8,20 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.fixture.FakeCartProductRepository
-import woowacourse.shopping.view.cart.selection.CartProductSelectionViewModel
+import woowacourse.shopping.view.cart.select.CartProductSelectViewModel
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
 @ExtendWith(InstantTaskExecutorExtension::class)
-class CartProductSelectionViewModelTest {
-    private lateinit var viewModel: CartProductSelectionViewModel
+class CartProductSelectViewModelTest {
+    private lateinit var viewModel: CartProductSelectViewModel
     private lateinit var cartProductRepository: CartProductRepository
 
     @BeforeEach
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
-        viewModel = CartProductSelectionViewModel(cartProductRepository)
+        viewModel = CartProductSelectViewModel(cartProductRepository)
         viewModel.loadPage(1)
     }
 

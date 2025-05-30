@@ -11,7 +11,7 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
+import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 
 class ShoppingCartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityShoppingCartBinding.inflate(layoutInflater) }
@@ -32,7 +32,7 @@ class ShoppingCartActivity : AppCompatActivity() {
             supportFragmentManager.commit {
                 add(
                     R.id.fragment,
-                    CartProductSelectionFragment::class.java,
+                    CartProductSelectFragment::class.java,
                     null,
                 )
             }

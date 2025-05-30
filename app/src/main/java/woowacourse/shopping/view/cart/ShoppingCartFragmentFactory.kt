@@ -5,8 +5,8 @@ import androidx.fragment.app.FragmentFactory
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
-import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
+import woowacourse.shopping.view.cart.recommend.CartProductRecommendFragment
+import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 
 class ShoppingCartFragmentFactory(
     private val productRepository: ProductRepository,
@@ -18,9 +18,9 @@ class ShoppingCartFragmentFactory(
         className: String,
     ): Fragment =
         when (className) {
-            CartProductSelectionFragment::class.java.name -> CartProductSelectionFragment(cartProductRepository)
-            CartProductRecommendationFragment::class.java.name ->
-                CartProductRecommendationFragment(
+            CartProductSelectFragment::class.java.name -> CartProductSelectFragment(cartProductRepository)
+            CartProductRecommendFragment::class.java.name ->
+                CartProductRecommendFragment(
                     productRepository,
                     cartProductRepository,
                     recentProductRepository,

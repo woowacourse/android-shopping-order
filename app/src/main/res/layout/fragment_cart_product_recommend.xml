@@ -5,11 +5,11 @@
 
         <variable
             name="viewmodel"
-            type="woowacourse.shopping.view.cart.recommendation.CartProductRecommendationViewModel" />
+            type="woowacourse.shopping.view.cart.recommend.CartProductRecommendViewModel" />
 
         <variable
             name="handler"
-            type="woowacourse.shopping.view.cart.recommendation.CartProductRecommendationEventHandler" />
+            type="woowacourse.shopping.view.cart.recommend.CartProductRecommendEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:context=".view.cart.recommendation.CartProductRecommendationFragment">
+        tools:context=".view.cart.recommend.CartProductRecommendFragment">
 
 
         <TextView

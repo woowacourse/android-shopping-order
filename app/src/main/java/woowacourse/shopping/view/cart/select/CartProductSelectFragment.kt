@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart.selection
+package woowacourse.shopping.view.cart.select
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,21 +8,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
-import woowacourse.shopping.databinding.FragmentCartProductSelectionBinding
+import woowacourse.shopping.databinding.FragmentCartProductSelectBinding
 import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
-import woowacourse.shopping.view.cart.selection.adapter.CartProductAdapter
+import woowacourse.shopping.view.cart.recommend.CartProductRecommendFragment
+import woowacourse.shopping.view.cart.select.adapter.CartProductAdapter
 
-class CartProductSelectionFragment(
+class CartProductSelectFragment(
     repository: CartProductRepository,
 ) : Fragment() {
     private val viewModel by lazy {
         ViewModelProvider(
             this,
-            CartProductSelectionViewModelFactory(repository),
-        )[CartProductSelectionViewModel::class.java]
+            CartProductSelectViewModelFactory(repository),
+        )[CartProductSelectViewModel::class.java]
     }
-    private var _binding: FragmentCartProductSelectionBinding? = null
+    private var _binding: FragmentCartProductSelectBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: CartProductAdapter
 
@@ -31,7 +31,7 @@ class CartProductSelectionFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentCartProductSelectionBinding.inflate(inflater, container, false)
+        _binding = FragmentCartProductSelectBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -65,8 +65,8 @@ class CartProductSelectionFragment(
             parentFragmentManager.commit {
                 replace(
                     R.id.fragment,
-                    CartProductRecommendationFragment::class.java,
-                    CartProductRecommendationFragment.newBundle(
+                    CartProductRecommendFragment::class.java,
+                    CartProductRecommendFragment.newBundle(
                         viewModel.selectedIds,
                         viewModel.totalPrice.value,
                         viewModel.totalCount.value,
