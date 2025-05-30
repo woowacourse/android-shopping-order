@@ -53,7 +53,6 @@ class GetCartRecommendProductsUseCase(
                     callback(Result.success(Products(filteredProducts)))
                 }.onFailure {
                     callback(Result.failure(it))
-                    return@fetchAllCartProducts
                 }
         }
     }
