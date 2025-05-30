@@ -11,6 +11,8 @@ import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
+import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class DetailViewModel(
@@ -21,8 +23,8 @@ class DetailViewModel(
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
 
-    private val _uiState = SingleLiveEvent<CartUiState>()
-    val uiState: LiveData<CartUiState> = _uiState
+    private val _cartEvent = SingleLiveEvent<CartEvent>()
+    val cartEvent: LiveData<CartEvent> = _cartEvent
 
     private val _lastViewed = MutableLiveData<ProductUiModel?>()
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
@@ -49,10 +51,10 @@ class DetailViewModel(
         cartItemRepository.addCartItemQuantity(product.id, product.quantity) { result ->
             result
                 .onSuccess {
-                    _uiState.postValue(CartUiState.SUCCESS)
+                    _cartEvent.postValue(AddItemSuccess)
                 }
                 .onFailure {
-                    _uiState.postValue(CartUiState.FAILURE)
+                    _cartEvent.postValue(AddItemFailure)
                 }
         }
     }

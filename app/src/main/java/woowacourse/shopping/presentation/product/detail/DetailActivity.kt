@@ -14,6 +14,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailBinding
+import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
+import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
 import woowacourse.shopping.presentation.product.detail.event.DetailEventHandlerImpl
 
 class DetailActivity : AppCompatActivity() {
@@ -42,14 +44,14 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.cartEvent.observe(this) { state ->
             when (state) {
-                CartUiState.SUCCESS -> {
+                is AddItemSuccess -> {
                     showToast(R.string.text_add_to_cart_success)
                     finish()
                 }
 
-                CartUiState.FAILURE -> {
+                is AddItemFailure -> {
                     showToast(R.string.text_unInserted_toast)
                 }
             }
