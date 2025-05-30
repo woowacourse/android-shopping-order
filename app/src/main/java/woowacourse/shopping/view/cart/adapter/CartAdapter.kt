@@ -1,9 +1,7 @@
 package woowacourse.shopping.view.cart.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
 
@@ -37,8 +35,7 @@ class CartAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): CartViewHolder {
-        val binding = ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CartViewHolder(binding, handler, cartQuantityHandler)
+        return CartViewHolder.of(parent, handler, cartQuantityHandler)
     }
 
     override fun getItemCount(): Int = visibleItems.size

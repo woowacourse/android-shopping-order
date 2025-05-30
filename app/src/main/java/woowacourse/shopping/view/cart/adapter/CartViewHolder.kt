@@ -1,6 +1,9 @@
 package woowacourse.shopping.view.cart.adapter
 
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
@@ -15,6 +18,18 @@ class CartViewHolder(
             model = item
             eventHandler = handler
             cartQuantityEventHandler = cartQuantityHandler
+        }
+    }
+
+    companion object {
+        fun of(
+            parent: ViewGroup,
+            handler: Handler,
+            cartQuantityHandler: CartQuantityHandler,
+        ): CartViewHolder  {
+            val inflater = LayoutInflater.from(parent.context).inflate(R.layout.item_cart, parent, false)
+            val binding = ItemCartBinding.bind(inflater)
+            return CartViewHolder(binding, handler, cartQuantityHandler)
         }
     }
 
