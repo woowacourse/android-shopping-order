@@ -46,11 +46,14 @@ class CartViewModel(
     private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
 
+    private val _isOrdered: MutableSingleLiveData<Unit> = MutableSingleLiveData()
+    val isOrdered: SingleLiveData<Unit> get() = _isOrdered
+
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _isOrdered: MutableSingleLiveData<Unit> = MutableSingleLiveData()
-    val isOrdered: SingleLiveData<Unit> get() = _isOrdered
+    private val _isError: MutableLiveData<String> = MutableLiveData()
+    val isError: LiveData<String> get() = _isError
 
     init {
         loadCartProducts()
@@ -67,7 +70,7 @@ class CartViewModel(
                     _cartProducts.postValue(cartProducts)
                     _isLoading.postValue(false)
                 }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
@@ -82,7 +85,7 @@ class CartViewModel(
                     _editedProductIds.postValue(editedProductIds.value?.plus(productId))
                     loadCartProducts()
                 }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
@@ -159,7 +162,7 @@ class CartViewModel(
                 .onSuccess { products ->
                     _recommendedProducts.postValue(products)
                 }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
@@ -219,7 +222,7 @@ class CartViewModel(
                     _editedProductIds.postValue(selectedProductIds)
                     _isOrdered.postValue(Unit)
                 }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }

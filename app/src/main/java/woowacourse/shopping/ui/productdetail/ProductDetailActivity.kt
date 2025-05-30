@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
+import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.common.DataBindingActivity
@@ -69,8 +70,15 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
                 viewModel.addHistoryProduct(product.productDetail)
             }
         }
+
         viewModel.onCartProductAddSuccess.observe(this) { isSuccess ->
             isSuccess?.let { handleCartProductAddResult(it) }
+        }
+
+        viewModel.isError.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 

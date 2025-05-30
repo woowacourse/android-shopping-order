@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.commit
+import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.CartActivity.OnClickHandler
@@ -77,8 +78,15 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                 },
             )
         }
+
         viewModel.isOrdered.observe(this) {
             finish()
+        }
+
+        viewModel.isError.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 

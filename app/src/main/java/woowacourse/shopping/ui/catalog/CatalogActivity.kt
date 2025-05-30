@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
+import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCatalogBinding
 import woowacourse.shopping.databinding.LayoutCatalogCartQuantityBinding
@@ -118,6 +119,12 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
 
         viewModel.historyProducts.observe(this) { products ->
             historyProductAdapter.submitItems(products)
+        }
+
+        viewModel.isError.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 

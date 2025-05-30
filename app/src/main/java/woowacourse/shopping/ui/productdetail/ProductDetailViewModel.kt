@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.productdetail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,13 +37,16 @@ class ProductDetailViewModel(
         MutableSingleLiveData(null)
     val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
 
+    private val _isError: MutableLiveData<String> = MutableLiveData()
+    val isError: LiveData<String> get() = _isError
+
     fun loadProductDetail(id: Long) {
         getCatalogProductUseCase(id) { result ->
             result
                 .onSuccess { catalogProduct ->
                     _product.postValue(catalogProduct ?: EMPTY_PRODUCT)
                 }.onFailure {
-                    Log.e("ProductDetailViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
@@ -78,7 +80,7 @@ class ProductDetailViewModel(
                 .onSuccess {
                     _onCartProductAddSuccess.postValue(true)
                 }.onFailure {
-                    Log.e("ProductDetailViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }

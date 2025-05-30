@@ -48,6 +48,9 @@ class CatalogViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _isError: MutableLiveData<String> = MutableLiveData()
+    val isError: LiveData<String> get() = _isError
+
     init {
         loadCartProducts()
     }
@@ -66,7 +69,7 @@ class CatalogViewModel(
                     _products.postValue(products.value?.plus(newProducts))
                     _isLoading.value = false
                 }.onFailure {
-                    Log.e("CatalogViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
@@ -116,7 +119,7 @@ class CatalogViewModel(
                         ),
                     )
                 }.onFailure {
-                    Log.e("CatalogViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
@@ -127,7 +130,7 @@ class CatalogViewModel(
                 .onSuccess { cartProducts ->
                     _products.postValue(products.value?.updateProducts(cartProducts))
                 }.onFailure {
-                    Log.e("CatalogViewModel", it.message.toString())
+                    _isError.postValue(it.message)
                 }
         }
     }
