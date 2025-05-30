@@ -47,7 +47,6 @@ class CatalogViewModel(
         val toggled =
             product.copy( quantity = product.quantity + 1)
 
-        _updatedProduct.value = toggled
         cartRepository.addCartItem(toggled.id, toggled.quantity) { result ->
             result
                 .onSuccess {
@@ -59,7 +58,7 @@ class CatalogViewModel(
 
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
-        _updatedProduct.value = newProduct
+
         cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
             result
                 .onSuccess {
@@ -73,7 +72,6 @@ class CatalogViewModel(
         val newQuantity = (product.quantity - 1).coerceAtLeast(0)
         val updated = product.copy(quantity = newQuantity)
 
-        _updatedProduct.value = updated
         if (product.quantity == 0) {
             cartRepository.deleteCartItem(product.id) { result ->
                 result
