@@ -37,7 +37,6 @@ class CatalogViewModel(
     val page: Int get() = currentPage
 
     fun initCatalog() {
-        currentPage = 0
         loadCatalogProducts()
         loadRecentViewedItems()
         updateCartCount()
@@ -101,7 +100,6 @@ class CatalogViewModel(
     }
 
     fun loadNextCatalogProducts() {
-        currentPage++
         loadCatalogProducts()
     }
 
@@ -111,6 +109,7 @@ class CatalogViewModel(
                 .onSuccess { pagingData ->
                     val newPagingData = cartRepository.getQuantity(pagingData)
                     _pagingData.postValue(newPagingData)
+                    currentPage++
                 }
         }
     }
