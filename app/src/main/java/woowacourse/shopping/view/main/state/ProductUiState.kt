@@ -13,8 +13,8 @@ data class ProductUiState(
     val lastSeenProductId
         get() = historyItems.firstOrNull()?.productId
 
-    val productIds
-        get() = productItems.map { it.item.id }
+    val lastSeenProductCategory
+        get() = historyItems.firstOrNull()?.category
 
     val sumOfCartQuantity
         get() = productItems.sumOf { it.cartQuantity.value }

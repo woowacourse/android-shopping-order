@@ -8,7 +8,7 @@ import kotlin.concurrent.thread
 class HistoryRepositoryImpl(
     private val historyDataSource: HistoryDataSource,
 ) : HistoryRepository {
-    override fun getHistory(onResult: (List<Long>) -> Unit) {
+    override fun getHistories(onResult: (List<Long>) -> Unit) {
         thread {
             onResult(historyDataSource.latestHistory().map { it.productId })
         }
