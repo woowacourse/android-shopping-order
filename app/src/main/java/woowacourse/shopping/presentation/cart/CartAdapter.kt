@@ -81,6 +81,11 @@ class CartAdapter(
         }
     }
 
+    fun setPagination() {
+        val paginationPos = itemCount - 1
+        notifyItemChanged(paginationPos)
+    }
+
     companion object {
         private val VIEW_TYPE_CART_PRODUCT = R.layout.product_item
         private val VIEW_TYPE_PAGINATION_BUTTON = R.layout.pagination_button_item

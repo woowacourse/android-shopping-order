@@ -19,6 +19,8 @@ class CartActivity : AppCompatActivity() {
         CartViewModel.FACTORY
     }
 
+    private lateinit var cartAdapter: CartAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,8 +30,7 @@ class CartActivity : AppCompatActivity() {
         setupToolbar()
         initBinding()
         initRecyclerView()
-        observeCartProducts()
-        observePagination()
+        observeViewModel()
     }
 
     private fun initBinding() {
@@ -55,39 +56,27 @@ class CartActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         val handler = CartEventHandlerImpl(viewModel)
-        binding.recyclerViewCart.adapter =
-            CartAdapter(
-                cartProducts = emptyList(),
-                cartHandler = handler,
-                handler = handler,
-            )
+        cartAdapter = CartAdapter(
+            cartProducts = emptyList(),
+            cartHandler = handler,
+            handler = handler,
+        )
+        binding.recyclerViewCart.adapter = cartAdapter
     }
 
-    private fun observeCartProducts() {
-        val adapter = getCartAdapter()
-
+    private fun observeViewModel() {
         viewModel.pagingData.observe(this) {
-            binding.frCartShimmer.stopShimmer()
-            binding.frCartShimmer.visibility = View.GONE
-            binding.recyclerViewCart.visibility = View.VISIBLE
-
-            adapter.setData(it.products, it)
+            cartAdapter.setData(it.products, it)
         }
 
         viewModel.product.observe(this) {
-            adapter.updateProduct(it)
+            cartAdapter.updateProduct(it)
         }
-    }
 
-    private fun observePagination() {
         viewModel.pageEvent.observe(this) {
-            val adapter = getCartAdapter()
-            val paginationPos = adapter.itemCount - 1
-            adapter.notifyItemChanged(paginationPos)
+            cartAdapter.setPagination()
         }
     }
-
-    private fun getCartAdapter(): CartAdapter = binding.recyclerViewCart.adapter as CartAdapter
 
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
