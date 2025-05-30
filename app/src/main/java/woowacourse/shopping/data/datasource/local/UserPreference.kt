@@ -7,16 +7,17 @@ import woowacourse.shopping.BuildConfig
 
 object UserPreference {
     private lateinit var prefs: SharedPreferences
+    private const val PREFERENCE_NAME = "user_prefs"
+    private const val PREF_ID_KEY = "id"
+    private const val PREF_PASSWORD_KEY = "password"
 
     fun init(context: Context) {
-        prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        prefs.edit {
-            putString("id", BuildConfig.ID)
-            putString("password", BuildConfig.PASSWORD)
-        }
+        prefs = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        saveUserInfo(PREF_ID_KEY, BuildConfig.ID)
+        saveUserInfo(PREF_PASSWORD_KEY, BuildConfig.PASSWORD)
     }
 
-    fun saveUserInfo(
+    private fun saveUserInfo(
         key: String,
         value: String,
     ) {
