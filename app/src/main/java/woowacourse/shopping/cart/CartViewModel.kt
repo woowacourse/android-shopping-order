@@ -69,7 +69,9 @@ class CartViewModel(
     }
 
     fun postTotalAmount() {
-        val amount = totalProducts.value?.filter { it.isChecked == true }?.sumOf { it.price * it.quantity } ?: 0
+        val amount =
+            totalProducts.value?.filter { it.isChecked == true }?.sumOf { it.price * it.quantity }
+                ?: 0
         Log.d("COUNT", "amount : $amount")
         _totalAmount.postValue(amount)
     }
@@ -96,20 +98,20 @@ class CartViewModel(
         }
     }
 
-    fun onPaginationButtonClick(buttonDirection: Int) {
+    fun onPaginationButtonClick(buttonEvent: ButtonEvent) {
         cartProductRepository.getTotalElements { totalSize ->
             val currentPage = page.value ?: INITIAL_PAGE
             val lastPage = (totalSize - 1) / PAGE_SIZE
 
-            when (buttonDirection) {
-                PREV_BUTTON -> {
+            when (buttonEvent) {
+                ButtonEvent.DECREASE -> {
                     if (currentPage > 0) {
                         decreasePage()
                         loadCartProducts()
                     }
                 }
 
-                NEXT_BUTTON -> {
+                ButtonEvent.INCREASE -> {
                     if (currentPage < lastPage) {
                         increasePage()
                         loadCartProducts()
@@ -120,31 +122,35 @@ class CartViewModel(
     }
 
     fun updateQuantity(
-        event: Int,
+        buttonEvent: ButtonEvent,
         product: ProductUiModel,
     ) {
-        if (event == DECREASE_BUTTON) {
-            if (product.quantity != 1) {
-                cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
-                    if (result == true) {
-                        _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
-                        val set = _totalProducts.value ?: mutableSetOf()
-                        set.remove(product)
-                        set.add(product.copy(quantity = product.quantity - 1))
-                        _totalProducts.postValue(set.toMutableSet())
-                        postTotalAmount()
+        when (buttonEvent) {
+            ButtonEvent.INCREASE -> {
+                if (product.quantity != 1) {
+                    cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
+                        if (result == true) {
+                            _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
+                            val set = _totalProducts.value ?: mutableSetOf()
+                            set.remove(product)
+                            set.add(product.copy(quantity = product.quantity - 1))
+                            _totalProducts.postValue(set.toMutableSet())
+                            postTotalAmount()
+                        }
                     }
                 }
             }
-        } else if (event == INCREASE_BUTTON) {
-            cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
-                if (result == true) {
-                    _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
-                    val set = _totalProducts.value ?: mutableSetOf()
-                    set.remove(product)
-                    set.add(product.copy(quantity = product.quantity + 1))
-                    _totalProducts.postValue(set.toMutableSet())
-                    postTotalAmount()
+
+            ButtonEvent.DECREASE -> {
+                cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
+                    if (result == true) {
+                        _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
+                        val set = _totalProducts.value ?: mutableSetOf()
+                        set.remove(product)
+                        set.add(product.copy(quantity = product.quantity + 1))
+                        _totalProducts.postValue(set.toMutableSet())
+                        postTotalAmount()
+                    }
                 }
             }
         }
@@ -223,9 +229,5 @@ class CartViewModel(
     companion object {
         private const val PAGE_SIZE = 5
         private const val INITIAL_PAGE = 0
-        private const val PREV_BUTTON = 1
-        private const val NEXT_BUTTON = 2
-        private const val DECREASE_BUTTON = 0
-        private const val INCREASE_BUTTON = 1
     }
 }
