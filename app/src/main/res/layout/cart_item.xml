@@ -27,7 +27,7 @@
 
         <CheckBox
             android:onClick="@{() -> cartHandler.onCheckProduct(product)}"
-            android:checked="@{product.isChecked ? true : false}"
+            android:checked="@{product.isChecked}"
             android:id="@+id/checkbox_cart_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
