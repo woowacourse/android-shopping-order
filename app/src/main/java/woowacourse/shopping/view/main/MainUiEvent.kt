@@ -7,4 +7,8 @@ sealed interface MainUiEvent {
         val productId: Long,
         val lastSeenProductId: Long? = null,
     ) : MainUiEvent
+
+    data class NavigateToCart(
+        val lastSeenProductCategory: String,
+    ) : MainUiEvent
 }

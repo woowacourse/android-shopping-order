@@ -32,8 +32,8 @@ class MainViewModel(
     private val _uiEvent = MutableSingleLiveData<MainUiEvent>()
     val uiEvent: SingleLiveData<MainUiEvent> get() = _uiEvent
 
-    private val _isLoading = MutableSingleLiveData(true)
-    val isLoading: SingleLiveData<Boolean> get() = _isLoading
+    private val _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     init {
         loadProductsAndCarts(INITIAL_PAGE)
@@ -47,7 +47,7 @@ class MainViewModel(
 
     private fun loadProductsAndCarts(pageIndex: Int) {
         setLoading(true)
-        productRepository.loadSinglePage(pageIndex, PAGE_SIZE) { productResult ->
+        productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE) { productResult ->
             productResult.fold(
                 onSuccess = { productPage ->
                     loadCartsAndMerge(productPage, pageIndex)
@@ -173,12 +173,20 @@ class MainViewModel(
             }
         }
 
-    fun saveHistory(productId: Long) =
-        withState(_uiState.value) { state ->
-            historyRepository.saveHistory(productId) {
-                _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
-            }
+    fun saveHistory(
+        productId: Long,
+        category: String,
+    ) = withState(_uiState.value) { state ->
+        historyRepository.saveHistory(productId, category) {
+            _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
         }
+    }
+
+    fun handleNavigateToCart() {
+        withState(_uiState.value) { uiState ->
+            _uiEvent.postValue(MainUiEvent.NavigateToCart(uiState.lastSeenProductCategory))
+        }
+    }
 
     private fun setLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)

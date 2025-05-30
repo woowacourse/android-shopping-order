@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         setUpSystemBar()
         setupRecyclerView()
         observeViewModel()
-        setUpListener()
     }
 
     private fun setUpBinding() {
@@ -128,13 +127,12 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
                         event.productId,
                         event.lastSeenProductId,
                     )
-            }
-        }
-    }
 
-    private fun setUpListener() {
-        binding.cartContainer.setOnClickListener {
-            activityResultLauncher.launch(CartActivity.newIntent(this))
+                is MainUiEvent.NavigateToCart -> {
+                    val category = event.lastSeenProductCategory
+                    activityResultLauncher.launch(CartActivity.newIntent(this, category))
+                }
+            }
         }
     }
 
@@ -146,8 +144,11 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         startActivity(intent)
     }
 
-    override fun onSelectProduct(productId: Long) {
-        viewModel.saveHistory(productId)
+    override fun onSelectProduct(
+        productId: Long,
+        category: String,
+    ) {
+        viewModel.saveHistory(productId, category)
     }
 
     override fun onLoadMoreItems() {
@@ -158,8 +159,11 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         viewModel.increaseCartQuantity(productId)
     }
 
-    override fun onClickHistory(productId: Long) {
-        viewModel.saveHistory(productId)
+    override fun onClickHistory(
+        productId: Long,
+        category: String,
+    ) {
+        viewModel.saveHistory(productId, category)
     }
 
     override fun onClickIncrease(productId: Long) {
