@@ -18,7 +18,7 @@ class CatalogEventHandlerImpl(
     }
 
     override fun onOpenProductQuantitySelector(product: ProductUiModel) {
-        viewModel.onQuantitySelectorToggled(product)
+        viewModel.toggleQuantity(product)
     }
 
     override fun onPlusQuantity(product: ProductUiModel) {

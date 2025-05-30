@@ -43,7 +43,7 @@ class CatalogViewModel(
         updateCartCount()
     }
 
-    fun onQuantitySelectorToggled(product: ProductUiModel) {
+    fun toggleQuantity(product: ProductUiModel) {
         val toggled =
             product.copy( quantity = product.quantity + 1)
 
