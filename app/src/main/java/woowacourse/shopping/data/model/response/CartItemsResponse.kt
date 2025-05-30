@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.model.response
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,7 +26,7 @@ data class CartItemsResponse(
     @SerialName("numberOfElements")
     val numberOfElements: Int,
     @SerialName("empty")
-    val empty: Boolean
+    val empty: Boolean,
 ) {
     @Serializable
     data class Content(
@@ -36,7 +35,7 @@ data class CartItemsResponse(
         @SerialName("quantity")
         val quantity: Int,
         @SerialName("product")
-        val product: Product
+        val product: Product,
     ) {
         @Serializable
         data class Product(
@@ -49,7 +48,7 @@ data class CartItemsResponse(
             @SerialName("imageUrl")
             val imageUrl: String,
             @SerialName("category")
-            val category: String
+            val category: String,
         )
     }
 
@@ -60,7 +59,7 @@ data class CartItemsResponse(
         @SerialName("sorted")
         val sorted: Boolean,
         @SerialName("unsorted")
-        val unsorted: Boolean
+        val unsorted: Boolean,
     )
 
     @Serializable
@@ -76,7 +75,7 @@ data class CartItemsResponse(
         @SerialName("pageSize")
         val pageSize: Int,
         @SerialName("unpaged")
-        val unpaged: Boolean
+        val unpaged: Boolean,
     ) {
         @Serializable
         data class Sort(
@@ -85,7 +84,7 @@ data class CartItemsResponse(
             @SerialName("sorted")
             val sorted: Boolean,
             @SerialName("unsorted")
-            val unsorted: Boolean
+            val unsorted: Boolean,
         )
     }
 }
