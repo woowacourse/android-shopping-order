@@ -144,11 +144,8 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         startActivity(intent)
     }
 
-    override fun onSelectProduct(
-        productId: Long,
-        category: String,
-    ) {
-        viewModel.saveHistory(productId, category)
+    override fun onSelectProduct(productId: Long) {
+        viewModel.saveHistory(productId)
     }
 
     override fun onLoadMoreItems() {
@@ -159,11 +156,8 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         viewModel.increaseCartQuantity(productId)
     }
 
-    override fun onClickHistory(
-        productId: Long,
-        category: String,
-    ) {
-        viewModel.saveHistory(productId, category)
+    override fun onClickHistory(productId: Long) {
+        viewModel.saveHistory(productId)
     }
 
     override fun onClickIncrease(productId: Long) {

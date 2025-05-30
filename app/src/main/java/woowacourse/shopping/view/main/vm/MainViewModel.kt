@@ -173,14 +173,12 @@ class MainViewModel(
             }
         }
 
-    fun saveHistory(
-        productId: Long,
-        category: String,
-    ) = withState(_uiState.value) { state ->
-        historyRepository.saveHistory(productId, category) {
-            _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
+    fun saveHistory(productId: Long) =
+        withState(_uiState.value) { state ->
+            historyRepository.saveHistory(productId) {
+                _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
+            }
         }
-    }
 
     fun handleNavigateToCart() {
         withState(_uiState.value) { uiState ->

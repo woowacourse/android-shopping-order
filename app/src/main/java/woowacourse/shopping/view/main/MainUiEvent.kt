@@ -9,6 +9,6 @@ sealed interface MainUiEvent {
     ) : MainUiEvent
 
     data class NavigateToCart(
-        val lastSeenProductCategory: String,
+        val lastSeenProductCategory: String?,
     ) : MainUiEvent
 }
