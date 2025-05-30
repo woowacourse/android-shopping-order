@@ -17,7 +17,7 @@ class DetailEventHandlerImpl(
         viewModel.decreaseQuantity()
     }
 
-    override fun onAddCartItem(product: ProductUiModel) {
+    override fun onAddCartItem() {
         viewModel.addToCart()
     }
 
