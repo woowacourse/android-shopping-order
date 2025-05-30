@@ -1,0 +1,60 @@
+package woowacourse.shopping.view.product
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.databinding.ItemProductBinding
+import woowacourse.shopping.domain.product.Product
+
+class ProductViewHolder(
+    private val binding: ItemProductBinding,
+    onSelectProduct: (Product) -> Unit,
+    onPlusQuantity: (
+        productId: Long,
+        quantity: Int,
+    ) -> Unit,
+    onMinusQuantity: (
+        productId: Long,
+        quantity: Int,
+    ) -> Unit,
+) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.productItemActions =
+            object : ProductItemActions {
+                override fun onSelectProduct(item: ProductsItem.ProductItem) {
+                    onSelectProduct(item.product)
+                }
+
+                override fun onPlusProductQuantity(item: ProductsItem.ProductItem) {
+                    onPlusQuantity(item.product.id, item.quantity.plus(1))
+                }
+
+                override fun onMinusProductQuantity(item: ProductsItem.ProductItem) {
+                    onMinusQuantity(item.product.id, item.quantity.minus(1))
+                }
+            }
+    }
+
+    fun bind(item: ProductsItem.ProductItem) {
+        binding.productItem = item
+    }
+
+    companion object {
+        fun of(
+            parent: ViewGroup,
+            onSelectProduct: (Product) -> Unit,
+            onPlusQuantity: (
+                productId: Long,
+                quantity: Int,
+            ) -> Unit,
+            onMinusQuantity: (
+                productId: Long,
+                quantity: Int,
+            ) -> Unit,
+        ): ProductViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val binding = ItemProductBinding.inflate(layoutInflater, parent, false)
+            return ProductViewHolder(binding, onSelectProduct, onPlusQuantity, onMinusQuantity)
+        }
+    }
+}
