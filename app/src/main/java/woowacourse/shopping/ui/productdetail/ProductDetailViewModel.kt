@@ -5,9 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
-import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.di.UseCaseModule.addSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseModule.getCatalogProductUseCase
+import woowacourse.shopping.di.UseCaseModule.getRecentSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseModule.updateCartProductUseCase
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
@@ -88,16 +90,13 @@ class ProductDetailViewModel(
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
-                ): T {
-                    val application = checkNotNull(extras[APPLICATION_KEY]) as ShoppingApp
-
-                    return ProductDetailViewModel(
-                        getCatalogProductUseCase = application.getCatalogProductUseCase,
-                        getRecentSearchHistoryUseCase = application.getRecentSearchHistoryUseCase,
-                        addSearchHistoryUseCase = application.addSearchHistoryUseCase,
-                        updateCartProductUseCase = application.updateCartProductUseCase,
+                ): T =
+                    ProductDetailViewModel(
+                        getCatalogProductUseCase = getCatalogProductUseCase,
+                        getRecentSearchHistoryUseCase = getRecentSearchHistoryUseCase,
+                        addSearchHistoryUseCase = addSearchHistoryUseCase,
+                        updateCartProductUseCase = updateCartProductUseCase,
                     ) as T
-                }
             }
     }
 }

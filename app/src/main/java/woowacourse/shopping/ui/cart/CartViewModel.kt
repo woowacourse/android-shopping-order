@@ -5,9 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
-import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.di.UseCaseModule.decreaseCartProductQuantityUseCase
+import woowacourse.shopping.di.UseCaseModule.getCartProductsUseCase
+import woowacourse.shopping.di.UseCaseModule.getCartRecommendProductsUseCase
+import woowacourse.shopping.di.UseCaseModule.increaseCartProductQuantityUseCase
+import woowacourse.shopping.di.UseCaseModule.orderProductsUseCase
+import woowacourse.shopping.di.UseCaseModule.removeCartProductUseCase
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
 import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
@@ -231,18 +235,15 @@ class CartViewModel(
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
-                ): T {
-                    val application = checkNotNull(extras[APPLICATION_KEY]) as ShoppingApp
-
-                    return CartViewModel(
-                        getCartProductsUseCase = application.getCartProductsUseCase,
-                        removeCartProductUseCase = application.removeCartProductUseCase,
-                        increaseCartProductQuantityUseCase = application.increaseCartProductQuantityUseCase,
-                        decreaseCartProductQuantityUseCase = application.decreaseCartProductQuantityUseCase,
-                        getCartRecommendProductsUseCase = application.getCartRecommendProductsUseCase,
-                        orderProductsUseCase = application.orderProductsUseCase,
+                ): T =
+                    CartViewModel(
+                        getCartProductsUseCase = getCartProductsUseCase,
+                        removeCartProductUseCase = removeCartProductUseCase,
+                        increaseCartProductQuantityUseCase = increaseCartProductQuantityUseCase,
+                        decreaseCartProductQuantityUseCase = decreaseCartProductQuantityUseCase,
+                        getCartRecommendProductsUseCase = getCartRecommendProductsUseCase,
+                        orderProductsUseCase = orderProductsUseCase,
                     ) as T
-                }
             }
     }
 }

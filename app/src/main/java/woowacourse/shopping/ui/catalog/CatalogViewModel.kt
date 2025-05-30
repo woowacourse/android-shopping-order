@@ -5,9 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
-import woowacourse.shopping.ShoppingApp
+import woowacourse.shopping.di.UseCaseModule.decreaseCartProductQuantityUseCase
+import woowacourse.shopping.di.UseCaseModule.getCartProductsQuantityUseCase
+import woowacourse.shopping.di.UseCaseModule.getCatalogProductUseCase
+import woowacourse.shopping.di.UseCaseModule.getCatalogProductsByIdsUseCase
+import woowacourse.shopping.di.UseCaseModule.getCatalogProductsUseCase
+import woowacourse.shopping.di.UseCaseModule.getSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseModule.increaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Page.Companion.UNINITIALIZED_PAGE
 import woowacourse.shopping.domain.model.Products
@@ -149,19 +154,16 @@ class CatalogViewModel(
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
-                ): T {
-                    val application = checkNotNull(extras[APPLICATION_KEY]) as ShoppingApp
-
-                    return CatalogViewModel(
-                        getCatalogProductsUseCase = application.getCatalogProductsUseCase,
-                        getCatalogProductUseCase = application.getCatalogProductUseCase,
-                        getCatalogProductsByIdsUseCase = application.getCatalogProductsByIdsUseCase,
-                        getSearchHistoryUseCase = application.getSearchHistoryUseCase,
-                        increaseCartProductQuantityUseCase = application.increaseCartProductQuantityUseCase,
-                        decreaseCartProductQuantityUseCase = application.decreaseCartProductQuantityUseCase,
-                        getCartProductsQuantityUseCase = application.getCartProductsQuantityUseCase,
+                ): T =
+                    CatalogViewModel(
+                        getCatalogProductsUseCase = getCatalogProductsUseCase,
+                        getCatalogProductUseCase = getCatalogProductUseCase,
+                        getCatalogProductsByIdsUseCase = getCatalogProductsByIdsUseCase,
+                        getSearchHistoryUseCase = getSearchHistoryUseCase,
+                        increaseCartProductQuantityUseCase = increaseCartProductQuantityUseCase,
+                        decreaseCartProductQuantityUseCase = decreaseCartProductQuantityUseCase,
+                        getCartProductsQuantityUseCase = getCartProductsQuantityUseCase,
                     ) as T
-                }
             }
     }
 }
