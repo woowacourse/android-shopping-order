@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.cart.ButtonEvent
 import woowacourse.shopping.cart.CartActivity
 import woowacourse.shopping.databinding.ActivityCatalogBinding
 import woowacourse.shopping.databinding.MenuCartLayoutBinding
@@ -84,11 +85,15 @@ class CatalogActivity : AppCompatActivity() {
                             viewModel.increaseQuantity(product)
                         }
                     },
-                quantityControlListener = { event, product ->
-                    if (event == 1) {
-                        viewModel.increaseQuantity(product)
-                    } else {
-                        viewModel.decreaseQuantity(product)
+                quantityControlListener = { buttonEvent, product ->
+                    when (buttonEvent) {
+                        ButtonEvent.INCREASE -> {
+                            viewModel.increaseQuantity(product)
+                        }
+
+                        ButtonEvent.DECREASE -> {
+                            viewModel.decreaseQuantity(product)
+                        }
                     }
                 },
             )
@@ -121,7 +126,9 @@ class CatalogActivity : AppCompatActivity() {
         viewModel.updatedItem.observe(this) { product ->
             Log.d("test", "프로덕트 $product")
             if (product != null) {
-                (binding.recyclerViewProducts.adapter as ProductAdapter).updateItem(product)
+                (binding.recyclerViewProducts.adapter as ProductAdapter).updateItem(
+                    product,
+                )
             }
         }
         viewModel.recentlyViewedProducts.observe(this) { products ->
@@ -148,7 +155,12 @@ class CatalogActivity : AppCompatActivity() {
     private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom,
+            )
             insets
         }
     }

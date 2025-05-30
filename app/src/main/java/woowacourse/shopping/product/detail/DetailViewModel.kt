@@ -18,10 +18,10 @@ class DetailViewModel(
     private val _product = MutableLiveData<ProductUiModel>(product)
     val product: LiveData<ProductUiModel> = _product
 
-    private val _quantity = MutableLiveData<Int>(1)
+    private val _quantity = MutableLiveData<Int>(product.quantity)
     val quantity: LiveData<Int> = _quantity
 
-    private val _price = MutableLiveData<Int>(0)
+    private val _price = MutableLiveData<Int>(product.price)
     val price: LiveData<Int> = _price
 
     private val _latestViewedProduct = MutableLiveData<ProductUiModel>()
@@ -34,14 +34,6 @@ class DetailViewModel(
         }
     }
 
-    fun setQuantity() {
-//        _quantity.value = productData.quantity
-    }
-
-    fun setPriceSum() {
-        _price.value = (product.value?.price ?: 0) * (quantity.value ?: 0)
-    }
-
     fun addToCart() {
         val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
 
@@ -52,11 +44,6 @@ class DetailViewModel(
                 cartProductRepository.insertCartProduct(it) {}
             }
         }
-    }
-
-    fun addToRecentlyViewedProduct() {
-        val uid = product.value?.id ?: return
-        recentlyViewedProductRepository.insertRecentlyViewedProductUid(uid)
     }
 
     fun setLatestViewedProduct() {
@@ -74,5 +61,9 @@ class DetailViewModel(
         if ((_quantity.value ?: 0) <= 0) return
         _quantity.value = _quantity.value?.minus(1)
         setPriceSum()
+    }
+
+    private fun setPriceSum() {
+        _price.value = (product.value?.price ?: 0) * (quantity.value ?: 0)
     }
 }
