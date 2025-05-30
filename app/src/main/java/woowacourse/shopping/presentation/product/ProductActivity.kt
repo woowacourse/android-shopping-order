@@ -169,16 +169,9 @@ class ProductActivity :
 
     private fun showSkeleton(isLoading: Boolean) {
         if (isLoading) {
-            binding.rvProducts.visibility = View.GONE
-            binding.rvRecentProducts.visibility = View.GONE
-            binding.tvRecentProduct.visibility = View.GONE
-            binding.divider.visibility = View.GONE
+            binding.group.visibility = View.GONE
         } else {
-            binding.rvProducts.visibility = View.VISIBLE
-            binding.rvRecentProducts.visibility = View.VISIBLE
-            binding.tvRecentProduct.visibility = View.VISIBLE
-            binding.divider.visibility = View.VISIBLE
-
+            binding.group.visibility = View.VISIBLE
             binding.shimmerLayoutProduct.visibility = View.GONE
         }
     }
