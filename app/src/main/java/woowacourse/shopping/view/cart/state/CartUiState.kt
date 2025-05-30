@@ -1,61 +1,48 @@
 package woowacourse.shopping.view.cart.state
 
-import woowacourse.shopping.domain.Quantity
-
 data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
     val allChecked: Boolean = false,
 ) {
     val totalPrice: Int
-        get() = items.filter { it.checked }.sumOf { it.productPrice }
+        get() = items.filter { it.checked }.sumOf { it.totalPrice }
 
     val checkedProductCount: Int
-        get() = items.filter { it.checked }.sumOf { it.cartQuantityValue }
+        get() = items.filter { it.checked }.sumOf { it.quantity }
+
+    val cartIds: List<Long>
+        get() = items.map { it.cart.productId }
 
     fun setAllItemsChecked(isChecked: Boolean): CartUiState {
-        val result = items.map { it.copy(checked = isChecked) }
-
-        return copy(items = result, allChecked = isChecked)
+        val updatedItems = items.map { it.modifyChecked(isChecked) }
+        return copy(items = updatedItems, allChecked = isChecked)
     }
 
     fun modifyCheckedState(
         cartId: Long,
         check: Boolean,
     ): CartUiState {
-        val targetIndex = targetIndex(cartId)
-        val targetItem = items[targetIndex]
-
-        val mutableItems = items.toMutableList()
-        mutableItems[targetIndex] = targetItem.modifyChecked(check)
-
-        return copy(items = mutableItems)
+        return updateItem(cartId) { it.modifyChecked(check) }
     }
 
-    fun modifyUiState(newState: CartState): CartUiState {
-        val targetIndex = targetIndex(newState.cartId)
-        val mutableItems = items.toMutableList()
-        mutableItems[targetIndex] = newState
-
-        return copy(items = mutableItems)
+    fun increaseCartQuantity(productId: Long): CartUiState {
+        return updateItem(productId) { it.increaseCartQuantity() }
     }
 
-    fun increaseCartQuantity(productId: Long): CartState {
-        val targetIndex = targetIndex(productId)
-        val target = items[targetIndex]
-        return target.increaseCartQuantity()
+    fun decreaseCartQuantity(productId: Long): CartUiState {
+        return updateItem(productId) { it.decreaseCartQuantity(1) }
     }
 
-    fun decreaseCartQuantity(productId: Long): CartState {
-        val targetIndex = targetIndex(productId)
-        val result = items[targetIndex].decreaseCartQuantity()
+    private fun updateItem(
+        productId: Long,
+        transform: (CartState) -> CartState,
+    ): CartUiState {
+        val index = items.indexOfFirst { it.cartId == productId }
+        if (index == -1) return this
 
-        if (!result.decreaseCartQuantity().quantity.hasQuantity()) {
-            return result.copy(quantity = Quantity(1))
-        }
-
-        return result
+        val updatedItems = items.toMutableList()
+        updatedItems[index] = transform(items[index])
+        return copy(items = updatedItems)
     }
-
-    private fun targetIndex(productId: Long) = items.indexOfFirst { it.cartId == productId }
 }

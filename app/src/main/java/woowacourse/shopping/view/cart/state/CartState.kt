@@ -1,54 +1,43 @@
 package woowacourse.shopping.view.cart.state
 
-import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.domain.product.Price
 
 data class CartState(
-    val cartId: Long,
-    val name: String,
-    val imgUrl: String,
-    val price: Price,
-    val quantity: Quantity,
+    val cart: ShoppingCart,
     val checked: Boolean,
 ) {
-    val priceValue: Int
-        get() = price.value
+    val name: String
+        get() = cart.product.name
 
-    val cartQuantityValue: Int
-        get() = quantity.value
+    val cartId: Long
+        get() = cart.id
+
+    val quantity: Int
+        get() = cart.quantity.value
+
+    val price: Int
+        get() = cart.product.priceValue
+
+    val imgUrl: String
+        get() = cart.product.imgUrl
 
     val hasQuantity: Boolean
-        get() = quantity.hasQuantity()
+        get() = cart.quantity.hasQuantity()
 
-    val productPrice: Int
-        get() = priceValue * cartQuantityValue
+    val totalPrice: Int
+        get() = quantity * price
 
     fun modifyChecked(checked: Boolean): CartState {
         return copy(checked = checked)
     }
 
     fun increaseCartQuantity(): CartState {
-        val increasedQuantity = quantity + 1
-
-        return copy(quantity = increasedQuantity)
+        val updatedCart = cart.increasedQuantity()
+        return copy(cart = updatedCart)
     }
 
-    fun decreaseCartQuantity(): CartState {
-        val decreasedCartQuantity = quantity - 1
-        val newState = copy(quantity = decreasedCartQuantity)
-
-        return newState
+    fun decreaseCartQuantity(minQuantity: Int): CartState {
+        val updatedCart = cart.withDecreasedQuantityOrMin(minQuantity)
+        return copy(cart = updatedCart)
     }
-}
-
-fun ShoppingCart.toCartState(allChecked: Boolean): CartState {
-    return CartState(
-        cartId = id,
-        name = product.name,
-        imgUrl = product.imgUrl,
-        price = Price(product.priceValue),
-        quantity = quantity,
-        checked = allChecked,
-    )
 }
