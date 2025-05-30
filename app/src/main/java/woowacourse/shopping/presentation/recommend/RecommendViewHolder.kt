@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendProductBinding
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendViewHolder(
@@ -20,7 +19,7 @@ class RecommendViewHolder(
     }
 
     fun bind(cartItemUiModel: CartItemUiModel) {
-        binding.cartItem = cartItemUiModel.toDomain()
+        binding.cartItem = cartItemUiModel
     }
 
     companion object {
