@@ -17,7 +17,7 @@ import woowacourse.shopping.data.product.dto.ProductsResponse
 import java.util.Base64
 
 class ProductsHttpClient(
-    private val baseUrl: String = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
+    private val baseUrl: String = BuildConfig.BASE_URL,
 ) {
     fun getCart(
         page: Int,

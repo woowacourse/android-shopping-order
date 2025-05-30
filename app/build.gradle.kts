@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("kotlin-kapt")
     alias(libs.plugins.android.application)
@@ -5,6 +7,14 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.serialization)
 }
+
+private val localProperties =
+    Properties().apply {
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            load(localFile.inputStream())
+        }
+    }
 
 android {
     namespace = "woowacourse.shopping"
@@ -25,6 +35,7 @@ android {
     buildTypes {
         debug {
             buildConfigField("boolean", "DEBUG", "true")
+            buildConfigField("String", "BASE_URL", localProperties["base.url.dev"].toString())
         }
         release {
             isMinifyEnabled = false
@@ -33,6 +44,7 @@ android {
                 "proguard-rules.pro",
             )
             buildConfigField("boolean", "DEBUG", "false")
+            buildConfigField("String", "BASE_URL", localProperties["base.url.release"].toString())
         }
     }
     compileOptions {
