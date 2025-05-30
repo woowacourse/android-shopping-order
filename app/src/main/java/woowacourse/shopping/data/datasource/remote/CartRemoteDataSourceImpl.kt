@@ -24,7 +24,9 @@ class CartRemoteDataSourceImpl(
                 ) {
                     if (response.isSuccessful) {
                         onResult(Result.success(response.body()?.quantity ?: 0))
+                        return
                     }
+                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
                 }
 
                 override fun onFailure(
@@ -78,7 +80,9 @@ class CartRemoteDataSourceImpl(
                     if (response.isSuccessful) {
                         val cartId = response.toIdOrNull() ?: throw IllegalStateException("")
                         onResult(Result.success(cartId))
+                        return
                     }
+                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
                 }
 
                 override fun onFailure(
@@ -105,7 +109,9 @@ class CartRemoteDataSourceImpl(
                 ) {
                     if (response.isSuccessful) {
                         onResult(Result.success(Unit))
+                        return
                     }
+                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
                 }
 
                 override fun onFailure(
@@ -129,7 +135,9 @@ class CartRemoteDataSourceImpl(
             ) {
                 if (response.isSuccessful) {
                     onResult(Result.success(Unit))
+                    return
                 }
+                onResult(Result.failure(Exception("응답에 실패했습니다.")))
             }
 
             override fun onFailure(
