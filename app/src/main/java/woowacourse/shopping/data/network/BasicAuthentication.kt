@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.network
 
 import android.util.Base64
-import com.facebook.shimmer.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 

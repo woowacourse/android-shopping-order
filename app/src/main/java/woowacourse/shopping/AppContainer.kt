@@ -34,9 +34,10 @@ class AppContainer(
 
     private val productsDataSource = ProductsDataSource(productService)
 
-    val productRepository: ProductRepository = DefaultProductRepository(productsDataSource)
+    val productRepository: ProductRepository =
+        DefaultProductRepository(productsDataSource)
 
-    val historyRepository: HistoryRepository by lazy { HistoryRepositoryImpl(historyDataSource) }
+    val historyRepository: HistoryRepository = HistoryRepositoryImpl(historyDataSource)
 
     val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
 
