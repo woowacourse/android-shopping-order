@@ -10,8 +10,9 @@ interface ProductRepository {
     )
 
     fun loadSinglePage(
-        page: Int,
-        pageSize: Int,
+        category: String? = null,
+        page: Int?,
+        pageSize: Int?,
         callback: (Result<ProductSinglePage>) -> Unit,
     )
 }

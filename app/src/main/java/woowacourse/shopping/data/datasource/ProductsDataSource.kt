@@ -10,11 +10,12 @@ import woowacourse.shopping.data.network.service.ProductService
 
 class ProductsDataSource(private val service: ProductService) {
     fun singlePage(
-        page: Int,
-        size: Int,
+        category: String?,
+        page: Int?,
+        size: Int?,
         callback: (Result<ProductsResponse?>) -> Unit,
     ) {
-        service.requestProducts(page, size).enqueue(
+        service.requestProducts(category, page = page, size = size).enqueue(
             object :
                 Callback<ProductsResponse> {
                 override fun onResponse(

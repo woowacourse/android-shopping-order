@@ -10,8 +10,9 @@ import woowacourse.shopping.data.network.response.products.ProductsResponse
 interface ProductService {
     @GET("/products")
     fun requestProducts(
-        @Query("page") page: Int,
-        @Query("size") size: Int,
+        @Query("category") category: String?,
+        @Query("page") page: Int?,
+        @Query("size") size: Int?,
     ): Call<ProductsResponse>
 
     @GET("/products/{id}")
