@@ -1,38 +1,40 @@
 package woowacourse.shopping.di
 
 import android.content.Context
-import woowacourse.shopping.data.datasource.local.RecentProductDataSource
-import woowacourse.shopping.data.datasource.local.RecentProductDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.CartDataSource
-import woowacourse.shopping.data.datasource.remote.CartDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.ProductDataSource
-import woowacourse.shopping.data.datasource.remote.ProductDataSourceImpl
+import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
+import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
 
 object DataSourceModule {
-    private var cartDataSource: CartDataSource? = null
-    private var productDataSource: ProductDataSource? = null
-    private var recentProductDataSource: RecentProductDataSource? = null
+    private var cartRemoteDataSource: CartRemoteDataSource? = null
+    private var productRemoteDataSource: ProductRemoteDataSource? = null
+    private var recentProductLocalDataSource: RecentProductLocalDataSource? = null
     private lateinit var appContext: Context
 
     fun init(context: Context) {
         appContext = context.applicationContext
     }
 
-    fun provideProductDataSource(): ProductDataSource =
-        productDataSource ?: run {
+    fun provideProductDataSource(): ProductRemoteDataSource =
+        productRemoteDataSource ?: run {
             val productService = NetworkModule.provideProductService()
-            ProductDataSourceImpl(productService).also { productDataSource = it }
+            ProductRemoteDataSourceImpl(productService).also { productRemoteDataSource = it }
         }
 
-    fun provideCartDataSource(): CartDataSource =
-        cartDataSource ?: run {
+    fun provideCartDataSource(): CartRemoteDataSource =
+        cartRemoteDataSource ?: run {
             val cartItemService = NetworkModule.provideCartItemService()
-            CartDataSourceImpl(cartItemService).also { cartDataSource = it }
+            CartRemoteDataSourceImpl(cartItemService).also { cartRemoteDataSource = it }
         }
 
-    fun provideRecentProductDataSource(): RecentProductDataSource =
-        recentProductDataSource ?: run {
+    fun provideRecentProductDataSource(): RecentProductLocalDataSource =
+        recentProductLocalDataSource ?: run {
             val recentProductDao = DatabaseModule.provideRecentProductDao()
-            RecentProductDataSourceImpl(recentProductDao).also { recentProductDataSource = it }
+            RecentProductLocalDataSourceImpl(recentProductDao).also {
+                recentProductLocalDataSource = it
+            }
         }
 }

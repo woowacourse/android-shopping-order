@@ -9,9 +9,9 @@ import woowacourse.shopping.data.dto.product.toDomain
 import woowacourse.shopping.data.remote.ProductService
 import woowacourse.shopping.domain.model.Product
 
-class ProductDataSourceImpl(
+class ProductRemoteDataSourceImpl(
     private val productService: ProductService,
-) : ProductDataSource {
+) : ProductRemoteDataSource {
     override fun fetchPagingProducts(
         page: Int?,
         pageSize: Int?,

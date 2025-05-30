@@ -12,9 +12,9 @@ import woowacourse.shopping.data.dto.cart.toDomain
 import woowacourse.shopping.data.remote.CartItemService
 import woowacourse.shopping.domain.model.CartItem
 
-class CartDataSourceImpl(
+class CartRemoteDataSourceImpl(
     private val cartItemService: CartItemService,
-) : CartDataSource {
+) : CartRemoteDataSource {
     override fun getTotalCount(onResult: (Result<Int>) -> Unit) =
         cartItemService.requestCartItemCount().enqueue(
             object : Callback<CartItemCountResponse> {
@@ -141,6 +141,5 @@ class CartDataSourceImpl(
         },
     )
 
-    private fun <T> Response<T>.toIdOrNull(): Long? =
-        headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
+    private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
 }

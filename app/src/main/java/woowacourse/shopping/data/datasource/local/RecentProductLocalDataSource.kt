@@ -2,7 +2,7 @@ package woowacourse.shopping.data.datasource.local
 
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
 
-interface RecentProductDataSource {
+interface RecentProductLocalDataSource {
     fun getProducts(): List<RecentlyViewedProduct>
 
     fun getMostRecentProduct(): RecentlyViewedProduct?

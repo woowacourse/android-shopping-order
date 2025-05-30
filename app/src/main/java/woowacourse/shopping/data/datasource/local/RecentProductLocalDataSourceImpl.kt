@@ -3,9 +3,9 @@ package woowacourse.shopping.data.datasource.local
 import woowacourse.shopping.data.dao.RecentlyProductDao
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
 
-class RecentProductDataSourceImpl(
+class RecentProductLocalDataSourceImpl(
     private val dao: RecentlyProductDao,
-) : RecentProductDataSource {
+) : RecentProductLocalDataSource {
     override fun getProducts(): List<RecentlyViewedProduct> = dao.getProducts()
 
     override fun getMostRecentProduct(): RecentlyViewedProduct? = dao.getMostRecentProduct()

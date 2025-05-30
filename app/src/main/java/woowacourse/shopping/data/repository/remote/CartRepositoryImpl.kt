@@ -1,19 +1,19 @@
 package woowacourse.shopping.data.repository.remote
 
 import android.util.Log
-import woowacourse.shopping.data.datasource.remote.CartDataSource
+import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
-    private val cartDataSource: CartDataSource,
+    private val cartRemoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
     private var cachedCart: Cart = Cart()
 
     override fun getTotalCount(onResult: (Result<Int>) -> Unit) {
-        cartDataSource.getTotalCount { result ->
+        cartRemoteDataSource.getTotalCount { result ->
             onResult(result)
         }
     }
@@ -23,7 +23,7 @@ class CartRepositoryImpl(
         pageSize: Int?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        cartDataSource.getPagedCartItems(page, pageSize) { cartItems ->
+        cartRemoteDataSource.getPagedCartItems(page, pageSize) { cartItems ->
             onResult(Result.success(cartItems))
         }
     }
@@ -52,7 +52,7 @@ class CartRepositoryImpl(
         productQuantity: Int,
         onResult: (Result<Long>) -> Unit,
     ) {
-        cartDataSource.insertCartItem(product.productId, productQuantity) { result ->
+        cartRemoteDataSource.insertCartItem(product.productId, productQuantity) { result ->
             val cartId = result.getOrNull() ?: -1L
             val cartItem =
                 CartItem(cartId = cartId, product = product, quantity = productQuantity)
@@ -67,7 +67,7 @@ class CartRepositoryImpl(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        cartDataSource.updateQuantity(cartId, quantity) { result ->
+        cartRemoteDataSource.updateQuantity(cartId, quantity) { result ->
             result.onSuccess {
                 onResult(result)
                 cachedCart = cachedCart.add(CartItem(cartId, product, quantity))
@@ -81,7 +81,7 @@ class CartRepositoryImpl(
     ) {
         val cartItem =
             cachedCart.findCartItem(productId) ?: throw NoSuchElementException("존재하지 않는 아이디")
-        cartDataSource.updateQuantity(cartItem.cartId, cartItem.quantity + 1) { result ->
+        cartRemoteDataSource.updateQuantity(cartItem.cartId, cartItem.quantity + 1) { result ->
             result.onSuccess {
                 onResult(result)
                 cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity + 1))
@@ -102,7 +102,7 @@ class CartRepositoryImpl(
                 }
             }
         } else {
-            cartDataSource.updateQuantity(cartItem.cartId, cartItem.quantity - 1) { result ->
+            cartRemoteDataSource.updateQuantity(cartItem.cartId, cartItem.quantity - 1) { result ->
                 result.onSuccess {
                     onResult(result)
                     cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity - 1))
@@ -117,7 +117,7 @@ class CartRepositoryImpl(
     ) {
         val cartId = cachedCart.findCartItem(productId)?.cartId ?: -1
         Log.d("CN_Log", "cartId=$cartId")
-        cartDataSource.deleteCartItemById(cartId) { result ->
+        cartRemoteDataSource.deleteCartItemById(cartId) { result ->
             result.onSuccess {
                 onResult(result)
                 cachedCart = cachedCart.delete(productId)
@@ -126,10 +126,10 @@ class CartRepositoryImpl(
     }
 
     fun fetchAllCartItems(onFinished: (() -> Unit)? = null) {
-        cartDataSource.getTotalCount { result ->
+        cartRemoteDataSource.getTotalCount { result ->
             val totalCount = result.getOrNull() ?: 0
 
-            cartDataSource.getPagedCartItems(0, totalCount) { cartItems ->
+            cartRemoteDataSource.getPagedCartItems(0, totalCount) { cartItems ->
                 cachedCart = Cart(cartItems)
                 onFinished?.invoke()
             }

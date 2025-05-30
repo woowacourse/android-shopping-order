@@ -2,7 +2,7 @@ package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.domain.model.Product
 
-interface ProductDataSource {
+interface ProductRemoteDataSource {
     fun fetchPagingProducts(
         page: Int?,
         pageSize: Int?,
