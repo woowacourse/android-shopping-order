@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:visibility="@{product.isExpanded ? View.VISIBLE : View.GONE}"
+            android:visibility="@{product.quantity > 0 ? View.VISIBLE : View.GONE}"
             app:handler="@{handler}"
             app:layout_constraintBottom_toBottomOf="@id/imageView_product"
             app:layout_constraintEnd_toEndOf="parent"

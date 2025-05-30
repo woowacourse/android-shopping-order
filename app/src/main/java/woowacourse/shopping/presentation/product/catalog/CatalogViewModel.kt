@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
+import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class CatalogViewModel(
     private val productsRepository: ProductsRepository,
@@ -29,7 +30,7 @@ class CatalogViewModel(
     private val _hasRecentViewedItems = MutableLiveData(false)
     val hasRecentViewedItems: LiveData<Boolean> = _hasRecentViewedItems
 
-    private val _updatedProduct = MutableLiveData<ProductUiModel>()
+    private val _updatedProduct = SingleLiveEvent<ProductUiModel>()
     val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
 
     private var currentPage = 0
@@ -44,7 +45,7 @@ class CatalogViewModel(
 
     fun onQuantitySelectorToggled(product: ProductUiModel) {
         val toggled =
-            product.copy(isExpanded = !product.isExpanded, quantity = product.quantity + 1)
+            product.copy( quantity = product.quantity + 1)
 
         _updatedProduct.value = toggled
         cartRepository.addCartItem(toggled.id, toggled.quantity) { result ->
@@ -70,11 +71,7 @@ class CatalogViewModel(
 
     fun decreaseQuantity(product: ProductUiModel) {
         val newQuantity = (product.quantity - 1).coerceAtLeast(0)
-        val updated =
-            product.copy(
-                quantity = newQuantity,
-                isExpanded = newQuantity > 0,
-            )
+        val updated = product.copy(quantity = newQuantity)
 
         _updatedProduct.value = updated
         if (product.quantity == 0) {

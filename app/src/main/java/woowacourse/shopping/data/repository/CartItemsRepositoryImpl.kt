@@ -25,8 +25,7 @@ class CartItemsRepositoryImpl(
         val updatedProducts =
             pagingData.products.map { product ->
                 val quantity = cartItemsLocalDataSource.getQuantity(product.id)
-                val isExpanded = quantity > 0
-                product.copy(quantity = quantity, isExpanded = isExpanded)
+                product.copy(quantity = quantity)
             }
         return pagingData.copy(products = updatedProducts)
     }
