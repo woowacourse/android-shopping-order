@@ -66,7 +66,7 @@
             android:layout_marginBottom="18dp"
             android:layout_marginStart="12dp"
             android:scaleType="centerCrop"
-            app:imageUrl="@{cartProduct}"
+            app:imageUrl="@{cartProduct.imageUrl}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/checkbox_selection"
             app:layout_constraintTop_toBottomOf="@id/textView_cart_product_name"

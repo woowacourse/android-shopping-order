@@ -34,6 +34,7 @@ class CatalogActivity : AppCompatActivity() {
         applyWindowInsets()
 
         setProductAdapter()
+        setProductsRecyclerViewLayoutManager()
         setRecentlyViewedProductAdapter()
         observeCatalogProducts()
     }
@@ -47,23 +48,27 @@ class CatalogActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.cart_menu_item, menu)
-
-        val menuItem = menu?.findItem(R.id.action_cart)
-        val binding =
-            DataBindingUtil.inflate<MenuCartLayoutBinding>(
-                LayoutInflater.from(this),
-                R.layout.menu_cart_layout,
-                null,
-                false,
-            )
-        binding.layoutCartMenu.setOnClickListener {
-            startActivity(CartActivity.newIntent(this))
-        }
-        binding.vm = viewModel
-        binding.lifecycleOwner = this
-
-        menuItem?.actionView = binding.root
+        setupCartMenuItem(menu)
         return true
+    }
+
+    private fun setupCartMenuItem(menu: Menu?) {
+        val menuItem = menu?.findItem(R.id.action_cart) ?: return
+
+        val binding = DataBindingUtil.inflate<MenuCartLayoutBinding>(
+            LayoutInflater.from(this),
+            R.layout.menu_cart_layout,
+            null,
+            false
+        ).apply {
+            layoutCartMenu.setOnClickListener {
+                startActivity(CartActivity.newIntent(this@CatalogActivity))
+            }
+            vm = viewModel
+            lifecycleOwner = this@CatalogActivity
+        }
+
+        menuItem.actionView = binding.root
     }
 
     private fun setProductAdapter() {
@@ -77,32 +82,30 @@ class CatalogActivity : AppCompatActivity() {
                             startActivity(intent)
                         }
 
-                        override fun onLoadButtonClick() {
-                            viewModel.loadNextCatalogProducts()
-                        }
+                        override fun onLoadButtonClick() = viewModel.loadNextCatalogProducts()
 
-                        override fun onQuantityAddClick(product: ProductUiModel) {
+                        override fun onQuantityAddClick(product: ProductUiModel) =
                             viewModel.increaseQuantity(product)
-                        }
                     },
                 quantityControlListener = { buttonEvent, product ->
                     when (buttonEvent) {
-                        ButtonEvent.INCREASE -> {
-                            viewModel.increaseQuantity(product)
-                        }
-
-                        ButtonEvent.DECREASE -> {
-                            viewModel.decreaseQuantity(product)
-                        }
+                        ButtonEvent.INCREASE -> viewModel.increaseQuantity(product)
+                        ButtonEvent.DECREASE -> viewModel.decreaseQuantity(product)
                     }
                 },
             )
 
         binding.recyclerViewProducts.adapter = adapter
+    }
+
+    private fun setProductsRecyclerViewLayoutManager() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int = spanSizeByPosition(position, adapter.itemCount)
+                override fun getSpanSize(position: Int): Int = spanSizeByPosition(
+                    position,
+                    binding.recyclerViewProducts.adapter?.itemCount ?: 0
+                )
             }
         binding.recyclerViewProducts.layoutManager = gridLayoutManager
     }
