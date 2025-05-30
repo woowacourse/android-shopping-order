@@ -6,6 +6,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.presentation.cart.CartViewModel" />
@@ -20,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:paddingTop="12dp"
+            android:visibility="@{viewModel.pagingData != null ? View.VISIBLE : View.GONE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/layout_order"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,6 +33,7 @@
             android:id="@+id/fr_cart_shimmer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="@{viewModel.pagingData == null ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
