@@ -113,10 +113,10 @@ class CartViewModel(
     }
 
     private fun allCheckOrUnchecked() {
-        val isAllSelected = _cartItems.value?.all { it.isSelected } ?: false
-        if (isAllSelected) _isCheckAll.value = true
-        val isAllNotSelected = _cartItems.value?.all { !it.isSelected } ?: false
-        if (isAllNotSelected) _isCheckAll.value = false
+        val isAllSelected = _cartItems.value?.all { it.isSelected }
+        val isAllNotSelected = _cartItems.value?.all { !it.isSelected }
+        isAllSelected?.let { _isCheckAll.value = true }
+        isAllNotSelected?.let { _isCheckAll.value = false }
     }
 
     private fun updateQuantity(
