@@ -49,7 +49,7 @@ class CartSelectionFragment : Fragment() {
                         viewModel.deleteCartProduct(CartItem.ProductItem(product))
                     },
                 onPaginationButtonClick = viewModel::onPaginationButtonClick,
-                quantityControlListener = viewModel::updateQuantity,
+                onQuantityControl = viewModel::updateQuantity,
                 onCheckClick = viewModel::changeProductSelection,
             )
     }

@@ -11,7 +11,7 @@ class CartAdapter(
     cartItems: List<CartItem>,
     private val onDeleteProductClick: DeleteProductClickListener,
     private val onPaginationButtonClick: PaginationButtonClickListener,
-    private val quantityControlListener: QuantityControlListener,
+    private val onQuantityControl: QuantityControlListener,
     private val onCheckClick: CheckClickListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val cartItems: MutableList<CartItem> = cartItems.toMutableList()
@@ -34,7 +34,7 @@ class CartAdapter(
         viewType: Int,
     ): RecyclerView.ViewHolder =
         if (viewType == CART_PRODUCT) {
-            CartViewHolder.from(parent, onDeleteProductClick, quantityControlListener, onCheckClick)
+            CartViewHolder.from(parent, onDeleteProductClick, onQuantityControl, onCheckClick)
         } else {
             PaginationButtonViewHolder.from(parent, onPaginationButtonClick)
         }
