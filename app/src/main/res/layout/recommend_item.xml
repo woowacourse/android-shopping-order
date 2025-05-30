@@ -23,7 +23,7 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="154dp"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
         android:onClick="@{() -> catalogHandler.onProductClick(product)}">
@@ -54,13 +54,13 @@
             app:product="@{product}" />
 
         <TextView
+            app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/textView_recommend_product_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginTop="8dp"
             android:ellipsize="end"
-            android:maxWidth="139dp"
             android:maxLines="1"
             android:text="@{product.name}"
             android:textColor="@color/black"
