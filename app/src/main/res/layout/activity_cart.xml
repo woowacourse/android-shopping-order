@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.cart.vm.CartViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.cart.CartActivity">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:name="woowacourse.shopping.view.cart.carts.CartListFragment"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/linear_bottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linear_bottom"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/gray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <CheckBox
+                android:id="@+id/checkbox_all_check"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onCheckedChanged="@{(button, isChecked) -> vm.changeAllStateChecked(isChecked)}"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:id="@+id/text_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="전체"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@id/checkbox_all_check"
+                app:layout_constraintStart_toStartOf="@id/checkbox_all_check"
+                app:layout_constraintTop_toBottomOf="@id/checkbox_all_check"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0" />
+
+            <TextView
+                android:id="@+id/text_total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:text="@{@string/format_thousand_won(vm.cartUiState.totalPrice)}"
+                tools:text="184,200원"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/text_order"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/text_order"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/turquoise"
+                android:padding="10dp"
+                android:gravity="center"
+                android:onClick="@{() -> vm.onChangeScreen()}"
+                android:text="@{@string/text_order(vm.cartUiState.checkedProductCount)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="주문하기"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
