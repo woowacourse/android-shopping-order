@@ -13,7 +13,7 @@
 
         <variable
             name="eventHandler"
-            type="woowacourse.shopping.view.cart.adapter.CartViewHolder.Handler" />
+            type="woowacourse.shopping.view.cart.carts.CartViewHolder.Handler" />
 
         <variable
             name="cartQuantityEventHandler"

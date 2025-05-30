@@ -1,4 +1,4 @@
-package woowacourse.shopping.view.cart
+package woowacourse.shopping.view.cart.carts
 
 import android.os.Bundle
 import android.view.View
@@ -7,7 +7,6 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartListBinding
-import woowacourse.shopping.view.cart.adapter.CartAdapter
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
 import woowacourse.shopping.view.core.handler.CartQuantityHandler

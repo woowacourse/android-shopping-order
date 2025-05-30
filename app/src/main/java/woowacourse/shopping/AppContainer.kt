@@ -10,12 +10,11 @@ import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.data.network.service.ProductService
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.data.repository.HistoryRepositoryImpl
+import woowacourse.shopping.data.repository.DefaultHistoryRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.loader.HistoryLoader
-import kotlin.getValue
 
 class AppContainer(
     context: Context,
@@ -37,7 +36,7 @@ class AppContainer(
     val productRepository: ProductRepository =
         DefaultProductRepository(productsDataSource)
 
-    val historyRepository: HistoryRepository = HistoryRepositoryImpl(historyDataSource)
+    val historyRepository: HistoryRepository = DefaultHistoryRepository(historyDataSource)
 
     val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
 

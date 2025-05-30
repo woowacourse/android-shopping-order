@@ -14,6 +14,7 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory

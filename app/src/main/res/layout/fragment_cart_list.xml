@@ -14,7 +14,7 @@
 
         <variable
             name="adapter"
-            type="woowacourse.shopping.view.cart.adapter.CartAdapter" />
+            type="woowacourse.shopping.view.cart.carts.CartAdapter" />
 
     </data>
 

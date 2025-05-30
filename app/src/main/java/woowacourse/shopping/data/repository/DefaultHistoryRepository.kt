@@ -5,7 +5,7 @@ import woowacourse.shopping.data.db.entity.HistoryEntity
 import woowacourse.shopping.domain.repository.HistoryRepository
 import kotlin.concurrent.thread
 
-class HistoryRepositoryImpl(
+class DefaultHistoryRepository(
     private val historyDataSource: HistoryDataSource,
 ) : HistoryRepository {
     override fun getHistories(onResult: (List<Long>) -> Unit) {

@@ -19,7 +19,7 @@
             android:id="@+id/fragment_container_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:name="woowacourse.shopping.view.cart.CartListFragment"
+            android:name="woowacourse.shopping.view.cart.carts.CartListFragment"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/linear_bottom"
             app:layout_constraintStart_toStartOf="parent"
