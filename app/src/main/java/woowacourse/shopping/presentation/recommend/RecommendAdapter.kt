@@ -10,7 +10,7 @@ class RecommendAdapter(
     private val itemClickListener: ItemClickListener,
     private val counterClickListener: CartCounterClickListener,
 ) : ListAdapter<CartItemUiModel, RecommendViewHolder>(
-        ItemDiffUtil,
+        CartItemDiffUtil,
     ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
