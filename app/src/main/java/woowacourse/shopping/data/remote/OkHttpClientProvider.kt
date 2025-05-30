@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.datasource.local.UserPreference
 
 object OkHttpClientProvider {
@@ -43,7 +44,7 @@ object OkHttpClientProvider {
                     }
                 },
             ).apply {
-                level = HttpLoggingInterceptor.Level.BODY
+                if (BuildConfig.DEBUG) level = HttpLoggingInterceptor.Level.BODY
             }
 
         return OkHttpClient
