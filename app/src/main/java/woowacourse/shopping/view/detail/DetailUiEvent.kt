@@ -1,9 +1,9 @@
 package woowacourse.shopping.view.detail
 
 sealed interface DetailUiEvent {
-    data object MoveToCart : DetailUiEvent
+    data class NavigateToCart(val category: String) : DetailUiEvent
 
-    data class MoveToLastSeenProduct(val productId: Long) : DetailUiEvent
+    data class NavigateToLastSeenProduct(val productId: Long) : DetailUiEvent
 
     data object ShowCannotDecrease : DetailUiEvent
 

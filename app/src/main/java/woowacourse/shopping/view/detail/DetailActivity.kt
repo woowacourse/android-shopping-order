@@ -70,7 +70,7 @@ class DetailActivity : AppCompatActivity(), CartQuantityHandler {
     private fun observeViewModel() {
         viewModel.event.observe(this) {
             when (it) {
-                DetailUiEvent.MoveToCart -> navigateToCart()
+                is DetailUiEvent.NavigateToCart -> startActivity(CartActivity.newIntent(this, it.category))
                 is DetailUiEvent.ShowCannotIncrease -> {
                     showToast(
                         getString(R.string.text_over_quantity).format(it.quantity),
@@ -83,16 +83,12 @@ class DetailActivity : AppCompatActivity(), CartQuantityHandler {
                     )
                 }
 
-                is DetailUiEvent.MoveToLastSeenProduct -> {
+                is DetailUiEvent.NavigateToLastSeenProduct -> {
                     startActivity(newIntent(this, it.productId))
                     finish()
                 }
             }
         }
-    }
-
-    private fun navigateToCart() {
-        startActivity(CartActivity.newIntent(this))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

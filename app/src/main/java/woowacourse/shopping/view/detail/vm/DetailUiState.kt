@@ -8,6 +8,9 @@ data class DetailUiState(
     val product: ProductState,
     val lastSeenProduct: Product?,
 ) {
+    val category: String
+        get() = product.item.category
+
     val cartQuantity: Quantity
         get() = product.cartQuantity
 

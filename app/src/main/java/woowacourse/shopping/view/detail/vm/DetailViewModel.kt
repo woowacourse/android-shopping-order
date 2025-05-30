@@ -104,7 +104,7 @@ class DetailViewModel(
                                 state.addQuantity(it.quantity),
                             ) { result ->
                                 result.fold(
-                                    onSuccess = { sendEvent(DetailUiEvent.MoveToCart) },
+                                    onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
                                     onFailure = {},
                                 )
                             }
@@ -116,7 +116,7 @@ class DetailViewModel(
                                 ),
                             ) { result ->
                                 result.fold(
-                                    onSuccess = { sendEvent(DetailUiEvent.MoveToCart) },
+                                    onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
                                     onFailure = {},
                                 )
                             }
@@ -130,7 +130,7 @@ class DetailViewModel(
 
     fun loadLastSeenProduct(lastSeenProductId: Long) {
         historyRepository.saveHistory(lastSeenProductId) {
-            _event.postValue(DetailUiEvent.MoveToLastSeenProduct(lastSeenProductId))
+            _event.postValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
         }
     }
 
