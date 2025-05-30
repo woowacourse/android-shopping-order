@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.cart
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -11,7 +10,6 @@ import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.view.cart.adapter.CartAdapter
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
-import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
 
 class CartListFragment :
@@ -24,7 +22,7 @@ class CartListFragment :
         val container = (requireActivity().application as App).container
         CartViewModelFactory(
             container.cartRepository,
-            container.historyLoader,
+            container.productRepository,
         )
     }
 
@@ -58,12 +56,11 @@ class CartListFragment :
     }
 
     private fun observeViewModel(binding: FragmentCartListBinding) {
-        viewModel.uiState.observe(viewLifecycleOwner) { value ->
+        viewModel.cartUiState.observe(viewLifecycleOwner) { value ->
             cartAdapter.submitList(value.items, value.pageState.page)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { value ->
-            Log.d("Dasdsa", "isLoading: $value ")
             if (!value) {
                 binding.recyclerViewCart.visibility = View.VISIBLE
                 binding.shimmerLayout.visibility = View.GONE

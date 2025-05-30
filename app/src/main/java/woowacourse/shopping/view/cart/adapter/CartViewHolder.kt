@@ -26,7 +26,7 @@ class CartViewHolder(
             parent: ViewGroup,
             handler: Handler,
             cartQuantityHandler: CartQuantityHandler,
-        ): CartViewHolder  {
+        ): CartViewHolder {
             val inflater = LayoutInflater.from(parent.context).inflate(R.layout.item_cart, parent, false)
             val binding = ItemCartBinding.bind(inflater)
             return CartViewHolder(binding, handler, cartQuantityHandler)

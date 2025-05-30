@@ -3,15 +3,15 @@ package woowacourse.shopping.view.cart.vm
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.view.loader.HistoryLoader
+import woowacourse.shopping.domain.repository.ProductRepository
 
 class CartViewModelFactory(
     private val cartRepository: CartRepository,
-    private val historyLoader: HistoryLoader,
+    private val productRepository: ProductRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
-            return CartViewModel(cartRepository, historyLoader) as T
+            return CartViewModel(cartRepository, productRepository) as T
         }
         throw IllegalArgumentException()
     }

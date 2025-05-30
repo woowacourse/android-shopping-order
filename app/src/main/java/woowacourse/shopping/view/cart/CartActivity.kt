@@ -14,10 +14,10 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
 import woowacourse.shopping.view.core.ext.showToast
-import kotlin.io.path.Path
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -25,13 +25,15 @@ class CartActivity : AppCompatActivity() {
         val container = (application as App).container
         CartViewModelFactory(
             container.cartRepository,
-            container.historyLoader,
+            container.productRepository,
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
+        val category = intent.getStringExtra(EXTRA_CATEGORY)
+        viewModel.setCategory(category)
 
         setUpBinding()
         setUpSystemBars()
@@ -73,10 +75,11 @@ class CartActivity : AppCompatActivity() {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 supportFragmentManager.commit {
-                    replace(R.id.fragment_container_view, OrderCompleteFragment())
+                    replace(R.id.fragment_container_view, RecommendFragment())
                 }
             }
-            is OrderCompleteFragment -> {}
+
+            is RecommendFragment -> {}
         }
     }
 
@@ -86,26 +89,36 @@ class CartActivity : AppCompatActivity() {
                 onClickHomeButton()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun onClickHomeButton(){
+    private fun onClickHomeButton() {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 val resultIntent = Intent()
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
-            is OrderCompleteFragment -> supportFragmentManager.commit {
-                replace(R.id.fragment_container_view, CartListFragment())
-            }
+
+            is RecommendFragment ->
+                supportFragmentManager.commit {
+                    replace(R.id.fragment_container_view, CartListFragment())
+                }
         }
     }
 
     companion object {
-        fun newIntent(context: Context): Intent {
-            return Intent(context, CartActivity::class.java)
+        fun newIntent(
+            context: Context,
+            category: String?,
+        ): Intent {
+            return Intent(context, CartActivity::class.java).apply {
+                putExtra(EXTRA_CATEGORY, category)
+            }
         }
+
+        private const val EXTRA_CATEGORY = "category"
     }
 }
