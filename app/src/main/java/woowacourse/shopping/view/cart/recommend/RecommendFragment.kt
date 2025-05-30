@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.cart.recommend
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -36,7 +37,8 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
         setUpRecyclerView(binding)
         viewModel.loadRecommendProduct()
         viewModel.recommendUiState.observe(viewLifecycleOwner) { value ->
-            recommendAdapter.submitList(value)
+            Log.d("TAG", "onViewCreated: ${value.item.first()}")
+            recommendAdapter.submitList(value.item)
         }
     }
 
@@ -54,12 +56,15 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     private val recommendAdapterHandler =
         object : RecommendAdapter.Handler {
             override fun showQuantity(productId: Long) {
+                Log.d("TAG", "showQuantity: ")
+                viewModel.increaseRecommendProductQuantity(productId)
             }
         }
 
     private val quantityHandler =
         object : CartQuantityHandler {
             override fun onClickIncrease(productId: Long) {
+                viewModel.increaseRecommendProductQuantity(productId)
             }
 
             override fun onClickDecrease(productId: Long) {

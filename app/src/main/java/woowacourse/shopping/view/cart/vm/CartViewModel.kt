@@ -1,14 +1,17 @@
 package woowacourse.shopping.view.cart.vm
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.Quantity
+import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.cart.CartUiEvent
 import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.cart.state.CartUiState
+import woowacourse.shopping.view.cart.state.RecommendUiState
 import woowacourse.shopping.view.cart.vm.Paging.Companion.INITIAL_PAGE_NO
 import woowacourse.shopping.view.cart.vm.Paging.Companion.PAGE_SIZE
 import woowacourse.shopping.view.core.common.withState
@@ -25,8 +28,8 @@ class CartViewModel(
     private val _cartUiState = MutableLiveData<CartUiState>()
     val cartUiState: LiveData<CartUiState> get() = _cartUiState
 
-    private val _recommendUiState = MutableLiveData<List<ProductState>>()
-    val recommendUiState: LiveData<List<ProductState>> get() = _recommendUiState
+    private val _recommendUiState = MutableLiveData<RecommendUiState>()
+    val recommendUiState: LiveData<RecommendUiState> get() = _recommendUiState
 
     private val _event = MutableSingleLiveData<CartUiEvent>()
     val event: SingleLiveData<CartUiEvent> get() = _event
@@ -50,7 +53,7 @@ class CartViewModel(
                 products.fold(
                     onSuccess = { result ->
 
-                        val recommentProduct =
+                        val recommendProduct =
                             result
                                 .products
                                 .asSequence()
@@ -60,7 +63,7 @@ class CartViewModel(
                                 .map { ProductState(item = it, cartQuantity = Quantity(0)) }
                                 .toList()
 
-                        _recommendUiState.value = recommentProduct
+                        _recommendUiState.value = RecommendUiState(recommendProduct)
                     },
                     onFailure = {},
                 )
@@ -68,34 +71,36 @@ class CartViewModel(
         }
     }
 
-//    fun increaseCartQuantity(productId: Long) =
-//        withState(_uiState.value) { state ->
-//            val updated = state.increaseCartQuantity(productId)
-//
-//            when (val cartId = updated.cartId) {
-//                null -> {
-//                    cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-//                        it.fold(
-//                            onSuccess = { value ->
-//                                _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
-//                            },
-//                            onFailure = { handleError(TAG_INCREASE, it) },
-//                        )
-//                    }
-//                }
-//
-//                else -> {
-//                    cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-//                        it.fold(
-//                            onSuccess = {
-//                                _uiState.value = state.modifyUiState(updated)
-//                            },
-//                            onFailure = { handleError(TAG_INCREASE, it) },
-//                        )
-//                    }
-//                }
-//            }
-//        }
+    fun increaseRecommendProductQuantity(productId: Long) =
+        withState(_recommendUiState.value) { state ->
+            val updated = state.increaseQuantity(productId)
+
+            when (val cartId = updated.cartId) {
+                null -> {
+                    cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
+                        it.fold(
+                            onSuccess = { value ->
+                                Log.d("TAG", "increaseRecommendProductQuantity: ${updated} ")
+                                _recommendUiState.value = state.modifyUiState(updated.copy(cartId = value?.toLong()))
+                            },
+                            onFailure = {  },
+                        )
+                    }
+                }
+
+                else -> {
+                    Log.d("TAG", "널아님")
+                    cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
+                        value.fold(
+                            onSuccess = {
+                                _recommendUiState.value = state.modifyUiState(updated)
+                            },
+                            onFailure = { },
+                        )
+                    }
+                }
+            }
+        }
 
     fun decreaseCartQuantity(productId: Long) {
         withState(_cartUiState.value) { state ->
