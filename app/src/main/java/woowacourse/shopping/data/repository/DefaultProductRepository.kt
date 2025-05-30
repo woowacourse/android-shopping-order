@@ -6,14 +6,15 @@ import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class DefaultProductRepository(
-    private val dataSource: ProductsDataSource,
+    private val productDataSource: ProductsDataSource,
 ) : ProductRepository {
     override fun loadSinglePage(
-        page: Int,
-        pageSize: Int,
+        category: String?,
+        page: Int?,
+        pageSize: Int?,
         callback: (Result<ProductSinglePage>) -> Unit,
     ) {
-        dataSource.singlePage(page, pageSize) { result ->
+        productDataSource.singlePage(category, page, pageSize) { result ->
             result.fold(
                 onSuccess = { response ->
                     if (response != null) {
@@ -34,7 +35,7 @@ class DefaultProductRepository(
         productId: Long,
         callback: (Result<Product>) -> Unit,
     ) {
-        dataSource.getProduct(productId) { result ->
+        productDataSource.getProduct(productId) { result ->
             result.fold(
                 onSuccess = { response ->
                     if (response != null) {

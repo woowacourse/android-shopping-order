@@ -6,7 +6,7 @@ import woowacourse.shopping.data.db.entity.HistoryEntity
 class HistoryDataSource(
     private val dao: HistoryDao,
 ) {
-    fun latestHistory(): List<HistoryEntity> = dao.getLatestHistory()
+    fun latestHistory(): List<HistoryEntity> = dao.getLatestHistories()
 
     fun insertHistory(entity: HistoryEntity) = dao.insert(entity)
 }

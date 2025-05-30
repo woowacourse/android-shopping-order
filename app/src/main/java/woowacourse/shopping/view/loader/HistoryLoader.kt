@@ -9,10 +9,10 @@ class HistoryLoader(
     private val historyRepository: HistoryRepository,
 ) {
     operator fun invoke(onResult: (Result<List<HistoryState>>) -> Unit) {
-        historyRepository.getHistory { historyIds ->
+        historyRepository.getHistories { historyIds ->
             if (historyIds.isEmpty()) {
                 onResult(Result.success(emptyList()))
-                return@getHistory
+                return@getHistories
             }
 
             val historyProducts = mutableListOf<HistoryState>()
@@ -29,6 +29,7 @@ class HistoryLoader(
                                 HistoryState(
                                     product.id,
                                     product.name,
+                                    product.category,
                                     product.imgUrl,
                                 ),
                             )
