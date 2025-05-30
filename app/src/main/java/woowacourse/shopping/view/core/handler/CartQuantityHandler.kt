@@ -1,7 +1,7 @@
 package woowacourse.shopping.view.core.handler
 
 interface CartQuantityHandler {
-    fun onClickIncrease(productId: Long)
+    fun onClickIncrease(cartId: Long)
 
-    fun onClickDecrease(productId: Long)
+    fun onClickDecrease(cartId: Long)
 }

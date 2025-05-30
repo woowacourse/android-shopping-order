@@ -1,5 +1,8 @@
 package woowacourse.shopping.view.cart.state
 
+import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.view.main.state.ProductState
+
 data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
@@ -14,6 +17,23 @@ data class CartUiState(
     val cartIds: List<Long>
         get() = items.map { it.cart.productId }
 
+    fun findCart(cartId: Long) = items.find { it.cartId == cartId } ?: throw IllegalArgumentException()
+
+    fun addCart(cartId: Long, productState: ProductState): CartUiState {
+        val shoppingCart = ShoppingCart(cartId, productState.item, productState.cartQuantity)
+        val cartState = CartState(shoppingCart, true)
+        val mutableItems = items.toMutableList()
+        mutableItems.add(cartState)
+        return copy(items = mutableItems)
+    }
+
+    fun deleteCart(cartId: Long): CartUiState {
+        val targetIndex = items.indexOfFirst { it.cartId == cartId }
+        val mutableItems = items.toMutableList()
+        mutableItems.removeAt(targetIndex)
+        return copy(items = mutableItems)
+    }
+
     fun setAllItemsChecked(isChecked: Boolean): CartUiState {
         val updatedItems = items.map { it.modifyChecked(isChecked) }
         return copy(items = updatedItems, allChecked = isChecked)
@@ -26,19 +46,19 @@ data class CartUiState(
         return updateItem(cartId) { it.modifyChecked(check) }
     }
 
-    fun increaseCartQuantity(productId: Long): CartUiState {
-        return updateItem(productId) { it.increaseCartQuantity() }
+    fun increaseCartQuantity(cartId: Long): CartUiState {
+        return updateItem(cartId) { it.increaseCartQuantity() }
     }
 
-    fun decreaseCartQuantity(productId: Long): CartUiState {
-        return updateItem(productId) { it.decreaseCartQuantity(1) }
+    fun decreaseCartQuantity(cartId: Long): CartUiState {
+        return updateItem(cartId) { it.decreaseCartQuantity(1) }
     }
 
     private fun updateItem(
-        productId: Long,
+        cartId: Long,
         transform: (CartState) -> CartState,
     ): CartUiState {
-        val index = items.indexOfFirst { it.cartId == productId }
+        val index = items.indexOfFirst { it.cartId == cartId }
         if (index == -1) return this
 
         val updatedItems = items.toMutableList()

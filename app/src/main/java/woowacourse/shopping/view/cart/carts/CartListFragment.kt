@@ -78,11 +78,11 @@ class CartListFragment :
         viewModel.updateCheckedState(cartId, isChecked)
     }
 
-    override fun onClickIncrease(productId: Long) {
-        viewModel.increaseCartQuantity(productId)
+    override fun onClickIncrease(cartId: Long) {
+        viewModel.increaseCartQuantity(cartId)
     }
 
-    override fun onClickDecrease(productId: Long) {
-        viewModel.decreaseCartQuantity(productId)
+    override fun onClickDecrease(cartId: Long) {
+        viewModel.decreaseCartQuantity(cartId)
     }
 }

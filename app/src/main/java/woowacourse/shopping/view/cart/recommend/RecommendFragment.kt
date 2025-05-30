@@ -37,7 +37,6 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
         setUpRecyclerView(binding)
         viewModel.loadRecommendProduct()
         viewModel.recommendUiState.observe(viewLifecycleOwner) { value ->
-            Log.d("TAG", "onViewCreated: ${value.item.first()}")
             recommendAdapter.submitList(value.item)
         }
     }
@@ -56,7 +55,6 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     private val recommendAdapterHandler =
         object : RecommendAdapter.Handler {
             override fun showQuantity(productId: Long) {
-                Log.d("TAG", "showQuantity: ")
                 viewModel.increaseRecommendProductQuantity(productId)
             }
         }
@@ -68,6 +66,7 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
             }
 
             override fun onClickDecrease(productId: Long) {
+                viewModel.decreaseRecommendProductQuantity(productId)
             }
         }
 }

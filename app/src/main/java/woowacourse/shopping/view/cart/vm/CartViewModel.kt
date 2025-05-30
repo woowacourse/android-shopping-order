@@ -57,12 +57,11 @@ class CartViewModel(
                             result
                                 .products
                                 .asSequence()
-                                .filterNot { it.id !in state.cartIds }
+                                .filter { it.id !in state.cartIds }
                                 .shuffled()
                                 .take(RECOMMEND_SIZE)
                                 .map { ProductState(item = it, cartQuantity = Quantity(0)) }
                                 .toList()
-
                         _recommendUiState.value = RecommendUiState(recommendProduct)
                     },
                     onFailure = {},
@@ -80,20 +79,23 @@ class CartViewModel(
                     cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
                         it.fold(
                             onSuccess = { value ->
-                                Log.d("TAG", "increaseRecommendProductQuantity: ${updated} ")
-                                _recommendUiState.value = state.modifyUiState(updated.copy(cartId = value?.toLong()))
+                                val cartId = value?.toLong() ?: 0L
+                                _recommendUiState.value =
+                                    state.modifyUiState(updated.copy(cartId = cartId))
+                                _cartUiState.value = _cartUiState.value?.addCart(cartId, updated)
+                                Log.d("TAG", "afterAdd: ${_cartUiState.value?.items}")
                             },
-                            onFailure = {  },
+                            onFailure = { },
                         )
                     }
                 }
 
                 else -> {
-                    Log.d("TAG", "널아님")
                     cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
                         value.fold(
                             onSuccess = {
                                 _recommendUiState.value = state.modifyUiState(updated)
+                                increaseCartQuantity(cartId)
                             },
                             onFailure = { },
                         )
@@ -102,12 +104,41 @@ class CartViewModel(
             }
         }
 
-    fun decreaseCartQuantity(productId: Long) {
-        withState(_cartUiState.value) { state ->
-            val updatedState = state.decreaseCartQuantity(productId)
-            val updatedItem = updatedState.items.first { it.cartId == productId }
+    fun decreaseRecommendProductQuantity(productId: Long) =
+        withState(_recommendUiState.value) { state ->
+            val updated = state.decreaseCartQuantity(productId)
+            val cartId = updated.cartId ?: return
 
-            cartRepository.updateQuantity(productId, updatedItem.cart.quantity) { result ->
+            if (updated.hasCartQuantity) {
+                cartRepository.updateQuantity(cartId, updated.cartQuantity) {
+                    it.fold(
+                        onSuccess = {
+                            _recommendUiState.value = state.modifyUiState(updated)
+                            decreaseCartQuantity(cartId)
+                        },
+                        onFailure = { },
+                    )
+                }
+            } else {
+                cartRepository.deleteCart(cartId) {
+                    it.fold(
+                        onSuccess = {
+                            val result = updated.copy(cartId = null)
+                            _recommendUiState.value = state.modifyUiState(result)
+                            _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
+                        },
+                        onFailure = { },
+                    )
+                }
+            }
+        }
+
+    fun decreaseCartQuantity(cartId: Long) {
+        withState(_cartUiState.value) { state ->
+            val updatedState = state.decreaseCartQuantity(cartId)
+            val updatedItem = updatedState.items.first { it.cartId == cartId }
+
+            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
                 result.fold(
                     onSuccess = {
                         _cartUiState.value = updatedState
@@ -118,12 +149,12 @@ class CartViewModel(
         }
     }
 
-    fun increaseCartQuantity(productId: Long) {
+    fun increaseCartQuantity(cartId: Long) {
         withState(_cartUiState.value) { state ->
-            val updatedState = state.increaseCartQuantity(productId)
-            val updatedItem = updatedState.items.first { it.cartId == productId }
+            val updatedState = state.increaseCartQuantity(cartId)
+            val updatedItem = updatedState.findCart(cartId)
 
-            cartRepository.updateQuantity(productId, updatedItem.cart.quantity) { result ->
+            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
                 result.fold(
                     onSuccess = {
                         _cartUiState.value = updatedState
