@@ -17,6 +17,7 @@ data class ProductEntity(
             name = name,
             imgUrl = imgUrl,
             price = Price(price),
+            category = "",
             quantity = Quantity(quantity),
         )
     }
