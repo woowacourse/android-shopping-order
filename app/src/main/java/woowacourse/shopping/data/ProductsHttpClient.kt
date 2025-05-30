@@ -7,6 +7,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.cart.dto.CartItemRequest
 import woowacourse.shopping.data.cart.dto.CartQuantityResponse
 import woowacourse.shopping.data.cart.dto.CartResponse
@@ -111,11 +112,8 @@ class ProductsHttpClient(
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
-            .addInterceptor(
-                HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                },
-            ).build()
+            .addHttpLoggingInterceptor()
+            .build()
 
     private fun http(
         httpMethod: HttpMethod,
@@ -145,6 +143,14 @@ class ProductsHttpClient(
             }
         }
     }
+
+    private fun OkHttpClient.Builder.addHttpLoggingInterceptor() =
+        addInterceptor(
+            HttpLoggingInterceptor().apply {
+                level =
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+            },
+        )
 
     companion object {
         private const val PATH_CART_ITEMS = "/cart-items"

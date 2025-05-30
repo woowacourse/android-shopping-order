@@ -6,6 +6,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.cart.service.CartService
 import woowacourse.shopping.data.product.service.ProductService
 
@@ -13,11 +14,8 @@ object API {
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
-            .addInterceptor(
-                HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                },
-            ).build()
+            .addHttpLoggingInterceptor()
+            .build()
 
     private val retrofit =
         Retrofit
@@ -29,4 +27,12 @@ object API {
 
     val productService: ProductService = retrofit.create(ProductService::class.java)
     val cartService: CartService = retrofit.create(CartService::class.java)
+
+    private fun OkHttpClient.Builder.addHttpLoggingInterceptor() =
+        addInterceptor(
+            HttpLoggingInterceptor().apply {
+                level =
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+            },
+        )
 }
