@@ -3,8 +3,8 @@ package woowacourse.shopping.data.cart.repository
 import woowacourse.shopping.data.cart.PageableCartItemData
 import woowacourse.shopping.data.cart.source.CartDataSource
 import woowacourse.shopping.data.cart.source.RemoteCartDataSource
+import woowacourse.shopping.domain.Pageable
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.cart.PageableCartItems
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(
@@ -13,13 +13,13 @@ class DefaultCartRepository(
     override fun loadPageableCartItems(
         page: Int,
         size: Int,
-        onLoad: (Result<PageableCartItems>) -> Unit,
+        onLoad: (Result<Pageable<CartItem>>) -> Unit,
     ) {
         {
             val pageableCartItemData: PageableCartItemData =
                 cartDataSource.pageableCartItems(page, size)
-            PageableCartItems(
-                cartItems = pageableCartItemData.cartItems.map { it.toDomain() },
+            Pageable<CartItem>(
+                items = pageableCartItemData.cartItems.map { it.toDomain() },
                 hasPrevious = pageableCartItemData.hasPrevious,
                 hasNext = pageableCartItemData.hasNext,
             )

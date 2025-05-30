@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
+import woowacourse.shopping.domain.Pageable
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.cart.PageableCartItems
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
@@ -96,9 +96,9 @@ class CartViewModel(
     private fun loadCartItems() {
         cartRepository.loadPageableCartItems(page - 1, COUNT_PER_PAGE) { result ->
             result
-                .onSuccess { pageableCartItems: PageableCartItems ->
+                .onSuccess { pageableCartItems: Pageable<CartItem> ->
                     val cartItems: List<CartItemType.ProductItem> =
-                        pageableCartItems.cartItems.map { newCartItem: CartItem ->
+                        pageableCartItems.items.map { newCartItem: CartItem ->
                             val checked =
                                 selectedCartItems.value?.any { selectedProductItem: CartItemType.ProductItem ->
                                     newCartItem == selectedProductItem.cartItem

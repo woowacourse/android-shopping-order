@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.product.repository
 
-import woowacourse.shopping.domain.product.PageableProducts
+import woowacourse.shopping.domain.Pageable
 import woowacourse.shopping.domain.product.Product
 
 interface ProductsRepository {
     fun loadPageableProducts(
         page: Int,
         size: Int,
-        onLoad: (Result<PageableProducts>) -> Unit,
+        onLoad: (Result<Pageable<Product>>) -> Unit,
     )
 
     fun getProductById(

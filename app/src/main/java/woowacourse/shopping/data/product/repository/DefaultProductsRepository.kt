@@ -7,7 +7,7 @@ import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSou
 import woowacourse.shopping.data.product.source.ProductsDataSource
 import woowacourse.shopping.data.product.source.RecentViewedProductsDataSource
 import woowacourse.shopping.data.product.source.RemoteProductsDataSource
-import woowacourse.shopping.domain.product.PageableProducts
+import woowacourse.shopping.domain.Pageable
 import woowacourse.shopping.domain.product.Product
 import java.time.LocalDateTime
 import kotlin.concurrent.thread
@@ -19,7 +19,7 @@ class DefaultProductsRepository(
     override fun loadPageableProducts(
         page: Int,
         size: Int,
-        onLoad: (Result<PageableProducts>) -> Unit,
+        onLoad: (Result<Pageable<Product>>) -> Unit,
     ) {
         {
             val pageableProductData: PageableProductData =
@@ -27,9 +27,10 @@ class DefaultProductsRepository(
                     page = page,
                     size = size,
                 )
-            PageableProducts(
-                products = pageableProductData.products.map { it.toDomain() },
-                loadable = pageableProductData.loadable,
+            Pageable<Product>(
+                items = pageableProductData.products.map { it.toDomain() },
+                hasPrevious = false,
+                hasNext = pageableProductData.loadable,
             )
         }.runAsync(onLoad)
     }
