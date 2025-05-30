@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils.replace
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
@@ -18,11 +18,8 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    val viewModel: CartViewModel by lazy {
-        ViewModelProvider(
-            this,
-            CartViewModelFactory(application as ShoppingApplication),
-        )[CartViewModel::class.java]
+    val viewModel: CartViewModel by viewModels {
+        CartViewModelFactory(application as ShoppingApplication)
     }
     private var hasHandledTotalCount = false
 
@@ -47,7 +44,7 @@ class CartActivity : AppCompatActivity() {
                         setReorderingAllowed(true)
                         replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
                     }
-                } else if(it == 0) {
+                } else if (it == 0) {
                     hasHandledTotalCount = true
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
