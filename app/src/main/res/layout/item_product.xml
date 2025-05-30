@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/product_item_background"
-        android:onClick="@{() -> adapterEventHandler.onSelectProduct(model.productId, model.item.category)}">
+        android:onClick="@{() -> adapterEventHandler.onSelectProduct(model.productId)}">
 
         <ImageView
             android:id="@+id/image_view_product"
