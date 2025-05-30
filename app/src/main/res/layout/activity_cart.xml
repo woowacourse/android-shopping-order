@@ -99,7 +99,6 @@
                     android:id="@+id/checkbox_order_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-3dp"
                     android:buttonTint="@color/white"
                     android:checked="@={viewModel.isAllChecked}"
                     android:onClick="@{() -> viewModel.onCheckAllCartItems()}"
