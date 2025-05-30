@@ -47,7 +47,7 @@ class CartActivity : AppCompatActivity() {
                         setReorderingAllowed(true)
                         replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
                     }
-                } else {
+                } else if(it == 0) {
                     hasHandledTotalCount = true
                     supportFragmentManager.commit {
                         setReorderingAllowed(true)
