@@ -30,6 +30,16 @@ android {
             "TECHCOURSE_URL",
             gradleLocalProperties(rootDir, providers).getProperty("techcourse.url"),
         )
+        buildConfigField(
+            "String",
+            "DEFAULT_USERNAME",
+            gradleLocalProperties(rootDir, providers).getProperty("default.username"),
+        )
+        buildConfigField(
+            "String",
+            "DEFAULT_PASSWORD",
+            gradleLocalProperties(rootDir, providers).getProperty("default.password"),
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =

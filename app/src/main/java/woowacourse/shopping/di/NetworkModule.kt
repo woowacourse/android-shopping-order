@@ -8,13 +8,24 @@ import woowacourse.shopping.data.api.CartApi
 import woowacourse.shopping.data.api.OrderApi
 import woowacourse.shopping.data.api.ProductApi
 import woowacourse.shopping.data.interceptor.ShoppingAuthInterceptor
+import woowacourse.shopping.di.PreferenceModule.authSharedPreference
 
 object NetworkModule {
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
-            .addInterceptor(ShoppingAuthInterceptor("parkjiminnnn", "password"))
-            .build()
+            .addInterceptor(
+                ShoppingAuthInterceptor(
+                    authSharedPreference.getAuthUsername()
+                        ?: BuildConfig.DEFAULT_USERNAME.apply {
+                            authSharedPreference.putAuthId(this)
+                        },
+                    authSharedPreference.getAuthPassword()
+                        ?: BuildConfig.DEFAULT_PASSWORD.apply {
+                            authSharedPreference.putAuthPassword(this)
+                        },
+                ),
+            ).build()
     }
 
     private val retrofit: Retrofit by lazy {
