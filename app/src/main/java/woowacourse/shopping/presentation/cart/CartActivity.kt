@@ -41,7 +41,6 @@ class CartActivity :
         binding.clickListener = this
         binding.lifecycleOwner = this
 
-        showSkeleton(true)
         initInsets()
         initAdapter()
         setupToolbar()
