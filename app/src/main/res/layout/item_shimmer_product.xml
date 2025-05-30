@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/product_item_background">
 
-        <ImageView
+        <View
             android:id="@+id/image_view_product"
             android:layout_width="154dp"
             android:layout_height="154dp"
@@ -19,7 +19,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <View
             android:id="@+id/textView_product_name"
             android:layout_width="140dp"
             android:layout_height="20dp"
@@ -31,7 +31,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image_view_product" />
 
-        <TextView
+        <View
             android:id="@+id/textView_product_price"
             android:layout_width="120dp"
             android:layout_height="25dp"

@@ -12,5 +12,5 @@ interface HistoryDao {
     fun insert(history: HistoryEntity)
 
     @Query("SELECT * FROM history_table ORDER BY createdAt DESC LIMIT 10")
-    fun getLatestHistory(): List<HistoryEntity>
+    fun getLatestHistories(): List<HistoryEntity>
 }
