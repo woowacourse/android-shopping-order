@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.cart.vm.CartViewModel" />
+
+        <variable
+            name="adapter"
+            type="woowacourse.shopping.view.cart.carts.CartAdapter" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="18dp"
+        android:paddingTop="24dp"
+        tools:context=".view.cart.CartActivity">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_cart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="60dp"
+            android:adapter="@{adapter}"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/pager"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/pager"
+            app:layout_constraintTop_toBottomOf="@id/recycler_view_cart"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/item_shimmer_cart" />
+
+                <include layout="@layout/item_shimmer_cart" />
+                <include layout="@layout/item_shimmer_cart" />
+                <include layout="@layout/item_shimmer_cart" />
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+        <LinearLayout
+            android:id="@+id/pager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:gravity="center"
+            android:visibility="@{vm.cartUiState.pageState.pageVisibility ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageButton
+                android:id="@+id/button_previous"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/previous_button_shape"
+                android:enabled="@{vm.cartUiState.pageState.previousPageEnabled}"
+                android:inset="0dp"
+                android:onClick="@{() -> vm.subPage()}"
+                android:src="@drawable/ic_previous" />
+
+            <TextView
+                android:id="@+id/text_view_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="11dp"
+                android:text="@{String.valueOf(vm.cartUiState.pageState.page)}"
+                android:textColor="@color/gray"
+                android:textSize="22sp" />
+
+            <ImageButton
+                android:id="@+id/button_forward"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/forward_button_shape"
+                android:enabled="@{vm.cartUiState.pageState.nextPageEnabled}"
+                android:inset="0dp"
+                android:onClick="@{() -> vm.addPage()}"
+                android:src="@drawable/ic_forward" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
