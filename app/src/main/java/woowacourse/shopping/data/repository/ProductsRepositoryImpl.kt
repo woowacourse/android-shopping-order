@@ -21,6 +21,7 @@ class ProductsRepositoryImpl(
                 .mapCatching { response ->
                     PagingData(
                         products = response.content.map { it.toDomain().toUiModel() },
+                        page = response.pageable.pageNumber,
                         hasNext = !response.last,
                         hasPrevious = !response.first,
                     )

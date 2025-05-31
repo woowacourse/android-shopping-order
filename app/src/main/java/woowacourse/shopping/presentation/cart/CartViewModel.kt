@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class CartViewModel(
     private val cartRepository: CartItemRepository,
@@ -23,13 +22,8 @@ class CartViewModel(
     private val _isPrevButtonEnabled = MutableLiveData(false)
     val isPrevButtonEnabled: LiveData<Boolean> = _isPrevButtonEnabled
 
-    private val _pageEvent = SingleLiveEvent<Int>()
-    val pageEvent: LiveData<Int> = _pageEvent
-
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
-
-    private var currentPage: Int = INITIAL_PAGE
 
     private val _pagingData = MutableLiveData<PagingData>()
     val pagingData: LiveData<PagingData> = _pagingData
@@ -53,7 +47,8 @@ class CartViewModel(
         cartRepository.deleteCartItem(cartProduct.id) { result ->
             result
                 .onSuccess {
-                    loadCartProducts()
+                    val currentPage = pagingData.value?.page ?: 0
+                    loadCartProducts(currentPage)
                     setCheckedProducts(cartProduct)
                 }
         }
@@ -67,19 +62,17 @@ class CartViewModel(
     }
 
     override fun onNextPage() {
-        if (currentPage >= 0 && _pagingData.value?.hasNext == true) {
-            currentPage++
-            _pageEvent.postValue(currentPage)
-            loadCartProducts()
+        val currentPage = _pagingData.value?.page ?: INITIAL_PAGE
+        if (_pagingData.value?.hasNext == true) {
+            loadCartProducts(page = currentPage + 1)
             isAllChecked.value = false
         }
     }
 
     override fun onPrevPage() {
+        val currentPage = _pagingData.value?.page ?: INITIAL_PAGE
         if (currentPage > 0) {
-            currentPage--
-            _pageEvent.postValue(currentPage)
-            loadCartProducts()
+            loadCartProducts(page = currentPage - 1)
             isAllChecked.value = false
         }
     }
@@ -115,7 +108,7 @@ class CartViewModel(
 
     override fun isPaginationEnabled(): Boolean = (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
 
-    override fun getPage(): Int = currentPage
+    override fun getPage(): Int = pagingData.value?.page ?: 0
 
     override fun onCheckProduct(product: ProductUiModel) {
         val currentPagingData = _pagingData.value ?: return
@@ -163,13 +156,11 @@ class CartViewModel(
         isAllChecked.value = currentProducts.isNotEmpty() && currentProducts.all { it.isChecked }
     }
 
-    private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
-        cartRepository.getCartItems(currentPage, pageSize) { result ->
+    private fun loadCartProducts(page: Int = INITIAL_PAGE, pageSize: Int = PAGE_SIZE) {
+        cartRepository.getCartItems(page, pageSize) { result ->
             result.onSuccess { pagingData ->
-                if (pagingData.products.isEmpty() && currentPage > 0) {
-                    currentPage--
-                    _pageEvent.postValue(currentPage)
-                    loadCartProducts()
+                if (pagingData.products.isEmpty() && pagingData.page > 0) {
+                    loadCartProducts(page = pagingData.page - 1)
                     isAllChecked.value = pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
                 } else {
                     val checkedProductIds = _checkedProducts.value?.map { it.id } ?: emptyList()

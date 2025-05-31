@@ -60,6 +60,7 @@ class CartItemsRepositoryImpl(
                 .mapCatching { response ->
                     PagingData(
                         products = response.content.map { it.toUiModel() },
+                        page = response.pageable.pageNumber,
                         hasNext = !response.last,
                         hasPrevious = !response.first,
                     )

@@ -67,14 +67,11 @@ class CartActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.pagingData.observe(this) {
             cartAdapter.setData(it.products, it)
+            cartAdapter.setPagination()
         }
 
         viewModel.product.observe(this) {
             cartAdapter.updateProduct(it)
-        }
-
-        viewModel.pageEvent.observe(this) {
-            cartAdapter.setPagination()
         }
     }
 
