@@ -4,6 +4,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.datasource.handleFailure
 import woowacourse.shopping.data.dto.cart.CartItemCountResponse
 import woowacourse.shopping.data.dto.cart.CartItemRequest
 import woowacourse.shopping.data.dto.cart.CartsResponse
@@ -86,7 +87,7 @@ class CartRemoteDataSourceImpl(
                         onResult(Result.success(cartId))
                         return
                     }
-                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                    handleFailure(onResult)
                 }
 
                 override fun onFailure(
@@ -115,7 +116,7 @@ class CartRemoteDataSourceImpl(
                         onResult(Result.success(Unit))
                         return
                     }
-                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                    handleFailure(onResult)
                 }
 
                 override fun onFailure(

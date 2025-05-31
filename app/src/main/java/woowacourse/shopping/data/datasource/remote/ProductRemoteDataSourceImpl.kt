@@ -3,6 +3,7 @@ package woowacourse.shopping.data.datasource.remote
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.datasource.handleFailure
 import woowacourse.shopping.data.dto.product.ProductContent
 import woowacourse.shopping.data.dto.product.ProductsResponse
 import woowacourse.shopping.data.dto.product.toDomain
@@ -30,7 +31,7 @@ class ProductRemoteDataSourceImpl(
                         onResult(Result.success(products))
                         return
                     }
-                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                    handleFailure(onResult)
                 }
 
                 override fun onFailure(
@@ -60,7 +61,7 @@ class ProductRemoteDataSourceImpl(
                         onResult(Result.success(product))
                         return
                     }
-                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                    handleFailure(onResult)
                 }
 
                 override fun onFailure(
