@@ -25,6 +25,7 @@ android {
 
         buildConfigField("String", "NAME", gradleLocalProperties(rootDir, providers).getProperty("name"))
         buildConfigField("String", "PASSWORD", gradleLocalProperties(rootDir, providers).getProperty("password"))
+        buildConfigField("String", "BASE_URL", "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com\"")
     }
 
     buildTypes {
