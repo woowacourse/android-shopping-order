@@ -21,7 +21,7 @@ class RecentProductListViewHolder(
     }
 
     fun bind(item: ProductCatalogItem.RecentProductsItem) {
-        adapter.updateItems(item.recentProducts)
+        adapter.submitList(item.recentProducts)
     }
 
     companion object {

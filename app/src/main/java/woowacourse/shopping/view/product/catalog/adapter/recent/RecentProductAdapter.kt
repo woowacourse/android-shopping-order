@@ -1,48 +1,37 @@
 package woowacourse.shopping.view.product.catalog.adapter.recent
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.domain.model.RecentProduct
 
 class RecentProductAdapter(
-    items: List<RecentProduct> = emptyList(),
     private val eventHandler: RecentProductViewHolder.EventHandler,
-) : RecyclerView.Adapter<RecentProductViewHolder>() {
-    private val items = items.toMutableList()
-
+) : ListAdapter<RecentProduct, RecentProductViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecentProductViewHolder = RecentProductViewHolder.from(parent, eventHandler)
 
-    override fun getItemCount(): Int = items.size
-
     override fun onBindViewHolder(
         holder: RecentProductViewHolder,
         position: Int,
     ) {
-        holder.bind(items[position])
+        holder.bind(getItem(position))
     }
 
-    fun updateItems(newItems: List<RecentProduct>) {
-        val oldSize = items.size
-        val newSize = newItems.size
-        val minSize = minOf(oldSize, newSize)
+    companion object {
+        private val diffCallback =
+            object : DiffUtil.ItemCallback<RecentProduct>() {
+                override fun areItemsTheSame(
+                    oldItem: RecentProduct,
+                    newItem: RecentProduct,
+                ): Boolean = oldItem.product.id == newItem.product.id
 
-        for (i in 0 until minSize) {
-            val oldItem = items[i]
-            val newItem = newItems[i]
-
-            if (oldItem != newItem) {
-                items[i] = newItem
-                notifyItemChanged(i)
+                override fun areContentsTheSame(
+                    oldItem: RecentProduct,
+                    newItem: RecentProduct,
+                ): Boolean = oldItem == newItem
             }
-        }
-
-        if (newSize > oldSize) {
-            val addedItems = newItems.subList(oldSize, newSize)
-            items.addAll(addedItems)
-            notifyItemRangeInserted(oldSize, addedItems.size)
-        }
     }
 }
