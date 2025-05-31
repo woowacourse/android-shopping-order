@@ -2,11 +2,12 @@ package woowacourse.shopping.data
 
 import android.content.Context
 import androidx.core.content.edit
-import woowacourse.shopping.BuildConfig
 import java.util.Base64
 
 class TokenProvider(
     context: Context,
+    name: String,
+    password: String,
 ) {
     private val storage =
         context.getSharedPreferences(
@@ -15,12 +16,12 @@ class TokenProvider(
         )
 
     init {
-        setToken(BuildConfig.NAME, BuildConfig.PASSWORD)
+        setToken(name, password)
     }
 
     fun getToken(): String? = storage.getString(KEY_TOKEN, null)
 
-    fun setToken(
+    private fun setToken(
         name: String,
         password: String,
     ) {

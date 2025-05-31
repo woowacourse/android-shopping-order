@@ -13,7 +13,11 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
-    private val retrofitInstance by lazy { RetrofitInstance(TokenProvider(this)) }
+    private val retrofitInstance by lazy {
+        val name = BuildConfig.NAME
+        val password = BuildConfig.PASSWORD
+        RetrofitInstance(TokenProvider(this, name, password))
+    }
 
     val productRepository
         by lazy { ProductRepositoryImpl(ProductRemoteDataSource(retrofitInstance.productService)) }
