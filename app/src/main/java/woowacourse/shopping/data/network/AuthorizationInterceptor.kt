@@ -4,7 +4,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import woowacourse.shopping.data.TokenProvider
 
-class RequestInterceptor(private val tokenProvider: TokenProvider) : Interceptor {
+class AuthorizationInterceptor(private val tokenProvider: TokenProvider) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val builder = chain.request().newBuilder()
         val authorizationValue = HEADER_VALUE_AUTHORIZATION.format(tokenProvider.getToken())

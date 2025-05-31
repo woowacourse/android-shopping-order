@@ -13,7 +13,7 @@ import woowacourse.shopping.data.service.ProductApiService
 class RetrofitInstance(tokenProvider: TokenProvider) {
     private val interceptorClient =
         OkHttpClient().newBuilder()
-            .addInterceptor(RequestInterceptor(tokenProvider))
+            .addInterceptor(AuthorizationInterceptor(tokenProvider))
             .build()
 
     val productService: ProductApiService =
