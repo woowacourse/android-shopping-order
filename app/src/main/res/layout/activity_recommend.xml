@@ -27,7 +27,7 @@
             app:titleTextColor="@color/white" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_horizontal"
+            android:id="@+id/guideline_horizontal1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -43,7 +43,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline_horizontal" />
+            app:layout_constraintTop_toBottomOf="@id/guideline_horizontal1" />
 
         <TextView
             android:id="@+id/tv_recommend_desc"
@@ -59,13 +59,21 @@
             android:id="@+id/rv_recommend"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/guideline_horizontal2"
             app:layout_constraintTop_toBottomOf="@id/tv_recommend_desc"
             tools:itemCount="4"
             tools:layout_editor_absoluteX="0dp"
             tools:listitem="@layout/item_product" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_horizontal2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.7" />
 
         <TextView
             android:id="@+id/layout_cart_total_price"
