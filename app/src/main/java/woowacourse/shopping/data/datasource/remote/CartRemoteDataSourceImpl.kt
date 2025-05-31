@@ -41,7 +41,7 @@ class CartRemoteDataSourceImpl(
     override fun getPagedCartItems(
         page: Int,
         size: Int?,
-        onResult: (List<CartItem>) -> Unit,
+        onResult: (Result<List<CartItem>>) -> Unit,
     ) = cartItemService.requestCartItems(page = page, size = size).enqueue(
         object : Callback<CartsResponse> {
             override fun onResponse(
@@ -49,18 +49,22 @@ class CartRemoteDataSourceImpl(
                 response: Response<CartsResponse>,
             ) {
                 if (response.isSuccessful) {
-                    val body =
-                        response.body()?.cartContent?.map { it.toDomain() }
-                            ?: emptyList()
-                    onResult(body)
+                    onResult(
+                        Result.success(
+                            response.body()?.cartContent?.map { it.toDomain() }
+                                ?: emptyList(),
+                        ),
+                    )
+                    return
                 }
+                onResult(Result.failure(Exception("응답에 실패했습니다.")))
             }
 
             override fun onFailure(
                 call: Call<CartsResponse>,
                 t: Throwable,
             ) {
-                onResult(emptyList())
+                onResult(Result.failure(t))
             }
         },
     )

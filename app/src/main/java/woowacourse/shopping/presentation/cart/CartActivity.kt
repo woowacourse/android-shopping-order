@@ -97,9 +97,6 @@ class CartActivity :
         }
 
         viewModel.cartItems.observe(this) { cartItems ->
-            binding.root.postDelayed({
-                showSkeleton(false)
-            }, 1_000L)
             cartAdapter.submitList(cartItems)
             viewModel.fetchSelectedInfo()
         }

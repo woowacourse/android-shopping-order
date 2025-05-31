@@ -16,7 +16,7 @@ class ProductRemoteDataSourceImpl(
         page: Int?,
         pageSize: Int?,
         category: String?,
-        onResult: (List<Product>) -> Unit,
+        onResult: (Result<List<Product>>) -> Unit,
     ) {
         productService.requestProducts(page, pageSize, category).enqueue(
             object : Callback<ProductsResponse> {
@@ -25,17 +25,19 @@ class ProductRemoteDataSourceImpl(
                     response: Response<ProductsResponse>,
                 ) {
                     if (response.isSuccessful) {
-                        val body =
+                        val products =
                             response.body()?.content?.map { it.toDomain() } ?: emptyList()
-                        onResult(body)
+                        onResult(Result.success(products))
+                        return
                     }
+                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
                 }
 
                 override fun onFailure(
                     call: Call<ProductsResponse>,
                     t: Throwable,
                 ) {
-                    onResult(emptyList())
+                    onResult(Result.failure(t))
                 }
             },
         )
@@ -43,7 +45,7 @@ class ProductRemoteDataSourceImpl(
 
     override fun fetchProductById(
         id: Long,
-        onResult: (Product) -> Unit,
+        onResult: (Result<Product>) -> Unit,
     ) {
         productService.requestProductById(id).enqueue(
             object : Callback<ProductContent> {
@@ -55,14 +57,17 @@ class ProductRemoteDataSourceImpl(
                         val product =
                             response.body()?.toDomain()
                                 ?: throw NoSuchElementException("해당 id의 상품을 찾지 못했습니다.")
-                        onResult(product)
+                        onResult(Result.success(product))
+                        return
                     }
+                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
                 }
 
                 override fun onFailure(
                     call: Call<ProductContent>,
                     t: Throwable,
                 ) {
+                    onResult(Result.failure(t))
                 }
             },
         )

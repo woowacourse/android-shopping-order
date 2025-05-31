@@ -7,11 +7,11 @@ interface ProductRemoteDataSource {
         page: Int?,
         pageSize: Int?,
         category: String?,
-        onResult: (List<Product>) -> Unit,
+        onResult: (Result<List<Product>>) -> Unit,
     )
 
     fun fetchProductById(
         id: Long,
-        onResult: (Product) -> Unit,
+        onResult: (Result<Product>) -> Unit,
     )
 }
