@@ -56,6 +56,7 @@ class CartItemFragment :
             it?.let {
                 cartItemAdapter.removeProduct(it)
                 viewModel.fetchShoppingCart(isNextPage = false, isRefresh = true)
+                viewModel.fetchRecommendedProducts()
             }
         }
 
@@ -65,7 +66,7 @@ class CartItemFragment :
     }
 
     override fun onProductDeletion(cartItem: CartItemUiModel) {
-        viewModel.deleteProduct(cartItem)
+        viewModel.removeFromCart(cartItem)
     }
 
     override fun onProductSelectionToggle(

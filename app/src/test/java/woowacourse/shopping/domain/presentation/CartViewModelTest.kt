@@ -40,7 +40,7 @@ class CartViewModelTest {
     fun `deleteProduct를 호출하면 deleteState에 해당 상품 ID가 전달된다`() {
         val item = dummyCartItemList[0]
 
-        viewModel.deleteProduct(item)
+        viewModel.removeFromCart(item)
 
         val result = viewModel.deleteState.getOrAwaitValue()
         assertThat(result).isEqualTo(item.product.id)
