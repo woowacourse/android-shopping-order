@@ -64,7 +64,7 @@ class CartRecommendationFragment :
     }
 
     override fun onInitialAddToCart(product: ProductUiModel) {
-        viewModel.initialAddToCart(product)
+        viewModel.addToCart(product)
     }
 }
 

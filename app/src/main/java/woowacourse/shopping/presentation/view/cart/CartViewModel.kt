@@ -75,23 +75,28 @@ class CartViewModel(
         }
     }
 
-    fun initialAddToCart(product: ProductUiModel) {
+    fun addToCart(product: ProductUiModel) {
         val updatedProduct = product.copy(amount = 1)
         cartRepository.addCartItem(updatedProduct.toCartItem()) {
             cartRepository.getAllCartItems { cartItems ->
                 val found = cartItems?.find { it.product.id == updatedProduct.id }
                 if (found != null) {
-                    val newUiModel =
-                        found.toCartItemUiModel().copy(
-                            isSelected = selectedStates[found.cartId] ?: false,
-                        )
-                    _itemUpdateEvent.postValue(newUiModel)
-                    _cartItems.postValue((_cartItems.value ?: emptyList()) + newUiModel)
-                    updateSelectionInfo()
+                    _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = true))
+                    setCartItemSelection(found.toCartItemUiModel(), true)
+                    calculateTotalCartCount()
                 } else {
-                    fetchShoppingCart(isNextPage = false, isRefresh = true)
+                    _itemUpdateEvent.postValue(
+                        updatedProduct.toCartItem().toCartItemUiModel().copy(isSelected = true),
+                    )
+                    fetchRecommendedProducts()
                 }
             }
+        }
+    }
+
+    private fun calculateTotalCartCount() {
+        cartRepository.getAllCartItemsCount { count ->
+            _totalCount.postValue(count?.quantity)
         }
     }
 
@@ -105,8 +110,8 @@ class CartViewModel(
     fun increaseAmount(product: ProductUiModel) {
         val cartItem = product.toCartItem()
         cartRepository.increaseCartItem(cartItem) { id ->
-            getCartItemById(id) {
-                it?.let { item ->
+            getCartItemById(id) { foundItem ->
+                foundItem?.let { item ->
                     val updatedItem =
                         item.toCartItemUiModel().copy(
                             isSelected = selectedStates[item.cartId] ?: false,
@@ -175,15 +180,20 @@ class CartViewModel(
     }
 
     fun fetchRecommendedProducts() {
-        productRepository.getMostRecentProduct {
-            val recommendedCategory = it?.category
-            productRepository.loadProductsByCategory(recommendedCategory.orEmpty()) {
+        productRepository.getMostRecentProduct { mostRecentProduct ->
+            val recommendedCategory = mostRecentProduct?.category
+            productRepository.loadProductsByCategory(recommendedCategory.orEmpty()) { productsInRecommendedCategory ->
                 cartRepository.getAllCartItems { allCartItems ->
-                    val products =
-                        it
-                            .filter { !allCartItems.orEmpty().map { it.product.id }.contains(it.id) }
-                            .take(10)
-                    _recommendedProducts.postValue(products.map { it.toUiModel() })
+                    val recommendedProducts =
+                        productsInRecommendedCategory
+                            .filterNot { productInRecommendedCategory ->
+                                allCartItems
+                                    .orEmpty()
+                                    .map { cartItem ->
+                                        cartItem.product.id
+                                    }.contains(productInRecommendedCategory.id)
+                            }.take(10)
+                    _recommendedProducts.postValue(recommendedProducts.map { it.toUiModel() })
                 }
             }
         }
@@ -204,32 +214,33 @@ class CartViewModel(
         id: Long,
         callback: (CartItem?) -> Unit,
     ) {
-        cartRepository.getAllCartItems { items ->
-            val foundItem = items?.find { it.cartId == id }
+        cartRepository.getAllCartItems { cartItems ->
+            val foundItem = cartItems?.find { cartItem -> cartItem.cartId == id }
             callback(foundItem)
         }
     }
 
     private fun updateProducts(updatedItem: CartItemUiModel) {
-        _cartItems.value =
+        _cartItems.postValue(
             _cartItems.value?.map { cartItem ->
                 if (cartItem.cartItem.cartId == updatedItem.cartItem.cartId) {
                     updatedItem
                 } else {
                     cartItem
                 }
-            }
+            },
+        )
         updateSelectionInfo()
     }
 
     private fun updateSelectionInfo() {
-        cartRepository.getAllCartItems { allItems ->
+        cartRepository.getAllCartItems { cartItems ->
             val selectedItemIds = selectedStates.filter { it.value }.map { it.key }.toSet()
             val selectedItems =
-                (allItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
+                (cartItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
             _totalCount.postValue(selectedItems.sumOf { it.amount })
-            _allSelected.postValue(selectedItems.size == allItems?.size)
+            _allSelected.postValue(selectedItems.size == cartItems?.size)
         }
     }
 

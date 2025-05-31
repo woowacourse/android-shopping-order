@@ -36,7 +36,7 @@ class RecommendationAdapter(
     }
 
     fun updateItem(updatedItem: CartItemUiModel) {
-        val index = recommendedProducts.indexOfFirst { it.cartId == updatedItem.cartItem.cartId }
+        val index = recommendedProducts.indexOfFirst { it.id == updatedItem.cartItem.product.id }
         if (index != -1) {
             recommendedProducts[index] = updatedItem.cartItem.toUiModel()
             notifyItemChanged(index)
