@@ -7,7 +7,7 @@ import woowacourse.shopping.data.datasource.handleFailure
 import woowacourse.shopping.data.dto.product.ProductContent
 import woowacourse.shopping.data.dto.product.ProductsResponse
 import woowacourse.shopping.data.dto.product.toDomain
-import woowacourse.shopping.data.remote.ProductService
+import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.domain.model.Product
 
 class ProductRemoteDataSourceImpl(

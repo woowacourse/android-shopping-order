@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote
+package woowacourse.shopping.data.service
 
 import android.util.Base64
 import android.util.Log

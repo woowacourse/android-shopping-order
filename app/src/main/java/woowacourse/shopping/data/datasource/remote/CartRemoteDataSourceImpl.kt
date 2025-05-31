@@ -10,7 +10,7 @@ import woowacourse.shopping.data.dto.cart.CartItemRequest
 import woowacourse.shopping.data.dto.cart.CartsResponse
 import woowacourse.shopping.data.dto.cart.UpdateCartRequest
 import woowacourse.shopping.data.dto.cart.toDomain
-import woowacourse.shopping.data.remote.CartItemService
+import woowacourse.shopping.data.service.CartItemService
 import woowacourse.shopping.domain.model.CartItem
 
 class CartRemoteDataSourceImpl(

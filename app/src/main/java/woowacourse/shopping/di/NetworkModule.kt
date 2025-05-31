@@ -4,9 +4,9 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import woowacourse.shopping.data.remote.CartItemService
-import woowacourse.shopping.data.remote.OkHttpClientProvider
-import woowacourse.shopping.data.remote.ProductService
+import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.service.OkHttpClientProvider
+import woowacourse.shopping.data.service.ProductService
 
 object NetworkModule {
     private const val BASE_URL =
