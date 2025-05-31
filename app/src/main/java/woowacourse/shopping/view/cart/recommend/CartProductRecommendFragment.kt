@@ -11,18 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
-import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapter
 import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
 class CartProductRecommendFragment(
-    private val productRepository: ProductRepository,
-    private val cartProductRepository: CartProductRepository,
-    private val recentProductRepository: RecentProductRepository,
+    application: ShoppingApplication,
 ) : Fragment() {
     private var _binding: FragmentCartProductRecommendBinding? = null
     private val binding get() = _binding!!
@@ -31,9 +27,9 @@ class CartProductRecommendFragment(
         ViewModelProvider(
             this,
             CartProductRecommendViewModelFactory(
-                productRepository,
-                cartProductRepository,
-                recentProductRepository,
+                application.productRepository,
+                application.cartProductRepository,
+                application.recentProductRepository,
             ),
         )[CartProductRecommendViewModel::class.java]
     }

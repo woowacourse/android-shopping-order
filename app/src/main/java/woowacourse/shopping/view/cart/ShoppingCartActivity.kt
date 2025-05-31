@@ -17,13 +17,8 @@ class ShoppingCartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityShoppingCartBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val application = application as ShoppingApplication
         supportFragmentManager.fragmentFactory =
-            ShoppingCartFragmentFactory(
-                application.productRepository,
-                application.cartProductRepository,
-                application.recentProductRepository,
-            )
+            ShoppingCartFragmentFactory(application as ShoppingApplication)
         super.onCreate(savedInstanceState)
         setUpView()
         supportActionBar?.title = ACTION_BAR_TITLE
