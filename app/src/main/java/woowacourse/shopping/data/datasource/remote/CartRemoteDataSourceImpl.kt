@@ -24,10 +24,13 @@ class CartRemoteDataSourceImpl(
                     response: Response<CartItemCountResponse>,
                 ) {
                     if (response.isSuccessful) {
-                        onResult(Result.success(response.body()?.quantity ?: 0))
+                        val quantity = response.body()?.quantity
+                        if (quantity != null) {
+                            onResult(Result.success(quantity))
+                        }
                         return
                     }
-                    onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                    handleFailure(onResult)
                 }
 
                 override fun onFailure(
@@ -50,15 +53,20 @@ class CartRemoteDataSourceImpl(
                 response: Response<CartsResponse>,
             ) {
                 if (response.isSuccessful) {
-                    onResult(
-                        Result.success(
-                            response.body()?.cartContent?.map { it.toDomain() }
-                                ?: emptyList(),
-                        ),
-                    )
+                    val cartId = response.toIdOrNull()
+                    if (cartId != null) {
+                        onResult(
+                            Result.success(
+                                response.body()?.cartContent?.map { it.toDomain() }
+                                    ?: emptyList(),
+                            ),
+                        )
+                    } else {
+                        onResult(Result.failure(Exception("응답 헤더에 cartId가 없습니다.")))
+                    }
                     return
                 }
-                onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                handleFailure(onResult)
             }
 
             override fun onFailure(
@@ -142,7 +150,7 @@ class CartRemoteDataSourceImpl(
                     onResult(Result.success(Unit))
                     return
                 }
-                onResult(Result.failure(Exception("응답에 실패했습니다.")))
+                handleFailure(onResult)
             }
 
             override fun onFailure(

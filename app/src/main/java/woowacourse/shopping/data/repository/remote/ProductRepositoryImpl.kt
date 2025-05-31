@@ -16,16 +16,18 @@ class ProductRepositoryImpl(
         category: String?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        productRemoteDataSource.fetchPagingProducts(page, pageSize, category) { products ->
-            val cartItems =
-                products.map { product ->
-                    cartRepository
-                        .getCartItemById(product.productId) ?: CartItem(
-                        product = product,
-                        quantity = 0,
-                    )
-                }
-            onResult(Result.success(cartItems))
+        productRemoteDataSource.fetchPagingProducts(page, pageSize, category) { result ->
+            result.fold(
+                onSuccess = { products ->
+                    val cartItems =
+                        products.map { product ->
+                            cartRepository.getCartItemById(product.productId)
+                                ?: CartItem(product = product, quantity = 0)
+                        }
+                    onResult(Result.success(cartItems))
+                },
+                onFailure = { throwable -> onResult(Result.failure(throwable)) },
+            )
         }
     }
 
@@ -33,14 +35,11 @@ class ProductRepositoryImpl(
         productId: Long,
         onResult: (Result<Product>) -> Unit,
     ) {
-        productRemoteDataSource.fetchProductById(productId) { product ->
-            onResult(Result.success(product))
+        productRemoteDataSource.fetchProductById(productId) { result ->
+            result.fold(
+                onSuccess = { product -> onResult(Result.success(product)) },
+                onFailure = { throwable -> onResult(Result.failure(throwable)) },
+            )
         }
     }
-
-    private fun List<Product>.toCartItems(): List<CartItem> =
-        this.map { product ->
-//            val quantity = cartDataSource.getQuantityById(product.productId)
-            CartItem(product = product, quantity = 0)
-        }
 }

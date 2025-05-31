@@ -26,9 +26,12 @@ class ProductRemoteDataSourceImpl(
                     response: Response<ProductsResponse>,
                 ) {
                     if (response.isSuccessful) {
-                        val products =
-                            response.body()?.content?.map { it.toDomain() } ?: emptyList()
-                        onResult(Result.success(products))
+                        val products = response.body()?.content?.map { it.toDomain() }
+                        if (products.isNullOrEmpty()) {
+                            onResult(Result.failure(NoSuchElementException("상품 데이터가 없습니다.")))
+                        } else {
+                            onResult(Result.success(products))
+                        }
                         return
                     }
                     handleFailure(onResult)
@@ -55,10 +58,12 @@ class ProductRemoteDataSourceImpl(
                     response: Response<ProductContent>,
                 ) {
                     if (response.isSuccessful) {
-                        val product =
-                            response.body()?.toDomain()
-                                ?: throw NoSuchElementException("해당 id의 상품을 찾지 못했습니다.")
-                        onResult(Result.success(product))
+                        val product = response.body()?.toDomain()
+                        if (product != null) {
+                            onResult(Result.success(product))
+                        } else {
+                            onResult(Result.failure(NoSuchElementException("상품 데이터가 없습니다.")))
+                        }
                         return
                     }
                     handleFailure(onResult)
