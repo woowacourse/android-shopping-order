@@ -1,73 +1,71 @@
 package woowacourse.shopping.view.product.catalog.adapter
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.view.product.catalog.ProductCatalogEventHandler
 import woowacourse.shopping.view.product.catalog.adapter.recent.RecentProductListViewHolder
 import woowacourse.shopping.view.util.product.ProductViewHolder
 
 class ProductAdapter(
-    items: List<ProductCatalogItem> = emptyList(),
     private val eventHandler: ProductCatalogEventHandler,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val items = items.toMutableList()
-
+) : ListAdapter<ProductCatalogItem, RecyclerView.ViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (ProductCatalogItem.ViewType.entries[viewType]) {
             ProductCatalogItem.ViewType.RECENT_PRODUCT ->
-                RecentProductListViewHolder.from(
-                    parent,
-                    eventHandler,
-                )
+                RecentProductListViewHolder.from(parent, eventHandler)
 
             ProductCatalogItem.ViewType.PRODUCT -> ProductViewHolder.from(parent, eventHandler)
             ProductCatalogItem.ViewType.LOAD_MORE -> LoadMoreViewHolder.from(parent, eventHandler)
         }
 
-    override fun getItemCount(): Int = items.size
-
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        when (val item = items[position]) {
+        when (val item = getItem(position)) {
             is ProductCatalogItem.RecentProductsItem ->
                 (holder as RecentProductListViewHolder).bind(item)
 
             is ProductCatalogItem.ProductItem ->
-                (holder as ProductViewHolder).bind(
-                    item.product,
-                    item.quantity,
-                )
+                (holder as ProductViewHolder).bind(item.product, item.quantity)
 
             ProductCatalogItem.LoadMoreItem -> Unit
         }
     }
 
-    override fun getItemViewType(position: Int): Int = items[position].type.ordinal
+    override fun getItemViewType(position: Int): Int = getItem(position).type.ordinal
 
-    fun updateItems(newItems: List<ProductCatalogItem>) {
-        val oldSize = items.size
-        val newSize = newItems.size
-        val minSize = minOf(oldSize, newSize)
+    companion object {
+        private val diffCallback =
+            object : DiffUtil.ItemCallback<ProductCatalogItem>() {
+                override fun areItemsTheSame(
+                    oldItem: ProductCatalogItem,
+                    newItem: ProductCatalogItem,
+                ): Boolean =
+                    when {
+                        oldItem is ProductCatalogItem.ProductItem &&
+                            newItem is ProductCatalogItem.ProductItem ->
+                            oldItem.product.id == newItem.product.id
 
-        for (i in 0 until minSize) {
-            val oldItem = items[i]
-            val newItem = newItems[i]
+                        oldItem is ProductCatalogItem.RecentProductsItem &&
+                            newItem is ProductCatalogItem.RecentProductsItem ->
+                            true
 
-            if (oldItem != newItem) {
-                items[i] = newItem
-                notifyItemChanged(i)
+                        oldItem is ProductCatalogItem.LoadMoreItem &&
+                            newItem is ProductCatalogItem.LoadMoreItem -> true
+
+                        else -> false
+                    }
+
+                override fun areContentsTheSame(
+                    oldItem: ProductCatalogItem,
+                    newItem: ProductCatalogItem,
+                ): Boolean = oldItem == newItem
             }
-        }
-
-        if (newSize > oldSize) {
-            val addedItems = newItems.subList(oldSize, newSize)
-            items.addAll(addedItems)
-            notifyItemRangeInserted(oldSize, addedItems.size)
-        }
     }
 }
