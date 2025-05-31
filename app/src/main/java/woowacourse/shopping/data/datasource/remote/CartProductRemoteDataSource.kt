@@ -60,7 +60,7 @@ class CartProductRemoteDataSource(
                 ) {
                     if (response.code() == SUCCESS_POST) {
                         val cartProductId =
-                            response.headers()["location"]?.removePrefix("/cart-items/")?.toInt()
+                            response.headers()[HEADER_LOCATION]?.removePrefix(PREFIX_CART_ITEM)?.toInt()
                                 ?: throw IllegalArgumentException()
                         onResult(Result.success(cartProductId))
                     } else {
@@ -165,5 +165,7 @@ class CartProductRemoteDataSource(
         private const val SUCCESS_PATCH = 200
         private const val SUCCESS_POST = 201
         private const val SUCCESS_DELETE = 204
+        private const val HEADER_LOCATION = "location"
+        private const val PREFIX_CART_ITEM = "/cart-items/"
     }
 }
