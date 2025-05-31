@@ -54,7 +54,6 @@ class CartProductSelectFragment(
     private fun initRecyclerView() {
         adapter = CartProductAdapter(eventHandler = viewModel)
         binding.rvProducts.adapter = adapter
-        binding.rvProducts.itemAnimator = null
     }
 
     private fun initBindings() {
@@ -78,7 +77,7 @@ class CartProductSelectFragment(
 
     private fun initObservers() {
         viewModel.products.observe(viewLifecycleOwner) { value ->
-            adapter.updateItems(value)
+            adapter.submitList(value)
         }
     }
 
