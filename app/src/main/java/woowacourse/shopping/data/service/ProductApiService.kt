@@ -11,14 +11,14 @@ import woowacourse.shopping.data.dto.response.ProductResponseDto
 interface ProductApiService {
     @GET("/products")
     fun getPagedProducts(
-        @Header("accept") accept: String = "*/*",
+        @Header("accept") accept: String = "application/json",
         @Query("page") page: Int?,
         @Query("size") size: Int?,
     ): Call<ProductResponseDto>
 
     @GET("/products/{id}")
     fun getProductById(
-        @Header("accept") accept: String = "*/*",
+        @Header("accept") accept: String = "application/json",
         @Path("id") id: Int,
     ): Call<ProductDto>
 }

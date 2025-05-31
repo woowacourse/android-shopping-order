@@ -17,31 +17,28 @@ import woowacourse.shopping.data.dto.response.CartProductResponseDto
 interface CartProductApiService {
     @GET("/cart-items")
     fun getPagedProducts(
-        @Header("accept") accept: String = "*/*",
+        @Header("accept") accept: String = "application/json",
         @Query("page") page: Int?,
         @Query("size") size: Int?,
     ): Call<CartProductResponseDto>
 
     @POST("/cart-items")
     fun insert(
-        @Header("accept") accept: String = "*/*",
         @Body body: CartProductRequestDto,
     ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
     fun delete(
-        @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
     ): Call<Unit>
 
     @GET("/cart-items/counts")
     fun getTotalQuantity(
-        @Header("accept") accept: String = "*/*",
+        @Header("accept") accept: String = "application/json",
     ): Call<CartProductQuantityResponseDto>
 
     @PATCH("/cart-items/{id}")
     fun updateQuantity(
-        @Header("accept") accept: String = "*/*",
         @Path("id") id: Int,
         @Body body: CartProductQuantityRequestDto,
     ): Call<Unit>
