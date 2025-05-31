@@ -12,15 +12,19 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
+import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.product.ItemClickListener
 
-class RecommendActivity : AppCompatActivity() {
+class RecommendActivity :
+    AppCompatActivity(),
+    ItemClickListener,
+    CartCounterClickListener {
     private lateinit var binding: ActivityRecommendBinding
     private val viewModel: RecommendViewModel by viewModels { RecommendViewModelFactory() }
     private val recommendAdapter: RecommendAdapter by lazy {
-        RecommendAdapter(viewModel as ItemClickListener, viewModel as CartCounterClickListener)
+        RecommendAdapter(this, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,5 +86,20 @@ class RecommendActivity : AppCompatActivity() {
                 putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
                 putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
             }
+    }
+
+    override fun onClickProductItem(productId: Long) {
+    }
+
+    override fun onClickAddToCart(cartItem: CartItem) {
+        viewModel.onClickAddToCart(cartItem)
+    }
+
+    override fun onClickMinus(id: Long) {
+        viewModel.onClickMinus(id)
+    }
+
+    override fun onClickPlus(id: Long) {
+        viewModel.onClickPlus(id)
     }
 }

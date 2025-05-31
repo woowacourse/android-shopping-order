@@ -9,18 +9,14 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.SingleLiveData
-import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toPresentation
-import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel(),
-    ItemClickListener,
-    CartCounterClickListener {
+) : ViewModel() {
     private lateinit var recentCategory: String
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val recommendProducts: LiveData<List<CartItemUiModel>> = _recommendProducts
@@ -64,10 +60,7 @@ class RecommendViewModel(
         _selectedTotalCount.value = count
     }
 
-    override fun onClickProductItem(productId: Long) {
-    }
-
-    override fun onClickAddToCart(cartItem: CartItem) {
+    fun onClickAddToCart(cartItem: CartItem) {
         cartRepository.insertProduct(cartItem.product, 1) { result ->
             result
                 .onSuccess {
@@ -78,7 +71,7 @@ class RecommendViewModel(
         }
     }
 
-    override fun onClickMinus(id: Long) {
+    fun onClickMinus(id: Long) {
         cartRepository.decreaseQuantity(id) { result ->
             result
                 .onSuccess {
@@ -89,7 +82,7 @@ class RecommendViewModel(
         }
     }
 
-    override fun onClickPlus(id: Long) {
+    fun onClickPlus(id: Long) {
         cartRepository.increaseQuantity(id) { result ->
             result
                 .onSuccess {
