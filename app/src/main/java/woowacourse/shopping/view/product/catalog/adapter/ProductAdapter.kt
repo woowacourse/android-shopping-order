@@ -1,17 +1,32 @@
 package woowacourse.shopping.view.product.catalog.adapter
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.view.product.catalog.ProductCatalogEventHandler
 import woowacourse.shopping.view.product.catalog.adapter.recent.RecentProductListViewHolder
 import woowacourse.shopping.view.util.product.ProductViewHolder
 
 class ProductAdapter(
-    items: List<ProductCatalogItem> = emptyList(),
     private val eventHandler: ProductCatalogEventHandler,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val items = items.toMutableList()
+) : ListAdapter<ProductCatalogItem, RecyclerView.ViewHolder>(
+        object : DiffUtil.ItemCallback<ProductCatalogItem>() {
+            override fun areItemsTheSame(
+                oldItem: ProductCatalogItem,
+                newItem: ProductCatalogItem,
+            ): Boolean {
+                return oldItem == newItem
+            }
 
+            override fun areContentsTheSame(
+                oldItem: ProductCatalogItem,
+                newItem: ProductCatalogItem,
+            ): Boolean {
+                return oldItem == newItem
+            }
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -27,13 +42,11 @@ class ProductAdapter(
             ProductCatalogItem.ViewType.LOAD_MORE -> LoadMoreViewHolder.from(parent, eventHandler)
         }
 
-    override fun getItemCount(): Int = items.size
-
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        when (val item = items[position]) {
+        when (val item = getItem(position)) {
             is ProductCatalogItem.RecentProductsItem ->
                 (holder as RecentProductListViewHolder).bind(item)
 
@@ -47,27 +60,5 @@ class ProductAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int = items[position].type.ordinal
-
-    fun updateItems(newItems: List<ProductCatalogItem>) {
-        val oldSize = items.size
-        val newSize = newItems.size
-        val minSize = minOf(oldSize, newSize)
-
-        for (i in 0 until minSize) {
-            val oldItem = items[i]
-            val newItem = newItems[i]
-
-            if (oldItem != newItem) {
-                items[i] = newItem
-                notifyItemChanged(i)
-            }
-        }
-
-        if (newSize > oldSize) {
-            val addedItems = newItems.subList(oldSize, newSize)
-            items.addAll(addedItems)
-            notifyItemRangeInserted(oldSize, addedItems.size)
-        }
-    }
+    override fun getItemViewType(position: Int): Int = getItem(position).type.ordinal
 }

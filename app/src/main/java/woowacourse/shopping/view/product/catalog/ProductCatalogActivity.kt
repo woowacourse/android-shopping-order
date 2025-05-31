@@ -107,7 +107,7 @@ class ProductCatalogActivity : AppCompatActivity() {
 
     private fun initObservers() {
         viewModel.productCatalogItems.observe(this) { value ->
-            productAdapter.updateItems(value)
+            productAdapter.submitList(value)
         }
 
         viewModel.selectedProduct.observe(this) { value ->
