@@ -36,8 +36,8 @@ class ProductCatalogViewModel(
     private val _totalQuantity = MutableLiveData(MINIMUM_QUANTITY)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
-    private val _onFinishLoading = MutableLiveData(false)
-    val onFinishLoading: LiveData<Boolean> get() = _onFinishLoading
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     override fun onRecentProductClick(item: RecentProduct) {
         _selectedProduct.setValue(item.product)
@@ -84,7 +84,7 @@ class ProductCatalogViewModel(
     }
 
     fun loadCatalog() {
-        _onFinishLoading.value = false
+        _isLoading.value = true
         loadRecentProducts()
         loadCartProducts()
         cartProductRepository.getTotalQuantity { result ->
@@ -112,10 +112,12 @@ class ProductCatalogViewModel(
 
     private fun loadRecentProducts() {
         recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT) { result ->
-            result.onSuccess {
-                recentProducts = it
-                _productCatalogItems.postValue(buildCatalogItems())
-            }
+            result
+                .onSuccess {
+                    recentProducts = it
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -153,7 +155,7 @@ class ProductCatalogViewModel(
             },
         )
         hasNext = pagedResult.hasNext
-        _onFinishLoading.postValue(true)
+        _isLoading.value = false
         _productCatalogItems.postValue(buildCatalogItems())
     }
 

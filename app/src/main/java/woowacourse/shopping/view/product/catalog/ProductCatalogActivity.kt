@@ -3,7 +3,6 @@ package woowacourse.shopping.view.product.catalog
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -40,6 +39,7 @@ class ProductCatalogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpView()
         initRecyclerView()
+        initBindings()
         initObservers()
     }
 
@@ -105,6 +105,11 @@ class ProductCatalogActivity : AppCompatActivity() {
         binding.rvProducts.itemAnimator = null
     }
 
+    private fun initBindings() {
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
+    }
+
     private fun initObservers() {
         viewModel.productCatalogItems.observe(this) { value ->
             productAdapter.updateItems(value)
@@ -113,15 +118,6 @@ class ProductCatalogActivity : AppCompatActivity() {
         viewModel.selectedProduct.observe(this) { value ->
             val intent = ProductDetailActivity.newIntent(this, value)
             startActivity(intent)
-        }
-
-        viewModel.onFinishLoading.observe(this) { value ->
-            if (value == true) {
-                binding.sfLoading.visibility = View.GONE
-            } else {
-                binding.sfLoading.visibility = View.VISIBLE
-                binding.sfLoading.startShimmer()
-            }
         }
     }
 

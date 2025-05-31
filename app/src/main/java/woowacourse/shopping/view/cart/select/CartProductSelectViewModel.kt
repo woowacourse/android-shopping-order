@@ -39,8 +39,8 @@ class CartProductSelectViewModel(
     private val _isSelectedAll = MutableLiveData(false)
     val isSelectedAll: LiveData<Boolean> get() = _isSelectedAll
 
-    private val _isFinishedLoading = MutableLiveData(false)
-    val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     override fun onNextPageClick() {
         val nextPage = page.value?.plus(1) ?: FIRST_PAGE_NUMBER
@@ -144,11 +144,11 @@ class CartProductSelectViewModel(
     }
 
     fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
-        _isFinishedLoading.value = false
+        _isLoading.value = true
         repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
             result
                 .onSuccess { pagedResult ->
-                    _isFinishedLoading.value = true
+                    _isLoading.value = false
                     _products.value =
                         (pagedResult.items.map { CartProductItem(it, it.id in _selectedIds) })
                     val hasNext = pagedResult.hasNext

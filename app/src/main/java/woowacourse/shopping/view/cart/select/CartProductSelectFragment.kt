@@ -80,16 +80,6 @@ class CartProductSelectFragment(
         viewModel.products.observe(viewLifecycleOwner) { value ->
             adapter.updateItems(value)
         }
-
-        viewModel.isFinishedLoading.observe(viewLifecycleOwner) { value ->
-            when (value) {
-                true -> binding.sfLoading.visibility = View.GONE
-                false -> {
-                    binding.sfLoading.visibility = View.VISIBLE
-                    binding.sfLoading.startShimmer()
-                }
-            }
-        }
     }
 
     override fun onDestroyView() {
