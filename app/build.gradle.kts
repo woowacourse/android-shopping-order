@@ -22,11 +22,6 @@ android {
 
         buildConfigField(
             "String",
-            "MOCK_URL",
-            gradleLocalProperties(rootDir, providers).getProperty("mock.url"),
-        )
-        buildConfigField(
-            "String",
             "TECHCOURSE_URL",
             gradleLocalProperties(rootDir, providers).getProperty("techcourse.url"),
         )
