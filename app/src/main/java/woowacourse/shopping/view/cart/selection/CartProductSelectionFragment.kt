@@ -78,7 +78,7 @@ class CartProductSelectionFragment(
 
     private fun initObservers() {
         viewModel.products.observe(viewLifecycleOwner) { value ->
-            adapter.updateItems(value)
+            adapter.submitList(value)
         }
 
         viewModel.isFinishedLoading.observe(viewLifecycleOwner) { value ->
