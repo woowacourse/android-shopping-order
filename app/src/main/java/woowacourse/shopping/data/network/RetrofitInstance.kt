@@ -9,10 +9,10 @@ import woowacourse.shopping.data.TokenProvider
 import woowacourse.shopping.data.service.CartProductApiService
 import woowacourse.shopping.data.service.ProductApiService
 
-class RetrofitInstance(repo: TokenProvider) {
+class RetrofitInstance(tokenProvider: TokenProvider) {
     private val interceptorClient =
         OkHttpClient().newBuilder()
-            .addInterceptor(RequestInterceptor(repo))
+            .addInterceptor(RequestInterceptor(tokenProvider))
             .build()
 
     val productService: ProductApiService =
