@@ -91,7 +91,7 @@ class CartProductRecommendFragment(
 
     private fun initObservers() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { value ->
-            adapter.updateItems(value)
+            adapter.submitList(value)
         }
 
         viewModel.selectedProduct.observe(viewLifecycleOwner) { value ->
