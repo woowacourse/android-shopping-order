@@ -75,42 +75,34 @@ class CartViewModel(
         }
     }
 
-    fun addToCart(product: ProductUiModel) {
-        val updatedProduct = product.copy(amount = 1)
-        cartRepository.addCartItem(updatedProduct.toCartItem()) {
-            cartRepository.getAllCartItems { cartItems ->
-                val found = cartItems?.find { it.product.id == updatedProduct.id }
-                if (found != null) {
-                    _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = true))
-                    setCartItemSelection(found.toCartItemUiModel(), true)
-                } else {
-                    _itemUpdateEvent.postValue(
-                        updatedProduct.toCartItem().toCartItemUiModel().copy(isSelected = true),
-                    )
-                    fetchRecommendedProducts()
+    fun increaseAmount(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+        if (product.amount < 1) {
+            addToCart(cartItem.toCartItemUiModel())
+            return
+        }
+        cartRepository.increaseCartItem(cartItem) { id ->
+            getCartItemById(id) { foundItem ->
+                foundItem?.let {
+                    val updatedItem = it.toCartItemUiModel().copy(isSelected = selectedStates[it.cartId] ?: false)
+                    _itemUpdateEvent.postValue(updatedItem)
+                    updateProducts(updatedItem)
                 }
             }
         }
     }
 
-    fun deleteProduct(cartItem: CartItemUiModel) {
-        selectedStates.remove(cartItem.cartItem.cartId)
-        cartRepository.deleteCartItem(cartItem.cartItem.cartId) {
-            _deleteState.postValue(it)
-        }
-    }
-
-    fun increaseAmount(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-        cartRepository.increaseCartItem(cartItem) { id ->
-            getCartItemById(id) { foundItem ->
-                foundItem?.let { item ->
-                    val updatedItem =
-                        item.toCartItemUiModel().copy(
-                            isSelected = selectedStates[item.cartId] ?: false,
-                        )
-                    _itemUpdateEvent.postValue(updatedItem)
-                    updateProducts(updatedItem)
+    private fun addToCart(cartItem: CartItemUiModel) {
+        val newItem = cartItem.cartItem.copy(amount = 1)
+        cartRepository.addCartItem(newItem) {
+            cartRepository.getAllCartItems { cartItems ->
+                val found = cartItems?.find { it.product.id == newItem.product.id }
+                if (found != null) {
+                    _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = true))
+                    setCartItemSelection(found.toCartItemUiModel(), true)
+                } else {
+                    _itemUpdateEvent.postValue(newItem.toCartItemUiModel().copy(isSelected = true))
+                    fetchRecommendedProducts()
                 }
             }
         }
@@ -133,6 +125,13 @@ class CartViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun deleteProduct(cartItem: CartItemUiModel) {
+        selectedStates.remove(cartItem.cartItem.cartId)
+        cartRepository.deleteCartItem(cartItem.cartItem.cartId) {
+            _deleteState.postValue(it)
         }
     }
 
