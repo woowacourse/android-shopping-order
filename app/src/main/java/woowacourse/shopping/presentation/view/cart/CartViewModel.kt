@@ -83,7 +83,6 @@ class CartViewModel(
                 if (found != null) {
                     _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = true))
                     setCartItemSelection(found.toCartItemUiModel(), true)
-                    calculateTotalCartCount()
                 } else {
                     _itemUpdateEvent.postValue(
                         updatedProduct.toCartItem().toCartItemUiModel().copy(isSelected = true),
@@ -91,12 +90,6 @@ class CartViewModel(
                     fetchRecommendedProducts()
                 }
             }
-        }
-    }
-
-    private fun calculateTotalCartCount() {
-        cartRepository.getAllCartItemsCount { count ->
-            _totalCount.postValue(count?.quantity)
         }
     }
 
@@ -236,8 +229,7 @@ class CartViewModel(
     private fun updateSelectionInfo() {
         cartRepository.getAllCartItems { cartItems ->
             val selectedItemIds = selectedStates.filter { it.value }.map { it.key }.toSet()
-            val selectedItems =
-                (cartItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
+            val selectedItems = (cartItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
             _totalCount.postValue(selectedItems.sumOf { it.amount })
             _allSelected.postValue(selectedItems.size == cartItems?.size)
