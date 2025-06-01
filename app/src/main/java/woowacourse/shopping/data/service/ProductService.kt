@@ -11,8 +11,8 @@ interface ProductService {
     @GET("/products")
     fun fetchProducts(
         @Query("category") category: String?,
-        @Query("page") page: Int?,
-        @Query("size") size: Int?,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
     ): Call<PageableResponse<ProductResponse>>
 
     @GET("/products/{id}")
