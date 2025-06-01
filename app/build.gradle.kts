@@ -18,10 +18,15 @@ android {
         versionName = "1.0"
         buildConfigField("String", "DB_NAME", "\"shopping_db\"")
         buildConfigField("Boolean", "IS_MOCK_MODE", "true")
-        buildConfigField("String", "BASE_URL", "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com\"")
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com\"",
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
     }
 
     buildTypes {
@@ -64,22 +69,23 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.activity.ktx.v182)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.recyclerview)
     implementation(libs.gson)
     implementation(libs.okhttp)
     implementation(libs.retrofit)
+    implementation(libs.shimmer)
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.okhttp3.mockwebserver)
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.mockk)
-    implementation(libs.shimmer)
+    androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
@@ -87,15 +93,11 @@ dependencies {
     androidTestImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.mannodermaus.junit5.core)
-    androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
     androidTestImplementation(libs.androidx.espresso.contrib)
     androidTestImplementation(libs.espresso.intents)
-    androidTestImplementation(libs.androidx.core.testing.v200)
+    androidTestImplementation(libs.androidx.core.testing)
     androidTestImplementation(libs.androidx.lifecycle.runtime.testing)
     androidTestImplementation(libs.androidx.espresso.idling.resource)
-    testImplementation(libs.okhttp3.mockwebserver)
-    implementation(libs.okhttp)
-
     kapt(libs.compiler)
     kapt(libs.androidx.room.compiler)
 }
