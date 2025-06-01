@@ -2,6 +2,7 @@ package woowacourse.shopping.feature.login
 
 import android.content.Context
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
@@ -37,6 +38,13 @@ class LoginActivity : AppCompatActivity() {
                 LoginError.NotFound -> showToastMessage(getString(R.string.login_alert_wrong_account))
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressedDispatcher.onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun showToastMessage(message: String) {
