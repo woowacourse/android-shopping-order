@@ -27,9 +27,9 @@ sealed interface ProductsItem {
     }
 
     enum class ItemType {
+        RECENT_WATCHING,
         PRODUCT,
         MORE,
-        RECENT_WATCHING,
         ;
 
         companion object {

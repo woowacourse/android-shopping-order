@@ -17,6 +17,8 @@ import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.product.viewModel.ProductsViewModel
+import woowacourse.shopping.view.product.viewModel.RecentProductsViewModel
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
 import woowacourse.shopping.view.shoppingCart.ShoppingCartActivity
 
@@ -28,6 +30,7 @@ class ProductsActivity :
     }
 
     private val viewModel: ProductsViewModel by viewModels()
+    private val recentProductsViewModel: RecentProductsViewModel by viewModels()
     private val productAdapter: ProductAdapter by lazy { ProductAdapter(this) }
     private val activityResultLauncher =
         registerForActivityResult(
@@ -38,17 +41,15 @@ class ProductsActivity :
                     val updateItem: Product? =
                         result.data?.getSerializableExtraData("updateProduct")
                     if (updateItem != null) {
-                        viewModel.updateShoppingCartQuantity()
-                        viewModel.updateProducts()
+                        viewModel.reload()
                     }
-                    viewModel.updateRecentWatching()
+                    recentProductsViewModel.updateRecentProducts()
                 }
 
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
                     val updateItems: Boolean? =
                         result.data?.getSerializableExtraData("updateProducts")
-                    if (updateItems != null && updateItems) viewModel.updateProducts()
-                    viewModel.updateShoppingCartQuantity()
+                    if (updateItems != null && updateItems) viewModel.reload()
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {
@@ -86,8 +87,13 @@ class ProductsActivity :
     }
 
     private fun setupObservers() {
-        viewModel.products.observe(this) { products: List<ProductsItem> ->
+        productAdapter.submitList(listOf(ProductsItem.LoadItem))
+        viewModel.productsUi.observe(this) { products ->
             productAdapter.submitList(products)
+        }
+
+        recentProductsViewModel.recentProducts.observe(this) { recentProducts ->
+            productAdapter.submitList(listOf(recentProducts))
         }
 
         viewModel.shoppingCartQuantity.observe(this) { shoppingCartQuantity: Int ->

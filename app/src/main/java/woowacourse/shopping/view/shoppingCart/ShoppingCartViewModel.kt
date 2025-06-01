@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
@@ -97,22 +98,18 @@ class ShoppingCartViewModel(
     fun updateShoppingCart() {
         val page = this.page - 1
         val size = COUNT_PER_PAGE
-        shoppingCartRepository.load(page, size) { result ->
-            result
-                .onSuccess { shoppingCarts: ShoppingCarts ->
-                    _isLoading.value = false
-                    if (isEmptyPage(shoppingCarts.shoppingCartItems)) return@load
 
-                    loadable = !shoppingCarts.last
+        viewModelScope.launch {
+            val shoppingCarts = shoppingCartRepository.load(page, size)
+            _isLoading.value = false
+            if (isEmptyPage(shoppingCarts.shoppingCartItems)) return@launch
 
-                    updateShoppingCartItems(
-                        shoppingCarts.shoppingCartItems,
-                        shoppingCart.value ?: emptyList(),
-                    )
-                }.onFailure {
-                    _event.postValue(ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE)
-                    _isLoading.value = false
-                }
+            loadable = !shoppingCarts.last
+
+            updateShoppingCartItems(
+                shoppingCarts.shoppingCartItems,
+                shoppingCart.value ?: emptyList(),
+            )
         }
     }
 
@@ -187,44 +184,32 @@ class ShoppingCartViewModel(
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartProductItem) {
-        shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id) { result ->
-            result
-                .onSuccess {
-                    updateShoppingCart()
-                    _hasUpdatedProducts.postValue(true)
-                }.onFailure {
-                    _event.postValue(ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
-                }
+        viewModelScope.launch {
+            shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id)
+            updateShoppingCart()
+            _hasUpdatedProducts.postValue(true)
         }
     }
 
     fun decreaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
-        shoppingCartRepository.decreaseQuantity(
-            shoppingCartProductItem.shoppingCartProduct.id,
-            shoppingCartProductItem.shoppingCartProduct.quantity - 1,
-        ) { result ->
-            result
-                .onSuccess {
-                    updateShoppingCart()
-                    _hasUpdatedProducts.value = true
-                }.onFailure {
-                    _event.postValue(ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE)
-                }
+        viewModelScope.launch {
+            shoppingCartRepository.updateQuantity(
+                shoppingCartProductItem.shoppingCartProduct.id,
+                shoppingCartProductItem.shoppingCartProduct.quantity - 1,
+            )
+            updateShoppingCart()
+            _hasUpdatedProducts.value = true
         }
     }
 
     fun increaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
-        shoppingCartRepository.increaseQuantity(
-            shoppingCartProductItem.shoppingCartProduct.id,
-            shoppingCartProductItem.shoppingCartProduct.quantity + 1,
-        ) { result ->
-            result
-                .onSuccess {
-                    updateShoppingCart()
-                    _hasUpdatedProducts.value = true
-                }.onFailure {
-                    _event.postValue(ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE)
-                }
+        viewModelScope.launch {
+            shoppingCartRepository.updateQuantity(
+                shoppingCartProductItem.shoppingCartProduct.id,
+                shoppingCartProductItem.shoppingCartProduct.quantity + 1,
+            )
+            updateShoppingCart()
+            _hasUpdatedProducts.value = true
         }
     }
 

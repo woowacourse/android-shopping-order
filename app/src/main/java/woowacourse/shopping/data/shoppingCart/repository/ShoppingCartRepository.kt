@@ -4,34 +4,22 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 interface ShoppingCartRepository {
-    fun load(
+    suspend fun load(
         page: Int,
         size: Int,
-        onResult: (Result<ShoppingCarts>) -> Unit,
-    )
+    ): ShoppingCarts
 
-    fun add(
+    suspend fun add(
         product: Product,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
     )
 
-    fun increaseQuantity(
+    suspend fun updateQuantity(
         shoppingCartId: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
     )
 
-    fun decreaseQuantity(
-        shoppingCartId: Long,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun remove(shoppingCartId: Long)
 
-    fun remove(
-        shoppingCartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
-
-    fun fetchAllQuantity(onResult: (Result<Int>) -> Unit)
+    suspend fun fetchAllQuantity(): Int
 }

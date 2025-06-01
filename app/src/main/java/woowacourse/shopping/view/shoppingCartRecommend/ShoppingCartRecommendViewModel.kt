@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -46,20 +48,19 @@ class ShoppingCartRecommendViewModel(
     }
 
     private fun initRecentWatchingProducts() {
-        productsRepository.getRecentRecommendWatchingProducts(MAX_RECENT_PRODUCT_LOAD_SIZE) { result ->
-            result.onSuccess { products ->
-                recentWatchingProducts = products
-                initShoppingCartProducts()
-            }
+        viewModelScope.launch {
+            val products =
+                productsRepository.getRecentRecommendWatchingProducts(MAX_RECENT_PRODUCT_LOAD_SIZE)
+            recentWatchingProducts = products
+            initShoppingCartProducts()
         }
     }
 
     private fun initShoppingCartProducts() {
-        shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE) { result ->
-            result.onSuccess { shoppingCarts ->
-                shoppingCartProducts = shoppingCarts.shoppingCartItems
-                getRecommendProducts()
-            }
+        viewModelScope.launch {
+            val shoppingCarts = shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
+            shoppingCartProducts = shoppingCarts.shoppingCartItems
+            getRecommendProducts()
         }
     }
 
@@ -83,75 +84,71 @@ class ShoppingCartRecommendViewModel(
     ) {
         when (item.shoppingCartId == null) {
             true -> {
-                shoppingCartRepository.add(item.product, selectedQuantity + 1) { result ->
-                    result.onSuccess {
-                        loadShoppingCartProducts(item)
-                    }
+                viewModelScope.launch {
+                    shoppingCartRepository.add(item.product, selectedQuantity + 1)
+                    loadShoppingCartProducts(item)
                 }
             }
 
             false -> {
-                shoppingCartRepository.increaseQuantity(
-                    item.shoppingCartId,
-                    selectedQuantity + 1,
-                ) { result ->
-                    result.onSuccess {
-                        loadShoppingCartProducts(item)
-                    }
+                viewModelScope.launch {
+                    shoppingCartRepository.updateQuantity(
+                        item.shoppingCartId,
+                        selectedQuantity + 1,
+                    )
+                    loadShoppingCartProducts(item)
                 }
             }
         }
     }
 
     private fun loadShoppingCartProducts(item: ProductsItem.ProductItem) {
-        shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE) { result ->
-            result.onSuccess { shoppingCarts ->
-                val uploaded =
-                    shoppingCarts.shoppingCartItems.find {
-                        it.product.id == item.product.id
-                    } ?: return@onSuccess removeShoppingCartToOrder(
-                        item.shoppingCartId ?: return@onSuccess,
-                    )
+        viewModelScope.launch {
+            val shoppingCarts = shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
+            val uploaded =
+                shoppingCarts.shoppingCartItems.find {
+                    it.product.id == item.product.id
+                } ?: return@launch removeShoppingCartToOrder(
+                    item.shoppingCartId ?: return@launch,
+                )
+            val productToOrder =
+                ShoppingCartProduct(
+                    id = uploaded.id,
+                    product = item.product,
+                    quantity = uploaded.quantity,
+                )
 
-                val productToOrder =
-                    ShoppingCartProduct(
-                        id = uploaded.id,
-                        product = item.product,
-                        quantity = uploaded.quantity,
-                    )
+            val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
 
-                val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
+            val existingIndex =
+                currentList.indexOfFirst { it.product.id == productToOrder.product.id }
 
-                val existingIndex =
-                    currentList.indexOfFirst { it.product.id == productToOrder.product.id }
+            if (existingIndex >= 0) {
+                currentList[existingIndex] = productToOrder
+            } else {
+                currentList.add(productToOrder)
+            }
 
-                if (existingIndex >= 0) {
-                    currentList[existingIndex] = productToOrder
-                } else {
-                    currentList.add(productToOrder)
+            _shoppingCartProductsToOrder.value = currentList
+
+            _recommendProducts.value
+                ?.indexOfFirst {
+                    it.product.id == item.product.id
+                }?.let { index ->
+                    val productItem =
+                        _recommendProducts.value?.get(index) as ProductsItem.ProductItem
+                    val updatedItem =
+                        productItem.copy(
+                            shoppingCartId = productToOrder.id,
+                            selectedQuantity = productToOrder.quantity,
+                        )
+                    _recommendProducts.value =
+                        _recommendProducts.value?.toMutableList()?.apply {
+                            set(index, updatedItem)
+                        }
                 }
 
-                _shoppingCartProductsToOrder.value = currentList
-
-                _recommendProducts.value
-                    ?.indexOfFirst {
-                        it.product.id == item.product.id
-                    }?.let { index ->
-                        val productItem =
-                            _recommendProducts.value?.get(index) as ProductsItem.ProductItem
-                        val updatedItem =
-                            productItem.copy(
-                                shoppingCartId = productToOrder.id,
-                                selectedQuantity = productToOrder.quantity,
-                            )
-                        _recommendProducts.value =
-                            _recommendProducts.value?.toMutableList()?.apply {
-                                set(index, updatedItem)
-                            }
-                    }
-
-                shoppingCartProducts = shoppingCarts.shoppingCartItems
-            }
+            shoppingCartProducts = shoppingCarts.shoppingCartItems
         }
     }
 
@@ -171,13 +168,12 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
-        shoppingCartRepository.decreaseQuantity(
-            item.shoppingCartId ?: return,
-            selectedQuantity - 1,
-        ) { result ->
-            result.onSuccess {
-                loadShoppingCartProducts(item)
-            }
+        viewModelScope.launch {
+            shoppingCartRepository.updateQuantity(
+                item.shoppingCartId ?: return@launch,
+                selectedQuantity - 1,
+            )
+            loadShoppingCartProducts(item)
         }
     }
 
