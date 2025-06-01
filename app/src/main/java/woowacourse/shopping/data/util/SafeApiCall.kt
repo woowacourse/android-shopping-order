@@ -8,7 +8,7 @@ inline fun <T> safeApiCall(apiCall: () -> retrofit2.Response<T>): Result<T> =
         val response = apiCall()
         if (response.isSuccessful) {
             Result.success(
-                response.body() ?: Unit as T,
+                response.body() as T,
             )
         } else {
             Result.failure(HttpException(response))
