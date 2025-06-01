@@ -15,6 +15,7 @@ class CatalogViewModelFactory(
         if (modelClass.isAssignableFrom(CatalogViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return CatalogViewModel(
+                // TODO cartProductRepository 하나로 개선
                 cartProductRepository =
                     RemoteCartProductRepositoryImpl(),
                 recentlyViewedProductRepository =
@@ -23,7 +24,7 @@ class CatalogViewModelFactory(
                         RemoteCatalogProductRepositoryImpl(),
                     ),
                 catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
-                remoteCatalogProductRepositoryImpl = RemoteCatalogProductRepositoryImpl(),
+                remoteCatalogProductRepository = RemoteCatalogProductRepositoryImpl(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

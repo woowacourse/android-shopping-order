@@ -1,7 +1,6 @@
 package woowacourse.shopping.product.catalog
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -41,6 +40,7 @@ class CatalogActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        (binding.recyclerViewProducts.adapter as ProductAdapter).clearItems()
         viewModel.loadCatalogUntilCurrentPage()
         viewModel.loadCartItemSize()
         viewModel.loadRecentlyViewedProducts()
@@ -55,18 +55,20 @@ class CatalogActivity : AppCompatActivity() {
     private fun setupCartMenuItem(menu: Menu?) {
         val menuItem = menu?.findItem(R.id.action_cart) ?: return
 
-        val binding = DataBindingUtil.inflate<MenuCartLayoutBinding>(
-            LayoutInflater.from(this),
-            R.layout.menu_cart_layout,
-            null,
-            false
-        ).apply {
-            layoutCartMenu.setOnClickListener {
-                startActivity(CartActivity.newIntent(this@CatalogActivity))
-            }
-            vm = viewModel
-            lifecycleOwner = this@CatalogActivity
-        }
+        val binding =
+            DataBindingUtil
+                .inflate<MenuCartLayoutBinding>(
+                    LayoutInflater.from(this),
+                    R.layout.menu_cart_layout,
+                    null,
+                    false,
+                ).apply {
+                    layoutCartMenu.setOnClickListener {
+                        startActivity(CartActivity.newIntent(this@CatalogActivity))
+                    }
+                    vm = viewModel
+                    lifecycleOwner = this@CatalogActivity
+                }
 
         menuItem.actionView = binding.root
     }
@@ -84,8 +86,7 @@ class CatalogActivity : AppCompatActivity() {
 
                         override fun onLoadButtonClick() = viewModel.loadNextCatalogProducts()
 
-                        override fun onQuantityAddClick(product: ProductUiModel) =
-                            viewModel.increaseQuantity(product)
+                        override fun onQuantityAddClick(product: ProductUiModel) = viewModel.increaseQuantity(product)
                     },
                 quantityControlListener = { buttonEvent, product ->
                     when (buttonEvent) {
@@ -102,10 +103,11 @@ class CatalogActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int = spanSizeByPosition(
-                    position,
-                    binding.recyclerViewProducts.adapter?.itemCount ?: 0
-                )
+                override fun getSpanSize(position: Int): Int =
+                    spanSizeByPosition(
+                        position,
+                        binding.recyclerViewProducts.adapter?.itemCount ?: 0,
+                    )
             }
         binding.recyclerViewProducts.layoutManager = gridLayoutManager
     }
@@ -122,36 +124,14 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun observeCatalogProducts() {
-        viewModel.catalogItems.observe(this) { value ->
-            Log.d("CATALOG", "$value")
-            (binding.recyclerViewProducts.adapter as ProductAdapter).setItems(value)
-        }
-        viewModel.updatedItem.observe(this) { product ->
-            Log.d("test", "프로덕트 $product")
-            if (product != null) {
-                (binding.recyclerViewProducts.adapter as ProductAdapter).updateItem(
-                    product,
-                )
-            }
-        }
-        viewModel.recentlyViewedProducts.observe(this) { products ->
-            (binding.recyclerViewRecentlyViewedProducts.adapter as RecentlyViewedProductAdapter).setItems(
-                products,
-            )
-        }
-        viewModel.loadingState.observe(this) {
-            when (it.isLoading) {
-                true -> {
-                    binding.shimmerFrameLayoutProducts.startShimmer()
-                    binding.shimmerFrameLayoutProducts.visibility = View.VISIBLE
-                }
+        val productsAdapter = binding.recyclerViewProducts.adapter as ProductAdapter
+        val recentProductsAdapter: RecentlyViewedProductAdapter =
+            binding.recyclerViewRecentlyViewedProducts.adapter as RecentlyViewedProductAdapter
 
-                false -> {
-                    binding.shimmerFrameLayoutProducts.stopShimmer()
-                    binding.shimmerFrameLayoutProducts.visibility = View.GONE
-                }
-            }
-        }
+        viewModel.loadedCatalogItems.observe(this, productsAdapter::addLoadedItems)
+        viewModel.updatedItem.observe(this, productsAdapter::updateItem)
+        viewModel.recentlyViewedProducts.observe(this, recentProductsAdapter::setItems)
+        viewModel.loadingState.observe(this) { changeShimmerState(it.isLoading) }
         binding.lifecycleOwner = this
     }
 
@@ -172,4 +152,18 @@ class CatalogActivity : AppCompatActivity() {
         position: Int,
         itemCount: Int,
     ): Int = if (position == itemCount - 1 && itemCount % 20 == 1) 2 else 1
+
+    private fun changeShimmerState(isLoading: Boolean) {
+        when (isLoading) {
+            true -> {
+                binding.shimmerFrameLayoutProducts.startShimmer()
+                binding.shimmerFrameLayoutProducts.visibility = View.VISIBLE
+            }
+
+            false -> {
+                binding.shimmerFrameLayoutProducts.stopShimmer()
+                binding.shimmerFrameLayoutProducts.visibility = View.GONE
+            }
+        }
+    }
 }

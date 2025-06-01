@@ -7,7 +7,6 @@ import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.CatalogItem.ProductItem
 
@@ -15,11 +14,13 @@ class CatalogViewModel(
     private val catalogProductRepository: CatalogProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val remoteCatalogProductRepositoryImpl: RemoteCatalogProductRepositoryImpl,
+    private val remoteCatalogProductRepository: CatalogProductRepository,
 ) : ViewModel() {
-    private val _catalogItems =
+    private val catalogItems: MutableList<CatalogItem> = mutableListOf()
+
+    private val _loadedCatalogItems =
         MutableLiveData<List<CatalogItem>>(emptyList<CatalogItem>())
-    val catalogItems: LiveData<List<CatalogItem>> = _catalogItems
+    val loadedCatalogItems: LiveData<List<CatalogItem>> = _loadedCatalogItems
 
     private var page: Int = INITIAL_PAGE
 
@@ -60,13 +61,12 @@ class CatalogViewModel(
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val catalogProduct: CatalogItem? =
-            catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
-        val quantity = (catalogProduct as ProductItem).productItem.quantity
-
         if (product.quantity == 1) {
-            cartProductRepository.deleteCartProduct(product.id)
-            _updatedItem.postValue(product.copy(quantity = 0))
+            cartProductRepository.deleteCartProduct(product.id) { result ->
+                if (result == true) {
+                    _updatedItem.postValue(product.copy(quantity = 0))
+                }
+            }
         } else {
             cartProductRepository.updateProduct(product.id, product.quantity - 1) { result ->
                 if (result == true) {
@@ -80,7 +80,7 @@ class CatalogViewModel(
 
     fun loadNextCatalogProducts() {
         page++
-        remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
+        remoteCatalogProductRepository.getAllProductsSize { allProductSize ->
             val startIndex = page * PAGE_SIZE
             val endIndex = minOf(startIndex + PAGE_SIZE, allProductSize)
 
@@ -89,8 +89,8 @@ class CatalogViewModel(
     }
 
     fun loadCatalogUntilCurrentPage() {
-        _catalogItems.value = emptyList()
-        remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
+        catalogItems.clear()
+        remoteCatalogProductRepository.getAllProductsSize { allProductSize ->
             val startIndex = 0
             val endIndex = minOf((page + 1) * PAGE_SIZE, allProductSize)
 
@@ -106,7 +106,7 @@ class CatalogViewModel(
     ) {
         _loadingState.postValue(LoadingState.loading())
 
-        remoteCatalogProductRepositoryImpl.getProductsByPage(
+        remoteCatalogProductRepository.getProductsByPage(
             page,
             size,
         ) { pagedProducts ->
@@ -129,19 +129,16 @@ class CatalogViewModel(
                         }
 
                     val items = mergedProducts.map { ProductItem(it) }
-                    val prevItems =
-                        _catalogItems.value
-                            .orEmpty()
-                            .filterNot { it is CatalogItem.LoadMoreButtonItem }
                     val hasNextPage = endIndex < allProductsSize
                     val updatedItems =
                         if (hasNextPage) {
-                            prevItems + items + CatalogItem.LoadMoreButtonItem
+                            items + CatalogItem.LoadMoreButtonItem
                         } else {
-                            prevItems + items
+                            items
                         }
 
-                    _catalogItems.postValue(updatedItems)
+                    catalogItems += updatedItems
+                    _loadedCatalogItems.postValue(updatedItems)
                     _loadingState.postValue(LoadingState.loaded())
                 }
             }

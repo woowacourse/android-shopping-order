@@ -1,9 +1,7 @@
 package woowacourse.shopping.product.catalog
 
-import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.domain.LoadingState
 
 class ProductAdapter(
     products: List<CatalogItem>,
@@ -15,15 +13,15 @@ class ProductAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder = when (viewType) {
-        VIEW_TYPE_PRODUCT ->
-            ProductViewHolder.from(parent, productActionListener, quantityControlListener)
+    ): RecyclerView.ViewHolder =
+        when (viewType) {
+            VIEW_TYPE_PRODUCT ->
+                ProductViewHolder.from(parent, productActionListener, quantityControlListener)
 
-        VIEW_TYPE_LOAD_MORE -> LoadButtonViewHolder.from(parent, productActionListener)
+            VIEW_TYPE_LOAD_MORE -> LoadButtonViewHolder.from(parent, productActionListener)
 
-        else -> LoadingStateProductViewHolder.from(parent)
-
-    }
+            else -> LoadingStateProductViewHolder.from(parent)
+        }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -43,16 +41,22 @@ class ProductAdapter(
             is CatalogItem.LoadingStateProductItem -> VIEW_TYPE_LOADING_PRODUCT
         }
 
-    fun setItems(items: List<CatalogItem>) {
+    fun clearItems() {
         products.clear()
+    }
+
+    fun addLoadedItems(items: List<CatalogItem>) {
+        if (products.lastOrNull() is CatalogItem.LoadMoreButtonItem) {
+            products.removeAt(products.lastIndex)
+            notifyItemRemoved(products.lastIndex + 1)
+        }
         products.addAll(items)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(products.lastIndex, items.size)
     }
 
     fun updateItem(product: ProductUiModel) {
         val index: Int =
             products.indexOfFirst { (it as CatalogItem.ProductItem).productItem.id == product.id }
-        Log.d("test", "이거 ${index}")
         products[index] = CatalogItem.ProductItem(product)
         notifyItemChanged(index)
     }

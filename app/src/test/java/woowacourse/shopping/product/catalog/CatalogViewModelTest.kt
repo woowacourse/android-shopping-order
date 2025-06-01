@@ -30,7 +30,7 @@ class CatalogViewModelTest {
 
         assertThat(0).isEqualTo(viewModel.page.value)
 
-        val catalogProducts: List<CatalogItem> = viewModel.catalogItems.value ?: emptyList()
+        val catalogProducts: List<CatalogItem> = viewModel.loadedCatalogItems.value ?: emptyList()
 
         assertThat(catalogProducts.size).isEqualTo(20)
     }
@@ -53,7 +53,7 @@ class CatalogViewModelTest {
 
         // then
         assertThat(viewModel.page.value).isEqualTo(1)
-        assertThat(viewModel.catalogItems.value?.size).isEqualTo(25)
+        assertThat(viewModel.loadedCatalogItems.value?.size).isEqualTo(25)
     }
 
     @Test
@@ -68,6 +68,6 @@ class CatalogViewModelTest {
             )
 
         // 페이지 항목 20개
-        assertThat(viewModel.catalogItems.value?.size).isEqualTo(20)
+        assertThat(viewModel.loadedCatalogItems.value?.size).isEqualTo(20)
     }
 }
