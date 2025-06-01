@@ -172,6 +172,7 @@ class OrderViewModel(
     }
 
     private fun isCheckedAll(currentOrderProducts: List<CartProductUiModel>): Boolean {
+        if (currentOrderProducts.isEmpty()) return false
         val cartProducts = getAllCartProducts()
         return cartProducts.all { cartProduct ->
             currentOrderProducts.any { it.productId == cartProduct.product.id }
@@ -196,16 +197,12 @@ class OrderViewModel(
 
         val filteredProducts =
             getCurrentOrderProducts().filter { it.productId !in deletedProductIds }
-        if (filteredProducts.size != getCurrentOrderProducts().size) {
-            orderProducts.postValue(filteredProducts)
-        }
+        orderProducts.postValue(filteredProducts)
     }
 
     private fun removeProductFromOrderList(cartId: Long) {
-        val updatedProducts =
-            getCurrentOrderProducts().toMutableList().apply {
-                removeIf { it.cartId == cartId }
-            }
+        val updatedProducts = getCurrentOrderProducts().toMutableList()
+        updatedProducts.removeIf { it.cartId == cartId }
         orderProducts.postValue(updatedProducts)
     }
 
@@ -262,8 +259,8 @@ class OrderViewModel(
 
     private fun updateOrderProductsWithLatestData(cartProducts: List<CartProductUiModel>) {
         val updatedProducts =
-            getCurrentOrderProducts().map { orderProduct ->
-                cartProducts.find { it.productId == orderProduct.productId } ?: orderProduct
+            getCurrentOrderProducts().mapNotNull { orderProduct ->
+                cartProducts.find { it.productId == orderProduct.productId }
             }
         orderProducts.postValue(updatedProducts)
     }

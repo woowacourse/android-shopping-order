@@ -21,6 +21,11 @@ class CartLocalDataSourceImpl : CartLocalDataSource {
         productId: Long,
         quantity: Int,
     ) {
+        if (quantity <= DEFAULT_QUANTITY) {
+            cartProductMap.remove(productId)
+            return
+        }
+
         val foundCartProduct = cartProductMap[productId] ?: return
         cartProductMap[productId] = foundCartProduct.copy(quantity = quantity)
     }
