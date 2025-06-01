@@ -18,7 +18,7 @@ class DefaultProductRepository(
             result.fold(
                 onSuccess = { response ->
                     if (response != null) {
-                        val productSinglePage = response.toDomain()
+                        val productSinglePage = response
                         callback(Result.success(productSinglePage))
                     } else {
                         callback(Result.failure(NullPointerException()))
@@ -39,7 +39,7 @@ class DefaultProductRepository(
             result.fold(
                 onSuccess = { response ->
                     if (response != null) {
-                        val productSinglePage = response.toDomain()
+                        val productSinglePage = response
                         callback(Result.success(productSinglePage))
                     } else {
                         callback(Result.failure(NullPointerException()))

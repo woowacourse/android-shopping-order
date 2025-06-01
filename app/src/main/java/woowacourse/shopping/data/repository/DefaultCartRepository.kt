@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.HttpException
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
@@ -15,83 +14,29 @@ class DefaultCartRepository(
         cart: Cart,
         callback: (Result<String?>) -> Unit,
     ) {
-        dataSource.addCart(cart.toRequest()) { response ->
-            response.fold(
-                onSuccess = { value ->
-                    if (value != null) {
-                        callback(Result.success(value))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
-        }
+        dataSource.addCart(cart.toRequest()) { callback(it) }
     }
 
     override fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage>) -> Unit,
+        callback: (Result<CartsSinglePage?>) -> Unit,
     ) {
-        dataSource.singlePage(page, pageSize) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        val cartSinglePage = response.toDomain()
-                        callback(Result.success(cartSinglePage))
-                    } else {
-                        val error = HttpException(response)
-                        callback(Result.failure(error))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
-        }
+        dataSource.singlePage(page, pageSize) { callback(it) }
     }
 
     override fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
+        callback: (Result<Unit?>) -> Unit,
     ) {
-        dataSource.updateCartQuantity(cartId, quantity.value) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        callback(Result.success(response))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
-        }
+        dataSource.updateCartQuantity(cartId, quantity.value) { callback(it) }
     }
 
     override fun deleteCart(
         cartId: Long,
-        callback: (Result<Unit>) -> Unit,
+        callback: (Result<Unit?>) -> Unit,
     ) {
-        dataSource.deleteCart(cartId) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        callback(Result.success(response))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
-        }
+        dataSource.deleteCart(cartId) { callback(it) }
     }
 }
