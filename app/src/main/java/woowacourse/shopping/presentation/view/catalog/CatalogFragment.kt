@@ -39,7 +39,7 @@ class CatalogFragment :
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshCartState()
+        viewModel.refreshCatalog()
     }
 
     override fun onProductClicked(product: ProductUiModel) {

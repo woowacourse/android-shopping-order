@@ -88,34 +88,31 @@ class CatalogViewModel(
         return (currentUiModels + fetchedUiModels)
     }
 
-    fun refreshCartState() {
-        if (_items.value.isNullOrEmpty()) return
+    fun refreshCatalog() {
+        val items = _items.value.orEmpty()
 
         loadRecentProducts()
+        calculateTotalCartCount()
 
         productRepository.loadAllCartItems { cartItems ->
-            val updatedCartState =
-                cartItems?.associateBy(
-                    { it.product.id },
-                    { it.toUiModel() },
+            val idToProductUiModel =
+                cartItems.associateBy(
+                    { cartItem -> cartItem.product.id },
+                    { cartItem -> cartItem.toUiModel() },
                 )
 
-            val totalCount = cartItems?.sumOf { it.quantity } ?: 0
-            _totalCartCount.postValue(totalCount)
-
             val updatedItems =
-                _items.value?.map { updatedItem ->
-                    if (updatedItem is CatalogItem.ProductItem) {
-                        val updatedProduct = updatedCartState?.get(updatedItem.product.id)
+                items.map { item ->
+                    if (item is CatalogItem.ProductItem) {
                         CatalogItem.ProductItem(
-                            updatedProduct ?: updatedItem.product.copy(quantity = 0),
+                            idToProductUiModel[item.product.id] ?: item.product,
                         )
                     } else {
-                        updatedItem
+                        item
                     }
                 }
 
-            _items.postValue(updatedItems.orEmpty())
+            _items.postValue(updatedItems)
         }
     }
 
