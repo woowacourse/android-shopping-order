@@ -81,7 +81,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/shoppingCartOrderLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="86dp"
             android:background="@color/gray_5"
             android:paddingVertical="14dp"
             android:paddingStart="12dp"
@@ -132,7 +132,7 @@
         <TextView
             android:id="@+id/shoppingCartOrderButton"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="86dp"
             android:enabled="@{orderBarViewModel.isOrderEnabled}"
             android:background="@drawable/background_order_button"
             android:gravity="center"

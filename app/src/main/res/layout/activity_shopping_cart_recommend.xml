@@ -101,34 +101,13 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/shoppingCartRecommendOrderLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="86dp"
             android:background="@color/gray_5"
             android:paddingVertical="14dp"
             android:paddingStart="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/shoppingCartRecommendOrderButton"
             app:layout_constraintStart_toStartOf="parent">
-
-            <CheckBox
-                android:id="@+id/shoppingCartProductAllSelectCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/shopping_cart_all_title"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/shoppingCartProductAllSelectCheckBox"
-                app:layout_constraintStart_toStartOf="@id/shoppingCartProductAllSelectCheckBox" />
 
             <TextView
                 android:layout_width="0dp"
