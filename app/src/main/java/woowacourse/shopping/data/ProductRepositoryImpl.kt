@@ -26,9 +26,9 @@ class ProductRepositoryImpl(
             pageSize = pageSize,
         ) {
             val products: List<Product> = it.productContent.map { it.toProduct() }
-            val hasMore = products.size >= pageSize
+            val isLastPage = products.size < pageSize
 
-            callback(products, hasMore)
+            callback(products, isLastPage)
         }
     }
 

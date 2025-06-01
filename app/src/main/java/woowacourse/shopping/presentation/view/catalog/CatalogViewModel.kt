@@ -42,7 +42,7 @@ class CatalogViewModel(
     fun fetchProducts() {
         _isLoading.value = true
         calculateTotalCartCount()
-        productRepository.loadPageOfProducts(pageIndex, PAGE_SIZE) { products, hasMore ->
+        productRepository.loadPageOfProducts(pageIndex, PAGE_SIZE) { products, isLastPage ->
             productRepository.loadAllCartItems { cartItems ->
                 productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
                     val productUiModels = matchProductsToCartItems(products, cartItems)
@@ -54,7 +54,7 @@ class CatalogViewModel(
                                 add(recentProductItem)
                             }
                             addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
-                            if (hasMore) add(CatalogItem.LoadMoreItem)
+                            if (!isLastPage) add(CatalogItem.LoadMoreItem)
                         }
                     _items.postValue(items)
                     pageIndex++
