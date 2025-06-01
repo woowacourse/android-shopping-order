@@ -202,6 +202,7 @@ class CatalogViewModel(
         private const val PAGE_SIZE = 20
         private const val RECENTLY_VIEWED_PRODUCTS_COUNT = 10
 
+        @Suppress("UNCHECKED_CAST")
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(

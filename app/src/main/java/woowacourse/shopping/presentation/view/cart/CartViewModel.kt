@@ -250,6 +250,7 @@ class CartViewModel(
         private const val DEFAULT_PAGE = 1
         private const val PAGE_SIZE = 5
 
+        @Suppress("UNCHECKED_CAST")
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(

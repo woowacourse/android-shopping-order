@@ -69,6 +69,7 @@ class DetailViewModel(
     }
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
