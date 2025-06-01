@@ -16,7 +16,7 @@ object RetrofitProductService {
         }
 
     private val base64Credentials: String by lazy {
-        val username = "wondroid-world"
+        val username = "ijh1298"
         val password = "password"
         val credentials = "$username:$password"
         Base64.getEncoder().encodeToString(credentials.toByteArray())

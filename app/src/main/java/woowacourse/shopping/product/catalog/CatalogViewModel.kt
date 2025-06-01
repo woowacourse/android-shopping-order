@@ -40,8 +40,8 @@ class CatalogViewModel(
             cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
                 _updatedItem.postValue(product)
             }
-        } else {
-            cartProductRepository.updateProduct(product.id, product.quantity + 1) { result ->
+        } else if (product.cartItemId != null) {
+            cartProductRepository.updateProduct(product.cartItemId, product.quantity + 1) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                 }
@@ -52,14 +52,14 @@ class CatalogViewModel(
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        if (product.quantity == 1) {
-            cartProductRepository.deleteCartProduct(product.id) { result ->
+        if (product.quantity == 1 && product.cartItemId != null) {
+            cartProductRepository.deleteCartProduct(product.cartItemId) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = 0))
                 }
             }
-        } else {
-            cartProductRepository.updateProduct(product.id, product.quantity - 1) { result ->
+        } else if (product.cartItemId != null) {
+            cartProductRepository.updateProduct(product.cartItemId, product.quantity - 1) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                 }

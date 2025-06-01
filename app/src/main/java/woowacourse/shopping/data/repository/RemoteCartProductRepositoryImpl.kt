@@ -49,10 +49,10 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     }
 
     override fun deleteCartProduct(
-        productId: Int,
+        cartItemId: Int,
         callback: (Boolean) -> Unit,
     ) {
-        retrofitService.deleteCartItem(cartItemId = productId).enqueue(
+        retrofitService.deleteCartItem(cartItemId = cartItemId).enqueue(
             object : Callback<Void> {
                 override fun onResponse(
                     call: Call<Void>,
@@ -117,13 +117,13 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     }
 
     override fun updateProduct(
-        productId: Int,
+        cartItemId: Int,
         quantity: Int,
         callback: (Boolean) -> Unit,
     ) {
         retrofitService
             .patchCartItemQuantity(
-                cartItemId = productId,
+                cartItemId = cartItemId,
                 quantity = Quantity(quantity),
             ).enqueue(
                 object : Callback<Void> {
