@@ -4,13 +4,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.ProductUiModel
 
-class RecentProductAdapter : RecyclerView.Adapter<RecentProductItemViewHolder>() {
+class RecentProductAdapter(
+    private val eventListener: CatalogAdapter.CatalogEventListener,
+) : RecyclerView.Adapter<RecentProductItemViewHolder>() {
     private val items = mutableListOf<ProductUiModel>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecentProductItemViewHolder = RecentProductItemViewHolder.from(parent)
+    ): RecentProductItemViewHolder = RecentProductItemViewHolder.from(parent, eventListener)
 
     override fun onBindViewHolder(
         holder: RecentProductItemViewHolder,

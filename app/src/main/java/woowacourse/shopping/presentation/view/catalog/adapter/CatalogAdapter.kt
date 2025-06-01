@@ -20,7 +20,7 @@ class CatalogAdapter(
     ): RecyclerView.ViewHolder =
         when (CatalogItem.CatalogType.entries[viewType]) {
             CatalogItem.CatalogType.RECENT ->
-                RecentProductViewHolder.from(parent)
+                RecentProductViewHolder.from(parent, eventListener)
 
             CatalogItem.CatalogType.PRODUCT ->
                 ProductViewHolder.from(

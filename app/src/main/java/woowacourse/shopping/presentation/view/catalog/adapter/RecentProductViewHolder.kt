@@ -7,9 +7,10 @@ import woowacourse.shopping.databinding.ItemRecentProductContainerBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 
 class RecentProductViewHolder(
-    private val binding: ItemRecentProductContainerBinding,
+    binding: ItemRecentProductContainerBinding,
+    eventListener: CatalogAdapter.CatalogEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private val adapter = RecentProductAdapter()
+    private val adapter = RecentProductAdapter(eventListener)
 
     init {
         binding.recyclerViewRecentProduct.adapter = adapter
@@ -20,14 +21,17 @@ class RecentProductViewHolder(
     }
 
     companion object {
-        fun from(parent: ViewGroup): RecentProductViewHolder {
+        fun from(
+            parent: ViewGroup,
+            eventListener: CatalogAdapter.CatalogEventListener,
+        ): RecentProductViewHolder {
             val binding =
                 ItemRecentProductContainerBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
-            return RecentProductViewHolder(binding)
+            return RecentProductViewHolder(binding, eventListener)
         }
     }
 }
