@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order
 
 interface OrderNavigator {
     fun navigateToCart()

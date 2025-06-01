@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart.event
+package woowacourse.shopping.presentation.view.order.cart.event
 
 enum class CartMessageEvent {
     FETCH_CART_ITEMS_FAILURE,

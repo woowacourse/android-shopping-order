@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.view.cart.OrderActivity"
+            android:name=".presentation.view.order.OrderActivity"
             android:exported="false" />
         <activity android:name="androidx.fragment.app.testing.EmptyFragmentActivity" />
     </application>

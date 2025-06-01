@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart.adapter
+package woowacourse.shopping.presentation.view.order.suggestion.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import woowacourse.shopping.presentation.model.SuggestionProductUiModel

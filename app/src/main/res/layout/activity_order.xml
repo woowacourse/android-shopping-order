@@ -7,14 +7,14 @@
 
         <variable
             name="vm"
-            type="woowacourse.shopping.presentation.view.cart.OrderViewModel" />
+            type="woowacourse.shopping.presentation.view.order.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.view.cart.OrderActivity">
+        tools:context=".presentation.view.order.OrderActivity">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/cart_fragment_container"

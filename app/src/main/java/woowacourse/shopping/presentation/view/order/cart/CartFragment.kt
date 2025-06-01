@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order.cart
 
 import android.os.Bundle
 import android.view.View
@@ -6,8 +6,9 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.view.cart.adapter.CartAdapter
-import woowacourse.shopping.presentation.view.cart.event.CartMessageEvent
+import woowacourse.shopping.presentation.view.order.OrderViewModel
+import woowacourse.shopping.presentation.view.order.cart.adapter.CartAdapter
+import woowacourse.shopping.presentation.view.order.cart.event.CartMessageEvent
 
 class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),

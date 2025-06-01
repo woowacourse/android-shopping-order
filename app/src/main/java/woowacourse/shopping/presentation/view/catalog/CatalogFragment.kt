@@ -13,10 +13,10 @@ import woowacourse.shopping.databinding.MenuItemCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.CatalogItem
 import woowacourse.shopping.presentation.ui.decorations.GridSpacingItemDecoration
-import woowacourse.shopping.presentation.view.cart.OrderActivity
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter
 import woowacourse.shopping.presentation.view.catalog.event.CatalogMessageEvent
 import woowacourse.shopping.presentation.view.detail.DetailFragment
+import woowacourse.shopping.presentation.view.order.OrderActivity
 
 class CatalogFragment :
     BaseFragment<FragmentCatalogBinding>(R.layout.fragment_catalog),

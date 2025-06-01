@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order
 
 import android.content.Context
 import android.content.Intent
@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.presentation.view.order.cart.CartFragment
+import woowacourse.shopping.presentation.view.order.suggestion.SuggestionFragment
 
 class OrderActivity :
     AppCompatActivity(),

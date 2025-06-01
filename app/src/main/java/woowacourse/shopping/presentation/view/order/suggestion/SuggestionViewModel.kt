@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order.suggestion
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +14,7 @@ import woowacourse.shopping.presentation.model.SuggestionProductUiModel
 import woowacourse.shopping.presentation.model.toSuggestionUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
-import woowacourse.shopping.presentation.view.cart.event.SuggestionMessageEvent
+import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionMessageEvent
 
 class SuggestionViewModel(
     private val cartRepository: CartRepository,

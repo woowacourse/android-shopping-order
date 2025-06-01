@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order.suggestion
 
 import android.os.Bundle
 import android.view.View
@@ -8,8 +8,10 @@ import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentSuggestionBinding
 import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.view.cart.adapter.SuggestionAdapter
-import woowacourse.shopping.presentation.view.cart.event.SuggestionMessageEvent
+import woowacourse.shopping.presentation.view.order.OrderNavigator
+import woowacourse.shopping.presentation.view.order.OrderViewModel
+import woowacourse.shopping.presentation.view.order.suggestion.adapter.SuggestionAdapter
+import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionMessageEvent
 
 class SuggestionFragment :
     BaseFragment<FragmentSuggestionBinding>(R.layout.fragment_suggestion),

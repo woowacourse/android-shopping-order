@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,7 +15,7 @@ import woowacourse.shopping.presentation.model.FetchPageDirection
 import woowacourse.shopping.presentation.model.toCartItemUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
-import woowacourse.shopping.presentation.view.cart.event.CartMessageEvent
+import woowacourse.shopping.presentation.view.order.cart.event.CartMessageEvent
 import kotlin.math.max
 
 class OrderViewModel(
