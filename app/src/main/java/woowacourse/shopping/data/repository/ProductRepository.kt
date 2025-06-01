@@ -4,8 +4,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.api.ProductApi
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.model.response.ProductsResponse
+import woowacourse.shopping.data.model.response.ProductsResponse.Content.Companion.toDomain
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products

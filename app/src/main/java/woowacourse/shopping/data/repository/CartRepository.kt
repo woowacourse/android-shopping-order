@@ -4,11 +4,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.api.CartApi
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.model.request.CartItemQuantityRequest
 import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.CartItemsQuantityResponse
 import woowacourse.shopping.data.model.response.CartItemsResponse
+import woowacourse.shopping.data.model.response.CartItemsResponse.Content.Companion.toDomain
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CartRepository
