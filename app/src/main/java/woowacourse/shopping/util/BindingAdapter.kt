@@ -12,9 +12,9 @@ object BindingAdapter {
         Glide
             .with(this)
             .load(imageUrl)
-            .placeholder(R.drawable.iced_americano)
-            .fallback(R.drawable.iced_americano)
-            .error(R.drawable.iced_americano)
+            .placeholder(R.drawable.fallback_image)
+            .fallback(R.drawable.fallback_image)
+            .error(R.drawable.fallback_image)
             .into(this)
     }
 }
