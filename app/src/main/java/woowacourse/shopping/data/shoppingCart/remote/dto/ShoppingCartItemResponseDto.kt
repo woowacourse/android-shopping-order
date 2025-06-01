@@ -2,6 +2,7 @@ package woowacourse.shopping.data.shoppingCart.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.data.product.remote.dto.ProductResponseDto
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 @Serializable

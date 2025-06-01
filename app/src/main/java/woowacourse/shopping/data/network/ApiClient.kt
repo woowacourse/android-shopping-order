@@ -12,13 +12,15 @@ object ApiClient {
     private const val BASE_URL =
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     fun getApiClient(authenticationRepository: AuthenticationRepository): Retrofit =
         Retrofit
             .Builder()
             .baseUrl(BASE_URL)
             .client(provideOkHttpClient(AppInterceptor(authenticationRepository)))
             .addConverterFactory(
-                Json.asConverterFactory("application/json".toMediaType()),
+                json.asConverterFactory("application/json".toMediaType()),
             ).build()
 
     private fun provideOkHttpClient(interceptor: AppInterceptor): OkHttpClient {
