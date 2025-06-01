@@ -35,15 +35,6 @@ class CartActivity : AppCompatActivity() {
     private fun initBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.buttonOrder.setOnClickListener {
-            val intent =
-                RecommendActivity.newIntent(
-                    this@CartActivity,
-                    viewModel.totalOrderPrice.value!!,
-                    viewModel.checkedProductCount.value!!
-                )
-            startActivity(intent)
-        }
     }
 
     private fun setupToolbar() {
@@ -82,6 +73,15 @@ class CartActivity : AppCompatActivity() {
 
         viewModel.product.observe(this) { productUiModel ->
             cartAdapter.updateProduct(CartAdapterItem.Product(productUiModel))
+        }
+
+        viewModel.navigateToRecommendEvent.observe(this) {
+            val intent = RecommendActivity.newIntent(
+                this@CartActivity,
+                viewModel.totalOrderPrice.value!!,
+                viewModel.checkedProductCount.value!!
+            )
+            startActivity(intent)
         }
     }
 

@@ -8,7 +8,8 @@ class CartEventHandlerImpl(
     private val viewModel: CartViewModel,
 ) : CartEventHandler,
     ProductQuantityHandler {
-    override fun onDeleteProduct(cartProduct: ProductUiModel) = viewModel.onDeleteProduct(cartProduct)
+    override fun onDeleteProduct(cartProduct: ProductUiModel) =
+        viewModel.onDeleteProduct(cartProduct)
 
     override fun onNextPage() = viewModel.onNextPage()
 

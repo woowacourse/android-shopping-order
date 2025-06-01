@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class CartViewModel(
     private val cartRepository: CartItemRepository,
@@ -40,6 +41,9 @@ class CartViewModel(
     val checkedProductCount: LiveData<Int> = checkedProducts.map { checkedProducts ->
         checkedProducts.count()
     }
+
+    private val _navigateToRecommendEvent = SingleLiveEvent<Unit>()
+    val navigateToRecommendEvent: LiveData<Unit> = _navigateToRecommendEvent
 
     val isAllChecked = MutableLiveData(false)
 
@@ -181,6 +185,13 @@ class CartViewModel(
                 if (it.id == updatedProduct.id) updatedProduct else it
             }
             paging.copy(products = updatedList)
+        }
+    }
+
+    fun onOrderClick() {
+        val orderCount = checkedProductCount.value ?: 0
+        if (orderCount > 0) {
+            _navigateToRecommendEvent.value = Unit
         }
     }
 
