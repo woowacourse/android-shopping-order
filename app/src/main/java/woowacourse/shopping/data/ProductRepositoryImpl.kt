@@ -68,17 +68,6 @@ class ProductRepositoryImpl(
         }
     }
 
-    override fun loadLastViewedProduct(
-        currentProductId: Long,
-        callback: (Product?) -> Unit,
-    ) {
-        thread {
-            val entity = recentProductDao.getLastViewedProduct(currentProductId)
-            val product = entity?.toProduct()
-            callback(product)
-        }
-    }
-
     override fun getMostRecentProduct(callback: (Product?) -> Unit) {
         thread {
             val entity = recentProductDao.getMostRecentProduct()

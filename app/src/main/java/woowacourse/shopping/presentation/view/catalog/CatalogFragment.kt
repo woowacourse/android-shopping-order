@@ -43,7 +43,6 @@ class CatalogFragment :
 
     override fun onProductClicked(product: ProductUiModel) {
         navigateToScreen(DetailFragment::class.java, DetailFragment.newBundle(product))
-        viewModel.addRecentProduct(product)
     }
 
     override fun onLoadMoreClicked() {

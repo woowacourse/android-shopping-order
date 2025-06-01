@@ -19,11 +19,6 @@ interface ProductRepository {
         callback: (List<Product>) -> Unit,
     )
 
-    fun loadLastViewedProduct(
-        currentProductId: Long,
-        callback: (Product?) -> Unit,
-    )
-
     fun getProductById(
         id: Long,
         callback: (Product?) -> Unit,

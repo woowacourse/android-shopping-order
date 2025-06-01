@@ -13,7 +13,9 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.CartFragment
 
-class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {
+class DetailFragment :
+    BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail),
+    DetailEventListener {
     private val viewModel: DetailViewModel by viewModels { DetailViewModel.Factory }
 
     override fun onViewCreated(
@@ -25,13 +27,11 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
         initListener()
 
         val product = arguments.getParcelableCompat<ProductUiModel>(EXTRA_PRODUCT)
-        product.let { viewModel.fetchProduct(it) }
+        viewModel.fetchProduct(product)
 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = viewModel
-
-        viewModel.fetchLastViewedProduct(product.id)
-
+        binding.eventListener = this
         binding.detailItemCounter.listener =
             object : ItemCounterListener {
                 override fun increase(product: ProductUiModel) = viewModel.increaseAmount()
@@ -47,11 +47,8 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
 
         viewModel.product.observe(viewLifecycleOwner) {
             binding.product = it
-        }
-        viewModel.lastViewedProduct.observe(viewLifecycleOwner) { recentProduct ->
-            binding.viewDetailLastViewed.setOnClickListener {
-                viewModel.loadProductById(recentProduct.id)
-            }
+            viewModel.addRecentProduct(it)
+            viewModel.fetchLastViewedProduct()
         }
     }
 
@@ -76,4 +73,12 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
                 EXTRA_PRODUCT to product,
             )
     }
+
+    override fun onRecentItemSelected(product: ProductUiModel) {
+        viewModel.fetchProduct(product)
+    }
+}
+
+interface DetailEventListener {
+    fun onRecentItemSelected(product: ProductUiModel)
 }

@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
-import woowacourse.shopping.presentation.model.toProduct
 import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
 
@@ -95,6 +94,8 @@ class CatalogViewModel(
     fun refreshCartState() {
         if (_items.value.isNullOrEmpty()) return
 
+        updateRecentProducts()
+
         productRepository.loadCartItems { cartItems ->
             val updatedCartState =
                 cartItems?.associateBy(
@@ -158,11 +159,6 @@ class CatalogViewModel(
                 handleUpdatedCartItem(id)
             }
         }
-    }
-
-    fun addRecentProduct(product: ProductUiModel) {
-        productRepository.addRecentProduct(product.toProduct())
-        updateRecentProducts()
     }
 
     private fun handleUpdatedCartItem(cartId: Long) {

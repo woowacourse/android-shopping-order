@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
+import woowacourse.shopping.presentation.model.toProduct
 import woowacourse.shopping.presentation.model.toUiModel
 
 class DetailViewModel(
@@ -25,9 +26,12 @@ class DetailViewModel(
     private val _lastViewedProduct = MutableLiveData<ProductUiModel>()
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
 
-    fun decreaseAmount() {
-        val currentAmount = _product.value?.amount ?: 1
-        _product.postValue(_product.value?.copy(amount = (currentAmount - 1).coerceAtLeast(1)))
+    fun fetchProduct(product: ProductUiModel) {
+        _product.postValue(product.copy(amount = 1))
+    }
+
+    fun addRecentProduct(product: ProductUiModel) {
+        productRepository.addRecentProduct(product.toProduct())
     }
 
     fun increaseAmount() {
@@ -35,8 +39,9 @@ class DetailViewModel(
         _product.postValue(_product.value?.copy(amount = currentAmount + 1))
     }
 
-    fun fetchProduct(product: ProductUiModel) {
-        _product.postValue(product.copy(amount = 1))
+    fun decreaseAmount() {
+        val currentAmount = _product.value?.amount ?: 1
+        _product.postValue(_product.value?.copy(amount = (currentAmount - 1).coerceAtLeast(1)))
     }
 
     fun addCartItem() {
@@ -55,17 +60,11 @@ class DetailViewModel(
         }
     }
 
-    fun loadProductById(productId: Long) {
-        productRepository.getProductById(productId) { product ->
-            product?.let {
-                fetchProduct(it.toUiModel())
+    fun fetchLastViewedProduct() {
+        productRepository.loadRecentProducts(1) { recentProducts ->
+            if (recentProducts.isNotEmpty()) {
+                _lastViewedProduct.postValue(recentProducts.first().toUiModel())
             }
-        }
-    }
-
-    fun fetchLastViewedProduct(currentProductId: Long) {
-        productRepository.loadLastViewedProduct(currentProductId) { product ->
-            product?.let { _lastViewedProduct.postValue(it.toUiModel()) }
         }
     }
 
