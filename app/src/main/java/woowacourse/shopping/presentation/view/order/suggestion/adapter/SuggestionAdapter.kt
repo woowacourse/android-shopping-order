@@ -20,7 +20,5 @@ class SuggestionAdapter(
         holder.bind(getItem(position))
     }
 
-    interface SuggestionEventListener : QuantityChangeListener {
-        fun onQuantitySelectorOpenButtonClick(productId: Long)
-    }
+    interface SuggestionEventListener : QuantityChangeListener
 }

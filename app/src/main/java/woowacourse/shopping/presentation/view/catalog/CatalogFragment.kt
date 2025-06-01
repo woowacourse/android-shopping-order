@@ -56,10 +56,6 @@ class CatalogFragment :
         viewModel.loadProducts()
     }
 
-    override fun onQuantitySelectorOpenButtonClick(productId: Long) {
-        viewModel.increaseProductQuantity(productId)
-    }
-
     override fun increaseQuantity(productId: Long) {
         viewModel.increaseProductQuantity(productId)
     }

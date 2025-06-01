@@ -42,7 +42,7 @@
             android:background="@drawable/selector_checkbox"
             android:button="@null"
             android:checked="@{cartItem.isSelected}"
-            android:onClick="@{() -> eventListener.onCheckOrder(cartItem.productId)}"
+            android:onClick="@{() -> eventListener.onSelectOrderProduct(cartItem.productId)}"
             app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
             app:layout_constraintEnd_toStartOf="@id/cart_item_name"
             app:layout_constraintStart_toStartOf="parent"

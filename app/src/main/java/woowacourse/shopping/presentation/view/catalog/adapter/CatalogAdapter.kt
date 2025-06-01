@@ -65,7 +65,5 @@ class CatalogAdapter(
         fun onProductClick(productId: Long)
 
         fun onLoadMoreClick()
-
-        fun onQuantitySelectorOpenButtonClick(productId: Long)
     }
 }

@@ -13,12 +13,10 @@ import woowacourse.shopping.presentation.view.order.OrderViewModel
 import woowacourse.shopping.presentation.view.order.suggestion.adapter.SuggestionAdapter
 import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionMessageEvent
 
-class SuggestionFragment :
-    BaseFragment<FragmentSuggestionBinding>(R.layout.fragment_suggestion),
-    SuggestionAdapter.SuggestionEventListener {
+class SuggestionFragment : BaseFragment<FragmentSuggestionBinding>(R.layout.fragment_suggestion) {
     private val sharedViewModel: OrderViewModel by activityViewModels()
     private val viewModel: SuggestionViewModel by viewModels { SuggestionViewModel.Factory }
-    private val suggestionAdapter by lazy { SuggestionAdapter(this) }
+    private val suggestionAdapter by lazy { SuggestionAdapter(sharedViewModel) }
 
     override fun onViewCreated(
         view: View,
@@ -29,18 +27,6 @@ class SuggestionFragment :
         setBackPressedDispatcher()
         setAdapter()
         setObservers()
-    }
-
-    override fun onQuantitySelectorOpenButtonClick(productId: Long) {
-        sharedViewModel.increaseProductQuantity(productId)
-    }
-
-    override fun increaseQuantity(productId: Long) {
-        sharedViewModel.increaseProductQuantity(productId)
-    }
-
-    override fun decreaseQuantity(productId: Long) {
-        sharedViewModel.decreaseProductQuantity(productId)
     }
 
     private fun setAdapter() {

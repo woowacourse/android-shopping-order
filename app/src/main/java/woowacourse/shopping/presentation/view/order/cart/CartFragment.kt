@@ -10,12 +10,9 @@ import woowacourse.shopping.presentation.view.order.OrderViewModel
 import woowacourse.shopping.presentation.view.order.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.cart.event.CartMessageEvent
 
-class CartFragment :
-    BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
-    CartAdapter.CartEventListener {
-    private val cartAdapter: CartAdapter by lazy { CartAdapter(eventListener = this) }
-
+class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private val sharedViewModel: OrderViewModel by activityViewModels()
+    private val cartAdapter: CartAdapter by lazy { CartAdapter(eventListener = sharedViewModel) }
 
     override fun onViewCreated(
         view: View,
@@ -25,22 +22,6 @@ class CartFragment :
         setupActionBar()
         setupObservers()
         setupCartAdapter()
-    }
-
-    override fun onDeleteProduct(cartId: Long) {
-        sharedViewModel.deleteCartItem(cartId)
-    }
-
-    override fun increaseQuantity(productId: Long) {
-        sharedViewModel.increaseProductQuantity(productId)
-    }
-
-    override fun decreaseQuantity(productId: Long) {
-        sharedViewModel.decreaseProductQuantity(productId)
-    }
-
-    override fun onCheckOrder(productId: Long) {
-        sharedViewModel.toggleOrderProductSelection(productId)
     }
 
     private fun setupActionBar() {
