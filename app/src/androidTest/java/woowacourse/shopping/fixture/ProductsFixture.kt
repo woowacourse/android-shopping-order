@@ -13,7 +13,7 @@ val dummyCartItemFixture =
                 imageUrl = "https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/000101.png",
                 Price(10_000),
             ),
-            amount = 1,
+            quantity = 1,
         ),
         CartItem(
             Product(
@@ -22,7 +22,7 @@ val dummyCartItemFixture =
                 imageUrl = "https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/000201.png",
                 Price(10_000),
             ),
-            amount = 1,
+            quantity = 1,
         ),
         CartItem(
             Product(
@@ -31,7 +31,7 @@ val dummyCartItemFixture =
                 imageUrl = "https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/000301.png",
                 Price(10_000),
             ),
-            amount = 1,
+            quantity = 1,
         ),
         CartItem(
             Product(
@@ -40,7 +40,7 @@ val dummyCartItemFixture =
                 imageUrl = "https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/000401.png",
                 Price(10_000),
             ),
-            amount = 1,
+            quantity = 1,
         ),
         CartItem(
             Product(
@@ -49,7 +49,7 @@ val dummyCartItemFixture =
                 imageUrl = "https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/000501.png",
                 Price(10_000),
             ),
-            amount = 1,
+            quantity = 1,
         ),
     )
 

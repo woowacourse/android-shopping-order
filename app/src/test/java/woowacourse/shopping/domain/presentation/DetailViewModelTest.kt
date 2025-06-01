@@ -39,7 +39,7 @@ class DetailViewModelTest {
     fun `상품의 수량을 1 증가시킬 수 있다`() {
         val amount = viewModel.amount.getOrAwaitValue()
 
-        viewModel.increaseAmount()
+        viewModel.increaseQuantity()
 
         val updatedAmount = viewModel.amount.getOrAwaitValue()
         assertThat(updatedAmount).isEqualTo(amount + 1)
@@ -47,10 +47,10 @@ class DetailViewModelTest {
 
     @Test
     fun `상품의 수량을 1 감소시킬 수 있다`() {
-        viewModel.increaseAmount()
+        viewModel.increaseQuantity()
         val amount = viewModel.amount.getOrAwaitValue()
 
-        viewModel.decreaseAmount()
+        viewModel.decreaseQuantity()
 
         val updatedAmount = viewModel.amount.getOrAwaitValue()
         assertThat(updatedAmount).isEqualTo(amount - 1)

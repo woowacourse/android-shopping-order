@@ -44,7 +44,5 @@
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/image_view_product"
             tools:text="잉어킹" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

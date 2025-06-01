@@ -30,37 +30,37 @@
             android:background="@color/gray_88"
             android:contentDescription="@null"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btn_open_select_amount"
+            android:id="@+id/btn_open_select_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="@drawable/shape_bg_circle"
+            android:elevation="5dp"
             android:onClick="@{() -> eventListener.onInitialAddToCart(product)}"
             android:padding="16dp"
             android:src="@drawable/ic_add"
-            android:elevation="5dp"
-            android:visibility="@{product.amount != 0 ? View.GONE : View.VISIBLE}"
+            android:visibility="@{product.quantity != 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/image_view_product"
             app:layout_constraintEnd_toEndOf="@id/image_view_product" />
 
         <include
             android:id="@+id/recommend_item_counter"
-            layout="@layout/view_select_amount"
+            layout="@layout/view_select_quantity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="16dp"
-            android:visibility="@{product.amount == 0 ? View.GONE : View.VISIBLE}"
-            app:amount="@{product.amount}"
+            android:visibility="@{product.quantity == 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/image_view_product"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:product="@{product}" />
+            app:product="@{product}"
+            app:quantity="@{product.quantity}" />
 
         <TextView
             android:id="@+id/text_view_product_name"
@@ -87,7 +87,5 @@
             app:layout_constraintStart_toStartOf="@id/text_view_product_name"
             app:layout_constraintTop_toBottomOf="@id/text_view_product_name"
             tools:text="10,000원" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

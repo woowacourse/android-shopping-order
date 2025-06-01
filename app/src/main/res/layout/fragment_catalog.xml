@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.view.catalog.CatalogViewModel" />
@@ -34,20 +36,20 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/text_view_cart_total_amount"
+                android:id="@+id/text_view_cart_total_quantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_margin="10dp"
-                android:text="@{vm.totalCartCount.toString()}"
-                android:visibility="@{(vm.totalCartCount == 0) ? View.GONE : View.VISIBLE}"
                 android:background="@drawable/shape_bg_cart_counter"
                 android:backgroundTint="@color/mint"
                 android:gravity="center"
                 android:padding="4dp"
+                android:text="@{vm.totalCartCount.toString()}"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold"
+                android:visibility="@{(vm.totalCartCount == 0) ? View.GONE : View.VISIBLE}"
                 tools:text="10" />
 
             <ImageButton
@@ -115,8 +117,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
-
-
             </GridLayout>
 
         </com.facebook.shimmer.ShimmerFrameLayout>
@@ -128,7 +128,5 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
             tools:listitem="@layout/item_product" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

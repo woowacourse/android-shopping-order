@@ -75,9 +75,9 @@ class CartViewModel(
         }
     }
 
-    fun increaseAmount(product: ProductUiModel) {
+    fun increaseQuantity(product: ProductUiModel) {
         val cartItem = product.toCartItem()
-        if (product.amount == 0) {
+        if (product.quantity == 0) {
             addToCart(cartItem.toCartItemUiModel())
             return
         }
@@ -93,9 +93,9 @@ class CartViewModel(
         }
     }
 
-    fun decreaseAmount(product: ProductUiModel) {
+    fun decreaseQuantity(product: ProductUiModel) {
         val cartItem = product.toCartItem()
-        if (cartItem.amount == 1) {
+        if (cartItem.quantity == 1) {
             removeFromCart(cartItem.toCartItemUiModel())
             return
         }
@@ -112,7 +112,7 @@ class CartViewModel(
     }
 
     private fun addToCart(cartItem: CartItemUiModel) {
-        val newItem = cartItem.cartItem.copy(amount = 1)
+        val newItem = cartItem.cartItem.copy(quantity = 1)
         cartRepository.addCartItem(newItem) {
             cartRepository.getAllCartItems { cartItems ->
                 val found = cartItems?.find { it.product.id == newItem.product.id }
@@ -128,7 +128,7 @@ class CartViewModel(
     }
 
     fun removeFromCart(cartItem: CartItemUiModel) {
-        val removedItem = cartItem.cartItem.copy(amount = 0)
+        val removedItem = cartItem.cartItem.copy(quantity = 0)
         selectedStates.remove(cartItem.cartItem.cartId)
         cartRepository.deleteCartItem(cartItem.cartItem.cartId) { id ->
             cartRepository.getAllCartItems { cartItems ->
@@ -240,7 +240,7 @@ class CartViewModel(
             val selectedItemIds = selectedStates.filter { it.value }.map { it.key }.toSet()
             val selectedItems = (cartItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
-            _totalCount.postValue(selectedItems.sumOf { it.amount })
+            _totalCount.postValue(selectedItems.sumOf { it.quantity })
             _allSelected.postValue(selectedItems.size == cartItems?.size)
         }
     }

@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text='@{String.format(@string/product_price_format, product.price * vm.product.amount)}'
+            android:text="@{String.format(@string/product_price_format, product.price * vm.product.quantity)}"
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="20sp"
@@ -92,16 +92,16 @@
 
         <include
             android:id="@+id/detail_item_counter"
-            layout="@layout/view_select_amount"
+            layout="@layout/view_select_quantity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="120dp"
-            app:amount="@{vm.product.amount}"
             app:layout_constraintBottom_toBottomOf="@id/text_view_detail_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_detail_price"
             app:layout_constraintTop_toTopOf="@id/text_view_detail_price"
-            app:product="@{product}" />
+            app:product="@{product}"
+            app:quantity="@{vm.product.quantity}" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/view_detail_last_viewed"
@@ -110,8 +110,8 @@
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/shape_cart_item"
-            android:paddingBottom="16dp"
             android:onClick="@{() -> eventListener.onRecentItemSelected(vm.lastViewedProduct)}"
+            android:paddingBottom="16dp"
             android:visibility="@{(vm.lastViewedProduct == null || vm.lastViewedProduct.id == product.id) ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -157,6 +157,5 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

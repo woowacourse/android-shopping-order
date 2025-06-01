@@ -35,7 +35,7 @@ class FakeCartRepository : CartRepository {
     ) {
         val item = cartItems.find { it.product.id == productId }
         item?.let {
-            val updated = it.copy(amount = it.amount + 1)
+            val updated = it.copy(quantity = it.quantity + 1)
             cartItems.remove(it)
             cartItems.add(updated)
             callback(updated)
@@ -48,9 +48,9 @@ class FakeCartRepository : CartRepository {
     ) {
         val item = cartItems.find { it.product.id == productId }
         item?.let {
-            val updated = it.copy(amount = it.amount - 1)
+            val updated = it.copy(quantity = it.quantity - 1)
             cartItems.remove(it)
-            if (updated.amount > 0) {
+            if (updated.quantity > 0) {
                 cartItems.add(updated)
                 callback(updated)
             } else {

@@ -42,7 +42,7 @@ class CatalogViewModel(
         _isLoading.value = true
 
         productRepository.loadCartItems { cartItems ->
-            val totalCount = cartItems?.sumOf { it.amount } ?: 0
+            val totalCount = cartItems?.sumOf { it.quantity } ?: 0
             _totalCartCount.postValue(totalCount)
 
             val cartItemState =
@@ -103,7 +103,7 @@ class CatalogViewModel(
                     { it.toUiModel() },
                 )
 
-            val totalCount = cartItems?.sumOf { it.amount } ?: 0
+            val totalCount = cartItems?.sumOf { it.quantity } ?: 0
             _totalCartCount.postValue(totalCount)
 
             val updatedItems =
@@ -112,7 +112,7 @@ class CatalogViewModel(
                         if (updatedItem is CatalogItem.ProductItem) {
                             val updatedProduct = updatedCartState?.get(updatedItem.product.id)
                             CatalogItem.ProductItem(
-                                updatedProduct ?: updatedItem.product.copy(amount = 0),
+                                updatedProduct ?: updatedItem.product.copy(quantity = 0),
                             )
                         } else {
                             updatedItem
@@ -124,7 +124,7 @@ class CatalogViewModel(
     }
 
     fun initialAddToCart(product: ProductUiModel) {
-        val updatedProduct = product.copy(amount = 1)
+        val updatedProduct = product.copy(quantity = 1)
         cartRepository.addCartItem(updatedProduct.toCartItem()) {
             cartRepository.getAllCartItems { cartItems ->
                 val found = cartItems?.find { it.product.id == updatedProduct.id }
@@ -149,9 +149,9 @@ class CatalogViewModel(
     fun decreaseCartItem(product: ProductUiModel) {
         val cartItem = product.toCartItem()
 
-        if (cartItem.amount <= 1) {
+        if (cartItem.quantity <= 1) {
             cartRepository.deleteCartItem(cartItem.cartId) {
-                _itemUpdateEvent.postValue(product.copy(amount = 0))
+                _itemUpdateEvent.postValue(product.copy(quantity = 0))
                 calculateTotalCartCount()
             }
         } else {

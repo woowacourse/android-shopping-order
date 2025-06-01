@@ -54,7 +54,7 @@ class CartRepositoryImpl(
         val item =
             CartItemRequest(
                 productId = cartItem.product.id,
-                quantity = cartItem.amount,
+                quantity = cartItem.quantity,
             )
 
         cartItemDataSource.submitCartItem(item) {
@@ -66,7 +66,7 @@ class CartRepositoryImpl(
         cartItem: CartItem,
         callback: (Long) -> Unit,
     ) {
-        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount + 1)) {
+        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.quantity + 1)) {
             callback(it)
         }
     }
@@ -75,7 +75,7 @@ class CartRepositoryImpl(
         cartItem: CartItem,
         callback: (Long) -> Unit,
     ) {
-        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount - 1)) {
+        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.quantity - 1)) {
             callback(it)
         }
     }

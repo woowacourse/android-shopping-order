@@ -12,44 +12,44 @@
         <variable
             name="product"
             type="woowacourse.shopping.presentation.model.ProductUiModel" />
-        
+
         <variable
-            name="amount"
+            name="quantity"
             type="Integer" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:paddingVertical="4dp"
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingVertical="4dp">
 
         <TextView
             android:id="@+id/btn_detail_count_down"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:onClick="@{() -> listener.decrease(product)}"
             android:text="@string/product_count_down_text"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true"
-            android:onClick="@{() -> listener.decrease(product)}"
-            app:layout_constraintBottom_toBottomOf="@id/text_view_detail_amount"
-            app:layout_constraintEnd_toStartOf="@id/text_view_detail_amount"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_detail_quantity"
+            app:layout_constraintEnd_toStartOf="@id/text_view_detail_quantity"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/text_view_detail_amount" />
+            app:layout_constraintTop_toTopOf="@id/text_view_detail_quantity" />
 
         <TextView
-            android:id="@+id/text_view_detail_amount"
+            android:id="@+id/text_view_detail_quantity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:text="@{String.valueOf(quantity)}"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:text="@{String.valueOf(amount)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_detail_count_up"
             app:layout_constraintStart_toEndOf="@id/btn_detail_count_down"
@@ -60,18 +60,16 @@
             android:id="@+id/btn_detail_count_up"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:onClick="@{() -> listener.increase(product)}"
             android:text="@string/product_count_up_text"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true"
-            android:onClick="@{() -> listener.increase(product)}"
-            app:layout_constraintBottom_toBottomOf="@id/text_view_detail_amount"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_detail_quantity"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/text_view_detail_amount"
-            app:layout_constraintTop_toTopOf="@id/text_view_detail_amount" />
-
-
+            app:layout_constraintStart_toEndOf="@id/text_view_detail_quantity"
+            app:layout_constraintTop_toTopOf="@id/text_view_detail_quantity" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

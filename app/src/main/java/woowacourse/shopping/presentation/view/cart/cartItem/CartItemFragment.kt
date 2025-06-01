@@ -77,11 +77,11 @@ class CartItemFragment :
     }
 
     override fun increase(product: ProductUiModel) {
-        viewModel.increaseAmount(product)
+        viewModel.increaseQuantity(product)
     }
 
     override fun decrease(product: ProductUiModel) {
-        viewModel.decreaseAmount(product)
+        viewModel.decreaseQuantity(product)
     }
 }
 

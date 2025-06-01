@@ -50,18 +50,18 @@ class CartViewModelTest {
     fun `increaseAmount를 호출하면 itemUpdateEvent에 변경된 상품이 전달된다`() {
         val item = dummyCartItemList.first()
 
-        viewModel.increaseAmount(item.product.id)
+        viewModel.increaseQuantity(item.product.id)
 
         val result = viewModel.itemUpdateEvent.getOrAwaitValue()
-        assertThat(result.amount).isEqualTo(item.amount + 1)
+        assertThat(result.amount).isEqualTo(item.quantity + 1)
     }
 
     @Test
     fun `decreaseAmount를 호출하면 itemUpdateEvent에 변경된 상품이 전달된다`() {
         val item = dummyCartItemList.first()
-        viewModel.increaseAmount(item.product.id)
+        viewModel.increaseQuantity(item.product.id)
 
-        viewModel.decreaseAmount(item.product.id)
+        viewModel.decreaseQuantity(item.product.id)
 
         val result = viewModel.itemUpdateEvent.getOrAwaitValue()
         assertThat(result.amount).isEqualTo(1)

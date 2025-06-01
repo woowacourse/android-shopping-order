@@ -77,15 +77,15 @@
 
         <include
             android:id="@+id/cart_item_counter"
-            layout="@layout/view_select_amount"
+            layout="@layout/view_select_quantity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:amount="@{cartItem.cartItem.amount}"
             app:layout_constraintBottom_toTopOf="@id/text_view_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image_view_product"
-            app:product="@{product}" />
+            app:product="@{product}"
+            app:quantity="@{cartItem.cartItem.quantity}" />
 
         <TextView
             android:id="@+id/text_view_price"
@@ -99,7 +99,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/image_view_product"
             tools:text="99,800원" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

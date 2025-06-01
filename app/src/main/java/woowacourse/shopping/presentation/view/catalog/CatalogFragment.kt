@@ -107,11 +107,11 @@ class CatalogFragment :
         }
         viewModel.totalCartCount.observe(viewLifecycleOwner) {
             if (it == 0) {
-                binding.textViewCartTotalAmount.visibility = View.GONE
+                binding.textViewCartTotalQuantity.visibility = View.GONE
             } else {
-                binding.textViewCartTotalAmount.visibility = View.VISIBLE
+                binding.textViewCartTotalQuantity.visibility = View.VISIBLE
             }
-            binding.textViewCartTotalAmount.text = it.toString()
+            binding.textViewCartTotalQuantity.text = it.toString()
         }
     }
 

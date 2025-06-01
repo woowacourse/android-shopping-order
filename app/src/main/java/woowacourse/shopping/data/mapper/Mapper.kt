@@ -46,7 +46,7 @@ fun CartItemContent.toCartItem() =
                 imageUrl = product.imageUrl,
                 price = Price(product.price),
             ),
-        amount = quantity,
+        quantity = quantity,
     )
 
 fun ProductResponse.toProduct() =
