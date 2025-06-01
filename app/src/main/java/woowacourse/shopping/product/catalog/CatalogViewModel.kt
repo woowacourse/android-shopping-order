@@ -49,7 +49,7 @@ class CatalogViewModel(
                 _updatedItem.postValue(product)
             }
         } else {
-            cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
+            cartProductRepository.updateProduct(product.id, product.quantity + 1) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                 }
@@ -65,10 +65,10 @@ class CatalogViewModel(
         val quantity = (catalogProduct as ProductItem).productItem.quantity
 
         if (product.quantity == 1) {
-            cartProductRepository.deleteCartProduct(product)
+            cartProductRepository.deleteCartProduct(product.id)
             _updatedItem.postValue(product.copy(quantity = 0))
         } else {
-            cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
+            cartProductRepository.updateProduct(product.id, product.quantity - 1) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                 }

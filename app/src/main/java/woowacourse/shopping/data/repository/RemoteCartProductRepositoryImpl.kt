@@ -48,24 +48,22 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
             )
     }
 
-    override fun deleteCartProduct(cartProduct: ProductUiModel) {
-        if (cartProduct.cartItemId != null) {
-            retrofitService.deleteCartItem(cartItemId = cartProduct.cartItemId).enqueue(
-                object : Callback<Void> {
-                    override fun onResponse(
-                        call: Call<Void>,
-                        response: Response<Void>,
-                    ) = Unit
+    override fun deleteCartProduct(productId: Int) {
+        retrofitService.deleteCartItem(cartItemId = productId).enqueue(
+            object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void>,
+                    response: Response<Void>,
+                ) = Unit
 
-                    override fun onFailure(
-                        call: Call<Void>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
-            )
-        }
+                override fun onFailure(
+                    call: Call<Void>,
+                    t: Throwable,
+                ) {
+                    println("error : $t")
+                }
+            },
+        )
     }
 
     override fun getCartProductsInRange(
@@ -113,13 +111,13 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     }
 
     override fun updateProduct(
-        cartProduct: ProductUiModel,
+        productId: Int,
         quantity: Int,
         callback: (Boolean) -> Unit,
     ) {
         retrofitService
             .patchCartItemQuantity(
-                cartItemId = cartProduct.cartItemId!!,
+                cartItemId = productId,
                 quantity = Quantity(quantity),
             ).enqueue(
                 object : Callback<Void> {

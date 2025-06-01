@@ -38,7 +38,7 @@ class DetailViewModel(
         val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
 
         if (addedProduct?.cartItemId != null) {
-            cartProductRepository.updateProduct(addedProduct, addedProduct.quantity) {}
+            cartProductRepository.updateProduct(addedProduct.id, addedProduct.quantity) {}
         } else {
             addedProduct?.let {
                 cartProductRepository.insertCartProduct(it) {}

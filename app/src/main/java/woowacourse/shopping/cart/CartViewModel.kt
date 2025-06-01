@@ -86,7 +86,7 @@ class CartViewModel(
         val set = _totalProducts.value ?: mutableSetOf()
         set.remove(cartProduct.productItem)
         _totalProducts.postValue(set.toMutableSet())
-        cartProductRepository.deleteCartProduct(cartProduct.productItem)
+        cartProductRepository.deleteCartProduct(cartProduct.productItem.id)
 
         cartProductRepository.getTotalElements { updatedSize ->
             val currentPage = page.value ?: INITIAL_PAGE
@@ -128,7 +128,7 @@ class CartViewModel(
         when (buttonEvent) {
             ButtonEvent.INCREASE -> {
                 if (product.quantity != 1) {
-                    cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
+                    cartProductRepository.updateProduct(product.id, product.quantity - 1) { result ->
                         if (result == true) {
                             _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                             val set = _totalProducts.value ?: mutableSetOf()
@@ -142,7 +142,7 @@ class CartViewModel(
             }
 
             ButtonEvent.DECREASE -> {
-                cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
+                cartProductRepository.updateProduct(product.id, product.quantity + 1) { result ->
                     if (result == true) {
                         _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                         val set = _totalProducts.value ?: mutableSetOf()
