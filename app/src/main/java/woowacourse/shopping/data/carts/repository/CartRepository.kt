@@ -41,6 +41,7 @@ interface CartRepository {
     fun delete(
         cartId: Int,
         onComplete: (Int) -> Unit,
+        onFail: (CartFetchError) -> Unit,
     )
 
     fun getAllItemsSize(onComplete: (Int) -> Unit)

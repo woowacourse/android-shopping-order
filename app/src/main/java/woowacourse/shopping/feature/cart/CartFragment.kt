@@ -157,9 +157,10 @@ class CartFragment :
     }
 
     override fun onCartItemDelete(cartItem: CartItem) {
-        val deletedIndex: Int? = viewModel.getPosition(cartItem)
-        deletedIndex?.let { cartAdapter.removeItem(it) }
-        viewModel.delete(cartItem)
+        viewModel.delete(cartItem) {
+            val deletedIndex: Int? = viewModel.getPosition(cartItem)
+            deletedIndex?.let { cartAdapter.removeItem(it) }
+        }
     }
 
     override fun onDestroyView() {

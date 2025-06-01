@@ -105,7 +105,10 @@ class CartViewModelTest {
         val initialSize = cartItems.size
 
         // When
-        viewModel.delete(targetItem)
+        viewModel.delete(targetItem) {
+            val deletedIndex: Int? = viewModel.getPosition(cartItem)
+            deletedIndex?.let { cartAdapter.removeItem(it) }
+        }
         waitForCartUpdate()
 
         // Then
@@ -229,7 +232,10 @@ class CartViewModelTest {
             val lastItem = currentPageItems.last()
 
             // When - 마지막 아이템 삭제
-            viewModel.delete(lastItem)
+            viewModel.delete(lastItem) {
+                val deletedIndex: Int? = viewModel.getPosition(cartItem)
+                deletedIndex?.let { cartAdapter.removeItem(it) }
+            }
             waitForCartUpdate(100)
 
             // Then - 페이지가 적절히 조정되어야 함
@@ -261,7 +267,10 @@ class CartViewModelTest {
         // Given - 모든 아이템 삭제
         val cartItems = getCurrentCart()
         cartItems.forEach { item ->
-            viewModel.delete(item)
+            viewModel.delete(item) {
+                val deletedIndex: Int? = viewModel.getPosition(cartItem)
+                deletedIndex?.let { cartAdapter.removeItem(it) }
+            }
             waitForUpdate(300)
         }
 

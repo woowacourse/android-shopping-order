@@ -154,11 +154,19 @@ class CartViewModel(
         }
     }
 
-    fun delete(cartItem: CartItem) {
+    fun delete(
+        cartItem: CartItem,
+        cartAdaptorItemDelete: () -> Unit?,
+    ) {
         selectedCartMap.remove(cartItem.id)
-        cartRepository.delete(cartItem.id) {
-            updateCartQuantity()
-        }
+        cartRepository.delete(
+            cartItem.id,
+            {
+                updateCartQuantity()
+                cartAdaptorItemDelete()
+            },
+            {},
+        )
     }
 
     fun updateCartQuantity() {

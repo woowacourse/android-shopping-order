@@ -154,7 +154,7 @@ class GoodsViewModel(
                     cartRepository.delete(cartItemWillRemove.id, {
                         cashedCartItems.remove(cartItemWillRemove.goods.id)
                         bindCartCache()
-                    })
+                    }, {})
                 } else {
                     updateCartItemQuantity(
                         cartItemWillRemove.id,
