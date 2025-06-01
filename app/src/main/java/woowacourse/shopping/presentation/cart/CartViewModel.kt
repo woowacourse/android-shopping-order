@@ -42,8 +42,8 @@ class CartViewModel(
         checkedProducts.count()
     }
 
-    private val _navigateToRecommendEvent = SingleLiveEvent<Unit>()
-    val navigateToRecommendEvent: LiveData<Unit> = _navigateToRecommendEvent
+    private val _navigateToRecommendEvent = SingleLiveEvent<OrderInfo>()
+    val navigateToRecommendEvent: LiveData<OrderInfo> = _navigateToRecommendEvent
 
     val isAllChecked = MutableLiveData(false)
 
@@ -189,9 +189,10 @@ class CartViewModel(
     }
 
     fun onOrderClick() {
-        val orderCount = checkedProductCount.value ?: 0
-        if (orderCount > 0) {
-            _navigateToRecommendEvent.value = Unit
+        val price = totalOrderPrice.value ?: 0
+        val count = checkedProductCount.value ?: 0
+        if (count > 0) {
+            _navigateToRecommendEvent.value = OrderInfo(price, count)
         }
     }
 

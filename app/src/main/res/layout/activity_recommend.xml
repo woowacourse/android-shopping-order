@@ -46,10 +46,10 @@
             android:layout_marginStart="6dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal"
-            app:recommendProducts="@{viewModel.items}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView_recommend_sub_info" />
+            app:layout_constraintTop_toBottomOf="@id/textView_recommend_sub_info"
+            app:recommendProducts="@{viewModel.items}" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_order"
@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-
+                android:text="@{@string/format_price(viewModel.price)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -80,7 +80,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/mint_blue"
                 android:gravity="center"
-
+                android:text="@{@string/text_order_button(viewModel.count)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"

@@ -75,11 +75,11 @@ class CartActivity : AppCompatActivity() {
             cartAdapter.updateProduct(CartAdapterItem.Product(productUiModel))
         }
 
-        viewModel.navigateToRecommendEvent.observe(this) {
+        viewModel.navigateToRecommendEvent.observe(this) { orderInfo ->
             val intent = RecommendActivity.newIntent(
                 this@CartActivity,
-                viewModel.totalOrderPrice.value!!,
-                viewModel.checkedProductCount.value!!
+                orderInfo.price,
+                orderInfo.count
             )
             startActivity(intent)
         }

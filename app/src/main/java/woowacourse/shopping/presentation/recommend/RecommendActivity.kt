@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,15 +18,18 @@ class RecommendActivity : AppCompatActivity() {
         DataBindingUtil.setContentView(this, R.layout.activity_recommend)
     }
 
-    private val viewModel: RecommendViewModel by viewModels {
-        RecommendViewModel.FACTORY
+    private val price: Int by lazy { intent.getIntExtra(TOTAL_PRICE_KEY, 0) }
+    private val count: Int by lazy { intent.getIntExtra(TOTAL_COUNT_KEY, 0) }
+
+    private val recommendViewModel: RecommendViewModel by viewModels {
+        RecommendViewModel.provideFactory(price, count)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpScreen()
+        setupToolbar()
         setUpBinding()
-        setOrderInfo()
     }
 
     private fun setUpScreen() {
@@ -37,17 +41,18 @@ class RecommendActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUpBinding() {
-        binding.apply {
-            viewModel = viewModel
-            lifecycleOwner = this@RecommendActivity
+    private fun setupToolbar() {
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = getString(R.string.text_cart_action_bar)
         }
     }
 
-    private fun setOrderInfo() {
-        val price = intent.getIntExtra(TOTAL_PRICE_KEY, 0)
-        val count = intent.getIntExtra(TOTAL_COUNT_KEY, 0)
-        viewModel.setOrderInfo(price, count)
+    private fun setUpBinding() {
+        binding.apply {
+            viewModel = recommendViewModel
+            lifecycleOwner = this@RecommendActivity
+        }
     }
 
     companion object {

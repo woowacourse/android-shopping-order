@@ -17,29 +17,21 @@ class RecommendViewModel(
     private val productsRepository: ProductsRepository,
     private val cartItemRepository: CartItemRepository,
     private val viewedItemRepository: ViewedItemRepository,
+    price: Int,
+    count: Int,
 ) : ViewModel() {
     private val _items: MutableLiveData<List<ProductUiModel>> = MutableLiveData(emptyList())
     val items: LiveData<List<ProductUiModel>>
         get() = _items
 
-    private val _price: MutableLiveData<Int> = MutableLiveData()
-    val price: LiveData<Int>
-        get() = _price
+    private val _price = MutableLiveData(price)
+    val price: LiveData<Int> = _price
 
-    private val _count: MutableLiveData<Int> = MutableLiveData()
-    val count: LiveData<Int>
-        get() = _count
+    private val _count = MutableLiveData(count)
+    val count: LiveData<Int> = _count
 
     init {
         loadRecommendedProducts()
-    }
-
-    fun setOrderInfo(
-        price: Int,
-        count: Int,
-    ) {
-        _price.value = price
-        _count.value = count
     }
 
     private fun loadRecommendedProducts() {
@@ -61,13 +53,17 @@ class RecommendViewModel(
     }
 
     companion object {
-        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                RecommendViewModel(
-                    productsRepository = RepositoryProvider.productsRepository,
-                    cartItemRepository = RepositoryProvider.cartItemRepository,
-                    viewedItemRepository = RepositoryProvider.viewedItemRepository,
-                )
+        fun provideFactory(price: Int, count: Int): ViewModelProvider.Factory {
+            return viewModelFactory {
+                initializer {
+                    RecommendViewModel(
+                        productsRepository = RepositoryProvider.productsRepository,
+                        cartItemRepository = RepositoryProvider.cartItemRepository,
+                        viewedItemRepository = RepositoryProvider.viewedItemRepository,
+                        price = price,
+                        count = count
+                    )
+                }
             }
         }
     }
