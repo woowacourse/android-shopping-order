@@ -3,9 +3,10 @@ package woowacourse.shopping.presentation.view.catalog.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
 class RecentProductAdapter(
-    private val eventListener: CatalogAdapter.CatalogEventListener,
+    private val eventListener: CatalogEventListener,
 ) : RecyclerView.Adapter<RecentProductItemViewHolder>() {
     private val items = mutableListOf<ProductUiModel>()
 

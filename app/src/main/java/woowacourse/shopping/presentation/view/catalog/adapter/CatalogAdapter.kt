@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.view.catalog.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
+import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
 class CatalogAdapter(
     private val eventListener: CatalogEventListener,
@@ -62,13 +62,5 @@ class CatalogAdapter(
             items[index] = CatalogItem.ProductItem(productUiModel)
             notifyItemChanged(index)
         }
-    }
-
-    interface CatalogEventListener : ItemCounterListener {
-        fun onProductClicked(product: ProductUiModel)
-
-        fun onLoadMoreClicked()
-
-        fun onInitialAddToCartClicked(product: ProductUiModel)
     }
 }

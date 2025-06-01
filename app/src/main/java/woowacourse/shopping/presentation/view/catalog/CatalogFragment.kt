@@ -19,7 +19,7 @@ import woowacourse.shopping.presentation.view.detail.DetailFragment
 
 class CatalogFragment :
     BaseFragment<FragmentCatalogBinding>(R.layout.fragment_catalog),
-    CatalogAdapter.CatalogEventListener,
+    CatalogEventListener,
     ItemCounterListener {
     private val catalogAdapter: CatalogAdapter by lazy { CatalogAdapter(eventListener = this) }
     private val viewModel: CatalogViewModel by viewModels { CatalogViewModel.Factory }

@@ -4,10 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
+import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
 class ProductViewHolder(
     private val binding: ItemProductBinding,
-    eventListener: CatalogAdapter.CatalogEventListener,
+    eventListener: CatalogEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.eventListener = eventListener
@@ -21,7 +22,7 @@ class ProductViewHolder(
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: CatalogAdapter.CatalogEventListener,
+            eventListener: CatalogEventListener,
         ): ProductViewHolder {
             val binding =
                 ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)

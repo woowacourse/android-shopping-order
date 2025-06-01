@@ -13,7 +13,7 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter.CatalogEventListener" />
+            type="woowacourse.shopping.presentation.view.catalog.CatalogEventListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
