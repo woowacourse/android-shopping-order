@@ -83,8 +83,13 @@ class DetailActivity : AppCompatActivity() {
                 }
 
                 is DetailUiEvent.NavigateToLastSeenProduct -> {
-                    startActivity(newIntent(this, it.productId))
-                    finish()
+                    val intent = newIntent(this, it.productId)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                DetailUiEvent.ShowNetworkErrorMessage -> {
+                    showToast(getString(R.string.text_network_error))
                 }
             }
         }

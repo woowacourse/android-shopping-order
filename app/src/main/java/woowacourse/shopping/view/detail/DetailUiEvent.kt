@@ -8,4 +8,6 @@ sealed interface DetailUiEvent {
     data object ShowCannotDecrease : DetailUiEvent
 
     data class ShowCannotIncrease(val quantity: Int) : DetailUiEvent
+
+    object ShowNetworkErrorMessage : DetailUiEvent
 }

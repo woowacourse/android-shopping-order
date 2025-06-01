@@ -31,42 +31,39 @@ class DetailViewModel(
         productId: Long,
         lastSeenProductId: Long,
     ) {
+        saveHistory(productId)
+
         defaultProductRepository.loadProduct(productId) { product ->
-            product.fold(
-                onSuccess = { productValue ->
-                    if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
-                        defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
-                            lastSeenProduct.fold(
-                                onSuccess = { lastSeenProductValue ->
-                                    _uiState.value =
-                                        DetailUiState(
-                                            ProductState(
-                                                item = productValue,
-                                                cartQuantity = Quantity(1),
-                                            ),
-                                            lastSeenProduct = lastSeenProductValue,
-                                        )
-                                },
-                                onFailure = {},
-                            )
-                        }
-                    } else {
-                        _uiState.postValue(
-                            DetailUiState(
-                                product =
+            product.onSuccess { productValue ->
+                if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
+                    defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
+                        lastSeenProduct.onSuccess { lastSeenProductValue ->
+                            _uiState.value =
+                                DetailUiState(
                                     ProductState(
                                         item = productValue,
                                         cartQuantity = Quantity(1),
                                     ),
-                                lastSeenProduct = null,
-                            ),
-                        )
+                                    lastSeenProduct = lastSeenProductValue,
+                                )
+                        }
+                            .onFailure { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) }
                     }
-                },
-                onFailure = {},
-            )
+                } else {
+                    _uiState.postValue(
+                        DetailUiState(
+                            product =
+                                ProductState(
+                                    item = productValue,
+                                    cartQuantity = Quantity(1),
+                                ),
+                            lastSeenProduct = null,
+                        ),
+                    )
+                }
+            }
+                .onFailure { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) }
         }
-        saveHistory(productId)
     }
 
     fun increaseCartQuantity() {
@@ -96,8 +93,8 @@ class DetailViewModel(
     fun saveCart(productId: Long) {
         withState(_uiState.value) { state ->
             defaultCartRepository.loadSinglePage(null, null) { result ->
-                result.fold(
-                    onSuccess = { value ->
+                result.onSuccess { value ->
+                    value?.let {
                         val savedCart = value.carts.find { it.productId == productId }
 
                         savedCart?.let {
@@ -107,7 +104,7 @@ class DetailViewModel(
                             ) { result ->
                                 result.fold(
                                     onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
-                                    onFailure = {},
+                                    onFailure = { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) },
                                 )
                             }
                         } ?: run {
@@ -119,13 +116,13 @@ class DetailViewModel(
                             ) { result ->
                                 result.fold(
                                     onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
-                                    onFailure = {},
+                                    onFailure = { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) },
                                 )
                             }
                         }
-                    },
-                    onFailure = {},
-                )
+                    }
+                }
+                    .onFailure { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) }
             }
         }
     }
