@@ -41,6 +41,7 @@ class RecommendActivity :
     private fun initBinding() {
         binding.lifecycleOwner = this
         binding.recommendCartItems.adapter = recommendProductsAdapter
+        binding.viewModel = viewModel
         binding.onClickBackButton = {
             setResult(RESULT_OK)
             finish()

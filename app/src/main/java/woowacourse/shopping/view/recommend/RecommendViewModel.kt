@@ -22,6 +22,12 @@ class RecommendViewModel(
 
     private var cartItems: List<CartItem> = emptyList()
 
+    private val _totalPrice: MutableLiveData<Int> = MutableLiveData()
+    val totalPrice: LiveData<Int> = _totalPrice
+
+    private val _totalQuantity: MutableLiveData<Int> = MutableLiveData()
+    val totalQuantity: LiveData<Int> = _totalQuantity
+
     private val _recommendProducts: MutableLiveData<List<RecommendProduct>> = MutableLiveData()
     val recommendProducts: LiveData<List<RecommendProduct>> = _recommendProducts
 
@@ -37,6 +43,8 @@ class RecommendViewModel(
             result
                 .onSuccess { cartItems: List<CartItem> ->
                     this.cartItems = cartItems
+                    _totalPrice.postValue(cartItems.sumOf { cartItem: CartItem -> cartItem.price })
+                    _totalQuantity.postValue(cartItems.sumOf { cartItems: CartItem -> cartItems.quantity })
                     loadRecentProducts()
                 }.onFailure {
                     _event.postValue(RecommendEvent.LOAD_SHOPPING_CART_FAILURE)
