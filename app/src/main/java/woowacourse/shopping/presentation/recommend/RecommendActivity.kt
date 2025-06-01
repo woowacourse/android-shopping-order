@@ -52,7 +52,9 @@ class RecommendActivity : AppCompatActivity() {
         binding.apply {
             viewModel = recommendViewModel
             lifecycleOwner = this@RecommendActivity
-            recyclerViewRecommendProducts.adapter = RecommendAdapter()
+            recyclerViewRecommendProducts.adapter = RecommendAdapter(onQuantityClick = { product ->
+                recommendViewModel.toggleQuantity(product)
+            })
         }
     }
 

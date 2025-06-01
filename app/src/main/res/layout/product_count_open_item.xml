@@ -8,8 +8,12 @@
                     type="woowacourse.shopping.presentation.product.catalog.ProductUiModel" />
 
                 <variable
-                    name="handler"
-                    type="woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler" />
+                    name="onClick"
+                    type="android.view.View.OnClickListener" />
+
+<!--                <variable-->
+<!--                    name="handler"-->
+<!--                    type="woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler" />-->
         </data>
 
         <FrameLayout
@@ -17,7 +21,7 @@
             android:layout_height="53dp">
         <ImageButton
             android:clickable="true"
-            android:onClick="@{() -> handler.onOpenProductQuantitySelector(product)}"
+            android:onClick="@{onClick}"
             android:id="@+id/button_open_quantity_layout"
             android:layout_width="48dp"
             android:layout_height="48dp"

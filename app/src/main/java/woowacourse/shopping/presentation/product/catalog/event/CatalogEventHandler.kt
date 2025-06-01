@@ -7,5 +7,5 @@ interface CatalogEventHandler {
 
     fun onLoadButtonClick()
 
-    fun onOpenProductQuantitySelector(product: ProductUiModel)
+    fun toggleQuantity(product: ProductUiModel)
 }

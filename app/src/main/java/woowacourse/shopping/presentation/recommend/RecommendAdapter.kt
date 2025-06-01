@@ -4,14 +4,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
-class RecommendAdapter : RecyclerView.Adapter<RecommendViewHolder>() {
+class RecommendAdapter(
+    private val onQuantityClick: (ProductUiModel) -> Unit,
+) : RecyclerView.Adapter<RecommendViewHolder>() {
     private var items: List<ProductUiModel> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecommendViewHolder {
-        return RecommendViewHolder(parent)
+        return RecommendViewHolder(parent,onQuantityClick)
     }
 
     override fun onBindViewHolder(holder: RecommendViewHolder, position: Int) {

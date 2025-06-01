@@ -17,7 +17,7 @@ class CatalogEventHandlerImpl(
         viewModel.loadNextCatalogProducts()
     }
 
-    override fun onOpenProductQuantitySelector(product: ProductUiModel) {
+    override fun toggleQuantity(product: ProductUiModel) {
         viewModel.toggleQuantity(product)
     }
 

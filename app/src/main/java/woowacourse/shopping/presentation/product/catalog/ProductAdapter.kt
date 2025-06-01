@@ -13,6 +13,7 @@ import woowacourse.shopping.presentation.util.DiffCallback
 class ProductAdapter(
     private val catalogHandler: CatalogEventHandler,
     private val quantityHandler: ProductQuantityHandler,
+    private val onQuantityClick: (ProductUiModel) -> Unit,
 ) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(DiffCallback()) {
     private var showLoadMoreButton = false
 
@@ -21,7 +22,7 @@ class ProductAdapter(
         viewType: Int,
     ): RecyclerView.ViewHolder =
         if (viewType == PRODUCT) {
-            ProductViewHolder.from(parent, catalogHandler, quantityHandler)
+            ProductViewHolder.from(parent, catalogHandler, quantityHandler, onQuantityClick)
         } else {
             LoadButtonViewHolder.from(parent, catalogHandler)
         }

@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.product.catalog
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -62,7 +61,9 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
-        productAdapter = ProductAdapter(handler, handler)
+        productAdapter = ProductAdapter(handler, handler, onQuantityClick = { product ->
+            handler.toggleQuantity(product)
+        })
         binding.recyclerViewProducts.apply {
             this.adapter = productAdapter
             layoutManager =
@@ -74,7 +75,8 @@ class CatalogActivity : AppCompatActivity() {
         GridLayoutManager(this, 2).apply {
             spanSizeLookup =
                 object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int = if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
+                    override fun getSpanSize(position: Int): Int =
+                        if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
                 }
         }
 

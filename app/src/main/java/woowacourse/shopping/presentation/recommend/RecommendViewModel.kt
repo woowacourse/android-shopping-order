@@ -27,6 +27,10 @@ class RecommendViewModel(
     private val _count = MutableLiveData(count)
     val count: LiveData<Int> = _count
 
+    private val _updatedProduct = MutableLiveData<ProductUiModel>()
+    val updatedProduct: LiveData<ProductUiModel>
+        get() = _updatedProduct
+
     init {
         loadRecommendedProductsFromLastViewed()
     }
@@ -42,6 +46,26 @@ class RecommendViewModel(
                     _items.postValue(recommendedProducts)
                 }
         }
+    }
+
+    fun toggleQuantity(product: ProductUiModel) {
+        val toggled = product.copy(quantity = product.quantity + 1)
+
+        cartItemRepository.addCartItem(toggled.id, toggled.quantity) { result ->
+            result
+                .onSuccess {
+                    _updatedProduct.postValue(toggled)
+                    applyProductChange(toggled)
+                }
+        }
+    }
+
+    private fun applyProductChange(toggled: ProductUiModel) {
+        val currentList = _items.value.orEmpty()
+        val updatedList = currentList.map {
+            if (it.id == toggled.id) toggled else it
+        }
+        _items.postValue(updatedList)
     }
 
     companion object {
