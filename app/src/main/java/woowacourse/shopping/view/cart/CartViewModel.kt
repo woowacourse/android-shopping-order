@@ -17,6 +17,11 @@ class CartViewModel(
     private val _cartItems: MutableLiveData<List<CartItemType>> = MutableLiveData()
     val cartItems: LiveData<List<CartItemType>> get() = _cartItems
 
+    private var cartProducts: List<CartItem> = emptyList()
+
+    private val _isSelectAll: MutableLiveData<Boolean> = MutableLiveData()
+    val isSelectAll: LiveData<Boolean> = _isSelectAll
+
     private val _event: MutableSingleLiveData<CartEvent> = MutableSingleLiveData()
     val event: SingleLiveData<CartEvent> get() = _event
 
@@ -39,6 +44,36 @@ class CartViewModel(
 
     init {
         loadCartItems()
+        loadAllProducts()
+    }
+
+    private fun loadAllProducts() {
+        cartRepository.loadCart { result: Result<List<CartItem>> ->
+            result
+                .onSuccess { it: List<CartItem> ->
+                    cartProducts = it
+                }.onFailure {
+                    _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
+                }
+        }
+    }
+
+    fun selectAll() {
+        _selectedCartItems.value = emptySet()
+        _selectedCartItems.value =
+            cartProducts
+                .map { cartItem ->
+                    CartItemType.ProductItem(
+                        cartItem = cartItem,
+                        checked = true,
+                    )
+                }.toSet()
+        _isSelectAll.postValue(true)
+    }
+
+    fun unselectAll() {
+        _selectedCartItems.value = emptySet()
+        _isSelectAll.postValue(false)
     }
 
     fun select(cartItem: CartItemType.ProductItem) {

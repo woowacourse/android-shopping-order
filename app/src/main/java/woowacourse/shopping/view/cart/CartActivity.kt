@@ -69,11 +69,21 @@ class CartActivity :
             val intent = RecommendActivity.newIntent(this)
             recommendActivityResultLauncher.launch(intent)
         }
+        binding.shoppingCartSelectAllCheckBox.setOnClickListener {
+            if (binding.shoppingCartSelectAllCheckBox.isChecked) {
+                viewModel.selectAll()
+            } else {
+                viewModel.unselectAll()
+            }
+        }
     }
 
     private fun bindData() {
         viewModel.cartItems.observe(this) { shoppingCart: List<CartItemType> ->
             cartProductAdapter.submitList(shoppingCart)
+        }
+        viewModel.isSelectAll.observe(this) {
+            viewModel.loadCartItems()
         }
     }
 
