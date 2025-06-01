@@ -117,7 +117,7 @@
             android:paddingHorizontal="16dp"
             android:paddingTop="30dp"
             android:paddingBottom="27dp"
-            android:text="@{@string/shopping_cart_order(viewModel.selectedCartItems.size)}"
+            android:text="@{@string/shopping_cart_order(viewModel.totalQuantity)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
