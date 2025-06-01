@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.cart.vm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,22 +52,20 @@ class CartViewModel(
     fun loadRecommendProduct() {
         withState(_cartUiState.value) { state ->
             productRepository.loadSinglePage(lastSeenCategory, null, null) { products ->
-                products.fold(
-                    onSuccess = { result ->
+                products.onSuccess { result ->
 
-                        val recommendProduct =
-                            result
-                                .products
-                                .asSequence()
-                                .filter { it.id !in state.cartIds }
-                                .shuffled()
-                                .take(RECOMMEND_SIZE)
-                                .map { ProductState(item = it, cartQuantity = Quantity(0)) }
-                                .toList()
-                        _recommendUiState.value = RecommendUiState(recommendProduct)
-                    },
-                    onFailure = {},
-                )
+                    val recommendProduct =
+                        result
+                            .products
+                            .asSequence()
+                            .filter { it.id !in state.cartIds }
+                            .shuffled()
+                            .take(RECOMMEND_SIZE)
+                            .map { ProductState(item = it, cartQuantity = Quantity(0)) }
+                            .toList()
+                    _recommendUiState.value = RecommendUiState(recommendProduct)
+                }
+                    .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
             }
         }
     }
@@ -80,28 +77,25 @@ class CartViewModel(
             when (val cartId = updated.cartId) {
                 null -> {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it.fold(
-                            onSuccess = { value ->
+                        it
+                            .onSuccess { value ->
                                 val cartId = value?.toLong() ?: 0L
                                 _recommendUiState.value =
                                     state.modifyUiState(updated.copy(cartId = cartId))
                                 _cartUiState.value = _cartUiState.value?.addCart(cartId, updated)
-                                Log.d("TAG", "afterAdd: ${_cartUiState.value?.items}")
-                            },
-                            onFailure = { },
-                        )
+                            }
+                            .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
                     }
                 }
 
                 else -> {
                     cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
-                        value.fold(
-                            onSuccess = {
+                        value
+                            .onSuccess {
                                 _recommendUiState.value = state.modifyUiState(updated)
                                 increaseCartQuantity(cartId)
-                            },
-                            onFailure = { },
-                        )
+                            }
+                            .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
                     }
                 }
             }
@@ -114,24 +108,17 @@ class CartViewModel(
 
             if (updated.hasCartQuantity) {
                 cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                    it.fold(
-                        onSuccess = {
-                            _recommendUiState.value = state.modifyUiState(updated)
-                            decreaseCartQuantity(cartId)
-                        },
-                        onFailure = { },
-                    )
+                    it.onSuccess {
+                        _recommendUiState.value = state.modifyUiState(updated)
+                        decreaseCartQuantity(cartId)
+                    }
+                        .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
                 }
             } else {
                 cartRepository.deleteCart(cartId) {
-                    it.fold(
-                        onSuccess = {
-                            val result = updated.copy(cartId = null)
-                            _recommendUiState.value = state.modifyUiState(result)
-                            _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
-                        },
-                        onFailure = { },
-                    )
+                    val result = updated.copy(cartId = null)
+                    _recommendUiState.value = state.modifyUiState(result)
+                    _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
                 }
             }
         }
@@ -142,12 +129,9 @@ class CartViewModel(
             val updatedItem = updatedState.items.first { it.cartId == cartId }
 
             cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
-                result.fold(
-                    onSuccess = {
-                        _cartUiState.value = updatedState
-                    },
-                    onFailure = {},
-                )
+                result
+                    .onSuccess { _cartUiState.value = updatedState }
+                    .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
             }
         }
     }
@@ -158,12 +142,9 @@ class CartViewModel(
             val updatedItem = updatedState.findCart(cartId)
 
             cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
-                result.fold(
-                    onSuccess = {
-                        _cartUiState.value = updatedState
-                    },
-                    onFailure = {},
-                )
+                result
+                    .onSuccess { _cartUiState.value = updatedState }
+                    .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
             }
         }
     }
@@ -176,8 +157,8 @@ class CartViewModel(
             PAGE_SIZE,
         ) { result ->
 
-            result.fold(
-                onSuccess = { value ->
+            result.onSuccess { value ->
+                value?.let {
                     val pageState = paging.createPageState(!value.hasNextPage)
                     val newItems =
                         value
@@ -187,10 +168,11 @@ class CartViewModel(
                     val currentItems = _cartUiState.value?.items ?: emptyList()
                     val combinedItems = currentItems + newItems
 
-                    _cartUiState.value = CartUiState(items = combinedItems, pageState = pageState)
-                },
-                onFailure = {},
-            )
+                    _cartUiState.value =
+                        CartUiState(items = combinedItems, pageState = pageState)
+                }
+            }
+                .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
             setLoading(false)
         }
     }
@@ -229,8 +211,8 @@ class CartViewModel(
     private fun refresh() {
         withState(_cartUiState.value) { state ->
             cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
-                result.fold(
-                    onSuccess = { value ->
+                result.onSuccess { value ->
+                    value?.let {
                         if (paging.resetToLastPageIfEmpty(value.carts)) {
                             refresh()
                             return@loadSinglePage
@@ -239,10 +221,15 @@ class CartViewModel(
                         val pageState = paging.createPageState(!value.hasNextPage)
                         val carts = value.carts.map { CartState(it, state.allChecked) }
 
-                        _cartUiState.postValue(CartUiState(items = carts, pageState = pageState))
-                    },
-                    onFailure = {},
-                )
+                        _cartUiState.postValue(
+                            CartUiState(
+                                items = carts,
+                                pageState = pageState,
+                            ),
+                        )
+                    }
+                }
+                    .onFailure { _event.setValue(CartUiEvent.ShowNetworkErrorMessage) }
             }
         }
     }

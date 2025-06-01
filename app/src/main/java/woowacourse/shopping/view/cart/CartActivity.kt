@@ -68,6 +68,9 @@ class CartActivity : AppCompatActivity() {
                 }
 
                 CartUiEvent.ChangeScreen -> onClickOrderButton()
+                CartUiEvent.ShowNetworkErrorMessage -> {
+                    showToast(getString(R.string.text_network_error))
+                }
             }
         }
     }

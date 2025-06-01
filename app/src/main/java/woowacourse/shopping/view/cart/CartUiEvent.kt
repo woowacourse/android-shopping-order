@@ -4,4 +4,6 @@ sealed interface CartUiEvent {
     data class ShowCannotIncrease(val quantity: Int) : CartUiEvent
 
     data object ChangeScreen : CartUiEvent
+
+    object ShowNetworkErrorMessage : CartUiEvent
 }
