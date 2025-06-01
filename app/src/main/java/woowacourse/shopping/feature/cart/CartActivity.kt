@@ -46,12 +46,7 @@ class CartActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            if (supportFragmentManager.backStackEntryCount > 0) {
-                supportFragmentManager.popBackStack()
-            } else {
-                finish()
-            }
-            return true
+            onBackPressedDispatcher.onBackPressed()
         }
         return super.onOptionsItemSelected(item)
     }
