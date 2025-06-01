@@ -163,8 +163,9 @@ class ShoppingCartActivity :
         finish()
     }
 
-    override fun onAllSelectedButtonClick(isChecked: Boolean) {
-        viewModel.selectAllShoppingCartProducts(isChecked)
+    override fun onAllSelectedButtonClick() {
+        val isAllSelected = !(orderBarViewModel.isAllSelected.value ?: false)
+        viewModel.selectAllShoppingCartProducts(isAllSelected)
     }
 
     override fun onOrderButtonClick() {
