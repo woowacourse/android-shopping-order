@@ -36,7 +36,7 @@ class ShoppingCartActivity :
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             when (result.resultCode) {
-                ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK -> viewModel.updateShoppingCart()
+                ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK -> viewModel.loadShoppingCart()
             }
         }
 
@@ -54,7 +54,7 @@ class ShoppingCartActivity :
         setupAdapter()
         setupObservers()
 
-        viewModel.updateShoppingCart()
+        viewModel.loadShoppingCart()
     }
 
     private fun initDataBinding() {
@@ -68,11 +68,8 @@ class ShoppingCartActivity :
         binding.shoppingCartProducts.apply {
             addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
-                    override fun onScrollStateChanged(
-                        recyclerView: RecyclerView,
-                        newState: Int,
-                    ) {
-                        super.onScrollStateChanged(recyclerView, newState)
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
 
                         val totalItemCount: Int =
                             recyclerView.adapter?.itemCount ?: throw IllegalStateException()

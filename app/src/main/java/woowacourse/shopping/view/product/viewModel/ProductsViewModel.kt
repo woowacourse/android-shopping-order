@@ -69,30 +69,8 @@ class ProductsViewModel(
                 }.await()
 
             loadable = productsDomain.size == LOAD_PRODUCTS_SIZE
-            updateProductsShoppingCartQuantity(this, offset, size)
+            updateProductsShoppingCartQuantity(this)
             _isLoading.value = false
-        }
-    }
-
-    private fun updateProductsShoppingCartQuantity(
-        scope: CoroutineScope,
-        offset: Int,
-        size: Int
-    ) {
-        scope.launch(handler) {
-            shoppingCartDomain = shoppingCartRepository.load(offset, size).shoppingCartItems
-            val productUi =
-                productsDomain.map { product ->
-                    val target = shoppingCartDomain.find { it.product.id == product.id }
-
-                    ProductsItem.ProductItem(
-                        shoppingCartId = target?.id,
-                        product = product,
-                        selectedQuantity = target?.quantity ?: 0,
-                    )
-                }
-
-            _productsUi.value = _productsUi.value?.plus(productUi)
         }
     }
 
@@ -110,6 +88,19 @@ class ProductsViewModel(
         _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
     }
 
+    fun minusProductToShoppingCart(
+        productItem: ProductsItem.ProductItem,
+        quantity: Int,
+    ) {
+        updateProductQuantity(productItem, quantity - 1)
+        _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
+    }
+
+    fun updateMoreProducts() {
+        page++
+        updateProducts()
+    }
+
     private fun updateProductQuantity(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
@@ -124,42 +115,43 @@ class ProductsViewModel(
                 )
             }
 
-            val currentProducts = productsUi.value?.toMutableList() ?: return@launch
-            val index: Int =
-                currentProducts.indexOfFirst { it is ProductsItem.ProductItem && it.product == productItem.product }
+            val shoppingCartProducts =
+                shoppingCartRepository.load(0, LOAD_PRODUCTS_SIZE * page)
 
-            if (index != -1) {
-                val shoppingCartProducts =
-                    shoppingCartRepository.load(0, LOAD_PRODUCTS_SIZE * page)
-                val newShoppingCartItem =
-                    shoppingCartProducts.shoppingCartItems
-                        .find {
-                            it.product.id == productItem.product.id
-                        }
-                val productItem = currentProducts[index] as ProductsItem.ProductItem
-                val updatedItem =
-                    productItem.copy(
+            _productsUi.value = productsUi.value?.map { item ->
+                if (item is ProductsItem.ProductItem && item.product.id == productItem.product.id) {
+                    val newShoppingCartItem = shoppingCartProducts.shoppingCartItems
+                        .find { it.product.id == item.product.id }
+                    item.copy(
                         selectedQuantity = newShoppingCartItem?.quantity ?: 0,
                         shoppingCartId = newShoppingCartItem?.id,
                     )
-
-                currentProducts[index] = updatedItem
-                _productsUi.value = currentProducts
+                } else {
+                    item
+                }
             }
+
         }
     }
 
-    fun minusProductToShoppingCart(
-        productItem: ProductsItem.ProductItem,
-        quantity: Int,
+    private fun updateProductsShoppingCartQuantity(
+        scope: CoroutineScope,
     ) {
-        updateProductQuantity(productItem, quantity - 1)
-        _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
-    }
+        scope.launch(handler) {
+            shoppingCartDomain = shoppingCartRepository.load().shoppingCartItems
+            val productUi =
+                productsDomain.map { product ->
+                    val target = shoppingCartDomain.find { it.product.id == product.id }
 
-    fun updateMoreProducts() {
-        page++
-        updateProducts()
+                    ProductsItem.ProductItem(
+                        shoppingCartId = target?.id,
+                        product = product,
+                        selectedQuantity = target?.quantity ?: 0,
+                    )
+                }
+
+            _productsUi.value = _productsUi.value?.plus(productUi)
+        }
     }
 
     companion object {

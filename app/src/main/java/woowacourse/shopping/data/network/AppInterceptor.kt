@@ -11,10 +11,10 @@ class AppInterceptor(
 ) : Interceptor {
     private val basicAuth: String =
         "Basic " +
-            Base64.encodeToString(
-                "${authenticationRepository.id}:${authenticationRepository.password}".toByteArray(),
-                Base64.NO_WRAP,
-            )
+                Base64.encodeToString(
+                    "${authenticationRepository.id}:${authenticationRepository.password}".toByteArray(),
+                    Base64.NO_WRAP,
+                )
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response =

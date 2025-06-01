@@ -49,7 +49,7 @@ class ProductsActivity :
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
                     val updateItems: Boolean? =
                         result.data?.getSerializableExtraData("updateProducts")
-                    if (updateItems != null && updateItems) viewModel.reload()
+                    if (updateItems != null) viewModel.reload()
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {

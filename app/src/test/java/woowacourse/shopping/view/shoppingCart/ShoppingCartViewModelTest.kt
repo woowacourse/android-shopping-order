@@ -39,7 +39,7 @@ class ShoppingCartViewModelTest {
         }
 
         // when:
-        shoppingCartViewModel.updateShoppingCart()
+        shoppingCartViewModel.loadShoppingCart()
 
         // then:
         val event = shoppingCartViewModel.event.getValue()

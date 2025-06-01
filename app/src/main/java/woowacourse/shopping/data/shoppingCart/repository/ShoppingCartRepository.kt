@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 interface ShoppingCartRepository {
     suspend fun load(
-        page: Int,
-        size: Int,
+        page: Int = 0,
+        size: Int = Integer.MAX_VALUE,
     ): ShoppingCarts
 
     suspend fun add(
