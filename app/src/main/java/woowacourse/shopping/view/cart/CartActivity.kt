@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,6 +33,15 @@ class CartActivity :
         )
     }
 
+    private val recommendActivityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.loadCartItems()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -57,7 +67,7 @@ class CartActivity :
         binding.lifecycleOwner = this
         binding.onOrder = {
             val intent = RecommendActivity.newIntent(this)
-            startActivity(intent)
+            recommendActivityResultLauncher.launch(intent)
         }
     }
 

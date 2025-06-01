@@ -3,6 +3,7 @@ package woowacourse.shopping.view.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -30,15 +31,23 @@ class RecommendActivity :
             insets
         }
 
-        binding.lifecycleOwner = this
-        binding.recommendCartItems.adapter = recommendProductsAdapter
-
         initBinding()
+
+        viewModel.recommendProducts.observe(this) { recommendProducts ->
+            recommendProductsAdapter.asdf(recommendProducts)
+        }
     }
 
     private fun initBinding() {
-        viewModel.recommendProducts.observe(this) { recommendProducts ->
-            recommendProductsAdapter.asdf(recommendProducts)
+        binding.lifecycleOwner = this
+        binding.recommendCartItems.adapter = recommendProductsAdapter
+        binding.onClickBackButton = {
+            setResult(RESULT_OK)
+            finish()
+        }
+        onBackPressedDispatcher.addCallback {
+            setResult(RESULT_OK)
+            finish()
         }
     }
 

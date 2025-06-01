@@ -93,7 +93,7 @@ class CartViewModel(
         }
     }
 
-    private fun loadCartItems() {
+    fun loadCartItems() {
         cartRepository.loadPageableCartItems(page - 1, COUNT_PER_PAGE) { result ->
             result
                 .onSuccess { pageableCartItems: PageableCartItems ->
