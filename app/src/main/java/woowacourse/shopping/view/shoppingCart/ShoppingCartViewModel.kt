@@ -53,7 +53,7 @@ class ShoppingCartViewModel(
     private var loadable: Boolean = false
 
     init {
-        _totalPrice.addSource(_shoppingCart) { it ->
+        _totalPrice.addSource(shoppingCart) { it ->
             _totalPrice.value =
                 it
                     .filterIsInstance<ShoppingCartProductItem>()
@@ -61,7 +61,7 @@ class ShoppingCartViewModel(
                     .sumOf { item -> item.shoppingCartProduct.price }
         }
 
-        _totalQuantity.addSource(_shoppingCart) {
+        _totalQuantity.addSource(shoppingCart) {
             _totalQuantity.value =
                 it
                     .filterIsInstance<ShoppingCartProductItem>()
@@ -69,11 +69,11 @@ class ShoppingCartViewModel(
                     .sumOf { item -> item.shoppingCartProduct.quantity }
         }
 
-        _isAllSelected.addSource(_shoppingCart) {
+        _isAllSelected.addSource(shoppingCart) {
             _isAllSelected.value = isAllSelected(it)
         }
 
-        _shoppingCartProductsToOrder.addSource(_shoppingCart) {
+        _shoppingCartProductsToOrder.addSource(shoppingCart) {
             _shoppingCartProductsToOrder.value =
                 it
                     .filterIsInstance<ShoppingCartProductItem>()
@@ -122,10 +122,9 @@ class ShoppingCartViewModel(
     }
 
     private fun updateShoppingCartItems() {
-        val page = this.page - 1
-        val size = COUNT_PER_PAGE
         viewModelScope.launch {
-            val shoppingCarts = shoppingCartRepository.load(page, size).shoppingCartItems
+            val shoppingCarts =
+                shoppingCartRepository.load(0, COUNT_PER_PAGE * page).shoppingCartItems
             _shoppingCart.value = _shoppingCart.value?.mapNotNull { item ->
                 shoppingCarts.find { it.id == item.shoppingCartProduct.id }?.let { foundProduct ->
                     item.copy(
