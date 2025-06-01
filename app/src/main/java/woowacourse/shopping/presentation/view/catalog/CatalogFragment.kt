@@ -30,6 +30,7 @@ class CatalogFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         initObserver()
         initListener()
@@ -90,28 +91,17 @@ class CatalogFragment :
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
                 binding.layoutCatalogShimmer.startShimmer()
-                binding.layoutCatalogShimmer.visibility = View.VISIBLE
-                binding.recyclerViewProducts.visibility = View.GONE
             } else {
                 binding.layoutCatalogShimmer.stopShimmer()
-                binding.layoutCatalogShimmer.visibility = View.GONE
-                binding.recyclerViewProducts.visibility = View.VISIBLE
             }
         }
 
         viewModel.items.observe(viewLifecycleOwner) { products ->
             catalogAdapter.updateProducts(products)
         }
+
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
             catalogAdapter.updateItem(it)
-        }
-        viewModel.totalCartCount.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.textViewCartTotalQuantity.visibility = View.GONE
-            } else {
-                binding.textViewCartTotalQuantity.visibility = View.VISIBLE
-            }
-            binding.textViewCartTotalQuantity.text = it.toString()
         }
     }
 
