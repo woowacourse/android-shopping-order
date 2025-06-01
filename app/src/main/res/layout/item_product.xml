@@ -40,22 +40,19 @@
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="@id/productImage" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/productQuantityComponentLayout"
+        <include
+            android:id="@+id/productQuantityComponent"
+            layout="@layout/component_product_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:productQuantityClickListener="@{productClickListener}"
+            app:quantityObservable="@{productItem}"
 
-            <include
-                android:id="@+id/productQuantityComponent"
-                layout="@layout/component_product_quantity"
-                app:productQuantityClickListener="@{productClickListener}"
-                app:quantityObservable="@{productItem}" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            />
 
         <TextView
             android:id="@+id/productName"

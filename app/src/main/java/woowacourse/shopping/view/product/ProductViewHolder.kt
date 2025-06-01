@@ -25,12 +25,12 @@ class ProductViewHolder(
     }
 
     private fun handleEmptySelectedQuantityVisibility() {
-        binding.productQuantityComponentLayout.visibility = View.GONE
+        binding.productQuantityComponent.productQuantityComponentRoot.visibility = View.GONE
         binding.productPlusQuantityButtonDefault.visibility = View.VISIBLE
     }
 
     private fun handleSelectedQuantityVisibility(item: ProductsItem.ProductItem) {
-        binding.productQuantityComponentLayout.visibility = View.VISIBLE
+        binding.productQuantityComponent.productQuantityComponentRoot.visibility = View.VISIBLE
         binding.productPlusQuantityButtonDefault.visibility = View.GONE
         binding.productQuantityComponent.quantity = item.selectedQuantity
     }
