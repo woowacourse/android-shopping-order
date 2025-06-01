@@ -1,21 +1,21 @@
 package woowacourse.shopping.di
 
 import android.content.Context
-import woowacourse.shopping.data.dao.CartDao
 import woowacourse.shopping.data.dao.RecentlyProductDao
 import woowacourse.shopping.data.database.CartDatabase
 
 object DatabaseModule {
     private lateinit var appContext: Context
-    private var database: CartDatabase? = null
+    private const val ERROR_APP_CONTEXT_NOT_INITIALIZE = "appContext가 초기화되지 않았습니다."
 
     fun init(context: Context) {
         appContext = context.applicationContext
     }
 
-    private fun provideDatabase(): CartDatabase = CartDatabase.getInstance(appContext).also { database = it }
+    private val database: CartDatabase by lazy {
+        check(::appContext.isInitialized) { ERROR_APP_CONTEXT_NOT_INITIALIZE }
+        CartDatabase.getInstance(appContext)
+    }
 
-    fun provideCartDao(): CartDao = provideDatabase().cartDao()
-
-    fun provideRecentProductDao(): RecentlyProductDao = provideDatabase().recentlyProductDao()
+    fun provideRecentProductDao(): RecentlyProductDao = database.recentlyProductDao()
 }

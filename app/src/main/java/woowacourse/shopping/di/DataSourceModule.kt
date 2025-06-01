@@ -9,32 +9,24 @@ import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
 
 object DataSourceModule {
-    private var cartRemoteDataSource: CartRemoteDataSource? = null
-    private var productRemoteDataSource: ProductRemoteDataSource? = null
-    private var recentProductLocalDataSource: RecentProductLocalDataSource? = null
     private lateinit var appContext: Context
+    private const val ERROR_APP_CONTEXT_NOT_INITIALIZE = "appContext가 초기화되지 않았습니다."
 
     fun init(context: Context) {
         appContext = context.applicationContext
     }
 
-    fun provideProductDataSource(): ProductRemoteDataSource =
-        productRemoteDataSource ?: run {
-            val productService = NetworkModule.provideProductService()
-            ProductRemoteDataSourceImpl(productService).also { productRemoteDataSource = it }
-        }
+    val cartRemoteDataSource: CartRemoteDataSource by lazy {
+        CartRemoteDataSourceImpl(NetworkModule.cartItemService)
+    }
 
-    fun provideCartDataSource(): CartRemoteDataSource =
-        cartRemoteDataSource ?: run {
-            val cartItemService = NetworkModule.provideCartItemService()
-            CartRemoteDataSourceImpl(cartItemService).also { cartRemoteDataSource = it }
-        }
+    val productRemoteDataSource: ProductRemoteDataSource by lazy {
+        ProductRemoteDataSourceImpl(NetworkModule.productService)
+    }
 
-    fun provideRecentProductDataSource(): RecentProductLocalDataSource =
-        recentProductLocalDataSource ?: run {
-            val recentProductDao = DatabaseModule.provideRecentProductDao()
-            RecentProductLocalDataSourceImpl(recentProductDao).also {
-                recentProductLocalDataSource = it
-            }
-        }
+    val recentProductLocalDataSource: RecentProductLocalDataSource by lazy {
+        check(::appContext.isInitialized) { ERROR_APP_CONTEXT_NOT_INITIALIZE }
+        val dao = DatabaseModule.provideRecentProductDao()
+        RecentProductLocalDataSourceImpl(dao)
+    }
 }

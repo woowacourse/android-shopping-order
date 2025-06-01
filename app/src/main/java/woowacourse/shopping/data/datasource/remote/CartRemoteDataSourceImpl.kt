@@ -53,17 +53,12 @@ class CartRemoteDataSourceImpl(
                 response: Response<CartsResponse>,
             ) {
                 if (response.isSuccessful) {
-                    val cartId = response.toIdOrNull()
-                    if (cartId != null) {
-                        onResult(
-                            Result.success(
-                                response.body()?.cartContent?.map { it.toDomain() }
-                                    ?: emptyList(),
-                            ),
-                        )
-                    } else {
-                        onResult(Result.failure(Exception("응답 헤더에 cartId가 없습니다.")))
-                    }
+                    onResult(
+                        Result.success(
+                            response.body()?.cartContent?.map { it.toDomain() }
+                                ?: emptyList(),
+                        ),
+                    )
                     return
                 }
                 handleFailure(onResult)

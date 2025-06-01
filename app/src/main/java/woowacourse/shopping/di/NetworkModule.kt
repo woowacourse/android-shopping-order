@@ -12,18 +12,20 @@ object NetworkModule {
     private const val BASE_URL =
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
 
-    private var productService: ProductService? = null
-    private var cartItemService: CartItemService? = null
-
-    private fun provideRetrofit(): Retrofit =
+    private val retrofit: Retrofit by lazy {
         Retrofit
             .Builder()
             .baseUrl(BASE_URL)
             .client(OkHttpClientProvider.provideClient())
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
+    }
 
-    fun provideProductService(): ProductService = productService ?: provideRetrofit().create(ProductService::class.java)
+    val productService: ProductService by lazy {
+        retrofit.create(ProductService::class.java)
+    }
 
-    fun provideCartItemService(): CartItemService = cartItemService ?: provideRetrofit().create(CartItemService::class.java)
+    val cartItemService: CartItemService by lazy {
+        retrofit.create(CartItemService::class.java)
+    }
 }
