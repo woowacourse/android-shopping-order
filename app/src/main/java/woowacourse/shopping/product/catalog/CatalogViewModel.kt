@@ -21,8 +21,7 @@ class CatalogViewModel(
         MutableLiveData<List<CatalogItem>>(emptyList<CatalogItem>())
     val catalogItems: LiveData<List<CatalogItem>> = _catalogItems
 
-    private val _page = MutableLiveData<Int>(INITIAL_PAGE)
-    val page: LiveData<Int> = _page
+    private var page: Int = INITIAL_PAGE
 
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
@@ -80,11 +79,9 @@ class CatalogViewModel(
     }
 
     fun loadNextCatalogProducts() {
-        increasePage()
-        val currentPage = page.value ?: 0
-
+        page++
         remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
-            val startIndex = currentPage * PAGE_SIZE
+            val startIndex = page * PAGE_SIZE
             val endIndex = minOf(startIndex + PAGE_SIZE, allProductSize)
 
             loadCatalog(startIndex, endIndex, 20, allProductSize)
@@ -93,11 +90,9 @@ class CatalogViewModel(
 
     fun loadCatalogUntilCurrentPage() {
         _catalogItems.value = emptyList()
-        val currentPage = page.value ?: 0
-
         remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
             val startIndex = 0
-            val endIndex = minOf((currentPage + 1) * PAGE_SIZE, allProductSize)
+            val endIndex = minOf((page + 1) * PAGE_SIZE, allProductSize)
 
             loadCatalog(startIndex, endIndex, 20, allProductSize)
         }
@@ -112,7 +107,7 @@ class CatalogViewModel(
         _loadingState.postValue(LoadingState.loading())
 
         remoteCatalogProductRepositoryImpl.getProductsByPage(
-            page.value ?: 0,
+            page,
             size,
         ) { pagedProducts ->
             cartProductRepository.getTotalElements { totalElements ->
@@ -163,10 +158,6 @@ class CatalogViewModel(
         recentlyViewedProductRepository.getRecentlyViewedProducts { products ->
             _recentlyViewedProducts.postValue(products.map { it.toUiModel() })
         }
-    }
-
-    private fun increasePage() {
-        _page.value = _page.value?.plus(1)
     }
 
     companion object {
