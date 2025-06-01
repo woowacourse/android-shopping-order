@@ -25,8 +25,7 @@ class CartViewModel(
     private val _isPrevButtonEnabled = MutableLiveData<Boolean>(false)
     val isPrevButtonEnabled: LiveData<Boolean> = _isPrevButtonEnabled
 
-    private val _page = MutableLiveData<Int>(INITIAL_PAGE)
-    val page: LiveData<Int> = _page
+    private var page: Int = INITIAL_PAGE
 
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
@@ -88,10 +87,9 @@ class CartViewModel(
         _totalProducts.postValue(set.toMutableSet())
         cartProductRepository.deleteCartProduct(cartProduct.productItem.id) {
             cartProductRepository.getTotalElements { updatedSize ->
-                val currentPage = page.value ?: INITIAL_PAGE
-                val startIndex = currentPage * PAGE_SIZE
-                if (startIndex >= updatedSize && currentPage > 0) {
-                    decreasePage()
+                val startIndex = page * PAGE_SIZE
+                if (startIndex >= updatedSize && page > 0) {
+                    page--
                 }
                 loadCartProducts()
             }
@@ -100,20 +98,19 @@ class CartViewModel(
 
     fun onPaginationButtonClick(buttonEvent: ButtonEvent) {
         cartProductRepository.getTotalElements { totalSize ->
-            val currentPage = page.value ?: INITIAL_PAGE
             val lastPage = (totalSize - 1) / PAGE_SIZE
 
             when (buttonEvent) {
                 ButtonEvent.DECREASE -> {
-                    if (currentPage > 0) {
-                        decreasePage()
+                    if (page > 0) {
+                        page--
                         loadCartProducts()
                     }
                 }
 
                 ButtonEvent.INCREASE -> {
-                    if (currentPage < lastPage) {
-                        increasePage()
+                    if (page < lastPage) {
+                        page++
                         loadCartProducts()
                     }
                 }
@@ -169,22 +166,12 @@ class CartViewModel(
     }
 
     private fun checkNextButtonEnabled(totalSize: Int) {
-        val currentPage = page.value ?: INITIAL_PAGE
         val lastPage = (totalSize - 1) / PAGE_SIZE
-        _isNextButtonEnabled.postValue(currentPage < lastPage)
+        _isNextButtonEnabled.postValue(page < lastPage)
     }
 
     private fun checkPrevButtonEnabled() {
-        val currentPage = page.value ?: INITIAL_PAGE
-        _isPrevButtonEnabled.postValue(currentPage >= 1)
-    }
-
-    private fun increasePage() {
-        _page.postValue(page.value?.plus(1))
-    }
-
-    private fun decreasePage() {
-        _page.postValue(page.value?.minus(1))
+        _isPrevButtonEnabled.postValue(page >= 1)
     }
 
     private fun loadAllCartProducts() {
@@ -200,8 +187,7 @@ class CartViewModel(
         _loadingState.postValue(LoadingState.loading())
 
         cartProductRepository.getTotalElements { totalSize ->
-            val currentPage = page.value ?: INITIAL_PAGE
-            val startIndex = currentPage * pageSize
+            val startIndex = page * pageSize
             val endIndex = minOf(startIndex + pageSize, totalSize)
 
             if (startIndex >= totalSize) {
@@ -209,7 +195,7 @@ class CartViewModel(
             }
 
             cartProductRepository
-                .getCartProductsInRange(currentPage, pageSize) { cartProducts ->
+                .getCartProductsInRange(page, pageSize) { cartProducts ->
                     val pagedProducts: List<ProductUiModel> =
                         cartProducts.map {
                             if (productSelections.contains(it.id)) {
