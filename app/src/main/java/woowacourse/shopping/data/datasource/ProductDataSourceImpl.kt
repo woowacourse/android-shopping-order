@@ -39,12 +39,12 @@ class ProductDataSourceImpl(
         )
     }
 
-    override fun fetchProducts(
-        page: Int,
-        size: Int,
+    override fun fetchPageOfProducts(
+        pageIndex: Int,
+        pageSize: Int,
         onResult: (ProductsResponse) -> Unit,
     ) {
-        productService.getProducts(page = page, size = size).enqueue(
+        productService.getProducts(page = pageIndex, size = pageSize).enqueue(
             object : Callback<ProductsResponse> {
                 override fun onResponse(
                     call: Call<ProductsResponse>,

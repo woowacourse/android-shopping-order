@@ -11,12 +11,12 @@ import woowacourse.shopping.data.service.CartItemService
 class CartItemDataSourceImpl(
     private val cartItemService: CartItemService,
 ) : CartItemDataSource {
-    override fun fetchCartItems(
-        page: Int,
-        size: Int,
+    override fun fetchPageOfCartItems(
+        pageIndex: Int,
+        pageSize: Int,
         onResult: (CartItemResponse?) -> Unit,
     ) {
-        cartItemService.getCartItems(page = page, size = size).enqueue(
+        cartItemService.getCartItems(page = pageIndex, size = pageSize).enqueue(
             object : Callback<CartItemResponse> {
                 override fun onResponse(
                     call: Call<CartItemResponse>,

@@ -15,7 +15,7 @@ class CartRepositoryImpl(
         limit: Int,
         callback: (List<CartItem>, Boolean) -> Unit,
     ) {
-        cartItemDataSource.fetchCartItems(page, limit) { response ->
+        cartItemDataSource.fetchPageOfCartItems(page, limit) { response ->
             if (response != null) {
                 val cartItems = response.content.map { it.toCartItem() }
                 callback(cartItems, !response.last)
@@ -24,9 +24,9 @@ class CartRepositoryImpl(
     }
 
     override fun getAllCartItems(callback: (List<CartItem>?) -> Unit) {
-        cartItemDataSource.fetchCartItems(
-            page = 0,
-            size = Int.MAX_VALUE,
+        cartItemDataSource.fetchPageOfCartItems(
+            pageIndex = 0,
+            pageSize = Int.MAX_VALUE,
         ) { it ->
             callback(it?.content?.map { it.toCartItem() }.orEmpty())
         }

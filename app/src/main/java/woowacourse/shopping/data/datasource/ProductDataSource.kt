@@ -9,9 +9,9 @@ interface ProductDataSource {
         onResult: (ProductResponse) -> Unit,
     )
 
-    fun fetchProducts(
-        page: Int,
-        size: Int,
+    fun fetchPageOfProducts(
+        pageIndex: Int,
+        pageSize: Int,
         onResult: (ProductsResponse) -> Unit,
     )
 }

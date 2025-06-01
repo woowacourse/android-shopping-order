@@ -21,9 +21,9 @@ class ProductRepositoryImpl(
         pageSize: Int,
         callback: (List<Product>, Boolean) -> Unit,
     ) {
-        productDataSource.fetchProducts(
-            page = pageIndex,
-            size = pageSize,
+        productDataSource.fetchPageOfProducts(
+            pageIndex = pageIndex,
+            pageSize = pageSize,
         ) {
             val products: List<Product> = it.productContent.map { it.toProduct() }
             val hasMore = products.size >= pageSize
@@ -43,9 +43,9 @@ class ProductRepositoryImpl(
     }
 
     override fun loadAllCartItems(callback: (List<CartItem>) -> Unit) {
-        cartItemDataSource.fetchCartItems(
-            page = 0,
-            size = Int.MAX_VALUE,
+        cartItemDataSource.fetchPageOfCartItems(
+            pageIndex = 0,
+            pageSize = Int.MAX_VALUE,
         ) { cartItems ->
             callback(cartItems?.content?.map { content -> content.toCartItem() }.orEmpty())
         }
@@ -80,9 +80,9 @@ class ProductRepositoryImpl(
         category: String,
         callback: (List<Product>) -> Unit,
     ) {
-        productDataSource.fetchProducts(
-            page = 0,
-            size = Int.MAX_VALUE,
+        productDataSource.fetchPageOfProducts(
+            pageIndex = 0,
+            pageSize = Int.MAX_VALUE,
         ) {
             val products: List<Product> = it.productContent.map { it.toProduct() }
             val filteredProducts = products.filter { it.category == category }

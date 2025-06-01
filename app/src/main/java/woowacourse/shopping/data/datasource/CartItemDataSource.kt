@@ -5,9 +5,9 @@ import woowacourse.shopping.data.model.response.CartItemResponse
 import woowacourse.shopping.data.model.response.Quantity
 
 interface CartItemDataSource {
-    fun fetchCartItems(
-        page: Int,
-        size: Int,
+    fun fetchPageOfCartItems(
+        pageIndex: Int,
+        pageSize: Int,
         onResult: (CartItemResponse?) -> Unit,
     )
 
