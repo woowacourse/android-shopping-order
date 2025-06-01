@@ -1,18 +1,20 @@
 package woowacourse.shopping.data.goods.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Pageable(
-    @SerializedName("offset")
+    @SerialName("offset")
     val offset: Int,
-    @SerializedName("pageNumber")
+    @SerialName("pageNumber")
     val pageNumber: Int,
-    @SerializedName("pageSize")
+    @SerialName("pageSize")
     val pageSize: Int,
-    @SerializedName("paged")
+    @SerialName("paged")
     val paged: Boolean,
-    @SerializedName("sort")
+    @SerialName("sort")
     val sort: SortX,
-    @SerializedName("unpaged")
+    @SerialName("unpaged")
     val unpaged: Boolean,
 )

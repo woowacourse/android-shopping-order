@@ -1,28 +1,30 @@
 package woowacourse.shopping.data.carts.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CartResponse(
-    @SerializedName("content")
+    @SerialName("content")
     val content: List<CartContent>,
-    @SerializedName("empty")
+    @SerialName("empty")
     val empty: Boolean,
-    @SerializedName("first")
+    @SerialName("first")
     val first: Boolean,
-    @SerializedName("last")
+    @SerialName("last")
     val last: Boolean,
-    @SerializedName("number")
+    @SerialName("number")
     val number: Int,
-    @SerializedName("numberOfElements")
+    @SerialName("numberOfElements")
     val numberOfElements: Int,
-    @SerializedName("pageable")
+    @SerialName("pageable")
     val pageable: PageableX,
-    @SerializedName("size")
+    @SerialName("size")
     val size: Int,
-    @SerializedName("sort")
+    @SerialName("sort")
     val sort: SortXX,
-    @SerializedName("totalElements")
+    @SerialName("totalElements")
     val totalElements: Int,
-    @SerializedName("totalPages")
+    @SerialName("totalPages")
     val totalPages: Int,
 )

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.goods.repository
 
-import com.google.gson.Gson
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
@@ -15,7 +14,6 @@ import java.util.concurrent.TimeUnit
 class CartRemoteDataSourceTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var dataSource: GoodsRemoteDataSourceImpl
-    private val gson = Gson()
 
     @BeforeEach
     fun setup() {

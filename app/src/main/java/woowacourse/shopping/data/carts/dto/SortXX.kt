@@ -1,12 +1,14 @@
 package woowacourse.shopping.data.carts.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SortXX(
-    @SerializedName("empty")
+    @SerialName("empty")
     val empty: Boolean,
-    @SerializedName("sorted")
+    @SerialName("sorted")
     val sorted: Boolean,
-    @SerializedName("unsorted")
+    @SerialName("unsorted")
     val unsorted: Boolean,
 )

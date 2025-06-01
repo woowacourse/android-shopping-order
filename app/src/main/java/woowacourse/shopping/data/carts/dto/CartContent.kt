@@ -1,13 +1,15 @@
 package woowacourse.shopping.data.carts.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import woowacourse.shopping.data.goods.dto.Content
 
+@Serializable
 data class CartContent(
-    @SerializedName("id")
+    @SerialName("id")
     val id: Int,
-    @SerializedName("product")
+    @SerialName("product")
     val product: Content,
-    @SerializedName("quantity")
+    @SerialName("quantity")
     val quantity: Int,
 )
