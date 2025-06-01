@@ -91,7 +91,7 @@ class CatalogViewModel(
     fun refreshCartState() {
         if (_items.value.isNullOrEmpty()) return
 
-        updateRecentProducts()
+        loadRecentProducts()
 
         productRepository.loadAllCartItems { cartItems ->
             val updatedCartState =
@@ -184,24 +184,19 @@ class CatalogViewModel(
         }
     }
 
-    private fun updateRecentProducts() {
-        productRepository.loadRecentProducts(count = 10) { recentProducts ->
-            val recentUiModels = recentProducts.map { it.toUiModel() }
-            val recentItem = CatalogItem.RecentProductItem(recentUiModels)
-
-            val currentItems = _items.value.orEmpty()
-
+    private fun loadRecentProducts() {
+        productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
+            val recentProductItem =
+                CatalogItem.RecentProductItem(recentProducts.map(Product::toUiModel))
             val updatedItems =
                 buildList {
-                    if (recentUiModels.isNotEmpty()) {
-                        add(recentItem)
-                    }
-
+                    if (recentProductItem.products.isNotEmpty()) add(recentProductItem)
                     addAll(
-                        currentItems.filter { it !is CatalogItem.RecentProductItem },
+                        _items.value
+                            .orEmpty()
+                            .filterNot { item -> item is CatalogItem.RecentProductItem },
                     )
                 }
-
             _items.postValue(updatedItems)
         }
     }
