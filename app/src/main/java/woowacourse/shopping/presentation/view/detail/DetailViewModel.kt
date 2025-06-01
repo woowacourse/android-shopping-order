@@ -72,7 +72,7 @@ class DetailViewModel(
         val product = _product.value ?: return
         val quantity = _quantity.value ?: DEFAULT_QUANTITY
 
-        cartRepository.insertCartProductQuantityToCart(product.id, quantity) { result ->
+        cartRepository.increaseQuantity(product.id, quantity) { result ->
             result
                 .onSuccess { _addToCartSuccessEvent.postValue(Unit) }
                 .onFailure { _toastEvent.postValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }

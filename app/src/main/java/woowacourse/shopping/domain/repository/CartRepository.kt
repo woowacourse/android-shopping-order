@@ -4,32 +4,34 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 
 interface CartRepository {
-    fun fetchCartItems(
+    fun fetchCartProducts(
         page: Int,
         size: Int,
         onResult: (Result<PageableItem<CartProduct>>) -> Unit,
     )
 
-    fun deleteCartItem(
+    fun deleteCartProduct(
         cartId: Long,
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun insertCartProductQuantityToCart(
+    fun increaseQuantity(
         productId: Long,
         increaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun decreaseCartProductQuantityFromCart(
+    fun decreaseQuantity(
         productId: Long,
         decreaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun fetchCartItemCount(onResult: (Result<Int>) -> Unit)
+    fun fetchCartProductCount(onResult: (Result<Int>) -> Unit)
 
-    fun findQuantityByProductId(productId: Long): Result<Int>
+    fun findCartProductByProductId(productId: Long): Result<CartProduct>
 
     fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
+
+    fun getAllCartProducts(): List<CartProduct>
 }
