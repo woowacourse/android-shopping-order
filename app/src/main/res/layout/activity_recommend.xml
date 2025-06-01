@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="vm"
+            name="viewModel"
             type="woowacourse.shopping.presentation.recommend.RecommendViewModel" />
 
     </data>
@@ -46,10 +46,51 @@
             android:layout_marginStart="6dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal"
-            app:recommendProducts="@{vm.items}"
+            app:recommendProducts="@{viewModel.items}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textView_recommend_sub_info" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_order"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:background="@color/gray_5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/text_total_order_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/button_order"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="184,200원" />
+
+            <TextView
+                android:id="@+id/button_order"
+                android:layout_width="122dp"
+                android:layout_height="match_parent"
+                android:background="@color/mint_blue"
+                android:gravity="center"
+
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="주문하기(2)" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

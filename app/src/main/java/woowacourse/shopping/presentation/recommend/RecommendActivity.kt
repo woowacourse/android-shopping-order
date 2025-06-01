@@ -39,7 +39,7 @@ class RecommendActivity : AppCompatActivity() {
 
     private fun setUpBinding() {
         binding.apply {
-            vm = viewModel
+            viewModel = viewModel
             lifecycleOwner = this@RecommendActivity
         }
     }
