@@ -32,8 +32,9 @@ class ProductsViewModel(
     private var loadable: Boolean = false
     private var page: Int = MINIMUM_PAGE
 
-    private val _productsUi: MutableLiveData<List<ProductsItem>> = MutableLiveData(emptyList())
-    val productsUi: LiveData<List<ProductsItem>> get() = _productsUi
+    private val _productsUi: MutableLiveData<List<ProductsItem.ProductItem>> =
+        MutableLiveData(emptyList())
+    val productsUi: LiveData<List<ProductsItem.ProductItem>> get() = _productsUi
 
     private var shoppingCartDomain = emptyList<ShoppingCartProduct>()
     private var productsDomain = emptyList<Product>()
@@ -109,27 +110,22 @@ class ProductsViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch(handler) {
-            if (productItem.shoppingCartId == null) {
-                shoppingCartRepository.add(productItem.product, quantity)
-            } else {
-                shoppingCartRepository.updateQuantity(
-                    productItem.shoppingCartId,
-                    quantity,
-                )
-            }
-
-            val shoppingCartProducts =
-                shoppingCartRepository.load(0, LOAD_PRODUCTS_SIZE * page)
+            val uploaded =
+                if (productItem.shoppingCartId == null) {
+                    shoppingCartRepository.add(productItem.product, quantity)
+                } else {
+                    shoppingCartRepository.updateQuantity(
+                        productItem.shoppingCartId,
+                        quantity,
+                    )
+                }
 
             _productsUi.value =
                 productsUi.value?.map { item ->
-                    if (item is ProductsItem.ProductItem && item.product.id == productItem.product.id) {
-                        val newShoppingCartItem =
-                            shoppingCartProducts.shoppingCartItems
-                                .find { it.product.id == item.product.id }
+                    if (item.product.id == productItem.product.id) {
                         item.copy(
-                            selectedQuantity = newShoppingCartItem?.quantity ?: 0,
-                            shoppingCartId = newShoppingCartItem?.id,
+                            selectedQuantity = uploaded?.quantity ?: 0,
+                            shoppingCartId = uploaded?.id,
                         )
                     } else {
                         item
