@@ -65,6 +65,7 @@ class DetailViewModel(
                 onFailure = {},
             )
         }
+        saveHistory(productId)
     }
 
     fun increaseCartQuantity() {
@@ -132,6 +133,10 @@ class DetailViewModel(
         historyRepository.saveHistory(lastSeenProductId) {
             _event.postValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
         }
+    }
+
+    private fun saveHistory(productId: Long) {
+        historyRepository.saveHistory(productId) {}
     }
 
     private fun sendEvent(event: DetailUiEvent) {

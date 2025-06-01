@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,12 +23,13 @@ import woowacourse.shopping.view.main.adapter.ProductRvItems
 import woowacourse.shopping.view.main.vm.MainViewModel
 import woowacourse.shopping.view.main.vm.MainViewModelFactory
 
-class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
+class MainActivity : AppCompatActivity() {
     private val activityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == RESULT_OK) {
+                viewModel.syncHistory()
                 viewModel.syncCartQuantities()
             }
         }
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
     }
 
     private val productsAdapter: ProductAdapter by lazy {
-        ProductAdapter(emptyList(), this)
+        ProductAdapter(emptyList(), viewModel.productEventHandler)
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -141,30 +143,6 @@ class MainActivity : AppCompatActivity(), ProductAdapterEventHandler {
         lastSeenProductId: Long?,
     ) {
         val intent = DetailActivity.newIntent(this, productId, lastSeenProductId)
-        startActivity(intent)
-    }
-
-    override fun onSelectProduct(productId: Long) {
-        viewModel.saveHistory(productId)
-    }
-
-    override fun onLoadMoreItems() {
-        viewModel.loadPage()
-    }
-
-    override fun showQuantity(productId: Long) {
-        viewModel.increaseCartQuantity(productId)
-    }
-
-    override fun onClickHistory(productId: Long) {
-        viewModel.saveHistory(productId)
-    }
-
-    override fun onClickIncrease(productId: Long) {
-        viewModel.increaseCartQuantity(productId)
-    }
-
-    override fun onClickDecrease(productId: Long) {
-        viewModel.decreaseCartQuantity(productId)
+        activityResultLauncher.launch(intent)
     }
 }

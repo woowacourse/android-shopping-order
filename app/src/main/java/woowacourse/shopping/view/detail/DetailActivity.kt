@@ -99,6 +99,7 @@ class DetailActivity : AppCompatActivity(), CartQuantityHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_bar_close -> {
+                setResult(RESULT_OK, Intent())
                 finish()
                 true
             }

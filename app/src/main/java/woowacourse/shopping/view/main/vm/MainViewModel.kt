@@ -16,6 +16,7 @@ import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.loader.HistoryLoader
 import woowacourse.shopping.view.main.MainUiEvent
+import woowacourse.shopping.view.main.adapter.ProductAdapterEventHandler
 import woowacourse.shopping.view.main.state.LoadState
 import woowacourse.shopping.view.main.state.ProductState
 import woowacourse.shopping.view.main.state.ProductUiState
@@ -161,6 +162,17 @@ class MainViewModel(
             }
         }
 
+    fun syncHistory() {
+        withState(_uiState.value) { state ->
+            historyLoader { historyStates ->
+                historyStates.fold(
+                    onSuccess = { _uiState.value = state.copy(historyItems = it) },
+                    onFailure = {},
+                )
+            }
+        }
+    }
+
     fun syncCartQuantities() =
         withState(_uiState.value) { state ->
             cartRepository.loadSinglePage(null, null) { result ->
@@ -173,12 +185,11 @@ class MainViewModel(
             }
         }
 
-    fun saveHistory(productId: Long) =
+    fun handleNavigateDetailEvent(productId: Long) {
         withState(_uiState.value) { state ->
-            historyRepository.saveHistory(productId) {
-                _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
-            }
+            _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
         }
+    }
 
     fun handleNavigateToCart() {
         withState(_uiState.value) { uiState ->
@@ -196,6 +207,33 @@ class MainViewModel(
     ) {
         Log.e(tag, "Error occurred", throwable)
         setLoading(false)
+    }
+
+    val productEventHandler = object : ProductAdapterEventHandler{
+        override fun onLoadMoreItems() {
+            loadPage()
+        }
+
+        override fun onSelectProduct(productId: Long) {
+            handleNavigateDetailEvent(productId)
+        }
+
+        override fun showQuantity(productId: Long) {
+            increaseCartQuantity(productId)
+        }
+
+        override fun onClickHistory(productId: Long) {
+            handleNavigateDetailEvent(productId)
+        }
+
+        override fun onClickIncrease(cartId: Long) {
+            increaseCartQuantity(cartId)
+        }
+
+        override fun onClickDecrease(cartId: Long) {
+            decreaseCartQuantity(cartId)
+        }
+
     }
 
     companion object {
