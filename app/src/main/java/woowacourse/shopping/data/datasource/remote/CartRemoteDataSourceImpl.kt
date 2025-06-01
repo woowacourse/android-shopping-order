@@ -91,8 +91,12 @@ class CartRemoteDataSourceImpl(
                     response: Response<ResponseBody>,
                 ) {
                     if (response.isSuccessful) {
-                        val cartId = response.toIdOrNull() ?: throw IllegalStateException("")
-                        onResult(Result.success(cartId))
+                        val cartId = response.toIdOrNull()
+                        if (cartId != null) {
+                            onResult(Result.success(cartId))
+                        } else {
+                            onResult(Result.failure(IllegalStateException("응답 헤더에 cartId가 없습니다.")))
+                        }
                         return
                     }
                     handleFailure(onResult)
