@@ -17,6 +17,7 @@ import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandl
 import woowacourse.shopping.presentation.product.catalog.viewHolder.CartActionViewHolder
 import woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.newIntent
 import woowacourse.shopping.presentation.product.recent.ViewedItemAdapter
+import woowacourse.shopping.product.catalog.ProductAdapter
 
 class CatalogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCatalogBinding
@@ -61,7 +62,7 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
-        productAdapter = ProductAdapter(emptyList(), handler, handler)
+        productAdapter = ProductAdapter(handler, handler)
         binding.recyclerViewProducts.apply {
             this.adapter = productAdapter
             layoutManager =
@@ -88,21 +89,13 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.pagingData.observe(this) { paging ->
-            binding.frProductShimmer.stopShimmer()
-            binding.frProductShimmer.visibility = View.GONE
-            binding.recyclerViewProducts.visibility = View.VISIBLE
-
             productAdapter.apply {
-                setData(paging.products)
-                setLoadButtonVisible(paging.hasNext)
+                productAdapter.submitList(paging.products)
+                productAdapter.setLoadButtonVisible(paging.hasNext)
             }
         }
         viewModel.recentViewedItems.observe(this) { recentItems ->
             viewedAdapter.setData(recentItems)
-        }
-
-        viewModel.updatedProduct.observe(this) { updatedItem ->
-            productAdapter.updateProduct(updatedItem)
         }
     }
 

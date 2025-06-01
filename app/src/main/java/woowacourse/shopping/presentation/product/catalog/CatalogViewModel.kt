@@ -44,7 +44,7 @@ class CatalogViewModel(
 
     fun toggleQuantity(product: ProductUiModel) {
         val toggled =
-            product.copy( quantity = product.quantity + 1)
+            product.copy(quantity = product.quantity + 1)
 
         cartRepository.addCartItem(toggled.id, toggled.quantity) { result ->
             result
@@ -107,8 +107,11 @@ class CatalogViewModel(
         productsRepository.getProducts(currentPage, pageSize) { result ->
             result
                 .onSuccess { pagingData ->
-                    val newPagingData = cartRepository.getQuantity(pagingData)
-                    _pagingData.postValue(newPagingData)
+                    val newPagingData: PagingData = cartRepository.getQuantity(pagingData)
+                    val currentProducts = _pagingData.value?.products ?: emptyList()
+                    _pagingData.postValue(
+                        newPagingData.copy(products = currentProducts + newPagingData.products),
+                    )
                     currentPage++
                 }
         }
