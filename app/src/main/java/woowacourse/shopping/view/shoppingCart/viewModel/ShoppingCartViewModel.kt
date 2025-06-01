@@ -49,28 +49,28 @@ class ShoppingCartViewModel(
         }
     }
 
-    private fun loadShoppingCartItems(
-        products: List<ShoppingCartProduct>,
-    ) {
-        _shoppingCart.value = _shoppingCart.value?.plus(
-            buildList {
-                addAll(products.map { ShoppingCartItem.ShoppingCartProductItem(it) })
-            }
-        )
+    private fun loadShoppingCartItems(products: List<ShoppingCartProduct>) {
+        _shoppingCart.value =
+            _shoppingCart.value?.plus(
+                buildList {
+                    addAll(products.map { ShoppingCartItem.ShoppingCartProductItem(it) })
+                },
+            )
     }
 
     private fun updateShoppingCartItems() {
         viewModelScope.launch {
             val shoppingCarts =
                 shoppingCartRepository.load(0, COUNT_PER_PAGE * page).shoppingCartItems
-            _shoppingCart.value = _shoppingCart.value?.mapNotNull { item ->
-                shoppingCarts.find { it.id == item.shoppingCartProduct.id }?.let { foundProduct ->
-                    item.copy(
-                        shoppingCartProduct = foundProduct,
-                        isChecked = item.isChecked,
-                    )
+            _shoppingCart.value =
+                _shoppingCart.value?.mapNotNull { item ->
+                    shoppingCarts.find { it.id == item.shoppingCartProduct.id }?.let { foundProduct ->
+                        item.copy(
+                            shoppingCartProduct = foundProduct,
+                            isChecked = item.isChecked,
+                        )
+                    }
                 }
-            }
         }
     }
 

@@ -61,7 +61,10 @@ class ProductsViewModel(
         updateShoppingCartQuantity()
     }
 
-    fun updateProducts(offset: Int = page - 1, size: Int = LOAD_PRODUCTS_SIZE) {
+    fun updateProducts(
+        offset: Int = page - 1,
+        size: Int = LOAD_PRODUCTS_SIZE,
+    ) {
         viewModelScope.launch {
             productsDomain =
                 async(handler) {
@@ -118,25 +121,24 @@ class ProductsViewModel(
             val shoppingCartProducts =
                 shoppingCartRepository.load(0, LOAD_PRODUCTS_SIZE * page)
 
-            _productsUi.value = productsUi.value?.map { item ->
-                if (item is ProductsItem.ProductItem && item.product.id == productItem.product.id) {
-                    val newShoppingCartItem = shoppingCartProducts.shoppingCartItems
-                        .find { it.product.id == item.product.id }
-                    item.copy(
-                        selectedQuantity = newShoppingCartItem?.quantity ?: 0,
-                        shoppingCartId = newShoppingCartItem?.id,
-                    )
-                } else {
-                    item
+            _productsUi.value =
+                productsUi.value?.map { item ->
+                    if (item is ProductsItem.ProductItem && item.product.id == productItem.product.id) {
+                        val newShoppingCartItem =
+                            shoppingCartProducts.shoppingCartItems
+                                .find { it.product.id == item.product.id }
+                        item.copy(
+                            selectedQuantity = newShoppingCartItem?.quantity ?: 0,
+                            shoppingCartId = newShoppingCartItem?.id,
+                        )
+                    } else {
+                        item
+                    }
                 }
-            }
-
         }
     }
 
-    private fun updateProductsShoppingCartQuantity(
-        scope: CoroutineScope,
-    ) {
+    private fun updateProductsShoppingCartQuantity(scope: CoroutineScope) {
         scope.launch(handler) {
             shoppingCartDomain = shoppingCartRepository.load().shoppingCartItems
             val productUi =

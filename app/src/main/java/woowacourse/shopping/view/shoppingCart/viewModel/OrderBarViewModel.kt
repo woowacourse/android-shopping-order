@@ -7,7 +7,6 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 class OrderBarViewModel : ViewModel() {
-
     private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
     val totalPrice: LiveData<Int> get() = _totalPrice
 
@@ -44,7 +43,6 @@ class OrderBarViewModel : ViewModel() {
                 .map { it.shoppingCartProduct }
 
         _isOrderEnabled.value = totalQuantity.value?.let { it > 0 } ?: false
-
     }
 
     private fun isAllSelected(items: List<ShoppingCartItem>): Boolean {
@@ -57,5 +55,4 @@ class OrderBarViewModel : ViewModel() {
                 .all { item -> item.isChecked }
         }
     }
-
 }

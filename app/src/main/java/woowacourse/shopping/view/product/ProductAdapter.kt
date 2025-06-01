@@ -8,27 +8,27 @@ import androidx.recyclerview.widget.RecyclerView
 class ProductAdapter(
     private val productListener: ProductListener,
 ) : ListAdapter<ProductsItem, RecyclerView.ViewHolder>(
-    object : DiffUtil.ItemCallback<ProductsItem>() {
-        override fun areItemsTheSame(
-            oldItem: ProductsItem,
-            newItem: ProductsItem,
-        ): Boolean =
-            when {
-                oldItem is ProductsItem.ProductItem && newItem is ProductsItem.ProductItem ->
-                    oldItem.product.id == newItem.product.id
+        object : DiffUtil.ItemCallback<ProductsItem>() {
+            override fun areItemsTheSame(
+                oldItem: ProductsItem,
+                newItem: ProductsItem,
+            ): Boolean =
+                when {
+                    oldItem is ProductsItem.ProductItem && newItem is ProductsItem.ProductItem ->
+                        oldItem.product.id == newItem.product.id
 
-                oldItem is ProductsItem.RecentWatchingItem && newItem is ProductsItem.RecentWatchingItem ->
-                    oldItem.products.map { it.product.id } == newItem.products.map { it.product.id }
+                    oldItem is ProductsItem.RecentWatchingItem && newItem is ProductsItem.RecentWatchingItem ->
+                        oldItem.products.map { it.product.id } == newItem.products.map { it.product.id }
 
-                else -> false
-            }
+                    else -> false
+                }
 
-        override fun areContentsTheSame(
-            oldItem: ProductsItem,
-            newItem: ProductsItem,
-        ): Boolean = oldItem == newItem
-    },
-) {
+            override fun areContentsTheSame(
+                oldItem: ProductsItem,
+                newItem: ProductsItem,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     private var items: MutableMap<ProductsItem.ItemType, List<ProductsItem>> =
         ProductsItem.ItemType.entries
             .associateWith { emptyList<ProductsItem>() }
