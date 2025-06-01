@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.cart.CartItem.PaginationButtonItem
 import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
@@ -16,8 +17,8 @@ class CartViewModel(
     private val catalogProductRepository: CatalogProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : ViewModel() {
-    private val _cartProducts = MutableLiveData<List<ProductUiModel>>()
-    val cartProducts: LiveData<List<ProductUiModel>> = _cartProducts
+    private val _cartProducts = MutableLiveData<List<CartItem>>()
+    val cartProducts: LiveData<List<CartItem>> = _cartProducts
 
     private val _isNextButtonEnabled = MutableLiveData<Boolean>(false)
     val isNextButtonEnabled: LiveData<Boolean> = _isNextButtonEnabled
@@ -29,6 +30,9 @@ class CartViewModel(
 
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
+
+    private val _updatePaginationButton = MutableLiveData<PaginationButtonItem>()
+    val updatePaginationButton: LiveData<PaginationButtonItem> = _updatePaginationButton
 
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loading())
@@ -118,6 +122,10 @@ class CartViewModel(
         }
     }
 
+    fun updatedPaginationButton() {
+        _updatePaginationButton.postValue(getPaginationButton())
+    }
+
     fun updateQuantity(
         buttonEvent: ButtonEvent,
         product: ProductUiModel,
@@ -196,16 +204,18 @@ class CartViewModel(
 
             cartProductRepository
                 .getCartProductsInRange(page, pageSize) { cartProducts ->
-                    val pagedProducts: List<ProductUiModel> =
-                        cartProducts.map {
-                            if (productSelections.contains(it.id)) {
-                                it.copy(isChecked = productSelections[it.id] == true)
-                            } else {
-                                it
-                            }
-                        }
+                    val pagedProducts: List<ProductItem> =
+                        cartProducts
+                            .map {
+                                if (productSelections.contains(it.id)) {
+                                    it.copy(isChecked = productSelections[it.id] == true)
+                                } else {
+                                    it
+                                }
+                            }.map { ProductItem(it) }
+                    val paginationButton = getPaginationButton()
 
-                    _cartProducts.postValue(pagedProducts)
+                    _cartProducts.postValue(pagedProducts + paginationButton)
                     checkNextButtonEnabled(totalSize)
                     checkPrevButtonEnabled()
                     postTotalCount()
@@ -214,6 +224,13 @@ class CartViewModel(
                 }
         }
     }
+
+    private fun getPaginationButton(): PaginationButtonItem =
+        PaginationButtonItem(
+            page = page + 1,
+            isNextButtonEnabled = isNextButtonEnabled.value ?: false,
+            isPrevButtonEnabled = isPrevButtonEnabled.value ?: false,
+        )
 
     companion object {
         private const val PAGE_SIZE = 5

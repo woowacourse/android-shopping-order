@@ -46,7 +46,7 @@ class CartRecommendationFragment : Fragment() {
         setProductAdapter()
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
             Log.d("TESTT", "$products")
-            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map { ProductItem(it) })
+            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).addLoadedItems(products.map { ProductItem(it) })
         }
         return binding.root
     }
