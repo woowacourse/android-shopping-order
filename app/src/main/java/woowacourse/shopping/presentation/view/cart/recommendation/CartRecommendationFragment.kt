@@ -67,7 +67,3 @@ class CartRecommendationFragment :
         viewModel.increaseQuantity(product)
     }
 }
-
-interface RecommendEventListener {
-    fun onInitialAddToCart(product: ProductUiModel)
-}

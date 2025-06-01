@@ -22,7 +22,11 @@ class RecentProductItemViewHolder private constructor(
             eventListener: CatalogEventListener,
         ): RecentProductItemViewHolder {
             val binding =
-                ItemRecentProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ItemRecentProductBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
             return RecentProductItemViewHolder(binding, eventListener)
         }
     }

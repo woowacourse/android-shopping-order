@@ -29,26 +29,30 @@ class DetailFragment :
         val product = arguments.getParcelableCompat<ProductUiModel>(EXTRA_PRODUCT)
         viewModel.fetchProduct(product)
 
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.vm = viewModel
-        binding.eventListener = this
-        binding.detailItemCounter.listener =
-            object : ItemCounterListener {
-                override fun increaseQuantity(product: ProductUiModel) = viewModel.increaseQuantity()
+        binding.apply {
+            lifecycleOwner = viewLifecycleOwner
+            vm = viewModel
+            eventListener = this@DetailFragment
+            detailItemCounter.eventListener =
+                object : ItemCounterListener {
+                    override fun increaseQuantity(product: ProductUiModel) = viewModel.increaseQuantity()
 
-                override fun decreaseQuantity(product: ProductUiModel) = viewModel.decreaseQuantity()
-            }
+                    override fun decreaseQuantity(product: ProductUiModel) = viewModel.decreaseQuantity()
+                }
+        }
     }
 
     private fun initObserver() {
-        viewModel.saveState.observe(viewLifecycleOwner) {
-            it?.let { navigateToScreen() }
-        }
+        with(viewModel) {
+            saveEvent.observe(viewLifecycleOwner) {
+                navigateToScreen()
+            }
 
-        viewModel.product.observe(viewLifecycleOwner) {
-            binding.product = it
-            viewModel.addRecentProduct(it)
-            viewModel.fetchLastViewedProduct()
+            product.observe(viewLifecycleOwner) { product ->
+                binding.product = product
+                addRecentProduct(product)
+                fetchLastViewedProduct()
+            }
         }
     }
 
@@ -68,17 +72,10 @@ class DetailFragment :
     companion object {
         private const val EXTRA_PRODUCT = "product"
 
-        fun newBundle(product: ProductUiModel) =
-            bundleOf(
-                EXTRA_PRODUCT to product,
-            )
+        fun newBundle(product: ProductUiModel) = bundleOf(EXTRA_PRODUCT to product)
     }
 
     override fun onRecentItemSelected(product: ProductUiModel) {
         viewModel.fetchProduct(product)
     }
-}
-
-interface DetailEventListener {
-    fun onRecentItemSelected(product: ProductUiModel)
 }

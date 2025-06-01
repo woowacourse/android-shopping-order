@@ -7,7 +7,7 @@ import woowacourse.shopping.databinding.ItemRecentProductContainerBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
-class RecentProductViewHolder(
+class RecentProductViewHolder private constructor(
     binding: ItemRecentProductContainerBinding,
     eventListener: CatalogEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {

@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
 
@@ -36,9 +36,10 @@ class RecommendationAdapter(
     }
 
     fun updateItem(updatedItem: CartItemUiModel) {
-        val index = recommendedProducts.indexOfFirst { it.id == updatedItem.cartItem.product.id }
+        val index =
+            recommendedProducts.indexOfFirst { it.id == updatedItem.cartItem.product.id }
         if (index != -1) {
-            recommendedProducts[index] = updatedItem.cartItem.toUiModel()
+            recommendedProducts[index] = updatedItem.cartItem.toProductUiModel()
             notifyItemChanged(index)
         }
     }

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
 
@@ -16,12 +16,12 @@ class CartItemViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.eventListener = eventListener
-        binding.cartItemCounter.listener = itemCounterListener
+        binding.cartItemCounter.eventListener = itemCounterListener
     }
 
     fun bind(cartItem: CartItemUiModel) {
         binding.cartItem = cartItem
-        binding.product = cartItem.cartItem.toUiModel()
+        binding.product = cartItem.cartItem.toProductUiModel()
         binding.checkbox.setOnCheckedChangeListener(null)
         binding.checkbox.isChecked = cartItem.isSelected
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->

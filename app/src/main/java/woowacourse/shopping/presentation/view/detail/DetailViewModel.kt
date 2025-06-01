@@ -11,14 +11,14 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toProduct
-import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 
 class DetailViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    private val _saveState = MutableLiveData<Unit>()
-    val saveState: LiveData<Unit> = _saveState
+    private val _saveEvent = MutableLiveData<Unit>()
+    val saveEvent: LiveData<Unit> = _saveEvent
 
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
@@ -44,18 +44,18 @@ class DetailViewModel(
         _product.postValue(_product.value?.copy(quantity = (currentQuantity - 1).coerceAtLeast(1)))
     }
 
-    fun addCartItem() {
+    fun addToCart() {
         val product = _product.value ?: return
         if (product.cartId == 0L) {
             cartRepository.addCartItem(product.toCartItem()) {
-                _saveState.postValue(Unit)
+                _saveEvent.postValue(Unit)
             }
         } else {
             cartRepository.updateCartItemQuantity(
                 cartId = product.cartId,
                 quantity = _product.value?.quantity ?: 1,
             ) {
-                _saveState.postValue(Unit)
+                _saveEvent.postValue(Unit)
             }
         }
     }
@@ -63,7 +63,7 @@ class DetailViewModel(
     fun fetchLastViewedProduct() {
         productRepository.loadRecentProducts(1) { recentProducts ->
             if (recentProducts.isNotEmpty()) {
-                _lastViewedProduct.postValue(recentProducts.first().toUiModel())
+                _lastViewedProduct.postValue(recentProducts.first().toProductUiModel())
             }
         }
     }

@@ -29,9 +29,9 @@ class DetailViewModelTest {
         val product = dummyProductUiModelFixture[1]
         viewModel.fetchProduct(product)
 
-        viewModel.addCartItem()
+        viewModel.addToCart()
 
-        val result = viewModel.saveState.getOrAwaitValue()
+        val result = viewModel.saveEvent.getOrAwaitValue()
         assertThat(result).isNotNull
     }
 

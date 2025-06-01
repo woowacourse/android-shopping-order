@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemLoadMoreBinding
 import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
-class LoadMoreViewHolder(
+class LoadMoreViewHolder private constructor(
     binding: ItemLoadMoreBinding,
     eventListener: CatalogEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -20,7 +20,11 @@ class LoadMoreViewHolder(
             eventListener: CatalogEventListener,
         ): LoadMoreViewHolder {
             val binding =
-                ItemLoadMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ItemLoadMoreBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
             return LoadMoreViewHolder(binding, eventListener)
         }
     }

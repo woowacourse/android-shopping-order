@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.R
 import woowacourse.shopping.fixture.dummyProductsFixture
-import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 import woowacourse.shopping.presentation.view.detail.DetailFragment
 
 class DetailFragmentTest {
@@ -23,7 +23,7 @@ class DetailFragmentTest {
         context = ApplicationProvider.getApplicationContext()
 
         launchFragmentInContainer(
-            DetailFragment.newBundle(dummyProductsFixture[0].toUiModel()),
+            DetailFragment.newBundle(dummyProductsFixture[0].toProductUiModel()),
             themeResId = R.style.Theme_Shopping,
         ) { DetailFragment() }
     }

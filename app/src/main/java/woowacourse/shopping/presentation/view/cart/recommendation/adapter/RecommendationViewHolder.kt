@@ -15,7 +15,7 @@ class RecommendationViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.eventListener = eventListener
-        binding.recommendItemCounter.listener = itemCounterListener
+        binding.recommendItemCounter.eventListener = itemCounterListener
     }
 
     fun bind(product: ProductUiModel) {

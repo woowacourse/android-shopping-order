@@ -19,14 +19,18 @@ class CatalogAdapter(
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (CatalogItem.CatalogType.entries[viewType]) {
-            CatalogItem.CatalogType.RECENT ->
-                RecentProductViewHolder.from(parent, eventListener)
+            CatalogItem.CatalogType.RECENT_PRODUCTS ->
+                RecentProductViewHolder.from(
+                    parent,
+                    eventListener,
+                )
 
             CatalogItem.CatalogType.PRODUCT ->
                 ProductViewHolder.from(
                     parent,
                     eventListener,
                 )
+
             CatalogItem.CatalogType.LOAD_MORE -> LoadMoreViewHolder.from(parent, eventListener)
         }
 
@@ -36,11 +40,11 @@ class CatalogAdapter(
     ) {
         when (holder) {
             is RecentProductViewHolder -> {
-                val item = items[position] as CatalogItem.RecentProductItem
+                val item = items[position] as CatalogItem.RecentProductsItem
                 holder.bind(item.products)
             }
             is ProductViewHolder -> holder.bind(items[position] as CatalogItem.ProductItem)
-            is LoadMoreViewHolder -> {}
+            is LoadMoreViewHolder -> Unit
         }
     }
 
@@ -52,8 +56,8 @@ class CatalogAdapter(
 
     fun updateItem(productUiModel: ProductUiModel) {
         val index =
-            items.indexOfFirst {
-                it is CatalogItem.ProductItem && it.product.id == productUiModel.id
+            items.indexOfFirst { item ->
+                item is CatalogItem.ProductItem && item.product.id == productUiModel.id
             }
 
         if (index != -1) {

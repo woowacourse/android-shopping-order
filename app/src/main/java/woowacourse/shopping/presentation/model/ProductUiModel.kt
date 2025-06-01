@@ -17,7 +17,7 @@ data class ProductUiModel(
     val quantity: Int = 0,
 ) : Parcelable
 
-fun Product.toUiModel() =
+fun Product.toProductUiModel() =
     ProductUiModel(
         id = id,
         category = category,
@@ -26,7 +26,7 @@ fun Product.toUiModel() =
         price = price.value,
     )
 
-fun CartItem.toUiModel() =
+fun CartItem.toProductUiModel() =
     ProductUiModel(
         cartId = cartId,
         id = product.id,

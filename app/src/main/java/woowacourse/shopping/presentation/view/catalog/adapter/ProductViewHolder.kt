@@ -6,13 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
-class ProductViewHolder(
+class ProductViewHolder private constructor(
     private val binding: ItemProductBinding,
     eventListener: CatalogEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.eventListener = eventListener
-        binding.categoryItemCounter.listener = eventListener
+        binding.categoryItemCounter.eventListener = eventListener
     }
 
     fun bind(item: CatalogItem.ProductItem) {
@@ -25,7 +25,11 @@ class ProductViewHolder(
             eventListener: CatalogEventListener,
         ): ProductViewHolder {
             val binding =
-                ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ItemProductBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
             return ProductViewHolder(binding, eventListener)
         }
     }

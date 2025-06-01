@@ -5,9 +5,9 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 sealed class CatalogItem(
     val viewType: CatalogType,
 ) {
-    data class RecentProductItem(
+    data class RecentProductsItem(
         val products: List<ProductUiModel>,
-    ) : CatalogItem(CatalogType.RECENT)
+    ) : CatalogItem(CatalogType.RECENT_PRODUCTS)
 
     data class ProductItem(
         val product: ProductUiModel,
@@ -16,7 +16,7 @@ sealed class CatalogItem(
     data object LoadMoreItem : CatalogItem(CatalogType.LOAD_MORE)
 
     enum class CatalogType {
-        RECENT,
+        RECENT_PRODUCTS,
         PRODUCT,
         LOAD_MORE,
     }

@@ -7,7 +7,4 @@ data class CartItemUiModel(
     val isSelected: Boolean = false,
 )
 
-fun CartItem.toCartItemUiModel(): CartItemUiModel =
-    CartItemUiModel(
-        cartItem = this,
-    )
+fun CartItem.toCartItemUiModel(): CartItemUiModel = CartItemUiModel(cartItem = this)

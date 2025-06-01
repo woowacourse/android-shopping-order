@@ -66,7 +66,7 @@ class CatalogFragment :
                         override fun getSpanSize(position: Int): Int {
                             val viewType = catalogAdapter.getItemViewType(position)
                             return when (CatalogItem.CatalogType.entries[viewType]) {
-                                CatalogItem.CatalogType.RECENT -> SPAN_COUNT
+                                CatalogItem.CatalogType.RECENT_PRODUCTS -> SPAN_COUNT
                                 CatalogItem.CatalogType.PRODUCT -> SINGLE_SPAN_COUNT
                                 CatalogItem.CatalogType.LOAD_MORE -> SPAN_COUNT
                             }

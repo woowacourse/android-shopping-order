@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.fixture
 
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 
 val dummyProductUiModelFixture =
     listOf(
@@ -186,4 +186,4 @@ val dummyProductUiModelFixture =
             imageUrl = "https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/003001.png",
             Price(10_000),
         ),
-    ).sortedBy { it.id }.map { it.toUiModel() }
+    ).sortedBy { it.id }.map { it.toProductUiModel() }

@@ -104,7 +104,3 @@ class CartFragment :
         binding.eventListener = this
     }
 }
-
-interface CartEventListener {
-    fun onBatchSelect(isChecked: Boolean)
-}

@@ -14,7 +14,7 @@ import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toCartItemUiModel
-import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
 
 class CatalogViewModel(
@@ -49,9 +49,9 @@ class CatalogViewModel(
                     val items =
                         buildList {
                             if (recentProducts.isNotEmpty()) {
-                                val recentProductItem =
-                                    CatalogItem.RecentProductItem(recentProducts.map(Product::toUiModel))
-                                add(recentProductItem)
+                                val recentProductsItem =
+                                    CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
+                                add(recentProductsItem)
                             }
                             addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
                             if (!isLastPage) add(CatalogItem.LoadMoreItem)
@@ -77,12 +77,12 @@ class CatalogViewModel(
         val idToCartItem =
             cartItems.associateBy(
                 { cartItem -> cartItem.product.id },
-                { cartItem -> cartItem.toUiModel() },
+                { cartItem -> cartItem.toProductUiModel() },
             )
 
         val fetchedUiModels =
             products.map { product ->
-                idToCartItem[product.id] ?: product.toUiModel()
+                idToCartItem[product.id] ?: product.toProductUiModel()
             }
 
         return (currentUiModels + fetchedUiModels)
@@ -98,7 +98,7 @@ class CatalogViewModel(
             val idToProductUiModel =
                 cartItems.associateBy(
                     { cartItem -> cartItem.product.id },
-                    { cartItem -> cartItem.toUiModel() },
+                    { cartItem -> cartItem.toProductUiModel() },
                 )
 
             val updatedItems =
@@ -149,7 +149,7 @@ class CatalogViewModel(
                 cartItems
                     ?.find { cartItem -> cartItem.product.id == newItem.product.id }
                     ?.let { foundItem ->
-                        _itemUpdateEvent.postValue(foundItem.toUiModel())
+                        _itemUpdateEvent.postValue(foundItem.toProductUiModel())
                         calculateTotalCartCount()
                     }
             }
@@ -159,7 +159,7 @@ class CatalogViewModel(
     private fun updateCartItem(cartId: Long) {
         getCartItemByCartId(cartId) { cartItem ->
             if (cartItem != null) {
-                _itemUpdateEvent.postValue(cartItem.toUiModel())
+                _itemUpdateEvent.postValue(cartItem.toProductUiModel())
             }
             calculateTotalCartCount()
         }
@@ -183,15 +183,15 @@ class CatalogViewModel(
 
     private fun loadRecentProducts() {
         productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
-            val recentProductItem =
-                CatalogItem.RecentProductItem(recentProducts.map(Product::toUiModel))
+            val recentProductsItem =
+                CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
             val updatedItems =
                 buildList {
-                    if (recentProductItem.products.isNotEmpty()) add(recentProductItem)
+                    if (recentProductsItem.products.isNotEmpty()) add(recentProductsItem)
                     addAll(
                         _items.value
                             .orEmpty()
-                            .filterNot { item -> item is CatalogItem.RecentProductItem },
+                            .filterNot { it is CatalogItem.RecentProductsItem },
                     )
                 }
             _items.postValue(updatedItems)

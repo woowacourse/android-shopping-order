@@ -84,12 +84,3 @@ class CartItemFragment :
         viewModel.decreaseQuantity(product)
     }
 }
-
-interface CartItemEventListener {
-    fun onProductDeletion(cartItem: CartItemUiModel)
-
-    fun onProductSelectionToggle(
-        cartItem: CartItemUiModel,
-        isChecked: Boolean,
-    )
-}
