@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import woowacourse.shopping.RepositoryProvider
@@ -16,6 +17,7 @@ class CartViewModel(
     private val cartRepository: CartItemRepository,
 ) : ViewModel(),
     CartEventHandler {
+
     private val _isNextButtonEnabled = MutableLiveData(false)
     val isNextButtonEnabled: LiveData<Boolean> = _isNextButtonEnabled
 
@@ -28,14 +30,16 @@ class CartViewModel(
     private val _pagingData = MutableLiveData<PagingData>()
     val pagingData: LiveData<PagingData> = _pagingData
 
-    private val _totalOrderPrice = MutableLiveData<Int>(0)
-    val totalOrderPrice: LiveData<Int> = _totalOrderPrice
+    private val _checkedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
+    val checkedProducts: LiveData<List<ProductUiModel>> = _checkedProducts
 
-    private val _checkedProductCount = MutableLiveData<Int>(0)
-    val checkedProductCount: LiveData<Int> = _checkedProductCount
+    val totalOrderPrice: LiveData<Int> = checkedProducts.map { checkedProducts ->
+        checkedProducts.sumOf { it.quantity * it.price }
+    }
 
-    private val _checkedProducts = MutableLiveData<List<ProductUiModel>>()
-    val checkProducts: LiveData<List<ProductUiModel>> = _checkedProducts
+    val checkedProductCount: LiveData<Int> = checkedProducts.map { checkedProducts ->
+        checkedProducts.count()
+    }
 
     val isAllChecked = MutableLiveData(false)
 
@@ -45,20 +49,16 @@ class CartViewModel(
 
     override fun onDeleteProduct(cartProduct: ProductUiModel) {
         cartRepository.deleteCartItem(cartProduct.id) { result ->
-            result
-                .onSuccess {
-                    val currentPage = pagingData.value?.page ?: 0
-                    loadCartProducts(currentPage)
-                    setCheckedProducts(cartProduct)
-                }
+            result.onSuccess {
+                val currentPage = pagingData.value?.page ?: INITIAL_PAGE
+                loadCartProducts(currentPage)
+                setCheckedProducts(cartProduct)
+            }
         }
     }
 
     private fun setCheckedProducts(cartProduct: ProductUiModel) {
         _checkedProducts.value = _checkedProducts.value?.filterNot { it.id == cartProduct.id }
-        val newTotalOrderPrice = _checkedProducts.value?.sumOf { it.quantity * it.price } ?: 0
-        _totalOrderPrice.postValue(newTotalOrderPrice)
-        _checkedProductCount.postValue(_checkedProducts.value?.count() ?: 0)
     }
 
     override fun onNextPage() {
@@ -80,12 +80,11 @@ class CartViewModel(
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
         cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
-            result
-                .onSuccess {
-                    _product.postValue(newProduct)
-                    updateProductInPagingData(newProduct)
-                    setOrderData()
-                }
+            result.onSuccess {
+                _product.postValue(newProduct)
+                updateProductInPagingData(newProduct)
+                setOrderData()
+            }
         }
     }
 
@@ -93,12 +92,11 @@ class CartViewModel(
         val newQuantity = if (product.quantity > 1) product.quantity - 1 else 1
         val newProduct = product.copy(quantity = newQuantity)
         cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
-            result
-                .onSuccess {
-                    _product.postValue(newProduct)
-                    updateProductInPagingData(newProduct)
-                    setOrderData()
-                }
+            result.onSuccess {
+                _product.postValue(newProduct)
+                updateProductInPagingData(newProduct)
+                setOrderData()
+            }
         }
     }
 
@@ -106,32 +104,31 @@ class CartViewModel(
 
     override fun isPrevButtonEnabled(): Boolean = _pagingData.value?.hasPrevious == true
 
-    override fun isPaginationEnabled(): Boolean = (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
+    override fun isPaginationEnabled(): Boolean =
+        (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
 
     override fun getPage(): Int = pagingData.value?.page ?: 0
 
     override fun onCheckProduct(product: ProductUiModel) {
         val currentPagingData = _pagingData.value ?: return
 
-        val updateProducts =
-            currentPagingData.products.map {
-                if (it.id == product.id) {
-                    it.copy(isChecked = !it.isChecked)
-                } else {
-                    it
-                }
+        val updatedProducts = currentPagingData.products.map {
+            if (it.id == product.id) {
+                it.copy(isChecked = !it.isChecked)
+            } else {
+                it
             }
+        }
 
-        _pagingData.value = currentPagingData.copy(products = updateProducts)
+        _pagingData.value = currentPagingData.copy(products = updatedProducts)
         setOrderData()
     }
 
     fun onCheckAllCartItems() {
         pagingData.value?.let { currentPagingData ->
-            val updatedProducts =
-                currentPagingData.products.map {
-                    it.copy(isChecked = isAllChecked.value!!)
-                }
+            val updatedProducts = currentPagingData.products.map {
+                it.copy(isChecked = isAllChecked.value!!)
+            }
             _pagingData.value = currentPagingData.copy(products = updatedProducts)
             setOrderData()
         }
@@ -151,8 +148,7 @@ class CartViewModel(
             (remainedCheckedProducts + currentCheckedProducts).distinctBy { it.id }
 
         _checkedProducts.postValue(newCheckedProducts)
-        _totalOrderPrice.postValue(newCheckedProducts.sumOf { it.quantity * it.price })
-        _checkedProductCount.postValue(newCheckedProducts.count())
+
         isAllChecked.value = currentProducts.isNotEmpty() && currentProducts.all { it.isChecked }
     }
 
@@ -161,13 +157,16 @@ class CartViewModel(
             result.onSuccess { pagingData ->
                 if (pagingData.products.isEmpty() && pagingData.page > 0) {
                     loadCartProducts(page = pagingData.page - 1)
-                    isAllChecked.value = pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
+                    isAllChecked.value =
+                        pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
                 } else {
                     val checkedProductIds = _checkedProducts.value?.map { it.id } ?: emptyList()
-                    val updatedProducts =
-                        pagingData.products.map { product ->
-                            product.copy(isChecked = product.id in checkedProductIds)
-                        }
+                    val updatedProducts = pagingData.products.map { product ->
+                        product.copy(isChecked = product.id in checkedProductIds)
+                    }
+
+                    _isNextButtonEnabled.postValue(pagingData.hasNext)
+                    _isPrevButtonEnabled.postValue(pagingData.hasPrevious)
 
                     isAllChecked.value = false
                     _pagingData.postValue(pagingData.copy(products = updatedProducts))
@@ -177,27 +176,24 @@ class CartViewModel(
     }
 
     private fun updateProductInPagingData(updatedProduct: ProductUiModel) {
-        _pagingData.value =
-            _pagingData.value?.let { paging ->
-                val updatedList =
-                    paging.products.map {
-                        if (it.id == updatedProduct.id) updatedProduct else it
-                    }
-                paging.copy(products = updatedList)
+        _pagingData.value = _pagingData.value?.let { paging ->
+            val updatedList = paging.products.map {
+                if (it.id == updatedProduct.id) updatedProduct else it
             }
+            paging.copy(products = updatedList)
+        }
     }
 
     companion object {
         private const val PAGE_SIZE = 5
         private const val INITIAL_PAGE = 0
 
-        val FACTORY: ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    CartViewModel(
-                        RepositoryProvider.cartItemRepository,
-                    )
-                }
+        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                CartViewModel(
+                    RepositoryProvider.cartItemRepository,
+                )
             }
+        }
     }
 }
