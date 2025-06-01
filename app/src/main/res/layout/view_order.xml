@@ -22,6 +22,10 @@
         <variable
             name="isCheckedAll"
             type="boolean" />
+
+        <variable
+            name="onClickSelectAll"
+            type="kotlin.jvm.functions.Function0&lt;kotlin.Unit&gt;" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -36,6 +40,7 @@
             android:layout_marginStart="20dp"
             android:background="@drawable/selector_checkbox"
             android:button="@null"
+            android:onClick="@{() -> onClickSelectAll.invoke()}"
             android:checked="@{isCheckedAll}"
             app:layout_constraintBottom_toTopOf="@id/text_view_checkbox_title"
             app:layout_constraintEnd_toStartOf="@id/text_view_total_price"

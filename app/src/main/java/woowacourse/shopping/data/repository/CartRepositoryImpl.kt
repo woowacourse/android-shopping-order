@@ -84,7 +84,7 @@ class CartRepositoryImpl(
             productIds.mapNotNull { cachedCart.getCartProduct(it) }
         }
 
-    override fun getAllCartProducts(): List<CartProduct> = cachedCart.getCartProducts()
+    override fun getAllCartProducts(): Result<List<CartProduct>> = runCatching { cachedCart.getCartProducts() }
 
     private fun patchCartItemQuantity(
         productId: Long,

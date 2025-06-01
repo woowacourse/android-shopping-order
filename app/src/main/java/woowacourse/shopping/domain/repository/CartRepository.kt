@@ -33,5 +33,5 @@ interface CartRepository {
 
     fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
 
-    fun getAllCartProducts(): List<CartProduct>
+    fun getAllCartProducts(): Result<List<CartProduct>>
 }

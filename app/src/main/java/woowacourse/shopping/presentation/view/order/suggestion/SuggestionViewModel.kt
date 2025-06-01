@@ -46,6 +46,8 @@ class SuggestionViewModel(
     private fun excludeCartProductIds(): List<Long> =
         cartRepository
             .getAllCartProducts()
+            .getOrNull()
+            .orEmpty()
             .filter { it.quantity != 0 }
             .map { it.product.id }
 
