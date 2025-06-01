@@ -11,7 +11,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
-import woowacourse.shopping.view.core.handler.CartQuantityHandler
 
 class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     private val viewModel: CartViewModel by activityViewModels {
@@ -23,7 +22,10 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     }
 
     private val recommendAdapter: RecommendAdapter by lazy {
-        RecommendAdapter(recommendAdapterHandler, quantityHandler)
+        RecommendAdapter(
+            viewModel.recommendEventHandler,
+            viewModel.quantityEventHandler,
+        )
     }
 
     override fun onViewCreated(
@@ -48,24 +50,7 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     }
 
     private fun setUpRecyclerView(binding: FragmentRecommendBinding) {
-        binding.recyclerViewRecommend.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        binding.recyclerViewRecommend.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
     }
-
-    private val recommendAdapterHandler =
-        object : RecommendAdapter.Handler {
-            override fun showQuantity(productId: Long) {
-                viewModel.increaseRecommendProductQuantity(productId)
-            }
-        }
-
-    private val quantityHandler =
-        object : CartQuantityHandler {
-            override fun onClickIncrease(productId: Long) {
-                viewModel.increaseRecommendProductQuantity(productId)
-            }
-
-            override fun onClickDecrease(productId: Long) {
-                viewModel.decreaseRecommendProductQuantity(productId)
-            }
-        }
 }

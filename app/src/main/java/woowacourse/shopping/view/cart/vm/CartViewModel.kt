@@ -9,6 +9,8 @@ import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.cart.CartUiEvent
+import woowacourse.shopping.view.cart.carts.CartAdapter
+import woowacourse.shopping.view.cart.recommend.RecommendAdapter
 import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.cart.state.CartUiState
 import woowacourse.shopping.view.cart.state.RecommendUiState
@@ -17,6 +19,7 @@ import woowacourse.shopping.view.cart.vm.Paging.Companion.PAGE_SIZE
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
+import woowacourse.shopping.view.core.handler.CartQuantityHandler
 import woowacourse.shopping.view.main.state.ProductState
 
 class CartViewModel(
@@ -251,6 +254,49 @@ class CartViewModel(
     private fun setLoading(isLoading: Boolean) {
         _isLoading.value = isLoading
     }
+
+    val recommendEventHandler =
+        object : RecommendAdapter.Handler {
+            override fun showQuantity(productId: Long) {
+                increaseRecommendProductQuantity(productId)
+            }
+        }
+
+    val quantityEventHandler =
+        object : CartQuantityHandler {
+            override fun onClickIncrease(productId: Long) {
+                increaseRecommendProductQuantity(productId)
+            }
+
+            override fun onClickDecrease(productId: Long) {
+                decreaseRecommendProductQuantity(productId)
+            }
+        }
+
+    val cartQuantityEventHandler =
+        object : CartQuantityHandler {
+            override fun onClickIncrease(cartId: Long) {
+                increaseCartQuantity(cartId)
+            }
+
+            override fun onClickDecrease(cartId: Long) {
+                decreaseCartQuantity(cartId)
+            }
+        }
+
+    val cartEventHandler =
+        object : CartAdapter.Handler {
+            override fun onClickDeleteItem(cartId: Long) {
+                deleteProduct(cartId)
+            }
+
+            override fun onCheckedChanged(
+                cartId: Long,
+                isChecked: Boolean,
+            ) {
+                updateCheckedState(cartId, isChecked)
+            }
+        }
 
     companion object {
         private const val RECOMMEND_SIZE = 10

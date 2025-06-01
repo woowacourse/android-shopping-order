@@ -209,32 +209,32 @@ class MainViewModel(
         setLoading(false)
     }
 
-    val productEventHandler = object : ProductAdapterEventHandler{
-        override fun onLoadMoreItems() {
-            loadPage()
-        }
+    val productEventHandler =
+        object : ProductAdapterEventHandler {
+            override fun onLoadMoreItems() {
+                loadPage()
+            }
 
-        override fun onSelectProduct(productId: Long) {
-            handleNavigateDetailEvent(productId)
-        }
+            override fun onSelectProduct(productId: Long) {
+                handleNavigateDetailEvent(productId)
+            }
 
-        override fun showQuantity(productId: Long) {
-            increaseCartQuantity(productId)
-        }
+            override fun showQuantity(productId: Long) {
+                increaseCartQuantity(productId)
+            }
 
-        override fun onClickHistory(productId: Long) {
-            handleNavigateDetailEvent(productId)
-        }
+            override fun onClickHistory(productId: Long) {
+                handleNavigateDetailEvent(productId)
+            }
 
-        override fun onClickIncrease(cartId: Long) {
-            increaseCartQuantity(cartId)
-        }
+            override fun onClickIncrease(cartId: Long) {
+                increaseCartQuantity(cartId)
+            }
 
-        override fun onClickDecrease(cartId: Long) {
-            decreaseCartQuantity(cartId)
+            override fun onClickDecrease(cartId: Long) {
+                decreaseCartQuantity(cartId)
+            }
         }
-
-    }
 
     companion object {
         private const val INITIAL_PAGE = 0

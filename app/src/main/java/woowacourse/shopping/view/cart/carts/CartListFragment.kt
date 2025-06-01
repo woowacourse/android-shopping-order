@@ -9,14 +9,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartListBinding
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
-import woowacourse.shopping.view.core.handler.CartQuantityHandler
 
-class CartListFragment :
-    Fragment(
-        R.layout.fragment_cart_list,
-    ),
-    CartQuantityHandler,
-    CartAdapter.Handler {
+class CartListFragment : Fragment(R.layout.fragment_cart_list) {
     private val viewModel: CartViewModel by activityViewModels {
         val container = (requireActivity().application as App).container
         CartViewModelFactory(
@@ -26,7 +20,10 @@ class CartListFragment :
     }
 
     private val cartAdapter by lazy {
-        CartAdapter(handler = this, cartQuantityHandler = this)
+        CartAdapter(
+            handler = viewModel.cartEventHandler,
+            cartQuantityHandler = viewModel.cartQuantityEventHandler,
+        )
     }
 
     override fun onViewCreated(
@@ -65,24 +62,5 @@ class CartListFragment :
                 binding.shimmerLayout.visibility = View.GONE
             }
         }
-    }
-
-    override fun onClickDeleteItem(cardId: Long) {
-        viewModel.deleteProduct(cardId)
-    }
-
-    override fun onCheckedChanged(
-        cartId: Long,
-        isChecked: Boolean,
-    ) {
-        viewModel.updateCheckedState(cartId, isChecked)
-    }
-
-    override fun onClickIncrease(cartId: Long) {
-        viewModel.increaseCartQuantity(cartId)
-    }
-
-    override fun onClickDecrease(cartId: Long) {
-        viewModel.decreaseCartQuantity(cartId)
     }
 }
