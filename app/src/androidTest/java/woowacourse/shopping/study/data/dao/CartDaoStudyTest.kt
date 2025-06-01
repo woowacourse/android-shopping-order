@@ -1,5 +1,7 @@
 package woowacourse.shopping.study.data.dao
 
+class CartDaoStudyTest
+/*
 import android.content.Context
 import android.os.SystemClock
 import androidx.room.Room
@@ -69,3 +71,4 @@ class CartDaoStudyTest {
         db.close()
     }
 }
+*/

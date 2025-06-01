@@ -7,9 +7,9 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import woowacourse.shopping.DUMMY_HISTORY_PRODUCT_1
+import woowacourse.shopping.DUMMY_HISTORY_PRODUCT_2
 import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.model.entity.HistoryProductEntity
-import java.util.concurrent.TimeUnit
 
 @Suppress("ktlint:standard:function-naming")
 class HistoryDaoTest {
@@ -30,14 +30,7 @@ class HistoryDaoTest {
     @Test
     fun 검색_기록을_저장하고_조회한다() {
         // given
-        val historyProduct =
-            HistoryProductEntity(
-                productId = 1,
-                timestamp = System.currentTimeMillis(),
-                name = "",
-                imageUrl = "",
-                category = "",
-            )
+        val historyProduct = DUMMY_HISTORY_PRODUCT_1
         dao.insertHistory(historyProduct)
 
         // when
@@ -45,123 +38,67 @@ class HistoryDaoTest {
 
         // then
         assertThat(result).hasSize(1)
-        assertThat(result[0].productId).isEqualTo(1)
+        assertThat(result[0].productId).isEqualTo(DUMMY_HISTORY_PRODUCT_1.productId)
     }
 
     @Test
     fun 검색_기록을_최신순으로_조회한다() {
         // given
-        val now = System.currentTimeMillis()
-        dao.insertHistory(
-            HistoryProductEntity(
-                productId = 1L,
-                timestamp = now - TimeUnit.MINUTES.toMillis(5),
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
-        )
-        dao.insertHistory(
-            HistoryProductEntity(
-                productId = 2L,
-                timestamp = now,
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
-        )
+        dao.insertHistory(DUMMY_HISTORY_PRODUCT_1.copy(timestamp = 1))
+        dao.insertHistory(DUMMY_HISTORY_PRODUCT_2.copy(timestamp = 0))
 
         // when
         val result = dao.getHistoryProducts()
 
         // then
-        assertThat(result.map { it.productId }).containsExactly(2L, 1L).inOrder()
+        assertThat(
+            result.map { it.productId },
+        ).containsExactly(DUMMY_HISTORY_PRODUCT_1.productId, DUMMY_HISTORY_PRODUCT_2.productId).inOrder()
     }
 
     @Test
     fun 검색_기록이_제한을_초과하면_오래된_기록부터_삭제된다() {
         // given
-        val base = System.currentTimeMillis()
         repeat(5) { index ->
             dao.insertHistory(
-                HistoryProductEntity(
-                    productId = index + 1L,
-                    timestamp = base + index,
-                    name = "",
-                    imageUrl = "",
-                    category = "",
+                DUMMY_HISTORY_PRODUCT_1.copy(
+                    productId = index.toLong(),
+                    timestamp = index.toLong(),
                 ),
             )
         }
 
         // when
         dao.insertHistoryWithLimit(
-            HistoryProductEntity(
-                productId = 100,
-                timestamp = base + 100,
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
+            history = DUMMY_HISTORY_PRODUCT_2,
             limit = 5,
         )
 
         // then
         val result = dao.getHistoryProducts()
         assertThat(result).hasSize(5)
-        assertThat(result.any { it.productId == 1L }).isFalse()
-        assertThat(result.first().productId).isEqualTo(100)
+        assertThat(result.any { it.productId == 0L }).isFalse()
+        assertThat(result.first().productId).isEqualTo(DUMMY_HISTORY_PRODUCT_2.productId)
     }
 
     @Test
     fun 최근_검색_기록을_조회한다() {
         // given
-        val now = System.currentTimeMillis()
-        dao.insertHistory(
-            HistoryProductEntity(
-                productId = 10,
-                timestamp = now,
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
-        )
-        dao.insertHistory(
-            HistoryProductEntity(
-                productId = 11,
-                timestamp = now + 500,
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
-        )
+        dao.insertHistory(DUMMY_HISTORY_PRODUCT_1.copy(timestamp = 0))
+        dao.insertHistory(DUMMY_HISTORY_PRODUCT_2.copy(timestamp = 1))
 
         // when
         val result = dao.getRecentHistoryProduct()
 
         // then
-        assertThat(result?.productId).isEqualTo(11)
+        assertThat(result?.productId).isEqualTo(DUMMY_HISTORY_PRODUCT_2.productId)
     }
 
     @Test
     fun 총_검색_기록_개수를_조회한다() {
         // given
-        dao.insertHistory(
-            HistoryProductEntity(
-                productId = 1L,
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
-        )
-        dao.insertHistory(
-            HistoryProductEntity(
-                productId = 2L,
-                name = "",
-                imageUrl = "",
-                category = "",
-            ),
-        )
+        dao.insertHistory(DUMMY_HISTORY_PRODUCT_1)
+        dao.insertHistory(DUMMY_HISTORY_PRODUCT_2)
 
         // when
         val count = dao.getHistoryCount()
@@ -176,12 +113,9 @@ class HistoryDaoTest {
         val base = System.currentTimeMillis()
         repeat(5) { index ->
             dao.insertHistory(
-                HistoryProductEntity(
-                    productId = index + 1L,
+                DUMMY_HISTORY_PRODUCT_1.copy(
+                    productId = index.toLong(),
                     timestamp = base + index,
-                    name = "",
-                    imageUrl = "",
-                    category = "",
                 ),
             )
         }
@@ -192,8 +126,8 @@ class HistoryDaoTest {
         // then
         val result = dao.getHistoryProducts()
         assertThat(result).hasSize(3)
+        assertThat(result.map { it.productId }).doesNotContain(0)
         assertThat(result.map { it.productId }).doesNotContain(1)
-        assertThat(result.map { it.productId }).doesNotContain(2)
     }
 
     @After
