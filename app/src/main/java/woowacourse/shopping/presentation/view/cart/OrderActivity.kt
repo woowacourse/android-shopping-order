@@ -81,7 +81,7 @@ class OrderActivity :
             orderButtonHandler()
         }
         binding.viewOrder.checkboxSelectAll.setOnCheckedChangeListener { _, checked ->
-            viewModel.selectCurrentPageCartProduct(checked)
+            // TODO: 전체 토글 기능 구현
         }
     }
 
