@@ -92,11 +92,10 @@ class CatalogViewModel(
     private fun loadRecentProducts(onSuccess: (CatalogItem.RecentProducts) -> Unit) {
         recentRepository.getRecentProducts(RECENT_PRODUCT_LIMIT) { result ->
             result
+                .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_RECENT_PRODUCT_FAILURE) }
                 .onSuccess {
                     val uiModels = it.map { product -> product.toUiModel() }
                     onSuccess(CatalogItem.RecentProducts(uiModels))
-                }.onFailure {
-                    emitToastMessage(CatalogMessageEvent.FETCH_RECENT_PRODUCT_FAILURE)
                 }
         }
     }
@@ -122,8 +121,8 @@ class CatalogViewModel(
 
     private fun updateProductQuantityInList(productId: Long) {
         cartRepository
-            .findCartProductByProductId(productId)
-            .onSuccess { cartProduct -> applyProductQuantityUpdate(productId, cartProduct.quantity) }
+            .findQuantityByProductId(productId)
+            .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
             .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 

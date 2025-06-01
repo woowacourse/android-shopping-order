@@ -75,6 +75,11 @@ class CartRepositoryImpl(
             result.quantity
         }
 
+    override fun findQuantityByProductId(productId: Long): Result<Int> =
+        runCatching {
+            cartLocalDataSource.getQuantity(productId)
+        }
+
     override fun findCartProductByProductId(productId: Long): Result<CartProduct> =
         runCatching { requireNotNull(cartLocalDataSource.getCartProduct(productId)) {} }
 

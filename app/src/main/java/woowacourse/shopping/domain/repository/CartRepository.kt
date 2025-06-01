@@ -29,6 +29,8 @@ interface CartRepository {
 
     fun fetchCartProductCount(onResult: (Result<Int>) -> Unit)
 
+    fun findQuantityByProductId(productId: Long): Result<Int>
+
     fun findCartProductByProductId(productId: Long): Result<CartProduct>
 
     fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
