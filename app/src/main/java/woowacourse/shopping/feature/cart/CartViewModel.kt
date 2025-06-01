@@ -13,7 +13,6 @@ import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
-import kotlin.math.max
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -22,16 +21,11 @@ class CartViewModel(
     private val _isMultiplePages = MutableLiveData(false)
     val isMultiplePages: LiveData<Boolean> get() = _isMultiplePages
 
-    private var currentPage: Int = MINIMUM_PAGE
-        set(value) {
-            field = value
-            _page.postValue(value)
-        }
-    private val _page = MutableLiveData(currentPage)
+    private val _page = MutableLiveData(MINIMUM_PAGE)
     val page: LiveData<Int> get() = _page
 
-    private val _visibleCart = MutableLiveData<List<CartItem>>()
-    val cart: LiveData<List<CartItem>> get() = _visibleCart
+    private val _cart = MutableLiveData<List<CartItem>>()
+    val cart: LiveData<List<CartItem>> get() = _cart
 
     private var totalCartSizeData: Int = 0
 
@@ -42,8 +36,6 @@ class CartViewModel(
     private val _isRightPageEnable = MutableLiveData(false)
     val isRightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
     val rightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
-
-    private val endPage: Int get() = max(1, (totalCartSizeData + PAGE_SIZE - 1) / PAGE_SIZE)
 
     private val _loginErrorEvent = MutableSingleLiveData<CartFetchError>()
     val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
@@ -140,7 +132,7 @@ class CartViewModel(
 
     private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
-    fun getPosition(cartItem: CartItem): Int? = _visibleCart.value?.indexOf(cartItem)?.takeIf { it >= 0 }
+    fun getPosition(cartItem: CartItem): Int? = _cart.value?.indexOf(cartItem)?.takeIf { it >= 0 }
 
     fun increaseQuantity(cartItem: CartItem) {
         cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
@@ -170,18 +162,19 @@ class CartViewModel(
     }
 
     fun updateCartQuantity() {
+        val currentPage = page.value?.minus(1) ?: 1
         cartRepository.fetchCartItemsByPage(
-            currentPage - 1,
+            currentPage,
             PAGE_SIZE,
             { cartResponse ->
                 updateCartDataSize(cartResponse)
                 val pageItems = getCartItemByCartResponse(cartResponse)
-                _visibleCart.value = pageItems
+                _cart.value = pageItems
                 updatePageMoveAvailability(cartResponse)
                 _isLoading.value = false
                 updateTotalPriceAndCount()
                 if (cartResponse.totalPages >= MINIMUM_PAGE && cartResponse.totalPages < currentPage) {
-                    currentPage = cartResponse.totalPages
+                    _page.value = cartResponse.totalPages
                     updateCartQuantity()
                 }
             },
@@ -195,12 +188,12 @@ class CartViewModel(
     }
 
     fun plusPage() {
-        currentPage++
+        _page.value = _page.value?.plus(1)
         updateCartQuantity()
     }
 
     fun minusPage() {
-        currentPage--
+        _page.value = _page.value?.minus(1)
         updateCartQuantity()
     }
 
@@ -213,7 +206,7 @@ class CartViewModel(
         cartItem: CartItem,
         isSelected: Boolean,
     ) {
-        val foundItem = _visibleCart.value?.find { it.id == cartItem.id }
+        val foundItem = _cart.value?.find { it.id == cartItem.id }
         foundItem?.let {
             if (isSelected) {
                 selectedCartMap[cartItem.id] = it
@@ -247,7 +240,7 @@ class CartViewModel(
     }
 
     private fun updateAllSelected() {
-        val currentPageItems = _visibleCart.value ?: return
+        val currentPageItems = _cart.value ?: return
         _isAllSelected.value = currentPageItems.all { selectedCartMap.containsKey(it.id) }
     }
 
