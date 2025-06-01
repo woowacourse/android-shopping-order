@@ -35,8 +35,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
         val container = (application as App).container
         MainViewModelFactory(
-            container.historyRepository,
-            container.historyLoader,
+            container.getRecentProductUseCase,
             container.cartRepository,
             container.productRepository,
         )
@@ -131,6 +130,10 @@ class MainActivity : AppCompatActivity() {
                 is MainUiEvent.NavigateToCart -> {
                     val category = event.lastSeenProductCategory
                     activityResultLauncher.launch(CartActivity.newIntent(this, category))
+                }
+
+                MainUiEvent.ShowNetworkErrorMessage -> {
+                    showToast(getString(R.string.text_network_error))
                 }
             }
         }

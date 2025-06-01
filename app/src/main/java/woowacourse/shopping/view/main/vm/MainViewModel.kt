@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.main.vm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,12 +8,10 @@ import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
-import woowacourse.shopping.view.loader.HistoryLoader
 import woowacourse.shopping.view.main.MainUiEvent
 import woowacourse.shopping.view.main.adapter.ProductAdapterEventHandler
 import woowacourse.shopping.view.main.state.LoadState
@@ -49,12 +46,9 @@ class MainViewModel(
     private fun loadProductsAndCarts(pageIndex: Int) {
         setLoading(true)
         productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE) { productResult ->
-            productResult.fold(
-                onSuccess = { productPage ->
-                    loadCartsAndMerge(productPage, pageIndex)
-                },
-                onFailure = { handleError("ProductLoad", it) },
-            )
+            productResult
+                .onSuccess { loadCartsAndMerge(it, pageIndex) }
+                .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
         }
     }
 
@@ -62,13 +56,11 @@ class MainViewModel(
         productPage: ProductSinglePage,
         pageIndex: Int,
     ) {
-        cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
-            cartResult.fold(
-                onSuccess = { cartPage ->
-                    applyMergedUiState(productPage, cartPage.carts)
-                },
-                onFailure = { handleError("CartLoad", it) },
-            )
+        cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) {
+            it
+                .onSuccess { result ->
+                    result?.let { applyMergedUiState(productPage, result.carts) }
+                }.onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
         }
     }
 
@@ -115,23 +107,16 @@ class MainViewModel(
             when (val cartId = updated.cartId) {
                 null -> {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it.fold(
-                            onSuccess = { value ->
-                                _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
-                            },
-                            onFailure = { handleError(TAG_INCREASE, it) },
-                        )
+                        it.onSuccess { value ->
+                            _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
+                        }
+                            .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
                     }
                 }
 
                 else -> {
                     cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                        it.fold(
-                            onSuccess = {
-                                _uiState.value = state.modifyUiState(updated)
-                            },
-                            onFailure = { handleError(TAG_INCREASE, it) },
-                        )
+                        _uiState.value = state.modifyUiState(updated)
                     }
                 }
             }
@@ -144,44 +129,41 @@ class MainViewModel(
 
             if (updated.hasCartQuantity) {
                 cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                    it.fold(
-                        onSuccess = { _uiState.value = state.modifyUiState(updated) },
-                        onFailure = { handleError(TAG_DECREASE, it) },
-                    )
+                    it
+                        .onSuccess { _uiState.value = state.modifyUiState(updated) }
+                        .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
                 }
             } else {
                 cartRepository.deleteCart(cartId) {
-                    it.fold(
-                        onSuccess = {
-                            val result = updated.copy(cartId = null)
-                            _uiState.value = state.modifyUiState(result)
-                        },
-                        onFailure = { handleError(TAG_DECREASE, it) },
-                    )
+                    it.onSuccess {
+                        val result = updated.copy(cartId = null)
+                        _uiState.value = state.modifyUiState(result)
+                    }
+                        .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
                 }
             }
         }
 
     fun syncHistory() {
         withState(_uiState.value) { state ->
-            historyLoader { historyStates ->
-                historyStates.fold(
-                    onSuccess = { _uiState.value = state.copy(historyItems = it) },
-                    onFailure = {},
-                )
+            getRecentProductUseCase { historyStates ->
+                historyStates
+                    .onSuccess { _uiState.value = state.copy(historyItems = it) }
+                    .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
             }
         }
     }
 
     fun syncCartQuantities() =
         withState(_uiState.value) { state ->
-            cartRepository.loadSinglePage(null, null) { result ->
-                result.fold(
-                    onSuccess = { value ->
-                        _uiState.value = state.modifyQuantity(value.carts)
-                    },
-                    onFailure = {},
-                )
+            cartRepository.loadSinglePage(null, null) {
+                it
+                    .onSuccess {
+                        _uiState.value = state.modifyQuantity(it?.carts.orEmpty())
+                    }
+                    .onFailure {
+                        _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage)
+                    }
             }
         }
 
@@ -199,14 +181,6 @@ class MainViewModel(
 
     private fun setLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)
-    }
-
-    private fun handleError(
-        tag: String,
-        throwable: Throwable,
-    ) {
-        Log.e(tag, "Error occurred", throwable)
-        setLoading(false)
     }
 
     val productEventHandler =
@@ -239,8 +213,5 @@ class MainViewModel(
     companion object {
         private const val INITIAL_PAGE = 0
         private const val PAGE_SIZE = 20
-
-        private const val TAG_INCREASE = "ProductQuantityIncrease"
-        private const val TAG_DECREASE = "ProductQuantityDecrease"
     }
 }

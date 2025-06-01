@@ -11,4 +11,6 @@ sealed interface MainUiEvent {
     data class NavigateToCart(
         val lastSeenProductCategory: String?,
     ) : MainUiEvent
+
+    object ShowNetworkErrorMessage : MainUiEvent
 }
