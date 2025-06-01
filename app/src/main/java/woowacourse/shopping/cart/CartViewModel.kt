@@ -52,12 +52,12 @@ class CartViewModel(
     val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
 
     init {
-        loadRecentlyViewedProduct()
+        loadRecommendProducts()
         loadAllCartProducts()
         loadCartProducts()
     }
 
-    fun loadRecentlyViewedProduct() {
+    fun loadRecommendProducts() {
         recentlyViewedProductRepository.getLatestViewedProduct { product ->
             catalogProductRepository.getProduct(product.id) { categoryProduct ->
                 val category = categoryProduct.category ?: ""
