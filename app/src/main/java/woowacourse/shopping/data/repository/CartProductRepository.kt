@@ -8,7 +8,10 @@ interface CartProductRepository {
         callback: (ProductUiModel) -> Unit,
     )
 
-    fun deleteCartProduct(productId: Int)
+    fun deleteCartProduct(
+        productId: Int,
+        callback: (Boolean) -> Unit,
+    )
 
     fun getCartProductsInRange(
         currentPage: Int,
