@@ -3,9 +3,9 @@ package woowacourse.shopping.data.datasource.remote
 import woowacourse.shopping.domain.model.CartItem
 
 interface CartRemoteDataSource {
-    fun getTotalCount(onResult: (Result<Int>) -> Unit)
+    fun fetchTotalCount(onResult: (Result<Int>) -> Unit)
 
-    fun getPagedCartItems(
+    fun fetchPagedCartItems(
         page: Int,
         size: Int?,
         onResult: (Result<List<CartItem>>) -> Unit,

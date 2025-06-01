@@ -11,8 +11,8 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private var cachedCart: Cart = Cart()
 
-    override fun getTotalCount(onResult: (Result<Int>) -> Unit) {
-        cartRemoteDataSource.getTotalCount { result ->
+    override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) {
+        cartRemoteDataSource.fetchTotalCount { result ->
             onResult(result)
         }
     }
@@ -22,7 +22,7 @@ class CartRepositoryImpl(
         pageSize: Int?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        cartRemoteDataSource.getPagedCartItems(page, pageSize) { result ->
+        cartRemoteDataSource.fetchPagedCartItems(page, pageSize) { result ->
             result.fold(
                 onSuccess = { cartItems -> onResult(Result.success(cartItems)) },
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
@@ -153,10 +153,10 @@ class CartRepositoryImpl(
     }
 
     fun fetchAllCartItems(onResult: (Result<List<CartItem>>) -> Unit) {
-        cartRemoteDataSource.getTotalCount { countResult ->
+        cartRemoteDataSource.fetchTotalCount { countResult ->
             countResult.fold(
                 onSuccess = { totalCount ->
-                    cartRemoteDataSource.getPagedCartItems(0, totalCount) { pagedResult ->
+                    cartRemoteDataSource.fetchPagedCartItems(0, totalCount) { pagedResult ->
                         pagedResult.fold(
                             onSuccess = { cartItems ->
                                 cachedCart = Cart(cartItems)

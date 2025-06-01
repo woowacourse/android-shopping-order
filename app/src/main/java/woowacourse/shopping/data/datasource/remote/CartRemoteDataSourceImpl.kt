@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.model.CartItem
 class CartRemoteDataSourceImpl(
     private val cartItemService: CartItemService,
 ) : CartRemoteDataSource {
-    override fun getTotalCount(onResult: (Result<Int>) -> Unit) =
+    override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) =
         cartItemService.requestCartItemCount().enqueue(
             object : Callback<CartItemCountResponse> {
                 override fun onResponse(
@@ -42,7 +42,7 @@ class CartRemoteDataSourceImpl(
             },
         )
 
-    override fun getPagedCartItems(
+    override fun fetchPagedCartItems(
         page: Int,
         size: Int?,
         onResult: (Result<List<CartItem>>) -> Unit,

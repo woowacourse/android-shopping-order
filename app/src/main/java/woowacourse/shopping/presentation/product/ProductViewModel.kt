@@ -65,7 +65,7 @@ class ProductViewModel(
     }
 
     fun fetchCartItemCount() {
-        cartRepository.getTotalCount { result ->
+        cartRepository.fetchTotalCount { result ->
             result
                 .onSuccess { count ->
                     _cartItemCount.postValue(count)

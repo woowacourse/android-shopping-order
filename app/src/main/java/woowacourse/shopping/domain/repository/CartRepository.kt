@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 
 interface CartRepository {
-    fun getTotalCount(onResult: (Result<Int>) -> Unit)
+    fun fetchTotalCount(onResult: (Result<Int>) -> Unit)
 
     fun fetchPagedCartItems(
         page: Int,
