@@ -1,9 +1,11 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
+import okio.IOException
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 class DefaultShoppingCartRepository(
@@ -25,7 +27,7 @@ class DefaultShoppingCartRepository(
     override suspend fun add(
         product: Product,
         quantity: Int,
-    ) {
+    ): ShoppingCartProduct {
         shoppingCartService
             .postCartItem(
                 CartItemRequestDto(
@@ -33,18 +35,23 @@ class DefaultShoppingCartRepository(
                     quantity = quantity,
                 ),
             )
+
+        return load().shoppingCartItems
+            .firstOrNull { it.product.id == product.id } ?: throw IOException(ERR_NOT_ADDED_PRODUCT)
     }
 
     override suspend fun updateQuantity(
         shoppingCartId: Long,
         quantity: Int,
-    ) {
+    ): ShoppingCartProduct? {
         val requestDto = CartItemQuantityRequestDto(quantity = quantity)
         shoppingCartService
             .updateCartItemQuantity(
                 shoppingCartId = shoppingCartId,
                 cartItemQuantityRequestDto = requestDto,
             )
+        return load().shoppingCartItems
+            .firstOrNull { it.id == shoppingCartId }
     }
 
     override suspend fun remove(shoppingCartId: Long) {
@@ -56,6 +63,7 @@ class DefaultShoppingCartRepository(
     companion object {
         @Suppress("ktlint:standard:property-naming")
         private var INSTANCE: ShoppingCartRepository? = null
+        private const val ERR_NOT_ADDED_PRODUCT = "상품이 추가되지 않았습니다"
 
         fun initialize(shoppingCartService: ShoppingCartService) {
             if (INSTANCE == null) {

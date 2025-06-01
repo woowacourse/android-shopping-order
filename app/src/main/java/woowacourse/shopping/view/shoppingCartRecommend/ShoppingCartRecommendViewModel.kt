@@ -10,7 +10,6 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.product.ProductsItem
 
@@ -32,9 +31,6 @@ class ShoppingCartRecommendViewModel(
         MutableLiveData()
     val recommendProducts: LiveData<List<ProductsItem.ProductItem>> get() = _recommendProducts
 
-    private var recentWatchingProducts: List<Product> = emptyList()
-    private var shoppingCartProducts: List<ShoppingCartProduct> = emptyList()
-
     init {
         _totalPrice.addSource(_shoppingCartProductsToOrder) { it ->
             _totalPrice.value = it.sumOf { item -> item.price }
@@ -51,27 +47,17 @@ class ShoppingCartRecommendViewModel(
         viewModelScope.launch {
             val products =
                 productsRepository.getRecentRecommendWatchingProducts(MAX_RECENT_PRODUCT_LOAD_SIZE)
-            recentWatchingProducts = products
-            initShoppingCartProducts()
-        }
-    }
-
-    private fun initShoppingCartProducts() {
-        viewModelScope.launch {
             val shoppingCarts = shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
-            shoppingCartProducts = shoppingCarts.shoppingCartItems
-            getRecommendProducts()
-        }
-    }
 
-    private fun getRecommendProducts() {
-        val cartProductIds: Set<Long> = shoppingCartProducts.map { it.product.id }.toSet()
-        val recommended =
-            recentWatchingProducts
-                .filter { !cartProductIds.contains(it.id) }
-                .map { ProductsItem.ProductItem(product = it) }
-                .take(10)
-        _recommendProducts.value = recommended
+            val cartProductIds: Set<Long> =
+                shoppingCarts.shoppingCartItems.map { it.product.id }.toSet()
+            val recommended =
+                products
+                    .filter { !cartProductIds.contains(it.id) }
+                    .map { ProductsItem.ProductItem(product = it) }
+                    .take(10)
+            _recommendProducts.value = recommended
+        }
     }
 
     fun updateShoppingCartProductsToOrder(shoppingCartProductsToOrder: List<ShoppingCartProduct>) {
@@ -82,99 +68,78 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
-        when (item.shoppingCartId == null) {
-            true -> {
-                viewModelScope.launch {
-                    shoppingCartRepository.add(item.product, selectedQuantity + 1)
-                    loadShoppingCartProducts(item)
-                }
-            }
-
-            false -> {
-                viewModelScope.launch {
-                    shoppingCartRepository.updateQuantity(
-                        item.shoppingCartId,
-                        selectedQuantity + 1,
-                    )
-                    loadShoppingCartProducts(item)
-                }
-            }
-        }
-    }
-
-    private fun loadShoppingCartProducts(item: ProductsItem.ProductItem) {
-        viewModelScope.launch {
-            val shoppingCarts = shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
-            val uploaded =
-                shoppingCarts.shoppingCartItems.find {
-                    it.product.id == item.product.id
-                } ?: return@launch removeShoppingCartToOrder(
-                    item.shoppingCartId ?: return@launch,
-                )
-            val productToOrder =
-                ShoppingCartProduct(
-                    id = uploaded.id,
-                    product = item.product,
-                    quantity = uploaded.quantity,
-                )
-
-            val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
-
-            val existingIndex =
-                currentList.indexOfFirst { it.product.id == productToOrder.product.id }
-
-            if (existingIndex >= 0) {
-                currentList[existingIndex] = productToOrder
-            } else {
-                currentList.add(productToOrder)
-            }
-
-            _shoppingCartProductsToOrder.value = currentList
-
-            _recommendProducts.value
-                ?.indexOfFirst {
-                    it.product.id == item.product.id
-                }?.let { index ->
-                    val productItem =
-                        _recommendProducts.value?.get(index) as ProductsItem.ProductItem
-                    val updatedItem =
-                        productItem.copy(
-                            shoppingCartId = productToOrder.id,
-                            selectedQuantity = productToOrder.quantity,
-                        )
-                    _recommendProducts.value =
-                        _recommendProducts.value?.toMutableList()?.apply {
-                            set(index, updatedItem)
-                        }
-                }
-
-            shoppingCartProducts = shoppingCarts.shoppingCartItems
-        }
-    }
-
-    private fun removeShoppingCartToOrder(shoppingCartId: Long) {
-        val index =
-            _shoppingCartProductsToOrder.value?.indexOfFirst { it.id == shoppingCartId } ?: return
-        val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
-
-        if (index >= 0) {
-            currentList.removeAt(index)
-        }
-
-        _shoppingCartProductsToOrder.value = currentList
+        updateRecommendProducts(item, selectedQuantity + 1)
     }
 
     fun minusProductToShoppingCart(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
+        updateRecommendProducts(item, selectedQuantity - 1)
+    }
+
+    private fun loadShoppingCartProducts(uploaded: ShoppingCartProduct) {
         viewModelScope.launch {
-            shoppingCartRepository.updateQuantity(
-                item.shoppingCartId ?: return@launch,
-                selectedQuantity - 1,
-            )
-            loadShoppingCartProducts(item)
+            val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
+
+            val existingIndex =
+                currentList.indexOfFirst { it.product.id == uploaded.product.id }
+
+            if (existingIndex >= 0) {
+                currentList[existingIndex] = uploaded
+            } else {
+                currentList.add(uploaded)
+            }
+
+            _shoppingCartProductsToOrder.value = currentList
+            _recommendProducts.value =
+                _recommendProducts.value?.map { item ->
+                    if (item.product.id == uploaded.product.id) {
+                        item.copy(
+                            shoppingCartId = uploaded.id,
+                            selectedQuantity = uploaded.quantity,
+                        )
+                    } else {
+                        item
+                    }
+                }
         }
+    }
+
+    private fun updateRecommendProducts(
+        item: ProductsItem.ProductItem,
+        selectedQuantity: Int,
+    ) {
+        viewModelScope.launch {
+            val uploaded =
+                if (item.shoppingCartId == null) {
+                    shoppingCartRepository.add(item.product, selectedQuantity)
+                } else {
+                    shoppingCartRepository.updateQuantity(item.shoppingCartId, selectedQuantity)
+                }
+
+            uploaded?.let {
+                loadShoppingCartProducts(it)
+            } ?: run {
+                removeRecommendProduct(item)
+            }
+        }
+    }
+
+    private fun removeRecommendProduct(item: ProductsItem.ProductItem) {
+        val newList =
+            _shoppingCartProductsToOrder.value.orEmpty().filter {
+                it.product.id != item.product.id
+            }
+        _shoppingCartProductsToOrder.value = newList
+        _recommendProducts.value =
+            _recommendProducts.value?.map {
+                if (it.product.id == item.product.id) {
+                    it.copy(selectedQuantity = 0)
+                } else {
+                    it
+                }
+            }
     }
 
     companion object {
