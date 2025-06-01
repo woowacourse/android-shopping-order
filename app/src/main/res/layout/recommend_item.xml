@@ -53,8 +53,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:product="@{product}" />
 
-        <TextView
+        <include
+            android:id="@+id/layout_recommend_button_open_quantity_selector"
+            layout="@layout/product_count_open_item"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="13dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="@{product.quantity > 0 ? View.GONE : View.VISIBLE}"
+            app:handler="@{catalogHandler}"
+            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
             app:layout_constraintEnd_toEndOf="parent"
+            app:product="@{product}" />
+
+        <TextView
             android:id="@+id/textView_recommend_product_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,6 +78,7 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageView_product"
             tools:text="아이스 카페 아메리카노" />
