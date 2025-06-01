@@ -3,37 +3,35 @@ package woowacourse.shopping.domain.model
 class Cart(
     cartProducts: List<CartProduct> = emptyList(),
 ) {
-    private val cachedCartProducts = cartProducts.associateBy { it.product.id }.toMutableMap()
+    private val cartProductMap = cartProducts.associateBy { it.product.id }.toMutableMap()
 
-    fun addAll(cartProducts: List<CartProduct>) {
-        cachedCartProducts.putAll(cartProducts.associateBy { it.product.id })
+    fun addCartProduct(cartProduct: CartProduct) {
+        cartProductMap[cartProduct.product.id] = cartProduct
     }
 
-    fun addCartProductToCart(cartProduct: CartProduct) {
-        cachedCartProducts[cartProduct.product.id] = cartProduct
+    fun addAllCartProducts(cartProducts: List<CartProduct>) {
+        cartProductMap.putAll(cartProducts.associateBy { it.product.id })
     }
 
-    fun deleteCartProductFromCartByCartId(cartId: Long) {
-        cachedCartProducts.values.removeIf { it.cartId == cartId }
+    fun removeCartProductByCartId(cartId: Long) {
+        cartProductMap.values.removeIf { it.cartId == cartId }
     }
 
-    fun findCartProductByProductId(productId: Long): CartProduct? = cachedCartProducts[productId]
-
-    fun findQuantityByProductId(productId: Long): Int = cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
-
-    fun findCartIdByProductId(productId: Long): Long =
-        requireNotNull(cachedCartProducts[productId]?.cartId) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
-
-    fun updateQuantityByProductId(
+    fun updateQuantity(
         productId: Long,
         quantity: Int,
     ) {
-        val foundCartProduct = cachedCartProducts[productId] ?: return
-        cachedCartProducts[productId] = foundCartProduct.copy(quantity = quantity)
+        val foundCartProduct = cartProductMap[productId] ?: return
+        cartProductMap[productId] = foundCartProduct.copy(quantity = quantity)
     }
+
+    fun getQuantity(productId: Long): Int = cartProductMap[productId]?.quantity ?: DEFAULT_QUANTITY
+
+    fun getCartProduct(productId: Long): CartProduct? = cartProductMap[productId]
+
+    fun getCartProducts(): List<CartProduct> = cartProductMap.values.toList()
 
     companion object {
         private const val DEFAULT_QUANTITY = 0
-        private const val NOT_FOUND_CART_ID_ERROR_MESSAGE = "해당 상품의 카트 ID를 찾을 수 없습니다."
     }
 }
