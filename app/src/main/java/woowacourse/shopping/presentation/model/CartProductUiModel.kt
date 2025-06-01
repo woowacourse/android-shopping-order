@@ -9,10 +9,10 @@ data class CartProductUiModel(
     val imageUrl: String,
     val quantity: Int,
     val totalPrice: Int,
-    val isSelected: Boolean,
+    val isSelected: Boolean = false,
 )
 
-fun CartProduct.toCartItemUiModel(isSelected: Boolean) =
+fun CartProduct.toCartItemUiModel() =
     CartProductUiModel(
         cartId,
         product.id,
@@ -20,5 +20,4 @@ fun CartProduct.toCartItemUiModel(isSelected: Boolean) =
         product.imageUrl,
         quantity,
         totalPrice,
-        isSelected,
     )

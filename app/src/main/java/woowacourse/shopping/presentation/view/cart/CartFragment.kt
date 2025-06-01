@@ -14,7 +14,7 @@ class CartFragment :
     CartAdapter.CartEventListener {
     private val cartAdapter: CartAdapter by lazy { CartAdapter(eventListener = this) }
 
-    private val viewModel: OrderViewModel by activityViewModels()
+    private val sharedViewModel: OrderViewModel by activityViewModels()
 
     override fun onViewCreated(
         view: View,
@@ -27,19 +27,19 @@ class CartFragment :
     }
 
     override fun onDeleteProduct(cartId: Long) {
-        viewModel.deleteCartItem(cartId)
+        sharedViewModel.deleteCartItem(cartId)
     }
 
     override fun increaseQuantity(productId: Long) {
-        viewModel.increaseProductQuantity(productId, RefreshTarget.CART)
+        sharedViewModel.increaseProductQuantity(productId)
     }
 
     override fun decreaseQuantity(productId: Long) {
-        viewModel.decreaseProductQuantity(productId, RefreshTarget.CART)
+        sharedViewModel.decreaseProductQuantity(productId)
     }
 
-    override fun onCheckOrder(cartId: Long) {
-        viewModel.switchCartItemSelection(cartId)
+    override fun onCheckOrder(productId: Long) {
+        sharedViewModel.toggleOrderProductSelection(productId)
     }
 
     private fun setupActionBar() {
@@ -50,14 +50,14 @@ class CartFragment :
     }
 
     private fun setupObservers() {
-        binding.vm = viewModel
+        binding.vm = sharedViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
+        sharedViewModel.cartProducts.observe(viewLifecycleOwner) { cartItems ->
             cartAdapter.updateItemsManually(cartItems)
         }
 
-        viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
+        sharedViewModel.toastEvent.observe(viewLifecycleOwner) { event ->
             showToast(event.toMessageResId())
         }
     }
@@ -79,8 +79,5 @@ class CartFragment :
 
             CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE ->
                 R.string.cart_screen_event_message_find_quantity_failure
-
-            CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE ->
-                R.string.cart_screen_event_message_fetch_suggestion_product_failure
         }
 }

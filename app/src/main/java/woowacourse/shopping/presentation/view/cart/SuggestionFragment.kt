@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentSuggestionBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.view.cart.adapter.SuggestionAdapter
+import woowacourse.shopping.presentation.view.cart.event.SuggestionMessageEvent
 
 class SuggestionFragment :
     BaseFragment<FragmentSuggestionBinding>(R.layout.fragment_suggestion),
     SuggestionAdapter.SuggestionEventListener {
-    private val viewModel: OrderViewModel by activityViewModels()
+    private val sharedViewModel: OrderViewModel by activityViewModels()
+    private val viewModel: SuggestionViewModel by viewModels { SuggestionViewModel.Factory }
     private val suggestionAdapter by lazy { SuggestionAdapter(this) }
 
     override fun onViewCreated(
@@ -24,22 +27,18 @@ class SuggestionFragment :
         setBackPressedDispatcher()
         setAdapter()
         setObservers()
-
-        if (savedInstanceState == null) {
-            viewModel.fetchSuggestionProducts()
-        }
     }
 
     override fun onQuantitySelectorOpenButtonClick(productId: Long) {
-        viewModel.increaseProductQuantity(productId, RefreshTarget.SUGGESTION)
+        sharedViewModel.increaseProductQuantity(productId)
     }
 
     override fun increaseQuantity(productId: Long) {
-        viewModel.increaseProductQuantity(productId, RefreshTarget.SUGGESTION)
+        sharedViewModel.increaseProductQuantity(productId)
     }
 
     override fun decreaseQuantity(productId: Long) {
-        viewModel.decreaseProductQuantity(productId, RefreshTarget.SUGGESTION)
+        sharedViewModel.decreaseProductQuantity(productId)
     }
 
     private fun setAdapter() {
@@ -49,6 +48,14 @@ class SuggestionFragment :
     private fun setObservers() {
         viewModel.suggestionProducts.observe(viewLifecycleOwner) { suggestionProducts ->
             suggestionAdapter.submitList(suggestionProducts)
+        }
+
+        viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
+            showToast(event.toMessageResId())
+        }
+
+        sharedViewModel.cartProducts.observe(viewLifecycleOwner) {
+            viewModel.fetchSuggestionProducts()
         }
     }
 
@@ -68,4 +75,13 @@ class SuggestionFragment :
     private fun navigateToCart() {
         (requireActivity() as? OrderNavigator)?.navigateToCart()
     }
+
+    private fun SuggestionMessageEvent.toMessageResId(): Int =
+        when (this) {
+            SuggestionMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE ->
+                R.string.suggestion_screen_event_message_find_quantity_failure
+
+            SuggestionMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE ->
+                R.string.suggestion_screen_event_message_fetch_suggestion_product_failure
+        }
 }

@@ -53,7 +53,7 @@ class CatalogViewModel(
     }
 
     fun increaseProductQuantity(productId: Long) {
-        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
+        cartRepository.increaseQuantity(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -61,7 +61,7 @@ class CatalogViewModel(
     }
 
     fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
+        cartRepository.decreaseQuantity(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -122,8 +122,8 @@ class CatalogViewModel(
 
     private fun updateProductQuantityInList(productId: Long) {
         cartRepository
-            .findQuantityByProductId(productId)
-            .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
+            .findCartProductByProductId(productId)
+            .onSuccess { cartProduct -> applyProductQuantityUpdate(productId, cartProduct.quantity) }
             .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 
@@ -145,7 +145,7 @@ class CatalogViewModel(
     }
 
     private fun updateCartItemCount() {
-        cartRepository.fetchCartItemCount { result ->
+        cartRepository.fetchCartProductCount { result ->
             result
                 .onSuccess { _cartItemCount.postValue(it) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
