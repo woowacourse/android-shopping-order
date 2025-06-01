@@ -19,9 +19,6 @@ class DetailViewModel(
     private val _saveState = MutableLiveData<Unit>()
     val saveState: LiveData<Unit> = _saveState
 
-    private val _amount = MutableLiveData<Int>(1)
-    val amount: LiveData<Int> = _amount
-
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
 
@@ -29,20 +26,17 @@ class DetailViewModel(
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
 
     fun decreaseAmount() {
-        val current = _amount.value ?: 1
-        if (current > 1) {
-            _amount.value = current - 1
-        }
+        val currentAmount = _product.value?.amount ?: 1
+        _product.postValue(_product.value?.copy(amount = (currentAmount - 1).coerceAtLeast(1)))
     }
 
     fun increaseAmount() {
-        val current = _amount.value ?: 1
-        _amount.value = current + 1
+        val currentAmount = _product.value?.amount ?: 1
+        _product.postValue(_product.value?.copy(amount = currentAmount + 1))
     }
 
     fun fetchProduct(product: ProductUiModel) {
-        _product.postValue(product)
-        _amount.postValue(1)
+        _product.postValue(product.copy(amount = 1))
     }
 
     fun addCartItem() {
@@ -52,10 +46,9 @@ class DetailViewModel(
                 _saveState.postValue(Unit)
             }
         } else {
-            val totalAmount = (_product.value?.amount ?: 0) + (_amount.value ?: 0)
             cartRepository.updateCartItemQuantity(
                 cartId = product.cartId,
-                quantity = totalAmount,
+                quantity = _product.value?.amount ?: 1,
             ) {
                 _saveState.postValue(Unit)
             }

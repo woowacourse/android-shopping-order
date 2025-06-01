@@ -45,10 +45,6 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
             it?.let { navigateToScreen() }
         }
 
-        viewModel.amount.observe(viewLifecycleOwner) {
-            binding.detailItemCounter.textViewDetailAmount.text = it.toString()
-        }
-
         viewModel.product.observe(viewLifecycleOwner) {
             binding.product = it
         }

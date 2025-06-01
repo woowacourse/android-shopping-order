@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text='@{String.format(@string/product_price_format, product.price * vm.amount)}'
+            android:text='@{String.format(@string/product_price_format, product.price * vm.product.amount)}'
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="20sp"
@@ -92,7 +92,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="120dp"
-            app:amount="@{vm.amount}"
+            app:amount="@{vm.product.amount}"
             app:layout_constraintBottom_toBottomOf="@id/text_view_detail_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_detail_price"
