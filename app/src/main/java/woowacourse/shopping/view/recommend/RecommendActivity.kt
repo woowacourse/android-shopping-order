@@ -48,11 +48,17 @@ class RecommendActivity :
     }
 
     override fun onPlusProductQuantity(item: RecommendProduct) {
-        // TODO: ViewModel 함수 사용
+        viewModel.plusCartItemQuantity(
+            productId = item.productId,
+            quantity = item.quantity + 1,
+        )
     }
 
     override fun onMinusProductQuantity(item: RecommendProduct) {
-        // TODO: ViewModel 함수 사용
+        viewModel.minusCartItemQuantity(
+            productId = item.productId,
+            quantity = item.quantity - 1,
+        )
     }
 
     companion object {

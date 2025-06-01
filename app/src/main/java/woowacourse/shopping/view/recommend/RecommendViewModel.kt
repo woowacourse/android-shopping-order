@@ -3,18 +3,24 @@ package woowacourse.shopping.view.recommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.cart.repository.CartRepository
+import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductsRecommendAlgorithm
 import woowacourse.shopping.domain.product.RecentViewedCategoryBasedAlgorithm
 
 class RecommendViewModel(
     private val productsRepository: ProductsRepository = DefaultProductsRepository(),
+    private val cartRepository: CartRepository = DefaultCartRepository(),
 ) : ViewModel() {
     private var recentProducts: List<Product> = emptyList()
 
     private var categoryProducts: List<Product> = emptyList()
+
+    private var cartItems: List<CartItem> = emptyList()
 
     private val _recommendProducts: MutableLiveData<List<RecommendProduct>> = MutableLiveData()
     val recommendProducts: LiveData<List<RecommendProduct>> = _recommendProducts
@@ -23,7 +29,19 @@ class RecommendViewModel(
     val event: LiveData<RecommendEvent> = _event
 
     init {
-        loadRecentProducts()
+        loadCart()
+    }
+
+    private fun loadCart() {
+        cartRepository.loadCart { result ->
+            result
+                .onSuccess { cartItems: List<CartItem> ->
+                    this.cartItems = cartItems
+                    loadRecentProducts()
+                }.onFailure {
+                    _event.postValue(RecommendEvent.LOAD_SHOPPING_CART_FAILURE)
+                }
+        }
     }
 
     private fun loadProductsByCategory() {
@@ -41,6 +59,60 @@ class RecommendViewModel(
                 }.onFailure {
                     _event.postValue(RecommendEvent.LOAD_ALL_PRODUCTS_FAILURE)
                 }
+        }
+    }
+
+    fun plusCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val cartItemId = cartItems.find { it.productId == productId }?.id
+        if (cartItemId == null) {
+            cartRepository.addCartItem(productId, quantity) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(RecommendEvent.ADD_CART_ITEM_FAILURE)
+                    }
+            }
+        } else {
+            cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(RecommendEvent.PLUS_CART_ITEM_FAILURE)
+                    }
+            }
+        }
+    }
+
+    fun minusCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        val cartItemId = cartItems.find { it.productId == productId }?.id ?: error("")
+        if (quantity == 0) {
+            cartRepository.remove(
+                cartItemId = cartItemId,
+            ) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(RecommendEvent.REMOVE_CART_ITEM_FAILURE)
+                    }
+            }
+        } else {
+            cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
+                result
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.postValue(RecommendEvent.MINUS_CART_ITEM_FAILURE)
+                    }
+            }
         }
     }
 
@@ -63,10 +135,13 @@ class RecommendViewModel(
                 prohibitedProducts = recentProducts,
             )
 
-        return products.map {
+        return products.map { product: Product ->
             RecommendProduct(
-                0,
-                it,
+                cartItems
+                    .find { cartItem: CartItem ->
+                        cartItem.productId == product.id
+                    }?.quantity ?: 0,
+                product,
             )
         }
     }
