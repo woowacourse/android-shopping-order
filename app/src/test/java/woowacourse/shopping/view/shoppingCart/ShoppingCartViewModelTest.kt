@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.InstantTaskExecutorExtension
+import woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ShoppingCartViewModelTest {

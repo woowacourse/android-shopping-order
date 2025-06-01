@@ -18,6 +18,8 @@ import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.shoppingCart.viewModel.OrderBarViewModel
+import woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
 
 class ShoppingCartActivity :
@@ -25,6 +27,8 @@ class ShoppingCartActivity :
     ShoppingCartProductAdapter.ShoppingCartListener,
     ShoppingCartClickListener {
     private val viewModel: ShoppingCartViewModel by viewModels()
+    private val orderBarViewModel: OrderBarViewModel by viewModels()
+
     private val binding: ActivityShoppingCartBinding by lazy {
         ActivityShoppingCartBinding.inflate(layoutInflater)
     }
@@ -60,6 +64,7 @@ class ShoppingCartActivity :
     private fun initDataBinding() {
         binding.adapter = shoppingCartProductAdapter
         binding.viewModel = this.viewModel
+        binding.orderBarViewModel = this.orderBarViewModel
         binding.lifecycleOwner = this@ShoppingCartActivity
         binding.shoppingCartListener = this@ShoppingCartActivity
     }
@@ -86,8 +91,9 @@ class ShoppingCartActivity :
     }
 
     private fun setupObservers() {
-        viewModel.shoppingCart.observe(this) { shoppingCart: List<ShoppingCartItem> ->
+        viewModel.shoppingCart.observe(this) { shoppingCart ->
             shoppingCartProductAdapter.submitList(shoppingCart)
+            orderBarViewModel.update(shoppingCart)
         }
 
         viewModel.event.observe(this) { event: ShoppingCartEvent ->
@@ -115,8 +121,6 @@ class ShoppingCartActivity :
                 binding.shoppingCartSkeletonLayout.visibility = View.GONE
             }
         }
-
-        viewModel.shoppingCartProductsToOrder.observe(this) { }
     }
 
     override fun onMinusPage() {
@@ -163,7 +167,7 @@ class ShoppingCartActivity :
         activityResultLauncher.launch(
             ShoppingCartRecommendActivity.newIntent(
                 this,
-                viewModel.shoppingCartProductsToOrder.value?.toTypedArray() ?: emptyArray(),
+                orderBarViewModel.shoppingCartProductsToOrder.value?.toTypedArray() ?: emptyArray(),
             ),
         )
     }

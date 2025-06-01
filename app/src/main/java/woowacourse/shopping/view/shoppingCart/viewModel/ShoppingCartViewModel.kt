@@ -1,7 +1,6 @@
-package woowacourse.shopping.view.shoppingCart
+package woowacourse.shopping.view.shoppingCart.viewModel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,14 +10,15 @@ import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
+import woowacourse.shopping.view.shoppingCart.ShoppingCartEvent
+import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 class ShoppingCartViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
+    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.Companion.get(),
 ) : ViewModel() {
-    private val _shoppingCart: MutableLiveData<List<ShoppingCartProductItem>> =
+    private val _shoppingCart: MutableLiveData<List<ShoppingCartItem.ShoppingCartProductItem>> =
         MutableLiveData(emptyList())
-    val shoppingCart: LiveData<List<ShoppingCartProductItem>> get() = _shoppingCart
+    val shoppingCart: LiveData<List<ShoppingCartItem.ShoppingCartProductItem>> get() = _shoppingCart
 
     private val _hasUpdatedProducts: MutableLiveData<Boolean> =
         MutableLiveData(false)
@@ -30,71 +30,9 @@ class ShoppingCartViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalPrice: LiveData<Int> get() = _totalPrice
-
-    private val _totalQuantity: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalQuantity: LiveData<Int> get() = _totalQuantity
-
-    private val _isAllSelected: MediatorLiveData<Boolean> =
-        MediatorLiveData<Boolean>().apply { value = false }
-    val isAllSelected: LiveData<Boolean> get() = _isAllSelected
-
-    private val _shoppingCartProductsToOrder: MediatorLiveData<List<ShoppingCartProduct>> =
-        MediatorLiveData(emptyList())
-    val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
-
-    private val _isOrderEnabled: MediatorLiveData<Boolean> =
-        MediatorLiveData<Boolean>().apply { value = false }
-    val isOrderEnabled: LiveData<Boolean> get() = _isOrderEnabled
-
     private var page: Int = MINIMUM_PAGE
 
     private var loadable: Boolean = false
-
-    init {
-        _totalPrice.addSource(shoppingCart) { it ->
-            _totalPrice.value =
-                it
-                    .filterIsInstance<ShoppingCartProductItem>()
-                    .filter { item -> item.isChecked }
-                    .sumOf { item -> item.shoppingCartProduct.price }
-        }
-
-        _totalQuantity.addSource(shoppingCart) {
-            _totalQuantity.value =
-                it
-                    .filterIsInstance<ShoppingCartProductItem>()
-                    .filter { item -> item.isChecked }
-                    .sumOf { item -> item.shoppingCartProduct.quantity }
-        }
-
-        _isAllSelected.addSource(shoppingCart) {
-            _isAllSelected.value = isAllSelected(it)
-        }
-
-        _shoppingCartProductsToOrder.addSource(shoppingCart) {
-            _shoppingCartProductsToOrder.value =
-                it
-                    .filterIsInstance<ShoppingCartProductItem>()
-                    .filter { it.isChecked }
-                    .map { it.shoppingCartProduct }
-        }
-
-        _isOrderEnabled.addSource(totalQuantity) {
-            _isOrderEnabled.value = it > 0
-        }
-    }
-
-    private fun isAllSelected(items: List<ShoppingCartItem>): Boolean {
-        val shoppingCartProductItems = items.filterIsInstance<ShoppingCartProductItem>()
-        return if (shoppingCartProductItems.isEmpty()) {
-            false
-        } else {
-            shoppingCartProductItems
-                .all { item -> item.isChecked }
-        }
-    }
 
     fun loadShoppingCart() {
         val page = this.page - 1
@@ -116,7 +54,7 @@ class ShoppingCartViewModel(
     ) {
         _shoppingCart.value = _shoppingCart.value?.plus(
             buildList {
-                addAll(products.map { ShoppingCartProductItem(it) })
+                addAll(products.map { ShoppingCartItem.ShoppingCartProductItem(it) })
             }
         )
     }
@@ -136,7 +74,7 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartProductItem) {
+    fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         viewModelScope.launch {
             shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id)
             updateShoppingCartItems()
@@ -144,7 +82,7 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun decreaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
+    fun decreaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
@@ -155,7 +93,7 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun increaseQuantity(shoppingCartProductItem: ShoppingCartProductItem) {
+    fun increaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
@@ -178,7 +116,7 @@ class ShoppingCartViewModel(
     }
 
     fun selectShoppingCartProduct(
-        shoppingCartProductItem: ShoppingCartProductItem,
+        shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
         selected: Boolean,
     ) {
         _shoppingCart.value =
