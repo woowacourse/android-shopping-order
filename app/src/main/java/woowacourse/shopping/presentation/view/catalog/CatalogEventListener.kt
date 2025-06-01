@@ -7,6 +7,4 @@ interface CatalogEventListener : ItemCounterListener {
     fun onProductClicked(product: ProductUiModel)
 
     fun onLoadMoreClicked()
-
-    fun onInitialAddToCartClicked(product: ProductUiModel)
 }

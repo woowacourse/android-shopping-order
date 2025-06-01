@@ -50,10 +50,6 @@ class CatalogFragment :
         viewModel.fetchProducts()
     }
 
-    override fun onInitialAddToCartClicked(product: ProductUiModel) {
-        viewModel.initialAddToCart(product)
-    }
-
     override fun increaseQuantity(product: ProductUiModel) {
         viewModel.increaseQuantity(product)
     }

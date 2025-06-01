@@ -38,10 +38,10 @@
             android:layout_margin="8dp"
             android:background="@drawable/shape_bg_circle"
             android:elevation="5dp"
-            android:onClick="@{() -> eventListener.onInitialAddToCartClicked(product)}"
+            android:onClick="@{() -> eventListener.increaseQuantity(product)}"
             android:padding="16dp"
             android:src="@drawable/ic_add"
-            android:visibility="@{product.quantity != 0 ? View.GONE : View.VISIBLE}"
+            android:visibility="@{product.quantity == 0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@id/image_view_product"
             app:layout_constraintEnd_toEndOf="@id/image_view_product" />
 

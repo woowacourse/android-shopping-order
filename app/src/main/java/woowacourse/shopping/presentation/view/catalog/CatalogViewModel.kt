@@ -9,8 +9,10 @@ import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
+import woowacourse.shopping.presentation.model.toCartItemUiModel
 import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
 
@@ -123,26 +125,14 @@ class CatalogViewModel(
         }
     }
 
-    fun initialAddToCart(product: ProductUiModel) {
-        val updatedProduct = product.copy(quantity = 1)
-        cartRepository.addCartItem(updatedProduct.toCartItem()) {
-            cartRepository.getAllCartItems { cartItems ->
-                val found = cartItems?.find { it.product.id == updatedProduct.id }
-                if (found != null) {
-                    _itemUpdateEvent.postValue(found.toUiModel())
-                    handleUpdatedCartItem(found.cartId)
-                } else {
-                    _itemUpdateEvent.postValue(updatedProduct)
-                    refreshCartState()
-                }
-            }
-        }
-    }
-
     fun increaseQuantity(product: ProductUiModel) {
         val cartItem = product.toCartItem()
+        if (product.quantity == 0) {
+            addToCart(cartItem.toCartItemUiModel())
+            return
+        }
         cartRepository.increaseQuantity(cartItem) { id ->
-            handleUpdatedCartItem(id)
+            updateCartItem(id)
         }
     }
 
@@ -156,18 +146,39 @@ class CatalogViewModel(
             }
         } else {
             cartRepository.decreaseQuantity(cartItem) { id ->
-                handleUpdatedCartItem(id)
+                updateCartItem(id)
             }
         }
     }
 
-    private fun handleUpdatedCartItem(cartId: Long) {
+    private fun addToCart(cartItem: CartItemUiModel) {
+        val newItem = cartItem.cartItem.copy(quantity = 1)
+        cartRepository.addCartItem(newItem) {
+            cartRepository.getAllCartItems { cartItems ->
+                cartItems?.find { cartItem -> cartItem.product.id == newItem.product.id }?.let { foundItem ->
+                    _itemUpdateEvent.postValue(foundItem.toUiModel())
+                    calculateTotalCartCount()
+                }
+            }
+        }
+    }
+
+    private fun updateCartItem(cartId: Long) {
         getCartItemByCartId(cartId) { cartItem ->
             if (cartItem != null) {
                 _itemUpdateEvent.postValue(cartItem.toUiModel())
             }
-            cartRepository
             calculateTotalCartCount()
+        }
+    }
+
+    private fun getCartItemByCartId(
+        id: Long,
+        callback: (CartItem?) -> Unit,
+    ) {
+        cartRepository.getAllCartItems { cartItems ->
+            val foundItem = cartItems?.find { cartItem -> cartItem.cartId == id }
+            callback(foundItem)
         }
     }
 
@@ -196,16 +207,6 @@ class CatalogViewModel(
                 }
 
             _items.postValue(updatedItems)
-        }
-    }
-
-    private fun getCartItemByCartId(
-        id: Long,
-        callback: (CartItem?) -> Unit,
-    ) {
-        cartRepository.getAllCartItems { list ->
-            val foundItem = list?.find { it.cartId == id }
-            callback(foundItem)
         }
     }
 
