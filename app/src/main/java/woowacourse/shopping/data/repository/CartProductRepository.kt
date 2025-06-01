@@ -9,7 +9,7 @@ interface CartProductRepository {
     )
 
     fun deleteCartProduct(
-        productId: Int,
+        cartItemId: Int,
         callback: (Boolean) -> Unit,
     )
 
@@ -20,7 +20,7 @@ interface CartProductRepository {
     )
 
     fun updateProduct(
-        productId: Int,
+        cartItemId: Int,
         quantity: Int,
         callback: (Boolean) -> Unit,
     )

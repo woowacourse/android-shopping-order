@@ -20,10 +20,6 @@ class CartSelectionFragment : Fragment() {
         )[CartViewModel::class.java]
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,7 +49,7 @@ class CartSelectionFragment : Fragment() {
 
     private fun observeCartViewModel() {
         val cartAdapter = binding.recyclerViewCart.adapter as CartAdapter
-        viewModel.cartProducts.observe(viewLifecycleOwner) { cartAdapter::setCartItems }
+        viewModel.cartProducts.observe(viewLifecycleOwner, cartAdapter::setCartItems)
         viewModel.isNextButtonEnabled.observe(viewLifecycleOwner) { viewModel.updatedPaginationButton() }
         viewModel.isPrevButtonEnabled.observe(viewLifecycleOwner) { viewModel.updatedPaginationButton() }
         viewModel.updatedItem.observe(viewLifecycleOwner, cartAdapter::setCartItem)

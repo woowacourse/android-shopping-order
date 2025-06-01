@@ -1,6 +1,5 @@
 package woowacourse.shopping.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -60,11 +59,9 @@ class CartViewModel(
 
     fun loadRecentlyViewedProduct() {
         recentlyViewedProductRepository.getLatestViewedProduct { product ->
-            Log.d("TESTT", "마지막 상품 $product")
             catalogProductRepository.getProduct(product.id) { categoryProduct ->
                 val category = categoryProduct.category ?: ""
                 catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
-                    Log.d("TESTT", "추천 품 $products")
                     _recommendedProducts.postValue(products)
                 }
             }
@@ -75,13 +72,11 @@ class CartViewModel(
         val amount =
             totalProducts.value?.filter { it.isChecked == true }?.sumOf { it.price * it.quantity }
                 ?: 0
-        Log.d("COUNT", "amount : $amount")
         _totalAmount.postValue(amount)
     }
 
     fun postTotalCount() {
         val count = totalProducts.value?.size ?: 0
-        Log.d("COUNT", "count : $count")
         _totalCount.postValue(count)
     }
 
@@ -89,7 +84,7 @@ class CartViewModel(
         val set = _totalProducts.value ?: mutableSetOf()
         set.remove(cartProduct.productItem)
         _totalProducts.postValue(set.toMutableSet())
-        cartProductRepository.deleteCartProduct(cartProduct.productItem.id) {
+        cartProductRepository.deleteCartProduct(cartProduct.productItem.cartItemId ?: return) {
             cartProductRepository.getTotalElements { updatedSize ->
                 val startIndex = page * PAGE_SIZE
                 if (startIndex >= updatedSize && page > 0) {
@@ -131,10 +126,10 @@ class CartViewModel(
         product: ProductUiModel,
     ) {
         when (buttonEvent) {
-            ButtonEvent.INCREASE -> {
+            ButtonEvent.DECREASE -> {
                 if (product.quantity != 1) {
                     cartProductRepository.updateProduct(
-                        product.id,
+                        product.cartItemId ?: return,
                         product.quantity - 1,
                     ) { result ->
                         if (result == true) {
@@ -149,8 +144,11 @@ class CartViewModel(
                 }
             }
 
-            ButtonEvent.DECREASE -> {
-                cartProductRepository.updateProduct(product.id, product.quantity + 1) { result ->
+            ButtonEvent.INCREASE -> {
+                cartProductRepository.updateProduct(
+                    product.cartItemId ?: return,
+                    product.quantity + 1,
+                ) { result ->
                     if (result == true) {
                         _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                         val set = _totalProducts.value ?: mutableSetOf()
@@ -196,8 +194,6 @@ class CartViewModel(
 
         cartProductRepository.getTotalElements { totalSize ->
             val startIndex = page * pageSize
-            val endIndex = minOf(startIndex + pageSize, totalSize)
-
             if (startIndex >= totalSize) {
                 return@getTotalElements
             }
