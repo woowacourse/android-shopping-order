@@ -139,14 +139,14 @@ class CatalogViewModel(
         }
     }
 
-    fun increaseCartItem(product: ProductUiModel) {
+    fun increaseQuantity(product: ProductUiModel) {
         val cartItem = product.toCartItem()
-        cartRepository.increaseCartItem(cartItem) { id ->
+        cartRepository.increaseQuantity(cartItem) { id ->
             handleUpdatedCartItem(id)
         }
     }
 
-    fun decreaseCartItem(product: ProductUiModel) {
+    fun decreaseQuantity(product: ProductUiModel) {
         val cartItem = product.toCartItem()
 
         if (cartItem.quantity <= 1) {
@@ -155,7 +155,7 @@ class CatalogViewModel(
                 calculateTotalCartCount()
             }
         } else {
-            cartRepository.decreaseCartItem(cartItem) { id ->
+            cartRepository.decreaseQuantity(cartItem) { id ->
                 handleUpdatedCartItem(id)
             }
         }

@@ -34,9 +34,9 @@ class DetailFragment :
         binding.eventListener = this
         binding.detailItemCounter.listener =
             object : ItemCounterListener {
-                override fun increase(product: ProductUiModel) = viewModel.increaseQuantity()
+                override fun increaseQuantity(product: ProductUiModel) = viewModel.increaseQuantity()
 
-                override fun decrease(product: ProductUiModel) = viewModel.decreaseQuantity()
+                override fun decreaseQuantity(product: ProductUiModel) = viewModel.decreaseQuantity()
             }
     }
 

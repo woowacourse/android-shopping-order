@@ -81,7 +81,7 @@ class CartViewModel(
             addToCart(cartItem.toCartItemUiModel())
             return
         }
-        cartRepository.increaseCartItem(cartItem) { id ->
+        cartRepository.increaseQuantity(cartItem) { id ->
             getCartItemById(id) { foundItem ->
                 foundItem?.let {
                     val updatedItem =
@@ -99,7 +99,7 @@ class CartViewModel(
             removeFromCart(cartItem.toCartItemUiModel())
             return
         }
-        cartRepository.decreaseCartItem(cartItem) { id ->
+        cartRepository.decreaseQuantity(cartItem) { id ->
             getCartItemById(id) { foundItem ->
                 foundItem?.let {
                     val updatedItem =

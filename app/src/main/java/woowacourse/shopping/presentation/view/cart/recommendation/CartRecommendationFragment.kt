@@ -55,11 +55,11 @@ class CartRecommendationFragment :
         }
     }
 
-    override fun increase(product: ProductUiModel) {
+    override fun increaseQuantity(product: ProductUiModel) {
         viewModel.increaseQuantity(product)
     }
 
-    override fun decrease(product: ProductUiModel) {
+    override fun decreaseQuantity(product: ProductUiModel) {
         viewModel.decreaseQuantity(product)
     }
 

@@ -62,7 +62,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun increaseCartItem(
+    override fun increaseQuantity(
         cartItem: CartItem,
         callback: (Long) -> Unit,
     ) {
@@ -71,7 +71,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun decreaseCartItem(
+    override fun decreaseQuantity(
         cartItem: CartItem,
         callback: (Long) -> Unit,
     ) {

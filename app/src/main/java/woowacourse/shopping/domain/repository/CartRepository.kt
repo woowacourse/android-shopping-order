@@ -24,12 +24,12 @@ interface CartRepository {
         callback: () -> Unit,
     )
 
-    fun increaseCartItem(
+    fun increaseQuantity(
         cartItem: CartItem,
         callback: (Long) -> Unit,
     )
 
-    fun decreaseCartItem(
+    fun decreaseQuantity(
         cartItem: CartItem,
         callback: (Long) -> Unit,
     )
