@@ -40,7 +40,7 @@ class ShoppingCartActivity :
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             when (result.resultCode) {
-                ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK -> viewModel.loadShoppingCart()
+                ResultFrom.RECOMMEND_PRODUCT_BACK.RESULT_OK -> viewModel.reload()
             }
         }
 
