@@ -9,12 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
+import woowacourse.shopping.view.productDetail.ProductDetailActivity
 
 class RecommendActivity :
     AppCompatActivity(),
     RecommendProductItemActions {
     private val binding by lazy { ActivityRecommnedBinding.inflate(layoutInflater) }
     private val viewModel: RecommendViewModel by viewModels()
+    private val recommendProductsAdapter by lazy {
+        RecommendProductsAdapter(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,24 +30,21 @@ class RecommendActivity :
             insets
         }
 
-        val adapter =
-            RecommendProductsAdapter(
-                recommendProductItemActions = this,
-            )
-
         binding.lifecycleOwner = this
-        binding.recommendCartItems.adapter = adapter
+        binding.recommendCartItems.adapter = recommendProductsAdapter
+
+        initBinding()
     }
 
-    companion object {
-        fun newIntent(context: Context): Intent {
-            val intent = Intent(context, RecommendActivity::class.java)
-            return intent
+    private fun initBinding() {
+        viewModel.recommendProducts.observe(this) { recommendProducts ->
+            recommendProductsAdapter.asdf(recommendProducts)
         }
     }
 
     override fun onSelectProduct(item: RecommendProduct) {
-        // TODO: ViewModel 함수 사용
+        val intent = ProductDetailActivity.newIntent(this, item.productId)
+        startActivity(intent)
     }
 
     override fun onPlusProductQuantity(item: RecommendProduct) {
@@ -52,5 +53,12 @@ class RecommendActivity :
 
     override fun onMinusProductQuantity(item: RecommendProduct) {
         // TODO: ViewModel 함수 사용
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            val intent = Intent(context, RecommendActivity::class.java)
+            return intent
+        }
     }
 }

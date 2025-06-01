@@ -13,6 +13,7 @@ data class CartItem(
     val productPrice = product.price
     val price get() = productPrice * quantity
     val productId = product.id
+    val category = product.category
 
     constructor(
         id: Long,

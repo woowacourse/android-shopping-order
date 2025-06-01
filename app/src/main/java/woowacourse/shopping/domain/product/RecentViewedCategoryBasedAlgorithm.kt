@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.product
 
 class RecentViewedCategoryBasedAlgorithm(
-    private val latestViewedCategory: String,
     private val maxSize: Int = DEFAULT_MAX_SIZE,
 ) : ProductsRecommendAlgorithm {
     override fun recommendedProducts(
@@ -10,7 +9,6 @@ class RecentViewedCategoryBasedAlgorithm(
     ): List<Product> =
         products
             .asSequence()
-            .filter { it.category == latestViewedCategory }
             .filter { it !in prohibitedProducts }
             .take(maxSize)
             .toList()

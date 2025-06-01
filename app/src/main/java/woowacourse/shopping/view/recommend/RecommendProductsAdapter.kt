@@ -1,12 +1,13 @@
 package woowacourse.shopping.view.recommend
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class RecommendProductsAdapter(
     private val recommendProductItemActions: RecommendProductItemActions,
 ) : RecyclerView.Adapter<RecommendProductsViewHolder>() {
-    private val items: List<RecommendProduct> = emptyList()
+    private var items: List<RecommendProduct> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -16,6 +17,12 @@ class RecommendProductsAdapter(
             parent = parent,
             recommendProductItemActions = recommendProductItemActions,
         )
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun asdf(newItems: List<RecommendProduct>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 
     override fun onBindViewHolder(
         holder: RecommendProductsViewHolder,
