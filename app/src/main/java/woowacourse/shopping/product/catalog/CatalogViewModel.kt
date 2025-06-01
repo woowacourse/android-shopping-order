@@ -14,10 +14,7 @@ class CatalogViewModel(
     private val catalogProductRepository: CatalogProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val remoteCatalogProductRepository: CatalogProductRepository,
 ) : ViewModel() {
-    private val catalogItems: MutableList<CatalogItem> = mutableListOf()
-
     private val _loadedCatalogItems =
         MutableLiveData<List<CatalogItem>>(emptyList<CatalogItem>())
     val loadedCatalogItems: LiveData<List<CatalogItem>> = _loadedCatalogItems
@@ -37,12 +34,6 @@ class CatalogViewModel(
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loaded())
     val loadingState: LiveData<LoadingState> get() = _loadingState
-
-    init {
-        catalogProductRepository.getAllProductsSize { allProductsSize ->
-            loadCatalog(0, PAGE_SIZE, 20, allProductsSize)
-        }
-    }
 
     fun increaseQuantity(product: ProductUiModel) {
         if (product.quantity == 0) {
@@ -80,36 +71,28 @@ class CatalogViewModel(
 
     fun loadNextCatalogProducts() {
         page++
-        remoteCatalogProductRepository.getAllProductsSize { allProductSize ->
-            val startIndex = page * PAGE_SIZE
-            val endIndex = minOf(startIndex + PAGE_SIZE, allProductSize)
-
-            loadCatalog(startIndex, endIndex, 20, allProductSize)
+        catalogProductRepository.getAllProductsSize { allProductSize ->
+            val endIndex = (page + 1) * PAGE_SIZE
+            loadCatalog(page, endIndex, 20, allProductSize)
         }
     }
 
     fun loadCatalogUntilCurrentPage() {
-        catalogItems.clear()
-        remoteCatalogProductRepository.getAllProductsSize { allProductSize ->
-            val startIndex = 0
-            val endIndex = minOf((page + 1) * PAGE_SIZE, allProductSize)
-
-            loadCatalog(startIndex, endIndex, 20, allProductSize)
+        catalogProductRepository.getAllProductsSize { allProductSize ->
+            val endIndex = (page + 1) * PAGE_SIZE
+            loadCatalog(0, endIndex, endIndex, allProductSize)
         }
     }
 
     fun loadCatalog(
-        startIndex: Int,
+        page: Int,
         endIndex: Int,
         size: Int = 20,
         allProductsSize: Int,
     ) {
         _loadingState.postValue(LoadingState.loading())
 
-        remoteCatalogProductRepository.getProductsByPage(
-            page,
-            size,
-        ) { pagedProducts ->
+        catalogProductRepository.getProductsByPage(page, size) { pagedProducts ->
             cartProductRepository.getTotalElements { totalElements ->
                 cartProductRepository.getCartProducts(totalElements) { cartProducts ->
                     val cartProductMap: Map<Int, ProductUiModel> =
@@ -137,7 +120,6 @@ class CatalogViewModel(
                             items
                         }
 
-                    catalogItems += updatedItems
                     _loadedCatalogItems.postValue(updatedItems)
                     _loadingState.postValue(LoadingState.loaded())
                 }

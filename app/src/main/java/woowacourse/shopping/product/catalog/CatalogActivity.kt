@@ -30,6 +30,7 @@ class CatalogActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog)
+        binding.lifecycleOwner = this
         applyWindowInsets()
 
         setProductAdapter()
@@ -132,7 +133,6 @@ class CatalogActivity : AppCompatActivity() {
         viewModel.updatedItem.observe(this, productsAdapter::updateItem)
         viewModel.recentlyViewedProducts.observe(this, recentProductsAdapter::setItems)
         viewModel.loadingState.observe(this) { changeShimmerState(it.isLoading) }
-        binding.lifecycleOwner = this
     }
 
     private fun applyWindowInsets() {
