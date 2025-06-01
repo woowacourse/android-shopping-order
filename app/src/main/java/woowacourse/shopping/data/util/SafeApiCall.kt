@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.util
 
 import retrofit2.HttpException
+import woowacourse.shopping.BuildConfig
 
 inline fun <T> safeApiCall(apiCall: () -> retrofit2.Response<T>): Result<T> =
     try {
@@ -13,6 +14,6 @@ inline fun <T> safeApiCall(apiCall: () -> retrofit2.Response<T>): Result<T> =
             Result.failure(HttpException(response))
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        if (BuildConfig.DEBUG) e.printStackTrace()
         Result.failure(e)
     }
