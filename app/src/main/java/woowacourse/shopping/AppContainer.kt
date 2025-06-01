@@ -9,8 +9,8 @@ import woowacourse.shopping.data.network.RetrofitProvider
 import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.data.network.service.ProductService
 import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.data.repository.DefaultHistoryRepository
+import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository

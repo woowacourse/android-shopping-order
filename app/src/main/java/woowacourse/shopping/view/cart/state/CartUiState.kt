@@ -19,7 +19,10 @@ data class CartUiState(
 
     fun findCart(cartId: Long) = items.find { it.cartId == cartId } ?: throw IllegalArgumentException()
 
-    fun addCart(cartId: Long, productState: ProductState): CartUiState {
+    fun addCart(
+        cartId: Long,
+        productState: ProductState,
+    ): CartUiState {
         val shoppingCart = ShoppingCart(cartId, productState.item, productState.cartQuantity)
         val cartState = CartState(shoppingCart, true)
         val mutableItems = items.toMutableList()
