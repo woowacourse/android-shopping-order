@@ -20,14 +20,15 @@ object RetrofitClient {
             .build()
     }
 
-    private fun createOkHttpClient(): OkHttpClient =
-        OkHttpClient
-            .Builder()
-            .addInterceptor(
-                HttpLoggingInterceptor(PrettyJsonLogger()).apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                },
-            ).build()
+    private fun createOkHttpClient(): OkHttpClient {
+        val builder = OkHttpClient.Builder()
+        val loggingInterceptor = HttpLoggingInterceptor(PrettyJsonLogger())
+        loggingInterceptor.level =
+            if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+
+        builder.addInterceptor(loggingInterceptor)
+        return builder.build()
+    }
 
     private fun createJsonConverterFactory() = Json.asConverterFactory("application/json".toMediaType())
 
