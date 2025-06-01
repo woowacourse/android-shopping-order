@@ -42,12 +42,12 @@ class ProductRepositoryImpl(
         }
     }
 
-    override fun loadAllCartItems(callback: (List<CartItem>?) -> Unit) {
+    override fun loadAllCartItems(callback: (List<CartItem>) -> Unit) {
         cartItemDataSource.fetchCartItems(
             page = 0,
             size = Int.MAX_VALUE,
-        ) { it ->
-            callback(it?.content?.map { it.toCartItem() }.orEmpty())
+        ) { cartItems ->
+            callback(cartItems?.content?.map { content -> content.toCartItem() }.orEmpty())
         }
     }
 

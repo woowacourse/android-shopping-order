@@ -45,7 +45,7 @@ class CatalogViewModel(
         productRepository.loadPageOfProducts(pageIndex, PAGE_SIZE) { products, hasMore ->
             productRepository.loadAllCartItems { cartItems ->
                 productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
-                    val productUiModels = matchProductsToCartItems(products, cartItems.orEmpty())
+                    val productUiModels = matchProductsToCartItems(products, cartItems)
                     val items =
                         buildList {
                             if (recentProducts.isNotEmpty()) {

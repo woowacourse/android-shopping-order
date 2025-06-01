@@ -22,7 +22,7 @@ interface ProductRepository {
         callback: (List<Product>) -> Unit,
     )
 
-    fun loadAllCartItems(callback: (List<CartItem>?) -> Unit)
+    fun loadAllCartItems(callback: (List<CartItem>) -> Unit)
 
     fun findProductById(
         id: Long,
