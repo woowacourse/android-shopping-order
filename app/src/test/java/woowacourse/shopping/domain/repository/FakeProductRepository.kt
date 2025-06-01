@@ -19,7 +19,7 @@ class FakeProductRepository : ProductRepository {
         callback(result, hasMore)
     }
 
-    override fun loadCartItems(callback: (List<CartItem>?) -> Unit) {
+    override fun loadAllCartItems(callback: (List<CartItem>?) -> Unit) {
         callback(cartItems)
     }
 
@@ -29,12 +29,12 @@ class FakeProductRepository : ProductRepository {
     }
 
     override fun loadRecentProducts(
-        limit: Int,
+        count: Int,
         callback: (List<Product>) -> Unit,
     ) {
         val recentProducts =
             recentProductIds
-                .take(limit)
+                .take(count)
                 .mapNotNull { id -> products.find { it.id == id } }
         callback(recentProducts)
     }
@@ -50,7 +50,7 @@ class FakeProductRepository : ProductRepository {
         callback(product)
     }
 
-    override fun getProductById(
+    override fun findProductById(
         id: Long,
         callback: (Product?) -> Unit,
     ) {

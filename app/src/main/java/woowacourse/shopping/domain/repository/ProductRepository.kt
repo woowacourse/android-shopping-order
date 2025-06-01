@@ -4,24 +4,15 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun loadProducts(
-        page: Int,
-        loadSize: Int,
+    fun loadPageOfProducts(
+        pageIndex: Int,
+        pageSize: Int,
         callback: (List<Product>, Boolean) -> Unit,
     )
 
-    fun loadCartItems(callback: (List<CartItem>?) -> Unit)
-
-    fun addRecentProduct(product: Product)
-
     fun loadRecentProducts(
-        limit: Int,
+        count: Int,
         callback: (List<Product>) -> Unit,
-    )
-
-    fun getProductById(
-        id: Long,
-        callback: (Product?) -> Unit,
     )
 
     fun getMostRecentProduct(callback: (Product?) -> Unit)
@@ -30,4 +21,13 @@ interface ProductRepository {
         category: String,
         callback: (List<Product>) -> Unit,
     )
+
+    fun loadAllCartItems(callback: (List<CartItem>?) -> Unit)
+
+    fun findProductById(
+        id: Long,
+        callback: (Product?) -> Unit,
+    )
+
+    fun addRecentProduct(product: Product)
 }

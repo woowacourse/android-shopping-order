@@ -16,23 +16,23 @@ class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
-    override fun loadProducts(
-        page: Int,
-        loadSize: Int,
+    override fun loadPageOfProducts(
+        pageIndex: Int,
+        pageSize: Int,
         callback: (List<Product>, Boolean) -> Unit,
     ) {
         productDataSource.fetchProducts(
-            page = page,
-            size = loadSize,
+            page = pageIndex,
+            size = pageSize,
         ) {
             val products: List<Product> = it.productContent.map { it.toProduct() }
-            val hasMore = products.size >= loadSize
+            val hasMore = products.size >= pageSize
 
             callback(products, hasMore)
         }
     }
 
-    override fun getProductById(
+    override fun findProductById(
         id: Long,
         callback: (Product?) -> Unit,
     ) {
@@ -42,7 +42,7 @@ class ProductRepositoryImpl(
         }
     }
 
-    override fun loadCartItems(callback: (List<CartItem>?) -> Unit) {
+    override fun loadAllCartItems(callback: (List<CartItem>?) -> Unit) {
         cartItemDataSource.fetchCartItems(
             page = 0,
             size = Int.MAX_VALUE,
@@ -58,11 +58,11 @@ class ProductRepositoryImpl(
     }
 
     override fun loadRecentProducts(
-        limit: Int,
+        count: Int,
         callback: (List<Product>) -> Unit,
     ) {
         thread {
-            val recentEntities = recentProductDao.getRecentProducts(limit)
+            val recentEntities = recentProductDao.getRecentProducts(count)
             val recentProducts = recentEntities.map { it.toProduct() }
             callback(recentProducts)
         }

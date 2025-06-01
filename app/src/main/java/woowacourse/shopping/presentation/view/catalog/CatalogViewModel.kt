@@ -42,8 +42,8 @@ class CatalogViewModel(
     fun fetchProducts() {
         _isLoading.value = true
         calculateTotalCartCount()
-        productRepository.loadProducts(pageIndex, PAGE_SIZE) { products, hasMore ->
-            productRepository.loadCartItems { cartItems ->
+        productRepository.loadPageOfProducts(pageIndex, PAGE_SIZE) { products, hasMore ->
+            productRepository.loadAllCartItems { cartItems ->
                 productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
                     val productUiModels = matchProductsToCartItems(products, cartItems.orEmpty())
                     val items =
@@ -93,7 +93,7 @@ class CatalogViewModel(
 
         updateRecentProducts()
 
-        productRepository.loadCartItems { cartItems ->
+        productRepository.loadAllCartItems { cartItems ->
             val updatedCartState =
                 cartItems?.associateBy(
                     { it.product.id },
@@ -185,7 +185,7 @@ class CatalogViewModel(
     }
 
     private fun updateRecentProducts() {
-        productRepository.loadRecentProducts(limit = 10) { recentProducts ->
+        productRepository.loadRecentProducts(count = 10) { recentProducts ->
             val recentUiModels = recentProducts.map { it.toUiModel() }
             val recentItem = CatalogItem.RecentProductItem(recentUiModels)
 
