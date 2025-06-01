@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.cart
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -30,7 +29,7 @@ class CartActivity : AppCompatActivity() {
         setupToolbar()
         initBinding()
         initRecyclerView()
-        observeViewModel()
+        observeCartViewModel()
     }
 
     private fun initBinding() {
@@ -57,21 +56,32 @@ class CartActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         val handler = CartEventHandlerImpl(viewModel)
         cartAdapter = CartAdapter(
-            cartProducts = emptyList(),
             cartHandler = handler,
             handler = handler,
         )
         binding.recyclerViewCart.adapter = cartAdapter
     }
 
-    private fun observeViewModel() {
-        viewModel.pagingData.observe(this) {
-            cartAdapter.setData(it.products, it)
-            cartAdapter.setPagination()
+    private fun observeCartViewModel() {
+        viewModel.pagingData.observe(this) { pagingData ->
+            val items = mutableListOf<CartAdapterItem>()
+
+            items.addAll(pagingData.products.map { CartAdapterItem.Product(it) })
+
+            if (pagingData.hasNext || pagingData.hasPrevious) {
+                items.add(
+                    CartAdapterItem.PaginationButton(
+                        hasPrevious = pagingData.hasPrevious,
+                        hasNext = pagingData.hasNext,
+                    ),
+                )
+            }
+
+            cartAdapter.submitList(items)
         }
 
-        viewModel.product.observe(this) {
-            cartAdapter.updateProduct(it)
+        viewModel.product.observe(this) { productUiModel ->
+            cartAdapter.updateProduct(CartAdapterItem.Product(productUiModel))
         }
     }
 
