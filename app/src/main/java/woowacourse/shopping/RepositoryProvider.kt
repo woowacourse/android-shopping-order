@@ -20,14 +20,14 @@ object RepositoryProvider {
     lateinit var viewedItemRepository: ViewedItemRepository
 
     fun init(application: Application) {
+        viewedItemRepository =
+            ViewedItemRepositoryImpl(ViewedItemDatabase.getInstance(application).viewedItemDao())
         productsRepository =
-            ProductsRepositoryImpl(ProductsRemoteDataSource(getProductRetrofitService))
+            ProductsRepositoryImpl(ProductsRemoteDataSource(getProductRetrofitService),viewedItemRepository)
         cartItemRepository =
             CartItemsRepositoryImpl(
                 CartItemsRemoteDataSource(getCartRetrofitService),
                 CartItemsLocalDataSource(),
             )
-        viewedItemRepository =
-            ViewedItemRepositoryImpl(ViewedItemDatabase.getInstance(application).viewedItemDao())
     }
 }

@@ -9,14 +9,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
-import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class RecommendViewModel(
     private val productsRepository: ProductsRepository,
     private val cartItemRepository: CartItemRepository,
-    private val viewedItemRepository: ViewedItemRepository,
     price: Int,
     count: Int,
 ) : ViewModel() {
@@ -31,23 +28,18 @@ class RecommendViewModel(
     val count: LiveData<Int> = _count
 
     init {
-        loadRecommendedProducts()
+        loadRecommendedProductsFromLastViewed()
     }
 
-    private fun loadRecommendedProducts() {
-        viewedItemRepository.getLastViewedItem { item ->
-            item?.let { loadProductsByCategory(it.category) }
-        }
-    }
+    private fun loadRecommendedProductsFromLastViewed() {
+        val cartProductIds = cartItemRepository.getCartItemIds()
 
-    private fun loadProductsByCategory(category: String) {
-        productsRepository.getProductsByCategory(category) { result ->
+        productsRepository.getRecommendedProductsFromLastViewed(
+            cartProductIds = cartProductIds
+        ) { result ->
             result
-                .onSuccess { products ->
-                    _items.postValue(products.map { it.toUiModel() }.take(10))
-                }
-                .onFailure {
-
+                .onSuccess { recommendedProducts ->
+                    _items.postValue(recommendedProducts)
                 }
         }
     }
@@ -59,7 +51,6 @@ class RecommendViewModel(
                     RecommendViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartItemRepository = RepositoryProvider.cartItemRepository,
-                        viewedItemRepository = RepositoryProvider.viewedItemRepository,
                         price = price,
                         count = count
                     )

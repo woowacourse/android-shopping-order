@@ -5,11 +5,13 @@ import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductsRepository
+import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ProductsRepositoryImpl(
     private val productsRemoteDataSource: ProductsRemoteDataSource,
+    private val viewedItemRepository: ViewedItemRepository
 ) : ProductsRepository {
     override fun getProducts(
         page: Int,
@@ -43,14 +45,36 @@ class ProductsRepositoryImpl(
         }
     }
 
-    override fun getProductsByCategory(
-        category: String,
-        onResult: (Result<List<Product>>) -> Unit,
+    override fun getRecommendedProductsFromLastViewed(
+        cartProductIds: List<Long>,
+        onResult: (Result<List<ProductUiModel>>) -> Unit
     ) {
-        productsRemoteDataSource.getProductsByCategory(category = category) { result ->
+        viewedItemRepository.getLastViewedItem { item ->
+            if (item != null) {
+                getRecommendedProducts(
+                    category = item.category,
+                    cartProductIds = cartProductIds,
+                    onResult = onResult
+                )
+            } else {
+                onResult(Result.success(emptyList()))
+            }
+        }
+    }
+
+    private fun getRecommendedProducts(
+        category: String,
+        cartProductIds: List<Long>,
+        onResult: (Result<List<ProductUiModel>>) -> Unit
+    ) {
+        productsRemoteDataSource.getProductsByCategory(category) { result ->
             result
                 .mapCatching { response ->
-                    response.content.map { it.toDomain() }
+                    response.content
+                        .map { it.toDomain() }
+                        .filter { it.id !in cartProductIds }
+                        .take(10)
+                        .map { it.toUiModel() }
                 }
                 .let(onResult)
         }

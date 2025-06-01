@@ -144,6 +144,10 @@ class CartItemsRepositoryImpl(
         }
     }
 
+    override fun getCartItemIds(): List<Long> {
+        return cartItemsLocalDataSource.getCartItemIds()
+    }
+
     private fun Content.toUiModel() =
         ProductUiModel(
             id = this.product.id,

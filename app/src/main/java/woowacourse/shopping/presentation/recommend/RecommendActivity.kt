@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -14,12 +13,13 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
 
 class RecommendActivity : AppCompatActivity() {
+    private lateinit var recommendAdapter: RecommendAdapter
+    private val price: Int by lazy { intent.getIntExtra(TOTAL_PRICE_KEY, 0) }
+    private val count: Int by lazy { intent.getIntExtra(TOTAL_COUNT_KEY, 0) }
+
     private val binding: ActivityRecommendBinding by lazy {
         DataBindingUtil.setContentView(this, R.layout.activity_recommend)
     }
-
-    private val price: Int by lazy { intent.getIntExtra(TOTAL_PRICE_KEY, 0) }
-    private val count: Int by lazy { intent.getIntExtra(TOTAL_COUNT_KEY, 0) }
 
     private val recommendViewModel: RecommendViewModel by viewModels {
         RecommendViewModel.provideFactory(price, count)
@@ -52,6 +52,7 @@ class RecommendActivity : AppCompatActivity() {
         binding.apply {
             viewModel = recommendViewModel
             lifecycleOwner = this@RecommendActivity
+            recyclerViewRecommendProducts.adapter = RecommendAdapter()
         }
     }
 

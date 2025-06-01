@@ -42,4 +42,6 @@ interface CartItemRepository {
     fun getCartItemsCount(onResult: (Result<Int>) -> Unit)
 
     fun getQuantity(pagingData: PagingData): PagingData
+
+    fun getCartItemIds(): List<Long>
 }
