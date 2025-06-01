@@ -36,9 +36,16 @@ class ProductRepositoryImpl(
         onResult: (Result<List<Product>>) -> Unit,
     ) = runCatchingInThread(onResult) {
         val category = recentProductLocalDataSource.getRecentViewedProductCategory()
-        val response = productRemoteDataSource.fetchProducts(category, null, null).getOrNull()
+
+        val fetchLimit = limit + excludedProductIds.size
+        val response = productRemoteDataSource.fetchProducts(category, 0, fetchLimit).getOrNull()
         val allProducts = response?.content ?: emptyList()
-        val filteredProducts = allProducts.filterNot { excludedProductIds.contains(it.id) }
-        filteredProducts.take(limit).map { it.toDomain() }
+
+        val filteredProducts =
+            allProducts
+                .filterNot { excludedProductIds.contains(it.id) }
+                .take(limit)
+
+        filteredProducts.map { it.toDomain() }
     }
 }
