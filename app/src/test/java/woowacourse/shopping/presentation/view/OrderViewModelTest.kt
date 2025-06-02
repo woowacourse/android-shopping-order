@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.model.FetchPageDirection
-import woowacourse.shopping.presentation.view.cart.OrderViewModel
+import woowacourse.shopping.presentation.view.order.OrderViewModel
 import woowacourse.shopping.presentation.view.util.InstantTaskExecutorExtension
 import woowacourse.shopping.presentation.view.util.getOrAwaitValue
 
@@ -32,7 +32,7 @@ class OrderViewModelTest {
     @Test
     fun `초기화 시 장바구니 아이템이 로드된다`() {
         // When
-        val items = viewModel.cartItems.getOrAwaitValue()
+        val items = viewModel.cartProducts.getOrAwaitValue()
 
         // Then
         assertAll(
@@ -44,11 +44,11 @@ class OrderViewModelTest {
     @Test
     fun `다음 페이지 요청 시 페이지 증가 및 아이템이 추가된다`() {
         // Given
-        val before = viewModel.cartItems.getOrAwaitValue()
+        val before = viewModel.cartProducts.getOrAwaitValue()
 
         // When
         viewModel.fetchCartItems(FetchPageDirection.NEXT)
-        val after = viewModel.cartItems.getOrAwaitValue()
+        val after = viewModel.cartProducts.getOrAwaitValue()
 
         // Then
         assertAll(
@@ -60,12 +60,12 @@ class OrderViewModelTest {
     @Test
     fun `삭제 성공 시 현재 페이지를 다시 조회한다`() {
         // Given
-        val items = viewModel.cartItems.getOrAwaitValue()
+        val items = viewModel.cartProducts.getOrAwaitValue()
         val target = items.last()
 
         // When
-        viewModel.deleteCartItem(target.productId)
-        val newItems = viewModel.cartItems.getOrAwaitValue()
+        viewModel.onDeleteProduct(target.productId)
+        val newItems = viewModel.cartProducts.getOrAwaitValue()
 
         // Then
         assertAll(
@@ -87,39 +87,79 @@ class OrderViewModelTest {
     @Test
     fun `특정_상품의_구매_수량을_증가시킬_수_있다`() {
         // When
-        val before = viewModel.cartItems.getOrAwaitValue()
+        val before = viewModel.cartProducts.getOrAwaitValue()
         val target = before.first()
-        viewModel.increaseProductQuantity(target.productId)
+        viewModel.increaseQuantity(target.productId)
 
         // Then
-        val after = viewModel.cartItems.getOrAwaitValue()
+        val after = viewModel.cartProducts.getOrAwaitValue()
         assertThat(after.first().quantity).isGreaterThan(target.quantity)
     }
 
     @Test
     fun `특정_상품의_구매_수량을_감소시킬_수_있다`() {
         // Give
-        val before = viewModel.cartItems.getOrAwaitValue()
+        val before = viewModel.cartProducts.getOrAwaitValue()
         val target = before.first()
 
         // When
-        viewModel.decreaseProductQuantity(target.productId)
+        viewModel.decreaseQuantity(target.productId)
 
         // Then
-        val after = viewModel.cartItems.getOrAwaitValue()
+        val after = viewModel.cartProducts.getOrAwaitValue()
         assertThat(after.first().quantity).isLessThan(target.quantity)
     }
 
     @Test
     fun `구매_수량이_1인_특정_상품의_구매_수량을_감소시키면_삭제된다`() {
         // When
-        val before = viewModel.cartItems.getOrAwaitValue()
+        val before = viewModel.cartProducts.getOrAwaitValue()
         val target = before.first()
-        viewModel.decreaseProductQuantity(target.productId)
-        viewModel.decreaseProductQuantity(target.productId)
+        viewModel.decreaseQuantity(target.productId)
+        viewModel.decreaseQuantity(target.productId)
 
         // Then
-        val after = viewModel.cartItems.getOrAwaitValue()
+        val after = viewModel.cartProducts.getOrAwaitValue()
         assertThat(after).doesNotContain(target)
+    }
+
+    @Test
+    fun `특정 상품을 주문 선택에 추가하면 orderProducts에 포함된다`() {
+        // Given
+        val target = viewModel.cartProducts.getOrAwaitValue().first()
+
+        // When
+        viewModel.onSelectOrderProduct(target.productId)
+
+        // Then
+        val orderProducts = viewModel.totalOrderCount.getOrAwaitValue()
+        assertThat(orderProducts).isEqualTo(target.quantity)
+    }
+
+    @Test
+    fun `전체 선택하면 orderProducts에 모든 상품이 포함된다`() {
+        // When
+        viewModel.toggleSelectAll()
+
+        // Then
+        val orderProducts = viewModel.totalOrderCount.getOrAwaitValue()
+        val expected = dummyCartProducts.sumOf { it.quantity }
+
+        assertThat(orderProducts).isEqualTo(expected)
+    }
+
+    @Test
+    fun `선택된 주문 상품들의 총 주문 가격과 총 수량이 올바르게 계산된다`() {
+        // Given
+        val target = viewModel.cartProducts.getOrAwaitValue().first()
+        viewModel.onSelectOrderProduct(target.productId)
+
+        // When
+        val totalCount = viewModel.totalOrderCount.getOrAwaitValue()
+        val totalPrice = viewModel.totalOrderPrice.getOrAwaitValue()
+
+        // Then
+        assertThat(totalCount).isEqualTo(target.quantity)
+        assertThat(totalPrice).isEqualTo(target.totalPrice)
     }
 }
