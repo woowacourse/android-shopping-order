@@ -1,14 +1,14 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.token
 
 import android.content.Context
 import androidx.core.content.edit
 import java.util.Base64
 
-class TokenProvider(
+class SharedPreferenceTokenProvider(
     context: Context,
     name: String,
     password: String,
-) {
+) : TokenProvider {
     private val storage =
         context.getSharedPreferences(
             SHARED_NAME,
@@ -19,9 +19,9 @@ class TokenProvider(
         setToken(name, password)
     }
 
-    fun getToken(): String? = storage.getString(KEY_TOKEN, null)
+    override fun getToken(): String? = storage.getString(KEY_TOKEN, null)
 
-    private fun setToken(
+    override fun setToken(
         name: String,
         password: String,
     ) {

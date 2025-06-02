@@ -6,9 +6,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.TokenProvider
 import woowacourse.shopping.data.service.CartProductApiService
 import woowacourse.shopping.data.service.ProductApiService
+import woowacourse.shopping.data.token.TokenProvider
 
 class RetrofitInstance(tokenProvider: TokenProvider) {
     private val interceptorClient =
