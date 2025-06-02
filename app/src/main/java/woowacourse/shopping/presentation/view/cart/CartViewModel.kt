@@ -248,7 +248,7 @@ class CartViewModel(
             val selectedItems = (cartItems).filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
             _totalCount.postValue(selectedItems.sumOf { it.quantity })
-            _allSelected.postValue(selectedItems.size == cartItems.size)
+            _allSelected.postValue(selectedItems.isNotEmpty() && selectedItems.size == cartItems.size)
         }
     }
 
