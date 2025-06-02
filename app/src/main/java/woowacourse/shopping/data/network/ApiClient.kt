@@ -10,7 +10,15 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
 
 object ApiClient {
-    fun getApiClient(authenticationRepository: AuthenticationRepository): Retrofit =
+    fun getApiClient(): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType()),
+            ).build()
+
+    fun getAuthenticationApiClient(authenticationRepository: AuthenticationRepository): Retrofit =
         Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)

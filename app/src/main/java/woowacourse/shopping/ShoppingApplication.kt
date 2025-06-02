@@ -32,13 +32,13 @@ class ShoppingApplication : Application() {
 
     private val productService: ProductService by lazy {
         ApiClient
-            .getApiClient(DefaultAuthenticationRepository.get())
+            .getApiClient()
             .create(ProductService::class.java)
     }
 
     private val shoppingCartService: ShoppingCartService by lazy {
         ApiClient
-            .getApiClient(DefaultAuthenticationRepository.get())
+            .getAuthenticationApiClient(DefaultAuthenticationRepository.get())
             .create(ShoppingCartService::class.java)
     }
 
@@ -53,7 +53,7 @@ class ShoppingApplication : Application() {
 
         DefaultAuthenticationRepository.get().updateUserAuthentication(
             UserAuthentication(
-                id = "oungsi2000",
+                id = "m6z1",
                 password = "password",
             ),
         )
