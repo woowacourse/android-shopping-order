@@ -31,14 +31,20 @@ object AuthStorage {
         get() = storage.getString(KEY_PW, DEFAULT_PW)
         set(value) = storage.edit { putString(KEY_PW, value) }
 
-    val authorization by lazy {
-        val valueToEncode = "$id:$pw".toByteArray()
-        "Basic " + Base64.getEncoder().encodeToString(valueToEncode)
-    }
+    val authToken: String?
+        get() {
+            if (id == null || pw == null) {
+                return null
+            }
+
+            val valueToEncode = "$id:$pw".toByteArray()
+            return BASIC_AUTH_FORMAT.format(Base64.getEncoder().encodeToString(valueToEncode))
+        }
 
     private const val KEY_ID = "woowacourse.shopping.KEY_ID"
-    private const val DEFAULT_ID = "jerry8282"
+    private const val DEFAULT_ID = "giovannijunseokim"
     private const val KEY_PW = "woowacourse.shopping.KEY_PW"
     private const val DEFAULT_PW = "password"
     private const val FILE_NAME = "auth"
+    private const val BASIC_AUTH_FORMAT = "Basic %s"
 }

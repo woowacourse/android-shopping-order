@@ -11,19 +11,22 @@ import woowacourse.shopping.data.cart.service.CartService
 import woowacourse.shopping.data.product.service.ProductService
 
 object API {
-    private val client: OkHttpClient =
+    private val client: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
+            .addInterceptor(AuthInterceptor())
             .addHttpLoggingInterceptor()
             .build()
+    }
 
-    private val retrofit =
+    private val retrofit by lazy {
         Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(client)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
+    }
 
     val productService: ProductService = retrofit.create(ProductService::class.java)
     val cartService: CartService = retrofit.create(CartService::class.java)
