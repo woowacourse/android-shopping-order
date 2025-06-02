@@ -144,7 +144,9 @@ class CartViewModel(
                 if (found != null) {
                     _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = false))
                 } else {
-                    _itemUpdateEvent.postValue(removedItem.toCartItemUiModel().copy(isSelected = false))
+                    _itemUpdateEvent.postValue(
+                        removedItem.toCartItemUiModel().copy(isSelected = false),
+                    )
                     fetchRecommendedProducts()
                 }
             }
@@ -160,7 +162,7 @@ class CartViewModel(
         selectionStatus[cartItem.cartItem.cartId] = isSelected
         _cartItems.postValue(
             _cartItems.value?.map { item ->
-                if (item.cartItem.cartId == item.cartItem.cartId) {
+                if (item.cartItem.cartId == cartItem.cartItem.cartId) {
                     item.copy(isSelected = isSelected)
                 } else {
                     item
