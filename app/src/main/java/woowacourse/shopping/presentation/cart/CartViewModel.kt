@@ -26,10 +26,6 @@ class CartViewModel(
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
-    init {
-        loadItems()
-    }
-
     fun loadItems(currentPage: Int = 0) {
         _uiState.value = ResultState.Loading
 

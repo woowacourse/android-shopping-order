@@ -48,8 +48,8 @@ class CartActivity :
         observeViewModel()
     }
 
-    override fun onRestart() {
-        super.onRestart()
+    override fun onStart() {
+        super.onStart()
         viewModel.loadItems()
         viewModel.fetchSelectedInfo()
     }
