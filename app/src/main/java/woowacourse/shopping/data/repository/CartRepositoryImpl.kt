@@ -11,7 +11,6 @@ import woowacourse.shopping.data.util.runCatchingInThread
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.concurrent.thread
 
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
@@ -101,7 +100,7 @@ class CartRepositoryImpl(
     }
 
     private fun fetchCart() =
-        thread {
+        runCatchingInThread {
             val totalElements = cartRemoteDataSource.fetchCartItems(0, 1).getOrThrow().totalElements
             val result = cartRemoteDataSource.fetchCartItems(0, totalElements).getOrThrow().content
             cartLocalDataSource.addAllCartProducts(result.map { it.toDomain() })
