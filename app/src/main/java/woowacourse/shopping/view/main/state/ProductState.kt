@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.main.state
 
 import woowacourse.shopping.domain.Quantity
+import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.product.Product
 
 data class ProductState(
@@ -31,5 +32,18 @@ data class ProductState(
         val newState = copy(cartQuantity = decreasedCartQuantity)
 
         return newState
+    }
+
+    companion object {
+        fun of(
+            cart: ShoppingCart?,
+            product: Product,
+        ): ProductState {
+            return ProductState(
+                cartId = cart?.id,
+                item = product,
+                cartQuantity = cart?.quantity ?: Quantity(0),
+            )
+        }
     }
 }

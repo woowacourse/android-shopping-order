@@ -66,15 +66,6 @@ class MainViewModel(
     ) {
         historyLoader { result ->
             result.onSuccess { historyStates ->
-                val newStates =
-                    productPage.products.map { product ->
-                        val cartItem = cartItems.find { it.productId == product.id }
-                        ProductState(
-                            cartId = cartItem?.id,
-                            item = product,
-                            cartQuantity = cartItem?.quantity ?: Quantity(0),
-                        )
-                    }
 
                 val updatedList = _uiState.value?.productItems.orEmpty() + newStates
 
@@ -88,6 +79,13 @@ class MainViewModel(
 
                 toggleFetching()
             }
+                    val newStates =
+                        productPage
+                            .products
+                            .map { product ->
+                                val cartItem = cartItems.find { it.productId == product.id }
+                                ProductState.of(cartItem, product)
+                            }
                 .onFailure(::handleFailure)
         }
     }
