@@ -82,7 +82,8 @@ class RecommendActivity :
         binding.tbRecommend.apply {
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
-                setResult(Activity.RESULT_OK)
+                val resultIntent = Intent()
+                setResult(Activity.RESULT_OK, resultIntent)
                 finish()
             }
         }
