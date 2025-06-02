@@ -101,6 +101,7 @@ class CartRepositoryImpl(
             result.fold(
                 onSuccess = {
                     cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity + 1))
+                    onResult(Result.success(Unit))
                 },
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
             )
@@ -123,10 +124,15 @@ class CartRepositoryImpl(
             }
         } else {
             cartRemoteDataSource.updateQuantity(cartItem.cartId, cartItem.quantity - 1) { result ->
-                result.onSuccess {
-                    cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity - 1))
-                }
-                onResult(result)
+                result.fold(
+                    onSuccess = {
+                        cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity - 1))
+                        onResult(Result.success(Unit))
+                    },
+                    onFailure = { throwable ->
+                        onResult(Result.failure(throwable))
+                    },
+                )
             }
         }
     }
