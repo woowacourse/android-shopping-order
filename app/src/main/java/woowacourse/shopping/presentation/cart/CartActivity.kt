@@ -121,12 +121,12 @@ class CartActivity :
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onClickMinus(id: Long) {
-        viewModel.decreaseQuantity(id)
-    }
-
     override fun onClickPlus(id: Long) {
         viewModel.increaseQuantity(id)
+    }
+
+    override fun onClickMinus(id: Long) {
+        viewModel.decreaseQuantity(id)
     }
 
     override fun onClickDelete(cartItem: CartItemUiModel) {
