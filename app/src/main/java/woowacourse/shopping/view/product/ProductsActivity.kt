@@ -45,9 +45,9 @@ class ProductsActivity :
                 }
 
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
-                    val updateItems: Boolean? =
+                    val hasUpdatedItems: Boolean? =
                         result.data?.getSerializableExtraData("updateProducts")
-                    if (updateItems != null && updateItems) viewModel.updateProducts()
+                    if (hasUpdatedItems != null && hasUpdatedItems) viewModel.updateProducts()
                     viewModel.updateShoppingCartQuantity()
                 }
 
