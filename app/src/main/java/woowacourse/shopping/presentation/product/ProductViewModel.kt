@@ -49,7 +49,7 @@ class ProductViewModel(
                     _products.postValue(cartItems)
                     _uiState.value = ResultState.Success(Unit)
                 }.onFailure {
-                    _toastMessage.postValue(R.string.product_toast_load_failure)
+                    _uiState.postValue(ResultState.Failure(it))
                 }
         }
 
@@ -58,7 +58,7 @@ class ProductViewModel(
                 .onSuccess { products ->
                     _recentProducts.postValue(products)
                 }.onFailure {
-                    _toastMessage.postValue(R.string.product_toast_load_failure)
+                    _uiState.postValue(ResultState.Failure(it))
                 }
         }
     }

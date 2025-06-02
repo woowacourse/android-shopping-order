@@ -49,7 +49,7 @@ class CartViewModel(
                     _cartItems.postValue(newItems)
                     _uiState.postValue(ResultState.Success(Unit))
                 }.onFailure {
-                    _toastMessage.postValue(R.string.cart_toast_load_fail)
+                    _uiState.postValue(ResultState.Failure(it))
                 }
         }
     }

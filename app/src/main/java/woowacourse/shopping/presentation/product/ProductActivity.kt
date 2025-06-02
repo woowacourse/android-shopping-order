@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -46,8 +45,6 @@ class ProductActivity :
         enableEdgeToEdge()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product)
         binding.lifecycleOwner = this
-
-        showSkeleton(true)
 
         initInsets()
         setupToolbar()
@@ -125,8 +122,8 @@ class ProductActivity :
     }
 
     private fun observeViewModel() {
-        viewModel.uiState.observe(this) { result ->
-            when (result) {
+        viewModel.uiState.observe(this) { state ->
+            when (state) {
                 is ResultState.Loading -> {
                     showSkeleton(true)
                 }
@@ -137,6 +134,7 @@ class ProductActivity :
 
                 is ResultState.Failure -> {
                     showSkeleton(true)
+                    showToast(state.throwable?.message)
                 }
             }
         }
@@ -165,7 +163,7 @@ class ProductActivity :
         }
 
         viewModel.toastMessage.observe(this) { resId ->
-            showToast(resId)
+            showToast(getString(resId))
         }
     }
 
@@ -178,10 +176,8 @@ class ProductActivity :
         }
     }
 
-    private fun showToast(
-        @StringRes messageResId: Int,
-    ) {
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+    private fun showToast(message: String?) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun handleLoadMoreClick() {
