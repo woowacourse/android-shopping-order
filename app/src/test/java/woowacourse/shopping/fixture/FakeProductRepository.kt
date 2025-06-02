@@ -11,7 +11,7 @@ class FakeProductRepository : ProductRepository {
         category: String?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        val pagedItems = ProductsFixture.dummyProducts.drop(page!!).take(pageSize!!)
+        val pagedItems = ProductsFixture.dummyProducts.drop(0).take(12)
         val result = pagedItems.toCartItems()
         onResult(Result.success(result))
     }

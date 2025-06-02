@@ -7,6 +7,7 @@ class FakeRecentProductRepository : RecentProductRepository {
     var recentProduct: Product? = null
 
     override fun getRecentProducts(onResult: (Result<List<Product>>) -> Unit) {
+        onResult(Result.success(ProductsFixture.dummyProducts))
     }
 
     override fun getMostRecentProduct(onResult: (Result<Product?>) -> Unit) {

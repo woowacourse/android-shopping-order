@@ -24,11 +24,7 @@ class ProductDetailViewModelTest {
         productRepository = FakeProductRepository()
         recentProductRepository = FakeRecentProductRepository()
         viewModel =
-            ProductDetailViewModel(
-                cartRepository,
-                productRepository,
-                recentProductRepository,
-            )
+            ProductDetailViewModel(cartRepository, productRepository, recentProductRepository)
     }
 
     @Test
@@ -67,7 +63,7 @@ class ProductDetailViewModelTest {
     fun `상품_개수_증가_버튼을_누르면_개수가_증가한다`() {
         // 상품 초기값 1
         viewModel.fetchData(1L)
-        viewModel.onClickPlus(1L)
+        viewModel.increaseQuantity()
 
         val result = viewModel.productCount.getOrAwaitValue()
         assertThat(result).isEqualTo(2)
@@ -78,8 +74,8 @@ class ProductDetailViewModelTest {
         // 상품 초기값 1
         viewModel.fetchData(1L)
         // 증가시켜서 개수 2
-        viewModel.onClickPlus(1L)
-        viewModel.onClickMinus(1L)
+        viewModel.increaseQuantity()
+        viewModel.decreaseQuantity()
 
         val result = viewModel.productCount.getOrAwaitValue()
         assertThat(result).isEqualTo(1)

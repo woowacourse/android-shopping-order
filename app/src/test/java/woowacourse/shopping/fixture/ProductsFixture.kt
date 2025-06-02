@@ -15,22 +15,15 @@ object ProductsFixture {
         )
 
     val dummyProducts: List<Product> =
-        listOf(
+        List(20) { index ->
             Product(
-                0,
+                index.toLong(),
                 "맥심 모카골드 마일드",
                 Price(12000),
                 "https://sitem.ssgcdn.com/64/93/82/item/0000006829364_i1_464.jpg",
                 "커피",
-            ),
-            Product(
-                1,
-                "맥심 슈프림골드 커피믹스",
-                Price(8000),
-                "https://sitem.ssgcdn.com/03/58/88/item/1000172885803_i1_464.jpg",
-                "커피",
-            ),
-        )
+            )
+        }
 
     val dummyCartItem =
         CartItem(

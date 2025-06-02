@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class FakeCartRepository : CartRepository {
-    override fun getTotalCount(onResult: (Result<Int>) -> Unit) {
-        onResult(Result.success(3))
+    override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) {
+        onResult(Result.success(ProductsFixture.dummyCartItems.size))
     }
 
     override fun fetchPagedCartItems(
@@ -14,6 +14,10 @@ class FakeCartRepository : CartRepository {
         pageSize: Int?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
+        onResult(Result.success(ProductsFixture.dummyCartItems))
+    }
+
+    override fun fetchAllCartItems(onResult: (Result<List<CartItem>>) -> Unit) {
         onResult(Result.success(ProductsFixture.dummyCartItems))
     }
 

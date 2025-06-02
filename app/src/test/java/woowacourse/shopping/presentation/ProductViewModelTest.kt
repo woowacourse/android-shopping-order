@@ -1,13 +1,14 @@
 package woowacourse.shopping.presentation
 
-import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
+import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.presentation.product.ProductViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -19,11 +20,27 @@ class ProductViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        cartRepository = mockk(relaxed = true)
+        cartRepository = FakeCartRepository()
         productRepository = FakeProductRepository()
-        recentProductRepository = mockk(relaxed = true)
+        recentProductRepository = FakeRecentProductRepository()
 
         viewModel = ProductViewModel(cartRepository, productRepository, recentProductRepository)
+    }
+
+    @Test
+    fun `장바구니 전체 상품 개수를 조회할 수 있다`() {
+        viewModel.fetchCartItemCount()
+
+        val products = viewModel.cartItemCount.getOrAwaitValue()
+        assertThat(products).isEqualTo(10)
+    }
+
+    @Test
+    fun `fetchData 초기 호출 시 최근 본 상품 목록을 조회할 수 있다`() {
+        viewModel.fetchData(0)
+
+        val recentProducts = viewModel.recentProducts.getOrAwaitValue()
+        assertThat(recentProducts).hasSize(20)
     }
 
     @Test
@@ -31,8 +48,7 @@ class ProductViewModelTest {
         viewModel.fetchData(0)
 
         val products = viewModel.products.getOrAwaitValue()
-        val data = (products as ResultState.Success).data
-        assertThat(data).hasSize(12)
+        assertThat(products).hasSize(12)
     }
 
     @Test
@@ -41,8 +57,7 @@ class ProductViewModelTest {
         viewModel.loadMore()
 
         val products = viewModel.products.getOrAwaitValue()
-        val data = (products as ResultState.Success).data
-        assertThat(data).hasSize(24)
+        assertThat(products).hasSize(24)
     }
 
     @Test
@@ -57,7 +72,7 @@ class ProductViewModelTest {
     @Test
     fun `모든 데이터를 불러오면 더보기 버튼은 false가 된다`() {
         viewModel.fetchData(0)
-        repeat(10) { viewModel.loadMore() }
+        repeat(8) { viewModel.loadMore() }
 
         val showLoadMore = viewModel.showLoadMore.getOrAwaitValue()
         assertThat(showLoadMore).isFalse()
