@@ -12,4 +12,8 @@ import woowacourse.shopping.data.product.local.entity.RecentWatchingEntity
 )
 abstract class ProductDatabase : RoomDatabase() {
     abstract fun recentWatchingDao(): RecentWatchingDao
+
+    companion object {
+        const val DATABASE_NAME = "product_database"
+    }
 }

@@ -18,14 +18,14 @@ class ShoppingApplication : Application() {
             .databaseBuilder(
                 applicationContext,
                 ProductDatabase::class.java,
-                "recent_watching",
+                ProductDatabase.DATABASE_NAME,
             ).fallbackToDestructiveMigration()
             .build()
     }
 
     private val authDataSource: SharedPreferences by lazy {
         getSharedPreferences(
-            "authentication",
+            AUTHENTICATION_PREFERENCES_NAME,
             MODE_PRIVATE,
         )
     }
@@ -57,5 +57,9 @@ class ShoppingApplication : Application() {
                 password = BuildConfig.USER_PASSWORD,
             ),
         )
+    }
+
+    companion object {
+        private const val AUTHENTICATION_PREFERENCES_NAME = "authentication"
     }
 }

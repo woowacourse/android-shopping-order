@@ -10,12 +10,14 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
 
 object ApiClient {
+    private const val MEDIA_TYPE_JSON = "application/json"
+
     fun getApiClient(): Retrofit =
         Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(
-                Json.asConverterFactory("application/json".toMediaType()),
+                Json.asConverterFactory(MEDIA_TYPE_JSON.toMediaType()),
             ).build()
 
     fun getAuthenticationApiClient(authenticationRepository: AuthenticationRepository): Retrofit =
@@ -24,7 +26,7 @@ object ApiClient {
             .baseUrl(BuildConfig.BASE_URL)
             .client(provideOkHttpClient(AuthenticationInterceptor(authenticationRepository)))
             .addConverterFactory(
-                Json.asConverterFactory("application/json".toMediaType()),
+                Json.asConverterFactory(MEDIA_TYPE_JSON.toMediaType()),
             ).build()
 
     private fun provideOkHttpClient(interceptor: AuthenticationInterceptor): OkHttpClient {

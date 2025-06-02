@@ -22,8 +22,12 @@ class AuthenticationInterceptor(
             val newRequest =
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", basicAuth)
+                    .addHeader(AUTHORIZATION_HEADER, basicAuth)
                     .build()
             proceed(newRequest)
         }
+
+    companion object {
+        private const val AUTHORIZATION_HEADER = "Authorization"
+    }
 }
