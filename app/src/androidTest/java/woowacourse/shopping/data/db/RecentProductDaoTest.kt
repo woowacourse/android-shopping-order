@@ -9,6 +9,12 @@ import org.junit.jupiter.api.Test
 class RecentProductDaoTest {
     private lateinit var database: ShoppingDatabase
     private lateinit var recentProductDao: RecentProductDao
+    private val product =
+        RecentProductEntity(
+            productId = 1L,
+            category = "포켓몬",
+            lastViewedAt = System.currentTimeMillis(),
+        )
 
     @BeforeEach
     fun `테스트_실행_전_인메모리_데이터베이스_생성`() {
@@ -29,9 +35,6 @@ class RecentProductDaoTest {
 
     @Test
     fun `최근_상품을_삽입하고_갯수를_조회할_수_있다`() {
-        // Given
-        val product = RecentProductEntity(productId = 1L, lastViewedAt = System.currentTimeMillis())
-
         // When
         recentProductDao.insertRecentProduct(product)
         val count = recentProductDao.getRecentProductCount()
@@ -46,9 +49,9 @@ class RecentProductDaoTest {
         val now = System.currentTimeMillis()
         val products =
             arrayOf(
-                RecentProductEntity(productId = 1L, lastViewedAt = now - 3000),
-                RecentProductEntity(productId = 2L, lastViewedAt = now - 2000),
-                RecentProductEntity(productId = 3L, lastViewedAt = now - 1000),
+                product.copy(productId = 1L, lastViewedAt = now - 3000),
+                product.copy(productId = 2L, lastViewedAt = now - 2000),
+                product.copy(productId = 3L, lastViewedAt = now - 1000),
             )
         insertProducts(*products)
 
@@ -67,9 +70,9 @@ class RecentProductDaoTest {
         val now = System.currentTimeMillis()
         val products =
             arrayOf(
-                RecentProductEntity(productId = 1L, lastViewedAt = now - 3000),
-                RecentProductEntity(productId = 2L, lastViewedAt = now - 2000),
-                RecentProductEntity(productId = 3L, lastViewedAt = now - 1000),
+                product.copy(productId = 1L, lastViewedAt = now - 3000),
+                product.copy(productId = 2L, lastViewedAt = now - 2000),
+                product.copy(productId = 3L, lastViewedAt = now - 1000),
             )
         insertProducts(*products)
 
