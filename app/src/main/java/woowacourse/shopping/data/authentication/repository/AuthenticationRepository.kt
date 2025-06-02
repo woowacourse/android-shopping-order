@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.authentication.repository
 
-import woowacourse.shopping.domain.authentication.UserAuthentication
+import woowacourse.shopping.data.authentication.model.UserAuthentication
 
 interface AuthenticationRepository {
     val id: String

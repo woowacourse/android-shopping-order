@@ -2,7 +2,7 @@ package woowacourse.shopping.data.authentication.repository
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import woowacourse.shopping.domain.authentication.UserAuthentication
+import woowacourse.shopping.data.authentication.model.UserAuthentication
 
 class DefaultAuthenticationRepository(
     private val authDataSource: SharedPreferences,

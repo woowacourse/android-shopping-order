@@ -3,6 +3,7 @@ package woowacourse.shopping
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.room.Room
+import woowacourse.shopping.data.authentication.model.UserAuthentication
 import woowacourse.shopping.data.authentication.repository.DefaultAuthenticationRepository
 import woowacourse.shopping.data.network.ApiClient
 import woowacourse.shopping.data.product.local.database.ProductDatabase
@@ -10,7 +11,6 @@ import woowacourse.shopping.data.product.remote.service.ProductService
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.domain.authentication.UserAuthentication
 
 class ShoppingApplication : Application() {
     private val productDatabase: ProductDatabase by lazy {

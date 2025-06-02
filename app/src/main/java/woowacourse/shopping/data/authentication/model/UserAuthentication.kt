@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.authentication
+package woowacourse.shopping.data.authentication.model
 
 data class UserAuthentication(
     val id: String,
