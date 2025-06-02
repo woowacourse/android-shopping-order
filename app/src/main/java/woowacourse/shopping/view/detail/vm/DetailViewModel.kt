@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -33,36 +34,44 @@ class DetailViewModel(
         productId: Long,
         lastSeenProductId: Long,
     ) {
+        defaultProductRepository.loadProduct(productId) { result ->
+            result
+                .onSuccess { product -> initializeUiState(productId, lastSeenProductId, product) }
+                .onFailure(::handleFailure)
+        }
         saveHistory(productId)
+    }
 
-        defaultProductRepository.loadProduct(productId) { product ->
-            product.onSuccess { productValue ->
-                if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
-                    defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
-                        lastSeenProduct.onSuccess { lastSeenProductValue ->
-                            _uiState.value =
-                                DetailUiState(
-                                    ProductState(
-                                        item = productValue,
-                                        cartQuantity = Quantity(1),
-                                    ),
-                                    lastSeenProduct = lastSeenProductValue,
-                                )
-                        }
-                            .onFailure(::handleFailure)
-                    }
-                } else {
-                    _uiState.value = (
-                        DetailUiState(
-                            product =
-                                ProductState(
-                                    item = productValue,
-                                    cartQuantity = Quantity(1),
-                                ),
-                            lastSeenProduct = null,
-                        )
+    private fun initializeUiState(
+        productId: Long,
+        lastSeenProductId: Long,
+        product: Product,
+    ) {
+        if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
+            loadLastSeenProduct(productId, product)
+        } else {
+            _uiState.value =
+                DetailUiState(
+                    ProductState(item = product, cartQuantity = Quantity(1)),
+                    lastSeenProduct = null,
+                )
+        }
+    }
+
+    private fun loadLastSeenProduct(
+        lastSeenProductId: Long,
+        product: Product,
+    ) {
+        defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
+            lastSeenProduct.onSuccess { lastSeenProductValue ->
+                _uiState.value =
+                    DetailUiState(
+                        ProductState(
+                            item = product,
+                            cartQuantity = Quantity(1),
+                        ),
+                        lastSeenProduct = lastSeenProductValue,
                     )
-                }
             }
                 .onFailure(::handleFailure)
         }
@@ -119,7 +128,7 @@ class DetailViewModel(
             }
         }
 
-    fun loadLastSeenProduct(lastSeenProductId: Long) {
+    fun saveLastSeenProduct(lastSeenProductId: Long) {
         historyRepository.saveHistory(lastSeenProductId)
     }
 
@@ -133,12 +142,8 @@ class DetailViewModel(
 
     val cartQuantityEventHandler =
         object : CartQuantityHandler {
-            override fun onClickIncrease(cartId: Long) {
-                increaseCartQuantity()
-            }
+            override fun onClickIncrease(cartId: Long) = increaseCartQuantity()
 
-            override fun onClickDecrease(cartId: Long) {
-                decreaseCartQuantity()
-            }
+            override fun onClickDecrease(cartId: Long) = decreaseCartQuantity()
         }
 }
