@@ -36,7 +36,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         binding.lifecycleOwner = viewLifecycleOwner
 
         sharedViewModel.cartProducts.observe(viewLifecycleOwner) { cartItems ->
-            cartAdapter.updateItemsManually(cartItems)
+            cartAdapter.submitList(cartItems)
         }
 
         sharedViewModel.toastEvent.observe(viewLifecycleOwner) { event ->
