@@ -11,7 +11,7 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private var cachedCart: Cart = Cart()
 
-    override fun getTotalCount(onResult: (Result<Int>) -> Unit) {
+    override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) {
         cartDataSource.getTotalCount { result ->
             onResult(result)
         }
@@ -38,7 +38,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun getCartItemById(productId: Long): CartItem? = cachedCart.findCartItem(productId)
+    override fun fetchCartItemById(productId: Long): CartItem? = cachedCart.findCartItem(productId)
 
     override fun insertOrUpdate(
         product: Product,

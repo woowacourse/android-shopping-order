@@ -20,7 +20,7 @@ class ProductRepositoryImpl(
             val cartItems =
                 products.map { product ->
                     cartRepository
-                        .getCartItemById(product.productId) ?: CartItem(
+                        .fetchCartItemById(product.productId) ?: CartItem(
                         product = product,
                         quantity = 0,
                     )
@@ -37,10 +37,4 @@ class ProductRepositoryImpl(
             onResult(Result.success(product))
         }
     }
-
-    private fun List<Product>.toCartItems(): List<CartItem> =
-        this.map { product ->
-//            val quantity = cartDataSource.getQuantityById(product.productId)
-            CartItem(product = product, quantity = 0)
-        }
 }
