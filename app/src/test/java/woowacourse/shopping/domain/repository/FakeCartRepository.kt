@@ -5,8 +5,8 @@ import woowacourse.shopping.domain.model.CartItem
 class FakeCartRepository : CartRepository {
     private val cartItems = mutableListOf<CartItem>()
 
-    override fun getCartItems(
-        limit: Int,
+    override fun loadPageOfCartItems(
+        pageSize: Int,
         offset: Int,
         callback: (List<CartItem>, Boolean) -> Unit,
     ) {
@@ -14,11 +14,11 @@ class FakeCartRepository : CartRepository {
     }
 
     override fun deleteCartItem(
-        id: Long,
+        cartId: Long,
         callback: (Long) -> Unit,
     ) {
-        val removed = cartItems.removeIf { it.product.id == id }
-        if (removed) callback(id)
+        val removed = cartItems.removeIf { it.product.id == cartId }
+        if (removed) callback(cartId)
     }
 
     override fun addCartItem(

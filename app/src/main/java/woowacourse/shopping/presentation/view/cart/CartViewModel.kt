@@ -60,9 +60,9 @@ class CartViewModel(
         val currentPage = _page.value ?: DEFAULT_PAGE
         val newPage = calculatePage(isNextPage, currentPage, isRefresh)
 
-        cartRepository.getCartItems(
-            page = newPage - DEFAULT_PAGE,
-            limit = PAGE_SIZE,
+        cartRepository.loadPageOfCartItems(
+            pageIndex = newPage - DEFAULT_PAGE,
+            pageSize = PAGE_SIZE,
         ) { products, hasMore ->
             val updatedItems =
                 products.map { product ->
@@ -120,7 +120,7 @@ class CartViewModel(
     private fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
         cartRepository.addCartItem(newItem) {
-            cartRepository.getAllCartItems { cartItems ->
+            cartRepository.loadAllCartItems { cartItems ->
                 val found =
                     cartItems?.find { it.product.id == newItem.product.id }
                 if (found != null) {
@@ -138,7 +138,7 @@ class CartViewModel(
         val removedItem = cartItem.cartItem.copy(quantity = 0)
         selectionStatus.remove(cartItem.cartItem.cartId)
         cartRepository.deleteCartItem(cartItem.cartItem.cartId) { id ->
-            cartRepository.getAllCartItems { cartItems ->
+            cartRepository.loadAllCartItems { cartItems ->
                 val found =
                     cartItems?.find { it.product.id == removedItem.product.id }
                 if (found != null) {
@@ -171,7 +171,7 @@ class CartViewModel(
     }
 
     fun setAllSelections(selectAll: Boolean) {
-        cartRepository.getAllCartItems { allItems ->
+        cartRepository.loadAllCartItems { allItems ->
             allItems?.forEach { cartItem ->
                 selectionStatus[cartItem.cartId] = selectAll
                 _cartItems.postValue(
@@ -193,7 +193,7 @@ class CartViewModel(
         productRepository.getMostRecentProduct { mostRecentProduct ->
             val recommendedCategory = mostRecentProduct?.category
             productRepository.loadProductsByCategory(recommendedCategory.orEmpty()) { productsInRecommendedCategory ->
-                cartRepository.getAllCartItems { allCartItems ->
+                cartRepository.loadAllCartItems { allCartItems ->
                     val recommendedProducts =
                         productsInRecommendedCategory
                             .filterNot { productInRecommendedCategory ->
@@ -224,7 +224,7 @@ class CartViewModel(
         id: Long,
         callback: (CartItem?) -> Unit,
     ) {
-        cartRepository.getAllCartItems { cartItems ->
+        cartRepository.loadAllCartItems { cartItems ->
             val foundItem = cartItems?.find { it.cartId == id }
             callback(foundItem)
         }
@@ -244,7 +244,7 @@ class CartViewModel(
     }
 
     private fun updateSelectionInfo() {
-        cartRepository.getAllCartItems { cartItems ->
+        cartRepository.loadAllCartItems { cartItems ->
             val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
             val selectedItems = (cartItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })

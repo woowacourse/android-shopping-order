@@ -145,7 +145,7 @@ class CatalogViewModel(
     private fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
         cartRepository.addCartItem(newItem) {
-            cartRepository.getAllCartItems { cartItems ->
+            cartRepository.loadAllCartItems { cartItems ->
                 cartItems
                     ?.find { cartItem -> cartItem.product.id == newItem.product.id }
                     ?.let { foundItem ->
@@ -169,7 +169,7 @@ class CatalogViewModel(
         id: Long,
         callback: (CartItem?) -> Unit,
     ) {
-        cartRepository.getAllCartItems { cartItems ->
+        cartRepository.loadAllCartItems { cartItems ->
             val foundItem = cartItems?.find { cartItem -> cartItem.cartId == id }
             callback(foundItem)
         }
