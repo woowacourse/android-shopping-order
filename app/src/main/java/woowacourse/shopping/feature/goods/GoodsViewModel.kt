@@ -36,9 +36,6 @@ class GoodsViewModel(
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
 
-    private val _isLoading = MutableLiveData(true)
-    val isLoading: LiveData<Boolean> = _isLoading
-
     private var cashedCartItems: MutableMap<Int, CartItem> = mutableMapOf()
 
     init {
@@ -78,7 +75,6 @@ class GoodsViewModel(
                 goods.addAll(fetchedGoods)
                 _isFullLoaded.postValue(goodsResponse.last)
                 _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
-                _isLoading.postValue(false)
             },
             onFail = { throwable ->
                 throw (throwable)

@@ -35,7 +35,7 @@ fun loadImageFromUrl(
 fun RecyclerView.bindCartItems(cartItems: List<CartItem>?) {
     when (val adapter = this.adapter) {
         is GoodsAdapter -> {
-            if (cartItems != null) adapter.setItems(cartItems)
+            if (cartItems != null) adapter.setGoodsItem(cartItems)
         }
 
         is CartAdapter -> {
@@ -45,7 +45,7 @@ fun RecyclerView.bindCartItems(cartItems: List<CartItem>?) {
         is ConcatAdapter -> {
             adapter.adapters.forEach { childAdapter ->
                 if (childAdapter is GoodsAdapter && cartItems != null) {
-                    childAdapter.setItems(cartItems)
+                    childAdapter.setGoodsItem(cartItems)
                 }
 
                 if (childAdapter is CartAdapter && cartItems != null) {

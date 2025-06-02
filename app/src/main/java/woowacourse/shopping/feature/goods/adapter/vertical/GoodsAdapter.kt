@@ -1,53 +1,71 @@
 package woowacourse.shopping.feature.goods.adapter.vertical
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.databinding.ItemGoodsBinding
+import woowacourse.shopping.databinding.ItemGoodsSkeletonBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 
 class GoodsAdapter(
     private val goodsClickListener: GoodsClickListener,
     private val quantityChangeListener: QuantityChangeListener,
-) : RecyclerView.Adapter<GoodsViewHolder>() {
-    private val items: MutableList<CartItem> = mutableListOf()
+) : ListAdapter<GoodsListItem, RecyclerView.ViewHolder>(GoodsDiffCallback()) {
+    fun showSkeleton(count: Int = 10) {
+        val skeletonItems = List(count) { GoodsListItem.Skeleton }
+        submitList(skeletonItems)
+    }
 
-    fun setItems(newItems: List<CartItem>) {
-        val oldItems = items.toList()
-        items.clear()
-        items.addAll(newItems)
-        if (oldItems.isEmpty()) {
-            @Suppress("NotifyDataSetChanged")
-            notifyDataSetChanged()
-        } else if (newItems.size > oldItems.size) {
-            notifyItemRangeInserted(oldItems.size, newItems.size - oldItems.size)
-        } else if (newItems.size == oldItems.size) {
-            oldItems.zip(newItems).forEachIndexed { index, (oldItem, newItem) ->
-                if (oldItem != newItem) {
-                    updateItemQuantity(index)
-                }
-            }
+    fun setGoodsItem(goodsItem: List<CartItem>) {
+        val newItems = goodsItem.map { GoodsListItem.GoodsData(it) }
+        submitList(newItems)
+    }
+
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is GoodsListItem.Skeleton -> TYPE_SKELETON
+            is GoodsListItem.GoodsData -> TYPE_GOODS_ITEM
         }
-    }
-
-    private fun updateItemQuantity(position: Int) {
-        notifyItemChanged(position, "quantity_changed")
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): GoodsViewHolder = GoodsViewHolder.from(parent, goodsClickListener, quantityChangeListener)
+    ): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
 
-    override fun onBindViewHolder(
-        holder: GoodsViewHolder,
-        position: Int,
-    ) {
-        val item: CartItem = items[position]
-        holder.bind(item)
+        return when (viewType) {
+            TYPE_SKELETON -> {
+                val binding = ItemGoodsSkeletonBinding.inflate(inflater, parent, false)
+                SkeletonViewHolder(binding)
+            }
+            TYPE_GOODS_ITEM -> {
+                val binding = ItemGoodsBinding.inflate(inflater, parent, false)
+                binding.clickListener = goodsClickListener
+                binding.quantityChangeListener = quantityChangeListener
+                GoodsViewHolder(binding)
+            }
+
+            else -> throw IllegalArgumentException("알 수 없는 뷰 타입: $viewType")
+        }
     }
 
     override fun onBindViewHolder(
-        holder: GoodsViewHolder,
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
+        when (val item = getItem(position)) {
+            is GoodsListItem.Skeleton -> {}
+            is GoodsListItem.GoodsData -> {
+                val goodsHolder = holder as GoodsViewHolder
+                goodsHolder.bind(item.goodsItem)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
         position: Int,
         payloads: List<Any>,
     ) {
@@ -55,12 +73,18 @@ class GoodsAdapter(
             onBindViewHolder(holder, position)
         } else {
             val payload = payloads[0]
-            if (payload == "quantity_changed") {
-                holder.binding.cartItem = items[position]
-                holder.binding.quantitySelector.cartItem = items[position]
+            if (payload == QUANTITY_CHANGED_PAYLOAD && holder is GoodsViewHolder) {
+                val item = getItem(position) as GoodsListItem.GoodsData
+                holder.bind(item.goodsItem)
+                holder.binding.quantitySelector.cartItem = item.goodsItem
             }
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private const val QUANTITY_CHANGED_PAYLOAD = "quantity_changed"
+
+        private const val TYPE_SKELETON = 0
+        private const val TYPE_GOODS_ITEM = 1
+    }
 }

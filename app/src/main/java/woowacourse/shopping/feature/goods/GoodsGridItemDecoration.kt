@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
-import woowacourse.shopping.feature.goods.adapter.vertical.GoodsSkeletonAdapter
 
 class GoodsGridItemDecoration(
     private val concatAdapter: ConcatAdapter,
@@ -25,7 +24,7 @@ class GoodsGridItemDecoration(
         val adapter = pair.first
         val localPosition = pair.second
 
-        if (adapter is GoodsAdapter || adapter is GoodsSkeletonAdapter) {
+        if (adapter is GoodsAdapter) {
             val layoutManager = parent.layoutManager as GridLayoutManager
             val spanCount = layoutManager.spanCount
             val column = localPosition % spanCount

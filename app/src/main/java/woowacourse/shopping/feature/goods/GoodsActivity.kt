@@ -26,7 +26,6 @@ import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.goods.adapter.horizontal.HorizontalSectionAdapter
 import woowacourse.shopping.feature.goods.adapter.horizontal.RecentlyViewedGoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
-import woowacourse.shopping.feature.goods.adapter.vertical.GoodsSkeletonAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.CART_KEY
@@ -68,11 +67,9 @@ class GoodsActivity : AppCompatActivity() {
                         viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
                     }
                 },
-        )
+        ).apply { showSkeleton() }
     }
-    private val goodsSkeletonAdapter by lazy {
-        GoodsSkeletonAdapter()
-    }
+
     private val moreButtonAdapter by lazy {
         MoreButtonAdapter {
             viewModel.addPage()
@@ -82,7 +79,7 @@ class GoodsActivity : AppCompatActivity() {
     private val concatAdapter by lazy {
         ConcatAdapter(
             horizontalSelectionAdapter,
-            goodsSkeletonAdapter,
+            goodsAdapter,
             moreButtonAdapter,
         )
     }
@@ -96,6 +93,11 @@ class GoodsActivity : AppCompatActivity() {
         binding.viewModel = viewModel
 
         binding.rvGoodsItems.layoutManager = getLayoutManager()
+
+        binding.rvGoodsItems.addItemDecoration(
+            GoodsGridItemDecoration(concatAdapter, 14),
+        )
+
         viewModel.navigateToCart.observe(this) {
             val intent = CartActivity.newIntent(this)
             startActivity(intent)
@@ -104,9 +106,6 @@ class GoodsActivity : AppCompatActivity() {
         viewModel.goodsWithCartQuantity.observe(this) {
             viewModel.fetchAndSetCartCache()
         }
-        binding.rvGoodsItems.addItemDecoration(
-            GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING),
-        )
 
         viewModel.recentlyViewedGoods.observe(this) { goods ->
             recentlyViewedGoodsAdapter.setItems(goods)
@@ -114,16 +113,6 @@ class GoodsActivity : AppCompatActivity() {
 
         viewModel.navigateToLogin.observe(this) {
             navigateGoodsLogin()
-        }
-        viewModel.isLoading.observe(this) { isLoading ->
-            if (!isLoading) {
-                concatAdapter.removeAdapter(goodsSkeletonAdapter)
-                concatAdapter.addAdapter(1, goodsAdapter)
-            } else {
-                if (concatAdapter.adapters.contains(goodsSkeletonAdapter).not()) {
-                    concatAdapter.addAdapter(1, goodsSkeletonAdapter)
-                }
-            }
         }
     }
 
@@ -135,7 +124,6 @@ class GoodsActivity : AppCompatActivity() {
                     val (adapter, _) = concatAdapter.getWrappedAdapterAndPosition(position)
                     return when (adapter) {
                         is GoodsAdapter -> 1
-                        is GoodsSkeletonAdapter -> 1
                         else -> 2
                     }
                 }
@@ -172,9 +160,5 @@ class GoodsActivity : AppCompatActivity() {
     private fun navigateGoodsLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
-    }
-
-    companion object {
-        private const val GRID_GOODS_ITEM_HORIZONTAL_PADDING = 14
     }
 }
