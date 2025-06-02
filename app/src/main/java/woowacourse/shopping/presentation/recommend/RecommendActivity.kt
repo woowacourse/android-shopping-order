@@ -8,22 +8,25 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
-import woowacourse.shopping.presentation.product.ItemClickListener
+import woowacourse.shopping.presentation.model.CartItemUiModel
 
 class RecommendActivity :
     AppCompatActivity(),
     RecommendItemClickListener,
     CartCounterClickListener {
     private lateinit var binding: ActivityRecommendBinding
-    private val viewModel: RecommendViewModel by viewModels { RecommendViewModelFactory() }
+    private lateinit var viewModel: RecommendViewModel
     private val recommendAdapter: RecommendAdapter by lazy {
         RecommendAdapter(this, this)
     }
@@ -31,18 +34,39 @@ class RecommendActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_recommend)
-        binding.lifecycleOwner = this
-        binding.vm = viewModel
-
-        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
-        val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
-        viewModel.fetchSelectedInfo(price, count)
-
+        setupBinding()
+        setupViewModel()
         initInsets()
         setupToolbar()
         initAdapter()
         observeViewModel()
+    }
+
+    private fun setupBinding() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_recommend)
+        binding.lifecycleOwner = this
+    }
+
+    private fun setupViewModel() {
+        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
+        val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
+        val defaultArgs =
+            bundleOf(
+                Extra.KEY_SELECT_PRICE to price,
+                Extra.KEY_SELECT_COUNT to count,
+            )
+        val creationExtras =
+            MutableCreationExtras(defaultViewModelCreationExtras).apply {
+                this[VIEW_MODEL_DEFAULT_ARGS_KEY] = defaultArgs
+            }
+        val factory = RecommendViewModelFactory()
+        viewModel =
+            ViewModelProvider(
+                viewModelStore,
+                factory,
+                creationExtras,
+            )[RecommendViewModel::class.java]
+        binding.vm = viewModel
     }
 
     private fun initInsets() {
@@ -87,18 +111,15 @@ class RecommendActivity :
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onClickProductItem(productId: Long) {
-    }
-
-    override fun onClickAddToCart(cartItem: CartItem) {
+    override fun onClickAddToCart(cartItem: CartItemUiModel) {
         viewModel.addToCart(cartItem)
     }
 
-    override fun onClickMinus(id: Long) {
+    override fun onClickPlus(id: Long) {
         viewModel.increaseQuantity(id)
     }
 
-    override fun onClickPlus(id: Long) {
+    override fun onClickMinus(id: Long) {
         viewModel.decreaseQuantity(id)
     }
 
@@ -112,5 +133,7 @@ class RecommendActivity :
                 putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
                 putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
             }
+
+        private val VIEW_MODEL_DEFAULT_ARGS_KEY = object : CreationExtras.Key<Bundle> {}
     }
 }
