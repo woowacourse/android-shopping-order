@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
@@ -61,17 +62,25 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.event.observe(this) {
-            when (it) {
+        viewModel.uiEvent.observe(this) { event ->
+            when (event) {
                 is CartUiEvent.ShowCannotIncrease -> {
-                    showToast(getString(R.string.text_over_quantity).format(it.quantity))
+                    showToast(getString(R.string.text_over_quantity).format(event.quantity))
                 }
-
                 CartUiEvent.ChangeScreen -> onClickOrderButton()
-                CartUiEvent.ShowNetworkErrorMessage -> {
-                    showToast(getString(R.string.text_network_error))
+                is CartUiEvent.ShowErrorMessage -> {
+                    val messageResId = getErrorMessage(event.throwable)
+                    showToast(getString(messageResId))
                 }
             }
+        }
+    }
+
+    private fun getErrorMessage(throwable: Throwable): Int {
+        return when (throwable) {
+            is NullPointerException -> R.string.error_text_null_result
+            is HttpException -> R.string.error_text_network_error
+            else -> R.string.error_text_unknown
         }
     }
 

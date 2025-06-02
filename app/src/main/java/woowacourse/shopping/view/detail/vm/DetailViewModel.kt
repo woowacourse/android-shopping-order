@@ -15,6 +15,7 @@ import woowacourse.shopping.view.core.handler.CartQuantityHandler
 import woowacourse.shopping.view.detail.DetailActivity.Companion.NO_LAST_SEEN_PRODUCT
 import woowacourse.shopping.view.detail.DetailUiEvent
 import woowacourse.shopping.view.main.state.ProductState
+import kotlin.onFailure
 
 class DetailViewModel(
     private val defaultProductRepository: ProductRepository,
@@ -24,8 +25,8 @@ class DetailViewModel(
     private val _uiState = MutableLiveData<DetailUiState>()
     val uiState: LiveData<DetailUiState> get() = _uiState
 
-    private val _event = MutableSingleLiveData<DetailUiEvent>()
-    val event: SingleLiveData<DetailUiEvent> get() = _event
+    private val _uiEvent = MutableSingleLiveData<DetailUiEvent>()
+    val uiEvent: SingleLiveData<DetailUiEvent> get() = _uiEvent
 
     fun load(
         productId: Long,
@@ -47,7 +48,7 @@ class DetailViewModel(
                                     lastSeenProduct = lastSeenProductValue,
                                 )
                         }
-                            .onFailure { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) }
+                            .onFailure(::handleFailure)
                     }
                 } else {
                     _uiState.postValue(
@@ -62,7 +63,7 @@ class DetailViewModel(
                     )
                 }
             }
-                .onFailure { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) }
+                .onFailure(::handleFailure)
         }
     }
 
@@ -80,7 +81,7 @@ class DetailViewModel(
 
             val quantity =
                 if (!decreasedCartQuantity.hasQuantity()) {
-                    _event.setValue(DetailUiEvent.ShowCannotDecrease)
+                    _uiEvent.setValue(DetailUiEvent.ShowCannotDecrease)
                     Quantity(1)
                 } else {
                     decreasedCartQuantity
@@ -94,42 +95,42 @@ class DetailViewModel(
         withState(_uiState.value) { state ->
             defaultCartRepository.loadSinglePage(null, null) { result ->
                 result.onSuccess { value ->
-                    value?.let {
-                        val savedCart = value.carts.find { it.productId == productId }
+                    val savedCart = value.carts.find { it.productId == productId }
 
-                        savedCart?.let {
-                            defaultCartRepository.updateQuantity(
-                                it.id,
-                                state.addQuantity(it.quantity),
-                            ) { result ->
-                                result.fold(
-                                    onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
-                                    onFailure = { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) },
-                                )
-                            }
-                        } ?: run {
-                            defaultCartRepository.addCart(
-                                Cart(
-                                    state.cartQuantity,
-                                    productId,
-                                ),
-                            ) { result ->
-                                result.fold(
-                                    onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
-                                    onFailure = { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) },
-                                )
-                            }
+                    savedCart?.let {
+                        defaultCartRepository.updateQuantity(
+                            it.id,
+                            state.addQuantity(it.quantity),
+                        ) { result ->
+                            result
+                                .onSuccess {
+                                    _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
+                                }
+                                .onFailure(::handleFailure)
+                        }
+                    } ?: run {
+                        defaultCartRepository.addCart(
+                            Cart(
+                                state.cartQuantity,
+                                productId,
+                            ),
+                        ) { result ->
+                            result
+                                .onSuccess {
+                                    _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
+                                }
+                                .onFailure(::handleFailure)
                         }
                     }
                 }
-                    .onFailure { _event.setValue(DetailUiEvent.ShowNetworkErrorMessage) }
+                    .onFailure(::handleFailure)
             }
         }
     }
 
     fun loadLastSeenProduct(lastSeenProductId: Long) {
         historyRepository.saveHistory(lastSeenProductId) {
-            _event.postValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
+            _uiEvent.postValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
         }
     }
 
@@ -137,8 +138,8 @@ class DetailViewModel(
         historyRepository.saveHistory(productId) {}
     }
 
-    private fun sendEvent(event: DetailUiEvent) {
-        _event.setValue(event)
+    private fun handleFailure(throwable: Throwable) {
+        _uiEvent.setValue(DetailUiEvent.ShowErrorMessage(throwable))
     }
 
     val cartQuantityEventHandler =

@@ -9,5 +9,5 @@ sealed interface DetailUiEvent {
 
     data class ShowCannotIncrease(val quantity: Int) : DetailUiEvent
 
-    object ShowNetworkErrorMessage : DetailUiEvent
+    data class ShowErrorMessage(val throwable: Throwable) : DetailUiEvent
 }

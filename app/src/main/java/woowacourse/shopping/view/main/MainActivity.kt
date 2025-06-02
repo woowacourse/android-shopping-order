@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
+import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityMainBinding
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
         val container = (application as App).container
         MainViewModelFactory(
-            container.getRecentProductUseCase,
+            container.historyLoader,
             container.cartRepository,
             container.productRepository,
         )
@@ -132,10 +133,19 @@ class MainActivity : AppCompatActivity() {
                     activityResultLauncher.launch(CartActivity.newIntent(this, category))
                 }
 
-                MainUiEvent.ShowNetworkErrorMessage -> {
-                    showToast(getString(R.string.text_network_error))
+                is MainUiEvent.ShowErrorMessage -> {
+                    val messageResId = getErrorMessage(event.throwable)
+                    showToast(getString(messageResId))
                 }
             }
+        }
+    }
+
+    private fun getErrorMessage(throwable: Throwable): Int {
+        return when (throwable) {
+            is NullPointerException -> R.string.error_text_null_result
+            is HttpException -> R.string.error_text_network_error
+            else -> R.string.error_text_unknown
         }
     }
 

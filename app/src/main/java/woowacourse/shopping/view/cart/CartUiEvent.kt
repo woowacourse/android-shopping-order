@@ -5,5 +5,5 @@ sealed interface CartUiEvent {
 
     data object ChangeScreen : CartUiEvent
 
-    object ShowNetworkErrorMessage : CartUiEvent
+    data class ShowErrorMessage(val throwable: Throwable) : CartUiEvent
 }

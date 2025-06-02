@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailBinding
@@ -67,31 +68,43 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.event.observe(this) {
-            when (it) {
-                is DetailUiEvent.NavigateToCart -> startActivity(CartActivity.newIntent(this, it.category))
+        viewModel.uiEvent.observe(this) { event ->
+            when (event) {
+                is DetailUiEvent.NavigateToCart ->
+                    startActivity(
+                        CartActivity.newIntent(
+                            this,
+                            event.category,
+                        ),
+                    )
+
                 is DetailUiEvent.ShowCannotIncrease -> {
                     showToast(
-                        getString(R.string.text_over_quantity).format(it.quantity),
+                        getString(R.string.text_over_quantity).format(event.quantity),
                     )
                 }
 
-                DetailUiEvent.ShowCannotDecrease -> {
-                    showToast(
-                        getString(R.string.text_minimum_quantity),
-                    )
-                }
+                DetailUiEvent.ShowCannotDecrease -> showToast(getString(R.string.text_minimum_quantity))
 
                 is DetailUiEvent.NavigateToLastSeenProduct -> {
-                    val intent = newIntent(this, it.productId)
+                    val intent = newIntent(this, event.productId)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     startActivity(intent)
                 }
 
-                DetailUiEvent.ShowNetworkErrorMessage -> {
-                    showToast(getString(R.string.text_network_error))
+                is DetailUiEvent.ShowErrorMessage -> {
+                    val messageResId = getErrorMessage(event.throwable)
+                    showToast(getString(messageResId))
                 }
             }
+        }
+    }
+
+    private fun getErrorMessage(throwable: Throwable): Int {
+        return when (throwable) {
+            is NullPointerException -> R.string.error_text_null_result
+            is HttpException -> R.string.error_text_network_error
+            else -> R.string.error_text_unknown
         }
     }
 

@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
+import woowacourse.shopping.view.loader.HistoryLoader
 import woowacourse.shopping.view.main.MainUiEvent
 import woowacourse.shopping.view.main.adapter.ProductAdapterEventHandler
 import woowacourse.shopping.view.main.state.LoadState
@@ -19,7 +20,6 @@ import woowacourse.shopping.view.main.state.ProductState
 import woowacourse.shopping.view.main.state.ProductUiState
 
 class MainViewModel(
-    private val historyRepository: HistoryRepository,
     private val historyLoader: HistoryLoader,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
@@ -48,7 +48,7 @@ class MainViewModel(
         productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE) { productResult ->
             productResult
                 .onSuccess { loadCartsAndMerge(it, pageIndex) }
-                .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
+                .onFailure(::handleFailure)
         }
     }
 
@@ -58,9 +58,8 @@ class MainViewModel(
     ) {
         cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) {
             it
-                .onSuccess { result ->
-                    result?.let { applyMergedUiState(productPage, result.carts) }
-                }.onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
+                .onSuccess { result -> applyMergedUiState(productPage, result.carts) }
+                .onFailure(::handleFailure)
         }
     }
 
@@ -69,34 +68,30 @@ class MainViewModel(
         cartItems: List<ShoppingCart>,
     ) {
         historyLoader { result ->
-            result.fold(
-                onSuccess = { historyStates ->
-                    val newStates =
-                        productPage.products.map { product ->
-                            val cartItem = cartItems.find { it.productId == product.id }
-                            ProductState(
-                                cartId = cartItem?.id,
-                                item = product,
-                                cartQuantity = cartItem?.quantity ?: Quantity(0),
-                            )
-                        }
+            result.onSuccess { historyStates ->
+                val newStates =
+                    productPage.products.map { product ->
+                        val cartItem = cartItems.find { it.productId == product.id }
+                        ProductState(
+                            cartId = cartItem?.id,
+                            item = product,
+                            cartQuantity = cartItem?.quantity ?: Quantity(0),
+                        )
+                    }
 
-                    val updatedList = _uiState.value?.productItems.orEmpty() + newStates
+                val updatedList = _uiState.value?.productItems.orEmpty() + newStates
 
-                    _uiState.postValue(
-                        ProductUiState(
-                            productItems = updatedList,
-                            historyItems = historyStates,
-                            load = LoadState.of(productPage.hasNextPage),
-                        ),
-                    )
+                _uiState.postValue(
+                    ProductUiState(
+                        productItems = updatedList,
+                        historyItems = historyStates,
+                        load = LoadState.of(productPage.hasNextPage),
+                    ),
+                )
 
-                    setLoading(false)
-                },
-                onFailure = { throwable ->
-                    handleError("HistoryLoad", throwable)
-                },
-            )
+                setLoading(false)
+            }
+                .onFailure(::handleFailure)
         }
     }
 
@@ -107,10 +102,10 @@ class MainViewModel(
             when (val cartId = updated.cartId) {
                 null -> {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it.onSuccess { value ->
-                            _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
-                        }
-                            .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
+                        it
+                            .onSuccess { value ->
+                                _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
+                            }.onFailure(::handleFailure)
                     }
                 }
 
@@ -131,7 +126,7 @@ class MainViewModel(
                 cartRepository.updateQuantity(cartId, updated.cartQuantity) {
                     it
                         .onSuccess { _uiState.value = state.modifyUiState(updated) }
-                        .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
+                        .onFailure(::handleFailure)
                 }
             } else {
                 cartRepository.deleteCart(cartId) {
@@ -139,31 +134,29 @@ class MainViewModel(
                         val result = updated.copy(cartId = null)
                         _uiState.value = state.modifyUiState(result)
                     }
-                        .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
+                        .onFailure(::handleFailure)
                 }
             }
         }
 
     fun syncHistory() {
         withState(_uiState.value) { state ->
-            getRecentProductUseCase { historyStates ->
+            historyLoader { historyStates ->
                 historyStates
                     .onSuccess { _uiState.value = state.copy(historyItems = it) }
-                    .onFailure { _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage) }
+                    .onFailure(::handleFailure)
             }
         }
     }
 
     fun syncCartQuantities() =
         withState(_uiState.value) { state ->
-            cartRepository.loadSinglePage(null, null) {
-                it
+            cartRepository.loadSinglePage(null, null) { result ->
+                result
                     .onSuccess {
-                        _uiState.value = state.modifyQuantity(it?.carts.orEmpty())
+                        _uiState.value = state.modifyQuantity(it.carts)
                     }
-                    .onFailure {
-                        _uiEvent.setValue(MainUiEvent.ShowNetworkErrorMessage)
-                    }
+                    .onFailure(::handleFailure)
             }
         }
 
@@ -181,6 +174,10 @@ class MainViewModel(
 
     private fun setLoading(isLoading: Boolean) {
         _isLoading.postValue(isLoading)
+    }
+
+    private fun handleFailure(throwable: Throwable) {
+        _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
     }
 
     val productEventHandler =

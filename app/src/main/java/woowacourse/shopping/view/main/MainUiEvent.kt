@@ -12,5 +12,5 @@ sealed interface MainUiEvent {
         val lastSeenProductCategory: String?,
     ) : MainUiEvent
 
-    object ShowNetworkErrorMessage : MainUiEvent
+    data class ShowErrorMessage(val throwable: Throwable) : MainUiEvent
 }
