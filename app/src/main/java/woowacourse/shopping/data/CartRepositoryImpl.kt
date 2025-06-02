@@ -3,6 +3,7 @@ package woowacourse.shopping.data
 import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.model.request.CartItemRequest
+import woowacourse.shopping.data.model.response.CartItemContent
 import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
@@ -13,40 +14,44 @@ class CartRepositoryImpl(
     override fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        callback: (List<CartItem>, Boolean, Boolean) -> Unit,
+        callback: (
+            cartItems: List<CartItem>,
+            isFirstPage: Boolean,
+            isLastPage: Boolean,
+        ) -> Unit,
     ) {
         cartItemDataSource.fetchPageOfCartItems(pageIndex, pageSize) { response ->
             if (response != null) {
-                val cartItems = response.content.map { it.toCartItem() }
+                val cartItems = response.content.map(CartItemContent::toCartItem)
                 callback(cartItems, response.first, response.last)
             }
         }
     }
 
-    override fun loadAllCartItems(callback: (List<CartItem>) -> Unit) {
+    override fun loadAllCartItems(callback: (cartItems: List<CartItem>) -> Unit) {
         cartItemDataSource.fetchPageOfCartItems(
             pageIndex = 0,
             pageSize = Int.MAX_VALUE,
         ) { response ->
-            callback(response?.content?.map { content -> content.toCartItem() }.orEmpty())
+            callback(response?.content?.map(CartItemContent::toCartItem).orEmpty())
         }
     }
 
-    override fun getAllCartItemsCount(callBack: (Int) -> Unit) {
+    override fun getAllCartItemsCount(callback: (totalCount: Int) -> Unit) {
         cartItemDataSource.fetchCartItemsCount { quantity ->
-            callBack(quantity?.quantity ?: 0)
+            callback(quantity?.quantity ?: 0)
         }
     }
 
     override fun increaseQuantity(
         cartItem: CartItem,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     ) {
         cartItemDataSource.updateCartItem(
             cartId = cartItem.cartId,
             quantity = Quantity(cartItem.quantity + 1),
         ) {
-            onResult()
+            callback()
         }
     }
 
@@ -79,20 +84,20 @@ class CartRepositoryImpl(
 
     override fun deleteCartItem(
         cartId: Long,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     ) {
         cartItemDataSource.removeCartItem(cartId) {
-            onResult()
+            callback()
         }
     }
 
     override fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     ) {
         cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
-            onResult()
+            callback()
         }
     }
 }

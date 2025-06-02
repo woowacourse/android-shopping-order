@@ -12,7 +12,7 @@ class ProductDataSourceImpl(
 ) : ProductDataSource {
     override fun fetchProduct(
         id: Long,
-        onResult: (ProductResponse) -> Unit,
+        callback: (ProductResponse) -> Unit,
     ) {
         productService.getProduct(id).enqueue(
             object : Callback<ProductResponse> {
@@ -24,7 +24,7 @@ class ProductDataSourceImpl(
                         val body = response.body()
                         println("body : $body")
                         if (body != null) {
-                            onResult(body)
+                            callback(body)
                         }
                     }
                 }
@@ -42,7 +42,7 @@ class ProductDataSourceImpl(
     override fun fetchPageOfProducts(
         pageIndex: Int,
         pageSize: Int,
-        onResult: (ProductsResponse) -> Unit,
+        callback: (ProductsResponse) -> Unit,
     ) {
         productService.getProducts(page = pageIndex, size = pageSize).enqueue(
             object : Callback<ProductsResponse> {
@@ -54,7 +54,7 @@ class ProductDataSourceImpl(
                         val body = response.body()
                         println("body : $body")
                         if (body != null) {
-                            onResult(body)
+                            callback(body)
                         }
                     }
                 }

@@ -14,7 +14,7 @@ class CartItemDataSourceImpl(
     override fun fetchPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        onResult: (CartItemResponse?) -> Unit,
+        callback: (response: CartItemResponse?) -> Unit,
     ) {
         cartItemService.getCartItems(page = pageIndex, size = pageSize).enqueue(
             object : Callback<CartItemResponse> {
@@ -25,7 +25,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        onResult(body)
+                        callback(body)
                     }
                 }
 
@@ -94,11 +94,11 @@ class CartItemDataSourceImpl(
     }
 
     override fun updateCartItem(
-        id: Long,
+        cartId: Long,
         quantity: Quantity,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     ) {
-        cartItemService.patchCartItem(id, quantity).enqueue(
+        cartItemService.patchCartItem(cartId, quantity).enqueue(
             object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -107,7 +107,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        onResult()
+                        callback()
                     }
                 }
 
@@ -121,7 +121,7 @@ class CartItemDataSourceImpl(
         )
     }
 
-    override fun fetchCartItemsCount(onResult: (Quantity?) -> Unit) {
+    override fun fetchCartItemsCount(callback: (Quantity?) -> Unit) {
         cartItemService.getCartItemsCount().enqueue(
             object : Callback<Quantity> {
                 override fun onResponse(
@@ -131,7 +131,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        onResult(body)
+                        callback(body)
                     }
                 }
 

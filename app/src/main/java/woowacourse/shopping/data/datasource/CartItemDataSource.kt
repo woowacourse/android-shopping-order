@@ -8,7 +8,7 @@ interface CartItemDataSource {
     fun fetchPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        onResult: (CartItemResponse?) -> Unit,
+        callback: (response: CartItemResponse?) -> Unit,
     )
 
     fun submitCartItem(
@@ -24,8 +24,8 @@ interface CartItemDataSource {
     fun updateCartItem(
         cartId: Long,
         quantity: Quantity,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     )
 
-    fun fetchCartItemsCount(onResult: (Quantity?) -> Unit)
+    fun fetchCartItemsCount(callback: (Quantity?) -> Unit)
 }

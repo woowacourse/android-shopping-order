@@ -6,16 +6,20 @@ interface CartRepository {
     fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        callback: (List<CartItem>, Boolean, Boolean) -> Unit,
+        callback: (
+            cartItems: List<CartItem>,
+            isFirstPage: Boolean,
+            isLastPage: Boolean,
+        ) -> Unit,
     )
 
-    fun loadAllCartItems(callback: (List<CartItem>) -> Unit)
+    fun loadAllCartItems(callback: (cartItems: List<CartItem>) -> Unit)
 
-    fun getAllCartItemsCount(callBack: (Int) -> Unit)
+    fun getAllCartItemsCount(callback: (totalCount: Int) -> Unit)
 
     fun increaseQuantity(
         cartItem: CartItem,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     )
 
     fun decreaseQuantity(
@@ -30,12 +34,12 @@ interface CartRepository {
 
     fun deleteCartItem(
         cartId: Long,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     )
 
     fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
-        onResult: () -> Unit,
+        callback: () -> Unit,
     )
 }

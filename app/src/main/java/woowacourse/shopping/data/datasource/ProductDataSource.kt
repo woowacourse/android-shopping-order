@@ -6,12 +6,12 @@ import woowacourse.shopping.data.model.response.ProductsResponse
 interface ProductDataSource {
     fun fetchProduct(
         id: Long,
-        onResult: (ProductResponse) -> Unit,
+        callback: (ProductResponse) -> Unit,
     )
 
     fun fetchPageOfProducts(
         pageIndex: Int,
         pageSize: Int,
-        onResult: (ProductsResponse) -> Unit,
+        callback: (ProductsResponse) -> Unit,
     )
 }

@@ -36,9 +36,9 @@ class CartFragmentTest {
 
             override fun deleteCartItem(
                 cartId: Long,
-                callback: (Long) -> Unit,
+                onResult: (Long) -> Unit,
             ) {
-                shoppingCart.indexOfFirst { it.id == cartId }.let { callback(cartId) }
+                shoppingCart.indexOfFirst { it.id == cartId }.let { onResult(cartId) }
             }
 
             override fun addCartItem(

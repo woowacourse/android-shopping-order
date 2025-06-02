@@ -15,10 +15,10 @@ class FakeCartRepository : CartRepository {
 
     override fun deleteCartItem(
         cartId: Long,
-        callback: (Long) -> Unit,
+        onResult: (Long) -> Unit,
     ) {
         val removed = cartItems.removeIf { it.product.id == cartId }
-        if (removed) callback(cartId)
+        if (removed) onResult(cartId)
     }
 
     override fun addCartItem(
