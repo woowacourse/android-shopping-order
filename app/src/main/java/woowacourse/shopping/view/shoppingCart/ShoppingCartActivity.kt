@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
-import woowacourse.shopping.view.common.QuantityObservable
+import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.showSnackBar
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
@@ -141,12 +141,12 @@ class ShoppingCartActivity :
         viewModel.selectShoppingCartProduct(shoppingCartProductItem, isSelected)
     }
 
-    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
-        viewModel.increaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
+    override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
+        viewModel.increaseQuantity(quantityTarget as ShoppingCartItem.ShoppingCartProductItem)
     }
 
-    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
-        viewModel.decreaseQuantity(quantityObservable as ShoppingCartItem.ShoppingCartProductItem)
+    override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
+        viewModel.decreaseQuantity(quantityTarget as ShoppingCartItem.ShoppingCartProductItem)
     }
 
     override fun onBackButtonClick() {

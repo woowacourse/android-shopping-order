@@ -10,7 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityShoppingCartRecommendBinding
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.view.common.QuantityObservable
+import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.product.ProductsItem
@@ -61,13 +61,13 @@ class ShoppingCartRecommendActivity :
         }
     }
 
-    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
-        val item = quantityObservable as ProductsItem.ProductItem
+    override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
+        val item = quantityTarget as ProductsItem.ProductItem
         viewModel.addProductToShoppingCart(item, item.selectedQuantity)
     }
 
-    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
-        val item = quantityObservable as ProductsItem.ProductItem
+    override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
+        val item = quantityTarget as ProductsItem.ProductItem
         viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
     }
 

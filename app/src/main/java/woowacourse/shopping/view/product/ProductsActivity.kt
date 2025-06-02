@@ -13,7 +13,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.GridItemDecoration
-import woowacourse.shopping.view.common.QuantityObservable
+import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
@@ -193,13 +193,13 @@ class ProductsActivity :
         )
     }
 
-    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
-        val item = quantityObservable as ProductsItem.ProductItem
+    override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
+        val item = quantityTarget as ProductsItem.ProductItem
         viewModel.addProductToShoppingCart(item, item.selectedQuantity)
     }
 
-    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
-        val item = quantityObservable as ProductsItem.ProductItem
+    override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
+        val item = quantityTarget as ProductsItem.ProductItem
         viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
     }
 }

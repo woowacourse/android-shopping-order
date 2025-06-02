@@ -11,7 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
-import woowacourse.shopping.view.common.QuantityObservable
+import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
@@ -94,11 +94,11 @@ class ProductDetailActivity :
         viewModel.addToShoppingCart()
     }
 
-    override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {
+    override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
         viewModel.plusQuantity()
     }
 
-    override fun onMinusShoppingCartClick(quantityObservable: QuantityObservable) {
+    override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
         viewModel.minusQuantity()
     }
 
