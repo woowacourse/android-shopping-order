@@ -51,7 +51,7 @@ class DetailViewModel(
                             .onFailure(::handleFailure)
                     }
                 } else {
-                    _uiState.postValue(
+                    _uiState.value = (
                         DetailUiState(
                             product =
                                 ProductState(
@@ -59,7 +59,7 @@ class DetailViewModel(
                                     cartQuantity = Quantity(1),
                                 ),
                             lastSeenProduct = null,
-                        ),
+                        )
                     )
                 }
             }
@@ -129,13 +129,11 @@ class DetailViewModel(
     }
 
     fun loadLastSeenProduct(lastSeenProductId: Long) {
-        historyRepository.saveHistory(lastSeenProductId) {
-            _uiEvent.postValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
-        }
+        historyRepository.saveHistory(lastSeenProductId)
     }
 
     private fun saveHistory(productId: Long) {
-        historyRepository.saveHistory(productId) {}
+        historyRepository.saveHistory(productId)
     }
 
     private fun handleFailure(throwable: Throwable) {
