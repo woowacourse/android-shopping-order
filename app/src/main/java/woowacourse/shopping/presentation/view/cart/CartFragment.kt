@@ -44,12 +44,17 @@ class CartFragment :
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
-        binding.selectAll.setOnClickListener { view ->
+        binding.selectAll.setOnClickListener {
             onBatchSelect(binding.selectAll.isChecked)
         }
         binding.btnPlaceOrder.setOnClickListener {
             navigateToRecommendation()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        backCallback.remove()
     }
 
     private fun navigateToScreen() {
@@ -59,16 +64,23 @@ class CartFragment :
         }
     }
 
+    private fun initObserver() {
+        viewModel.allSelected.observe(viewLifecycleOwner) {
+            binding.selectAll.isChecked = it
+        }
+    }
+
+    private fun initListener() {
+        binding.btnBack.setOnClickListener {
+            navigateBack()
+        }
+        binding.eventListener = this
+    }
+
     private fun navigateBack() {
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
             remove(this@CartFragment)
-        }
-    }
-
-    private fun initObserver() {
-        viewModel.allSelected.observe(viewLifecycleOwner) {
-            binding.selectAll.isChecked = it
         }
     }
 
@@ -78,11 +90,6 @@ class CartFragment :
         }
         binding.checkboxWrapper.isVisible = false
         viewModel.fetchRecommendedProducts()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        backCallback.remove()
     }
 
     override fun onBatchSelect(isChecked: Boolean) {
@@ -95,12 +102,5 @@ class CartFragment :
 
     override fun decreaseQuantity(product: ProductUiModel) {
         viewModel.decreaseQuantity(product)
-    }
-
-    private fun initListener() {
-        binding.btnBack.setOnClickListener {
-            navigateBack()
-        }
-        binding.eventListener = this
     }
 }

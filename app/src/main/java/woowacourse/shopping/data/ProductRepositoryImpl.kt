@@ -24,8 +24,8 @@ class ProductRepositoryImpl(
         productDataSource.fetchPageOfProducts(
             pageIndex = pageIndex,
             pageSize = pageSize,
-        ) {
-            val products: List<Product> = it.productContent.map { it.toProduct() }
+        ) { response ->
+            val products: List<Product> = response.productContent.map { content -> content.toProduct() }
             val isLastPage = products.size < pageSize
 
             callback(products, isLastPage)
@@ -36,8 +36,8 @@ class ProductRepositoryImpl(
         id: Long,
         callback: (Product?) -> Unit,
     ) {
-        productDataSource.fetchProduct(id) {
-            val product = it.toProduct()
+        productDataSource.fetchProduct(id) { response ->
+            val product = response.toProduct()
             callback(product)
         }
     }
@@ -63,7 +63,7 @@ class ProductRepositoryImpl(
     ) {
         thread {
             val recentEntities = recentProductDao.getRecentProducts(count)
-            val recentProducts = recentEntities.map { it.toProduct() }
+            val recentProducts = recentEntities.map { entity -> entity.toProduct() }
             callback(recentProducts)
         }
     }
@@ -83,9 +83,9 @@ class ProductRepositoryImpl(
         productDataSource.fetchPageOfProducts(
             pageIndex = 0,
             pageSize = Int.MAX_VALUE,
-        ) {
-            val products: List<Product> = it.productContent.map { it.toProduct() }
-            val filteredProducts = products.filter { it.category == category }
+        ) { response ->
+            val products: List<Product> = response.productContent.map { content -> content.toProduct() }
+            val filteredProducts = products.filter { product -> product.category == category }
             callback(filteredProducts)
         }
     }

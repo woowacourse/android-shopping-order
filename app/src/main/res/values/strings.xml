@@ -23,4 +23,5 @@
     <string name="product_count_up_text">+</string>
     <string name="catalog_recent_product_title">최근 본 상품</string>
     <string name="place_order_text">주문하기(%s)</string>
+    <string name="select_all">전체</string>
 </resources>

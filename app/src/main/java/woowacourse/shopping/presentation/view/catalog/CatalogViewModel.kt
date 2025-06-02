@@ -147,9 +147,9 @@ class CatalogViewModel(
         cartRepository.addCartItem(newItem) {
             cartRepository.loadAllCartItems { cartItems ->
                 cartItems
-                    ?.find { cartItem -> cartItem.product.id == newItem.product.id }
-                    ?.let { foundItem ->
-                        _itemUpdateEvent.postValue(foundItem.toProductUiModel())
+                    .find { cartItem -> cartItem.product.id == newItem.product.id }
+                    .let { foundItem ->
+                        _itemUpdateEvent.postValue(foundItem?.toProductUiModel())
                         calculateTotalCartCount()
                     }
             }
