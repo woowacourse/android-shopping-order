@@ -20,7 +20,7 @@ class FakeCartProductRepository : CartProductRepository {
                 name = "Product $productId",
                 price = 1000,
             )
-        cartProducts.add(CartProduct(product = product, quantity = quantity))
+        cartProducts.add(CartProduct(id = product.id, product = product, quantity = quantity))
     }
 
     override fun getPagedProducts(

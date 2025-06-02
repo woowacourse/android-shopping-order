@@ -1,5 +1,8 @@
 package woowacourse.shopping.viewmodel.cart.selection
 
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldHaveSize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -160,5 +163,51 @@ class CartProductSelectionViewModelTest {
                 .first { it.cartProduct.product.id == cartProduct.product.id }
                 .cartProduct
         assertEquals(1, updatedItem.quantity)
+    }
+
+    @Test
+    fun `상품 선택 시 선택된 상품에 추가된다`() {
+        // given
+        val cartProduct =
+            viewModel.products
+                .getOrAwaitValue()
+                .first()
+                .cartProduct
+
+        // when
+        viewModel.onSelectItem(cartProduct)
+        val actual = viewModel.selectedIds
+
+        // then
+        actual shouldContain cartProduct.id
+    }
+
+    @Test
+    fun `상품 전체 선택 시 전체 상품이 선택된 상품에 추가된다`() {
+        // given
+        val cartProducts =
+            viewModel.products
+                .getOrAwaitValue()
+                .map { it.cartProduct }
+
+        // when
+        viewModel.onSelectAllItems()
+        val actual = viewModel.selectedIds
+
+        // then
+        actual shouldContainAll cartProducts.map { it.id }
+    }
+
+    @Test
+    fun `전체 상품이 담긴 상태에서 상품 전체 선택 시 선택된 상품에서 제거된다`() {
+        // given
+        viewModel.onSelectAllItems()
+
+        // when
+        viewModel.onSelectAllItems()
+        val actual = viewModel.selectedIds
+
+        // then
+        actual shouldHaveSize 0
     }
 }
