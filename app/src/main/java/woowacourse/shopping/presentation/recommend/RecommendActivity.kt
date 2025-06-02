@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +30,9 @@ class RecommendActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpScreen()
         setupToolbar()
+        setAdapter()
         setUpBinding()
+        observeViewModel()
     }
 
     private fun setUpScreen() {
@@ -52,15 +55,29 @@ class RecommendActivity : AppCompatActivity() {
         binding.apply {
             viewModel = recommendViewModel
             lifecycleOwner = this@RecommendActivity
-            recyclerViewRecommendProducts.adapter = RecommendAdapter(onQuantityClick = { product ->
+            recyclerViewRecommendProducts.adapter = recommendAdapter
+        }
+    }
+
+    private fun setAdapter() {
+        recommendAdapter = RecommendAdapter(
+            handler = RecommendEventHandlerImpl(recommendViewModel),
+            onQuantityClick = { product ->
+                Log.d("product",product.toString())
                 recommendViewModel.toggleQuantity(product)
             })
+    }
+
+    private fun observeViewModel() {
+        recommendViewModel.updatedProduct.observe(this){ product ->
+            recommendAdapter.updateProduct(product)
         }
     }
 
     companion object {
         private const val TOTAL_PRICE_KEY = "Price"
         private const val TOTAL_COUNT_KEY = "Count"
+        private const val CHECKED_PRODUCTS_KEY = "CheckedProducts"
 
         fun newIntent(
             context: Context,

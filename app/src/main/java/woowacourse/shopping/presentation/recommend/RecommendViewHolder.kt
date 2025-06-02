@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.RecommendItemBinding
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class RecommendViewHolder(
     parent: ViewGroup,
     private val onQuantityClick: (ProductUiModel) -> Unit,
+    private val quantityHandler: ProductQuantityHandler,
 ) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.recommend_item, parent, false)
 ) {
@@ -21,5 +23,6 @@ class RecommendViewHolder(
         binding.onQuantityClick = View.OnClickListener {
             onQuantityClick(productUiModel)
         }
+        binding.handler = quantityHandler
     }
 }

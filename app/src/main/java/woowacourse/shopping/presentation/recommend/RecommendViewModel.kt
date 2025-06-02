@@ -49,7 +49,8 @@ class RecommendViewModel(
     }
 
     fun toggleQuantity(product: ProductUiModel) {
-        val toggled = product.copy(quantity = product.quantity + 1)
+        val toggled =
+            product.copy(quantity = product.quantity + 1)
 
         cartItemRepository.addCartItem(toggled.id, toggled.quantity) { result ->
             result
@@ -57,6 +58,40 @@ class RecommendViewModel(
                     _updatedProduct.postValue(toggled)
                     applyProductChange(toggled)
                 }
+        }
+    }
+
+    fun increaseQuantity(product: ProductUiModel) {
+        val newProduct = product.copy(quantity = product.quantity + 1)
+
+        cartItemRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
+            result
+                .onSuccess {
+                    _updatedProduct.postValue(newProduct)
+                    applyProductChange(newProduct)
+                }
+        }
+    }
+
+    fun decreaseQuantity(product: ProductUiModel) {
+        val newQuantity = (product.quantity - 1).coerceAtLeast(0)
+        val updated = product.copy(quantity = newQuantity)
+
+        if (product.quantity == 0) {
+            cartItemRepository.deleteCartItem(product.id) { result ->
+                result
+                    .onSuccess {
+                        applyProductChange(product)
+                    }
+            }
+        } else {
+            cartItemRepository.updateCartItemQuantity(updated.id, updated.quantity) { result ->
+                result
+                    .onSuccess {
+                        _updatedProduct.postValue(updated)
+                        applyProductChange(updated)
+                    }
+            }
         }
     }
 

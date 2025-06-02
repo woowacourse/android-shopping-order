@@ -59,5 +59,5 @@ fun View.visibleIfNotSameProduct(
 
 @BindingAdapter("recommendProducts")
 fun RecyclerView.setRecommendProducts(products: List<ProductUiModel>?) {
-    (adapter as? RecommendAdapter)?.setItems(products.orEmpty())
+    (adapter as? RecommendAdapter)?.submitList(products.orEmpty())
 }
