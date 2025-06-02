@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository.remote
 
-import android.util.Log
 import woowacourse.shopping.data.datasource.remote.CartDataSource
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
@@ -25,6 +24,17 @@ class CartRepositoryImpl(
     ) {
         cartDataSource.getPagedCartItems(page, pageSize) { cartItems ->
             onResult(Result.success(cartItems))
+        }
+    }
+
+    override fun fetchAllCartItems(onFinished: (() -> Unit)?) {
+        cartDataSource.getTotalCount { result ->
+            val totalCount = result.getOrNull() ?: 0
+
+            cartDataSource.getPagedCartItems(0, totalCount) { cartItems ->
+                cachedCart = Cart(cartItems)
+                onFinished?.invoke()
+            }
         }
     }
 
@@ -116,22 +126,10 @@ class CartRepositoryImpl(
         onResult: (Result<Unit>) -> Unit,
     ) {
         val cartId = cachedCart.findCartItem(productId)?.cartId ?: -1
-        Log.d("CN_Log", "cartId=$cartId")
         cartDataSource.deleteCartItemById(cartId) { result ->
             result.onSuccess {
                 onResult(result)
                 cachedCart = cachedCart.delete(productId)
-            }
-        }
-    }
-
-    fun fetchAllCartItems(onFinished: (() -> Unit)? = null) {
-        cartDataSource.getTotalCount { result ->
-            val totalCount = result.getOrNull() ?: 0
-
-            cartDataSource.getPagedCartItems(0, totalCount) { cartItems ->
-                cachedCart = Cart(cartItems)
-                onFinished?.invoke()
             }
         }
     }
