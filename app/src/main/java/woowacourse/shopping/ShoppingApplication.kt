@@ -53,8 +53,8 @@ class ShoppingApplication : Application() {
 
         DefaultAuthenticationRepository.get().updateUserAuthentication(
             UserAuthentication(
-                id = "m6z1",
-                password = "password",
+                id = BuildConfig.USER_ID,
+                password = BuildConfig.USER_PASSWORD,
             ),
         )
     }

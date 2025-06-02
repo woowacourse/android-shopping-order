@@ -31,6 +31,17 @@ android {
             "BASE_URL",
             "\"${properties.getProperty("base_url")}\"",
         )
+
+        buildConfigField(
+            "String",
+            "USER_ID",
+            "\"${properties.getProperty("user_id")}\"",
+        )
+        buildConfigField(
+            "String",
+            "USER_PASSWORD",
+            "\"${properties.getProperty("user_password")}\"",
+        )
     }
 
     buildTypes {
