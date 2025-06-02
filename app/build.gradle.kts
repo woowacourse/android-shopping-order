@@ -12,14 +12,22 @@ android {
     val properties = Properties()
     properties.load(project.rootProject.file("local.properties").inputStream())
 
-    val userId = properties.getProperty("user_id") ?: ""
-    val userPassword = properties.getProperty("user_password") ?: ""
-    val baseUrl = properties.getProperty("base_url") ?: ""
-
     defaultConfig {
-        buildConfigField("String", "USER_ID", "\"$userId\"")
-        buildConfigField("String", "USER_PASSWORD", "\"$userPassword\"")
-        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField(
+            "String",
+            "USER_ID",
+            "\"${properties.getProperty("user_id")}\"",
+        )
+        buildConfigField(
+            "String",
+            "USER_PASSWORD",
+            "\"${properties.getProperty("user_password")}\"",
+        )
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${properties.getProperty("base_url")}\"",
+        )
     }
 
     namespace = "woowacourse.shopping"
