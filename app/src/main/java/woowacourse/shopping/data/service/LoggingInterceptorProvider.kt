@@ -19,18 +19,18 @@ object LoggingInterceptorProvider {
             object : HttpLoggingInterceptor.Logger {
                 override fun log(message: String) {
                     if (message.startsWith("{") || message.startsWith("[")) {
-                        try {
+                        runCatching {
                             val parsed = json.parseToJsonElement(message)
-                            Log.d(
+                            Log.i(
                                 "PrettyLogger",
                                 json.encodeToString(JsonElement.serializer(), parsed),
                             )
-                        } catch (e: Exception) {
-                            Log.d("PrettyLogger", message)
+                        }.onFailure {
+                            Log.i("PrettyLogger", message)
                         }
-                    } else {
-                        Log.d("PrettyLogger", message)
+                        return
                     }
+                    Log.i("PrettyLogger", message)
                 }
             },
         ).apply {
