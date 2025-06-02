@@ -8,9 +8,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.view.common.MutableSingleLiveData
-import woowacourse.shopping.view.common.SingleLiveData
-import woowacourse.shopping.view.shoppingCart.ShoppingCartEvent
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 class ShoppingCartViewModel(
@@ -23,9 +20,6 @@ class ShoppingCartViewModel(
     private val _hasUpdatedProducts: MutableLiveData<Boolean> =
         MutableLiveData(false)
     val hasUpdatedProducts: LiveData<Boolean> get() = _hasUpdatedProducts
-
-    private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
-    val event: SingleLiveData<ShoppingCartEvent> get() = _event
 
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -117,11 +111,6 @@ class ShoppingCartViewModel(
     fun plusPage() {
         if (!loadable) return
         page++
-        loadShoppingCart()
-    }
-
-    fun minusPage() {
-        page = page.minus(1).coerceAtLeast(MINIMUM_PAGE)
         loadShoppingCart()
     }
 

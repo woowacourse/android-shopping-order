@@ -7,7 +7,6 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,7 +16,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
-import woowacourse.shopping.view.common.showSnackBar
 import woowacourse.shopping.view.shoppingCart.viewModel.OrderBarViewModel
 import woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
@@ -98,22 +96,6 @@ class ShoppingCartActivity :
             orderBarViewModel.update(shoppingCart)
         }
 
-        viewModel.event.observe(this) { event: ShoppingCartEvent ->
-            @StringRes val messageResourceId: Int =
-                when (event) {
-                    ShoppingCartEvent.UPDATE_SHOPPING_CART_FAILURE -> R.string.shopping_cart_update_shopping_cart_error_message
-
-                    ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE ->
-                        R.string.shopping_cart_remove_shopping_cart_product_error_message
-
-                    ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE -> R.string.products_minus_shopping_cart_product_error_message
-
-                    ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE -> R.string.product_detail_add_shopping_cart_error_message
-                }
-
-            binding.root.showSnackBar(getString(messageResourceId))
-        }
-
         viewModel.isLoading.observe(this) { loading ->
             if (loading) {
                 binding.shoppingCartSkeletonLayout.visibility = View.VISIBLE
@@ -121,6 +103,22 @@ class ShoppingCartActivity :
             } else {
                 binding.shoppingCartSkeletonLayout.stopShimmer()
                 binding.shoppingCartSkeletonLayout.visibility = View.GONE
+            }
+        }
+
+        orderBarViewModel.event.observe(this) { event ->
+            when (event) {
+                OrderEvent.PROCEED -> {
+                    activityResultLauncher.launch(
+                        ShoppingCartRecommendActivity.newIntent(
+                            this,
+                            orderBarViewModel.shoppingCartProductsToOrder.value?.toTypedArray()
+                                ?: emptyArray(),
+                        ),
+                    )
+                }
+
+                OrderEvent.ABORT -> Unit
             }
         }
     }
@@ -159,12 +157,7 @@ class ShoppingCartActivity :
     }
 
     override fun onOrderButtonClick() {
-        activityResultLauncher.launch(
-            ShoppingCartRecommendActivity.newIntent(
-                this,
-                orderBarViewModel.shoppingCartProductsToOrder.value?.toTypedArray() ?: emptyArray(),
-            ),
-        )
+        orderBarViewModel.checkoutIfPossible()
     }
 
     companion object {
