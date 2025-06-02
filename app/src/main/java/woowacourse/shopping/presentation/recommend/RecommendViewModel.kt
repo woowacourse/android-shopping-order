@@ -60,7 +60,7 @@ class RecommendViewModel(
         _selectedTotalCount.value = count
     }
 
-    fun onClickAddToCart(cartItem: CartItem) {
+    fun addToCart(cartItem: CartItem) {
         cartRepository.insertProduct(cartItem.product, 1) { result ->
             result
                 .onSuccess {
@@ -71,24 +71,24 @@ class RecommendViewModel(
         }
     }
 
-    fun onClickMinus(id: Long) {
-        cartRepository.decreaseQuantity(id) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(id, -1)
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_decrease_fail
-                }
-        }
-    }
-
-    fun onClickPlus(id: Long) {
+    fun increaseQuantity(id: Long) {
         cartRepository.increaseQuantity(id) { result ->
             result
                 .onSuccess {
                     updateQuantity(id, 1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_increase_fail
+                }
+        }
+    }
+
+    fun decreaseQuantity(id: Long) {
+        cartRepository.decreaseQuantity(id) { result ->
+            result
+                .onSuccess {
+                    updateQuantity(id, -1)
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_decrease_fail
                 }
         }
     }

@@ -92,14 +92,14 @@ class RecommendActivity :
     }
 
     override fun onClickAddToCart(cartItem: CartItem) {
-        viewModel.onClickAddToCart(cartItem)
+        viewModel.addToCart(cartItem)
     }
 
     override fun onClickMinus(id: Long) {
-        viewModel.onClickMinus(id)
+        viewModel.increaseQuantity(id)
     }
 
     override fun onClickPlus(id: Long) {
-        viewModel.onClickPlus(id)
+        viewModel.decreaseQuantity(id)
     }
 }
