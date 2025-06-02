@@ -58,7 +58,7 @@ data class ProductUiState(
         return result
     }
 
-    fun toggleFetching() = copy(isFetching = !isFetching)
+    fun fetchToggleState() = copy(isFetching = !isFetching)
 
     private fun targetIndex(productId: Long) = productItems.indexOfFirst { it.item.id == productId }
 }
