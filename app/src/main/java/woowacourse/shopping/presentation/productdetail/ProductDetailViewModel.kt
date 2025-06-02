@@ -10,14 +10,12 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
-import woowacourse.shopping.presentation.cart.CartCounterClickListener
 
 class ProductDetailViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-) : ViewModel(),
-    CartCounterClickListener {
+) : ViewModel() {
     private val _product: MutableLiveData<Product> = MutableLiveData()
     val product: LiveData<Product> = _product
     private val _productCount: MutableLiveData<Int> = MutableLiveData(1)
@@ -57,18 +55,18 @@ class ProductDetailViewModel(
         }
     }
 
-    override fun onClickMinus(id: Long) {
+    fun increaseQuantity() {
+        val currentCount = _productCount.value ?: return
+        _productCount.value = currentCount + 1
+    }
+
+    fun decreaseQuantity() {
         val currentCount = _productCount.value ?: return
         if (currentCount == 1) {
             _toastMessage.value = R.string.product_detail_toast_invalid_quantity
             return
         }
         _productCount.value = currentCount - 1
-    }
-
-    override fun onClickPlus(id: Long) {
-        val currentCount = _productCount.value ?: return
-        _productCount.value = currentCount + 1
     }
 
     private fun insertCurrentProductToRecent(product: Product) {

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -19,11 +20,13 @@ import woowacourse.shopping.databinding.ActivityDetailProductBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
+import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.product.ItemClickListener
 
 class ProductDetailActivity :
     AppCompatActivity(),
-    ItemClickListener {
+    ItemClickListener,
+    CartCounterClickListener {
     private lateinit var binding: ActivityDetailProductBinding
     private val viewModel: ProductDetailViewModel by viewModels { ProductDetailViewModelFactory() }
 
@@ -33,6 +36,7 @@ class ProductDetailActivity :
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_product)
         binding.lifecycleOwner = this
         binding.vm = viewModel
+        binding.cartCounterListener = this
         binding.itemClickListener = this
 
         initInsets()
@@ -119,5 +123,14 @@ class ProductDetailActivity :
     }
 
     override fun onClickAddToCart(cartItem: CartItem) {
+    }
+
+    override fun onClickPlus(id: Long) {
+        Log.d("meeple_log", "onclick")
+        viewModel.increaseQuantity()
+    }
+
+    override fun onClickMinus(id: Long) {
+        viewModel.decreaseQuantity()
     }
 }

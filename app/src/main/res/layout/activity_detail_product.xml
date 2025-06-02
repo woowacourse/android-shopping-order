@@ -12,6 +12,10 @@
             type="woowacourse.shopping.presentation.productdetail.ProductDetailViewModel" />
 
         <variable
+            name="cartCounterListener"
+            type="woowacourse.shopping.presentation.cart.CartCounterClickListener" />
+
+        <variable
             name="itemClickListener"
             type="woowacourse.shopping.presentation.product.ItemClickListener" />
     </data>
@@ -84,7 +88,7 @@
             layout="@layout/layout_cart_quantity_box"
             android:layout_width="140dp"
             android:layout_height="44dp"
-            app:clickListener="@{vm}"
+            app:clickListener="@{cartCounterListener}"
             app:id="@{vm.product.productId}"
             app:layout_constraintBottom_toBottomOf="@id/tv_product_detail_price_text"
             app:layout_constraintEnd_toEndOf="parent"
