@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.base
+package woowacourse.shopping.presentation.view.common
 
 import android.os.Bundle
 import android.view.LayoutInflater

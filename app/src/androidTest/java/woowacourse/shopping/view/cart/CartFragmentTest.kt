@@ -12,7 +12,7 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.R
-import woowacourse.shopping.RepositoryProvider
+import woowacourse.shopping.data.RepositoryProvider
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.fixture.dummyProductsFixture

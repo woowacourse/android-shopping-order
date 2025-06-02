@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view
+package woowacourse.shopping.presentation.view.common
 
 import woowacourse.shopping.presentation.model.ProductUiModel
 

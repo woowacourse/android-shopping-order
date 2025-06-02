@@ -8,11 +8,11 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.common.BaseFragment
+import woowacourse.shopping.presentation.view.common.ItemCounterListener
 
 class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),

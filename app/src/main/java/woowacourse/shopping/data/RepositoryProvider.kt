@@ -1,8 +1,6 @@
-package woowacourse.shopping
+package woowacourse.shopping.data
 
 import android.content.Context
-import woowacourse.shopping.data.CartRepositoryImpl
-import woowacourse.shopping.data.ProductRepositoryImpl
 import woowacourse.shopping.data.api.ApiClient
 import woowacourse.shopping.data.datasource.CartItemDataSourceImpl
 import woowacourse.shopping.data.datasource.ProductDataSourceImpl

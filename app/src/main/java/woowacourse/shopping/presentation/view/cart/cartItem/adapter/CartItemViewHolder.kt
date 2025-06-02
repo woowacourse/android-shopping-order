@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart.adapter
+package woowacourse.shopping.presentation.view.cart.cartItem.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toProductUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
+import woowacourse.shopping.presentation.view.common.ItemCounterListener
 
 class CartItemViewHolder(
     private val binding: ItemCartBinding,

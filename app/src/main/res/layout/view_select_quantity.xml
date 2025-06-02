@@ -7,7 +7,7 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.ItemCounterListener" />
+            type="woowacourse.shopping.presentation.view.common.ItemCounterListener" />
 
         <variable
             name="product"

@@ -1,10 +1,10 @@
-package woowacourse.shopping.presentation.view.cart.adapter
+package woowacourse.shopping.presentation.view.cart.cartItem.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
+import woowacourse.shopping.presentation.view.common.ItemCounterListener
 
 class CartItemAdapter(
     cartItems: List<CartItemUiModel> = emptyList(),

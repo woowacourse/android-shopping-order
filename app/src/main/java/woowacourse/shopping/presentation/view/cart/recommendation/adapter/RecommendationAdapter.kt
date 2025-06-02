@@ -5,8 +5,8 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toProductUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
+import woowacourse.shopping.presentation.view.common.ItemCounterListener
 
 class RecommendationAdapter(
     recommendedProducts: List<ProductUiModel> = emptyList(),
