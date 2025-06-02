@@ -14,41 +14,13 @@ class DefaultProductRepository(
         pageSize: Int?,
         callback: (Result<ProductSinglePage>) -> Unit,
     ) {
-        productDataSource.singlePage(category, page, pageSize) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        val productSinglePage = response
-                        callback(Result.success(productSinglePage))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
-        }
+        productDataSource.singlePage(category, page, pageSize) { callback(it) }
     }
 
     override fun loadProduct(
         productId: Long,
         callback: (Result<Product>) -> Unit,
     ) {
-        productDataSource.getProduct(productId) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        val productSinglePage = response
-                        callback(Result.success(productSinglePage))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
-        }
+        productDataSource.getProduct(productId) { callback(it) }
     }
 }
