@@ -51,6 +51,7 @@ class CartViewModel(
 
     private val _selectedItemCount = MutableLiveData(0)
     val selectedItemCount: LiveData<Int> get() = _selectedItemCount
+
     private val _recommendedGoods = MutableLiveData<List<CartItem>>()
     val recommendedGoods: LiveData<List<CartItem>> = _recommendedGoods
 
@@ -113,6 +114,20 @@ class CartViewModel(
         updateCartQuantity()
     }
 
+    fun addCartItemOrIncreaseQuantityFromRecommend(cartItem: CartItem) {
+        val currentList = _recommendedGoods.value ?: return
+        val updatedList =
+            currentList.map { item ->
+                if (item.goods.id == cartItem.goods.id) {
+                    item.copy(quantity = item.quantity + 1)
+                } else {
+                    item
+                }
+            }
+        _recommendedGoods.value = updatedList
+        addCartItemOrIncreaseQuantity(cartItem)
+    }
+
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
         val existing = selectedCartMap[cartItem.id]
         if (existing != null) {
@@ -135,6 +150,20 @@ class CartViewModel(
             selectedCartMap[cartItem.id]?.quantity =
                 (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
         }, {})
+    }
+
+    fun removeCartItemOrDecreaseQuantityFromRecommend(cartItem: CartItem) {
+        val currentList = _recommendedGoods.value ?: return
+        val updatedList =
+            currentList.map { item ->
+                if (item.goods.id == cartItem.goods.id && item.quantity >= 1) {
+                    item.copy(quantity = item.quantity - 1)
+                } else {
+                    item
+                }
+            }
+        _recommendedGoods.value = updatedList
+        removeCartItemOrDecreaseQuantity(cartItem)
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {

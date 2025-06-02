@@ -1,89 +1,100 @@
 package woowacourse.shopping.feature.cart.adapter
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.databinding.ItemGoodsBinding
+import woowacourse.shopping.databinding.ItemGoodsSkeletonBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
+import woowacourse.shopping.feature.goods.adapter.vertical.GoodsDiffCallback
+import woowacourse.shopping.feature.goods.adapter.vertical.GoodsListItem
+import woowacourse.shopping.feature.goods.adapter.vertical.GoodsViewHolder
+import woowacourse.shopping.feature.goods.adapter.vertical.SkeletonViewHolder
 
 class RecommendAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val externalQuantityChange: QuantityChangeListener,
-) : RecyclerView.Adapter<RecommendViewHolder>() {
-    private val items = mutableListOf<CartItem>()
-
-    fun setItems(newItems: List<CartItem>) {
-        val old = items.toList()
-        items.clear()
-        items.addAll(newItems)
-        when {
-            old.isEmpty() -> {
-                @Suppress("NotifyDataSetChanged")
-                notifyDataSetChanged()
-            }
-            newItems.size > old.size -> {
-                notifyItemRangeInserted(old.size, newItems.size - old.size)
-            }
-            else -> {
-                newItems.forEachIndexed { idx, newItem ->
-                    if (idx < old.size && newItem != old[idx]) {
-                        notifyItemChanged(idx)
-                    }
-                }
-            }
-        }
+) : ListAdapter<GoodsListItem, RecyclerView.ViewHolder>(GoodsDiffCallback()) {
+    fun showSkeleton(count: Int = 10) {
+        val skeletonItems = List(count) { GoodsListItem.Skeleton }
+        submitList(skeletonItems)
     }
 
-    private fun incrementItemQuantity(itemId: Int) {
-        val pos = items.indexOfFirst { it.goods.id == itemId }
-        if (pos != -1) {
-            val old = items[pos]
-            items[pos] = old.copy(quantity = old.quantity + 1)
-            notifyItemChanged(pos)
-        }
+    fun setRecommendItem(goodsItem: List<CartItem>) {
+        val newItems = goodsItem.map { GoodsListItem.GoodsData(it) }
+        submitList(newItems)
     }
 
-    private fun decrementItemQuantity(itemId: Int) {
-        val pos = items.indexOfFirst { it.goods.id == itemId }
-        if (pos != -1) {
-            val old = items[pos]
-            items[pos] = old.copy(quantity = old.quantity - 1)
-            if (items[pos].quantity < 0) items[pos].quantity = 0
-            notifyItemChanged(pos)
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is GoodsListItem.Skeleton -> TYPE_SKELETON
+            is GoodsListItem.GoodsData -> TYPE_RECOMMEND_ITEM
         }
-    }
-
-    override fun getItemCount(): Int = items.size
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecommendViewHolder {
-        val wrappedListener =
-            object : QuantityChangeListener {
-                override fun onIncrease(cartItem: CartItem) {
-                    externalQuantityChange.onIncrease(cartItem)
-                    incrementItemQuantity(cartItem.goods.id)
-                }
+    ): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
 
-                override fun onDecrease(cartItem: CartItem) {
-                    externalQuantityChange.onDecrease(cartItem)
-                    decrementItemQuantity(cartItem.goods.id)
-                }
+        return when (viewType) {
+            TYPE_SKELETON -> {
+                val binding = ItemGoodsSkeletonBinding.inflate(inflater, parent, false)
+                SkeletonViewHolder(binding)
             }
-        return RecommendViewHolder.from(parent, wrappedListener, lifecycleOwner)
+            TYPE_RECOMMEND_ITEM -> {
+                val binding = ItemGoodsBinding.inflate(inflater, parent, false)
+                binding.quantityChangeListener = externalQuantityChange
+                GoodsViewHolder(binding)
+            }
+
+            else -> throw IllegalArgumentException("알 수 없는 뷰 타입: $viewType")
+        }
     }
 
     override fun onBindViewHolder(
-        holder: RecommendViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        val item = items[position]
-        holder.bind(item)
-        val screenWidth = holder.itemView.context.resources.displayMetrics.widthPixels
+        val screenWith = holder.itemView.context.resources.displayMetrics.widthPixels
         holder.itemView.layoutParams =
             holder.itemView.layoutParams.apply {
-                width = screenWidth / 3
+                width = (screenWith * 0.4f).toInt()
             }
+        when (val item = getItem(position)) {
+            is GoodsListItem.Skeleton -> {}
+            is GoodsListItem.GoodsData -> {
+                val goodsHolder = holder as GoodsViewHolder
+                goodsHolder.bind(item.goodsItem)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>,
+    ) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            val payload = payloads[0]
+            if (payload == QUANTITY_CHANGED_PAYLOAD && holder is GoodsViewHolder) {
+                val item = getItem(position) as GoodsListItem.GoodsData
+                holder.bind(item.goodsItem)
+                holder.binding.cartItem = item.goodsItem
+                holder.binding.quantitySelector.cartItem = item.goodsItem
+            }
+        }
+    }
+
+    companion object {
+        private const val QUANTITY_CHANGED_PAYLOAD = "quantity_changed"
+
+        private const val TYPE_SKELETON = 0
+        private const val TYPE_RECOMMEND_ITEM = 1
     }
 }

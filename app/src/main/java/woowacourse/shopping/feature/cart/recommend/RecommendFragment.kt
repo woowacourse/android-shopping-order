@@ -27,14 +27,14 @@ class RecommendFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner,
             object : QuantityChangeListener {
                 override fun onIncrease(cartItem: CartItem) {
-                    viewModel.addCartItemOrIncreaseQuantity(cartItem)
+                    viewModel.addCartItemOrIncreaseQuantityFromRecommend(cartItem)
                 }
 
                 override fun onDecrease(cartItem: CartItem) {
-                    viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
+                    viewModel.removeCartItemOrDecreaseQuantityFromRecommend(cartItem)
                 }
             },
-        )
+        ).apply { showSkeleton() }
     }
 
     override fun onCreateView(
@@ -58,7 +58,7 @@ class RecommendFragment : Fragment() {
         }
 
         viewModel.recommendedGoods.observe(viewLifecycleOwner) { goodsList ->
-            recommendAdapter.setItems(goodsList)
+            recommendAdapter.setRecommendItem(goodsList)
         }
 
         viewModel.loadRecommendedGoods()
