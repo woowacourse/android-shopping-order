@@ -9,9 +9,9 @@ interface CartEventHandler {
 
     fun onPrevPage()
 
-    fun isNextButtonEnabled(): Boolean
+    fun hasNextPage(): Boolean
 
-    fun isPrevButtonEnabled(): Boolean
+    fun hasPrevPage(): Boolean
 
     fun isPaginationEnabled(): Boolean
 

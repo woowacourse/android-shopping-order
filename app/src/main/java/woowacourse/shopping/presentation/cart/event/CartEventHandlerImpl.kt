@@ -15,9 +15,9 @@ class CartEventHandlerImpl(
 
     override fun onPrevPage() = viewModel.onPrevPage()
 
-    override fun isNextButtonEnabled() = viewModel.isNextButtonEnabled()
+    override fun hasNextPage() = viewModel.hasNextPage()
 
-    override fun isPrevButtonEnabled() = viewModel.isPrevButtonEnabled()
+    override fun hasPrevPage() = viewModel.hasPrevPage()
 
     override fun isPaginationEnabled(): Boolean = viewModel.isPaginationEnabled()
 

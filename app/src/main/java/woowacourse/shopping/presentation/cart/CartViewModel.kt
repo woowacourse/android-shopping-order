@@ -104,9 +104,9 @@ class CartViewModel(
         }
     }
 
-    override fun isNextButtonEnabled(): Boolean = _pagingData.value?.hasNext == true
+    override fun hasNextPage(): Boolean = _pagingData.value?.hasNext == true
 
-    override fun isPrevButtonEnabled(): Boolean = _pagingData.value?.hasPrevious == true
+    override fun hasPrevPage(): Boolean = _pagingData.value?.hasPrevious == true
 
     override fun isPaginationEnabled(): Boolean =
         (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
@@ -191,8 +191,9 @@ class CartViewModel(
     fun onOrderClick() {
         val price = totalOrderPrice.value ?: 0
         val count = checkedProductCount.value ?: 0
+        val checkedItems = checkedProducts.value ?: emptyList()
         if (count > 0) {
-            _navigateToRecommendEvent.value = OrderInfo(price, count)
+            _navigateToRecommendEvent.value = OrderInfo(checkedItems)
         }
     }
 
