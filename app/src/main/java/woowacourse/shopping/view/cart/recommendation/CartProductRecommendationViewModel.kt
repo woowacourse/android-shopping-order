@@ -57,6 +57,9 @@ class CartProductRecommendationViewModel(
         _totalPrice.value = totalPrice ?: DEFAULT_PRICE
         _totalCount.value = totalCount ?: DEFAULT_COUNT
 
+        _totalPrice.removeSource(_recommendedProducts)
+        _totalCount.removeSource(_recommendedProducts)
+
         _totalPrice.addSource(_recommendedProducts) { list ->
             _totalPrice.value =
                 totalPrice?.plus(list.sumOf { it.product.price * it.quantity })
