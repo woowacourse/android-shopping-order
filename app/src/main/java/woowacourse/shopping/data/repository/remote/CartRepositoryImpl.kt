@@ -1,16 +1,15 @@
 package woowacourse.shopping.data.repository.remote
 
+import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
+    private val cartLocalDataSource: CartLocalDataSource,
     private val cartRemoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    private var cachedCart: Cart = Cart()
-
     override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) {
         cartRemoteDataSource.fetchTotalCount { result ->
             onResult(result)
@@ -30,22 +29,18 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun getCartItemById(productId: Long): CartItem? = cachedCart.findCartItem(productId)
+    override fun getCartItemById(productId: Long): CartItem? = cartLocalDataSource.find(productId)
 
     override fun insertOrUpdate(
         product: Product,
         productQuantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        if (cachedCart.exist(productId = product.productId)) {
-            val cartItem = cachedCart.findCartItem(product.productId)
-            if (cartItem == null) {
-                onResult(Result.failure(NoSuchElementException("해당 상품을 찾을 수 없습니다.")))
-                return
-            }
+        if (cartLocalDataSource.exist(product.productId)) {
+            val cartItem = findCartItemOrFail(product.productId, onResult) ?: return
 
-            updateProduct(cartItem.cartId, product, cartItem.quantity + productQuantity) {
-                onResult(Result.success(Unit))
+            updateProduct(cartItem.cartId, product, cartItem.quantity + productQuantity) { result ->
+                onResult(result)
             }
         } else {
             insertProduct(product, productQuantity) { result -> onResult(result.map { Unit }) }
@@ -62,7 +57,7 @@ class CartRepositoryImpl(
                 onSuccess = { cartId ->
                     val cartItem =
                         CartItem(cartId = cartId, product = product, quantity = productQuantity)
-                    cachedCart = cachedCart.add(cartItem)
+                    cartLocalDataSource.add(cartItem)
                     onResult(Result.success(cartId))
                 },
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
@@ -79,7 +74,7 @@ class CartRepositoryImpl(
         cartRemoteDataSource.updateQuantity(cartId, quantity) { result ->
             result.fold(
                 onSuccess = {
-                    cachedCart = cachedCart.add(CartItem(cartId, product, quantity))
+                    cartLocalDataSource.add(CartItem(cartId, product, quantity))
                     onResult(result)
                 },
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
@@ -91,16 +86,12 @@ class CartRepositoryImpl(
         productId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val cartItem = cachedCart.findCartItem(productId)
-        if (cartItem == null) {
-            onResult(Result.failure(NoSuchElementException("존재하지 않는 상품입니다")))
-            return
-        }
+        val cartItem = findCartItemOrFail(productId, onResult) ?: return
 
         cartRemoteDataSource.updateQuantity(cartItem.cartId, cartItem.quantity + 1) { result ->
             result.fold(
                 onSuccess = {
-                    cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity + 1))
+                    cartLocalDataSource.add(cartItem.copy(quantity = cartItem.quantity + 1))
                     onResult(Result.success(Unit))
                 },
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
@@ -112,11 +103,7 @@ class CartRepositoryImpl(
         productId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val cartItem = cachedCart.findCartItem(productId)
-        if (cartItem == null) {
-            onResult(Result.failure(NoSuchElementException("존재하지 않는 상품입니다")))
-            return
-        }
+        val cartItem = findCartItemOrFail(productId, onResult) ?: return
 
         if (cartItem.quantity == 1) {
             deleteProduct(productId) { result ->
@@ -126,7 +113,7 @@ class CartRepositoryImpl(
             cartRemoteDataSource.updateQuantity(cartItem.cartId, cartItem.quantity - 1) { result ->
                 result.fold(
                     onSuccess = {
-                        cachedCart = cachedCart.add(cartItem.copy(quantity = cartItem.quantity - 1))
+                        cartLocalDataSource.add(cartItem.copy(quantity = cartItem.quantity - 1))
                         onResult(Result.success(Unit))
                     },
                     onFailure = { throwable ->
@@ -141,20 +128,16 @@ class CartRepositoryImpl(
         productId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val cartItem = cachedCart.findCartItem(productId)
-        if (cartItem == null) {
-            onResult(Result.failure(NoSuchElementException("존재하지 않는 상품입니다")))
-            return
-        }
+        val cartItem = findCartItemOrFail(productId, onResult) ?: return
 
         cartRemoteDataSource.deleteCartItemById(cartItem.cartId) { result ->
             result.fold(
                 onSuccess = {
-                    cachedCart = cachedCart.delete(productId)
+                    cartLocalDataSource.delete(productId)
+                    onResult(Result.success(Unit))
                 },
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
             )
-            onResult(result)
         }
     }
 
@@ -165,7 +148,7 @@ class CartRepositoryImpl(
                     cartRemoteDataSource.fetchPagedCartItems(0, totalCount) { pagedResult ->
                         pagedResult.fold(
                             onSuccess = { cartItems ->
-                                cachedCart = Cart(cartItems)
+                                cartLocalDataSource.saveCart(cartItems)
                                 onResult(Result.success(cartItems))
                             },
                             onFailure = { throwable -> onResult(Result.failure(throwable)) },
@@ -175,5 +158,17 @@ class CartRepositoryImpl(
                 onFailure = { throwable -> onResult(Result.failure(throwable)) },
             )
         }
+    }
+
+    private fun findCartItemOrFail(
+        productId: Long,
+        onResult: (Result<Unit>) -> Unit,
+    ): CartItem? {
+        val cartItem = cartLocalDataSource.find(productId)
+        if (cartItem == null) {
+            onResult(Result.failure(NoSuchElementException("해당 상품을 찾을 수 없습니다.")))
+            return null
+        }
+        return cartItem
     }
 }

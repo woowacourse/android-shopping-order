@@ -1,5 +1,6 @@
 package woowacourse.shopping.di
 
+import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
@@ -15,8 +16,8 @@ object RepositoryModule {
     }
 
     val cartRepository: CartRepository by lazy {
-        val cartDataSource = DataSourceModule.cartRemoteDataSource
-        CartRepositoryImpl(cartDataSource)
+        val cartRemoteDataSource = DataSourceModule.cartRemoteDataSource
+        CartRepositoryImpl(CartLocalDataSourceImpl(), cartRemoteDataSource)
     }
 
     val recentProductRepository: RecentProductRepository by lazy {
