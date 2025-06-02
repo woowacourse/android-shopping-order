@@ -2,11 +2,11 @@ package woowacourse.shopping.data.shoppingCart.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.data.product.remote.dto.ProductResponseDto
+import woowacourse.shopping.data.product.remote.dto.ProductResponse
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 @Serializable
-data class ShoppingCartItemsResponseDto(
+data class ShoppingCartItemsResponse(
     @SerialName("content")
     val shoppingCartItems: List<ShoppingCartItemResponseDto>,
     @SerialName("last")
@@ -17,7 +17,7 @@ data class ShoppingCartItemsResponseDto(
         @SerialName("id")
         val id: Long,
         @SerialName("product")
-        val product: ProductResponseDto,
+        val product: ProductResponse,
         @SerialName("quantity")
         val quantity: Int,
     ) {

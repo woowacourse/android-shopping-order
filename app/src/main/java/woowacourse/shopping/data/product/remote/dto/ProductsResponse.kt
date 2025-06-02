@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductsResponseDto(
+data class ProductsResponse(
     @SerialName("content")
-    val products: List<ProductResponseDto>,
+    val products: List<ProductResponse>,
 )

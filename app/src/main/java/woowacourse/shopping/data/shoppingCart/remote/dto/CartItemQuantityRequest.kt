@@ -4,9 +4,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartItemRequestDto(
-    @SerializedName("productId")
-    val productId: Long,
+data class CartItemQuantityRequest(
     @SerializedName("quantity")
     val quantity: Int,
 )

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.product.Product
 
 @Serializable
-data class ProductResponseDto(
+data class ProductResponse(
     @SerialName("category")
     val category: String,
     @SerialName("id")

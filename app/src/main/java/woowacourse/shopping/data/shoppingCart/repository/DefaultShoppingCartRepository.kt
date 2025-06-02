@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
 import okio.IOException
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
+import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequest
+import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequest
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
@@ -30,7 +30,7 @@ class DefaultShoppingCartRepository(
     ): ShoppingCartProduct {
         shoppingCartService
             .postCartItem(
-                CartItemRequestDto(
+                CartItemRequest(
                     productId = product.id,
                     quantity = quantity,
                 ),
@@ -44,11 +44,11 @@ class DefaultShoppingCartRepository(
         shoppingCartId: Long,
         quantity: Int,
     ): ShoppingCartProduct? {
-        val requestDto = CartItemQuantityRequestDto(quantity = quantity)
+        val requestDto = CartItemQuantityRequest(quantity = quantity)
         shoppingCartService
             .updateCartItemQuantity(
                 shoppingCartId = shoppingCartId,
-                cartItemQuantityRequestDto = requestDto,
+                cartItemQuantityRequest = requestDto,
             )
         return load().shoppingCartItems
             .firstOrNull { it.id == shoppingCartId }
