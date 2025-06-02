@@ -22,7 +22,7 @@ import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
-import woowacourse.shopping.presentation.view.cart.CartFragment
+import woowacourse.shopping.presentation.view.order.cart.CartFragment
 import woowacourse.shopping.util.clickOnViewChild
 import woowacourse.shopping.util.nthChildOf
 
