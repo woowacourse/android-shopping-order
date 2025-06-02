@@ -3,7 +3,6 @@ package woowacourse.shopping.view.shoppingCart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -94,16 +93,6 @@ class ShoppingCartActivity :
         viewModel.shoppingCart.observe(this) { shoppingCart ->
             shoppingCartProductAdapter.submitList(shoppingCart)
             orderBarViewModel.update(shoppingCart)
-        }
-
-        viewModel.isLoading.observe(this) { loading ->
-            if (loading) {
-                binding.shoppingCartSkeletonLayout.visibility = View.VISIBLE
-                binding.shoppingCartSkeletonLayout.startShimmer()
-            } else {
-                binding.shoppingCartSkeletonLayout.stopShimmer()
-                binding.shoppingCartSkeletonLayout.visibility = View.GONE
-            }
         }
 
         orderBarViewModel.event.observe(this) { event ->

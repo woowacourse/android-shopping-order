@@ -84,6 +84,7 @@ class ProductsActivity :
         binding.adapter = productAdapter
         binding.onClickShoppingCartButton = ::navigateToShoppingCart
         binding.lifecycleOwner = this
+        binding.viewModel = this@ProductsActivity.viewModel
     }
 
     private fun setupObservers() {
@@ -102,16 +103,6 @@ class ProductsActivity :
 
         viewModel.event.observe(this) { event: ProductsEvent ->
             handleUiEvent(event)
-        }
-
-        viewModel.isLoading.observe(this) { loading ->
-            if (loading) {
-                binding.productsSkeletonLayout.visibility = View.VISIBLE
-                binding.productsSkeletonLayout.startShimmer()
-            } else {
-                binding.productsSkeletonLayout.stopShimmer()
-                binding.productsSkeletonLayout.visibility = View.GONE
-            }
         }
     }
 

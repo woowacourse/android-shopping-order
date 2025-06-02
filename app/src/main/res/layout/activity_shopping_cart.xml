@@ -21,6 +21,9 @@
             name="orderBarViewModel"
             type="woowacourse.shopping.view.shoppingCart.viewModel.OrderBarViewModel" />
 
+        <import type="android.view.View" />
+
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -153,7 +156,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="18dp"
-            android:visibility="gone"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
+            app:shimmer_auto_start="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/shoppingCartToolbar">
 
