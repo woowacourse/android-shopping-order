@@ -7,13 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.ConcatAdapter
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
-import woowacourse.shopping.feature.cart.adapter.CartSkeletonAdapter
 import woowacourse.shopping.feature.cart.adapter.CartViewHolder
 
 class CartFragment :
@@ -44,14 +42,9 @@ class CartFragment :
                 viewModel.setItemSelection(item, isChecked)
             },
             isItemChecked = { item -> viewModel.isItemSelected(item) },
-        )
-    }
-    private val cartSkeletonAdapter: CartSkeletonAdapter by lazy {
-        CartSkeletonAdapter()
-    }
-
-    private val concatAdapter: ConcatAdapter by lazy {
-        ConcatAdapter(cartSkeletonAdapter)
+        ).apply {
+            showSkeleton()
+        }
     }
 
     override fun onCreateView(
@@ -81,15 +74,14 @@ class CartFragment :
     }
 
     private fun setupRecyclerView() {
-        binding.rvCartItems.adapter = concatAdapter
+        binding.rvCartItems.adapter = cartAdapter
     }
 
     private fun setupBottomBar() {
         // 전체선택 체크박스 누를 때
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.selectAllItems(isChecked)
-            cartAdapter.notifyDataSetChanged() // ① 전체선택 후 즉시 개별 체크박스 갱신
+            viewModel.selectAllItems(isChecked) // ① 전체선택 후 즉시 개별 체크박스 갱신
         }
 
         // 뷰모델이 isAllSelected 변경될 때
@@ -97,10 +89,8 @@ class CartFragment :
             binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
             binding.bottomBar.checkboxAll.isChecked = isAll
             binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, checked ->
-                viewModel.selectAllItems(checked)
-                cartAdapter.notifyDataSetChanged() // ② “전체선택” 에서 해제 시에도 반영
-            }
-            cartAdapter.notifyDataSetChanged() // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
+                viewModel.selectAllItems(checked) // ② “전체선택” 에서 해제 시에도 반영
+            } // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
         }
     }
 
@@ -129,23 +119,6 @@ class CartFragment :
         viewModel.removeItemEvent.observe(viewLifecycleOwner) { cartItem ->
             onCartItemDelete(cartItem)
         }
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (!isLoading) {
-                if (concatAdapter.adapters.contains(cartSkeletonAdapter)) {
-                    concatAdapter.removeAdapter(cartSkeletonAdapter)
-                }
-                if (!concatAdapter.adapters.contains(cartAdapter)) {
-                    concatAdapter.addAdapter(0, cartAdapter)
-                }
-            } else {
-                if (concatAdapter.adapters.contains(cartAdapter)) {
-                    concatAdapter.removeAdapter(cartAdapter)
-                }
-                if (!concatAdapter.adapters.contains(cartSkeletonAdapter)) {
-                    concatAdapter.addAdapter(0, cartSkeletonAdapter)
-                }
-            }
-        }
         binding.bottomBar.orderButton.setOnClickListener {
             (requireActivity() as CartActivity).navigateToRecommend()
         }
@@ -158,8 +131,7 @@ class CartFragment :
 
     override fun onCartItemDelete(cartItem: CartItem) {
         viewModel.delete(cartItem) {
-            val deletedIndex: Int? = viewModel.getPosition(cartItem)
-            deletedIndex?.let { cartAdapter.removeItem(it) }
+            cartAdapter.removeItem(cartItem)
         }
     }
 

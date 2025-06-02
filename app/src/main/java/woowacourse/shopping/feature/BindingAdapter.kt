@@ -39,7 +39,7 @@ fun RecyclerView.bindCartItems(cartItems: List<CartItem>?) {
         }
 
         is CartAdapter -> {
-            if (cartItems != null) adapter.setItems(cartItems)
+            if (cartItems != null) adapter.setCartItems(cartItems)
         }
 
         is ConcatAdapter -> {
@@ -49,7 +49,7 @@ fun RecyclerView.bindCartItems(cartItems: List<CartItem>?) {
                 }
 
                 if (childAdapter is CartAdapter && cartItems != null) {
-                    childAdapter.setItems(cartItems)
+                    childAdapter.setCartItems(cartItems)
                 }
             }
         }

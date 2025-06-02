@@ -41,9 +41,6 @@ class CartViewModel(
     private val _removeItemEvent = MutableSingleLiveData<CartItem>()
     val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
 
-    private val _isLoading = MutableLiveData(true)
-    val isLoading: LiveData<Boolean> = _isLoading
-
     private val selectedCartMap = mutableMapOf<Int, CartItem>()
 
     private val _isAllSelected = MutableLiveData(false)
@@ -177,7 +174,6 @@ class CartViewModel(
                 val pageItems = getCartItemByCartResponse(cartResponse)
                 _cart.value = pageItems
                 updatePageMoveAvailability(cartResponse)
-                _isLoading.value = false
                 updateTotalPriceAndCount()
                 if (cartResponse.totalPages >= MINIMUM_PAGE && cartResponse.totalPages < currentPage) {
                     _page.value = cartResponse.totalPages

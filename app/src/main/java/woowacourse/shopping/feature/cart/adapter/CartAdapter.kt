@@ -2,8 +2,10 @@ package woowacourse.shopping.feature.cart.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
+import woowacourse.shopping.databinding.ItemCartSkeletonBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 
@@ -12,88 +14,88 @@ class CartAdapter(
     private val quantityChangeListener: QuantityChangeListener,
     private val onItemCheckedChange: (CartItem, Boolean) -> Unit,
     private val isItemChecked: (CartItem) -> Boolean,
-) : RecyclerView.Adapter<CartViewHolder>() {
-    private val cartItems: MutableList<CartItem> = mutableListOf()
-
-    fun removeItem(position: Int) {
-        cartItems.removeAt(position)
-        notifyItemRemoved(position)
+) : ListAdapter<CartListItem, RecyclerView.ViewHolder>(CartDiffCallback()) {
+    fun showSkeleton(count: Int = 5) {
+        val skeletonItems = List(count) { CartListItem.Skeleton }
+        submitList(skeletonItems)
     }
 
-    fun setItems(newCartItems: List<CartItem>) {
-        val oldItems = cartItems.toList()
-        cartItems.clear()
-        cartItems.addAll(newCartItems)
-
-        if (newCartItems.size < oldItems.size) {
-            notifyItemRangeRemoved(newCartItems.size, oldItems.size - newCartItems.size)
-        }
-
-        newCartItems.forEachIndexed { index, newCartItem ->
-            if (index < oldItems.size && newCartItem != oldItems[index]) {
-                if (newCartItem.goods == oldItems[index].goods &&
-                    newCartItem.quantity != oldItems[index].quantity
-                ) {
-                    updateItemQuantity(index)
-                } else {
-                    notifyItemChanged(index)
-                }
-            }
-        }
-
-        if (newCartItems.size > oldItems.size) {
-            notifyItemRangeInserted(oldItems.size, newCartItems.size - oldItems.size)
-        }
+    fun setCartItems(cartItems: List<CartItem>) {
+        val newItems = cartItems.map { CartListItem.CartData(it) }
+        submitList(newItems)
     }
 
-    private fun updateItemQuantity(position: Int) {
-        notifyItemChanged(position, QUANTITY_CHANGED_PAYLOAD)
+    fun removeItem(removeCartItem: CartItem) {
+        val currentList = currentList.toMutableList()
+        currentList.removeIf {
+            it is CartListItem.CartData && it.cartItem.goods.id == removeCartItem.goods.id
+        }
+        submitList(currentList)
     }
+
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is CartListItem.Skeleton -> TYPE_SKELETON
+            is CartListItem.CartData -> TYPE_CART_ITEM
+        }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CartViewHolder {
+    ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemCartBinding.inflate(inflater, parent, false)
-        binding.cartClickListener = cartClickListener
-        binding.quantityChangeListener = quantityChangeListener
-        return CartViewHolder(binding)
-    }
 
-    override fun onBindViewHolder(
-        holder: CartViewHolder,
-        position: Int,
-    ) {
-        val item = cartItems[position]
-        holder.bind(item)
-
-        holder.binding.checkBoxItem.setOnCheckedChangeListener(null)
-        holder.binding.checkBoxItem.isChecked = isItemChecked(item)
-        holder.binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
-            onItemCheckedChange(item, isChecked)
+        return when (viewType) {
+            TYPE_SKELETON -> {
+                val binding = ItemCartSkeletonBinding.inflate(inflater, parent, false)
+                SkeletonViewHolder(binding)
+            }
+            TYPE_CART_ITEM -> {
+                val binding = ItemCartBinding.inflate(inflater, parent, false)
+                binding.cartClickListener = cartClickListener
+                binding.quantityChangeListener = quantityChangeListener
+                CartViewHolder(binding)
+            }
+            else -> throw IllegalArgumentException("알 수 없는 뷰 타입: $viewType")
         }
     }
 
     override fun onBindViewHolder(
-        holder: CartViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
-        payloads: List<Any>,
     ) {
-        if (payloads.isEmpty()) {
-            onBindViewHolder(holder, position)
-        } else {
-            val payload = payloads[0]
-            if (payload == QUANTITY_CHANGED_PAYLOAD) {
-                holder.bind(cartItems[position])
-                holder.binding.quantitySelector.cartItem = cartItems[position]
+        when (val item = getItem(position)) {
+            is CartListItem.Skeleton -> {}
+            is CartListItem.CartData -> {
+                val cartHolder = holder as CartViewHolder
+                cartHolder.bind(item.cartItem)
+                cartHolder.binding.checkBoxItem.setOnCheckedChangeListener(null)
+                cartHolder.binding.checkBoxItem.isChecked = isItemChecked(item.cartItem)
+                cartHolder.binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
+                    onItemCheckedChange(item.cartItem, isChecked)
+                }
             }
         }
     }
 
-    override fun getItemCount(): Int = cartItems.size
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>,
+    ) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else if (payloads.contains(QUANTITY_CHANGED_PAYLOAD) && holder is CartViewHolder) {
+            val item = getItem(position) as CartListItem.CartData
+            holder.bind(item.cartItem)
+            holder.binding.quantitySelector.cartItem = item.cartItem
+        }
+    }
 
     companion object {
-        private const val QUANTITY_CHANGED_PAYLOAD = "quantity_changed"
+        const val QUANTITY_CHANGED_PAYLOAD = "quantity_changed"
+
+        private const val TYPE_SKELETON = 0
+        private const val TYPE_CART_ITEM = 1
     }
 }
