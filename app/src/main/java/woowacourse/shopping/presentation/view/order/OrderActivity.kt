@@ -19,7 +19,6 @@ class OrderActivity :
     AppCompatActivity(),
     OrderNavigator {
     private lateinit var binding: ActivityOrderBinding
-    private var currentFragmentTag: String? = null
     private val viewModel: OrderViewModel by viewModels { OrderViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,17 +27,7 @@ class OrderActivity :
         setWindowInsets()
         setupListeners()
 
-        if (savedInstanceState != null) {
-            currentFragmentTag = savedInstanceState.getString(KEY_CURRENT_FRAGMENT_TAG)
-            return
-        }
-
-        showFragment(CartFragment::class.java)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        currentFragmentTag?.let { outState.putString(KEY_CURRENT_FRAGMENT_TAG, it) }
+        if (savedInstanceState == null) showFragment(CartFragment::class.java)
     }
 
     override fun navigateToCart() = showFragment(CartFragment::class.java)
@@ -62,43 +51,36 @@ class OrderActivity :
 
     private fun <T : Fragment> showFragment(fragmentClass: Class<T>) {
         val tag = fragmentClass.simpleName
-        val fragmentManager = supportFragmentManager
 
-        fragmentManager.commit {
+        supportFragmentManager.commit {
             setReorderingAllowed(true)
-            currentFragmentTag?.let { fragmentManager.findFragmentByTag(it)?.let(::hide) }
+            currentFragment()?.let { hide(it) }
 
-            val targetFragment = fragmentManager.findFragmentByTag(tag)
+            val targetFragment = supportFragmentManager.findFragmentByTag(tag)
             if (targetFragment != null) {
                 show(targetFragment)
             } else {
                 add(R.id.cart_fragment_container, fragmentClass, null, tag)
             }
-            currentFragmentTag = tag
         }
     }
 
     private fun setupListeners() {
-        binding.viewOrder.buttonOrder.setOnClickListener {
-            orderButtonHandler()
-        }
-        binding.viewOrder.checkboxSelectAll.setOnCheckedChangeListener { _, checked ->
-            // TODO: 전체 토글 기능 구현
-        }
+        binding.viewOrder.buttonOrder.setOnClickListener { orderButtonHandler() }
     }
 
     private fun orderButtonHandler() {
-        when (currentFragmentTag) {
-            CartFragment::class.simpleName -> showFragment(SuggestionFragment::class.java)
-            SuggestionFragment::class.simpleName -> {
+        when (currentFragment()) {
+            is CartFragment -> showFragment(SuggestionFragment::class.java)
+            is SuggestionFragment -> {
                 // TODO: 주문 기능 구현
             }
         }
     }
 
-    companion object {
-        private const val KEY_CURRENT_FRAGMENT_TAG = "current_fragment_tag"
+    private fun currentFragment(): Fragment? = supportFragmentManager.fragments.firstOrNull { it.isVisible }
 
+    companion object {
         fun newIntent(context: Context): Intent = Intent(context, OrderActivity::class.java)
     }
 }
