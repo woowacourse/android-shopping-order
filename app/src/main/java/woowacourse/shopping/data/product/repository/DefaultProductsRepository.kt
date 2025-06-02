@@ -115,15 +115,14 @@ class DefaultProductsRepository(
     }
 
     companion object {
-        @Suppress("ktlint:standard:property-naming")
-        private var INSTANCE: ProductsRepository? = null
+        private var instance: ProductsRepository? = null
 
         fun initialize(
             recentWatchingDao: RecentWatchingDao,
             productService: ProductService,
         ) {
-            if (INSTANCE == null) {
-                INSTANCE =
+            if (instance == null) {
+                instance =
                     DefaultProductsRepository(
                         recentWatchingDao = recentWatchingDao,
                         productService = productService,
@@ -131,6 +130,6 @@ class DefaultProductsRepository(
             }
         }
 
-        fun get(): ProductsRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")
+        fun get(): ProductsRepository = instance ?: throw IllegalStateException("초기화 되지 않았습니다.")
     }
 }

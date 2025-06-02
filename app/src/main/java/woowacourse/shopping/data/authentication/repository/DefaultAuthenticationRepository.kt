@@ -24,15 +24,14 @@ class DefaultAuthenticationRepository(
         private const val USER_ID_KEY = "id"
         private const val USER_PASSWORD_KEY = "password"
 
-        @Suppress("ktlint:standard:property-naming")
-        private var INSTANCE: AuthenticationRepository? = null
+        private var instance: AuthenticationRepository? = null
 
         fun initialize(authDataStore: SharedPreferences) {
-            if (INSTANCE == null) {
-                INSTANCE = DefaultAuthenticationRepository(authDataSource = authDataStore)
+            if (instance == null) {
+                instance = DefaultAuthenticationRepository(authDataSource = authDataStore)
             }
         }
 
-        fun get(): AuthenticationRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")
+        fun get(): AuthenticationRepository = instance ?: throw IllegalStateException("초기화 되지 않았습니다.")
     }
 }

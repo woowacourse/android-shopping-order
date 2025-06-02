@@ -165,18 +165,17 @@ class DefaultShoppingCartRepository(
     }
 
     companion object {
-        @Suppress("ktlint:standard:property-naming")
-        private var INSTANCE: ShoppingCartRepository? = null
+        private var instance: ShoppingCartRepository? = null
 
         fun initialize(shoppingCartService: ShoppingCartService) {
-            if (INSTANCE == null) {
-                INSTANCE =
+            if (instance == null) {
+                instance =
                     DefaultShoppingCartRepository(
                         shoppingCartService = shoppingCartService,
                     )
             }
         }
 
-        fun get(): ShoppingCartRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")
+        fun get(): ShoppingCartRepository = instance ?: throw IllegalStateException("초기화 되지 않았습니다.")
     }
 }
