@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -74,18 +76,16 @@ class RecommendActivity :
         viewModel.recommendProducts.observe(this) {
             recommendAdapter.submitList(it)
         }
+
+        viewModel.toastMessage.observe(this) { resId ->
+            showToast(resId)
+        }
     }
 
-    companion object {
-        fun newIntent(
-            context: Context,
-            selectedPrice: Int,
-            selectedCount: Int,
-        ): Intent =
-            Intent(context, RecommendActivity::class.java).apply {
-                putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
-                putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
-            }
+    private fun showToast(
+        @StringRes messageResId: Int,
+    ) {
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
     override fun onClickProductItem(productId: Long) {
@@ -101,5 +101,17 @@ class RecommendActivity :
 
     override fun onClickPlus(id: Long) {
         viewModel.decreaseQuantity(id)
+    }
+
+    companion object {
+        fun newIntent(
+            context: Context,
+            selectedPrice: Int,
+            selectedCount: Int,
+        ): Intent =
+            Intent(context, RecommendActivity::class.java).apply {
+                putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
+                putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
+            }
     }
 }

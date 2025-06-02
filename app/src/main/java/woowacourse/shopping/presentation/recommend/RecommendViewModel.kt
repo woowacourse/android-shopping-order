@@ -33,16 +33,20 @@ class RecommendViewModel(
 
     private fun fetchData() {
         recentProductRepository.getMostRecentProduct { result ->
-            result.onSuccess { recentProduct ->
-                recentCategory = recentProduct?.category ?: ""
+            result
+                .onSuccess { recentProduct ->
+                    recentCategory = recentProduct?.category ?: ""
 
-                recommendProductsUseCase(recentCategory) { result ->
-                    result.onSuccess { products ->
-                        val recommendItems = products.map { it.toPresentation() }
-                        _recommendProducts.postValue(recommendItems)
+                    recommendProductsUseCase(recentCategory) { result ->
+                        result
+                            .onSuccess { products ->
+                                val recommendItems = products.map { it.toPresentation() }
+                                _recommendProducts.postValue(recommendItems)
+                            }.onFailure { _toastMessage.postValue(R.string.recommend_toast_load_fail) }
                     }
+                }.onFailure {
+                    _toastMessage.postValue(R.string.recommend_toast_recent_load_fail)
                 }
-            }
         }
     }
 
