@@ -15,7 +15,7 @@ import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.usecase.GetRecentProductUseCase
+import woowacourse.shopping.view.loader.HistoryLoader
 
 class AppContainer(
     context: Context,
@@ -42,5 +42,5 @@ class AppContainer(
 
     val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
 
-    val getRecentProductUseCase = GetRecentProductUseCase(productRepository, historyRepository)
+    val historyLoader = HistoryLoader(productRepository, historyRepository)
 }
