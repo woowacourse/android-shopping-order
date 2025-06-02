@@ -3,8 +3,11 @@ package woowacourse.shopping.view.shoppingCartRecommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
@@ -14,6 +17,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.product.ProductsItem
 
 class ShoppingCartRecommendViewModel(
+    shoppingCartProductsToOrderList: List<ShoppingCartProduct>,
     private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
     private val productsRepository: ProductsRepository = DefaultProductsRepository.get(),
 ) : ViewModel() {
@@ -29,6 +33,7 @@ class ShoppingCartRecommendViewModel(
     val recommendProducts: LiveData<List<ProductsItem.ProductItem>> get() = _recommendProducts
 
     init {
+        _shoppingCartProductsToOrder.value = shoppingCartProductsToOrderList
         initRecentWatchingProducts()
     }
 
@@ -47,10 +52,6 @@ class ShoppingCartRecommendViewModel(
                     .take(10)
             _recommendProducts.value = recommended
         }
-    }
-
-    fun updateShoppingCartProductsToOrder(shoppingCartProductsToOrder: List<ShoppingCartProduct>) {
-        _shoppingCartProductsToOrder.value = shoppingCartProductsToOrder
     }
 
     fun addProductToShoppingCart(
@@ -133,5 +134,14 @@ class ShoppingCartRecommendViewModel(
 
     companion object {
         private const val MAX_RECENT_PRODUCT_LOAD_SIZE = Int.MAX_VALUE
+
+        fun factory(shoppingCartProductsToOrder: List<ShoppingCartProduct>): ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    ShoppingCartRecommendViewModel(
+                        shoppingCartProductsToOrder,
+                    )
+                }
+            }
     }
 }

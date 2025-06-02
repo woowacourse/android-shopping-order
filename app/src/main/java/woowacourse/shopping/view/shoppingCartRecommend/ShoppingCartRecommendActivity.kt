@@ -21,7 +21,12 @@ class ShoppingCartRecommendActivity :
     private val binding: ActivityShoppingCartRecommendBinding by lazy {
         ActivityShoppingCartRecommendBinding.inflate(layoutInflater)
     }
-    private val viewModel: ShoppingCartRecommendViewModel by viewModels()
+    private lateinit var shoppingCartProductsToOrder: List<ShoppingCartProduct>
+    private val viewModel: ShoppingCartRecommendViewModel by viewModels {
+        ShoppingCartRecommendViewModel.factory(
+            shoppingCartProductsToOrder,
+        )
+    }
 
     private val recommendProductAdapter: RecommendProductAdapter by lazy {
         RecommendProductAdapter(this)
@@ -37,14 +42,13 @@ class ShoppingCartRecommendActivity :
             insets
         }
 
-        bindViewModel()
-        val shoppingCartProductsToOrder: List<ShoppingCartProduct> =
+        shoppingCartProductsToOrder =
             intent
                 .getSerializableExtraData<Array<ShoppingCartProduct>>(
                     EXTRA_SHOPPING_CART_PRODUCTS_TO_ORDER_KEY,
                 )?.toList() ?: emptyList()
 
-        viewModel.updateShoppingCartProductsToOrder(shoppingCartProductsToOrder)
+        bindViewModel()
         setUpObservers()
     }
 
