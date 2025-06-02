@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.recommend
 import androidx.recyclerview.widget.DiffUtil
 import woowacourse.shopping.presentation.CartItemUiModel
 
-object ItemDiffUtil : DiffUtil.ItemCallback<CartItemUiModel>() {
+object RecommendDiffUtil : DiffUtil.ItemCallback<CartItemUiModel>() {
     override fun areItemsTheSame(
         oldItem: CartItemUiModel,
         newItem: CartItemUiModel,
