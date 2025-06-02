@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="productItem"
             type="woowacourse.shopping.view.product.ProductsItem.ProductItem" />
@@ -27,8 +29,8 @@
             android:contentDescription="@{productItem.product.name}"
             app:imageUrl="@{productItem.product.imageUrl}"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/productPlusQuantityButtonDefault"
@@ -38,6 +40,7 @@
             android:layout_marginBottom="8dp"
             android:onClick="@{() -> productClickListener.onPlusShoppingCartClick(productItem)}"
             android:src="@drawable/btn_product_plus"
+            android:visibility="@{productItem.selectedQuantity==0 ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="@id/productImage" />
 
@@ -46,6 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
+            android:visibility="@{productItem.selectedQuantity==0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="@id/productImage"
             app:layout_constraintStart_toStartOf="@id/productImage">
@@ -54,6 +58,7 @@
                 android:id="@+id/productQuantityComponent"
                 layout="@layout/component_product_quantity"
                 app:productQuantityClickListener="@{productClickListener}"
+                app:quantity="@{productItem.selectedQuantity}"
                 app:quantityTarget="@{productItem}" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -70,8 +75,8 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@id/productImage"
             app:layout_constraintEnd_toEndOf="@id/productImage"
+            app:layout_constraintStart_toStartOf="@id/productImage"
             app:layout_constraintTop_toBottomOf="@id/productImage"
             tools:text="PET보틀-정사각형어쩌구저쩌구" />
 

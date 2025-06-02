@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.shoppingCartRecommend
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendProductBinding
@@ -18,22 +17,6 @@ class RecommendProductViewHolder(
 
     fun bind(item: ProductsItem.ProductItem) {
         binding.productItem = item
-        if (item.selectedQuantity == 0) {
-            handleEmptySelectedQuantityVisibility()
-            return
-        }
-        handleSelectedQuantityVisibility(item.selectedQuantity)
-    }
-
-    private fun handleEmptySelectedQuantityVisibility() {
-        binding.productQuantityComponentLayout.visibility = View.GONE
-        binding.productPlusQuantityButtonDefault.visibility = View.VISIBLE
-    }
-
-    private fun handleSelectedQuantityVisibility(quantity: Int) {
-        binding.productQuantityComponentLayout.visibility = View.VISIBLE
-        binding.productPlusQuantityButtonDefault.visibility = View.GONE
-        binding.productQuantityComponent.quantity = quantity
     }
 
     companion object {
