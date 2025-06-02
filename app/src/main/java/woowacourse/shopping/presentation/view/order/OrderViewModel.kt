@@ -234,6 +234,11 @@ class OrderViewModel(
         items: List<CartProductUiModel>,
         hasMore: Boolean,
     ) {
+        if (items.isEmpty()) {
+            fetchCartItems(FetchPageDirection.PREVIOUS)
+            return
+        }
+
         _cartProducts.postValue(items)
         _hasMore.postValue(hasMore)
     }
