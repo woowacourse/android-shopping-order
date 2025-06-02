@@ -53,9 +53,11 @@ android {
             }
         val id = localProperties["id"] as String
         val pw = localProperties["password"] as String
+        val baseUrl = localProperties["base_url"] as String
 
         buildConfigField("String", "ID", "\"$id\"")
         buildConfigField("String", "PASSWORD", "\"$pw\"")
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
     buildFeatures {
         dataBinding = true

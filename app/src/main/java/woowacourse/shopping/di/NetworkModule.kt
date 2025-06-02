@@ -4,14 +4,13 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.CartItemService
 import woowacourse.shopping.data.remote.OkHttpClientProvider
 import woowacourse.shopping.data.remote.ProductService
 
 object NetworkModule {
-    private const val BASE_URL =
-        "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
-
+    private const val BASE_URL = BuildConfig.BASE_URL
     private var productService: ProductService? = null
     private var cartItemService: CartItemService? = null
 
