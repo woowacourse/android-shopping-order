@@ -34,12 +34,16 @@ class ShoppingCartViewModel(
 
     private var loadable: Boolean = false
 
+    init {
+        loadShoppingCart()
+    }
+
     fun reload() {
         _shoppingCart.value = emptyList()
         loadShoppingCart()
     }
 
-    fun loadShoppingCart() {
+    private fun loadShoppingCart() {
         val page = this.page - 1
         val size = COUNT_PER_PAGE
 

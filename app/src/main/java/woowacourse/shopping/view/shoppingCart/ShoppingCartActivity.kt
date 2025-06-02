@@ -57,8 +57,6 @@ class ShoppingCartActivity :
         initDataBinding()
         setupAdapter()
         setupObservers()
-
-        viewModel.loadShoppingCart()
     }
 
     private fun initDataBinding() {
