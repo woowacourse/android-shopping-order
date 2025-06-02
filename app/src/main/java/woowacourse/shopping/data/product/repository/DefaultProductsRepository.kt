@@ -47,8 +47,13 @@ class DefaultProductsRepository(
 
     override fun loadLatestViewedProduct(onLoad: (productId: Result<Product?>) -> Unit) {
         {
-            val productId = recentViewedProductsDataSource.load().maxBy { it.viewedAt }.productId
-            productsDataSource.getProductById(productId)?.toDomain()
+            val productId: Long? =
+                recentViewedProductsDataSource.load().maxByOrNull { it.viewedAt }?.productId
+            if (productId == null) {
+                null
+            } else {
+                productsDataSource.getProductById(productId)?.toDomain()
+            }
         }.runAsync(onLoad)
     }
 
