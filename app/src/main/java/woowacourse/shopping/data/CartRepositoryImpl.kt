@@ -13,12 +13,12 @@ class CartRepositoryImpl(
     override fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        callback: (List<CartItem>, Boolean) -> Unit,
+        callback: (List<CartItem>, Boolean, Boolean) -> Unit,
     ) {
         cartItemDataSource.fetchPageOfCartItems(pageIndex, pageSize) { response ->
             if (response != null) {
                 val cartItems = response.content.map { it.toCartItem() }
-                callback(cartItems, !response.last)
+                callback(cartItems, response.first, response.last)
             }
         }
     }

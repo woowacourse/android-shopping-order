@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.view.cart.CartViewModel" />
@@ -21,8 +21,8 @@
             android:layout_marginBottom="40dp"
             android:paddingHorizontal="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/text_view_page"
+            app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/item_cart" />
 
 
@@ -30,8 +30,8 @@
             android:id="@+id/btn_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@{vm.page == 1 ? @color/gray_aa : @color/mint}"
-            android:clickable="@{vm.page != 1}"
+            android:backgroundTint="@{vm.isFirstPage ? @color/gray_aa : @color/mint}"
+            android:clickable="@{!vm.isFirstPage}"
             android:contentDescription="@null"
             android:onClick="@{() -> vm.fetchShoppingCart(false, false)}"
             android:padding="12dp"
@@ -60,8 +60,8 @@
             android:id="@+id/btn_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@{vm.hasMore ? @color/mint : @color/gray_aa }"
-            android:clickable="@{vm.hasMore}"
+            android:backgroundTint="@{vm.isLastPage ? @color/gray_aa : @color/mint}"
+            android:clickable="@{!vm.isLastPage}"
             android:contentDescription="@null"
             android:onClick="@{() -> vm.fetchShoppingCart(true, false)}"
             android:padding="12dp"

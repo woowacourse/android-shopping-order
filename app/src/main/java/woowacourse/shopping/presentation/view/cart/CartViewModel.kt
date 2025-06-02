@@ -35,8 +35,11 @@ class CartViewModel(
     private val _page = MutableLiveData(START_PAGE)
     val page: LiveData<Int> = _page
 
-    private var _hasMore = MutableLiveData<Boolean>()
-    val hasMore: LiveData<Boolean> = _hasMore
+    private var _isFirstPage = MutableLiveData<Boolean>()
+    val isFirstPage: LiveData<Boolean> = _isFirstPage
+
+    private var _isLastPage = MutableLiveData<Boolean>()
+    val isLastPage: LiveData<Boolean> = _isLastPage
 
     private val _totalPrice = MutableLiveData<Int>()
     val totalPrice: LiveData<Int> = _totalPrice
@@ -63,7 +66,7 @@ class CartViewModel(
         cartRepository.loadPageOfCartItems(
             pageIndex = newPage - DEFAULT_PAGE,
             pageSize = PAGE_SIZE,
-        ) { products, hasMore ->
+        ) { products, isFirstPage, isLastPage ->
             val updatedItems =
                 products.map { product ->
                     product
@@ -72,7 +75,8 @@ class CartViewModel(
                 }
             _cartItems.postValue(updatedItems)
             _page.postValue(newPage)
-            _hasMore.postValue(hasMore)
+            _isFirstPage.postValue(isFirstPage)
+            _isLastPage.postValue(isLastPage)
             updateSelectionInfo()
         }
     }

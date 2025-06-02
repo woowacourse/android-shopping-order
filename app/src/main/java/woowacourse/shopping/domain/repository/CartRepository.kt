@@ -6,7 +6,7 @@ interface CartRepository {
     fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        callback: (List<CartItem>, Boolean) -> Unit,
+        callback: (List<CartItem>, Boolean, Boolean) -> Unit,
     )
 
     fun loadAllCartItems(callback: (List<CartItem>) -> Unit)
