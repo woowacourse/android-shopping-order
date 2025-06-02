@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.selection.adapter.CartProductItem
@@ -18,11 +19,19 @@ class CartProductSelectionViewModel(
     private val _products = MutableLiveData<List<CartProductItem>>()
     val products: LiveData<List<CartProductItem>> get() = _products
 
-    private val _totalPrice = MutableLiveData(0)
-    val totalPrice: LiveData<Int> get() = _totalPrice
+    val totalPrice: LiveData<Int> =
+        _products.map { products ->
+            products
+                .filter { it.cartProduct.id in _selectedIds }
+                .sumOf { it.cartProduct.product.price * it.cartProduct.quantity }
+        }
 
-    private val _totalCount = MutableLiveData(0)
-    val totalCount: LiveData<Int> get() = _totalCount
+    val totalCount: LiveData<Int> =
+        _products.map { products ->
+            products
+                .filter { it.cartProduct.id in _selectedIds }
+                .sumOf { it.cartProduct.quantity }
+        }
 
     private var _page = MutableLiveData(FIRST_PAGE_NUMBER)
     val page: LiveData<Int> get() = _page
@@ -62,11 +71,6 @@ class CartProductSelectionViewModel(
                 loadPage(currentPage)
             }
         }
-
-        if (item.id in _selectedIds) {
-            _totalCount.value = totalCount.value?.minus(item.quantity)
-            _totalPrice.value = totalPrice.value?.minus(item.totalPrice)
-        }
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
@@ -74,10 +78,6 @@ class CartProductSelectionViewModel(
             products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
         repository.updateQuantity(cartProductItem.cartProduct, 1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-        }
-        if (item.id in _selectedIds) {
-            _totalCount.value = totalCount.value?.plus(1)
-            _totalPrice.value = totalPrice.value?.plus(item.product.price)
         }
     }
 
@@ -88,22 +88,14 @@ class CartProductSelectionViewModel(
         repository.updateQuantity(cartProductItem.cartProduct, -1) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
-        if (item.id in _selectedIds) {
-            _totalCount.value = totalCount.value?.minus(1)
-            _totalPrice.value = totalPrice.value?.minus(item.product.price)
-        }
     }
 
     override fun onSelectItem(item: CartProduct) {
         val isSelected = item.id in _selectedIds
         if (isSelected) {
             _selectedIds.remove(item.id)
-            _totalCount.value = totalCount.value?.minus(item.quantity)
-            _totalPrice.value = totalPrice.value?.minus(item.totalPrice)
         } else {
             _selectedIds.add(item.id)
-            _totalCount.value = totalCount.value?.plus(item.quantity)
-            _totalPrice.value = totalPrice.value?.plus(item.totalPrice)
         }
         _products.value =
             products.value.orEmpty().map {
@@ -123,20 +115,8 @@ class CartProductSelectionViewModel(
 
         if (isSelectedAll) {
             _selectedIds.removeAll(allIds.toSet())
-            currentProducts.forEach {
-                if (it.isSelected) {
-                    _totalCount.value = totalCount.value?.minus(it.cartProduct.quantity)
-                    _totalPrice.value = totalPrice.value?.minus(it.cartProduct.totalPrice)
-                }
-            }
         } else {
             _selectedIds.addAll(allIds)
-            currentProducts.forEach {
-                if (!it.isSelected) {
-                    _totalCount.value = totalCount.value?.plus(it.cartProduct.quantity)
-                    _totalPrice.value = totalPrice.value?.plus(it.cartProduct.totalPrice)
-                }
-            }
         }
         val updatedProducts = currentProducts.map { it.copy(isSelected = !isSelectedAll) }
         _isSelectedAll.value = !isSelectedAll
