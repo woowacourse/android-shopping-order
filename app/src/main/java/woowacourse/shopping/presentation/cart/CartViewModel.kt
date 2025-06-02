@@ -112,11 +112,16 @@ class CartViewModel(
         fetchSelectedInfo()
     }
 
+    fun toggleItemCheckAll() {
+        val currentCheckState = _isCheckAll.value ?: return
+        val toggledState = !currentCheckState
+        _isCheckAll.value = toggledState
+        _cartItems.value = _cartItems.value?.map { it.copy(isSelected = toggledState) }.orEmpty()
+    }
+
     private fun allCheckOrUnchecked() {
-        val isAllSelected = _cartItems.value?.all { it.isSelected }
-        val isAllNotSelected = _cartItems.value?.all { !it.isSelected }
-        isAllSelected?.let { _isCheckAll.value = true }
-        isAllNotSelected?.let { _isCheckAll.value = false }
+        val isAllSelected = _cartItems.value?.all { it.isSelected } ?: false
+        _isCheckAll.value = isAllSelected
     }
 
     private fun updateQuantity(
@@ -137,12 +142,5 @@ class CartViewModel(
             }
         _cartItems.postValue(updatedItem)
         fetchSelectedInfo()
-    }
-
-    fun toggleItemCheckAll() {
-        val currentCheckState = _isCheckAll.value ?: return
-        val toggledState = !currentCheckState
-        _isCheckAll.value = toggledState
-        _cartItems.value = _cartItems.value?.map { it.copy(isSelected = toggledState) }.orEmpty()
     }
 }
