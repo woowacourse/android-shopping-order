@@ -42,13 +42,13 @@ class OrderViewModel(
 
     private val orderProducts = MutableLiveData<List<CartProductUiModel>>(emptyList())
 
-    val orderTotalPrice: LiveData<Int> =
+    val totalOrderPrice: LiveData<Int> =
         orderProducts.map { it.sumOf { product -> product.totalPrice } }
 
-    val orderTotalCount: LiveData<Int> =
+    val totalOrderCount: LiveData<Int> =
         orderProducts.map { it.sumOf { product -> product.quantity } }
 
-    val isCheckedAll: LiveData<Boolean> = orderProducts.map { isCheckedAll(it) }
+    val isAllSelected: LiveData<Boolean> = orderProducts.map { isCheckedAll(it) }
 
     init {
         fetchCartItems(FetchPageDirection.CURRENT)
@@ -59,7 +59,7 @@ class OrderViewModel(
             result
                 .onFailure { postToastEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
                 .onSuccess {
-                    refreshCurrentPageItems()
+                    refreshCurrentPageItems(productId)
                     addOrderProductFromSuggestion(productId)
                 }
         }
@@ -68,7 +68,7 @@ class OrderViewModel(
     override fun decreaseQuantity(productId: Long) {
         cartRepository.decreaseQuantity(productId, QUANTITY_STEP) { result ->
             result
-                .onSuccess { refreshCurrentPageItems() }
+                .onSuccess { refreshCurrentPageItems(productId) }
                 .onFailure { postToastEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
@@ -96,8 +96,8 @@ class OrderViewModel(
         }
     }
 
-    fun toggleAllOrderProductSelection() {
-        val isCheckedAll = isCheckedAll.value ?: false
+    fun toggleSelectAll() {
+        val isCheckedAll = isAllSelected.value ?: false
         setSelectedCurrentCartProducts(!isCheckedAll)
 
         if (isCheckedAll) {
@@ -115,9 +115,7 @@ class OrderViewModel(
     }
 
     private fun applySelectionState(cartProducts: List<CartProductUiModel>): List<CartProductUiModel> {
-        updateOrderProductsWithLatestData(cartProducts)
-        val selectedProductIds = getSelectedProductIds()
-
+        val selectedProductIds = getCurrentOrderProducts().map { it.productId }
         return cartProducts.map { it.copy(isSelected = selectedProductIds.contains(it.productId)) }
     }
 
@@ -132,20 +130,10 @@ class OrderViewModel(
 
     private fun convertToUiModels(cartProducts: List<CartProduct>): List<CartProductUiModel> = cartProducts.map { it.toCartItemUiModel() }
 
-    private fun findRemovedProductIds(newItems: List<CartProductUiModel>): Set<Long> {
-        val newProductIds = newItems.map { it.productId }.toSet()
-        return getCurrentCartItems().map { it.productId }.filter { it !in newProductIds }.toSet()
+    private fun findRemovedProductIds(newItems: List<CartProductUiModel>): List<Long> {
+        val newProductIds = newItems.map { it.productId }
+        return getCurrentCartItems().map { it.productId }.filter { it !in newProductIds }
     }
-
-    private fun getAllCartProducts(): List<CartProduct> = cartRepository.getAllCartProducts().getOrNull().orEmpty()
-
-    private fun getCurrentCartItems(): List<CartProductUiModel> = _cartProducts.value.orEmpty()
-
-    private fun getCurrentOrderProducts(): List<CartProductUiModel> = orderProducts.value.orEmpty()
-
-    private fun getCurrentPage(): Int = _page.value ?: DEFAULT_PAGE
-
-    private fun getSelectedProductIds(): Set<Long> = getCurrentOrderProducts().map { it.productId }.toSet()
 
     private fun handleCartItemDeletionSuccess(deletedCartId: Long) {
         removeProductFromOrderList(deletedCartId)
@@ -163,11 +151,27 @@ class OrderViewModel(
         stopLoading()
     }
 
-    private fun handleQuantityRefreshSuccess(pageableItem: PageableItem<CartProduct>) {
-        val uiModels = convertToUiModels(pageableItem.items)
-        val itemsWithSelectionState = applySelectionState(uiModels)
+    private fun handleQuantityRefreshSuccess(
+        targetProductId: Long,
+        pageableItem: PageableItem<CartProduct>,
+    ) {
+        val itemsWithSelectionState = convertPageableToUiModels(pageableItem)
+        updateOrderProductsWithLatestData(targetProductId)
         val removedProductIds = findRemovedProductIds(itemsWithSelectionState)
-        updateCartItemsAfterRefresh(itemsWithSelectionState, pageableItem.hasMore)
+        updateUiStateAfterRefresh(itemsWithSelectionState, pageableItem.hasMore, removedProductIds)
+    }
+
+    private fun convertPageableToUiModels(pageableItem: PageableItem<CartProduct>): List<CartProductUiModel> {
+        val uiModels = convertToUiModels(pageableItem.items)
+        return applySelectionState(uiModels)
+    }
+
+    private fun updateUiStateAfterRefresh(
+        itemsWithSelectionState: List<CartProductUiModel>,
+        hasMore: Boolean,
+        removedProductIds: List<Long>,
+    ) {
+        updateCartItemsAfterRefresh(itemsWithSelectionState, hasMore)
         removeDeletedProductsFromOrder(removedProductIds)
     }
 
@@ -179,22 +183,17 @@ class OrderViewModel(
         }
     }
 
-    private fun postToastEvent(event: CartMessageEvent) {
-        _toastEvent.postValue(event)
-    }
-
-    private fun refreshCurrentPageItems() {
+    private fun refreshCurrentPageItems(targetProductId: Long) {
         val currentPage = getCurrentPage()
         cartRepository.fetchCartProducts(currentPage, ITEMS_PER_PAGE) { result ->
             result
-                .onSuccess { handleQuantityRefreshSuccess(it) }
+                .onSuccess { handleQuantityRefreshSuccess(targetProductId, it) }
                 .onFailure { postToastEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
-    private fun removeDeletedProductsFromOrder(deletedProductIds: Set<Long>) {
+    private fun removeDeletedProductsFromOrder(deletedProductIds: List<Long>) {
         if (deletedProductIds.isEmpty()) return
-
         val filteredProducts =
             getCurrentOrderProducts().filter { it.productId !in deletedProductIds }
         orderProducts.postValue(filteredProducts)
@@ -209,14 +208,6 @@ class OrderViewModel(
     private fun setSelectedCurrentCartProducts(isSelected: Boolean) {
         val updatedCartProducts = getCurrentCartItems().map { it.copy(isSelected = isSelected) }
         _cartProducts.postValue(updatedCartProducts)
-    }
-
-    private fun startLoading() {
-        _isLoading.postValue(true)
-    }
-
-    private fun stopLoading() {
-        _isLoading.postValue(false)
     }
 
     private fun toggleOrderProductSelection(productId: Long) {
@@ -257,10 +248,35 @@ class OrderViewModel(
         _page.postValue(page)
     }
 
-    private fun updateOrderProductsWithLatestData(cartProducts: List<CartProductUiModel>) {
+    private fun updateOrderProductsWithLatestData(targetProductId: Long) {
+        val targetCartProduct =
+            cartRepository.findCartProductByProductId(targetProductId).getOrNull()
+        val currentOrderProducts = getCurrentOrderProducts().toMutableList()
+
+        if (targetCartProduct == null) {
+            removeOrderProduct(currentOrderProducts, targetProductId)
+            return
+        }
+
+        replaceOrderProductWithLatest(currentOrderProducts, targetCartProduct)
+    }
+
+    private fun removeOrderProduct(
+        currentOrderProducts: MutableList<CartProductUiModel>,
+        targetProductId: Long,
+    ) {
+        currentOrderProducts.removeIf { it.productId == targetProductId }
+        orderProducts.postValue(currentOrderProducts)
+    }
+
+    private fun replaceOrderProductWithLatest(
+        currentOrderProducts: MutableList<CartProductUiModel>,
+        updatedOrderProduct: CartProduct,
+    ) {
         val updatedProducts =
-            getCurrentOrderProducts().mapNotNull { orderProduct ->
-                cartProducts.find { it.productId == orderProduct.productId }
+            currentOrderProducts.map {
+                if (it.productId != updatedOrderProduct.product.id) return@map it
+                updatedOrderProduct.toCartItemUiModel()
             }
         orderProducts.postValue(updatedProducts)
     }
@@ -270,6 +286,26 @@ class OrderViewModel(
         val isLastItemOnPage =
             currentItems.size == 1 && currentItems.first().cartId == deletedCartId
         return if (isLastItemOnPage) FetchPageDirection.PREVIOUS else FetchPageDirection.CURRENT
+    }
+
+    private fun getAllCartProducts(): List<CartProduct> = cartRepository.getAllCartProducts().getOrNull().orEmpty()
+
+    private fun getCurrentCartItems(): List<CartProductUiModel> = _cartProducts.value.orEmpty()
+
+    private fun getCurrentOrderProducts(): List<CartProductUiModel> = orderProducts.value.orEmpty()
+
+    private fun getCurrentPage(): Int = _page.value ?: DEFAULT_PAGE
+
+    private fun startLoading() {
+        _isLoading.postValue(true)
+    }
+
+    private fun stopLoading() {
+        _isLoading.postValue(false)
+    }
+
+    private fun postToastEvent(event: CartMessageEvent) {
+        _toastEvent.postValue(event)
     }
 
     companion object {

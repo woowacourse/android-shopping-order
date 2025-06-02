@@ -28,11 +28,11 @@
             layout="@layout/view_order"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:isCheckedAll="@{vm.isCheckedAll}"
-            app:onClickSelectAll="@{() -> vm.toggleAllOrderProductSelection()}"
+            app:isCheckedAll="@{vm.isAllSelected()}"
             app:isShowCheckBox="@{true}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:totalCount="@{vm.orderTotalCount}"
-            app:totalPrice="@{vm.orderTotalPrice}" />
+            app:onClickSelectAll="@{() -> vm.toggleSelectAll()}"
+            app:totalCount="@{vm.totalOrderCount}"
+            app:totalPrice="@{vm.totalOrderPrice}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
