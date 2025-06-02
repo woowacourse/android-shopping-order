@@ -11,6 +11,7 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.domain.authentication.UserAuthentication
+import kotlin.concurrent.thread
 
 class ShoppingApplication : Application() {
     private val productDatabase: ProductDatabase by lazy {
@@ -51,11 +52,13 @@ class ShoppingApplication : Application() {
             productService,
         )
 
-        DefaultAuthenticationRepository.get().updateUserAuthentication(
-            UserAuthentication(
-                id = "oungsi2000",
-                password = "password",
-            ),
-        )
+        thread {
+            DefaultAuthenticationRepository.get().updateUserAuthentication(
+                UserAuthentication(
+                    id = "oungsi2000",
+                    password = "password",
+                ),
+            )
+        }.join()
     }
 }
