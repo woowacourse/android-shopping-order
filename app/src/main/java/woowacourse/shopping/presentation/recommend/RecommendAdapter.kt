@@ -4,10 +4,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendAdapter(
-    private val itemClickListener: ItemClickListener,
+    private val itemClickListener: RecommendItemClickListener,
     private val counterClickListener: CartCounterClickListener,
 ) : ListAdapter<CartItemUiModel, RecommendViewHolder>(
         CartItemDiffUtil,

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,7 +20,7 @@ import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendActivity :
     AppCompatActivity(),
-    ItemClickListener,
+    RecommendItemClickListener,
     CartCounterClickListener {
     private lateinit var binding: ActivityRecommendBinding
     private val viewModel: RecommendViewModel by viewModels { RecommendViewModelFactory() }

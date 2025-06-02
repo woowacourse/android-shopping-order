@@ -6,11 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendProductBinding
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.product.ItemClickListener
 
 class RecommendViewHolder(
     private val binding: ItemRecommendProductBinding,
-    itemClickListener: ItemClickListener,
+    itemClickListener: RecommendItemClickListener,
     counterClickListener: CartCounterClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
@@ -25,7 +24,7 @@ class RecommendViewHolder(
     companion object {
         fun create(
             parent: ViewGroup,
-            itemClickListener: ItemClickListener,
+            itemClickListener: RecommendItemClickListener,
             counterClickListener: CartCounterClickListener,
         ): RecommendViewHolder =
             RecommendViewHolder(

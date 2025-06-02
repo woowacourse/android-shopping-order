@@ -58,11 +58,11 @@ class RecommendViewModel(
         _selectedTotalCount.value = count
     }
 
-    fun addToCart(cartItem: CartItem) {
-        cartRepository.insertProduct(cartItem.product, 1) { result ->
+    fun addToCart(cartItem: CartItemUiModel) {
+        cartRepository.insertProduct(cartItem.product.toDomain(), 1) { result ->
             result
                 .onSuccess {
-                    updateQuantity(productId = cartItem.product.productId, 1)
+                    updateQuantity(productId = cartItem.product.id, 1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_add_cart_fail
                 }
