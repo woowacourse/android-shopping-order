@@ -49,19 +49,25 @@ class ProductRemoteDataSource(
     ) {
         val latch = CountDownLatch(ids.size)
         val products = mutableListOf<Product>()
+        val exceptions = mutableListOf<Throwable>()
+
         ids.forEach { id ->
             getProductById(id) { result ->
                 result
                     .onSuccess { product ->
                         product?.let { products.add(it) }
-                        latch.countDown()
-                    }.onFailure {
-                        onResult(Result.failure(it))
+                    }.onFailure { throwable ->
+                        exceptions.add(throwable)
                     }
+                latch.countDown()
             }
         }
         latch.await()
-        onResult(Result.success(products))
+        if (exceptions.isNotEmpty()) {
+            onResult(Result.failure(exceptions.first()))
+        } else {
+            onResult(Result.success(products))
+        }
     }
 
     fun getPagedProducts(
