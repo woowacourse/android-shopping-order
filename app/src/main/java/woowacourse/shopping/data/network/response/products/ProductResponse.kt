@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.network.response.products
 
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.data.network.response.BaseResponse
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
 
@@ -11,8 +12,8 @@ data class ProductResponse(
     val price: Int,
     val imageUrl: String,
     val category: String,
-) {
-    fun toDomain(): Product {
+) : BaseResponse<Product> {
+    override fun toDomain(): Product {
         return Product(
             id = id,
             name = name,
