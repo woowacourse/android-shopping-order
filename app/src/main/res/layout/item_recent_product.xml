@@ -17,7 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="4dp"
+        android:layout_margin="5dp"
         android:onClick="@{() -> eventListener.onProductClicked(product)}">
 
         <ImageView

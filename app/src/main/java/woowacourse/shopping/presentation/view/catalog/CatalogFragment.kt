@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.custom.GridSpacingItemDecoration
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.CartFragment
@@ -74,12 +73,12 @@ class CatalogFragment :
                     }
             }
 
-        binding.recyclerViewProducts.addItemDecoration(
-            GridSpacingItemDecoration(
-                SPAN_COUNT,
-                ITEM_SPACING,
-            ),
-        )
+//        binding.recyclerViewProducts.addItemDecoration(
+//            GridSpacingItemDecoration(
+//                SPAN_COUNT,
+//                ITEM_SPACING,
+//            ),
+//        )
         binding.recyclerViewProducts.adapter = catalogAdapter
     }
 
