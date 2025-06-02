@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.cart.CartItem.PaginationButtonItem
 import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
@@ -17,40 +16,29 @@ class CartViewModel(
     private val catalogProductRepository: CatalogProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : ViewModel() {
-    private val _cartProducts = MutableLiveData<List<CartItem>>()
-    val cartProducts: LiveData<List<CartItem>> = _cartProducts
-
-    private val _isNextButtonEnabled = MutableLiveData<Boolean>(false)
-    val isNextButtonEnabled: LiveData<Boolean> = _isNextButtonEnabled
-
-    private val _isPrevButtonEnabled = MutableLiveData<Boolean>(false)
-    val isPrevButtonEnabled: LiveData<Boolean> = _isPrevButtonEnabled
-
-    private var page: Int = INITIAL_PAGE
+    private val _cartProducts = MutableLiveData<MutableSet<ProductItem>>()
+    val cartProducts: LiveData<MutableSet<ProductItem>> = _cartProducts
 
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
-
-    private val _updatePaginationButton = MutableLiveData<PaginationButtonItem>()
-    val updatePaginationButton: LiveData<PaginationButtonItem> = _updatePaginationButton
 
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loading())
     val loadingState: LiveData<LoadingState> get() = _loadingState
 
-    private val productSelections = mutableMapOf<Int, Boolean>()
-
     private val _totalCount = MutableLiveData<Int>(-1)
     val totalCount: LiveData<Int> get() = _totalCount
-
-    private val _totalProducts = MutableLiveData<MutableSet<ProductUiModel>>()
-    val totalProducts: LiveData<MutableSet<ProductUiModel>> get() = _totalProducts
 
     private val _totalAmount = MutableLiveData<Int>(0)
     val totalAmount: LiveData<Int> get() = _totalAmount
 
+    private val _selectedEvent = MutableLiveData<Unit>()
+    val selectedEvent: LiveData<Unit> = _selectedEvent
+
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
     val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
+
+    private val selectedState: MutableMap<Int, Boolean> = mutableMapOf()
 
     init {
         loadRecommendProducts()
@@ -75,56 +63,25 @@ class CartViewModel(
     }
 
     fun postTotalAmount() {
+        val products: List<ProductUiModel> =
+            cartProducts.value?.map { it.productItem } ?: emptyList()
         val amount =
-            totalProducts.value?.filter { it.isChecked == true }?.sumOf { it.price * it.quantity }
-                ?: 0
+            products
+                .map { it.copy(isChecked = selectedState[it.id] ?: true) }
+                .filter { it.isChecked == true }
+                .sumOf { it.price * it.quantity }
         _totalAmount.postValue(amount)
     }
 
     fun postTotalCount() {
-        val count = totalProducts.value?.size ?: 0
+        val count = cartProducts.value?.size ?: 0
         _totalCount.postValue(count)
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
-        val set = _totalProducts.value ?: mutableSetOf()
-        set.remove(cartProduct.productItem)
-        _totalProducts.postValue(set.toMutableSet())
         cartProductRepository.deleteCartProduct(cartProduct.productItem.cartItemId ?: return) {
-            cartProductRepository.getTotalElements { updatedSize ->
-                val startIndex = page * PAGE_SIZE
-                if (startIndex >= updatedSize && page > 0) {
-                    page--
-                }
-                loadCartProducts()
-            }
+            loadCartProducts()
         }
-    }
-
-    fun onPaginationButtonClick(buttonEvent: ButtonEvent) {
-        cartProductRepository.getTotalElements { totalSize ->
-            val lastPage = (totalSize - 1) / PAGE_SIZE
-
-            when (buttonEvent) {
-                ButtonEvent.DECREASE -> {
-                    if (page > 0) {
-                        page--
-                        loadCartProducts()
-                    }
-                }
-
-                ButtonEvent.INCREASE -> {
-                    if (page < lastPage) {
-                        page++
-                        loadCartProducts()
-                    }
-                }
-            }
-        }
-    }
-
-    fun updatedPaginationButton() {
-        _updatePaginationButton.postValue(getPaginationButton())
     }
 
     fun updateQuantity(
@@ -139,11 +96,11 @@ class CartViewModel(
                         product.quantity - 1,
                     ) { result ->
                         if (result == true) {
-                            _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
-                            val set = _totalProducts.value ?: mutableSetOf()
-                            set.remove(product)
-                            set.add(product.copy(quantity = product.quantity - 1))
-                            _totalProducts.postValue(set.toMutableSet())
+                            val updatedItem: ProductUiModel =
+                                product.copy(quantity = product.quantity - 1)
+                            _updatedItem.postValue(updatedItem)
+
+                            loadCartProducts()
                             postTotalAmount()
                         }
                     }
@@ -156,11 +113,11 @@ class CartViewModel(
                     product.quantity + 1,
                 ) { result ->
                     if (result == true) {
-                        _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
-                        val set = _totalProducts.value ?: mutableSetOf()
-                        set.remove(product)
-                        set.add(product.copy(quantity = product.quantity + 1))
-                        _totalProducts.postValue(set.toMutableSet())
+                        val updatedItem: ProductUiModel =
+                            product.copy(quantity = product.quantity + 1)
+                        _updatedItem.postValue(updatedItem)
+
+                        loadCartProducts()
                         postTotalAmount()
                     }
                 }
@@ -170,77 +127,64 @@ class CartViewModel(
 
     fun addProduct(product: ProductUiModel) {
         cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
-            Log.d("아이템", "$product")
             _updatedItem.postValue(product)
             refreshProductsInfo()
         }
     }
 
     fun changeProductSelection(productUiModel: ProductUiModel) {
-        val set = _totalProducts.value ?: mutableSetOf()
-        set.remove(productUiModel.copy(isChecked = productSelections[productUiModel.id] ?: true))
-        productSelections[productUiModel.id] = productSelections[productUiModel.id]?.not() == true
-        set.add(productUiModel.copy(isChecked = productSelections[productUiModel.id] ?: true))
-        _totalProducts.postValue(set.toMutableSet())
-        postTotalAmount()
-    }
+        val items: MutableSet<ProductItem> = _cartProducts.value ?: return
+        if (selectedState.contains(productUiModel.id)) {
+            selectedState[productUiModel.id] = selectedState[productUiModel.id]?.not() ?: false
+        } else {
+            selectedState[productUiModel.id] = false
+        }
+        items.removeIf { productUiModel.id == it.productItem.id }
+        items.add(
+            ProductItem(
+                productUiModel.copy(
+                    isChecked = selectedState[productUiModel.id] ?: false,
+                ),
+            ),
+        )
 
-    private fun checkNextButtonEnabled(totalSize: Int) {
-        val lastPage = (totalSize - 1) / PAGE_SIZE
-        _isNextButtonEnabled.postValue(page < lastPage)
-    }
-
-    private fun checkPrevButtonEnabled() {
-        _isPrevButtonEnabled.postValue(page >= 1)
+        Log.d("호출됨", "changeProductSelection")
+        _selectedEvent.postValue(Unit)
     }
 
     private fun loadAllCartProducts() {
         cartProductRepository.getTotalElements { totalSize ->
             cartProductRepository
                 .getCartProductsInRange(0, totalSize) { cartProducts ->
-                    _totalProducts.postValue(cartProducts.toMutableSet())
+                    val items = cartProducts.map { ProductItem(it) }.toMutableSet()
+                    _cartProducts.postValue(items)
                 }
         }
     }
 
-    private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
+    private fun loadCartProducts() {
         _loadingState.postValue(LoadingState.loading())
 
         cartProductRepository.getTotalElements { totalSize ->
-            val startIndex = page * pageSize
-            if (startIndex >= totalSize) {
-                return@getTotalElements
-            }
-
             cartProductRepository
-                .getCartProductsInRange(page, pageSize) { cartProducts ->
+                .getCartProductsInRange(0, totalSize) { cartProducts ->
                     val pagedProducts: List<ProductItem> =
                         cartProducts
                             .map {
-                                if (productSelections.contains(it.id)) {
-                                    it.copy(isChecked = productSelections[it.id] == true)
+                                if (selectedState.contains(it.id)) {
+                                    it.copy(isChecked = selectedState[it.id] == true)
                                 } else {
                                     it
                                 }
                             }.map { ProductItem(it) }
-                    val paginationButton = getPaginationButton()
 
-                    _cartProducts.postValue(pagedProducts + paginationButton)
-                    checkNextButtonEnabled(totalSize)
-                    checkPrevButtonEnabled()
+                    _cartProducts.postValue(pagedProducts.toMutableSet())
                     postTotalCount()
 
                     _loadingState.postValue(LoadingState.loaded())
                 }
         }
     }
-
-    private fun getPaginationButton(): PaginationButtonItem =
-        PaginationButtonItem(
-            page = page + 1,
-            isNextButtonEnabled = isNextButtonEnabled.value ?: false,
-            isPrevButtonEnabled = isPrevButtonEnabled.value ?: false,
-        )
 
     companion object {
         private const val PAGE_SIZE = 5

@@ -31,11 +31,8 @@ class CartActivity : AppCompatActivity() {
         binding.vm = viewModel
         binding.lifecycleOwner = this
 
-        viewModel.totalProducts.observe(this) {
-            viewModel.postTotalCount()
-            viewModel.postTotalAmount()
-        }
-
+        viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
+        viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.totalCount.observe(this) {
             if (it != -1) {
                 if (it != 0) {

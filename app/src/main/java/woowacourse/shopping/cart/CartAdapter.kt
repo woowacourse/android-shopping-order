@@ -16,13 +16,6 @@ class CartAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val cartItems: MutableList<CartItem> = cartItems.toMutableList()
 
-    fun setButton(buttonItem: PaginationButtonItem) {
-        if (cartItems.isNotEmpty()) {
-            cartItems[cartItems.lastIndex] = buttonItem
-            notifyItemChanged(cartItems.lastIndex)
-        }
-    }
-
     fun setCartItems(cartProducts: List<CartItem>) {
         notifyItemRangeRemoved(0, cartItems.size)
         cartItems.clear()

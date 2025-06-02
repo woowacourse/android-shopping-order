@@ -15,7 +15,9 @@ import woowacourse.shopping.product.catalog.QuantityControlListener
 
 class CartSelectionFragment : Fragment() {
     private lateinit var binding: FragmentCartSelectionBinding
-    private val viewModel: CartViewModel by viewModels { CartViewModelFactory(requireActivity().application as ShoppingApplication) }
+    private val viewModel: CartViewModel by viewModels({ requireActivity() }) {
+        CartViewModelFactory(requireActivity().application as ShoppingApplication)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +40,7 @@ class CartSelectionFragment : Fragment() {
                     DeleteProductClickListener { product ->
                         viewModel.deleteCartProduct(CartItem.ProductItem(product))
                     },
-                onPaginationButtonClick = viewModel::onPaginationButtonClick,
+                onPaginationButtonClick = {},
                 onQuantityControl =
                     object : QuantityControlListener {
                         override fun onClick(
@@ -54,12 +56,13 @@ class CartSelectionFragment : Fragment() {
 
     private fun observeCartViewModel() {
         val cartAdapter = binding.recyclerViewCart.adapter as CartAdapter
-        viewModel.cartProducts.observe(viewLifecycleOwner, cartAdapter::setCartItems)
-        viewModel.isNextButtonEnabled.observe(viewLifecycleOwner) { viewModel.updatedPaginationButton() }
-        viewModel.isPrevButtonEnabled.observe(viewLifecycleOwner) { viewModel.updatedPaginationButton() }
+        viewModel.cartProducts.observe(viewLifecycleOwner) { products ->
+            cartAdapter.setCartItems(products.toList())
+        }
         viewModel.updatedItem.observe(viewLifecycleOwner, cartAdapter::setCartItem)
-        viewModel.updatePaginationButton.observe(viewLifecycleOwner, cartAdapter::setButton)
-        viewModel.loadingState.observe(viewLifecycleOwner) { changeShimmerState(it.isLoading) }
+        binding.shimmerFrameLayoutCartProducts.stopShimmer()
+        binding.shimmerFrameLayoutCartProducts.visibility = View.GONE
+        // viewModel.loadingState.observe(viewLifecycleOwner) { changeShimmerState(it.isLoading) }
     }
 
     private fun changeShimmerState(isLoading: Boolean) {
