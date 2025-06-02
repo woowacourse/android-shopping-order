@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
@@ -42,6 +40,8 @@ class ProductsViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private var isApiLoading: Boolean = false
+
     val handler =
         CoroutineExceptionHandler { _, exception ->
             _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
@@ -62,23 +62,19 @@ class ProductsViewModel(
         updateShoppingCartQuantity()
     }
 
-    fun updateProducts(
+    private fun updateProducts(
         offset: Int = page - 1,
         size: Int = LOAD_PRODUCTS_SIZE,
     ) {
-        viewModelScope.launch {
-            productsDomain =
-                async(handler) {
-                    productsRepository.load(offset, size)
-                }.await()
-
+        viewModelScope.launch(handler) {
+            productsDomain = productsRepository.load(offset, size)
             loadable = productsDomain.size == LOAD_PRODUCTS_SIZE
-            updateProductsShoppingCartQuantity(this)
+            updateProductsShoppingCartQuantity()
             _isLoading.value = false
         }
     }
 
-    fun updateShoppingCartQuantity() {
+    private fun updateShoppingCartQuantity() {
         viewModelScope.launch {
             _shoppingCartQuantity.value = shoppingCartRepository.fetchAllQuantity()
         }
@@ -88,6 +84,8 @@ class ProductsViewModel(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
+        if (isApiLoading) return
+        isApiLoading = true
         updateProductQuantity(productItem, quantity + 1)
         _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
     }
@@ -96,6 +94,8 @@ class ProductsViewModel(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
+        if (isApiLoading) return
+        isApiLoading = true
         updateProductQuantity(productItem, quantity - 1)
         _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
     }
@@ -131,25 +131,24 @@ class ProductsViewModel(
                         item
                     }
                 }
+            isApiLoading = false
         }
     }
 
-    private fun updateProductsShoppingCartQuantity(scope: CoroutineScope) {
-        scope.launch(handler) {
-            shoppingCartDomain = shoppingCartRepository.load().shoppingCartItems
-            val productUi =
-                productsDomain.map { product ->
-                    val target = shoppingCartDomain.find { it.product.id == product.id }
+    private suspend fun updateProductsShoppingCartQuantity() {
+        shoppingCartDomain = shoppingCartRepository.load().shoppingCartItems
+        val productUi =
+            productsDomain.map { product ->
+                val target = shoppingCartDomain.find { it.product.id == product.id }
 
-                    ProductsItem.ProductItem(
-                        shoppingCartId = target?.id,
-                        product = product,
-                        selectedQuantity = target?.quantity ?: 0,
-                    )
-                }
+                ProductsItem.ProductItem(
+                    shoppingCartId = target?.id,
+                    product = product,
+                    selectedQuantity = target?.quantity ?: 0,
+                )
+            }
 
-            _productsUi.value = _productsUi.value?.plus(productUi)
-        }
+        _productsUi.value = _productsUi.value?.plus(productUi)
     }
 
     companion object {

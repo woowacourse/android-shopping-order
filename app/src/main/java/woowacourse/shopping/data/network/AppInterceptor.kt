@@ -19,6 +19,7 @@ class AppInterceptor(
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response =
         with(chain) {
+            Thread.sleep(2000)
             val newRequest =
                 request()
                     .newBuilder()

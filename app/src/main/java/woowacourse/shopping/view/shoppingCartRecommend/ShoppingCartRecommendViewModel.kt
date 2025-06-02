@@ -32,6 +32,8 @@ class ShoppingCartRecommendViewModel(
         MutableLiveData()
     val recommendProducts: LiveData<List<ProductsItem.ProductItem>> get() = _recommendProducts
 
+    private var isApiLoading: Boolean = false
+
     init {
         _shoppingCartProductsToOrder.value = shoppingCartProductsToOrderList
         initRecentWatchingProducts()
@@ -58,6 +60,8 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
+        if (isApiLoading) return
+        isApiLoading = true
         updateRecommendProducts(item, selectedQuantity + 1)
     }
 
@@ -65,35 +69,35 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
+        if (isApiLoading) return
+        isApiLoading = true
         updateRecommendProducts(item, selectedQuantity - 1)
     }
 
     private fun loadShoppingCartProducts(uploaded: ShoppingCartProduct) {
-        viewModelScope.launch {
-            val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
+        val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
 
-            val existingIndex =
-                currentList.indexOfFirst { it.product.id == uploaded.product.id }
+        val existingIndex =
+            currentList.indexOfFirst { it.product.id == uploaded.product.id }
 
-            if (existingIndex >= 0) {
-                currentList[existingIndex] = uploaded
-            } else {
-                currentList.add(uploaded)
-            }
-
-            _shoppingCartProductsToOrder.value = currentList
-            _recommendProducts.value =
-                _recommendProducts.value?.map { item ->
-                    if (item.product.id == uploaded.product.id) {
-                        item.copy(
-                            shoppingCartId = uploaded.id,
-                            selectedQuantity = uploaded.quantity,
-                        )
-                    } else {
-                        item
-                    }
-                }
+        if (existingIndex >= 0) {
+            currentList[existingIndex] = uploaded
+        } else {
+            currentList.add(uploaded)
         }
+
+        _shoppingCartProductsToOrder.value = currentList
+        _recommendProducts.value =
+            _recommendProducts.value?.map { item ->
+                if (item.product.id == uploaded.product.id) {
+                    item.copy(
+                        shoppingCartId = uploaded.id,
+                        selectedQuantity = uploaded.quantity,
+                    )
+                } else {
+                    item
+                }
+            }
     }
 
     private fun updateRecommendProducts(
@@ -113,6 +117,7 @@ class ShoppingCartRecommendViewModel(
             } ?: run {
                 removeRecommendProduct(item)
             }
+            isApiLoading = false
         }
     }
 

@@ -28,6 +28,8 @@ class ShoppingCartViewModel(
 
     private var loadable: Boolean = false
 
+    private var isApiLoading: Boolean = false
+
     init {
         loadShoppingCart()
     }
@@ -43,12 +45,12 @@ class ShoppingCartViewModel(
 
         viewModelScope.launch {
             val shoppingCarts = shoppingCartRepository.load(page, size)
-            _isLoading.value = false
             loadable = !shoppingCarts.last
 
             loadShoppingCartItems(
                 shoppingCarts.shoppingCartItems,
             )
+            _isLoading.value = false
         }
     }
 
@@ -61,32 +63,35 @@ class ShoppingCartViewModel(
             )
     }
 
-    private fun updateShoppingCartItems() {
-        viewModelScope.launch {
-            val shoppingCarts =
-                shoppingCartRepository.load(0, COUNT_PER_PAGE * page).shoppingCartItems
-            _shoppingCart.value =
-                _shoppingCart.value?.mapNotNull { item ->
-                    shoppingCarts.find { it.id == item.shoppingCartProduct.id }
-                        ?.let { foundProduct ->
-                            item.copy(
-                                shoppingCartProduct = foundProduct,
-                                isChecked = item.isChecked,
-                            )
-                        }
-                }
-        }
+    private suspend fun updateShoppingCartItems() {
+        val shoppingCarts =
+            shoppingCartRepository.load(0, COUNT_PER_PAGE * page).shoppingCartItems
+        _shoppingCart.value =
+            _shoppingCart.value?.mapNotNull { item ->
+                shoppingCarts.find { it.id == item.shoppingCartProduct.id }
+                    ?.let { foundProduct ->
+                        item.copy(
+                            shoppingCartProduct = foundProduct,
+                            isChecked = item.isChecked,
+                        )
+                    }
+            }
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
+        if (isApiLoading) return
+        isApiLoading = true
         viewModelScope.launch {
             shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id)
             updateShoppingCartItems()
             _hasUpdatedProducts.postValue(true)
+            isApiLoading = false
         }
     }
 
     fun decreaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
+        if (isApiLoading) return
+        isApiLoading = true
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
@@ -94,10 +99,13 @@ class ShoppingCartViewModel(
             )
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
+            isApiLoading = false
         }
     }
 
     fun increaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
+        if (isApiLoading) return
+        isApiLoading = true
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
@@ -105,6 +113,7 @@ class ShoppingCartViewModel(
             )
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
+            isApiLoading = false
         }
     }
 
