@@ -6,7 +6,7 @@ import okhttp3.Response
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
 import java.io.IOException
 
-class AppInterceptor(
+class AuthenticationInterceptor(
     authenticationRepository: AuthenticationRepository,
 ) : Interceptor {
     private val basicAuth: String =
