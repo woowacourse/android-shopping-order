@@ -67,29 +67,18 @@ class DetailViewModel(
         }
     }
 
-    fun increaseCartQuantity() {
+    fun increaseCartQuantity() =
         withState(_uiState.value) { state ->
-            val result = state.product.increaseCartQuantity()
-            _uiState.value = state.copy(product = result)
+            _uiState.value = state.increaseQuantity()
         }
-    }
 
-    fun decreaseCartQuantity() {
+    fun decreaseCartQuantity() =
         withState(_uiState.value) { state ->
-            val product = state.product
-            val decreasedCartQuantity = (product.cartQuantity - 1)
+            val (newState, event) = state.decreaseQuantity()
 
-            val quantity =
-                if (!decreasedCartQuantity.hasQuantity()) {
-                    _uiEvent.setValue(DetailUiEvent.ShowCannotDecrease)
-                    Quantity(1)
-                } else {
-                    decreasedCartQuantity
-                }
-
-            _uiState.value = state.copy(product = product.copy(cartQuantity = quantity))
+            _uiState.value = newState
+            event?.let(_uiEvent::setValue)
         }
-    }
 
     fun saveCart(productId: Long) {
         withState(_uiState.value) { state ->
