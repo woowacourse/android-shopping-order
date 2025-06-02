@@ -8,7 +8,7 @@ interface CartDataSource {
     fun getPagedCartItems(
         page: Int,
         size: Int?,
-        onResult: (List<CartItem>) -> Unit,
+        onResult: (Result<List<CartItem>>) -> Unit,
     )
 
     fun insertCartItem(

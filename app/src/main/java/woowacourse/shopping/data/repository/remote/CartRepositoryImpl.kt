@@ -23,17 +23,22 @@ class CartRepositoryImpl(
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
         cartDataSource.getPagedCartItems(page, pageSize) { cartItems ->
-            onResult(Result.success(cartItems))
+            onResult(cartItems)
         }
     }
 
-    override fun fetchAllCartItems(onFinished: (() -> Unit)?) {
-        cartDataSource.getTotalCount { result ->
-            val totalCount = result.getOrNull() ?: 0
+    override fun fetchAllCartItems(onResult: (Result<Unit>) -> Unit) {
+        cartDataSource.getTotalCount { totalCountResult ->
+            val totalCount = totalCountResult.getOrNull() ?: 0
 
-            cartDataSource.getPagedCartItems(0, totalCount) { cartItems ->
-                cachedCart = Cart(cartItems)
-                onFinished?.invoke()
+            cartDataSource.getPagedCartItems(0, totalCount) { cartItemsResult ->
+                cartItemsResult
+                    .onSuccess { cartItems ->
+                        cachedCart = Cart(cartItems)
+                        onResult(Result.success(Unit))
+                    }.onFailure {
+                        onResult(Result.failure(it))
+                    }
             }
         }
     }

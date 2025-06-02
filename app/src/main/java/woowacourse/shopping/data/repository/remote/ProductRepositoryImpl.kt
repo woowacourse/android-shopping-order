@@ -16,16 +16,21 @@ class ProductRepositoryImpl(
         category: String?,
         onResult: (Result<List<CartItem>>) -> Unit,
     ) {
-        productDataSource.fetchPagingProducts(page, pageSize, category) { products ->
-            val cartItems =
-                products.map { product ->
-                    cartRepository
-                        .fetchCartItemById(product.productId) ?: CartItem(
-                        product = product,
-                        quantity = 0,
-                    )
+        productDataSource.fetchPagingProducts(page, pageSize, category) { result ->
+            result
+                .onSuccess { products ->
+                    val cartItems =
+                        products.map { product ->
+                            cartRepository
+                                .fetchCartItemById(product.productId) ?: CartItem(
+                                product = product,
+                                quantity = 0,
+                            )
+                        }
+                    onResult(Result.success(cartItems))
+                }.onFailure {
+                    onResult(Result.failure(it))
                 }
-            onResult(Result.success(cartItems))
         }
     }
 
@@ -33,8 +38,13 @@ class ProductRepositoryImpl(
         productId: Long,
         onResult: (Result<Product>) -> Unit,
     ) {
-        productDataSource.fetchProductById(productId) { product ->
-            onResult(Result.success(product))
+        productDataSource.fetchProductById(productId) { result ->
+            result
+                .onSuccess { product ->
+                    onResult(Result.success(product))
+                }.onFailure {
+                    onResult(Result.failure(it))
+                }
         }
     }
 }

@@ -12,7 +12,7 @@ interface CartRepository {
         onResult: (Result<List<CartItem>>) -> Unit,
     )
 
-    fun fetchAllCartItems(onFinished: (() -> Unit)? = null)
+    fun fetchAllCartItems(onResult: (Result<Unit>) -> Unit)
 
     fun fetchCartItemById(productId: Long): CartItem?
 

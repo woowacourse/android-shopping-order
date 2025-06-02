@@ -16,7 +16,7 @@ class ProductDataSourceImpl(
         page: Int?,
         pageSize: Int?,
         category: String?,
-        onResult: (List<Product>) -> Unit,
+        onResult: (Result<List<Product>>) -> Unit,
     ) {
         productService.requestProducts(page, pageSize, category).enqueue(
             object : Callback<ProductsResponse> {
@@ -27,7 +27,7 @@ class ProductDataSourceImpl(
                     if (response.isSuccessful) {
                         val body =
                             response.body()?.content?.map { it.toDomain() } ?: emptyList()
-                        onResult(body)
+                        onResult(Result.success(body))
                     }
                 }
 
@@ -35,7 +35,7 @@ class ProductDataSourceImpl(
                     call: Call<ProductsResponse>,
                     t: Throwable,
                 ) {
-                    onResult(emptyList())
+                    onResult(Result.failure(t))
                 }
             },
         )
@@ -43,7 +43,7 @@ class ProductDataSourceImpl(
 
     override fun fetchProductById(
         id: Long,
-        onResult: (Product) -> Unit,
+        onResult: (Result<Product>) -> Unit,
     ) {
         productService.requestProductById(id).enqueue(
             object : Callback<ProductContent> {
@@ -54,8 +54,14 @@ class ProductDataSourceImpl(
                     if (response.isSuccessful) {
                         val product =
                             response.body()?.toDomain()
-                                ?: throw NoSuchElementException("해당 id의 상품을 찾지 못했습니다.")
-                        onResult(product)
+                                ?: return onResult(
+                                    Result.failure(
+                                        NoSuchElementException(
+                                            ERROR_NOT_FOUND_PRODUCT,
+                                        ),
+                                    ),
+                                )
+                        onResult(Result.success(product))
                     }
                 }
 
@@ -63,8 +69,13 @@ class ProductDataSourceImpl(
                     call: Call<ProductContent>,
                     t: Throwable,
                 ) {
+                    onResult(Result.failure(t))
                 }
             },
         )
+    }
+
+    companion object {
+        private const val ERROR_NOT_FOUND_PRODUCT = "해당 id의 상품을 찾지 못했습니다."
     }
 }

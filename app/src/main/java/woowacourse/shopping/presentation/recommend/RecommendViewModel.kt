@@ -41,16 +41,19 @@ class RecommendViewModel(
                 recentCategory = recentProduct?.category ?: ""
 
                 productRepository.fetchPagingProducts(category = recentCategory) { result ->
-                    result.onSuccess { products ->
-                        val recommendProductsUiModel =
-                            products
-                                .asSequence()
-                                .filter { it.quantity == 0 }
-                                .map { it.toPresentation() }
-                                .take(10)
-                                .toList()
-                        _recommendProducts.postValue(recommendProductsUiModel)
-                    }
+                    result
+                        .onSuccess { products ->
+                            val recommendProductsUiModel =
+                                products
+                                    .asSequence()
+                                    .filter { it.quantity == 0 }
+                                    .map { it.toPresentation() }
+                                    .take(10)
+                                    .toList()
+                            _recommendProducts.postValue(recommendProductsUiModel)
+                        }.onFailure {
+                            _toastMessage.postValue(R.string.recommend_toast_load_fail)
+                        }
                 }
             }
         }

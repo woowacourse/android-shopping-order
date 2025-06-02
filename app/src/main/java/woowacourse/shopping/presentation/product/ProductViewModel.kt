@@ -33,9 +33,14 @@ class ProductViewModel(
     private var currentPage = FIRST_PAGE
 
     init {
-        cartRepository.fetchAllCartItems {
-            fetchData()
-            fetchCartItemCount()
+        cartRepository.fetchAllCartItems { result ->
+            result
+                .onSuccess {
+                    fetchData()
+                    fetchCartItemCount()
+                }.onFailure {
+                    _toastMessage.postValue(R.string.cart_toast_load_fail)
+                }
         }
     }
 

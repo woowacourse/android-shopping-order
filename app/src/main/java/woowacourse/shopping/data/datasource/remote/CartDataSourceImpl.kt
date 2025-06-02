@@ -39,7 +39,7 @@ class CartDataSourceImpl(
     override fun getPagedCartItems(
         page: Int,
         size: Int?,
-        onResult: (List<CartItem>) -> Unit,
+        onResult: (Result<List<CartItem>>) -> Unit,
     ) = cartItemService.requestCartItems(page = page, size = size).enqueue(
         object : Callback<CartsResponse> {
             override fun onResponse(
@@ -50,7 +50,7 @@ class CartDataSourceImpl(
                     val body =
                         response.body()?.cartContent?.map { it.toDomain() }
                             ?: emptyList()
-                    onResult(body)
+                    onResult(Result.success(body))
                 }
             }
 
@@ -58,7 +58,7 @@ class CartDataSourceImpl(
                 call: Call<CartsResponse>,
                 t: Throwable,
             ) {
-                onResult(emptyList())
+                onResult(Result.failure(t))
             }
         },
     )
@@ -76,7 +76,12 @@ class CartDataSourceImpl(
                     response: Response<ResponseBody>,
                 ) {
                     if (response.isSuccessful) {
-                        val cartId = response.toIdOrNull() ?: throw IllegalStateException("")
+                        val cartId =
+                            response.toIdOrNull() ?: return onResult(
+                                Result.failure(
+                                    IllegalStateException(ERROR_NOT_EXIST_ID),
+                                ),
+                            )
                         onResult(Result.success(cartId))
                     }
                 }
@@ -141,6 +146,9 @@ class CartDataSourceImpl(
         },
     )
 
-    private fun <T> Response<T>.toIdOrNull(): Long? =
-        headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
+    private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
+
+    companion object {
+        private const val ERROR_NOT_EXIST_ID = "ID 값이 존재하지 않습니다."
+    }
 }
