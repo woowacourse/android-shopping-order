@@ -15,6 +15,7 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.catalog.adapter.history.HistoryProductAdapter
 import woowacourse.shopping.ui.catalog.adapter.product.CatalogAdapter
 import woowacourse.shopping.ui.catalog.adapter.product.CatalogAdapter.OnClickHandler
+import woowacourse.shopping.ui.catalog.adapter.product.CatalogItem
 import woowacourse.shopping.ui.catalog.adapter.product.CatalogLayoutManager
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
@@ -112,7 +113,13 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
 
     private fun initObservers() {
         viewModel.products.observe(this) { products ->
-            catalogAdapter.submitItems(products.products, !products.page.isLast)
+            val catalogItems =
+                products.products.map { CatalogItem.ProductItem(it) as CatalogItem }.toMutableList()
+
+            if (!products.page.isLast) {
+                catalogItems.add(CatalogItem.LoadMoreItem)
+            }
+            catalogAdapter.submitList(catalogItems.toList())
             viewModel.loadCartProductsQuantity()
         }
 
