@@ -36,9 +36,6 @@ class CartViewModel(
     private val _uiEvent = MutableSingleLiveData<CartUiEvent>()
     val uiEvent: SingleLiveData<CartUiEvent> get() = _uiEvent
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
     private var lastSeenCategory: String? = null
 
     init {
@@ -149,7 +146,7 @@ class CartViewModel(
     }
 
     fun loadCarts() {
-        setLoading(true)
+        toggleFetching()
         val nextPage = paging.getPageNo() - 1
         cartRepository.loadSinglePage(
             nextPage,
@@ -172,7 +169,7 @@ class CartViewModel(
                 }
             }
                 .onFailure(::handleFailure)
-            setLoading(false)
+            toggleFetching()
         }
     }
 
@@ -232,12 +229,14 @@ class CartViewModel(
         }
     }
 
-    fun onChangeScreen() {
-        _uiEvent.setValue(CartUiEvent.ChangeScreen)
+    private fun toggleFetching() {
+        withState(_cartUiState.value) { state ->
+            _cartUiState.value = state.toggleFetching()
+        }
     }
 
-    private fun setLoading(isLoading: Boolean) {
-        _isLoading.value = isLoading
+    fun onChangeScreen() {
+        _uiEvent.setValue(CartUiEvent.ChangeScreen)
     }
 
     private fun handleFailure(throwable: Throwable) {

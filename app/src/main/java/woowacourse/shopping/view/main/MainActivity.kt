@@ -104,10 +104,8 @@ class MainActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { value ->
             productsAdapter.submitList(value)
-        }
 
-        viewModel.isLoading.observe(this) { value ->
-            if (value.not()) {
+            if (value.isFetching) {
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
                 binding.recyclerViewProduct.visibility = View.VISIBLE

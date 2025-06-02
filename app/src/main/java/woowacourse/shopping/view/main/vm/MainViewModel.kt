@@ -30,9 +30,6 @@ class MainViewModel(
     private val _uiEvent = MutableSingleLiveData<MainUiEvent>()
     val uiEvent: SingleLiveData<MainUiEvent> get() = _uiEvent
 
-    private val _isLoading = MutableLiveData(true)
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
     init {
         loadProductsAndCarts(INITIAL_PAGE)
     }
@@ -44,7 +41,7 @@ class MainViewModel(
         }
 
     private fun loadProductsAndCarts(pageIndex: Int) {
-        setLoading(true)
+        toggleFetching()
         productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE) { productResult ->
             productResult
                 .onSuccess { loadCartsAndMerge(it, pageIndex) }
@@ -89,7 +86,7 @@ class MainViewModel(
                     ),
                 )
 
-                setLoading(false)
+                toggleFetching()
             }
                 .onFailure(::handleFailure)
         }
@@ -102,10 +99,10 @@ class MainViewModel(
             when (val cartId = updated.cartId) {
                 null -> {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it
-                            .onSuccess { value ->
-                                _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
-                            }.onFailure(::handleFailure)
+                        it.onSuccess { value ->
+                            _uiState.value = state.modifyUiState(updated.copy(value?.toLong()))
+                        }
+                            .onFailure(::handleFailure)
                     }
                 }
 
@@ -151,10 +148,10 @@ class MainViewModel(
 
     fun syncCartQuantities() =
         withState(_uiState.value) { state ->
-            cartRepository.loadSinglePage(null, null) { result ->
-                result
+            cartRepository.loadSinglePage(null, null) {
+                it
                     .onSuccess {
-                        _uiState.value = state.modifyQuantity(it.carts)
+                        _uiState.value = state.modifyQuantity(it?.carts.orEmpty())
                     }
                     .onFailure(::handleFailure)
             }
@@ -172,8 +169,10 @@ class MainViewModel(
         }
     }
 
-    private fun setLoading(isLoading: Boolean) {
-        _isLoading.value = isLoading
+    private fun toggleFetching() {
+        withState(_uiState.value) { state ->
+            _uiState.value = state.toggleFetching()
+        }
     }
 
     private fun handleFailure(throwable: Throwable) {

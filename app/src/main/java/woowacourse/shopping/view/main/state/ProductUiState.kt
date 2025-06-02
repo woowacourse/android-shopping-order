@@ -6,6 +6,7 @@ data class ProductUiState(
     val productItems: List<ProductState> = emptyList(),
     val historyItems: List<HistoryState> = emptyList(),
     val load: LoadState = LoadState.CannotLoad,
+    val isFetching: Boolean = true,
 ) {
     val productItemSize: Int
         get() = productItems.size
@@ -56,6 +57,8 @@ data class ProductUiState(
 
         return result
     }
+
+    fun toggleFetching() = copy(isFetching = !isFetching)
 
     private fun targetIndex(productId: Long) = productItems.indexOfFirst { it.item.id == productId }
 }

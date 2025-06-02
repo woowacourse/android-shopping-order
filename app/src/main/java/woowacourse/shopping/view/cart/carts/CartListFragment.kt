@@ -54,10 +54,8 @@ class CartListFragment : Fragment(R.layout.fragment_cart_list) {
     private fun observeViewModel(binding: FragmentCartListBinding) {
         viewModel.cartUiState.observe(viewLifecycleOwner) { value ->
             cartAdapter.submitList(value.items, value.pageState.page)
-        }
 
-        viewModel.isLoading.observe(viewLifecycleOwner) { value ->
-            if (!value) {
+            if (!value.isFetching) {
                 binding.recyclerViewCart.visibility = View.VISIBLE
                 binding.shimmerLayout.visibility = View.GONE
             }

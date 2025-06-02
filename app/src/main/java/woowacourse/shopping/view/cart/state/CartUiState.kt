@@ -7,6 +7,7 @@ data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
     val allChecked: Boolean = false,
+    val isFetching: Boolean = true,
 ) {
     val totalPrice: Int
         get() = items.filter { it.checked }.sumOf { it.totalPrice }
@@ -56,6 +57,8 @@ data class CartUiState(
     fun decreaseCartQuantity(cartId: Long): CartUiState {
         return updateItem(cartId) { it.decreaseCartQuantity(1) }
     }
+
+    fun toggleFetching() = copy(isFetching = !isFetching)
 
     private fun updateItem(
         cartId: Long,
