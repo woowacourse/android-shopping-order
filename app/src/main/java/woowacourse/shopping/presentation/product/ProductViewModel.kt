@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -34,7 +33,7 @@ class ProductViewModel(
     private var currentPage = FIRST_PAGE
 
     init {
-        (cartRepository as CartRepositoryImpl).fetchAllCartItems {
+        cartRepository.fetchAllCartItems {
             fetchData()
             fetchCartItemCount()
         }

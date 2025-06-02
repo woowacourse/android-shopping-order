@@ -158,7 +158,7 @@ class CartRepositoryImpl(
         }
     }
 
-    fun fetchAllCartItems(onResult: (Result<List<CartItem>>) -> Unit) {
+    override fun fetchAllCartItems(onResult: (Result<List<CartItem>>) -> Unit) {
         cartRemoteDataSource.fetchTotalCount { countResult ->
             countResult.fold(
                 onSuccess = { totalCount ->

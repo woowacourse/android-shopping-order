@@ -12,6 +12,8 @@ interface CartRepository {
         onResult: (Result<List<CartItem>>) -> Unit,
     )
 
+    fun fetchAllCartItems(onResult: (Result<List<CartItem>>) -> Unit)
+
     fun getCartItemById(productId: Long): CartItem?
 
     fun insertOrUpdate(
