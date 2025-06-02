@@ -67,7 +67,7 @@ class CartActivity : AppCompatActivity() {
                 is CartUiEvent.ShowCannotIncrease -> {
                     showToast(getString(R.string.text_over_quantity).format(event.quantity))
                 }
-                CartUiEvent.ChangeScreen -> onClickOrderButton()
+                CartUiEvent.ChangeScreen -> changeFragment()
                 is CartUiEvent.ShowErrorMessage -> {
                     val messageResId = getErrorMessage(event.throwable)
                     showToast(getString(messageResId))
@@ -84,7 +84,7 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
-    private fun onClickOrderButton() {
+    private fun changeFragment() {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 supportFragmentManager.commit {
