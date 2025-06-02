@@ -6,19 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
+import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.product.catalog.QuantityControlListener
 
 class CartSelectionFragment : Fragment() {
     private lateinit var binding: FragmentCartSelectionBinding
-    private val viewModel: CartViewModel by lazy {
-        ViewModelProvider(
-            requireActivity(),
-            CartViewModelFactory(requireActivity().application as ShoppingApplication),
-        )[CartViewModel::class.java]
-    }
+    private val viewModel: CartViewModel by viewModels { CartViewModelFactory(requireActivity().application as ShoppingApplication) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +39,15 @@ class CartSelectionFragment : Fragment() {
                         viewModel.deleteCartProduct(CartItem.ProductItem(product))
                     },
                 onPaginationButtonClick = viewModel::onPaginationButtonClick,
-                onQuantityControl = viewModel::updateQuantity,
+                onQuantityControl =
+                    object : QuantityControlListener {
+                        override fun onClick(
+                            buttonEvent: ButtonEvent,
+                            product: ProductUiModel,
+                        ) = viewModel.updateQuantity(buttonEvent, product)
+
+                        override fun onAdd(product: ProductUiModel) = viewModel.addProduct(product)
+                    },
                 onCheckClick = viewModel::changeProductSelection,
             )
     }
@@ -70,17 +75,4 @@ class CartSelectionFragment : Fragment() {
             }
         }
     }
-
-//    private fun updateCartItems() {
-//        val products: List<ProductUiModel> = viewModel.cartProducts.value ?: return
-//        val isNext: Boolean = viewModel.isNextButtonEnabled.value == true
-//        val isPrev: Boolean = viewModel.isPrevButtonEnabled.value == true
-//        val paginationItem = PaginationButtonItem(page + 1, isNext, isPrev)
-//
-//        val cartItems: List<CartItem> = products.map { CartItem.ProductItem(it) }
-//        val cartItemsWithPaginationBtn =
-//            if (cartItems.isEmpty()) cartItems else cartItems + paginationItem
-//        Log.d("UPDATE", "$cartItemsWithPaginationBtn")
-//        (binding.recyclerViewCart.adapter as CartAdapter).setCartItems(cartItemsWithPaginationBtn)
-//    }
 }

@@ -1,5 +1,6 @@
 package woowacourse.shopping.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -66,6 +67,11 @@ class CartViewModel(
                 }
             }
         }
+    }
+
+    fun refreshProductsInfo() {
+        postTotalAmount()
+        postTotalCount()
     }
 
     fun postTotalAmount() {
@@ -159,6 +165,14 @@ class CartViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun addProduct(product: ProductUiModel) {
+        cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
+            Log.d("아이템", "$product")
+            _updatedItem.postValue(product)
+            refreshProductsInfo()
         }
     }
 

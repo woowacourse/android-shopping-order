@@ -86,15 +86,19 @@ class CatalogActivity : AppCompatActivity() {
                         }
 
                         override fun onLoadButtonClick() = viewModel.loadNextCatalogProducts()
-
-                        override fun onQuantityAddClick(product: ProductUiModel) = viewModel.increaseQuantity(product)
                     },
-                quantityControlListener = { buttonEvent, product ->
-                    when (buttonEvent) {
-                        ButtonEvent.INCREASE -> viewModel.increaseQuantity(product)
-                        ButtonEvent.DECREASE -> viewModel.decreaseQuantity(product)
-                    }
-                },
+                quantityControlListener =
+                    object : QuantityControlListener {
+                        override fun onClick(
+                            buttonEvent: ButtonEvent,
+                            product: ProductUiModel,
+                        ) = when (buttonEvent) {
+                            ButtonEvent.INCREASE -> viewModel.increaseQuantity(product)
+                            ButtonEvent.DECREASE -> viewModel.decreaseQuantity(product)
+                        }
+
+                        override fun onAdd(product: ProductUiModel) = viewModel.increaseQuantity(product)
+                    },
             )
 
         binding.recyclerViewProducts.adapter = adapter

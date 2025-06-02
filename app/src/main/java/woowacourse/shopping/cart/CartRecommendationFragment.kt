@@ -1,13 +1,12 @@
 package woowacourse.shopping.cart
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartRecommendationBinding
@@ -15,19 +14,13 @@ import woowacourse.shopping.product.catalog.CatalogItem.ProductItem
 import woowacourse.shopping.product.catalog.ProductActionListener
 import woowacourse.shopping.product.catalog.ProductAdapter
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.product.catalog.QuantityControlListener
 import woowacourse.shopping.product.detail.DetailActivity
 
 class CartRecommendationFragment : Fragment() {
     private lateinit var binding: FragmentCartRecommendationBinding
-    private val viewModel: CartViewModel by lazy {
-        ViewModelProvider(
-            requireActivity(),
-            CartViewModelFactory(requireActivity().application as ShoppingApplication),
-        )[CartViewModel::class.java]
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val viewModel: CartViewModel by activityViewModels {
+        CartViewModelFactory(requireActivity().application as ShoppingApplication)
     }
 
     override fun onCreateView(
@@ -44,10 +37,7 @@ class CartRecommendationFragment : Fragment() {
             )
         binding.lifecycleOwner = this
         setProductAdapter()
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            Log.d("TESTT", "$products")
-            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).addLoadedItems(products.map { ProductItem(it) })
-        }
+        observeCartViewModel()
         return binding.root
     }
 
@@ -63,12 +53,27 @@ class CartRecommendationFragment : Fragment() {
                         }
 
                         override fun onLoadButtonClick() = Unit
-
-                        override fun onQuantityAddClick(product: ProductUiModel) = Unit
                     },
-                quantityControlListener = { event, product -> },
+                quantityControlListener =
+                    object : QuantityControlListener {
+                        override fun onClick(
+                            buttonEvent: ButtonEvent,
+                            product: ProductUiModel,
+                        ) = viewModel.updateQuantity(buttonEvent, product)
+
+                        override fun onAdd(product: ProductUiModel) = viewModel.addProduct(product)
+                    },
             )
 
         binding.RecyclerViewCartRecommendation.adapter = adapter
+    }
+
+    private fun observeCartViewModel() {
+        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
+            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).addLoadedItems(products.map { ProductItem(it) })
+        }
+        viewModel.updatedItem.observe(viewLifecycleOwner) {
+            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).updateItem(it)
+        }
     }
 }
