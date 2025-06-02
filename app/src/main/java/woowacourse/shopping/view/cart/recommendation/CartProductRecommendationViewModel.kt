@@ -2,6 +2,7 @@ package woowacourse.shopping.view.cart.recommendation
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.model.CartProduct
@@ -26,10 +27,10 @@ class CartProductRecommendationViewModel(
 
     private val selectedCartIds: MutableSet<Int> = mutableSetOf()
 
-    private val _totalPrice = MutableLiveData<Int>()
+    private val _totalPrice = MediatorLiveData<Int>()
     val totalPrice: LiveData<Int> get() = _totalPrice
 
-    private val _totalCount = MutableLiveData<Int>()
+    private val _totalCount = MediatorLiveData<Int>()
     val totalCount: LiveData<Int> get() = _totalCount
 
     private val _selectedProduct = MutableSingleLiveData<Product>()
@@ -55,6 +56,14 @@ class CartProductRecommendationViewModel(
         selectedCartIds.addAll(selectedIds)
         _totalPrice.value = totalPrice ?: DEFAULT_PRICE
         _totalCount.value = totalCount ?: DEFAULT_COUNT
+
+        _totalPrice.addSource(_recommendedProducts) { list ->
+            _totalPrice.value =
+                totalPrice?.plus(list.sumOf { it.product.price * it.quantity })
+        }
+        _totalCount.addSource(_recommendedProducts) { list ->
+            _totalCount.value = totalCount?.plus(list.sumOf { it.quantity })
+        }
     }
 
     private fun loadRecommendedProducts() {
@@ -141,8 +150,6 @@ class CartProductRecommendationViewModel(
             }
 
         _recommendedProducts.postValue(updatedList)
-        _totalCount.postValue((totalCount.value ?: DEFAULT_COUNT) + quantityToAdd)
-        _totalPrice.value = totalPrice.value?.plus(item.price * quantityToAdd)
     }
 
     fun finishOrder() {
