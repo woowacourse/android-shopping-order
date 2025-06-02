@@ -1,9 +1,9 @@
 package woowacourse.shopping.view.shoppingCartRecommend
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -21,25 +21,14 @@ class ShoppingCartRecommendViewModel(
         MutableLiveData()
     val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
 
-    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalPrice: LiveData<Int> get() = _totalPrice
-
-    private val _totalQuantity: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalQuantity: LiveData<Int> get() = _totalQuantity
+    val totalPrice: LiveData<Int> get() = _shoppingCartProductsToOrder.map { item -> item.sumOf { it.price } }
+    val totalQuantity: LiveData<Int> get() = _shoppingCartProductsToOrder.map { item -> item.sumOf { it.quantity } }
 
     private val _recommendProducts: MutableLiveData<List<ProductsItem.ProductItem>> =
         MutableLiveData()
     val recommendProducts: LiveData<List<ProductsItem.ProductItem>> get() = _recommendProducts
 
     init {
-        _totalPrice.addSource(_shoppingCartProductsToOrder) { it ->
-            _totalPrice.value = it.sumOf { item -> item.price }
-        }
-
-        _totalQuantity.addSource(_shoppingCartProductsToOrder) {
-            _totalQuantity.value = it.sumOf { item -> item.quantity }
-        }
-
         initRecentWatchingProducts()
     }
 
