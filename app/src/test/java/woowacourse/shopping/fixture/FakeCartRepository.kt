@@ -14,7 +14,7 @@ class FakeCartRepository(
     private val cartItems: MutableMap<Long, CartProduct> =
         initialCartProducts.associateBy { it.product.id }.toMutableMap()
 
-    override fun fetchCartItems(
+    override fun fetchCartProducts(
         page: Int,
         size: Int,
         onResult: (Result<PageableItem<CartProduct>>) -> Unit,
@@ -24,10 +24,9 @@ class FakeCartRepository(
         val pagedItems = sortedItems.drop(offset).take(size)
         val hasMore = (offset + size) < sortedItems.size
         onResult(Result.success(PageableItem(pagedItems, hasMore)))
-        println("fetch: $pagedItems")
     }
 
-    override fun deleteCartItem(
+    override fun deleteCartProduct(
         cartId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
@@ -38,12 +37,7 @@ class FakeCartRepository(
         onResult(Result.success(Unit))
     }
 
-    override fun findQuantityByProductId(productId: Long): Result<Int> {
-        val quantity = cartItems[productId]?.quantity ?: 0
-        return Result.success(quantity)
-    }
-
-    override fun insertCartProductQuantityToCart(
+    override fun increaseQuantity(
         productId: Long,
         increaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
@@ -66,7 +60,7 @@ class FakeCartRepository(
         onResult(Result.success(Unit))
     }
 
-    override fun decreaseCartProductQuantityFromCart(
+    override fun decreaseQuantity(
         productId: Long,
         decreaseCount: Int,
         onResult: (Result<Unit>) -> Unit,
@@ -83,8 +77,23 @@ class FakeCartRepository(
         onResult(Result.success(Unit))
     }
 
-    override fun fetchCartItemCount(onResult: (Result<Int>) -> Unit) {
+    override fun fetchCartProductCount(onResult: (Result<Int>) -> Unit) {
         onResult(Result.success(cartItems.size))
+    }
+
+    override fun findCartProductByProductId(productId: Long): Result<CartProduct> =
+        runCatching {
+            cartItems[productId] ?: throw NoSuchElementException("Cart product not found")
+        }
+
+    override fun getAllCartProducts(): Result<List<CartProduct>> =
+        runCatching {
+            cartItems.values.toList()
+        }
+
+    override fun findQuantityByProductId(productId: Long): Result<Int> {
+        val quantity = cartItems[productId]?.quantity ?: 0
+        return Result.success(quantity)
     }
 
     override fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> {

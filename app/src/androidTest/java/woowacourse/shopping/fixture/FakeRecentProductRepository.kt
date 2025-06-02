@@ -23,6 +23,7 @@ class FakeRecentProductRepository(
 
     override fun insertAndTrimToLimit(
         productId: Long,
+        category: String,
         onResult: (Result<Unit>) -> Unit,
     ) {
         recentProductIds.remove(productId)
