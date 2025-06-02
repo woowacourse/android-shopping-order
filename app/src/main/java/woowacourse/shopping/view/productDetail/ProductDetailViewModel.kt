@@ -3,7 +3,10 @@ package woowacourse.shopping.view.productDetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
@@ -15,6 +18,9 @@ import woowacourse.shopping.view.common.SingleLiveData
 import woowacourse.shopping.view.product.ProductsItem
 
 class ProductDetailViewModel(
+    productId: Long,
+    shoppingCartId: Long?,
+    shoppingCartQuantity: Int,
     private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
     private val productsRepository: ProductsRepository = DefaultProductsRepository.get(),
 ) : ViewModel() {
@@ -37,11 +43,7 @@ class ProductDetailViewModel(
     private val _recentProductBoxVisible: MutableLiveData<Boolean> = MutableLiveData(false)
     val recentProductBoxVisible: LiveData<Boolean> get() = _recentProductBoxVisible
 
-    fun updateProduct(
-        productId: Long,
-        shoppingCartQuantity: Int,
-        shoppingCartId: Long?,
-    ) {
+    init {
         viewModelScope.launch {
             val product = productsRepository.getProduct(productId)
             if (product == null) {
@@ -111,5 +113,22 @@ class ProductDetailViewModel(
     fun minusQuantity() {
         _quantity.value = (_quantity.value)?.minus(1)?.coerceAtLeast(1)
         _price.value = quantity.value?.times(product.value?.product?.price ?: 0)
+    }
+
+    companion object {
+        fun factory(
+            productId: Long,
+            shoppingCartId: Long?,
+            shoppingCartQuantity: Int,
+        ): ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    ProductDetailViewModel(
+                        productId,
+                        shoppingCartId,
+                        shoppingCartQuantity,
+                    )
+                }
+            }
     }
 }

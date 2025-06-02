@@ -19,9 +19,19 @@ import woowacourse.shopping.view.common.showSnackBar
 class ProductDetailActivity :
     AppCompatActivity(),
     ProductDetailClickListener {
-    private val viewModel: ProductDetailViewModel by viewModels()
+    private var productId: Long = 0
+    private var shoppingCartId: Long? = null
+    private var shoppingCartQuantity: Int = 0
+
     private val binding: ActivityProductDetailBinding by lazy {
         ActivityProductDetailBinding.inflate(layoutInflater)
+    }
+    private val viewModel: ProductDetailViewModel by viewModels {
+        ProductDetailViewModel.factory(
+            productId,
+            shoppingCartId,
+            shoppingCartQuantity,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,16 +44,14 @@ class ProductDetailActivity :
             insets
         }
 
-        val productId: Long =
+        productId =
             intent.getSerializableExtraData(EXTRA_PRODUCT_ID) ?: run {
                 binding.root.showSnackBar(getString(R.string.product_not_provided_error_message))
                 return finish()
             }
-        val shoppingCartId: Long? = intent.getSerializableExtraData(EXTRA_SHOPPING_CART_ID)
-
-        val shoppingCartQuantity: Int =
+        shoppingCartId = intent.getSerializableExtraData(EXTRA_SHOPPING_CART_ID)
+        shoppingCartQuantity =
             intent.getSerializableExtraData(EXTRA_SHOPPING_CART_QUANTITY) ?: 0
-        viewModel.updateProduct(productId, shoppingCartQuantity, shoppingCartId)
         bindViewModel()
         setupObservers()
     }
