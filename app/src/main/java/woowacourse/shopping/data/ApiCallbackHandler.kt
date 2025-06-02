@@ -9,9 +9,9 @@ import woowacourse.shopping.data.network.response.BaseResponse
 import kotlin.text.split
 
 class ApiCallbackHandler {
-    fun <T> enqueueWithResult(
+    inline fun <reified T> enqueueWithResult(
         call: Call<T>,
-        callback: (Result<T>) -> Unit,
+        crossinline callback: (Result<T>) -> Unit,
     ) {
         val result =
             object : Callback<T> {
@@ -20,11 +20,16 @@ class ApiCallbackHandler {
                     response: Response<T>,
                 ) {
                     val body = response.body()
-                    if (response.isSuccessful && body != null) {
-                        callback(Result.success(body))
-                    } else if (response.isSuccessful) {
-                        logMissingBody(call, response)
-                        callback(Result.failure(NullPointerException()))
+
+                    if (response.isSuccessful) {
+                        when {
+                            body != null -> callback(Result.success(body))
+                            T::class == Unit::class -> callback(Result.success(Unit as T))
+                            else -> {
+                                logMissingBody(call, response)
+                                callback(Result.failure(NullPointerException()))
+                            }
+                        }
                     } else {
                         callback(Result.failure(HttpException(response)))
                     }
@@ -113,7 +118,7 @@ class ApiCallbackHandler {
             ?.last()
     }
 
-    private fun <T> logMissingBody(
+    fun <T> logMissingBody(
         call: Call<T>,
         response: Response<T>,
     ) {
