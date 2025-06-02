@@ -122,8 +122,8 @@ class CatalogViewModel(
             addToCart(cartItem.toCartItemUiModel())
             return
         }
-        cartRepository.increaseQuantity(cartItem) { id ->
-            updateCartItem(id)
+        cartRepository.increaseQuantity(cartItem) {
+            updateCartItem(cartItem.cartId)
         }
     }
 
@@ -136,8 +136,8 @@ class CatalogViewModel(
                 calculateTotalCartCount()
             }
         } else {
-            cartRepository.decreaseQuantity(cartItem) { id ->
-                updateCartItem(id)
+            cartRepository.decreaseQuantity(cartItem) {
+                updateCartItem(cartItem.cartId)
             }
         }
     }

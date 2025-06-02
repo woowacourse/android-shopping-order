@@ -15,12 +15,12 @@ interface CartRepository {
 
     fun increaseQuantity(
         cartItem: CartItem,
-        callback: (Long) -> Unit,
+        onResult: () -> Unit,
     )
 
     fun decreaseQuantity(
         cartItem: CartItem,
-        callback: (Long) -> Unit,
+        callback: () -> Unit,
     )
 
     fun addCartItem(
@@ -30,12 +30,12 @@ interface CartRepository {
 
     fun deleteCartItem(
         cartId: Long,
-        callback: (Long) -> Unit,
+        onResult: () -> Unit,
     )
 
     fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
-        callback: (Long) -> Unit,
+        onResult: () -> Unit,
     )
 }

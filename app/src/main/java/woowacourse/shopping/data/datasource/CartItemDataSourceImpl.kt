@@ -67,10 +67,10 @@ class CartItemDataSourceImpl(
     }
 
     override fun removeCartItem(
-        id: Long,
-        callback: (Long) -> Unit,
+        cartId: Long,
+        callback: () -> Unit,
     ) {
-        cartItemService.deleteCartItem(id).enqueue(
+        cartItemService.deleteCartItem(cartId).enqueue(
             object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -79,7 +79,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        callback(id)
+                        callback()
                     }
                 }
 
@@ -96,7 +96,7 @@ class CartItemDataSourceImpl(
     override fun updateCartItem(
         id: Long,
         quantity: Quantity,
-        onResult: (Long) -> Unit,
+        onResult: () -> Unit,
     ) {
         cartItemService.patchCartItem(id, quantity).enqueue(
             object : Callback<Unit> {
@@ -107,7 +107,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        onResult(id)
+                        onResult()
                     }
                 }
 

@@ -38,12 +38,27 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun deleteCartItem(
-        cartId: Long,
-        callback: (Long) -> Unit,
+    override fun increaseQuantity(
+        cartItem: CartItem,
+        onResult: () -> Unit,
     ) {
-        cartItemDataSource.removeCartItem(cartId) {
-            callback(cartId)
+        cartItemDataSource.updateCartItem(
+            cartId = cartItem.cartId,
+            quantity = Quantity(cartItem.quantity + 1),
+        ) {
+            onResult()
+        }
+    }
+
+    override fun decreaseQuantity(
+        cartItem: CartItem,
+        callback: () -> Unit,
+    ) {
+        cartItemDataSource.updateCartItem(
+            cartId = cartItem.cartId,
+            quantity = Quantity(cartItem.quantity - 1),
+        ) {
+            callback()
         }
     }
 
@@ -62,37 +77,22 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun increaseQuantity(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
+    override fun deleteCartItem(
+        cartId: Long,
+        onResult: () -> Unit,
     ) {
-        cartItemDataSource.updateCartItem(
-            cartId = cartItem.cartId,
-            quantity = Quantity(cartItem.quantity + 1),
-        ) {
-            callback(it)
-        }
-    }
-
-    override fun decreaseQuantity(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    ) {
-        cartItemDataSource.updateCartItem(
-            cartId = cartItem.cartId,
-            quantity = Quantity(cartItem.quantity - 1),
-        ) {
-            callback(it)
+        cartItemDataSource.removeCartItem(cartId) {
+            onResult()
         }
     }
 
     override fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
-        callback: (Long) -> Unit,
+        onResult: () -> Unit,
     ) {
         cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
-            callback(cartId)
+            onResult()
         }
     }
 }

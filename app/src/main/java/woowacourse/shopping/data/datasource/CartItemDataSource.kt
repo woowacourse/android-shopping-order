@@ -18,13 +18,13 @@ interface CartItemDataSource {
 
     fun removeCartItem(
         cartId: Long,
-        callback: (Long) -> Unit,
+        callback: () -> Unit,
     )
 
     fun updateCartItem(
         cartId: Long,
         quantity: Quantity,
-        onResult: (Long) -> Unit,
+        onResult: () -> Unit,
     )
 
     fun fetchCartItemsCount(onResult: (Quantity?) -> Unit)

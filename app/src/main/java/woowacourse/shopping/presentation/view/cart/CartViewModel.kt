@@ -87,8 +87,8 @@ class CartViewModel(
             addToCart(cartItem.toCartItemUiModel())
             return
         }
-        cartRepository.increaseQuantity(cartItem) { id ->
-            getCartItemById(id) { foundItem ->
+        cartRepository.increaseQuantity(cartItem) {
+            getCartItemById(cartItem.cartId) { foundItem ->
                 if (foundItem != null) {
                     val updatedItem =
                         foundItem
@@ -107,8 +107,8 @@ class CartViewModel(
             removeFromCart(cartItem.toCartItemUiModel())
             return
         }
-        cartRepository.decreaseQuantity(cartItem) { id ->
-            getCartItemById(id) { foundItem ->
+        cartRepository.decreaseQuantity(cartItem) {
+            getCartItemById(cartItem.cartId) { foundItem ->
                 if (foundItem != null) {
                     val updatedItem =
                         foundItem
@@ -141,7 +141,7 @@ class CartViewModel(
     fun removeFromCart(cartItem: CartItemUiModel) {
         val removedItem = cartItem.cartItem.copy(quantity = 0)
         selectionStatus.remove(cartItem.cartItem.cartId)
-        cartRepository.deleteCartItem(cartItem.cartItem.cartId) { id ->
+        cartRepository.deleteCartItem(cartItem.cartItem.cartId) {
             cartRepository.loadAllCartItems { cartItems ->
                 val found =
                     cartItems.find { it.product.id == removedItem.product.id }
@@ -154,7 +154,7 @@ class CartViewModel(
                     fetchRecommendedProducts()
                 }
             }
-            _deleteState.postValue(id)
+            _deleteState.postValue(removedItem.cartId)
         }
         updateSelectionInfo()
     }
