@@ -16,3 +16,14 @@
 - [x] 서버를 연동한다
     - 기존에 작성한 테스트가 깨지면 안 된다
 - [x] 사용자 인증 정보를 저장한다
+
+### 1차 피드백 반영
+
+- [ ] ShoppingApplication 인스턴스를 생성 -> dataBase의 인스턴스 생성
+- [ ] Fragment의 Tag를 통한 분기 처리 로직 수정
+- [ ] viewModel에서 수행 작업 -> ViewModel에서 리스너를 구현
+- [ ] exception이 안 터지는 곳에서 runCatching rapping 제거
+- [ ] datasource execute 동기처리 enqueue 비동기처리로 수정
+- [ ] recyclerView -> listAdapter로 수정
+- [ ] ConcatAdapter 적용
+- [ ] domain layer 학습 후 중복 로직(상품 수량을 늘린다, 줄인다, 장바구니 담는다) 제거
