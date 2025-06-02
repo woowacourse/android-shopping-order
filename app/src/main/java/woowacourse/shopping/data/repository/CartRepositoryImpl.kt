@@ -28,6 +28,7 @@ class CartRepositoryImpl(
     ) = runCatchingInThread(onResult) {
         val result = cartRemoteDataSource.fetchCartItems(page, size).getOrThrow()
         val products = result.content.map { it.toDomain() }
+        cartLocalDataSource.addAllCartProducts(products)
         val hasMore = !result.last
         PageableItem(products, hasMore)
     }
