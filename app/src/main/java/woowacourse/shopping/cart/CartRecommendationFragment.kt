@@ -72,8 +72,5 @@ class CartRecommendationFragment : Fragment() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
             (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).addLoadedItems(products.map { ProductItem(it) })
         }
-        viewModel.updatedItem.observe(viewLifecycleOwner) {
-            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).updateItem(it)
-        }
     }
 }

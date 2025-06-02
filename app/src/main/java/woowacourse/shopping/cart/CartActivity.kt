@@ -30,9 +30,25 @@ class CartActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
         binding.vm = viewModel
         binding.lifecycleOwner = this
+        observeCartViewModel()
 
-        viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
+        applyWindowInsets()
+        setSupportActionBar()
+    }
+
+    private fun setSupportActionBar() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.text_cart_action_bar)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return super.onSupportNavigateUp()
+    }
+
+    private fun observeCartViewModel() {
         viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
+        viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.totalCount.observe(this) {
             if (it != -1) {
                 if (it != 0) {
@@ -53,19 +69,6 @@ class CartActivity : AppCompatActivity() {
                 }
             }
         }
-
-        applyWindowInsets()
-        setSupportActionBar()
-    }
-
-    private fun setSupportActionBar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.text_cart_action_bar)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return super.onSupportNavigateUp()
     }
 
     private fun applyWindowInsets() {

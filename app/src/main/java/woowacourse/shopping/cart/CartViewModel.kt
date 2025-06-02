@@ -1,6 +1,5 @@
 package woowacourse.shopping.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,17 +9,15 @@ import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
+import java.util.TreeSet
 
 class CartViewModel(
     private val cartProductRepository: CartProductRepository,
     private val catalogProductRepository: CatalogProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
 ) : ViewModel() {
-    private val _cartProducts = MutableLiveData<MutableSet<ProductItem>>()
-    val cartProducts: LiveData<MutableSet<ProductItem>> = _cartProducts
-
-    private val _updatedItem = MutableLiveData<ProductUiModel>()
-    val updatedItem: LiveData<ProductUiModel> = _updatedItem
+    private val _cartProducts = MutableLiveData<TreeSet<ProductItem>>()
+    val cartProducts: LiveData<TreeSet<ProductItem>> = _cartProducts
 
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loading())
@@ -40,9 +37,10 @@ class CartViewModel(
 
     private val selectedState: MutableMap<Int, Boolean> = mutableMapOf()
 
+    private var isInitialLoad = true
+
     init {
         loadRecommendProducts()
-        loadAllCartProducts()
         loadCartProducts()
     }
 
@@ -60,22 +58,6 @@ class CartViewModel(
     fun refreshProductsInfo() {
         postTotalAmount()
         postTotalCount()
-    }
-
-    fun postTotalAmount() {
-        val products: List<ProductUiModel> =
-            cartProducts.value?.map { it.productItem } ?: emptyList()
-        val amount =
-            products
-                .map { it.copy(isChecked = selectedState[it.id] ?: true) }
-                .filter { it.isChecked == true }
-                .sumOf { it.price * it.quantity }
-        _totalAmount.postValue(amount)
-    }
-
-    fun postTotalCount() {
-        val count = cartProducts.value?.size ?: 0
-        _totalCount.postValue(count)
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
@@ -96,12 +78,7 @@ class CartViewModel(
                         product.quantity - 1,
                     ) { result ->
                         if (result == true) {
-                            val updatedItem: ProductUiModel =
-                                product.copy(quantity = product.quantity - 1)
-                            _updatedItem.postValue(updatedItem)
-
                             loadCartProducts()
-                            postTotalAmount()
                         }
                     }
                 }
@@ -113,12 +90,7 @@ class CartViewModel(
                     product.quantity + 1,
                 ) { result ->
                     if (result == true) {
-                        val updatedItem: ProductUiModel =
-                            product.copy(quantity = product.quantity + 1)
-                        _updatedItem.postValue(updatedItem)
-
                         loadCartProducts()
-                        postTotalAmount()
                     }
                 }
             }
@@ -127,8 +99,8 @@ class CartViewModel(
 
     fun addProduct(product: ProductUiModel) {
         cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
-            _updatedItem.postValue(product)
             refreshProductsInfo()
+            loadCartProducts()
         }
     }
 
@@ -147,47 +119,56 @@ class CartViewModel(
                 ),
             ),
         )
-
-        Log.d("호출됨", "changeProductSelection")
         _selectedEvent.postValue(Unit)
     }
 
-    private fun loadAllCartProducts() {
-        cartProductRepository.getTotalElements { totalSize ->
-            cartProductRepository
-                .getCartProductsInRange(0, totalSize) { cartProducts ->
-                    val items = cartProducts.map { ProductItem(it) }.toMutableSet()
-                    _cartProducts.postValue(items)
-                }
-        }
-    }
-
     private fun loadCartProducts() {
-        _loadingState.postValue(LoadingState.loading())
+        if (isInitialLoad) {
+            _loadingState.postValue(LoadingState.loading())
+        } else {
+            _loadingState.postValue(LoadingState.refreshing())
+        }
 
         cartProductRepository.getTotalElements { totalSize ->
-            cartProductRepository
-                .getCartProductsInRange(0, totalSize) { cartProducts ->
-                    val pagedProducts: List<ProductItem> =
-                        cartProducts
-                            .map {
-                                if (selectedState.contains(it.id)) {
-                                    it.copy(isChecked = selectedState[it.id] == true)
-                                } else {
-                                    it
-                                }
-                            }.map { ProductItem(it) }
+            cartProductRepository.getCartProductsInRange(0, totalSize) { cartProducts ->
+                val pagedProducts: List<ProductItem> =
+                    cartProducts
+                        .map {
+                            if (selectedState.contains(it.id)) {
+                                it.copy(isChecked = selectedState[it.id] == true)
+                            } else {
+                                it
+                            }
+                        }.map { ProductItem(it) }
 
-                    _cartProducts.postValue(pagedProducts.toMutableSet())
-                    postTotalCount()
+                val items =
+                    TreeSet(
+                        compareBy<ProductItem> { it.productItem.id },
+                    ).apply { addAll(pagedProducts) }
 
-                    _loadingState.postValue(LoadingState.loaded())
-                }
+                _cartProducts.postValue(items)
+                postTotalCount()
+                postTotalAmount()
+
+                _loadingState.postValue(LoadingState.loaded())
+                isInitialLoad = false
+            }
         }
     }
 
-    companion object {
-        private const val PAGE_SIZE = 5
-        private const val INITIAL_PAGE = 0
+    private fun postTotalAmount() {
+        val products: List<ProductUiModel> =
+            cartProducts.value?.map { it.productItem } ?: emptyList()
+        val amount =
+            products
+                .map { it.copy(isChecked = selectedState[it.id] ?: true) }
+                .filter { it.isChecked == true }
+                .sumOf { it.price * it.quantity }
+        _totalAmount.postValue(amount)
+    }
+
+    private fun postTotalCount() {
+        val count = cartProducts.value?.size ?: 0
+        _totalCount.postValue(count)
     }
 }

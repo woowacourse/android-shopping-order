@@ -1,37 +1,30 @@
 package woowacourse.shopping.cart
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.cart.CartItem.PaginationButtonItem
 import woowacourse.shopping.cart.CartItem.ProductItem
-import woowacourse.shopping.product.catalog.ProductUiModel
 import woowacourse.shopping.product.catalog.QuantityControlListener
 
 class CartAdapter(
-    cartItems: List<CartItem>,
     private val onDeleteProductClick: DeleteProductClickListener,
     private val onPaginationButtonClick: PaginationButtonClickListener,
     private val onQuantityControl: QuantityControlListener,
     private val onCheckClick: CheckClickListener,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val cartItems: MutableList<CartItem> = cartItems.toMutableList()
+) : ListAdapter<ProductItem, RecyclerView.ViewHolder>(
+        object : DiffUtil.ItemCallback<ProductItem>() {
+            override fun areItemsTheSame(
+                oldItem: ProductItem,
+                newItem: ProductItem,
+            ): Boolean = oldItem.productItem.id == newItem.productItem.id
 
-    fun setCartItems(cartProducts: List<CartItem>) {
-        notifyItemRangeRemoved(0, cartItems.size)
-        cartItems.clear()
-        cartItems.addAll(cartProducts)
-        notifyItemRangeInserted(0, cartItems.size)
-    }
-
-    fun setCartItem(product: ProductUiModel) {
-        val index =
-            cartItems
-                .filterIsInstance<ProductItem>()
-                .indexOfFirst { it.productItem.id == product.id }
-        cartItems[index] = ProductItem(product)
-        notifyItemChanged(index)
-    }
-
+            override fun areContentsTheSame(
+                oldItem: ProductItem,
+                newItem: ProductItem,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -47,21 +40,16 @@ class CartAdapter(
         position: Int,
     ) {
         when (holder) {
-            is CartViewHolder -> holder.bind((cartItems[position] as ProductItem).productItem)
-            is PaginationButtonViewHolder -> holder.bind(cartItems[position] as PaginationButtonItem)
+            is CartViewHolder -> holder.bind((currentList[position] as ProductItem).productItem)
         }
     }
 
     override fun getItemViewType(position: Int): Int =
-        when (cartItems[position]) {
-            is PaginationButtonItem -> PAGINATION_BUTTON
+        when (currentList[position]) {
             is ProductItem -> CART_PRODUCT
         }
 
-    override fun getItemCount(): Int = cartItems.size
-
     companion object {
         private const val CART_PRODUCT = 1
-        private const val PAGINATION_BUTTON = 2
     }
 }

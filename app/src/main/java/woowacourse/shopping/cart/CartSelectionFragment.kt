@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
+import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
 import woowacourse.shopping.product.catalog.QuantityControlListener
 
@@ -35,10 +37,9 @@ class CartSelectionFragment : Fragment() {
     private fun setCartProductAdapter() {
         binding.recyclerViewCart.adapter =
             CartAdapter(
-                cartItems = emptyList(),
                 onDeleteProductClick =
                     DeleteProductClickListener { product ->
-                        viewModel.deleteCartProduct(CartItem.ProductItem(product))
+                        viewModel.deleteCartProduct(ProductItem(product))
                     },
                 onPaginationButtonClick = {},
                 onQuantityControl =
@@ -57,25 +58,19 @@ class CartSelectionFragment : Fragment() {
     private fun observeCartViewModel() {
         val cartAdapter = binding.recyclerViewCart.adapter as CartAdapter
         viewModel.cartProducts.observe(viewLifecycleOwner) { products ->
-            cartAdapter.setCartItems(products.toList())
+            cartAdapter.submitList(products.toList())
         }
-        viewModel.updatedItem.observe(viewLifecycleOwner, cartAdapter::setCartItem)
-        binding.shimmerFrameLayoutCartProducts.stopShimmer()
-        binding.shimmerFrameLayoutCartProducts.visibility = View.GONE
-        // viewModel.loadingState.observe(viewLifecycleOwner) { changeShimmerState(it.isLoading) }
+        viewModel.loadingState.observe(viewLifecycleOwner) { changeShimmerState(it) }
     }
 
-    private fun changeShimmerState(isLoading: Boolean) {
-        when (isLoading) {
-            true -> {
-                binding.shimmerFrameLayoutCartProducts.startShimmer()
-                binding.shimmerFrameLayoutCartProducts.visibility = View.VISIBLE
-            }
+    private fun changeShimmerState(state: LoadingState) {
+        binding.shimmerFrameLayoutCartProducts.visibility = state.shimmerVisibility
+        binding.recyclerViewCart.visibility = state.recyclerViewVisibility
 
-            false -> {
-                binding.shimmerFrameLayoutCartProducts.stopShimmer()
-                binding.shimmerFrameLayoutCartProducts.visibility = View.GONE
-            }
+        if (state.shimmerVisibility == View.VISIBLE) {
+            binding.shimmerFrameLayoutCartProducts.startShimmer()
+        } else {
+            binding.shimmerFrameLayoutCartProducts.stopShimmer()
         }
     }
 }
