@@ -66,7 +66,12 @@ class CartActivity :
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.onOrder = {
-            val intent = RecommendActivity.newIntent(this)
+            val intent =
+                RecommendActivity.newIntent(
+                    this,
+                    viewModel.totalQuantity.value ?: error(""),
+                    viewModel.totalPrice.value ?: error(""),
+                )
             recommendActivityResultLauncher.launch(intent)
         }
         binding.shoppingCartSelectAllCheckBox.setOnClickListener {

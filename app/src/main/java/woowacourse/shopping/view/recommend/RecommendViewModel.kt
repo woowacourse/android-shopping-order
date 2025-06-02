@@ -43,8 +43,6 @@ class RecommendViewModel(
             result
                 .onSuccess { cartItems: List<CartItem> ->
                     this.cartItems = cartItems
-                    _totalPrice.postValue(cartItems.sumOf { cartItem: CartItem -> cartItem.price })
-                    _totalQuantity.postValue(cartItems.sumOf { cartItems: CartItem -> cartItems.quantity })
                     loadRecentProducts()
                 }.onFailure {
                     _event.postValue(RecommendEvent.LOAD_SHOPPING_CART_FAILURE)
@@ -68,6 +66,14 @@ class RecommendViewModel(
                     _event.postValue(RecommendEvent.LOAD_PRODUCT_FAILURE)
                 }
         }
+    }
+
+    fun loadTotal(
+        totalQuantity: Int,
+        totalPrice: Int,
+    ) {
+        _totalQuantity.postValue(totalQuantity)
+        _totalPrice.postValue(totalPrice)
     }
 
     fun plusCartItemQuantity(

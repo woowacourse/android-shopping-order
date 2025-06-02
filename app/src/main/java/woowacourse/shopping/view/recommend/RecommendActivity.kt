@@ -34,13 +34,16 @@ class RecommendActivity :
         }
 
         initBinding()
-
         initObserve()
+        viewModel.loadTotal(
+            intent.getIntExtra(EXTRA_TOTAL_QUANTITY_ID, 0),
+            intent.getIntExtra(EXTRA_TOTAL_PRICE_ID, 0),
+        )
     }
 
     private fun initObserve() {
         viewModel.recommendProducts.observe(this) { recommendProducts ->
-            recommendProductsAdapter.asdf(recommendProducts)
+            recommendProductsAdapter.submitList(recommendProducts)
         }
         viewModel.event.observe(this) { event: RecommendEvent ->
             when (event) {
@@ -99,8 +102,18 @@ class RecommendActivity :
     }
 
     companion object {
-        fun newIntent(context: Context): Intent {
-            val intent = Intent(context, RecommendActivity::class.java)
+        private const val EXTRA_TOTAL_QUANTITY_ID = "woowacourse.shopping.EXTRA_TOTAL_QUANTITY_ID"
+        private const val EXTRA_TOTAL_PRICE_ID = "woowacourse.shopping.EXTRA_TOTAL_PRICE_ID"
+
+        fun newIntent(
+            context: Context,
+            totalQuantity: Int,
+            totalPrice: Int,
+        ): Intent {
+            val intent =
+                Intent(context, RecommendActivity::class.java)
+                    .putExtra(EXTRA_TOTAL_QUANTITY_ID, totalQuantity)
+                    .putExtra(EXTRA_TOTAL_PRICE_ID, totalPrice)
             return intent
         }
     }
