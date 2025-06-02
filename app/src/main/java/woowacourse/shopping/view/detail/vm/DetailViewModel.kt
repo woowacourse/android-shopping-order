@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -81,41 +82,42 @@ class DetailViewModel(
         }
 
     fun saveCart(productId: Long) {
-        withState(_uiState.value) { state ->
-            defaultCartRepository.loadSinglePage(null, null) { result ->
-                result.onSuccess { value ->
-                    val savedCart = value.carts.find { it.productId == productId }
-
-                    savedCart?.let {
-                        defaultCartRepository.updateQuantity(
-                            it.id,
-                            state.addQuantity(it.quantity),
-                        ) { result ->
-                            result
-                                .onSuccess {
-                                    _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
-                                }
-                                .onFailure(::handleFailure)
-                        }
-                    } ?: run {
-                        defaultCartRepository.addCart(
-                            Cart(
-                                state.cartQuantity,
-                                productId,
-                            ),
-                        ) { result ->
-                            result
-                                .onSuccess {
-                                    _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
-                                }
-                                .onFailure(::handleFailure)
-                        }
-                    }
+        defaultCartRepository.loadSinglePage(null, null) { result ->
+            result
+                .onSuccess { value ->
+                    value.isSavedInCart(productId)
+                        ?.let { whenProductSavedInCart(it) }
+                        ?: run { whenProductNotSavedInCart(productId) }
                 }
+                .onFailure(::handleFailure)
+        }
+    }
+
+    private fun whenProductSavedInCart(cart: ShoppingCart) =
+        withState(_uiState.value) { state ->
+            defaultCartRepository.updateQuantity(
+                cart.id,
+                state.addQuantity(cart.quantity),
+            ) { result ->
+                result
+                    .onSuccess {
+                        _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
+                    }
                     .onFailure(::handleFailure)
             }
         }
-    }
+
+    private fun whenProductNotSavedInCart(productId: Long) =
+        withState(_uiState.value) { state ->
+            val cart = Cart(state.cartQuantity, productId)
+            defaultCartRepository.addCart(cart) { result ->
+                result
+                    .onSuccess {
+                        _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
+                    }
+                    .onFailure(::handleFailure)
+            }
+        }
 
     fun loadLastSeenProduct(lastSeenProductId: Long) {
         historyRepository.saveHistory(lastSeenProductId)
