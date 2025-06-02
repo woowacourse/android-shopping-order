@@ -173,7 +173,7 @@ class MainViewModel(
     }
 
     private fun setLoading(isLoading: Boolean) {
-        _isLoading.postValue(isLoading)
+        _isLoading.value = isLoading
     }
 
     private fun handleFailure(throwable: Throwable) {
