@@ -37,4 +37,13 @@
     <string name="product_quantity_minus">-</string>
     <string name="product_quantity_plus">+</string>
 
+    <!-- 상품 추천 페이지 -->
+    <string name="product_recommend_add_shopping_cart_success_message">장바구니에 해당 상품이 추가되었습니다.</string>
+    <string name="product_recommend_add_shopping_cart_error_message">장바구니에 해당 상품을 추가하는 데 실패했습니다.</string>
+    <string name="product_recommend_load_product_error_message">상품을 불러오는 데 실패했습니다.</string>
+    <string name="product_recommend_load_recent_products_error_message">최근 본 상품 목록을 불러오는 데 실패했습니다.</string>
+    <string name="product_recommend_load_products_by_category">상품 목록들을 불러오는 데 실패했습니다.</string>
+    <string name="product_recommend_remove_shopping_cart_product_error_message">장바구니에 담긴 상품을 제거하는 데 실패했습니다.</string>
+    <string name="product_recommend_patch_shopping_cart_error_message">장바구니 아이템을 수정하는 데 실패했습니다.</string>
+
 </resources>

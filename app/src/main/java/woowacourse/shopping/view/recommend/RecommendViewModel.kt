@@ -65,7 +65,7 @@ class RecommendViewModel(
                         ),
                     )
                 }.onFailure {
-                    _event.postValue(RecommendEvent.LOAD_ALL_PRODUCTS_FAILURE)
+                    _event.postValue(RecommendEvent.LOAD_PRODUCT_FAILURE)
                 }
         }
     }
@@ -81,7 +81,7 @@ class RecommendViewModel(
                     .onSuccess {
                         loadCart()
                     }.onFailure {
-                        _event.postValue(RecommendEvent.ADD_CART_ITEM_FAILURE)
+                        _event.postValue(RecommendEvent.PLUS_CART_ITEM_FAILURE)
                     }
             }
         } else {
@@ -131,7 +131,7 @@ class RecommendViewModel(
                     recentProducts = products
                     loadProductsByCategory()
                 }.onFailure {
-                    _event.postValue(RecommendEvent.LOAD_RECOMMEND_PRODUCTS_FAILURE)
+                    _event.postValue(RecommendEvent.LOAD_RECENT_PRODUCTS_FAILURE)
                 }
         }
     }

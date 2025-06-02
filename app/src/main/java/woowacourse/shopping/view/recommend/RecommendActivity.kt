@@ -9,8 +9,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
+import woowacourse.shopping.view.showToast
 
 class RecommendActivity :
     AppCompatActivity(),
@@ -33,8 +35,33 @@ class RecommendActivity :
 
         initBinding()
 
+        initObserve()
+    }
+
+    private fun initObserve() {
         viewModel.recommendProducts.observe(this) { recommendProducts ->
             recommendProductsAdapter.asdf(recommendProducts)
+        }
+        viewModel.event.observe(this) { event: RecommendEvent ->
+            when (event) {
+                RecommendEvent.LOAD_RECENT_PRODUCTS_FAILURE ->
+                    showToast(R.string.product_recommend_load_recent_products_error_message)
+
+                RecommendEvent.LOAD_SHOPPING_CART_FAILURE ->
+                    showToast(R.string.product_recommend_add_shopping_cart_error_message)
+
+                RecommendEvent.LOAD_PRODUCT_FAILURE ->
+                    showToast(R.string.product_recommend_load_products_by_category)
+
+                RecommendEvent.PLUS_CART_ITEM_FAILURE ->
+                    showToast(R.string.product_recommend_add_shopping_cart_error_message)
+
+                RecommendEvent.REMOVE_CART_ITEM_FAILURE ->
+                    showToast(R.string.product_recommend_remove_shopping_cart_product_error_message)
+
+                RecommendEvent.MINUS_CART_ITEM_FAILURE ->
+                    showToast(R.string.shopping_cart_update_shopping_cart_quantity_error_message)
+            }
         }
     }
 
