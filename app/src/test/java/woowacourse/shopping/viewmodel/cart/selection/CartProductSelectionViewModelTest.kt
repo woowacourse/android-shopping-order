@@ -1,4 +1,4 @@
-package woowacourse.shopping.viewmodel.cart
+package woowacourse.shopping.viewmodel.cart.selection
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
