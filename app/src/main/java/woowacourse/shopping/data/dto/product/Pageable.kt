@@ -14,7 +14,7 @@ data class Pageable(
     @SerialName("paged")
     val paged: Boolean,
     @SerialName("sort")
-    val sort: SortX,
+    val sort: Sort,
     @SerialName("unpaged")
     val unpaged: Boolean,
 )

@@ -2,6 +2,8 @@ package woowacourse.shopping.data.dto.cart
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.data.dto.product.Pageable
+import woowacourse.shopping.data.dto.product.Sort
 
 @Serializable
 data class CartsResponse(
@@ -22,7 +24,7 @@ data class CartsResponse(
     @SerialName("size")
     val size: Int,
     @SerialName("sort")
-    val sort: SortX,
+    val sort: Sort,
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")

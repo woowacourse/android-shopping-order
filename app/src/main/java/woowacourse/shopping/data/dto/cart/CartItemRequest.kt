@@ -8,5 +8,5 @@ data class CartItemRequest(
     @SerialName("productId")
     val productId: Long,
     @SerialName("quantity")
-    val quantity: Int
+    val quantity: Int,
 )

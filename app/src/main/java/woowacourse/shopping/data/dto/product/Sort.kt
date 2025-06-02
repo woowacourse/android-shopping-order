@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.dto.cart
+package woowacourse.shopping.data.dto.product
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SortX(
+data class Sort(
     @SerialName("empty")
     val empty: Boolean,
     @SerialName("sorted")

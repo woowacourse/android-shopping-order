@@ -22,7 +22,7 @@ data class ProductsResponse(
     @SerialName("size")
     val size: Int,
     @SerialName("sort")
-    val sort: SortX,
+    val sort: Sort,
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")
