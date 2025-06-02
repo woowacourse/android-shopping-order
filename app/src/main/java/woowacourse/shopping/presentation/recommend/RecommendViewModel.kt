@@ -6,16 +6,16 @@ import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toPresentation
 
 class RecommendViewModel(
-    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
+    private val recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel() {
     private lateinit var recentCategory: String
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
@@ -36,16 +36,10 @@ class RecommendViewModel(
             result.onSuccess { recentProduct ->
                 recentCategory = recentProduct?.category ?: ""
 
-                productRepository.fetchPagingProducts(category = recentCategory) { result ->
+                recommendProductsUseCase(recentCategory) { result ->
                     result.onSuccess { products ->
-                        val recommendProductsUiModel =
-                            products
-                                .asSequence()
-                                .filter { it.quantity == 0 }
-                                .map { it.toPresentation() }
-                                .take(10)
-                                .toList()
-                        _recommendProducts.postValue(recommendProductsUiModel)
+                        val recommendItems = products.map { it.toPresentation() }
+                        _recommendProducts.postValue(recommendItems)
                     }
                 }
             }
