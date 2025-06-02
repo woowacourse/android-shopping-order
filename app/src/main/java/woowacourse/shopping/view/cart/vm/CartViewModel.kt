@@ -46,7 +46,7 @@ class CartViewModel(
         lastSeenCategory = category
     }
 
-    fun loadRecommendProduct() {
+    fun loadRecommendProduct() =
         withState(_cartUiState.value) { state ->
             productRepository.loadSinglePage(lastSeenCategory, null, null) { products ->
                 products.onSuccess { result ->
@@ -60,11 +60,9 @@ class CartViewModel(
                             .map { ProductState(item = it, cartQuantity = Quantity(0)) }
                             .toList()
                     _recommendUiState.value = RecommendUiState(recommendProduct)
-                }
-                    .onFailure(::handleFailure)
+                }.onFailure(::handleFailure)
             }
         }
-    }
 
     fun increaseRecommendProductQuantity(productId: Long) =
         withState(_recommendUiState.value) { state ->
@@ -153,8 +151,8 @@ class CartViewModel(
             PAGE_SIZE,
         ) { result ->
 
-            result.onSuccess { value ->
-                value?.let {
+            result
+                .onSuccess { value ->
                     val pageState = paging.createPageState(!value.hasNextPage)
                     val newItems =
                         value
@@ -164,10 +162,8 @@ class CartViewModel(
                     val currentItems = _cartUiState.value?.items ?: emptyList()
                     val combinedItems = currentItems + newItems
 
-                    _cartUiState.value =
-                        CartUiState(items = combinedItems, pageState = pageState)
+                    _cartUiState.value = CartUiState(items = combinedItems, pageState = pageState)
                 }
-            }
                 .onFailure(::handleFailure)
             toggleFetching()
         }
@@ -217,12 +213,7 @@ class CartViewModel(
                     val pageState = paging.createPageState(!value.hasNextPage)
                     val carts = value.carts.map { CartState(it, state.allChecked) }
 
-                    _cartUiState.postValue(
-                        CartUiState(
-                            items = carts,
-                            pageState = pageState,
-                        ),
-                    )
+                    _cartUiState.value = CartUiState(items = carts, pageState = pageState)
                 }
                     .onFailure(::handleFailure)
             }
