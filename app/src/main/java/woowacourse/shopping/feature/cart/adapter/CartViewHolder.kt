@@ -13,5 +13,10 @@ class CartViewHolder(
 
     interface CartClickListener {
         fun onCartItemDelete(cartItem: CartItem)
+
+        fun onCartItemChecked(
+            cartItem: CartItem,
+            changeCheck: Boolean,
+        )
     }
 }

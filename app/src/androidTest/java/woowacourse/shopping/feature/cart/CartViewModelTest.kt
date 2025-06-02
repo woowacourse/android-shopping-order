@@ -283,7 +283,7 @@ class CartViewModelTest {
         assertThat(viewModel.isRightPageEnable.value).isFalse()
     }
 
-    private fun getCurrentCart(): List<CartItem> = viewModel.cart.value ?: emptyList()
+    private fun getCurrentCart(): List<CartItem> = viewModel.carts.value ?: emptyList()
 
     private fun waitForUpdate(delayMs: Long = 400) {
         Thread.sleep(delayMs)

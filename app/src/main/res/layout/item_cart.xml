@@ -32,6 +32,8 @@
             android:focusable="false"
             android:padding="0dp"
             android:focusableInTouchMode="false"
+            android:checked="@{cartItem.isSelected}"
+            android:onClick="@{() -> cartClickListener.onCartItemChecked(cartItem, !cartItem.isSelected)}"
             app:layout_constraintBottom_toTopOf="@+id/iv_cart_item_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

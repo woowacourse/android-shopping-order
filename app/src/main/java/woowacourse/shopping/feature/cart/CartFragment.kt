@@ -38,10 +38,6 @@ class CartFragment :
                         viewModel.removeCartItemOrDecreaseQuantity(cartItem)
                     }
                 },
-            onItemCheckedChange = { item, isChecked ->
-                viewModel.setItemSelection(item, isChecked)
-            },
-            isItemChecked = { item -> viewModel.isItemSelected(item) },
         ).apply {
             showSkeleton()
         }
@@ -65,7 +61,6 @@ class CartFragment :
         setupBinding()
         setupRecyclerView()
         observeViewModel()
-        setupBottomBar()
     }
 
     private fun setupBinding() {
@@ -75,23 +70,6 @@ class CartFragment :
 
     private fun setupRecyclerView() {
         binding.rvCartItems.adapter = cartAdapter
-    }
-
-    private fun setupBottomBar() {
-        // 전체선택 체크박스 누를 때
-        binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
-        binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.selectAllItems(isChecked) // ① 전체선택 후 즉시 개별 체크박스 갱신
-        }
-
-        // 뷰모델이 isAllSelected 변경될 때
-        viewModel.isAllSelected.observe(viewLifecycleOwner) { isAll ->
-            binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
-            binding.bottomBar.checkboxAll.isChecked = isAll
-            binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, checked ->
-                viewModel.selectAllItems(checked) // ② “전체선택” 에서 해제 시에도 반영
-            } // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
-        }
     }
 
     private fun observeViewModel() {
@@ -126,13 +104,19 @@ class CartFragment :
 
     override fun onResume() {
         super.onResume()
-        viewModel.updateCartQuantity()
     }
 
     override fun onCartItemDelete(cartItem: CartItem) {
         viewModel.delete(cartItem) {
             cartAdapter.removeItem(cartItem)
         }
+    }
+
+    override fun onCartItemChecked(
+        cartItem: CartItem,
+        changeCheckValue: Boolean,
+    ) {
+        viewModel.updateCartItemCheck(cartItem, changeCheckValue)
     }
 
     override fun onDestroyView() {

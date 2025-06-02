@@ -12,8 +12,6 @@ import woowacourse.shopping.feature.QuantityChangeListener
 class CartAdapter(
     private val cartClickListener: CartViewHolder.CartClickListener,
     private val quantityChangeListener: QuantityChangeListener,
-    private val onItemCheckedChange: (CartItem, Boolean) -> Unit,
-    private val isItemChecked: (CartItem) -> Boolean,
 ) : ListAdapter<CartListItem, RecyclerView.ViewHolder>(CartDiffCallback()) {
     fun showSkeleton(count: Int = 5) {
         val skeletonItems = List(count) { CartListItem.Skeleton }
@@ -70,10 +68,6 @@ class CartAdapter(
                 val cartHolder = holder as CartViewHolder
                 cartHolder.bind(item.cartItem)
                 cartHolder.binding.checkBoxItem.setOnCheckedChangeListener(null)
-                cartHolder.binding.checkBoxItem.isChecked = isItemChecked(item.cartItem)
-                cartHolder.binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
-                    onItemCheckedChange(item.cartItem, isChecked)
-                }
             }
         }
     }

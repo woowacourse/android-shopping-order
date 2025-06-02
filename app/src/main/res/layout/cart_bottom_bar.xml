@@ -39,7 +39,8 @@
                 android:minHeight="0dp"
                 android:buttonTint="@android:color/white"
                 android:checked="@{viewModel.isAllSelected}"
-                android:onCheckedChanged="@{(cb, checked) -> viewModel.selectAllItems(checked)}"/>
+                android:onClick="@{() -> viewModel.selectAllItems()}"/>
+
             <TextView
                 android:id="@+id/tv_all"
                 android:layout_width="wrap_content"
