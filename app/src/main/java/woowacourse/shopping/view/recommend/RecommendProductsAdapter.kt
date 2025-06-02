@@ -19,7 +19,7 @@ class RecommendProductsAdapter(
         )
 
     @SuppressLint("NotifyDataSetChanged")
-    fun asdf(newItems: List<RecommendProduct>) {
+    fun submitList(newItems: List<RecommendProduct>) {
         items = newItems
         notifyDataSetChanged()
     }
