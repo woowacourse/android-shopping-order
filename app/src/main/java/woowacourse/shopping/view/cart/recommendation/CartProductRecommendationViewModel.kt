@@ -154,7 +154,10 @@ class CartProductRecommendationViewModel(
 
     fun finishOrder() {
         selectedCartIds.forEach { id ->
-            cartProductRepository.delete(id) {
+            cartProductRepository.delete(id) { result ->
+                result.onFailure {
+                    Log.e("error", it.message.toString())
+                }
             }
         }
     }
