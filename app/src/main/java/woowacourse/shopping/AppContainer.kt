@@ -1,6 +1,7 @@
 package woowacourse.shopping
 
 import android.content.Context
+import woowacourse.shopping.data.ApiCallbackHandler
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.datasource.HistoryDataSource
 import woowacourse.shopping.data.datasource.ProductsDataSource
@@ -14,11 +15,12 @@ import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.view.loader.HistoryLoader
+import woowacourse.shopping.domain.usecase.GetRecentProductUseCase
 
 class AppContainer(
     context: Context,
 ) {
+    private val callBackHandler = ApiCallbackHandler()
     private val db = PetoMarketDatabase.getInstance(context)
 
     private val historyDao = db.historyDao()
@@ -29,9 +31,9 @@ class AppContainer(
 
     private val cartService: CartService = RetrofitProvider.cartService
 
-    private val cartDataSource = CartDataSource(cartService)
+    private val cartDataSource = CartDataSource(cartService, callBackHandler)
 
-    private val productsDataSource = ProductsDataSource(productService)
+    private val productsDataSource = ProductsDataSource(productService, callBackHandler)
 
     val productRepository: ProductRepository =
         DefaultProductRepository(productsDataSource)
@@ -40,5 +42,5 @@ class AppContainer(
 
     val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
 
-    val historyLoader = HistoryLoader(productRepository, historyRepository)
+    val getRecentProductUseCase = GetRecentProductUseCase(productRepository, historyRepository)
 }

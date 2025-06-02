@@ -12,7 +12,7 @@ class DefaultCartRepository(
 ) : CartRepository {
     override fun addCart(
         cart: Cart,
-        callback: (Result<String?>) -> Unit,
+        callback: (Result<String>) -> Unit,
     ) {
         dataSource.addCart(cart.toRequest()) { callback(it) }
     }
@@ -20,7 +20,7 @@ class DefaultCartRepository(
     override fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage?>) -> Unit,
+        callback: (Result<CartsSinglePage>) -> Unit,
     ) {
         dataSource.singlePage(page, pageSize) { callback(it) }
     }
@@ -28,14 +28,14 @@ class DefaultCartRepository(
     override fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-        callback: (Result<Unit?>) -> Unit,
+        callback: (Result<Unit>) -> Unit,
     ) {
         dataSource.updateCartQuantity(cartId, quantity.value) { callback(it) }
     }
 
     override fun deleteCart(
         cartId: Long,
-        callback: (Result<Unit?>) -> Unit,
+        callback: (Result<Unit>) -> Unit,
     ) {
         dataSource.deleteCart(cartId) { callback(it) }
     }

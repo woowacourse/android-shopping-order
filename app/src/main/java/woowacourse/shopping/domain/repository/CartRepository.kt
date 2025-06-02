@@ -7,23 +7,23 @@ import woowacourse.shopping.domain.cart.CartsSinglePage
 interface CartRepository {
     fun addCart(
         cart: Cart,
-        callback: (Result<String?>) -> Unit,
+        callback: (Result<String>) -> Unit,
     )
 
     fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-        callback: (Result<Unit?>) -> Unit,
+        callback: (Result<Unit>) -> Unit,
     )
 
     fun deleteCart(
         cartId: Long,
-        callback: (Result<Unit?>) -> Unit,
+        callback: (Result<Unit>) -> Unit,
     )
 
     fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage?>) -> Unit,
+        callback: (Result<CartsSinglePage>) -> Unit,
     )
 }
