@@ -143,7 +143,8 @@ class ProductActivity :
 
         viewModel.products.observe(this) { products ->
             val showLoadMore = viewModel.showLoadMore.value == true
-            productAdapter.setData(products, showLoadMore)
+            val list = products.toProductListItems(showLoadMore)
+            productAdapter.submitList(list)
         }
 
         viewModel.recentProducts.observe(this) { recentProducts ->
@@ -158,8 +159,9 @@ class ProductActivity :
         }
 
         viewModel.showLoadMore.observe(this) { showLoadMore ->
-            val productsState = viewModel.products.value ?: return@observe
-            productAdapter.setData(productsState, showLoadMore)
+            val productsState = viewModel.products.value
+            val list = productsState?.toProductListItems(showLoadMore)
+            productAdapter.submitList(list)
         }
 
         viewModel.toastMessage.observe(this) { resId ->
@@ -190,6 +192,10 @@ class ProductActivity :
         val intent = CartActivity.newIntent(this)
         startActivity(intent)
     }
+
+    private fun List<CartItem>.toProductListItems(showLoadMore: Boolean): List<ProductListItem> =
+        this.map { ProductListItem.Product(it) } +
+            if (showLoadMore) listOf(ProductListItem.LoadMore) else emptyList()
 
     override fun onClickProductItem(productId: Long) {
         val intent =
