@@ -11,8 +11,8 @@
         android:layout_height="match_parent"
         android:padding="20dp">
 
-        <ImageView
-            android:id="@+id/image_view_shimmer"
+        <View
+            android:id="@+id/view_shimmer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/gray_e2"
@@ -22,8 +22,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/image_view_shimmer_title"
+        <View
+            android:id="@+id/view_shimmer_title"
             android:layout_width="0dp"
             android:layout_height="14dp"
             android:layout_marginTop="10dp"
@@ -32,10 +32,10 @@
             android:contentDescription="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_view_shimmer" />
+            app:layout_constraintTop_toBottomOf="@id/view_shimmer" />
 
-        <ImageView
-            android:id="@+id/image_view_shimmer_content"
+        <View
+            android:id="@+id/view_shimmer_content"
             android:layout_width="0dp"
             android:layout_height="14dp"
             android:layout_marginTop="10dp"
@@ -44,7 +44,7 @@
             android:contentDescription="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_view_shimmer_title" />
+            app:layout_constraintTop_toBottomOf="@id/view_shimmer_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
