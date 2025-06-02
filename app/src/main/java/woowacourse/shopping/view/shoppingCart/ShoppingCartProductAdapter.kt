@@ -39,12 +39,6 @@ class ShoppingCartProductAdapter(
                     parent,
                     shoppingCartListener,
                 )
-
-            ShoppingCartItem.ItemType.PAGINATION ->
-                ShoppingCartPaginationViewHolder.of(
-                    parent,
-                    shoppingCartListener,
-                )
         }
     }
 
@@ -54,11 +48,9 @@ class ShoppingCartProductAdapter(
     ) {
         when (holder) {
             is ShoppingCartProductViewHolder -> holder.bind(getItem(position) as ShoppingCartItem.ShoppingCartProductItem)
-            is ShoppingCartPaginationViewHolder -> holder.bind(getItem(position) as ShoppingCartItem.PaginationItem)
         }
     }
 
     interface ShoppingCartListener :
-        ShoppingCartPaginationViewHolder.ShoppingCartPaginationClickListener,
         ShoppingCartProductViewHolder.ShoppingCartProductClickListener
 }

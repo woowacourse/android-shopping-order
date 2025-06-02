@@ -14,17 +14,9 @@ sealed interface ShoppingCartItem {
         override val viewType: ItemType = ItemType.PRODUCT
     }
 
-    data class PaginationItem(
-        val page: Int,
-        val nextEnabled: Boolean,
-        val previousEnabled: Boolean,
-    ) : ShoppingCartItem {
-        override val viewType: ItemType = ItemType.PAGINATION
-    }
-
     enum class ItemType {
         PRODUCT,
-        PAGINATION, ;
+        ;
 
         companion object {
             fun from(viewType: Int): ItemType = entries[viewType]

@@ -84,7 +84,7 @@ class ShoppingCartActivity :
                             (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
 
                         if (visibleLastItemPosition in totalItemCount - 1..totalItemCount) {
-                            onPlusPage()
+                            viewModel.plusPage()
                         }
                     }
                 },
@@ -123,14 +123,6 @@ class ShoppingCartActivity :
                 binding.shoppingCartSkeletonLayout.visibility = View.GONE
             }
         }
-    }
-
-    override fun onMinusPage() {
-        viewModel.minusPage()
-    }
-
-    override fun onPlusPage() {
-        viewModel.plusPage()
     }
 
     override fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
