@@ -4,7 +4,7 @@ import woowacourse.shopping.BuildConfig
 import kotlin.concurrent.thread
 
 inline fun <T> runCatchingInThread(
-    crossinline onResult: (Result<T>) -> Unit,
+    crossinline onResult: (Result<T>) -> Unit = {},
     crossinline block: () -> T,
 ) {
     thread {
