@@ -23,7 +23,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun loadAllCartItems(callback: (List<CartItem>?) -> Unit) {
+    override fun loadAllCartItems(callback: (List<CartItem>) -> Unit) {
         cartItemDataSource.fetchPageOfCartItems(
             pageIndex = 0,
             pageSize = Int.MAX_VALUE,
@@ -32,9 +32,9 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun getAllCartItemsCount(callBack: (Quantity?) -> Unit) {
+    override fun getAllCartItemsCount(callBack: (Int) -> Unit) {
         cartItemDataSource.fetchCartItemsCount { quantity ->
-            callBack(quantity)
+            callBack(quantity?.quantity ?: 0)
         }
     }
 

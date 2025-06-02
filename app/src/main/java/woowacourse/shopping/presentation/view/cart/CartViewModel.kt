@@ -122,7 +122,7 @@ class CartViewModel(
         cartRepository.addCartItem(newItem) {
             cartRepository.loadAllCartItems { cartItems ->
                 val found =
-                    cartItems?.find { it.product.id == newItem.product.id }
+                    cartItems.find { it.product.id == newItem.product.id }
                 if (found != null) {
                     _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = true))
                     setCartItemSelection(found.toCartItemUiModel(), true)
@@ -140,7 +140,7 @@ class CartViewModel(
         cartRepository.deleteCartItem(cartItem.cartItem.cartId) { id ->
             cartRepository.loadAllCartItems { cartItems ->
                 val found =
-                    cartItems?.find { it.product.id == removedItem.product.id }
+                    cartItems.find { it.product.id == removedItem.product.id }
                 if (found != null) {
                     _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = false))
                 } else {
@@ -172,7 +172,7 @@ class CartViewModel(
 
     fun setAllSelections(selectAll: Boolean) {
         cartRepository.loadAllCartItems { allItems ->
-            allItems?.forEach { cartItem ->
+            allItems.forEach { cartItem ->
                 selectionStatus[cartItem.cartId] = selectAll
                 _cartItems.postValue(
                     _cartItems.value?.map { item ->
@@ -198,7 +198,6 @@ class CartViewModel(
                         productsInRecommendedCategory
                             .filterNot { productInRecommendedCategory ->
                                 allCartItems
-                                    .orEmpty()
                                     .map { cartItem ->
                                         cartItem.product.id
                                     }.contains(productInRecommendedCategory.id)
@@ -225,7 +224,7 @@ class CartViewModel(
         callback: (CartItem?) -> Unit,
     ) {
         cartRepository.loadAllCartItems { cartItems ->
-            val foundItem = cartItems?.find { it.cartId == id }
+            val foundItem = cartItems.find { it.cartId == id }
             callback(foundItem)
         }
     }
@@ -246,10 +245,10 @@ class CartViewModel(
     private fun updateSelectionInfo() {
         cartRepository.loadAllCartItems { cartItems ->
             val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
-            val selectedItems = (cartItems.orEmpty()).filter { selectedItemIds.contains(it.cartId) }
+            val selectedItems = (cartItems).filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
             _totalCount.postValue(selectedItems.sumOf { it.quantity })
-            _allSelected.postValue(selectedItems.size == cartItems?.size)
+            _allSelected.postValue(selectedItems.size == cartItems.size)
         }
     }
 

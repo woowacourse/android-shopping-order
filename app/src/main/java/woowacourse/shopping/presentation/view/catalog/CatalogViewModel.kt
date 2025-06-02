@@ -170,14 +170,14 @@ class CatalogViewModel(
         callback: (CartItem?) -> Unit,
     ) {
         cartRepository.loadAllCartItems { cartItems ->
-            val foundItem = cartItems?.find { cartItem -> cartItem.cartId == id }
+            val foundItem = cartItems.find { cartItem -> cartItem.cartId == id }
             callback(foundItem)
         }
     }
 
     private fun calculateTotalCartCount() {
         cartRepository.getAllCartItemsCount { count ->
-            _totalCartCount.postValue(count?.quantity)
+            _totalCartCount.postValue(count)
         }
     }
 

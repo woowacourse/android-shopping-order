@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
 
 interface CartRepository {
@@ -10,9 +9,9 @@ interface CartRepository {
         callback: (List<CartItem>, Boolean) -> Unit,
     )
 
-    fun loadAllCartItems(callback: (List<CartItem>?) -> Unit)
+    fun loadAllCartItems(callback: (List<CartItem>) -> Unit)
 
-    fun getAllCartItemsCount(callBack: (Quantity?) -> Unit)
+    fun getAllCartItemsCount(callBack: (Int) -> Unit)
 
     fun increaseQuantity(
         cartItem: CartItem,
