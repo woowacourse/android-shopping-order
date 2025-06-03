@@ -104,6 +104,12 @@ class CartFragment :
 
     override fun onResume() {
         super.onResume()
+
+        binding.rvCartItems.post {
+            if (binding.rvCartItems.adapter != null) {
+                binding.rvCartItems.scrollToPosition(0)
+            }
+        }
     }
 
     override fun onCartItemDelete(cartItem: CartItem) {

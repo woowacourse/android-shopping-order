@@ -57,7 +57,6 @@ class CartViewModel(
                         emptyList()
                     }
             }
-
             addSource(cartsList) { update() }
             addSource(_page) { update() }
         }
@@ -208,8 +207,9 @@ class CartViewModel(
     }
 
     private fun addLocalCartItem(cartItem: CartItem) {
-        val addedItem: List<CartItem> = cartsList.value?.plus(listOf<CartItem>(cartItem)) ?: emptyList()
+        val addedItem: List<CartItem> = listOf(cartItem) + (cartsList.value ?: emptyList())
         _carts.value = addedItem.associateBy { it.id }.toMutableMap()
+        _page.value = 1
     }
 
     private fun updateCartItem(
