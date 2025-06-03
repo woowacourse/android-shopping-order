@@ -13,12 +13,14 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toProduct
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
 
 class CatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-) : ViewModel() {
+) : ViewModel(),
+    ItemCounterListener {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -27,6 +29,9 @@ class CatalogViewModel(
 
     private val _itemUpdateEvent = MutableLiveData<ProductUiModel>()
     val itemUpdateEvent: LiveData<ProductUiModel> = _itemUpdateEvent
+
+    private val _deleteState = MutableLiveData<Long>()
+    val deleteState: LiveData<Long> = _deleteState
 
     private val _totalCartCount = MutableLiveData<Int>()
     val totalCartCount: LiveData<Int> = _totalCartCount
@@ -37,6 +42,14 @@ class CatalogViewModel(
 
     init {
         fetchProducts()
+    }
+
+    override fun increase(product: ProductUiModel) {
+        increaseCartItem(product)
+    }
+
+    override fun decrease(product: ProductUiModel) {
+        decreaseCartItem(product)
     }
 
     fun fetchProducts() {
@@ -138,14 +151,14 @@ class CatalogViewModel(
         }
     }
 
-    fun increaseCartItem(product: ProductUiModel) {
+    private fun increaseCartItem(product: ProductUiModel) {
         val cartItem = product.toCartItem()
         cartRepository.increaseCartItem(cartItem) { id ->
             handleUpdatedCartItem(id)
         }
     }
 
-    fun decreaseCartItem(product: ProductUiModel) {
+    private fun decreaseCartItem(product: ProductUiModel) {
         val cartItem = product.toCartItem()
 
         if (cartItem.amount <= 1) {
@@ -161,8 +174,9 @@ class CatalogViewModel(
     }
 
     fun addRecentProduct(product: ProductUiModel) {
-        productRepository.addRecentProduct(product.toProduct())
-        updateRecentProducts()
+        productRepository.addRecentProduct(product.toProduct()) {
+            updateRecentProducts()
+        }
     }
 
     private fun handleUpdatedCartItem(cartId: Long) {
