@@ -30,8 +30,8 @@ class ProductActivity :
     private var _toolbarBinding: ViewCartActionBinding? = null
     private val toolbarBinding get() = _toolbarBinding!!
     private val viewModel: ProductViewModel by viewModels { ProductViewModelFactory() }
-    private val recentAdapter: RecentAdapter by lazy {
-        RecentAdapter(this)
+    private val recentProductAdapter: RecentProductAdapter by lazy {
+        RecentProductAdapter(this)
     }
     private val productAdapter: ProductAdapter by lazy {
         ProductAdapter(
@@ -108,7 +108,7 @@ class ProductActivity :
         }
         binding.rvRecentProducts.apply {
             itemAnimator = null
-            adapter = recentAdapter
+            adapter = recentProductAdapter
         }
     }
 
@@ -143,7 +143,7 @@ class ProductActivity :
         }
 
         viewModel.recentProducts.observe(this) { recentProducts ->
-            recentAdapter.submitList(recentProducts)
+            recentProductAdapter.submitList(recentProducts)
         }
 
         viewModel.cartItemCount.observe(this) { count ->
