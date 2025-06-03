@@ -32,16 +32,19 @@ class CartViewModel(
     private val _selectedEvent = MutableLiveData<Unit>()
     val selectedEvent: LiveData<Unit> = _selectedEvent
 
-    private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
-    val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
-
     private val selectedState: MutableMap<Int, Boolean> = mutableMapOf()
 
     private var isInitialLoad = true
 
+    private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
+    val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
+
+    private val _updatedProduct = MutableLiveData<ProductUiModel>()
+    val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
+
     init {
-        loadRecommendProducts()
         loadCartProducts()
+        loadRecommendProducts()
     }
 
     fun loadRecommendProducts() {
@@ -78,6 +81,7 @@ class CartViewModel(
                         product.quantity - 1,
                     ) { result ->
                         if (result == true) {
+                            _updatedProduct.postValue(product.copy(quantity = product.quantity - 1))
                             loadCartProducts()
                         }
                     }
@@ -90,6 +94,7 @@ class CartViewModel(
                     product.quantity + 1,
                 ) { result ->
                     if (result == true) {
+                        _updatedProduct.postValue(product.copy(quantity = product.quantity + 1))
                         loadCartProducts()
                     }
                 }
@@ -99,6 +104,7 @@ class CartViewModel(
 
     fun addProduct(product: ProductUiModel) {
         cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
+            _updatedProduct.postValue(product)
             refreshProductsInfo()
             loadCartProducts()
         }

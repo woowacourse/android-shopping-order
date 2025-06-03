@@ -1,6 +1,7 @@
 package woowacourse.shopping.cart
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,7 @@ import woowacourse.shopping.product.detail.DetailActivity
 
 class CartRecommendationFragment : Fragment() {
     private lateinit var binding: FragmentCartRecommendationBinding
-    private val viewModel: CartViewModel by activityViewModels {
+    private val cartViewModel: CartViewModel by activityViewModels {
         CartViewModelFactory(requireActivity().application as ShoppingApplication)
     }
 
@@ -59,9 +60,14 @@ class CartRecommendationFragment : Fragment() {
                         override fun onClick(
                             buttonEvent: ButtonEvent,
                             product: ProductUiModel,
-                        ) = viewModel.updateQuantity(buttonEvent, product)
+                        ) {
+                            Log.d("호출", "클릭 리스너, product = $product, buttonEvent = $buttonEvent")
+                            cartViewModel.updateQuantity(buttonEvent, product)
+                        }
 
-                        override fun onAdd(product: ProductUiModel) = viewModel.addProduct(product)
+                        override fun onAdd(product: ProductUiModel) {
+                            cartViewModel.addProduct(product)
+                        }
                     },
             )
 
@@ -69,8 +75,16 @@ class CartRecommendationFragment : Fragment() {
     }
 
     private fun observeCartViewModel() {
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).addLoadedItems(products.map { ProductItem(it) })
+        val recommendProductAdapter =
+            binding.RecyclerViewCartRecommendation.adapter as ProductAdapter
+
+        cartViewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
+            Log.d("호출", "recommendedProducts observed $products")
+            recommendProductAdapter.addLoadedItems(products.map { ProductItem(it) })
+        }
+        cartViewModel.updatedProduct.observe(viewLifecycleOwner) { product ->
+            Log.d("호출", "observed $product")
+            recommendProductAdapter.updateItem(product)
         }
     }
 }

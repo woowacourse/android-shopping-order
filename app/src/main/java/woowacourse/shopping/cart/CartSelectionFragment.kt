@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
 import woowacourse.shopping.domain.LoadingState
@@ -17,9 +16,7 @@ import woowacourse.shopping.product.catalog.QuantityControlListener
 
 class CartSelectionFragment : Fragment() {
     private lateinit var binding: FragmentCartSelectionBinding
-    private val viewModel: CartViewModel by viewModels({ requireActivity() }) {
-        CartViewModelFactory(requireActivity().application as ShoppingApplication)
-    }
+    private val viewModel: CartViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
         inflater: LayoutInflater,

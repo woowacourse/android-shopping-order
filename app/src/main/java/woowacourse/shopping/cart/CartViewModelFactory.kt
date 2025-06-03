@@ -3,7 +3,6 @@ package woowacourse.shopping.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
@@ -17,10 +16,11 @@ class CartViewModelFactory(
             return CartViewModel(
                 cartProductRepository = RemoteCartProductRepositoryImpl(),
                 catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
-                RecentlyViewedProductRepositoryImpl(
-                    ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
-                    RemoteCatalogProductRepositoryImpl(),
-                ),
+                recentlyViewedProductRepository =
+                    RecentlyViewedProductRepositoryImpl(
+                        recentlyViewedProductDao = application.database.recentlyViewedProductDao(),
+                        catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
+                    ),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
