@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.databinding.FragmentCartRecommendationBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.ProductUiModel
@@ -17,7 +18,12 @@ class CartRecommendationFragment :
     ItemCounterListener {
     private val viewModel: CartViewModel by viewModels(
         ownerProducer = { requireParentFragment() },
-        factoryProducer = { CartViewModel.Factory },
+        factoryProducer = {
+            CartViewModel.factory(
+                productRepository = RepositoryProvider.productRepository,
+                cartRepository = RepositoryProvider.cartRepository,
+            )
+        },
     )
 
     private val recommendationAdapter: RecommendationAdapter by lazy {
