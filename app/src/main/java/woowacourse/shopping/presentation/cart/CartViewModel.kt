@@ -189,7 +189,6 @@ class CartViewModel(
     }
 
     fun onOrderClick() {
-        val price = totalOrderPrice.value ?: 0
         val count = checkedProductCount.value ?: 0
         val checkedItems = checkedProducts.value ?: emptyList()
         if (count > 0) {
