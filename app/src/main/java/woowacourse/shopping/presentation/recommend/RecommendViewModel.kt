@@ -140,11 +140,9 @@ class RecommendViewModel(
         orderRepository.orderItems(cartIds) { result ->
             result
                 .onSuccess {
-                    Log.d("result", result.toString())
                     _orderEvent.postValue(OrderItemSuccess)
                 }
                 .onFailure {
-                    Log.d("fail", it.stackTraceToString())
                     _orderEvent.postValue(OrderItemFailure)
                 }
         }
