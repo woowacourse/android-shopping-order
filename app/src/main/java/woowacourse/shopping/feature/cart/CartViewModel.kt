@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,8 +25,18 @@ class CartViewModel(
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
+    @VisibleForTesting
+    internal fun setTestPage(page: Int) {
+        _page.value = page
+    }
+
     private val _page = MutableLiveData(MINIMUM_PAGE)
     val page: LiveData<Int> get() = _page
+
+    @VisibleForTesting
+    internal fun setTestCarts(items: List<CartItem>) {
+        _carts.value = items.associateBy { it.id }
+    }
 
     private val _carts = MutableLiveData<Map<Int, CartItem>>(emptyMap())
 
