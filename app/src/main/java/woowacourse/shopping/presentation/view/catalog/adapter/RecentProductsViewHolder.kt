@@ -7,7 +7,7 @@ import woowacourse.shopping.databinding.ItemRecentProductContainerBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
-class RecentProductViewHolder private constructor(
+class RecentProductsViewHolder private constructor(
     binding: ItemRecentProductContainerBinding,
     eventListener: CatalogEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -25,14 +25,14 @@ class RecentProductViewHolder private constructor(
         fun from(
             parent: ViewGroup,
             eventListener: CatalogEventListener,
-        ): RecentProductViewHolder {
+        ): RecentProductsViewHolder {
             val binding =
                 ItemRecentProductContainerBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
-            return RecentProductViewHolder(binding, eventListener)
+            return RecentProductsViewHolder(binding, eventListener)
         }
     }
 }

@@ -85,7 +85,7 @@ class CatalogFragment :
         }
 
         viewModel.items.observe(viewLifecycleOwner) { products ->
-            catalogAdapter.updateProducts(products)
+            catalogAdapter.submitList(products)
         }
 
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
