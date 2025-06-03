@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -230,16 +229,15 @@ class CatalogViewModel(
     companion object {
         private const val DEFAULT_ID = 0L
 
-        val Factory: ViewModelProvider.Factory =
+        fun factory(
+            productRepository: ProductRepository,
+            cartRepository: CartRepository,
+        ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
-                ): T {
-                    val productRepository = RepositoryProvider.productRepository
-                    val cartRepository = RepositoryProvider.cartRepository
-                    return CatalogViewModel(productRepository, cartRepository) as T
-                }
+                ): T = CatalogViewModel(productRepository, cartRepository) as T
             }
     }
 }

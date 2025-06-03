@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.ProductUiModel
@@ -18,7 +19,12 @@ class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
     CartEventListener,
     ItemCounterListener {
-    private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
+    private val viewModel: CartViewModel by viewModels {
+        CartViewModel.factory(
+            productRepository = RepositoryProvider.productRepository,
+            cartRepository = RepositoryProvider.cartRepository,
+        )
+    }
     private val backCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -105,8 +111,4 @@ class CartFragment :
         }
         binding.eventListener = this
     }
-}
-
-interface CartEventListener {
-    fun onBatchSelect(isChecked: Boolean)
 }

@@ -7,6 +7,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
+import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.custom.GridSpacingItemDecoration
@@ -19,8 +20,18 @@ import woowacourse.shopping.presentation.view.detail.DetailFragment
 class CatalogFragment :
     BaseFragment<FragmentCatalogBinding>(R.layout.fragment_catalog),
     CatalogAdapter.CatalogEventListener {
-    private val catalogAdapter: CatalogAdapter by lazy { CatalogAdapter(eventListener = this, itemCounterListener = viewModel) }
-    private val viewModel: CatalogViewModel by viewModels { CatalogViewModel.Factory }
+    private val catalogAdapter: CatalogAdapter by lazy {
+        CatalogAdapter(
+            eventListener = this,
+            itemCounterListener = viewModel,
+        )
+    }
+    private val viewModel: CatalogViewModel by viewModels {
+        CatalogViewModel.factory(
+            productRepository = RepositoryProvider.productRepository,
+            cartRepository = RepositoryProvider.cartRepository,
+        )
+    }
 
     override fun onViewCreated(
         view: View,
@@ -28,7 +39,10 @@ class CatalogFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        parentFragmentManager.setFragmentResultListener("cart_update_result", viewLifecycleOwner) { _, _ ->
+        parentFragmentManager.setFragmentResultListener(
+            "cart_update_result",
+            viewLifecycleOwner,
+        ) { _, _ ->
             viewModel.refreshCartState()
         }
 
