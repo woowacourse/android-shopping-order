@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.view
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -17,7 +16,7 @@ class ShoppingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityShoppingBinding.inflate(LayoutInflater.from(this))
+        binding = ActivityShoppingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setWindowInsets()
