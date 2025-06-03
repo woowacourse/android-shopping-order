@@ -36,8 +36,8 @@ class CatalogViewModel(
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase,
 ) : ViewModel() {
-    private val _products: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
-    val products: LiveData<Products> get() = _products
+    private val _catalogProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
+    val catalogProducts: LiveData<Products> get() = _catalogProducts
 
     private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
         MutableLiveData(emptyList())
@@ -58,14 +58,14 @@ class CatalogViewModel(
     }
 
     private fun loadCartProducts(
-        page: Int = products.value?.page?.current ?: UNINITIALIZED_PAGE,
+        page: Int = catalogProducts.value?.page?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
         viewModelScope.launch {
             _isLoading.value = true
             getCatalogProductsUseCase(page, count)
                 .onSuccess { newProducts ->
-                    _products.value = products.value?.plus(newProducts)
+                    _catalogProducts.value = catalogProducts.value?.plus(newProducts)
                     _isLoading.value = false
                 }.onFailure {
                     _isError.value = it.message
@@ -75,7 +75,7 @@ class CatalogViewModel(
 
     fun loadMoreCartProducts() {
         val currentPage =
-            products.value
+            catalogProducts.value
                 ?.page
                 ?.current
                 ?.plus(DEFAULT_PAGE_STEP) ?: UNINITIALIZED_PAGE
@@ -92,7 +92,7 @@ class CatalogViewModel(
 
     fun increaseCartProduct(productId: Long) {
         viewModelScope.launch {
-            val product = products.value?.getProductByProductId(productId) ?: return@launch
+            val product = catalogProducts.value?.getProductByProductId(productId) ?: return@launch
             increaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -101,7 +101,7 @@ class CatalogViewModel(
 
     fun decreaseCartProduct(productId: Long) {
         viewModelScope.launch {
-            val product = products.value?.getProductByProductId(productId) ?: return@launch
+            val product = catalogProducts.value?.getProductByProductId(productId) ?: return@launch
             decreaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -112,7 +112,7 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
-                    _products.value = products.value?.updateProduct(cartProduct)
+                    _catalogProducts.value = catalogProducts.value?.updateProduct(cartProduct)
                 }.onFailure {
                     _isError.value = it.message
                 }
@@ -123,7 +123,7 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { cartProducts ->
-                    _products.value = products.value?.updateProducts(cartProducts)
+                    _catalogProducts.value = catalogProducts.value?.updateProducts(cartProducts)
                 }.onFailure {
                     _isError.value = it.message
                 }

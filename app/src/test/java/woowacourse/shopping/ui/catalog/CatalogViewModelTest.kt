@@ -81,7 +81,7 @@ class CatalogViewModelTest {
         viewModel.loadCartProducts()
 
         // then
-        val result = viewModel.products.getOrAwaitValue()
+        val result = viewModel.catalogProducts.getOrAwaitValue()
         assertThat(result.products).containsExactlyElementsIn(DUMMY_CATALOG_PRODUCTS_1.products + newProduct)
         assertThat(result.hasMore).isFalse()
     }
@@ -121,7 +121,7 @@ class CatalogViewModelTest {
         viewModel.increaseCartProduct(productId)
 
         // then
-        val updated = viewModel.products.getOrAwaitValue()
+        val updated = viewModel.catalogProducts.getOrAwaitValue()
         assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(
             10,
         )
@@ -143,7 +143,7 @@ class CatalogViewModelTest {
         viewModel.decreaseCartProduct(productId)
 
         // then
-        val updated = viewModel.products.getOrAwaitValue()
+        val updated = viewModel.catalogProducts.getOrAwaitValue()
         assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(1)
     }
 
@@ -165,7 +165,7 @@ class CatalogViewModelTest {
         viewModel.loadCartProduct(productId)
 
         // then
-        val result = viewModel.products.getOrAwaitValue()
+        val result = viewModel.catalogProducts.getOrAwaitValue()
         assertThat(result.products.first { it.productDetail.id == productId }.quantity).isEqualTo(
             100,
         )
@@ -188,7 +188,7 @@ class CatalogViewModelTest {
         viewModel.loadCartProductsByProductIds(listOf(DUMMY_PRODUCT_Detail_1.id))
 
         // then
-        val result = viewModel.products.getOrAwaitValue()
+        val result = viewModel.catalogProducts.getOrAwaitValue()
         assertThat(result.products).containsExactlyElementsIn(updatedProducts)
     }
 
