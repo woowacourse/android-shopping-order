@@ -19,9 +19,10 @@ class RemoteProductsDataSource(
     ): PageableProductData {
         val response: ProductsResponse? = productService.getProducts(page, size).execute().body()
 
-        return PageableProductData(
+        return PageableProductData.from(
             products = response?.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList(),
-            loadable = response?.loadable == true,
+            pageNumber = response?.pageable?.pageNumber,
+            totalPages = response?.totalPages,
         )
     }
 

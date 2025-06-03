@@ -67,16 +67,4 @@ data class ProductsResponse(
         @SerialName("unsorted")
         val unsorted: Boolean?,
     )
-
-    val loadable: Boolean =
-        run {
-            val pageNumber = pageable?.pageNumber
-            val totalPages = this.totalPages
-
-            if (pageNumber == null || totalPages == null) {
-                false
-            } else {
-                pageNumber + 1 < totalPages
-            }
-        }
 }
