@@ -5,7 +5,7 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class RecommendEventHandlerImpl(
     private val viewModel: RecommendViewModel,
-): ProductQuantityHandler {
+) : ProductQuantityHandler {
     override fun onPlusQuantity(product: ProductUiModel) {
         viewModel.increaseQuantity(product)
     }

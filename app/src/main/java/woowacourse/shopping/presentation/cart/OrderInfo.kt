@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+
 data class OrderInfo(
-    val price: Int,
-    val count: Int,
+    val checkedItems: List<ProductUiModel>,
 )

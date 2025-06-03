@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,18 +12,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
+import woowacourse.shopping.presentation.product.catalog.CatalogActivity
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemSuccess
+import woowacourse.shopping.presentation.util.IntentCompat
 
 class RecommendActivity : AppCompatActivity() {
     private lateinit var recommendAdapter: RecommendAdapter
-    private val price: Int by lazy { intent.getIntExtra(TOTAL_PRICE_KEY, 0) }
-    private val count: Int by lazy { intent.getIntExtra(TOTAL_COUNT_KEY, 0) }
+    private val checkedItems: List<ProductUiModel> by lazy { requireCheckedItems() }
 
     private val binding: ActivityRecommendBinding by lazy {
         DataBindingUtil.setContentView(this, R.layout.activity_recommend)
     }
 
     private val recommendViewModel: RecommendViewModel by viewModels {
-        RecommendViewModel.provideFactory(price, count)
+        RecommendViewModel.provideFactory(checkedItems)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,30 +66,56 @@ class RecommendActivity : AppCompatActivity() {
         recommendAdapter = RecommendAdapter(
             handler = RecommendEventHandlerImpl(recommendViewModel),
             onQuantityClick = { product ->
-                Log.d("product",product.toString())
                 recommendViewModel.toggleQuantity(product)
             })
     }
 
+    private fun requireCheckedItems(): List<ProductUiModel> {
+        return IntentCompat.getParcelableArrayListExtra(
+            intent,
+            CHECKED_PRODUCTS_KEY,
+        ) ?: emptyList()
+    }
+
     private fun observeViewModel() {
-        recommendViewModel.updatedProduct.observe(this){ product ->
+        recommendViewModel.updatedProduct.observe(this) { product ->
             recommendAdapter.updateProduct(product)
+        }
+
+        recommendViewModel.orderEvent.observe(this) { state ->
+            when (state) {
+                is OrderItemSuccess -> {
+                    navigateToMain()
+                    showToast(R.string.message_order_success)
+                }
+
+                is OrderEvent.OrderItemFailure -> {
+                    showToast(R.string.message_order_fail)
+                }
+            }
         }
     }
 
+    private fun showToast(messageResId: Int) {
+        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun navigateToMain() {
+        val intent = Intent(this, CatalogActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+        finish()
+    }
+
     companion object {
-        private const val TOTAL_PRICE_KEY = "Price"
-        private const val TOTAL_COUNT_KEY = "Count"
         private const val CHECKED_PRODUCTS_KEY = "CheckedProducts"
 
         fun newIntent(
             context: Context,
-            price: Int,
-            count: Int,
+            checkedItems: ArrayList<ProductUiModel>,
         ): Intent {
             return Intent(context, RecommendActivity::class.java).apply {
-                putExtra(TOTAL_PRICE_KEY, price)
-                putExtra(TOTAL_COUNT_KEY, count)
+                putParcelableArrayListExtra(CHECKED_PRODUCTS_KEY, checkedItems)
             }
         }
     }

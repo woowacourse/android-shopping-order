@@ -1,42 +1,56 @@
 package woowacourse.shopping.presentation.recommend
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemFailure
+import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemSuccess
+import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class RecommendViewModel(
     private val productsRepository: ProductsRepository,
     private val cartItemRepository: CartItemRepository,
-    price: Int,
-    count: Int,
+    private val orderRepository: OrderRepository,
+    initialCheckedItems: List<ProductUiModel>,
 ) : ViewModel() {
     private val _items: MutableLiveData<List<ProductUiModel>> = MutableLiveData(emptyList())
     val items: LiveData<List<ProductUiModel>>
         get() = _items
 
-    private val _price = MutableLiveData(price)
-    val price: LiveData<Int> = _price
-
-    private val _count = MutableLiveData(count)
-    val count: LiveData<Int> = _count
-
     private val _updatedProduct = MutableLiveData<ProductUiModel>()
     val updatedProduct: LiveData<ProductUiModel>
         get() = _updatedProduct
+
+    private val _checkedItems = MutableLiveData<List<ProductUiModel>>(initialCheckedItems)
+    val checkedItems: LiveData<List<ProductUiModel>> get() = _checkedItems
+
+    val totalOrderPrice: LiveData<Int> = checkedItems.map { checkedProducts ->
+        checkedProducts.sumOf { it.quantity * it.price }
+    }
+
+    val totalOrderCount: LiveData<Int> = checkedItems.map { checkedProducts ->
+        checkedProducts.sumOf { it.quantity }
+    }
+
+    private val _orderEvent = SingleLiveEvent<OrderEvent>()
+    val orderEvent: LiveData<OrderEvent> = _orderEvent
 
     init {
         loadRecommendedProductsFromLastViewed()
     }
 
     private fun loadRecommendedProductsFromLastViewed() {
-        val cartProductIds = cartItemRepository.getCartItemIds()
+        val cartProductIds = cartItemRepository.getCartItemProductIds()
 
         productsRepository.getRecommendedProductsFromLastViewed(
             cartProductIds = cartProductIds
@@ -101,17 +115,52 @@ class RecommendViewModel(
             if (it.id == toggled.id) toggled else it
         }
         _items.postValue(updatedList)
+
+        val currentChecked = _checkedItems.value.orEmpty().toMutableList()
+        val index = currentChecked.indexOfFirst { it.id == toggled.id }
+
+        if (toggled.quantity > 0) {
+            if (index >= 0) {
+                currentChecked[index] = toggled
+            } else {
+                currentChecked.add(toggled)
+            }
+        } else {
+            if (index >= 0) {
+                currentChecked.removeAt(index)
+            }
+        }
+
+        _checkedItems.postValue(currentChecked)
+    }
+
+
+   fun orderCheckedItems() {
+        val cartIds = cartItemRepository.getCartItemCartIds()
+        orderRepository.orderItems(cartIds) { result ->
+            result
+                .onSuccess {
+                    Log.d("result", result.toString())
+                    _orderEvent.postValue(OrderItemSuccess)
+                }
+                .onFailure {
+                    Log.d("fail", it.stackTraceToString())
+                    _orderEvent.postValue(OrderItemFailure)
+                }
+        }
     }
 
     companion object {
-        fun provideFactory(price: Int, count: Int): ViewModelProvider.Factory {
+        fun provideFactory(
+            initialCheckedItems: List<ProductUiModel>,
+        ): ViewModelProvider.Factory {
             return viewModelFactory {
                 initializer {
                     RecommendViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartItemRepository = RepositoryProvider.cartItemRepository,
-                        price = price,
-                        count = count
+                        orderRepository = RepositoryProvider.orderRepository,
+                        initialCheckedItems = initialCheckedItems
                     )
                 }
             }
