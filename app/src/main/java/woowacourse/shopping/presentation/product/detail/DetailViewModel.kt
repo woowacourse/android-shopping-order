@@ -30,9 +30,10 @@ class DetailViewModel(
     private val _lastViewed = MutableLiveData<ProductUiModel?>()
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
 
-    fun setProduct(
-        onInserted: () -> Unit = {},
-    ) {
+    private val _productInserted = MutableLiveData<Boolean>()
+    val productInserted: LiveData<Boolean> = _productInserted
+
+    fun setProduct() {
         productsRepository.getProductById(productId) { result ->
             result
                 .onSuccess { product ->
@@ -40,8 +41,11 @@ class DetailViewModel(
                     _product.postValue(loadedProduct)
 
                     viewedRepository.insertViewedItem(loadedProduct) {
-                        onInserted()
+                        _productInserted.postValue(true)
                     }
+                }
+                .onFailure {
+                    _productInserted.postValue(false)
                 }
         }
     }

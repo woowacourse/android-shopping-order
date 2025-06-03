@@ -100,8 +100,6 @@ class DetailActivity : AppCompatActivity() {
         Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
     }
 
-    private fun productFromIntent(): Long = intent.getLongExtra(KEY_PRODUCT_DETAIL, 0)
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.detail_back_menu_item, menu)
         return true
