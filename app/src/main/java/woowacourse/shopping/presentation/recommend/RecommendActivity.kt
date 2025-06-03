@@ -94,6 +94,10 @@ class RecommendActivity : AppCompatActivity() {
                 }
             }
         }
+
+        recommendViewModel.items.observe(this) { items ->
+            recommendAdapter.submitList(items)
+        }
     }
 
     private fun showToast(messageResId: Int) {

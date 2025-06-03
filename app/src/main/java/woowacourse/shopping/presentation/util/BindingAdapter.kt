@@ -49,8 +49,3 @@ fun setPrevButtonEnabled(
     view.isEnabled = isEnabled
 }
 
-
-@BindingAdapter("recommendProducts")
-fun RecyclerView.setRecommendProducts(products: List<ProductUiModel>?) {
-    (adapter as? RecommendAdapter)?.submitList(products.orEmpty())
-}
