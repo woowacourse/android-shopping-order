@@ -124,7 +124,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
         }
 
         viewModel.historyProducts.observe(this) { products ->
-            historyProductAdapter.submitItems(products)
+            historyProductAdapter.submitList(products)
         }
     }
 
