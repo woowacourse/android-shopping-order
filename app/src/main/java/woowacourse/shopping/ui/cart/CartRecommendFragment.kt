@@ -11,7 +11,11 @@ import woowacourse.shopping.ui.common.DataBindingFragment
 
 class CartRecommendFragment : DataBindingFragment<FragmentCartRecommandBinding>(R.layout.fragment_cart_recommand) {
     private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
-    private val adapter: CartRecommendAdapter by lazy { CartRecommendAdapter(createAdapterOnClickHandler()) }
+    private val adapter: CartRecommendAdapter by lazy {
+        CartRecommendAdapter(
+            createAdapterOnClickHandler(),
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +30,6 @@ class CartRecommendFragment : DataBindingFragment<FragmentCartRecommandBinding>(
         binding.cartItemsRecommendContainer.adapter = adapter
         viewModel.recommendedProducts.observe(requireActivity()) { recommendedProducts ->
             adapter.submitList(recommendedProducts.products)
-            viewModel.updateOrderInfo()
         }
     }
 

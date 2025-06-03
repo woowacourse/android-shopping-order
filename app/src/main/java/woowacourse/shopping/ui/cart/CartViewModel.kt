@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -39,8 +40,27 @@ class CartViewModel(
     private val _editedProductIds: MutableLiveData<Set<Long>> = MutableLiveData(emptySet())
     val editedProductIds: LiveData<Set<Long>> get() = _editedProductIds
 
-    private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(0)
+    private val _totalOrderPrice: MediatorLiveData<Int> =
+        combineLiveData(
+            cartProducts,
+            recommendedProducts,
+            transform = { cart, recommend ->
+                cart.getSelectedCartProductsPrice() + recommend.getSelectedCartRecommendProductsPrice()
+            },
+            INIT_ORDER_PRICE,
+        )
     val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
+
+    private val _totalQuantity: MediatorLiveData<Int> =
+        combineLiveData(
+            cartProducts,
+            recommendedProducts,
+            transform = { cart, recommend ->
+                cart.getSelectedCartProductQuantity() + recommend.getSelectedCartRecommendProductQuantity()
+            },
+            INIT_ORDER_QUANTITY,
+        )
+    val totalQuantity: LiveData<Int> get() = _totalQuantity
 
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -143,12 +163,6 @@ class CartViewModel(
         _cartProducts.value = cartProducts.value?.updateAllSelection()
     }
 
-    fun updateOrderInfo() {
-        _totalOrderPrice.value =
-            (cartProducts.value?.getSelectedCartProductsPrice() ?: 0) +
-            (recommendedProducts.value?.getSelectedCartRecommendProductsPrice() ?: 0)
-    }
-
     fun loadRecommendedProducts() {
         getCartRecommendProductsUseCase { result ->
             result
@@ -203,9 +217,12 @@ class CartViewModel(
     }
 
     fun orderProducts() {
-        val selectedCartProductsIds: List<Long> = cartProducts.value?.getSelectedCartProductIds() ?: emptyList()
-        val selectedRecommendedProductsIds: List<Long> = recommendedProducts.value?.getSelectedCartRecommendProductIds() ?: emptyList()
-        val selectedProductIds: Set<Long> = (selectedCartProductsIds + selectedRecommendedProductsIds).toSet()
+        val selectedCartProductsIds: List<Long> =
+            cartProducts.value?.getSelectedCartProductIds() ?: emptyList()
+        val selectedRecommendedProductsIds: List<Long> =
+            recommendedProducts.value?.getSelectedCartRecommendProductIds() ?: emptyList()
+        val selectedProductIds: Set<Long> =
+            (selectedCartProductsIds + selectedRecommendedProductsIds).toSet()
 
         if (selectedProductIds.isEmpty()) return
 
@@ -224,6 +241,8 @@ class CartViewModel(
         const val DEFAULT_PAGE_STEP: Int = 1
         const val PAGE_INDEX_OFFSET: Int = 1
         const val DEFAULT_PAGE_SIZE: Int = 5
+        private const val INIT_ORDER_PRICE = 0
+        private const val INIT_ORDER_QUANTITY = 0
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
@@ -242,6 +261,32 @@ class CartViewModel(
                         getCartRecommendProductsUseCase = application.getCartRecommendProductsUseCase,
                         orderProductsUseCase = application.orderProductsUseCase,
                     ) as T
+                }
+            }
+
+        private fun <T, R> combineLiveData(
+            source1: LiveData<T>,
+            source2: LiveData<T>,
+            transform: (T, T) -> R,
+            initialValue: R,
+        ): MediatorLiveData<R> =
+            MediatorLiveData<R>().apply {
+                var data1: T? = null
+                var data2: T? = null
+
+                value = initialValue
+                addSource(source1) {
+                    data1 = it
+                    if (data1 != null && data2 != null) {
+                        value = transform(data1!!, data2!!)
+                    }
+                }
+
+                addSource(source2) {
+                    data2 = it
+                    if (data1 != null && data2 != null) {
+                        value = transform(data1!!, data2!!)
+                    }
                 }
             }
     }
