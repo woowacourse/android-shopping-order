@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.UseCaseModule.addSearchHistoryUseCase
 import woowacourse.shopping.di.UseCaseModule.getCatalogProductUseCase
 import woowacourse.shopping.di.UseCaseModule.getRecentSearchHistoryUseCase
@@ -40,25 +42,32 @@ class ProductDetailViewModel(
     private val _isError: MutableLiveData<String> = MutableLiveData()
     val isError: LiveData<String> get() = _isError
 
-    fun loadProductDetail(id: Long) {
-        getCatalogProductUseCase(id) { result ->
-            result
+    fun loadProductDetail(productId: Long) {
+        viewModelScope.launch {
+            getCatalogProductUseCase(productId)
                 .onSuccess { catalogProduct ->
-                    _product.postValue(catalogProduct ?: EMPTY_PRODUCT)
+                    _product.value = catalogProduct
                 }.onFailure {
-                    _isError.postValue(it.message)
+                    _isError.value = it.message
                 }
         }
     }
 
     fun loadLastHistoryProduct() {
-        getRecentSearchHistoryUseCase { historyProduct ->
-            _lastHistoryProduct.postValue(historyProduct)
+        viewModelScope.launch {
+            runCatching {
+                getRecentSearchHistoryUseCase()
+            }.onSuccess {
+                _lastHistoryProduct.value = it.getOrNull()
+            }.onFailure {
+            }
         }
     }
 
     fun addHistoryProduct(productDetail: ProductDetail) {
-        addSearchHistoryUseCase(productDetail)
+        viewModelScope.launch {
+            addSearchHistoryUseCase(productDetail)
+        }
     }
 
     fun decreaseCartProductQuantity() {
@@ -71,17 +80,16 @@ class ProductDetailViewModel(
 
     fun updateCartProduct() {
         val product: Product = product.value ?: return
-        updateCartProductUseCase(
-            productId = product.productDetail.id,
-            cartId = product.cartId,
-            quantity = product.quantity,
-        ) { result ->
-            result
-                .onSuccess {
-                    _onCartProductAddSuccess.postValue(true)
-                }.onFailure {
-                    _isError.postValue(it.message)
-                }
+        viewModelScope.launch {
+            updateCartProductUseCase(
+                productId = product.productDetail.id,
+                cartId = product.cartId,
+                quantity = product.quantity,
+            ).onSuccess {
+                _onCartProductAddSuccess.postValue(true)
+            }.onFailure {
+                _isError.value = it.message
+            }
         }
     }
 
