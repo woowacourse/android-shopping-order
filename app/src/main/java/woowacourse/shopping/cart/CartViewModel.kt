@@ -26,8 +26,8 @@ class CartViewModel(
     private val _totalCount = MutableLiveData<Int>(-1)
     val totalCount: LiveData<Int> get() = _totalCount
 
-    private val _totalAmount = MutableLiveData<Int>(0)
-    val totalAmount: LiveData<Int> get() = _totalAmount
+    private val _totalPrice = MutableLiveData<Int>(0)
+    val totalPrice: LiveData<Int> get() = _totalPrice
 
     private val _selectedEvent = MutableLiveData<Unit>()
     val selectedEvent: LiveData<Unit> = _selectedEvent
@@ -56,8 +56,8 @@ class CartViewModel(
     }
 
     fun refreshProductsInfo() {
-        postTotalAmount()
-        postTotalCount()
+        updateTotalPrice()
+        updateTotalCount()
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
@@ -147,8 +147,8 @@ class CartViewModel(
                     ).apply { addAll(pagedProducts) }
 
                 _cartProducts.postValue(items)
-                postTotalCount()
-                postTotalAmount()
+                updateTotalCount()
+                updateTotalPrice()
 
                 _loadingState.postValue(LoadingState.loaded())
                 isInitialLoad = false
@@ -156,7 +156,7 @@ class CartViewModel(
         }
     }
 
-    private fun postTotalAmount() {
+    private fun updateTotalPrice() {
         val products: List<ProductUiModel> =
             cartProducts.value?.map { it.productItem } ?: emptyList()
         val amount =
@@ -164,10 +164,10 @@ class CartViewModel(
                 .map { it.copy(isChecked = selectedState[it.id] ?: true) }
                 .filter { it.isChecked == true }
                 .sumOf { it.price * it.quantity }
-        _totalAmount.postValue(amount)
+        _totalPrice.postValue(amount)
     }
 
-    private fun postTotalCount() {
+    private fun updateTotalCount() {
         val count = cartProducts.value?.size ?: 0
         _totalCount.postValue(count)
     }

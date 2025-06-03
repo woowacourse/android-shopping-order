@@ -49,23 +49,15 @@ class CartActivity : AppCompatActivity() {
     private fun observeCartViewModel() {
         viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
-        viewModel.totalCount.observe(this) {
-            if (it != -1) {
-                if (it != 0) {
-                    hasHandledTotalCount = true
-                    supportFragmentManager.commit {
-                        setReorderingAllowed(true)
-                        replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
-                    }
-                } else if (it == 0) {
-                    hasHandledTotalCount = true
-                    supportFragmentManager.commit {
-                        setReorderingAllowed(true)
-                        replace(
-                            R.id.fragment_container_cart_selection,
-                            CartRecommendationFragment(),
-                        )
-                    }
+        viewModel.totalCount.observe(this) { count ->
+            if (!hasHandledTotalCount && count != -1) {
+                hasHandledTotalCount = true
+                supportFragmentManager.commit {
+                    setReorderingAllowed(true)
+                    replace(
+                        R.id.fragment_container_cart_selection,
+                        if (count != 0) CartSelectionFragment() else CartRecommendationFragment(),
+                    )
                 }
             }
         }
