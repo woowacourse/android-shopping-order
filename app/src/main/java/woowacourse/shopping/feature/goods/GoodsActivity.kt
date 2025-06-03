@@ -19,6 +19,7 @@ import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityGoodsBinding
 import woowacourse.shopping.databinding.MenuCartNavbarBinding
+import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.feature.QuantityChangeListener
@@ -151,10 +152,14 @@ class GoodsActivity : AppCompatActivity() {
     }
 
     private fun navigateGoodsDetails(goods: Goods) {
-        val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
-        intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
-        intent.putExtra(CART_KEY, viewModel.findCart(goods)?.toUiModel())
-        startActivity(intent)
+        if (!Authorization.isLogin) {
+            navigateGoodsLogin()
+        } else {
+            val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
+            intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
+            intent.putExtra(CART_KEY, viewModel.findCart(goods)?.toUiModel())
+            startActivity(intent)
+        }
     }
 
     private fun navigateGoodsLogin() {
