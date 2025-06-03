@@ -125,7 +125,8 @@ class ProductsViewModel(
                 .onSuccess { recentWatchingProducts ->
                     var updatedProducts = productsWithoutLoadItem
                     if (hasRecentWatching) {
-                        updatedProducts = productsWithoutLoadItem.drop(1)
+                        updatedProducts =
+                            productsWithoutLoadItem.filterNot { it is RecentWatchingItem }
                     }
                     handleRecentProductsSuccess(
                         recentWatchingProducts = recentWatchingProducts,
