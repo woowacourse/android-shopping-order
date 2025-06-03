@@ -93,6 +93,7 @@ class GoodsActivity : AppCompatActivity() {
         binding.rvGoodsItems.adapter = concatAdapter
         binding.viewModel = viewModel
 
+        viewModel.initialize()
         binding.rvGoodsItems.layoutManager = getLayoutManager()
 
         binding.rvGoodsItems.addItemDecoration(
@@ -158,7 +159,7 @@ class GoodsActivity : AppCompatActivity() {
             val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
             intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
             intent.putExtra(SELECTED_ITEM_CART_ID_KEY, viewModel.findCart(goods))
-            intent.putExtra(MOST_RECENT_ITEM_CART_ID_KEY, viewModel.mostRecentlyViewedCart())
+            intent.putExtra(MOST_RECENT_ITEM_CART_ID_KEY, viewModel.mostRecentlyViewedCartId())
             startActivity(intent)
         }
     }

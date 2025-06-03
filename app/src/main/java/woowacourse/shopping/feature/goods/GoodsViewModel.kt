@@ -1,10 +1,12 @@
 package woowacourse.shopping.feature.goods
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import woowacourse.shopping.data.carts.dto.CartQuantity
-import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.goods.repository.GoodsRepository
@@ -16,43 +18,86 @@ import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
+@Suppress("ktlint:standard:backing-property-naming")
 class GoodsViewModel(
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
-    private val goods = mutableListOf<Goods>()
-    private var page: Int = 1
+    private val _goods = MutableLiveData<List<Goods>>(emptyList())
+
+    private val _cartCache = MutableLiveData<Map<Int, CartItem>>(emptyMap())
+
+    private var currentPage: Int = 1
     private val _isFullLoaded = MutableLiveData(false)
     val isFullLoaded: LiveData<Boolean> get() = _isFullLoaded
-    private val _goodsWithCartQuantity = MutableLiveData<List<CartItem>>()
-    val goodsWithCartQuantity: LiveData<List<CartItem>> get() = _goodsWithCartQuantity
-    private var _totalCartItemSize: MutableLiveData<String> = MutableLiveData("0")
-    val totalCartItemSize: LiveData<String> get() = _totalCartItemSize
+
+    private val _recentlyViewedGoods = MutableLiveData<List<Goods>>(emptyList())
+    val recentlyViewedGoods: LiveData<List<Goods>> get() = _recentlyViewedGoods
+
     private val _navigateToCart = MutableSingleLiveData<Unit>()
     val navigateToCart: SingleLiveData<Unit> get() = _navigateToCart
-    private val _recentlyViewedGoods: MutableLiveData<List<Goods>> = MutableLiveData()
-    val recentlyViewedGoods: LiveData<List<Goods>> get() = _recentlyViewedGoods
 
     private val _navigateToLogin = MutableSingleLiveData<Unit>()
     val navigateToLogin: SingleLiveData<Unit> get() = _navigateToLogin
 
-    private var cashedCartItems: MutableMap<Int, CartItem> = mutableMapOf()
+    val goodsWithCartQuantity: LiveData<List<CartItem>> =
+        MediatorLiveData<List<CartItem>>().apply {
+            fun update() {
+                val goods = _goods.value ?: emptyList()
+                val cartCache = _cartCache.value ?: emptyMap()
+                value =
+                    goods.map { goods ->
+                        cartCache[goods.id] ?: CartItem(goods = goods, quantity = 0)
+                    }
+            }
+            addSource(_goods) { update() }
+            addSource(_cartCache) { update() }
+        }
 
-    init {
+    val totalCartItemSize: LiveData<String> =
+        _cartCache.map { cartCache ->
+            val totalQuantity = cartCache.values.sumOf { it.quantity }
+            when {
+                totalQuantity < 1 -> "0"
+                totalQuantity in 1..99 -> totalQuantity.toString()
+                else -> "99+"
+            }
+        }
+
+    @VisibleForTesting
+    internal fun setTestGoods(goodsList: List<Goods>) {
+        _goods.value = goodsList
+    }
+
+    @VisibleForTesting
+    internal fun setTestCartCache(cartItems: List<CartItem>) {
+        _cartCache.value = cartItems.associateBy { it.goods.id }
+    }
+
+    @VisibleForTesting
+    internal fun setTestRecentlyViewedGoods(goodsList: List<Goods>) {
+        _recentlyViewedGoods.value = goodsList
+    }
+
+    @VisibleForTesting
+    internal fun setTestIsFullLoaded(isLoaded: Boolean) {
+        _isFullLoaded.value = isLoaded
+    }
+
+    fun initialize() {
         appendCartItemsWithZeroQuantity()
         updateRecentlyViewedGoods()
     }
 
-    fun findCart(goods: Goods): Int = cashedCartItems.values.find { it.goods.id == goods.id }?.id ?: -1
+    fun findCart(goods: Goods): Int = _cartCache.value?.get(goods.id)?.id ?: -1
 
-    fun mostRecentlyViewedCart(): Int {
-        val recentGoodsId = recentlyViewedGoods.value?.firstOrNull()?.id
-        return cashedCartItems.values
-            .find { it.goods.id == recentGoodsId }
+    fun mostRecentlyViewedCartId(): Int {
+        val recentGoodsId = _recentlyViewedGoods.value?.firstOrNull()?.id
+        return _cartCache.value
+            ?.values
+            ?.find { it.goods.id == recentGoodsId }
             ?.id ?: -1
     }
-
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
@@ -72,77 +117,37 @@ class GoodsViewModel(
         }
     }
 
-    private fun appendCartItemsWithZeroQuantity() {
-        val goodsLoadOffset = (page - 1) * PAGE_SIZE
-        goodsRepository.fetchPageGoods(
-            limit = PAGE_SIZE,
-            offset = goodsLoadOffset,
-            onComplete = { goodsResponse ->
-                val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
-                goods.addAll(fetchedGoods)
-                _isFullLoaded.postValue(goodsResponse.last)
-                _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
-            },
-            onFail = { throwable ->
-                throw (throwable)
-            },
-        )
+    fun addPage() {
+        currentPage++
+        appendCartItemsWithZeroQuantity()
     }
 
     fun updateRecentlyViewedGoods() {
         goodsRepository.fetchRecentGoods { goods ->
-            _recentlyViewedGoods.postValue(goods)
+            _recentlyViewedGoods.value = goods
         }
     }
 
     fun fetchAndSetCartCache() {
         cartRepository.fetchAllCartItems({ cartResponse ->
-            val cartItems = getCartItemByCartResponse(cartResponse)
-            cashedCartItems =
-                cartItems
-                    .associateBy(
-                        { it.goods.id },
-                        { it },
-                    ).toMutableMap()
-
-            setTotalCartItemSize(cartItems.sumOf { it.quantity })
-            bindCartCache()
+            val cartItems = cartResponse.toCartItems()
+            _cartCache.value = cartItems.associateBy { it.goods.id }
         }, {})
-    }
-
-    private fun bindCartCache() {
-        val newList = goods.map { cashedCartItems[it.id] ?: CartItem(goods = it, quantity = 0) }
-        if (_goodsWithCartQuantity.value != newList) {
-            _goodsWithCartQuantity.postValue(newList)
-        }
-    }
-
-    private fun setTotalCartItemSize(totalCartQuantity: Int) {
-        val sizeText =
-            when {
-                totalCartQuantity < 1 -> "0"
-                totalCartQuantity in 1..99 -> totalCartQuantity.toString()
-                else -> "99+"
-            }
-        _totalCartItemSize.postValue(sizeText)
-    }
-
-    fun addPage() {
-        page++
-        appendCartItemsWithZeroQuantity()
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
         if (!Authorization.isLogin) {
             _navigateToLogin.setValue(Unit)
         } else {
-            val cashedCartItem = cashedCartItems[cartItem.goods.id]
-            if (cashedCartItem == null) {
+            val currentCache = _cartCache.value ?: emptyMap()
+            val existingItem = currentCache[cartItem.goods.id]
+
+            if (existingItem == null) {
                 addCartItem(cartItem)
             } else {
                 updateCartItemQuantity(
-                    cashedCartItem.id,
-                    cartItem.copy(quantity = cashedCartItem.quantity + 1),
+                    existingItem.id,
+                    cartItem.copy(quantity = existingItem.quantity + 1),
                 )
             }
         }
@@ -152,31 +157,50 @@ class GoodsViewModel(
         if (!Authorization.isLogin) {
             _navigateToLogin.setValue(Unit)
         } else {
-            cashedCartItems[cartItem.goods.id]?.let { cartItemWillRemove ->
-                if (cartItemWillRemove.quantity - 1 <= 0) {
-                    cartRepository.delete(cartItemWillRemove.id, {
-                        cashedCartItems.remove(cartItemWillRemove.goods.id)
-                        bindCartCache()
-                    }, {})
-                } else {
-                    updateCartItemQuantity(
-                        cartItemWillRemove.id,
-                        cartItem.copy(quantity = cartItemWillRemove.quantity - 1),
-                    )
-                }
+            val currentCache = _cartCache.value ?: emptyMap()
+            val existingItem = currentCache[cartItem.goods.id] ?: return
+
+            if (existingItem.quantity - 1 <= 0) {
+                cartRepository.delete(existingItem.id, {
+                    removeFromCartCache(existingItem.goods.id)
+                }, {})
+            } else {
+                updateCartItemQuantity(
+                    existingItem.id,
+                    cartItem.copy(quantity = existingItem.quantity - 1),
+                )
             }
         }
     }
 
-    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> {
-        val contents = goodsResponse.content
-        return contents.map { it.toDomain() }
+    private fun removeFromCartCache(goodsId: Int) {
+        val currentCache = _cartCache.value?.toMutableMap() ?: mutableMapOf()
+        currentCache.remove(goodsId)
+        _cartCache.value = currentCache
     }
+
+    private fun appendCartItemsWithZeroQuantity() {
+        val goodsLoadOffset = (currentPage - 1) * PAGE_SIZE
+        goodsRepository.fetchPageGoods(
+            limit = PAGE_SIZE,
+            offset = goodsLoadOffset,
+            onComplete = { goodsResponse ->
+                val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
+                _goods.value = fetchedGoods.toMutableList()
+                _isFullLoaded.postValue(goodsResponse.last)
+            },
+            onFail = { throwable ->
+                throw throwable
+            },
+        )
+    }
+
+    private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> = goodsResponse.content.map { it.toDomain() }
 
     private fun addCartItem(cartItem: CartItem) {
         cartRepository.addCartItem(cartItem.goods, 1, { resultCode: Int, cartId: Int ->
-            cashedCartItems[cartItem.goods.id] = cartItem.copy(quantity = 1, id = cartId)
-            bindCartCache()
+            val newCartItem = cartItem.copy(quantity = 1, id = cartId)
+            updateCartCacheItem(newCartItem)
         }, {})
     }
 
@@ -185,10 +209,14 @@ class GoodsViewModel(
         cartItem: CartItem,
     ) {
         cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity), {
-            cashedCartItems.replace(cartItem.goods.id, cartItem)
-            bindCartCache()
-        }, {
-        })
+            updateCartCacheItem(cartItem)
+        }, {})
+    }
+
+    private fun updateCartCacheItem(cartItem: CartItem) {
+        val currentCache = _cartCache.value?.toMutableMap() ?: mutableMapOf()
+        currentCache[cartItem.goods.id] = cartItem
+        _cartCache.value = currentCache
     }
 
     companion object {
