@@ -2,8 +2,8 @@ package woowacourse.shopping.data.network.response
 
 import woowacourse.shopping.domain.product.ProductSinglePage
 
-data class ProductPageEntity(
-    val products: List<ProductEntity>,
+data class ProductPageResponse(
+    val products: List<ProductResponse>,
     val hasNext: Boolean,
 ) {
     fun toDomain(): ProductSinglePage {

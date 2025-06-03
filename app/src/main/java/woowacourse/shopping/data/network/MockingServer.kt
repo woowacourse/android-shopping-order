@@ -6,8 +6,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import woowacourse.shopping.data.network.response.ProductEntity
-import woowacourse.shopping.data.network.response.ProductPageEntity
+import woowacourse.shopping.data.network.response.ProductResponse
+import woowacourse.shopping.data.network.response.ProductPageResponse
 import woowacourse.shopping.data.storage.ProductStorage
 
 class MockingServer {
@@ -15,7 +15,7 @@ class MockingServer {
     private val client = OkHttpClient()
     private val gson = Gson()
 
-    fun getProduct(productId: Long): ProductEntity {
+    fun getProduct(productId: Long): ProductResponse {
         val product = ProductStorage[productId]
         val json = gson.toJson(product)
         val path = "$BASE_PATH$productId"
@@ -25,7 +25,7 @@ class MockingServer {
         return parseProduct(responseBody)
     }
 
-    fun getProducts(productIds: List<Long>): List<ProductEntity> {
+    fun getProducts(productIds: List<Long>): List<ProductResponse> {
         val products = ProductStorage.getProductsById(productIds)
 
         val json = gson.toJson(products)
@@ -39,7 +39,7 @@ class MockingServer {
     fun singlePage(
         fromIndex: Int,
         toIndex: Int,
-    ): ProductPageEntity {
+    ): ProductPageResponse {
         val page = ProductStorage.singlePage(fromIndex, toIndex)
         val json = gson.toJson(page)
         val path = "$BASE_PATH?page=$fromIndex-$toIndex"
@@ -66,12 +66,12 @@ class MockingServer {
             ?: throw IllegalStateException("MockWebServer returned no body")
     }
 
-    private fun parseProduct(json: String) = gson.fromJson(json, ProductEntity::class.java)
+    private fun parseProduct(json: String) = gson.fromJson(json, ProductResponse::class.java)
 
-    private fun parseProductSinglePage(json: String) = gson.fromJson(json, ProductPageEntity::class.java)
+    private fun parseProductSinglePage(json: String) = gson.fromJson(json, ProductPageResponse::class.java)
 
-    private fun parseProductList(json: String): List<ProductEntity> {
-        val type = object : TypeToken<List<ProductEntity>>() {}.type
+    private fun parseProductList(json: String): List<ProductResponse> {
+        val type = object : TypeToken<List<ProductResponse>>() {}.type
         return gson.fromJson(json, type)
     }
 
