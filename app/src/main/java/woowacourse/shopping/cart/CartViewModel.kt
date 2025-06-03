@@ -34,6 +34,9 @@ class CartViewModel(
 
     private val selectedState: MutableMap<Int, Boolean> = mutableMapOf()
 
+    private val _isAllSelected = MutableLiveData<Boolean>(true)
+    val isAllSelected: LiveData<Boolean> = _isAllSelected
+
     private var isInitialLoad = true
 
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
@@ -112,21 +115,47 @@ class CartViewModel(
     }
 
     fun changeProductSelection(productUiModel: ProductUiModel) {
-        val items: MutableSet<ProductItem> = _cartProducts.value ?: return
+        val products: MutableSet<ProductItem> = cartProducts.value ?: return
         if (selectedState.contains(productUiModel.id)) {
             selectedState[productUiModel.id] = selectedState[productUiModel.id]?.not() ?: false
         } else {
             selectedState[productUiModel.id] = false
         }
-        items.removeIf { productUiModel.id == it.productItem.id }
-        items.add(
+        products.removeIf { productUiModel.id == it.productItem.id }
+        products.add(
             ProductItem(
                 productUiModel.copy(
                     isChecked = selectedState[productUiModel.id] ?: false,
                 ),
             ),
         )
+        loadSelectAllState()
         _selectedEvent.postValue(Unit)
+    }
+
+    fun selectAll() {
+        val products: MutableSet<ProductItem> = cartProducts.value ?: return
+
+        if (isAllSelected.value == true) {
+            products.forEach { product ->
+                selectedState[product.productItem.id] = false
+            }
+        } else {
+            products.forEach { product ->
+                selectedState[product.productItem.id] = true
+            }
+        }
+        loadCartProducts()
+    }
+
+    fun loadSelectAllState() {
+        _isAllSelected.postValue(isAllProductsSelected())
+    }
+
+    private fun isAllProductsSelected(): Boolean {
+        val allProducts = cartProducts.value ?: return false
+        val result = allProducts.filter { it.productItem.isChecked }.size == allProducts.size
+        return result
     }
 
     private fun loadCartProducts() {
@@ -156,6 +185,7 @@ class CartViewModel(
                 _cartProducts.postValue(items)
                 updateTotalCount()
                 updateTotalPrice()
+                loadSelectAllState()
 
                 _loadingState.postValue(LoadingState.loaded())
                 isInitialLoad = false
@@ -175,7 +205,7 @@ class CartViewModel(
     }
 
     private fun updateTotalCount() {
-        val count = cartProducts.value?.size ?: 0
+        val count = cartProducts.value?.filter { it.productItem.isChecked }?.size ?: 0
         _totalCount.postValue(count)
     }
 }

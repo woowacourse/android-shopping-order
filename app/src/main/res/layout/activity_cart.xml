@@ -68,9 +68,10 @@
 
         <CheckBox
             android:id="@+id/checkbox_all_selection"
+            android:onClick="@{() -> vm.selectAll()}"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:checked="true"
+            android:checked="@{vm.isAllSelected}"
             android:layout_marginStart="@dimen/spacing_12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
