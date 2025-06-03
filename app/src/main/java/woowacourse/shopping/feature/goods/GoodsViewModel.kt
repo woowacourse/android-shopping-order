@@ -12,6 +12,7 @@ import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.feature.model.GoodsItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -27,7 +28,7 @@ class GoodsViewModel(
 
     private val products = MutableLiveData<List<Cart>>()
 
-    private val histories = MutableLiveData<List<Cart>>()
+    private val histories = MutableLiveData<List<History>>()
 
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
@@ -145,13 +146,10 @@ class GoodsViewModel(
         }
     }
 
-    fun findCartFromHistory(cart: Cart) {
-        val cart =
-            _items.value
-                ?.filterIsInstance<Cart>()
-                ?.find { it.product.id == cart.product.id }
-        if (cart != null) {
-            _navigateToCart.setValue(cart)
+    fun findCartFromHistory(history: History) {
+        val product = _items.value?.filterIsInstance<GoodsItem.Product>()?.find { it.cart.product.id == history.id }
+        if (product != null) {
+            _navigateToCart.setValue(product.cart)
         }
     }
 

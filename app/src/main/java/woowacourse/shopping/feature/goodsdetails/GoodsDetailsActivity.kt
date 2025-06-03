@@ -60,7 +60,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private fun navigateToLastViewed() {
         viewModel.navigateToLastViewedCart.observe(this) { lastViewedCart ->
             lastViewedCart.let {
-                val intent = newIntent(this@GoodsDetailsActivity, it.product.id.toLong())
+                val intent = newIntent(this@GoodsDetailsActivity, it.id.toLong())
                 startActivity(intent)
                 finish()
             }

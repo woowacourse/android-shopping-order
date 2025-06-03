@@ -8,8 +8,6 @@ import androidx.room.PrimaryKey
 data class HistoryEntity(
     @PrimaryKey val id: Long,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "price") val price: Int,
     @ColumnInfo(name = "image_url") val imageUrl: String,
-    @ColumnInfo(name = "quantity") val quantity: Int,
     @ColumnInfo(name = "timestamp") val timestamp: Long = System.currentTimeMillis(),
 )

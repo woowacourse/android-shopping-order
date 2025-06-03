@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.goodsdetails
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +9,7 @@ import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -22,16 +22,16 @@ class GoodsDetailsViewModel(
 ) : ViewModel() {
     private val _cart = MutableLiveData<Cart>()
     val cart: LiveData<Cart> get() = _cart
-    private val _lastViewed = MutableLiveData<Cart>()
-    val lastViewed: LiveData<Cart> get() = _lastViewed
+    private val _lastViewed = MutableLiveData<History>()
+    val lastViewed: LiveData<History> get() = _lastViewed
     private val _isLastViewedVisible = MutableLiveData<Boolean>()
     val isLastViewedVisible: LiveData<Boolean> get() = _isLastViewedVisible
     private val _isSuccess = MutableSingleLiveData<Unit>()
     val isSuccess: SingleLiveData<Unit> get() = _isSuccess
     private val _isFail = MutableSingleLiveData<Unit>()
     val isFail: SingleLiveData<Unit> get() = _isFail
-    private val _navigateToLastViewedCart = MutableSingleLiveData<Cart>()
-    val navigateToLastViewedCart: SingleLiveData<Cart> get() = _navigateToLastViewedCart
+    private val _navigateToLastViewedCart = MutableSingleLiveData<History>()
+    val navigateToLastViewedCart: SingleLiveData<History> get() = _navigateToLastViewedCart
 
     fun setInitialCart(id: Long) {
         loadProductDetails(productId = id)
@@ -90,25 +90,6 @@ class GoodsDetailsViewModel(
         }
     }
 
-    fun commitCart2() {
-        runCatching {
-            _cart.value?.let { it ->
-                cartRepository.updateCart(it.id, CartQuantity(it.quantity)) { result ->
-                    result
-                        .onSuccess {
-                            insertToHistory(cart.value as Cart)
-                        }.onFailure { error ->
-                            Log.e("commitCartError", "$error")
-                        }
-                }
-            }
-        }.onSuccess {
-            _isSuccess.setValue(Unit)
-        }.onFailure {
-            _isFail.setValue(Unit)
-        }
-    }
-
     fun commitCart() {
         if (cart.value != null) {
             val newQuantity = cart.value?.quantity ?: 0
@@ -155,7 +136,7 @@ class GoodsDetailsViewModel(
     }
 
     fun updateLastViewedVisibility() {
-        val lastName = _lastViewed.value?.product?.name
+        val lastName = _lastViewed.value?.name
         val currentName = cart.value?.product?.name
         _isLastViewedVisible.postValue(lastName != null && currentName != null && lastName != currentName)
     }
@@ -178,17 +159,7 @@ class GoodsDetailsViewModel(
 
     private fun insertToHistory(cart: Cart) {
         historyRepository.insert(
-            Cart(
-                cart.id,
-                Product(
-                    cart.product.id,
-                    cart.product.name,
-                    cart.product.price,
-                    cart.product.imageUrl,
-                    "",
-                ),
-                cart.quantity,
-            ),
+            History(cart.id, cart.product.name, cart.product.imageUrl),
         )
     }
 }
