@@ -39,12 +39,10 @@ class CatalogViewModel(
     private val _catalogProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val catalogProducts: LiveData<Products> get() = _catalogProducts
 
-    private val _historyProducts: MutableLiveData<List<HistoryProduct>> =
-        MutableLiveData(emptyList())
+    private val _historyProducts: MutableLiveData<List<HistoryProduct>> = MutableLiveData(emptyList())
     val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
 
-    private val _cartProductsQuantity: MutableLiveData<Int> =
-        MutableLiveData(INITIAL_PRODUCT_QUANTITY)
+    private val _cartProductsQuantity: MutableLiveData<Int> = MutableLiveData(INITIAL_PRODUCT_QUANTITY)
     val cartProductsQuantity: LiveData<Int> get() = _cartProductsQuantity
 
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)

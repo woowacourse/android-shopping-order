@@ -28,8 +28,7 @@ class ProductDetailViewModel(
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
 ) : ViewModel() {
-    private val _product: MutableLiveData<Product> =
-        MutableLiveData(EMPTY_PRODUCT)
+    private val _product: MutableLiveData<Product> = MutableLiveData(EMPTY_PRODUCT)
     val product: LiveData<Product> get() = _product
 
     private val _lastHistoryProduct: MutableLiveData<HistoryProduct?> = MutableLiveData(null)
