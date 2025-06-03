@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="product"
+            type="woowacourse.shopping.presentation.product.catalog.ProductUiModel" />
+
+        <variable
+            name="handler"
+            type="woowacourse.shopping.presentation.product.ProductQuantityHandler" />
+
+        <variable
+            name="onQuantityClick"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="154dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp">
+
+        <ImageView
+            android:id="@+id/imageView_product"
+            android:layout_width="match_parent"
+            android:layout_height="154dp"
+            android:contentDescription="@string/text_product_image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/iced_americano"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:loadImage="@{product.imageUrl}" />
+
+        <include
+            android:id="@+id/layout_recommend_quantity_selector"
+            layout="@layout/product_count_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="@{product.quantity > 0 ? View.VISIBLE : View.GONE}"
+            app:handler="@{handler}"
+            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:product="@{product}" />
+
+        <include
+            app:onClick="@{onQuantityClick}"
+            android:id="@+id/layout_recommend_button_open_quantity_selector"
+            layout="@layout/product_count_open_item"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="13dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="@{product.quantity > 0 ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/imageView_product"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:product="@{product}" />
+
+        <TextView
+            android:id="@+id/textView_recommend_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{product.name}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView_product"
+            tools:text="아이스 카페 아메리카노" />
+
+        <TextView
+            android:id="@+id/textView_recommend_product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="@{@string/format_price(product.price)}"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView_recommend_product_name"
+            tools:text="10,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
