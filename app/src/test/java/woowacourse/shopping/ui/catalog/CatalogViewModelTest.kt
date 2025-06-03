@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
-import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
+import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
@@ -31,7 +31,7 @@ import woowacourse.shopping.util.setUpTestLiveData
 class CatalogViewModelTest {
     private lateinit var getCatalogProductsUseCase: GetCatalogProductsUseCase
     private lateinit var getCatalogProductUseCase: GetCatalogProductUseCase
-    private lateinit var getCatalogProductsByIdsUseCase: GetCatalogProductsByIdsUseCase
+    private lateinit var getCatalogProductsByProductIdsUseCase: GetCatalogProductsByProductIdsUseCase
     private lateinit var getSearchHistoryUseCase: GetSearchHistoryUseCase
     private lateinit var increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase
     private lateinit var decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase
@@ -41,7 +41,7 @@ class CatalogViewModelTest {
     fun setup() {
         getCatalogProductsUseCase = mockk()
         getCatalogProductUseCase = mockk()
-        getCatalogProductsByIdsUseCase = mockk()
+        getCatalogProductsByProductIdsUseCase = mockk()
         getSearchHistoryUseCase = mockk()
         increaseCartProductQuantityUseCase = mockk()
         decreaseCartProductQuantityUseCase = mockk()
@@ -56,7 +56,7 @@ class CatalogViewModelTest {
             CatalogViewModel(
                 getCatalogProductsUseCase,
                 getCatalogProductUseCase,
-                getCatalogProductsByIdsUseCase,
+                getCatalogProductsByProductIdsUseCase,
                 getSearchHistoryUseCase,
                 increaseCartProductQuantityUseCase,
                 decreaseCartProductQuantityUseCase,
@@ -179,13 +179,13 @@ class CatalogViewModelTest {
         val updatedProducts = listOf(DUMMY_CATALOG_PRODUCT_1.copy(quantity = 6))
 
         every {
-            getCatalogProductsByIdsUseCase.invoke(any(), any())
+            getCatalogProductsByProductIdsUseCase.invoke(any(), any())
         } answers {
             secondArg<(List<Product>) -> Unit>().invoke(updatedProducts)
         }
 
         // when
-        viewModel.loadCartProductsByIds(listOf(DUMMY_PRODUCT_Detail_1.id))
+        viewModel.loadCartProductsByProductIds(listOf(DUMMY_PRODUCT_Detail_1.id))
 
         // then
         val result = viewModel.products.getOrAwaitValue()

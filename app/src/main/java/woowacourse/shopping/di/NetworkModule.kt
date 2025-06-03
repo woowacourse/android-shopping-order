@@ -15,16 +15,7 @@ object NetworkModule {
         OkHttpClient
             .Builder()
             .addInterceptor(
-                ShoppingAuthInterceptor(
-                    authSharedPreference.getAuthUsername()
-                        ?: BuildConfig.DEFAULT_USERNAME.apply {
-                            authSharedPreference.putAuthId(this)
-                        },
-                    authSharedPreference.getAuthPassword()
-                        ?: BuildConfig.DEFAULT_PASSWORD.apply {
-                            authSharedPreference.putAuthPassword(this)
-                        },
-                ),
+                ShoppingAuthInterceptor(authSharedPreference),
             ).build()
     }
 
