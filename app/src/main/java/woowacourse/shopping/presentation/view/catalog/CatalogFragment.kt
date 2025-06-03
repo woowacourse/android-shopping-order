@@ -11,7 +11,6 @@ import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.custom.GridSpacingItemDecoration
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.CartFragment
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
@@ -19,9 +18,8 @@ import woowacourse.shopping.presentation.view.detail.DetailFragment
 
 class CatalogFragment :
     BaseFragment<FragmentCatalogBinding>(R.layout.fragment_catalog),
-    CatalogAdapter.CatalogEventListener,
-    ItemCounterListener {
-    private val catalogAdapter: CatalogAdapter by lazy { CatalogAdapter(eventListener = this) }
+    CatalogAdapter.CatalogEventListener {
+    private val catalogAdapter: CatalogAdapter by lazy { CatalogAdapter(eventListener = this, itemCounterListener = viewModel) }
     private val viewModel: CatalogViewModel by viewModels { CatalogViewModel.Factory }
 
     override fun onViewCreated(
@@ -30,14 +28,13 @@ class CatalogFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        parentFragmentManager.setFragmentResultListener("cart_update_result", viewLifecycleOwner) { _, _ ->
+            viewModel.refreshCartState()
+        }
+
         initObserver()
         initListener()
         setCatalogAdapter()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshCartState()
     }
 
     override fun onProductClicked(product: ProductUiModel) {
@@ -51,14 +48,6 @@ class CatalogFragment :
 
     override fun onInitialAddToCartClicked(product: ProductUiModel) {
         viewModel.initialAddToCart(product)
-    }
-
-    override fun increase(product: ProductUiModel) {
-        viewModel.increaseCartItem(product)
-    }
-
-    override fun decrease(product: ProductUiModel) {
-        viewModel.decreaseCartItem(product)
     }
 
     private fun setCatalogAdapter() {
@@ -100,18 +89,13 @@ class CatalogFragment :
         }
 
         viewModel.items.observe(viewLifecycleOwner) { products ->
-            catalogAdapter.updateProducts(products)
+            catalogAdapter.submitList(products)
         }
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
-            catalogAdapter.updateItem(it)
+        viewModel.deleteState.observe(viewLifecycleOwner) {
+            catalogAdapter.removeItemAmount(it)
         }
-        viewModel.totalCartCount.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.textViewCartTotalAmount.visibility = View.GONE
-            } else {
-                binding.textViewCartTotalAmount.visibility = View.VISIBLE
-            }
-            binding.textViewCartTotalAmount.text = it.toString()
+        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { updatedProduct ->
+            catalogAdapter.updateItem(updatedProduct)
         }
     }
 

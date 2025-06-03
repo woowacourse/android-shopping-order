@@ -60,6 +60,8 @@ class CartFragment :
     }
 
     private fun navigateBack() {
+        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
             remove(this@CartFragment)

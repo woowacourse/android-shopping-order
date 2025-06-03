@@ -42,7 +42,7 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
 
     private fun initObserver() {
         viewModel.saveState.observe(viewLifecycleOwner) {
-            it?.let { navigateToScreen() }
+            it?.let { navigateToCatalog() }
         }
 
         viewModel.amount.observe(viewLifecycleOwner) {
@@ -65,7 +65,9 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
         }
     }
 
-    private fun navigateToScreen() {
+    private fun navigateToCatalog() {
+        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+
         parentFragmentManager.commit {
             setReorderingAllowed(true)
             replace(R.id.shopping_fragment_container, CartFragment::class.java, null)
