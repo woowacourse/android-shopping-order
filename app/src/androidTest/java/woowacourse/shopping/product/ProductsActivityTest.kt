@@ -7,21 +7,13 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.product.remote.service.ProductService
-import woowacourse.shopping.data.product.repository.DefaultProductsRepository
-import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
-import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.fixture.FakeApiClient
-import woowacourse.shopping.fixture.MockProductDispatcher
-import woowacourse.shopping.fixture.MockShoppingCartDispatcher
 import woowacourse.shopping.fixture.page1
 import woowacourse.shopping.matcher.RecyclerViewMatcher.Companion.withRecyclerView
 import woowacourse.shopping.matcher.isDisplayed
@@ -31,6 +23,7 @@ import woowacourse.shopping.matcher.matchText
 import woowacourse.shopping.matcher.performClick
 import woowacourse.shopping.matcher.scrollToPosition
 import woowacourse.shopping.matcher.sizeGreaterThan
+import woowacourse.shopping.rule.MockServerRule
 import woowacourse.shopping.view.product.ProductsActivity
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
@@ -38,46 +31,23 @@ import kotlin.concurrent.thread
 @Suppress("FunctionName")
 @RunWith(AndroidJUnit4::class)
 class ProductsActivityTest {
-    private val mockProductServer = MockWebServer()
-    private val mockShoppingCartServer = MockWebServer()
-
     private val mainActivityScenario = ActivityScenario.launch(ProductsActivity::class.java)
-    private val shoppingCartService
-        get() =
-            FakeApiClient.getApiClient(
-                mockShoppingCartServer.url("/").toString(),
-            ).create(ShoppingCartService::class.java)
-    private val productService
-        get() =
-            FakeApiClient.getApiClient(
-                mockProductServer.url("/").toString(),
-            ).create(ProductService::class.java)
+
+    @Rule
+    @JvmField
+    val mockServerRule = MockServerRule(mainActivityScenario)
 
     @Before
     fun setUp() {
-        mockProductServer.dispatcher =
-            MockProductDispatcher(
-                mockProductServer.url("/"),
-            ).dispatcher
-        mockShoppingCartServer.dispatcher =
-            MockShoppingCartDispatcher(
-                mockShoppingCartServer.url("/"),
-            ).dispatcher
-
-        mainActivityScenario.onActivity { activity ->
-            val app = activity.application as ShoppingApplication
-            DefaultShoppingCartRepository.initialize(shoppingCartService)
-            DefaultProductsRepository.initialize(
-                app.productDatabase.recentWatchingDao(),
-                productService,
-            )
-            activity.viewModelStore.clear()
+        mainActivityScenario.onActivity {
+            it.viewModelStore.clear()
         }
         mainActivityScenario.recreate()
     }
 
     @Test
     fun 상품의_목록이_표시된다() {
+        mainActivityScenario.recreate()
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -101,11 +71,15 @@ class ProductsActivityTest {
     @Test
     fun 상품의_목록은_20개_단위로_표시된다() {
         // 최근 본 상품, 더보기 버튼 각각 +1 해서 총 22
+        mainActivityScenario.recreate()
+
         onView(withId(R.id.products)).check(matchSize(22))
     }
 
     @Test
     fun 더보기_버튼을_눌러서_상품을_추가_로드할_수_있다() {
+        mainActivityScenario.recreate()
+
         onView(withId(R.id.products)).perform(scrollToPosition(21))
         Thread.sleep(1000)
         onView(withId(R.id.productsMoreButton)).performClick()
@@ -114,6 +88,8 @@ class ProductsActivityTest {
 
     @Test
     fun 상품의_이름이_너무_길_경우_말줄임표로_표시된다() {
+        mainActivityScenario.recreate()
+
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -124,6 +100,8 @@ class ProductsActivityTest {
 
     @Test
     fun 상품을_클릭하면_상품_상세_화면으로_이동된다() {
+        mainActivityScenario.recreate()
+
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -135,6 +113,8 @@ class ProductsActivityTest {
 
     @Test
     fun 수량을_변경하면_현재_수량_정보가_장바구니에_반영된다() {
+        mainActivityScenario.recreate()
+
         // given
         // 기존 수량 : 1
 
@@ -150,8 +130,8 @@ class ProductsActivityTest {
         // then
         val requests =
             buildList {
-                repeat(mockShoppingCartServer.requestCount) {
-                    add(mockShoppingCartServer.takeRequest())
+                repeat(mockServerRule.mockShoppingCartServer.requestCount) {
+                    add(mockServerRule.mockShoppingCartServer.takeRequest())
                 }
             }
 
@@ -178,6 +158,8 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_목록에서_플러스_버튼_클릭_시_뱃지_카운트가_증가한다() {
+        mainActivityScenario.recreate()
+
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
                 1,
@@ -194,6 +176,8 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_목록에서_수량을_변경하면_상품을_다시_로딩한다() {
+        mainActivityScenario.recreate()
+
         // given
         // 1번째 상품의 수량 : 1
 
@@ -209,8 +193,8 @@ class ProductsActivityTest {
         // then
         val requests =
             buildList {
-                repeat(mockProductServer.requestCount) {
-                    add(mockProductServer.takeRequest())
+                repeat(mockServerRule.mockProductServer.requestCount) {
+                    add(mockServerRule.mockProductServer.takeRequest())
                 }
             }
 
@@ -225,6 +209,8 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_목록에서_수량이_0일_경우_수량_선택_버튼이_아닌_플러스_버튼만_제공된다() {
+        mainActivityScenario.recreate()
+
         // given
         // 3번째 상품의 수량은 0
 
@@ -239,6 +225,8 @@ class ProductsActivityTest {
 
     @Test
     fun 최근_본_상품의_목록이_나타난다() {
+        mainActivityScenario.recreate()
+
         // given
         onView(
             withRecyclerView(R.id.products).atPositionOnView(
@@ -263,6 +251,8 @@ class ProductsActivityTest {
 
     @Test
     fun 최근_본_상품_목록이_10개가_넘어가면_맨_나중에_있는_아이템이_삭제된다() {
+        mainActivityScenario.recreate()
+
         // given - when
         for (i in 1..11) {
             onView(withId(R.id.products))
@@ -290,6 +280,8 @@ class ProductsActivityTest {
 
     @Test
     fun 최근_본_상품에_있는_상품을_클릭하면_맨_앞으로_아이템이_이동한다() {
+        mainActivityScenario.recreate()
+
         // given
         for (i in 1..5) {
             onView(withId(R.id.products))
@@ -333,11 +325,11 @@ class ProductsActivityTest {
 
     @Test
     fun 상품_로딩_전_스켈레톤_UI_를_보여준다() {
+        mainActivityScenario.recreate()
+
         mainActivityScenario.onActivity {
             thread {
-                // 왜안바껴시발
-                val delayServer = MockWebServer()
-                delayServer.dispatcher =
+                mockServerRule.mockProductServer.dispatcher =
                     object : Dispatcher() {
                         override fun dispatch(request: RecordedRequest): MockResponse {
                             return MockResponse()
@@ -346,14 +338,7 @@ class ProductsActivityTest {
                                 .setBodyDelay(2000, TimeUnit.MILLISECONDS)
                         }
                     }
-                val app = it.application as ShoppingApplication
-                val productService =
-                    FakeApiClient.getApiClient(delayServer.url("/").toString())
-                        .create(ProductService::class.java)
-                DefaultProductsRepository.initialize(
-                    app.productDatabase.recentWatchingDao(),
-                    productService,
-                )
+                it.viewModelStore.clear()
             }.join()
         }
         mainActivityScenario.recreate()
