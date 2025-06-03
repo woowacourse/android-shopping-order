@@ -1,12 +1,9 @@
 package woowacourse.shopping.presentation.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 
-@Parcelize
 data class ProductUiModel(
     val cartId: Long = 0L,
     val id: Long,
@@ -15,7 +12,7 @@ data class ProductUiModel(
     val imageUrl: String,
     val price: Int,
     val quantity: Int = 0,
-) : Parcelable
+)
 
 fun Product.toProductUiModel() =
     ProductUiModel(
