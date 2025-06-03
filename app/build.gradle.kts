@@ -91,6 +91,10 @@ dependencies {
     // shimmer
     implementation(libs.shimmer)
 
+    // coroutine
+    implementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
