@@ -14,7 +14,9 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 import woowacourse.shopping.product.catalog.QuantityControlListener
 
 class CartSelectionFragment : Fragment() {
-    private lateinit var binding: FragmentCartSelectionBinding
+    @Suppress("ktlint:standard:backing-property-naming")
+    private var _binding: FragmentCartSelectionBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: CartViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
@@ -22,9 +24,9 @@ class CartSelectionFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding =
+        _binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_cart_selection, container, false)
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         setCartProductAdapter()
         observeCartViewModel()
         return binding.root

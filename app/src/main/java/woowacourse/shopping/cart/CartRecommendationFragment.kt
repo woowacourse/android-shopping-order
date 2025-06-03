@@ -18,7 +18,9 @@ import woowacourse.shopping.product.catalog.QuantityControlListener
 import woowacourse.shopping.product.detail.DetailActivity
 
 class CartRecommendationFragment : Fragment() {
-    private lateinit var binding: FragmentCartRecommendationBinding
+    @Suppress("ktlint:standard:backing-property-naming")
+    private var _binding: FragmentCartRecommendationBinding? = null
+    private val binding get() = _binding!!
     private val cartViewModel: CartViewModel by activityViewModels {
         CartViewModelFactory(requireActivity().application as ShoppingApplication)
     }
@@ -28,14 +30,14 @@ class CartRecommendationFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        binding =
+        _binding =
             DataBindingUtil.inflate(
                 inflater,
                 R.layout.fragment_cart_recommendation,
                 container,
                 false,
             )
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         setProductAdapter()
         observeCartViewModel()
         return binding.root
@@ -80,5 +82,10 @@ class CartRecommendationFragment : Fragment() {
         cartViewModel.updatedProduct.observe(viewLifecycleOwner) { product ->
             recommendProductAdapter.updateItem(product)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
