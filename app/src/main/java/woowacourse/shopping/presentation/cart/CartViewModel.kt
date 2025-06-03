@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
@@ -17,11 +18,26 @@ class CartViewModel(
     val uiState: LiveData<ResultState<Unit>> = _uiState
     private val _cartItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val cartItems: LiveData<List<CartItemUiModel>> = _cartItems
-    private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    private val _selectedTotalPrice: MediatorLiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            addSource(_cartItems) { cartItems ->
+                value = cartItems?.filter { it.isSelected }?.sumOf { it.totalPrice } ?: 0
+            }
+        }
     val selectedTotalPrice: LiveData<Int> = _selectedTotalPrice
-    private val _selectedTotalCount: MutableLiveData<Int> = MutableLiveData(0)
+    private val _selectedTotalCount: MediatorLiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            addSource(_cartItems) { cartItems ->
+                value = cartItems?.filter { it.isSelected }?.sumOf { it.quantity } ?: 0
+            }
+        }
     val selectedTotalCount: LiveData<Int> = _selectedTotalCount
-    private val _isCheckAll: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _isCheckAll: MediatorLiveData<Boolean> =
+        MediatorLiveData<Boolean>().apply {
+            addSource(_cartItems) { cartItems ->
+                value = cartItems?.all { it.isSelected } ?: false
+            }
+        }
     val isCheckAll: LiveData<Boolean> = _isCheckAll
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
@@ -48,13 +64,6 @@ class CartViewModel(
                     _toastMessage.postValue(R.string.cart_toast_load_fail)
                 }
         }
-    }
-
-    fun fetchSelectedInfo() {
-        val checkedItem = cartItems.value?.filter { it.isSelected } ?: return
-        allCheckOrUnchecked()
-        _selectedTotalCount.postValue(checkedItem.sumOf { it.quantity })
-        _selectedTotalPrice.postValue(checkedItem.sumOf { it.totalPrice })
     }
 
     fun deleteProduct(cartItem: CartItemUiModel) {
@@ -104,13 +113,6 @@ class CartViewModel(
             _cartItems.value?.map { if (it.id == cartId) it.copy(isSelected = !it.isSelected) else it }
                 ?: return
         _cartItems.postValue(newCartItems)
-
-        fetchSelectedInfo()
-    }
-
-    private fun allCheckOrUnchecked() {
-        val isAllSelected = _cartItems.value?.all { it.isSelected } ?: false
-        _isCheckAll.value = isAllSelected
     }
 
     private fun updateQuantity(
@@ -130,13 +132,11 @@ class CartViewModel(
                 }
             }
         _cartItems.postValue(updatedItem)
-        fetchSelectedInfo()
     }
 
     fun toggleItemCheckAll() {
         val currentCheckState = _isCheckAll.value ?: return
         val toggledState = !currentCheckState
-        _isCheckAll.value = toggledState
         _cartItems.value = _cartItems.value?.map { it.copy(isSelected = toggledState) }.orEmpty()
     }
 }

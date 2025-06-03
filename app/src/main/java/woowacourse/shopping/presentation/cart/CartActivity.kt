@@ -51,7 +51,6 @@ class CartActivity :
     override fun onStart() {
         super.onStart()
         viewModel.loadItems()
-        viewModel.fetchSelectedInfo()
     }
 
     private fun initInsets() {
@@ -102,7 +101,6 @@ class CartActivity :
                 showSkeleton(false)
             }, 1_000L)
             cartAdapter.submitList(cartItems)
-            viewModel.fetchSelectedInfo()
         }
 
         viewModel.toastMessage.observe(this) { resId ->
