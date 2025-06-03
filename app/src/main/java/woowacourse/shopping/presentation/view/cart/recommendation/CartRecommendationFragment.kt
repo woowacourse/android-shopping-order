@@ -41,7 +41,7 @@ class CartRecommendationFragment :
 
     private fun initObserver() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            recommendationAdapter.updateRecommendedProducts(products)
+            recommendationAdapter.submitList(products)
         }
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { product ->
             recommendationAdapter.updateItem(product)
@@ -51,7 +51,7 @@ class CartRecommendationFragment :
     private fun initRecommendationAdapter() {
         binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
         viewModel.recommendedProducts.observe(viewLifecycleOwner) {
-            recommendationAdapter.updateRecommendedProducts(it)
+            recommendationAdapter.submitList(it)
         }
     }
 
