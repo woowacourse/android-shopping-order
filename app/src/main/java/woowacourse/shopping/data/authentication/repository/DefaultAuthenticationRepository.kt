@@ -1,34 +1,28 @@
 package woowacourse.shopping.data.authentication.repository
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import woowacourse.shopping.data.authentication.dataSource.AuthenticationLocalDataSource
 import woowacourse.shopping.data.authentication.model.UserAuthentication
 
 class DefaultAuthenticationRepository(
-    private val authDataSource: SharedPreferences,
+    val authenticationLocalDataSource: AuthenticationLocalDataSource,
 ) : AuthenticationRepository {
-    override var id: String
-        get() = authDataSource.getString(USER_ID_KEY, "").orEmpty()
-        private set(value) = authDataSource.edit { putString(USER_ID_KEY, value) }
-
-    override var password: String
-        get() = authDataSource.getString(USER_PASSWORD_KEY, "").orEmpty()
-        private set(value) = authDataSource.edit { putString(USER_PASSWORD_KEY, value) }
+    override val id: String
+        get() = authenticationLocalDataSource.id
+    override val password: String
+        get() = authenticationLocalDataSource.password
 
     override fun updateUserAuthentication(userAuthentication: UserAuthentication) {
-        this.id = userAuthentication.id
-        this.password = userAuthentication.password
+        authenticationLocalDataSource.updateId(userAuthentication.id)
+        authenticationLocalDataSource.updatePassword(userAuthentication.password)
     }
 
     companion object {
-        private const val USER_ID_KEY = "id"
-        private const val USER_PASSWORD_KEY = "password"
-
         private var instance: AuthenticationRepository? = null
 
-        fun initialize(authDataStore: SharedPreferences) {
+        fun initialize(authenticationLocalDataSource: AuthenticationLocalDataSource) {
             if (instance == null) {
-                instance = DefaultAuthenticationRepository(authDataSource = authDataStore)
+                instance =
+                    DefaultAuthenticationRepository(authenticationLocalDataSource = authenticationLocalDataSource)
             }
         }
 

@@ -1,47 +1,22 @@
 package woowacourse.shopping.data.shoppingCart.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import woowacourse.shopping.data.shoppingCart.remote.dto.CartCountsResponseDto
+import woowacourse.shopping.data.shoppingCart.datasource.ShoppingCartRemoteDataSource
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemQuantityRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
-import woowacourse.shopping.data.shoppingCart.remote.dto.ShoppingCartItemsResponseDto
-import woowacourse.shopping.data.shoppingCart.remote.service.ShoppingCartService
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 
 class DefaultShoppingCartRepository(
-    private val shoppingCartService: ShoppingCartService,
+    private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ShoppingCartRepository {
     override fun load(
         page: Int,
         size: Int,
         onResult: (Result<ShoppingCarts>) -> Unit,
     ) {
-        shoppingCartService
-            .getCartItems(page, size)
-            .enqueue(
-                object : Callback<ShoppingCartItemsResponseDto> {
-                    override fun onResponse(
-                        call: Call<ShoppingCartItemsResponseDto>,
-                        response: Response<ShoppingCartItemsResponseDto>,
-                    ) {
-                        onResult(
-                            Result.success(
-                                response.body()?.toDomain() ?: ShoppingCarts(false, emptyList()),
-                            ),
-                        )
-                    }
-
-                    override fun onFailure(
-                        call: Call<ShoppingCartItemsResponseDto>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
+        shoppingCartRemoteDataSource.getCartItems(page, size) { result ->
+            onResult(result.mapCatching { it?.toDomain() ?: ShoppingCarts(false, emptyList()) })
+        }
     }
 
     override fun add(
@@ -49,29 +24,14 @@ class DefaultShoppingCartRepository(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        shoppingCartService
-            .postCartItem(
-                CartItemRequestDto(
-                    productId = product.id,
-                    quantity = quantity,
-                ),
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        onResult(Result.success(Unit))
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
+        shoppingCartRemoteDataSource.saveCartItem(
+            CartItemRequestDto(
+                productId = product.id,
+                quantity = quantity,
+            ),
+        ) { result ->
+            onResult(result.mapCatching { it })
+        }
     }
 
     override fun increaseQuantity(
@@ -97,83 +57,33 @@ class DefaultShoppingCartRepository(
         onResult: (Result<Unit>) -> Unit,
     ) {
         val requestDto = CartItemQuantityRequestDto(quantity = quantity)
-        shoppingCartService
-            .updateCartItemQuantity(
-                shoppingCartId = shoppingCartId,
-                cartItemQuantityRequestDto = requestDto,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        onResult(Result.success(Unit))
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
+        shoppingCartRemoteDataSource.updateCartItemQuantity(shoppingCartId, requestDto) { result ->
+            onResult(result.mapCatching { it })
+        }
     }
 
     override fun remove(
         shoppingCartId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        shoppingCartService.deleteCartItem(shoppingCartId).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit?>,
-                    response: Response<Unit?>,
-                ) {
-                    if (response.isSuccessful) {
-                        onResult(Result.success(Unit))
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<Unit?>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+        shoppingCartRemoteDataSource.deleteCartItem(shoppingCartId) { result ->
+            onResult(result.mapCatching { it })
+        }
     }
 
     override fun fetchAllQuantity(onResult: (Result<Int>) -> Unit) {
-        shoppingCartService.getCartCounts().enqueue(
-            object : Callback<CartCountsResponseDto> {
-                override fun onResponse(
-                    call: Call<CartCountsResponseDto?>,
-                    response: Response<CartCountsResponseDto?>,
-                ) {
-                    onResult(Result.success(response.body()?.quantity ?: 0))
-                }
-
-                override fun onFailure(
-                    call: Call<CartCountsResponseDto?>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+        shoppingCartRemoteDataSource.getCartCounts { result ->
+            onResult(result.mapCatching { it?.quantity ?: 0 })
+        }
     }
 
     companion object {
         private var instance: ShoppingCartRepository? = null
 
-        fun initialize(shoppingCartService: ShoppingCartService) {
+        fun initialize(shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource) {
             if (instance == null) {
                 instance =
-                    DefaultShoppingCartRepository(
-                        shoppingCartService = shoppingCartService,
-                    )
+                    DefaultShoppingCartRepository(shoppingCartRemoteDataSource = shoppingCartRemoteDataSource)
             }
         }
 

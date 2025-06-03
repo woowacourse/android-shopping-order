@@ -44,7 +44,7 @@ class ProductsViewModel(
         val limit = LOAD_PRODUCTS_SIZE + 1
         val currentProducts: List<ProductsItem> = _products.value ?: emptyList()
 
-        productsRepository.load(offset, limit) { result ->
+        productsRepository.getProducts(offset, limit) { result ->
             result
                 .onSuccess { newProducts ->
                     loadable = newProducts.size == LOAD_PRODUCTS_SIZE + 1

@@ -23,7 +23,7 @@ interface ShoppingCartService {
     ): Call<Unit>
 
     @PATCH("cart-items/{id}")
-    fun updateCartItemQuantity(
+    fun patchCartItem(
         @Path("id") shoppingCartId: Long,
         @Body cartItemQuantityRequestDto: CartItemQuantityRequestDto,
     ): Call<Unit>
