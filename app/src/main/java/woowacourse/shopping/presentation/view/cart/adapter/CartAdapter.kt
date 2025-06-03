@@ -3,10 +3,11 @@ package woowacourse.shopping.presentation.view.cart.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CartProductUiModel
+import woowacourse.shopping.presentation.model.DisplayModel
 import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
 
 class CartAdapter(
-    initialProducts: List<CartProductUiModel> = emptyList(),
+    initialProducts: List<DisplayModel<CartProductUiModel>> = emptyList(),
     private val eventListener: CartEventListener,
 ) : RecyclerView.Adapter<CartViewHolder>() {
     private val products = initialProducts.toMutableList()
@@ -25,17 +26,17 @@ class CartAdapter(
         holder.bind(products[position])
     }
 
-    fun updateItemsManually(newProducts: List<CartProductUiModel>) {
+    fun updateItemsManually(newProducts: List<DisplayModel<CartProductUiModel>>) {
         removeMissingItems(newProducts)
         updateChangedItems(newProducts)
         addNewItems(newProducts)
     }
 
-    private fun removeMissingItems(newProducts: List<CartProductUiModel>) {
+    private fun removeMissingItems(newProducts: List<DisplayModel<CartProductUiModel>>) {
         val iterator = products.listIterator()
         while (iterator.hasNext()) {
             val item = iterator.next()
-            if (newProducts.none { it.productId == item.productId }) {
+            if (newProducts.none { it.data.productId == item.data.productId }) {
                 val index = iterator.previousIndex()
                 iterator.remove()
                 notifyItemRemoved(index)
@@ -43,9 +44,9 @@ class CartAdapter(
         }
     }
 
-    private fun updateChangedItems(newProducts: List<CartProductUiModel>) {
+    private fun updateChangedItems(newProducts: List<DisplayModel<CartProductUiModel>>) {
         newProducts.forEach { newItem ->
-            val oldIndex = products.indexOfFirst { it.productId == newItem.productId }
+            val oldIndex = products.indexOfFirst { it.data.productId == newItem.data.productId }
             if (oldIndex != -1 && products[oldIndex] != newItem) {
                 products[oldIndex] = newItem
                 notifyItemChanged(oldIndex)
@@ -53,9 +54,9 @@ class CartAdapter(
         }
     }
 
-    private fun addNewItems(newProducts: List<CartProductUiModel>) {
+    private fun addNewItems(newProducts: List<DisplayModel<CartProductUiModel>>) {
         newProducts.forEach { newItem ->
-            val exists = products.any { it.productId == newItem.productId }
+            val exists = products.any { it.data.productId == newItem.data.productId }
             if (!exists) {
                 products.add(newItem)
                 notifyItemInserted(itemCount - 1)

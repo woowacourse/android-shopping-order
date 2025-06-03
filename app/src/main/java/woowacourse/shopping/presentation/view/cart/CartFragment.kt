@@ -53,7 +53,7 @@ class CartFragment :
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
+        viewModel.cartDisplayItems.observe(viewLifecycleOwner) { cartItems ->
             cartAdapter.updateItemsManually(cartItems)
         }
 

@@ -80,8 +80,8 @@ class OrderActivity :
         binding.viewOrder.buttonOrder.setOnClickListener {
             orderButtonHandler()
         }
-        binding.viewOrder.checkboxSelectAll.setOnCheckedChangeListener { _, checked ->
-            viewModel.selectCurrentPageCartProduct(checked)
+        binding.viewOrder.checkboxSelectAll.setOnClickListener {
+            viewModel.selectCurrentPageCartProduct()
         }
     }
 

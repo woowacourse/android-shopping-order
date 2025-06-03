@@ -10,6 +10,10 @@
             type="woowacourse.shopping.presentation.model.CartProductUiModel" />
 
         <variable
+            name="isSelected"
+            type="boolean" />
+
+        <variable
             name="eventListener"
             type="woowacourse.shopping.presentation.view.cart.adapter.CartAdapter.CartEventListener" />
 
@@ -41,7 +45,7 @@
             android:layout_marginEnd="12dp"
             android:background="@drawable/selector_checkbox"
             android:button="@null"
-            android:checked="@{cartItem.isSelected}"
+            android:checked="@{isSelected}"
             android:onClick="@{() -> eventListener.onCheckOrder(cartItem.cartId)}"
             app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
             app:layout_constraintEnd_toStartOf="@id/cart_item_name"

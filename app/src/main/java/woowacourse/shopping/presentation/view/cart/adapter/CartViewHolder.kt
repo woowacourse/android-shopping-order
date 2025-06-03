@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.model.CartProductUiModel
+import woowacourse.shopping.presentation.model.DisplayModel
 
 class CartViewHolder(
     private val binding: ItemCartBinding,
@@ -14,8 +15,9 @@ class CartViewHolder(
         binding.eventListener = eventListener
     }
 
-    fun bind(cartItem: CartProductUiModel) {
-        binding.cartItem = cartItem
+    fun bind(cartItem: DisplayModel<CartProductUiModel>) {
+        binding.cartItem = cartItem.data
+        binding.isSelected = cartItem.isSelected
     }
 
     companion object {

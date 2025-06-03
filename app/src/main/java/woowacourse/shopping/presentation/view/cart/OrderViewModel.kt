@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartProductUiModel
+import woowacourse.shopping.presentation.model.DisplayModel
 import woowacourse.shopping.presentation.model.FetchPageDirection
 import woowacourse.shopping.presentation.model.SuggestionProductUiModel
 import woowacourse.shopping.presentation.model.toCartItemUiModel
@@ -30,13 +31,25 @@ class OrderViewModel(
     private val _toastEvent = MutableSingleLiveData<CartMessageEvent>()
     val toastEvent: SingleLiveData<CartMessageEvent> = _toastEvent
 
-    private val _cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
-    val cartItems: LiveData<List<CartProductUiModel>> = _cartItems
-
-    private val _suggestionProducts = MutableLiveData<List<SuggestionProductUiModel>>(emptyList())
-    val suggestionProducts: LiveData<List<SuggestionProductUiModel>> = _suggestionProducts
-
+    private val cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     private val selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
+    val cartDisplayItems =
+        MediatorLiveData<List<DisplayModel<CartProductUiModel>>>().apply {
+            addSource(cartItems) { cartItems ->
+                val currentSelectedCartItems = selectedCartItems.value.orEmpty()
+                value = cartItems.map { DisplayModel(it, currentSelectedCartItems.contains(it)) }
+            }
+            addSource(selectedCartItems) { selectedCartItems ->
+                val currentCartItems = cartItems.value.orEmpty()
+                value = currentCartItems.map { DisplayModel(it, selectedCartItems.contains(it)) }
+            }
+        }
+
+    private val _suggestionProducts =
+        MutableLiveData<List<SuggestionProductUiModel>>(
+            emptyList(),
+        )
+    val suggestionProducts: LiveData<List<SuggestionProductUiModel>> = _suggestionProducts
 
     val totalPrice: LiveData<Int> =
         selectedCartItems.map { it.sumOf { cartProduct -> cartProduct.totalPrice } }
@@ -44,10 +57,15 @@ class OrderViewModel(
     val totalCount: LiveData<Int> =
         selectedCartItems.map { selectedCartItems -> selectedCartItems.sumOf { it.quantity } }
 
+    private val _isCheckAll = MutableLiveData<Boolean>()
     val isCheckAll: LiveData<Boolean> =
         MediatorLiveData<Boolean>().apply {
-            addSource(_cartItems) { updateCheckBoxChecked() }
-            addSource(selectedCartItems) { updateCheckBoxChecked() }
+            addSource(selectedCartItems) { selectedCartItems ->
+                value = selectedCartItems.size == cartRepository.fetchAllCartItems().size
+            }
+            addSource(_isCheckAll) { isCheckAll ->
+                value = isCheckAll
+            }
         }
 
     private val _page = MutableLiveData(DEFAULT_PAGE)
@@ -112,13 +130,13 @@ class OrderViewModel(
             selectedCartItems.value = selectedItems.filter { it.cartId != cartId }
             return
         }
-        val foundCartProduct = _cartItems.value?.find { it.cartId == cartId } ?: return
+        val foundCartProduct = this.cartItems.value?.find { it.cartId == cartId } ?: return
         selectedCartItems.value = selectedItems + foundCartProduct
     }
 
     fun fetchSuggestionProducts() {
         val excludedProductIds =
-            _cartItems.value
+            this.cartItems.value
                 .orEmpty()
                 .filter { it.quantity != 0 }
                 .map { it.productId }
@@ -128,6 +146,17 @@ class OrderViewModel(
                 .onSuccess { combine(it) }
                 .onFailure { postFailureEvent(CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
         }
+    }
+
+    fun selectCurrentPageCartProduct() {
+        _isCheckAll.value = !(_isCheckAll.value ?: false)
+        val checked = (_isCheckAll.value ?: false)
+        if (checked) {
+            selectedCartItems.value =
+                cartRepository.fetchAllCartItems().map { it.toCartItemUiModel() }
+            return
+        }
+        selectedCartItems.value = emptyList()
     }
 
     private fun combine(suggestionProducts: List<Product>) {
@@ -183,7 +212,7 @@ class OrderViewModel(
         selectedItems.removeIf { it.cartId == deletedCartId }
         selectedCartItems.postValue(selectedItems)
 
-        val items = _cartItems.value.orEmpty()
+        val items = this.cartItems.value.orEmpty()
         val isLastItem = items.size == 1 && items.first().cartId == deletedCartId
 
         fetchCartItems(if (isLastItem) FetchPageDirection.PREVIOUS else FetchPageDirection.CURRENT)
@@ -193,7 +222,7 @@ class OrderViewModel(
         pageableItem: PageableItem<CartProduct>,
         newPage: Int,
     ) {
-        _cartItems.postValue(pageableItem.items.map { it.toCartItemUiModel(it.isSelected()) })
+        this.cartItems.postValue(pageableItem.items.map { it.toCartItemUiModel() })
         _hasMore.postValue(pageableItem.hasMore)
         _page.postValue(newPage)
         _isLoading.postValue(false)
@@ -201,8 +230,8 @@ class OrderViewModel(
 
     private fun onRefreshProductQuantitySuccess(pageableItem: PageableItem<CartProduct>) {
         val (cartItems, hasMore) = pageableItem
-        val uiModels = cartItems.map { it.toCartItemUiModel(it.isSelected()) }
-        _cartItems.postValue(uiModels)
+        val uiModels = cartItems.map { it.toCartItemUiModel() }
+        this.cartItems.postValue(uiModels)
         _hasMore.postValue(hasMore)
 
         updateSelectedCartProducts(uiModels)
@@ -223,34 +252,9 @@ class OrderViewModel(
         _toastEvent.postValue(event)
     }
 
-    fun selectCurrentPageCartProduct(checked: Boolean) {
-        if (checked == isCheckAll.value) return
-        val currentCartItems = _cartItems.value.orEmpty()
-        val currentSelectedItems = selectedCartItems.value.orEmpty()
-        _cartItems.value = currentCartItems.map { it.copy(isSelected = checked) }
-
-        if (checked) {
-            selectedCartItems.value =
-                (currentSelectedItems + currentCartItems).distinctBy { it.productId }
-            return
-        }
-
-        selectedCartItems.value =
-            currentSelectedItems
-                .filterNot { item ->
-                    _cartItems.value.orEmpty().any { it.productId == item.productId }
-                }
-    }
-
     private fun CartProduct.isSelected(): Boolean {
         val selectedItems = selectedCartItems.value
         return selectedItems?.any { it.cartId == cartId } ?: false
-    }
-
-    private fun MediatorLiveData<Boolean>.updateCheckBoxChecked() {
-        val cartItems = cartItems.value
-        val selectedItems = selectedCartItems.value
-        value = cartItems?.all { selectedItems?.contains(it) ?: false }
     }
 
     companion object {

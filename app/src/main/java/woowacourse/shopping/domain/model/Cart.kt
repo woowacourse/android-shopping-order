@@ -3,33 +3,34 @@ package woowacourse.shopping.domain.model
 class Cart(
     cartProducts: List<CartProduct> = emptyList(),
 ) {
-    private val cachedCartProducts = cartProducts.associateBy { it.product.id }.toMutableMap()
+    private val _cachedCartProducts = cartProducts.associateBy { it.product.id }.toMutableMap()
+    val cachedCartProducts: List<CartProduct> get() = _cachedCartProducts.values.toList()
 
     fun addAll(cartProducts: List<CartProduct>) {
-        cachedCartProducts.putAll(cartProducts.associateBy { it.product.id })
+        _cachedCartProducts.putAll(cartProducts.associateBy { it.product.id })
     }
 
     fun addCartProductToCart(cartProduct: CartProduct) {
-        cachedCartProducts[cartProduct.product.id] = cartProduct
+        _cachedCartProducts[cartProduct.product.id] = cartProduct
     }
 
     fun deleteCartProductFromCartByCartId(cartId: Long) {
-        cachedCartProducts.values.removeIf { it.cartId == cartId }
+        _cachedCartProducts.values.removeIf { it.cartId == cartId }
     }
 
-    fun findCartProductByProductId(productId: Long): CartProduct? = cachedCartProducts[productId]
+    fun findCartProductByProductId(productId: Long): CartProduct? = _cachedCartProducts[productId]
 
-    fun findQuantityByProductId(productId: Long): Int = cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
+    fun findQuantityByProductId(productId: Long): Int = _cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
 
     fun findCartIdByProductId(productId: Long): Long =
-        requireNotNull(cachedCartProducts[productId]?.cartId) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
+        requireNotNull(_cachedCartProducts[productId]?.cartId) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
 
     fun updateQuantityByProductId(
         productId: Long,
         quantity: Int,
     ) {
-        val foundCartProduct = cachedCartProducts[productId] ?: return
-        cachedCartProducts[productId] = foundCartProduct.copy(quantity = quantity)
+        val foundCartProduct = _cachedCartProducts[productId] ?: return
+        _cachedCartProducts[productId] = foundCartProduct.copy(quantity = quantity)
     }
 
     companion object {
