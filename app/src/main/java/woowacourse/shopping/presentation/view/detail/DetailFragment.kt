@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentDetailBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.util.getParcelableCompat
 import woowacourse.shopping.presentation.view.cart.CartFragment
 import woowacourse.shopping.presentation.view.common.BaseFragment
 import woowacourse.shopping.presentation.view.common.ItemCounterListener
@@ -26,7 +25,7 @@ class DetailFragment :
         initObserver()
         initListener()
 
-        val product = arguments.getParcelableCompat<ProductUiModel>(EXTRA_PRODUCT)
+        val product = arguments?.getLong(PRODUCT_ID) ?: 0
         viewModel.fetchProduct(product)
 
         binding.apply {
@@ -69,13 +68,13 @@ class DetailFragment :
         }
     }
 
-    companion object {
-        private const val EXTRA_PRODUCT = "product"
-
-        fun newBundle(product: ProductUiModel) = bundleOf(EXTRA_PRODUCT to product)
+    override fun onRecentItemSelected(product: ProductUiModel) {
+        viewModel.fetchProduct(product.id)
     }
 
-    override fun onRecentItemSelected(product: ProductUiModel) {
-        viewModel.fetchProduct(product)
+    companion object {
+        private const val PRODUCT_ID = "product_id"
+
+        fun newBundle(id: Long) = bundleOf(PRODUCT_ID to id)
     }
 }

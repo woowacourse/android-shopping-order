@@ -42,7 +42,7 @@ class CatalogFragment :
     }
 
     override fun onProductClicked(product: ProductUiModel) {
-        navigateToScreen(DetailFragment::class.java, DetailFragment.newBundle(product))
+        navigateToScreen(DetailFragment::class.java, DetailFragment.newBundle(product.id))
     }
 
     override fun onLoadMoreClicked() {

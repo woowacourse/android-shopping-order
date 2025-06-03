@@ -26,8 +26,17 @@ class DetailViewModel(
     private val _lastViewedProduct = MutableLiveData<ProductUiModel>()
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
 
-    fun fetchProduct(product: ProductUiModel) {
-        _product.postValue(product.copy(quantity = 1))
+    fun fetchProduct(id: Long) {
+        productRepository.findProductById(id) { product ->
+            cartRepository.loadAllCartItems { cartItems ->
+                val cartItem = cartItems.find { cartItem -> cartItem.product.id == id }
+                if (cartItem == null) {
+                    _product.postValue(product?.toProductUiModel()?.copy(quantity = 1))
+                } else {
+                    _product.postValue(cartItem.toProductUiModel().copy(quantity = 1))
+                }
+            }
+        }
     }
 
     fun addRecentProduct(product: ProductUiModel) {
