@@ -61,46 +61,34 @@
             android:id="@+id/wrapper"
             android:layout_width="match_parent"
             android:layout_height="100dp"
+            android:background="@color/gray_55"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/checkbox_wrapper"
+            <CheckBox
+                android:id="@+id/select_all"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:background="@color/gray_55"
+                android:gravity="center_horizontal|bottom"
+                android:textColor="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tv_select_all_description"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/gray_55"
+                android:gravity="center_horizontal|top"
+                android:text="@string/cart_total_check_title"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <CheckBox
-                    android:id="@+id/select_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:background="@color/gray_55"
-                    android:gravity="center_horizontal|bottom"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toTopOf="@id/tv_select_all_description"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_select_all_description"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="@color/gray_55"
-                    android:gravity="center_horizontal|top"
-                    android:text="전체"
-                    android:textColor="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/select_all" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@id/select_all"
+                app:layout_constraintStart_toStartOf="@id/select_all"
+                app:layout_constraintEnd_toEndOf="@id/select_all"/>
 
             <TextView
                 android:id="@+id/text_view_cart_total_price"
@@ -115,7 +103,7 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btn_place_order"
-                app:layout_constraintStart_toEndOf="@id/checkbox_wrapper"
+                app:layout_constraintStart_toEndOf="@+id/select_all"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="184,200원" />
 

@@ -11,6 +11,7 @@
 
     <!-- Cart Screen -->
     <string name="toolbar_cart_title">Cart</string>
+    <string name="cart_total_check_title">전체</string>
 
     <!-- Cart Recommendation Screen -->
     <string name="recommendation_title">이런 상품은 어떠세요?</string>
