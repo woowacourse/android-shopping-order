@@ -12,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.AuthStorage
-import woowacourse.shopping.data.product.source.LocalProductsDataSource
 import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
@@ -62,7 +61,6 @@ class ProductsActivity : AppCompatActivity() {
             insets
         }
 
-        LocalProductsDataSource.init(applicationContext)
         LocalRecentViewedProductsDataSource.init(applicationContext)
         AuthStorage.init(applicationContext)
 
