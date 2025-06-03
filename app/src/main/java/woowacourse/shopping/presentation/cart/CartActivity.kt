@@ -78,8 +78,7 @@ class CartActivity : AppCompatActivity() {
         viewModel.navigateToRecommendEvent.observe(this) { orderInfo ->
             val intent = RecommendActivity.newIntent(
                 this@CartActivity,
-                orderInfo.price,
-                orderInfo.count
+                ArrayList(orderInfo.checkedItems),
             )
             startActivity(intent)
         }
