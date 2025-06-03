@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.productdetail.ProductDetailViewModel" />
+
+        <variable
+            name="cartCounterListener"
+            type="woowacourse.shopping.presentation.cart.CartCounterClickListener" />
+
+        <variable
+            name="itemClickListener"
+            type="woowacourse.shopping.presentation.product.ItemClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tb_detail_product"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/baemin"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:menu="@menu/menu_product_detail"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        <ImageView
+            android:id="@+id/iv_product_detail"
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            app:imageUrl="@{vm.product.imageUrl}"
+            app:layout_constraintTop_toBottomOf="@id/tb_detail_product"
+            tools:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/tv_product_detail_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/textview_margin"
+            android:layout_marginStart="16dp"
+            android:text="@{vm.product.name}"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_product_detail"
+            tools:text="맥심 모카골드 마일드" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:layout_marginTop="22dp"
+            app:dividerColor="@color/gray1"
+            app:layout_constraintTop_toBottomOf="@id/tv_product_detail_name" />
+
+        <TextView
+            android:id="@+id/tv_product_detail_price_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/textview_margin"
+            android:layout_marginStart="18dp"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:count="@{vm.productCount}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:price="@{vm.product.price}"
+            tools:text="99,800원" />
+
+        <include
+            android:id="@+id/included_layout_cart"
+            layout="@layout/layout_cart_quantity_box"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            app:clickListener="@{cartCounterListener}"
+            app:id="@{vm.product.productId}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_product_detail_price_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_product_detail_price_text"
+            app:quantity="@{vm.productCount}" />
+
+        <include
+            android:id="@+id/included_recent_product"
+            layout="@layout/layout_recent_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="40dp"
+            app:clickListener="@{itemClickListener}"
+            app:id="@{vm.recentProduct.productId}"
+            app:layout_constraintTop_toBottomOf="@id/tv_product_detail_price_text"
+            app:name="@{vm.recentProduct.name}"
+            app:visibleIf="@{!vm.isRecentProduct}" />
+
+        <Button
+            android:id="@+id/btn_product_detail_add_cart"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@color/cyan"
+            android:backgroundTint="@color/cyan"
+            android:paddingVertical="8dp"
+            android:text="@string/product_detail_add_cart"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
