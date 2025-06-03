@@ -9,6 +9,9 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IncreaseProductQuantityUseCase
 import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
@@ -19,6 +22,9 @@ class ProductViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val increaseProductQuantityUseCase: IncreaseProductQuantityUseCase,
+    private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
+    private val addToCartUseCase: AddToCartUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
     val uiState: LiveData<ResultState<Unit>> = _uiState
@@ -101,39 +107,39 @@ class ProductViewModel(
     }
 
     fun increaseQuantity(productId: Long) {
-        cartRepository.increaseQuantity(productId) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId, 1)
-                    fetchCartItemCount()
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_increase_fail
-                }
-        }
+        increaseProductQuantityUseCase(
+            productId,
+            onSuccess = {
+                updateQuantity(productId, 1)
+                fetchCartItemCount()
+            },
+            onFailure = {
+                _toastMessage.value = R.string.product_toast_increase_fail
+            },
+        )
     }
 
     fun decreaseQuantity(productId: Long) {
-        cartRepository.decreaseQuantity(productId) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId, -1)
-                    fetchCartItemCount()
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_increase_fail
-                }
-        }
+        decreaseProductQuantityUseCase(
+            productId,
+            onSuccess = {
+                updateQuantity(productId, -1)
+                fetchCartItemCount()
+            },
+            onFailure = { _toastMessage.value = R.string.product_toast_increase_fail },
+        )
     }
 
     fun addToCart(cartItemUiModel: CartItemUiModel) {
-        cartRepository.insertProduct(cartItemUiModel.product.toDomain(), 1) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId = cartItemUiModel.product.id, 1)
-                    fetchCartItemCount()
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_add_cart_fail
-                }
-        }
+        addToCartUseCase(
+            product = cartItemUiModel.product.toDomain(),
+            quantity = 1,
+            onSuccess = {
+                updateQuantity(productId = cartItemUiModel.product.id, 1)
+                fetchCartItemCount()
+            },
+            onFailure = { _toastMessage.value = R.string.product_toast_add_cart_fail },
+        )
     }
 
     private fun updateQuantity(

@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IncreaseProductQuantityUseCase
 import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
@@ -13,6 +15,8 @@ import woowacourse.shopping.presentation.toPresentation
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val increaseProductQuantityUseCase: IncreaseProductQuantityUseCase,
+    private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
     val uiState: LiveData<ResultState<Unit>> = _uiState
@@ -79,14 +83,11 @@ class CartViewModel(
     }
 
     fun increaseQuantity(productId: Long) {
-        cartRepository.increaseQuantity(productId) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId, 1)
-                }.onFailure {
-                    _toastMessage.value = R.string.cart_toast_increase_fail
-                }
-        }
+        increaseProductQuantityUseCase(
+            productId,
+            onSuccess = { updateQuantity(productId, 1) },
+            onFailure = { _toastMessage.value = R.string.cart_toast_increase_fail },
+        )
     }
 
     fun decreaseQuantity(productId: Long) {
@@ -98,14 +99,11 @@ class CartViewModel(
             return
         }
 
-        cartRepository.decreaseQuantity(productId) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId, -1)
-                }.onFailure {
-                    _toastMessage.value = R.string.cart_toast_decrease_fail
-                }
-        }
+        decreaseProductQuantityUseCase(
+            productId,
+            onSuccess = { updateQuantity(productId, -1) },
+            onFailure = { _toastMessage.value = R.string.cart_toast_decrease_fail },
+        )
     }
 
     fun toggleItemChecked(cartId: Long) {

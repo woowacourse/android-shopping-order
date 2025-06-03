@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IncreaseProductQuantityUseCase
 import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
@@ -17,7 +19,9 @@ import woowacourse.shopping.presentation.toPresentation
 class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
-    private val cartRepository: CartRepository,
+    private val increaseProductQuantityUseCase: IncreaseProductQuantityUseCase,
+    private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
+    private val addToCartUseCase: AddToCartUseCase,
 ) : ViewModel(),
     ItemClickListener,
     CartCounterClickListener {
@@ -39,7 +43,6 @@ class RecommendViewModel(
         recentProductRepository.getMostRecentProduct { result ->
             result.onSuccess { recentProduct ->
                 recentCategory = recentProduct?.category ?: ""
-
                 productRepository.fetchPagingProducts(category = recentCategory) { result ->
                     result
                         .onSuccess { products ->
@@ -51,6 +54,11 @@ class RecommendViewModel(
                                     .take(10)
                                     .toList()
                             _recommendProducts.postValue(recommendProductsUiModel)
+                            if (recommendProductsUiModel.isEmpty()) {
+                                _toastMessage.postValue(
+                                    R.string.recommend_toast_load_not_enough_products,
+                                )
+                            }
                         }.onFailure {
                             _toastMessage.postValue(R.string.recommend_toast_load_fail)
                         }
@@ -71,36 +79,28 @@ class RecommendViewModel(
     }
 
     override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
-        cartRepository.insertProduct(cartItemUiModel.product.toDomain(), 1) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(productId = cartItemUiModel.product.id, 1)
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_add_cart_fail
-                }
-        }
+        addToCartUseCase(
+            product = cartItemUiModel.product.toDomain(),
+            quantity = 1,
+            onSuccess = { updateQuantity(productId = cartItemUiModel.product.id, 1) },
+            onFailure = { _toastMessage.value = R.string.product_toast_add_cart_fail },
+        )
     }
 
     override fun onClickMinus(id: Long) {
-        cartRepository.decreaseQuantity(id) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(id, -1)
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_decrease_fail
-                }
-        }
+        decreaseProductQuantityUseCase(
+            id,
+            onSuccess = { updateQuantity(id, -1) },
+            onFailure = { _toastMessage.value = R.string.product_toast_decrease_fail },
+        )
     }
 
     override fun onClickPlus(id: Long) {
-        cartRepository.increaseQuantity(id) { result ->
-            result
-                .onSuccess {
-                    updateQuantity(id, 1)
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_increase_fail
-                }
-        }
+        increaseProductQuantityUseCase(
+            id,
+            onSuccess = { updateQuantity(id, 1) },
+            onFailure = { _toastMessage.value = R.string.product_toast_increase_fail },
+        )
     }
 
     private fun updateQuantity(
