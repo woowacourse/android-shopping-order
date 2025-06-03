@@ -4,24 +4,28 @@ import woowacourse.shopping.di.DatabaseModule.database
 import woowacourse.shopping.di.NetworkModule.cartApi
 import woowacourse.shopping.di.NetworkModule.orderApi
 import woowacourse.shopping.di.NetworkModule.productApi
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.HistoryRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 
 object RepositoryModule {
-    val cartRepository: woowacourse.shopping.domain.repository.CartRepository by lazy {
+    val cartRepository: CartRepository by lazy {
         woowacourse.shopping.data.repository
             .CartRepository(cartApi)
     }
 
-    val productRepository: woowacourse.shopping.domain.repository.ProductRepository by lazy {
+    val productRepository: ProductRepository by lazy {
         woowacourse.shopping.data.repository
             .ProductRepository(productApi)
     }
 
-    val historyRepository: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
+    val historyRepository: HistoryRepository by lazy {
         woowacourse.shopping.data.repository
             .HistoryRepository(database.historyDao())
     }
 
-    val orderRepository: woowacourse.shopping.domain.repository.OrderRepository by lazy {
+    val orderRepository: OrderRepository by lazy {
         woowacourse.shopping.data.repository
             .OrderRepository(orderApi)
     }
