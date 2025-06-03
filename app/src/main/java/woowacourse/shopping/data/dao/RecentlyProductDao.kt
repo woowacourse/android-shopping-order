@@ -10,20 +10,20 @@ import woowacourse.shopping.data.entity.RecentlyViewedProduct
 @Dao
 interface RecentlyProductDao {
     @Query("SELECT * FROM recentlyViewedProduct ORDER BY viewedAt DESC")
-    fun getProducts(): List<RecentlyViewedProduct>
+    suspend fun getProducts(): List<RecentlyViewedProduct>
 
     @Query("SELECT * FROM recentlyViewedProduct ORDER BY viewedAt DESC LIMIT 1")
-    fun getMostRecentProduct(): RecentlyViewedProduct?
+    suspend fun getMostRecentProduct(): RecentlyViewedProduct?
 
     @Query("SELECT * FROM recentlyViewedProduct ORDER BY viewedAt ASC LIMIT 1")
-    fun getOldestProduct(): RecentlyViewedProduct
+    suspend fun getOldestProduct(): RecentlyViewedProduct
 
     @Query("SELECT COUNT(*) FROM recentlyViewedProduct")
-    fun getCount(): Int
+    suspend fun getCount(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProduct(product: RecentlyViewedProduct)
+    suspend fun insertProduct(product: RecentlyViewedProduct)
 
     @Delete
-    fun delete(product: RecentlyViewedProduct)
+    suspend fun delete(product: RecentlyViewedProduct)
 }
