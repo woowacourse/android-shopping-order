@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils.replace
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -47,17 +48,41 @@ class CartActivity : AppCompatActivity() {
     private fun observeCartViewModel() {
         viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
-        viewModel.totalCount.observe(this) { count ->
-            if (!hasHandledTotalCount && count != -1) {
-                hasHandledTotalCount = true
-                supportFragmentManager.commit {
-                    setReorderingAllowed(true)
-                    replace(
-                        R.id.fragment_container_cart_selection,
-                        if (count != 0) CartSelectionFragment() else CartRecommendationFragment(),
-                    )
-                }
+        viewModel.totalCount.observe(this) { replaceFragmentByTotalCount(it) }
+    }
+
+    private fun replaceFragmentByTotalCount(totalCount: Int) {
+        if (!hasHandledTotalCount && totalCount != -1) {
+            hasHandledTotalCount = true
+            when (totalCount) {
+                0 -> replaceCartRecommendationFragment()
+                else -> replaceCartSelectionFragment()
             }
+        }
+    }
+
+    private fun replaceCartRecommendationFragment() {
+        binding.checkboxAllSelection.visibility = View.GONE
+        binding.textViewAllSelection.visibility = View.GONE
+
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(
+                R.id.fragment_container_cart_selection,
+                CartRecommendationFragment::class.java,
+                null,
+            )
+        }
+    }
+
+    private fun replaceCartSelectionFragment() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(
+                R.id.fragment_container_cart_selection,
+                CartSelectionFragment::class.java,
+                null,
+            )
         }
     }
 
