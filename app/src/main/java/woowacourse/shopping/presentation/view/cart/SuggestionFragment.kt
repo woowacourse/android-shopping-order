@@ -8,6 +8,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentSuggestionBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.view.cart.adapter.SuggestionAdapter
+import woowacourse.shopping.presentation.view.cart.event.OrderMessageEvent
 
 class SuggestionFragment :
     BaseFragment<FragmentSuggestionBinding>(R.layout.fragment_suggestion),
@@ -50,6 +51,10 @@ class SuggestionFragment :
         viewModel.suggestionProducts.observe(viewLifecycleOwner) { suggestionProducts ->
             suggestionAdapter.submitList(suggestionProducts)
         }
+
+        viewModel.toastOrderEvent.observe(viewLifecycleOwner) { event ->
+            showToast(event.toMessageResId())
+        }
     }
 
     private fun setupActionBar() {
@@ -68,4 +73,9 @@ class SuggestionFragment :
     private fun navigateToCart() {
         (requireActivity() as? OrderNavigator)?.navigateToCart()
     }
+
+    private fun OrderMessageEvent.toMessageResId(): Int =
+        when (this) {
+            OrderMessageEvent.ORDER_CART_ITEMS_FAILURE -> R.string.suggestion_screen_event_message_order_failure
+        }
 }

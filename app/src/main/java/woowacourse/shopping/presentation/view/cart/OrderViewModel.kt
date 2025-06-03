@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartProductUiModel
 import woowacourse.shopping.presentation.model.DisplayModel
@@ -22,14 +23,19 @@ import woowacourse.shopping.presentation.model.toSuggestionUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.cart.event.CartMessageEvent
+import woowacourse.shopping.presentation.view.cart.event.OrderMessageEvent
 import kotlin.math.max
 
 class OrderViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
-    private val _toastEvent = MutableSingleLiveData<CartMessageEvent>()
-    val toastEvent: SingleLiveData<CartMessageEvent> = _toastEvent
+    private val _toastCartEvent = MutableSingleLiveData<CartMessageEvent>()
+    val toastCartEvent: SingleLiveData<CartMessageEvent> = _toastCartEvent
+
+    private val _toastOrderEvent = MutableSingleLiveData<OrderMessageEvent>()
+    val toastOrderEvent: SingleLiveData<OrderMessageEvent> = _toastOrderEvent
 
     private val cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     private val selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
@@ -90,7 +96,7 @@ class OrderViewModel(
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
                 .onSuccess { onFetchCartItemsSuccess(it, newPage) }
-                .onFailure { postFailureEvent(CartMessageEvent.FETCH_CART_ITEMS_FAILURE) }
+                .onFailure { postFailureCartEvent(CartMessageEvent.FETCH_CART_ITEMS_FAILURE) }
         }
     }
 
@@ -98,7 +104,7 @@ class OrderViewModel(
         cartRepository.deleteCartItem(cartId) { result ->
             result
                 .onSuccess { handleFetchCartItemDeleted(cartId) }
-                .onFailure { postFailureEvent(CartMessageEvent.DELETE_CART_ITEM_FAILURE) }
+                .onFailure { postFailureCartEvent(CartMessageEvent.DELETE_CART_ITEM_FAILURE) }
         }
     }
 
@@ -109,7 +115,7 @@ class OrderViewModel(
         cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { refreshProductQuantity(refreshTarget) }
-                .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+                .onFailure { postFailureCartEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
@@ -120,7 +126,7 @@ class OrderViewModel(
         cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { refreshProductQuantity(refreshTarget) }
-                .onFailure { postFailureEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+                .onFailure { postFailureCartEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
@@ -144,7 +150,7 @@ class OrderViewModel(
         productRepository.fetchSuggestionProducts(SUGGESTION_LIMIT, excludedProductIds) { result ->
             result
                 .onSuccess { combine(it) }
-                .onFailure { postFailureEvent(CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
+                .onFailure { postFailureCartEvent(CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
         }
     }
 
@@ -157,6 +163,22 @@ class OrderViewModel(
             return
         }
         selectedCartItems.value = emptyList()
+    }
+
+    fun orderCartItems() {
+        val selectedItemIds = selectedCartItems.value.orEmpty().map { it.cartId.toString() }
+        orderRepository.addOrder(selectedItemIds) { result ->
+            result
+                .onSuccess { deleteSelectedCartItems() }
+                .onFailure { postFailureOrderEvent(OrderMessageEvent.ORDER_CART_ITEMS_FAILURE) }
+        }
+    }
+
+    private fun deleteSelectedCartItems() {
+        selectedCartItems.value.orEmpty().map {
+            cartRepository.deleteCartItem(it.cartId) {
+            }
+        }
     }
 
     private fun combine(suggestionProducts: List<Product>) {
@@ -203,7 +225,7 @@ class OrderViewModel(
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
                 .onSuccess { onRefreshProductQuantitySuccess(it) }
-                .onFailure { postFailureEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+                .onFailure { postFailureCartEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
@@ -248,8 +270,12 @@ class OrderViewModel(
         selectedCartItems.postValue(updatedSelectedItems)
     }
 
-    private fun postFailureEvent(event: CartMessageEvent) {
-        _toastEvent.postValue(event)
+    private fun postFailureCartEvent(event: CartMessageEvent) {
+        _toastCartEvent.postValue(event)
+    }
+
+    private fun postFailureOrderEvent(event: OrderMessageEvent) {
+        _toastOrderEvent.postValue(event)
     }
 
     private fun CartProduct.isSelected(): Boolean {
@@ -272,7 +298,8 @@ class OrderViewModel(
                 ): T {
                     val cartRepository = RepositoryProvider.cartRepository
                     val productRepository = RepositoryProvider.productRepository
-                    return OrderViewModel(cartRepository, productRepository) as T
+                    val orderRepository = RepositoryProvider.orderRepository
+                    return OrderViewModel(cartRepository, productRepository, orderRepository) as T
                 }
             }
     }

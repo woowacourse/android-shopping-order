@@ -57,7 +57,7 @@ class CartFragment :
             cartAdapter.updateItemsManually(cartItems)
         }
 
-        viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
+        viewModel.toastCartEvent.observe(viewLifecycleOwner) { event ->
             showToast(event.toMessageResId())
         }
     }

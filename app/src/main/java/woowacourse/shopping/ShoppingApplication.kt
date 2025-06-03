@@ -1,7 +1,9 @@
 package woowacourse.shopping
 
 import android.app.Application
+import woowacourse.shopping.data.db.ShoppingDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.di.provider.DataSourceProvider
@@ -11,7 +13,7 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        _instance = this
+        _shoppingDatabase = ShoppingDatabase.getDatabase(applicationContext)
         initRepositories()
     }
 
@@ -19,6 +21,7 @@ class ShoppingApplication : Application() {
         initProductRepository()
         initCartRepository()
         initRecentProductRepository()
+        initOrderRepository()
     }
 
     private fun initProductRepository() {
@@ -43,8 +46,14 @@ class ShoppingApplication : Application() {
         RepositoryProvider.initRecentProductRepository(repository)
     }
 
+    private fun initOrderRepository() {
+        val orderRemoteDataSource = DataSourceProvider.orderRemoteDataSource
+        val repository = OrderRepositoryImpl(orderRemoteDataSource)
+        RepositoryProvider.initOrderRepository(repository)
+    }
+
     companion object {
-        private var _instance: ShoppingApplication? = null
-        val instance get() = _instance!!
+        private var _shoppingDatabase: ShoppingDatabase? = null
+        val shoppingDatabase get() = _shoppingDatabase!!
     }
 }

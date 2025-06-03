@@ -1,6 +1,7 @@
 package woowacourse.shopping.di.provider
 
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -14,6 +15,9 @@ object RepositoryProvider {
     lateinit var recentProductRepository: RecentProductRepository
         private set
 
+    lateinit var orderRepository: OrderRepository
+        private set
+
     fun initProductRepository(repository: ProductRepository) {
         productRepository = repository
     }
@@ -24,5 +28,9 @@ object RepositoryProvider {
 
     fun initRecentProductRepository(repository: RecentProductRepository) {
         recentProductRepository = repository
+    }
+
+    fun initOrderRepository(repository: OrderRepository) {
+        orderRepository = repository
     }
 }

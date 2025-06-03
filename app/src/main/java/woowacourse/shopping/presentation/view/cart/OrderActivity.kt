@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.presentation.view.ShoppingActivity
 
 class OrderActivity :
     AppCompatActivity(),
@@ -89,9 +90,19 @@ class OrderActivity :
         when (currentFragmentTag) {
             CartFragment::class.simpleName -> showFragment(SuggestionFragment::class.java)
             SuggestionFragment::class.simpleName -> {
-                // TODO: 주문 기능 구현
+                viewModel.orderCartItems()
+                navigateToShopping()
             }
         }
+    }
+
+    private fun navigateToShopping() {
+        val intent =
+            ShoppingActivity.newIntent(this).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     companion object {
