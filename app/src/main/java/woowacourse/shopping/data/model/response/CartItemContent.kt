@@ -5,10 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CartItemContent(
-    @SerialName("id")
-    val id: Long,
-    @SerialName("product")
-    val product: Product,
-    @SerialName("quantity")
-    val quantity: Int,
+    @SerialName("id") val id: Long,
+    @SerialName("product") val product: ProductContent,
+    @SerialName("quantity") val quantity: Int,
 )
