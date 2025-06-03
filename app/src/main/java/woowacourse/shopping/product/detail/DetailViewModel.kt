@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.cart.ButtonEvent
 import woowacourse.shopping.data.repository.CartProductRepository
-import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
@@ -13,7 +12,6 @@ class DetailViewModel(
     product: ProductUiModel,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val catalogProductRepository: CatalogProductRepository,
 ) : ViewModel() {
     private val _product = MutableLiveData<ProductUiModel>(product)
     val product: LiveData<ProductUiModel> = _product
@@ -35,14 +33,12 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
+        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0) ?: return
 
-        if (addedProduct?.cartItemId != null) {
+        if (addedProduct.cartItemId != null) {
             cartProductRepository.updateProduct(addedProduct.id, addedProduct.quantity) {}
         } else {
-            addedProduct?.let {
-                cartProductRepository.insertCartProduct(it) {}
-            }
+            cartProductRepository.insertCartProduct(addedProduct) {}
         }
     }
 

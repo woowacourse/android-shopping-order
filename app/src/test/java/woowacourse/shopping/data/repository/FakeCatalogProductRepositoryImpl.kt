@@ -17,12 +17,12 @@ class FakeCatalogProductRepositoryImpl(
         callback(dummyProducts.subList(startIndex, endIndex))
     }
 
-    override fun getCartProductsByUids(
-        uids: List<Int>,
+    override fun getCartProductsByIds(
+        productIds: List<Int>,
         callback: (List<ProductUiModel>) -> Unit,
     ) {
         callback(
-            uids.mapNotNull { uid ->
+            productIds.mapNotNull { uid ->
                 dummyProducts.find { product -> product.id == uid }
             },
         )

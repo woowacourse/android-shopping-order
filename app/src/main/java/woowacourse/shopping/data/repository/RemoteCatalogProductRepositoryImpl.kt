@@ -11,11 +11,12 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 
 class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
+
     override fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     ) {
         retrofitService
             .requestProducts(
@@ -79,25 +80,25 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
         )
     }
 
-    override fun getCartProductsByUids(
-        uids: List<Int>,
+    override fun getCartProductsByIds(
+        productIds: List<Int>,
         callback: (List<ProductUiModel>) -> Unit,
     ) {
         val resultsMap = mutableMapOf<Int, ProductUiModel>()
         var completedCount = 0
 
-        if (uids.isEmpty()) {
+        if (productIds.isEmpty()) {
             callback(emptyList())
             return
         }
 
-        uids.forEach { uid ->
+        productIds.forEach { uid ->
             getProduct(uid) { product ->
                 resultsMap[uid] = product
                 completedCount++
 
-                if (completedCount == uids.size) {
-                    val orderedResults = uids.mapNotNull { resultsMap[it] }
+                if (completedCount == productIds.size) {
+                    val orderedResults = productIds.mapNotNull { resultsMap[it] }
                     callback(orderedResults)
                 }
             }
@@ -147,12 +148,12 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     }
 
     override fun getProduct(
-        id: Int,
+        productId: Int,
         callback: (ProductUiModel) -> Unit,
     ) {
         retrofitService
             .requestDetailProduct(
-                id = id,
+                id = productId,
             ).enqueue(
                 object : Callback<Content> {
                     override fun onResponse(
