@@ -10,10 +10,10 @@ import woowacourse.shopping.data.model.entity.HistoryProductEntity
 @Dao
 interface HistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertHistory(history: HistoryProductEntity)
+    suspend fun insertHistory(history: HistoryProductEntity)
 
     @Transaction
-    fun insertHistoryWithLimit(
+    suspend fun insertHistoryWithLimit(
         history: HistoryProductEntity,
         limit: Int,
     ) {
@@ -26,10 +26,10 @@ interface HistoryDao {
     }
 
     @Query("SELECT * FROM search_history ORDER BY timestamp DESC")
-    fun getHistoryProducts(): List<HistoryProductEntity>
+    suspend fun getHistoryProducts(): List<HistoryProductEntity>
 
     @Query("SELECT COUNT(*) FROM search_history")
-    fun getHistoryCount(): Int
+    suspend fun getHistoryCount(): Int
 
     @Query(
         """
@@ -42,8 +42,8 @@ interface HistoryDao {
     )
     """,
     )
-    fun deleteOldestHistories(count: Int)
+    suspend fun deleteOldestHistories(count: Int)
 
     @Query("SELECT * FROM search_history ORDER BY timestamp DESC LIMIT 1")
-    fun getRecentHistoryProduct(): HistoryProductEntity?
+    suspend fun getRecentHistoryProduct(): HistoryProductEntity?
 }

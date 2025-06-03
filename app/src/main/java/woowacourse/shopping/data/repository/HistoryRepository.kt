@@ -6,24 +6,25 @@ import woowacourse.shopping.data.model.entity.HistoryProductEntity.Companion.toD
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.repository.HistoryRepository
-import kotlin.concurrent.thread
 
 class HistoryRepository(
     private val dao: HistoryDao,
 ) : HistoryRepository {
-    override fun fetchAllHistory(callback: (List<HistoryProduct>) -> Unit) {
-        thread {
-            callback(
-                dao.getHistoryProducts().map { it.toDomain() },
-            )
+    override suspend fun fetchAllHistory(): Result<List<HistoryProduct>> =
+        runCatching {
+            dao.getHistoryProducts().map { it.toDomain() }
         }
-    }
 
-    override fun addHistoryWithLimit(
+    override suspend fun fetchRecentHistory(): Result<HistoryProduct?> =
+        runCatching {
+            dao.getRecentHistoryProduct()?.toDomain()
+        }
+
+    override suspend fun addHistoryWithLimit(
         productDetail: ProductDetail,
         limit: Int,
-    ) {
-        thread {
+    ): Result<Unit> =
+        runCatching {
             dao.insertHistoryWithLimit(
                 history =
                     HistoryProductEntity(
@@ -35,13 +36,4 @@ class HistoryRepository(
                 limit = limit,
             )
         }
-    }
-
-    override fun fetchRecentHistory(callback: (HistoryProduct?) -> Unit) {
-        thread {
-            callback(
-                dao.getRecentHistoryProduct()?.toDomain(),
-            )
-        }
-    }
 }

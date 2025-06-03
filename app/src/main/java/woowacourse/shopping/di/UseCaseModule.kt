@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
-import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
+import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
@@ -60,8 +60,8 @@ object UseCaseModule {
         GetCatalogProductUseCase(productRepository, cartRepository)
     }
 
-    val getCatalogProductsByIdsUseCase by lazy {
-        GetCatalogProductsByIdsUseCase(productRepository, cartRepository)
+    val getCatalogProductsByProductIdsUseCase by lazy {
+        GetCatalogProductsByProductIdsUseCase(productRepository, cartRepository)
     }
 
     val getCartProductsQuantityUseCase by lazy {

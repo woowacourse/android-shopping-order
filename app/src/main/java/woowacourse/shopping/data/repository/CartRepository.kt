@@ -1,13 +1,8 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.api.CartApi
 import woowacourse.shopping.data.model.request.CartItemQuantityRequest
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.CartItemsQuantityResponse
-import woowacourse.shopping.data.model.response.CartItemsResponse
 import woowacourse.shopping.data.model.response.CartItemsResponse.Content.Companion.toDomain
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Products
@@ -16,129 +11,50 @@ import woowacourse.shopping.domain.repository.CartRepository
 class CartRepository(
     private val api: CartApi,
 ) : CartRepository {
-    override fun fetchCartProducts(
+    override suspend fun fetchCartProducts(
         page: Int,
         size: Int,
-        callback: (Result<Products>) -> Unit,
-    ) {
-        api.getCartItems(page, size).enqueue(
-            object : Callback<CartItemsResponse> {
-                override fun onResponse(
-                    call: Call<CartItemsResponse>,
-                    response: Response<CartItemsResponse>,
-                ) {
-                    val body = response.body()
-                    val items = body?.content?.map { it.toDomain() } ?: emptyList()
-                    val pageInfo = Page(page, body?.first ?: true, body?.last ?: true)
-                    callback(Result.success(Products(items, pageInfo)))
-                }
+    ): Result<Products> =
+        runCatching {
+            api.getCartItems(page, size)
+        }.mapCatching { response ->
+            val items = response.content.map { it.toDomain() }
+            val pageInfo = Page(page, response.first, response.last)
+            Products(items, pageInfo)
+        }
 
-                override fun onFailure(
-                    call: Call<CartItemsResponse>,
-                    t: Throwable,
-                ) {
-                    callback(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    override fun fetchAllCartProducts(callback: (Result<Products>) -> Unit) {
+    override suspend fun fetchAllCartProducts(): Result<Products> {
         val firstPage = 0
         val maxSize = Int.MAX_VALUE
-        fetchCartProducts(firstPage, maxSize, callback)
+
+        return fetchCartProducts(firstPage, maxSize)
     }
 
-    override fun fetchCartItemCount(callback: (Result<Int>) -> Unit) {
-        api.getCartItemsCount().enqueue(
-            object : Callback<CartItemsQuantityResponse> {
-                override fun onResponse(
-                    call: Call<CartItemsQuantityResponse>,
-                    response: Response<CartItemsQuantityResponse>,
-                ) {
-                    callback(Result.success(response.body()?.quantity ?: 0))
-                }
+    override suspend fun fetchCartItemCount(): Result<Int> =
+        runCatching {
+            api.getCartItemsCount()
+        }.mapCatching { response ->
+            response.quantity
+        }
 
-                override fun onFailure(
-                    call: Call<CartItemsQuantityResponse>,
-                    t: Throwable,
-                ) {
-                    callback(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    override fun addCartProduct(
+    override suspend fun addCartProduct(
         productId: Long,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        val request = CartItemRequest(productId = productId, quantity = quantity)
-        api.postCartItem(request).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    callback(Result.success(Unit))
-                }
+    ): Result<Unit> =
+        runCatching {
+            api.postCartItem(CartItemRequest(productId = productId, quantity = quantity))
+        }
 
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    callback(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         cartId: Long,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        val request = CartItemQuantityRequest(quantity)
-        api.patchCartItem(cartId, request).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    callback(Result.success(Unit))
-                }
+    ): Result<Unit> =
+        runCatching {
+            api.patchCartItem(cartId, CartItemQuantityRequest(quantity))
+        }
 
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    callback(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    override fun deleteCartProduct(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        api.deleteCartItem(cartId).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    callback(Result.success(Unit))
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    callback(Result.failure(t))
-                }
-            },
-        )
-    }
+    override suspend fun deleteCartProduct(cartId: Long): Result<Unit> =
+        runCatching {
+            api.deleteCartItem(cartId)
+        }
 }
