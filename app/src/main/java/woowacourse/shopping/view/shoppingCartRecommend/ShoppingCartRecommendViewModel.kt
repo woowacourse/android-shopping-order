@@ -156,15 +156,8 @@ class ShoppingCartRecommendViewModel(
     }
 
     private fun removeShoppingCartToOrder(shoppingCartId: Long) {
-        val index =
-            _shoppingCartProductsToOrder.value?.indexOfFirst { it.id == shoppingCartId } ?: return
-        val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
-
-        if (index >= 0) {
-            currentList.removeAt(index)
-        }
-
-        _shoppingCartProductsToOrder.value = currentList
+        _shoppingCartProductsToOrder.value =
+            _shoppingCartProductsToOrder.value?.filterNot { it.id == shoppingCartId }
     }
 
     fun minusProductToShoppingCart(
@@ -176,6 +169,13 @@ class ShoppingCartRecommendViewModel(
             selectedQuantity - 1,
         ) { result ->
             result.onSuccess {
+                val recommendProducts = item.copy(selectedQuantity = selectedQuantity - 1)
+                val targetIndex: Int? =
+                    _recommendProducts.value?.indexOfFirst { it.product.id == item.product.id }
+                _recommendProducts.value =
+                    _recommendProducts.value?.toMutableList()?.apply {
+                        set(targetIndex ?: return@apply, recommendProducts)
+                    }
                 loadShoppingCartProducts(item)
             }
         }
