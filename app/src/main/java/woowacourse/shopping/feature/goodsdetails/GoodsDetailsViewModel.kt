@@ -53,7 +53,7 @@ class GoodsDetailsViewModel(
                                         }?.id ?: 0,
                                 product =
                                     Product(
-                                        id = content.id.toInt(),
+                                        id = content.id,
                                         name = content.name,
                                         price = content.price,
                                         imageUrl = content.imageUrl,

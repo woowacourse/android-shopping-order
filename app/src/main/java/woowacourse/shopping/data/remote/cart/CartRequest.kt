@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CartRequest(
-    val productId: Int,
-    val quantity: Int
+    val productId: Long,
+    val quantity: Int,
 )

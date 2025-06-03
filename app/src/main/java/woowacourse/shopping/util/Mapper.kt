@@ -18,7 +18,7 @@ fun Cart.updateQuantity(newQuantity: Int): Cart = this.copy(quantity = newQuanti
 
 fun CartRemoteProduct.toDomain(): Product =
     Product(
-        id = id.toInt(),
+        id = id,
         name = name,
         price = price,
         imageUrl = imageUrl,
@@ -27,7 +27,7 @@ fun CartRemoteProduct.toDomain(): Product =
 
 fun Content.toDomain(): Product =
     Product(
-        id = id.toInt(),
+        id = id,
         name = name,
         price = price,
         imageUrl = imageUrl,

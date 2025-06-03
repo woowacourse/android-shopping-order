@@ -205,14 +205,14 @@ class CartViewModel(
                     productRepository.fetchAllProducts(
                         onSuccess = { response ->
                             val matchedProduct =
-                                response.content.find { it.id.toInt() == latestProduct.product.id }
+                                response.content.find { it.id == latestProduct.product.id }
                             val category = matchedProduct?.category
 
                             val recommendProducts =
                                 response.content
                                     .filter {
                                         it.category == category &&
-                                            it.id.toInt() != latestProduct.product.id &&
+                                            it.id != latestProduct.product.id &&
                                             it.id !in cartProductIds
                                     }.take(10)
 
