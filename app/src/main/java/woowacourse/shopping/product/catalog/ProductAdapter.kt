@@ -19,9 +19,7 @@ class ProductAdapter(
             VIEW_TYPE_PRODUCT ->
                 ProductViewHolder.from(parent, productActionListener, quantityControlListener)
 
-            VIEW_TYPE_LOAD_MORE -> LoadButtonViewHolder.from(parent, productActionListener)
-
-            else -> LoadingStateProductViewHolder.from(parent)
+            else -> LoadButtonViewHolder.from(parent, productActionListener)
         }
 
     override fun onBindViewHolder(
@@ -39,7 +37,6 @@ class ProductAdapter(
         when (products[position]) {
             CatalogItem.LoadMoreButtonItem -> VIEW_TYPE_LOAD_MORE
             is CatalogItem.ProductItem -> VIEW_TYPE_PRODUCT
-            is CatalogItem.LoadingStateProductItem -> VIEW_TYPE_LOADING_PRODUCT
         }
 
     fun clearItems() {
@@ -68,6 +65,5 @@ class ProductAdapter(
     companion object {
         private const val VIEW_TYPE_PRODUCT = 1
         private const val VIEW_TYPE_LOAD_MORE = 2
-        private const val VIEW_TYPE_LOADING_PRODUCT = 3
     }
 }
