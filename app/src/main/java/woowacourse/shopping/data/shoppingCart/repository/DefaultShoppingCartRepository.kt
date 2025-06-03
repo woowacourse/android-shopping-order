@@ -66,12 +66,10 @@ class DefaultShoppingCartRepository(
         private const val ERR_NOT_ADDED_PRODUCT = "상품이 추가되지 않았습니다"
 
         fun initialize(shoppingCartService: ShoppingCartService) {
-            if (INSTANCE == null) {
-                INSTANCE =
-                    DefaultShoppingCartRepository(
-                        shoppingCartService = shoppingCartService,
-                    )
-            }
+            INSTANCE =
+                DefaultShoppingCartRepository(
+                    shoppingCartService = shoppingCartService,
+                )
         }
 
         fun get(): ShoppingCartRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")

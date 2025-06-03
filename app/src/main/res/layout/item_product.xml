@@ -70,6 +70,7 @@
             tools:text="PET보틀-정사각형어쩌구저쩌구" />
 
         <TextView
+            android:id="@+id/productPrice"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{@string/product_price_format(productItem.product.price)}"

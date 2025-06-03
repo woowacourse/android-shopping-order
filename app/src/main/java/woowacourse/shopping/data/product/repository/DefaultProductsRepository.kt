@@ -49,13 +49,11 @@ class DefaultProductsRepository(
             recentWatchingDao: RecentWatchingDao,
             productService: ProductService,
         ) {
-            if (INSTANCE == null) {
-                INSTANCE =
-                    DefaultProductsRepository(
-                        recentWatchingDao = recentWatchingDao,
-                        productService = productService,
-                    )
-            }
+            INSTANCE =
+                DefaultProductsRepository(
+                    recentWatchingDao = recentWatchingDao,
+                    productService = productService,
+                )
         }
 
         fun get(): ProductsRepository = INSTANCE ?: throw IllegalStateException("초기화 되지 않았습니다.")

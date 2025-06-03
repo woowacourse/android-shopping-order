@@ -14,15 +14,7 @@ import woowacourse.shopping.domain.authentication.UserAuthentication
 import kotlin.concurrent.thread
 
 class ShoppingApplication : Application() {
-    private val productDatabase: ProductDatabase by lazy {
-        Room
-            .databaseBuilder(
-                applicationContext,
-                ProductDatabase::class.java,
-                "recent_watching",
-            ).fallbackToDestructiveMigration()
-            .build()
-    }
+    lateinit var productDatabase: ProductDatabase
 
     private val authDataSource: SharedPreferences by lazy {
         getSharedPreferences(
@@ -36,7 +28,6 @@ class ShoppingApplication : Application() {
             .getApiClient(DefaultAuthenticationRepository.get())
             .create(ProductService::class.java)
     }
-
     private val shoppingCartService: ShoppingCartService by lazy {
         ApiClient
             .getApiClient(DefaultAuthenticationRepository.get())
@@ -45,7 +36,16 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        productDatabase =
+            Room
+                .databaseBuilder(
+                    applicationContext,
+                    ProductDatabase::class.java,
+                    "recent_watching",
+                ).fallbackToDestructiveMigration()
+                .build()
         DefaultAuthenticationRepository.initialize(authDataSource)
+
         DefaultShoppingCartRepository.initialize(shoppingCartService)
         DefaultProductsRepository.initialize(
             productDatabase.recentWatchingDao(),
