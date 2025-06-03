@@ -55,11 +55,8 @@ class ProductDetailViewModel(
 
     fun loadLastHistoryProduct() {
         viewModelScope.launch {
-            runCatching {
-                getRecentSearchHistoryUseCase()
-            }.onSuccess {
-                _lastHistoryProduct.value = it.getOrNull()
-            }.onFailure {
+            getRecentSearchHistoryUseCase().onSuccess {
+                _lastHistoryProduct.value = it
             }
         }
     }
