@@ -1,15 +1,26 @@
 package woowacourse.shopping.presentation.view.catalog.adapter
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
 
 class RecentProductAdapter(
     private val eventListener: CatalogEventListener,
-) : RecyclerView.Adapter<RecentProductItemViewHolder>() {
-    private val items = mutableListOf<ProductUiModel>()
+) : ListAdapter<ProductUiModel, RecentProductItemViewHolder>(
+        object : DiffUtil.ItemCallback<ProductUiModel>() {
+            override fun areItemsTheSame(
+                oldItem: ProductUiModel,
+                newItem: ProductUiModel,
+            ): Boolean = oldItem.id == newItem.id
 
+            override fun areContentsTheSame(
+                oldItem: ProductUiModel,
+                newItem: ProductUiModel,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -19,14 +30,6 @@ class RecentProductAdapter(
         holder: RecentProductItemViewHolder,
         position: Int,
     ) {
-        holder.bind(items[position])
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    fun submitList(products: List<ProductUiModel>) {
-        items.clear()
-        items.addAll(products)
-        notifyDataSetChanged()
+        holder.bind(getItem(position))
     }
 }
