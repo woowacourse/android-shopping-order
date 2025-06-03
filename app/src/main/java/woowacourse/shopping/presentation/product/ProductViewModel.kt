@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.usecase.IncreaseProductQuantityUseCase
 import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
+import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.toDomain
 import woowacourse.shopping.presentation.toPresentation
 
@@ -25,7 +26,9 @@ class ProductViewModel(
     private val increaseProductQuantityUseCase: IncreaseProductQuantityUseCase,
     private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-) : ViewModel() {
+) : ViewModel(),
+    ItemClickListener,
+    CartCounterClickListener {
     private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
     val uiState: LiveData<ResultState<Unit>> = _uiState
     private val _products: MutableLiveData<List<ProductItemType>> = MutableLiveData()
@@ -36,6 +39,8 @@ class ProductViewModel(
     val cartItemCount: LiveData<Int> = _cartItemCount
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
+    private val _navigateTo = SingleLiveData<Long>()
+    val navigateTo: LiveData<Long> = _navigateTo
 
     private var currentPage = FIRST_PAGE
 
@@ -106,31 +111,11 @@ class ProductViewModel(
         }
     }
 
-    fun increaseQuantity(productId: Long) {
-        increaseProductQuantityUseCase(
-            productId,
-            onSuccess = {
-                updateQuantity(productId, 1)
-                fetchCartItemCount()
-            },
-            onFailure = {
-                _toastMessage.value = R.string.product_toast_increase_fail
-            },
-        )
+    override fun onClickProductItem(productId: Long) {
+        _navigateTo.value = productId
     }
 
-    fun decreaseQuantity(productId: Long) {
-        decreaseProductQuantityUseCase(
-            productId,
-            onSuccess = {
-                updateQuantity(productId, -1)
-                fetchCartItemCount()
-            },
-            onFailure = { _toastMessage.value = R.string.product_toast_increase_fail },
-        )
-    }
-
-    fun addToCart(cartItemUiModel: CartItemUiModel) {
+    override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
         addToCartUseCase(
             product = cartItemUiModel.product.toDomain(),
             quantity = 1,
@@ -139,6 +124,30 @@ class ProductViewModel(
                 fetchCartItemCount()
             },
             onFailure = { _toastMessage.value = R.string.product_toast_add_cart_fail },
+        )
+    }
+
+    override fun onClickMinus(id: Long) {
+        decreaseProductQuantityUseCase(
+            id,
+            onSuccess = {
+                updateQuantity(id, -1)
+                fetchCartItemCount()
+            },
+            onFailure = { _toastMessage.value = R.string.product_toast_increase_fail },
+        )
+    }
+
+    override fun onClickPlus(id: Long) {
+        increaseProductQuantityUseCase(
+            id,
+            onSuccess = {
+                updateQuantity(id, 1)
+                fetchCartItemCount()
+            },
+            onFailure = {
+                _toastMessage.value = R.string.product_toast_increase_fail
+            },
         )
     }
 

@@ -15,20 +15,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
-class CartActivity :
-    AppCompatActivity(),
-    CartPageClickListener,
-    CartCounterClickListener {
+class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels { CartViewModelFactory() }
     private val cartAdapter by lazy {
         CartAdapter(
-            cartCounterClickListener = this,
-            cartPageClickListener = this,
+            cartCounterClickListener = viewModel,
+            cartPageClickListener = viewModel,
         )
     }
 
@@ -38,7 +34,7 @@ class CartActivity :
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
         binding.vm = viewModel
-        binding.clickListener = this
+        binding.clickListener = viewModel
         binding.lifecycleOwner = this
 
         showSkeleton(true)
@@ -106,6 +102,12 @@ class CartActivity :
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
         }
+
+        viewModel.navigateTo.observe(this) { (totalPrice, totalCount) ->
+            val intent =
+                RecommendActivity.newIntent(this, totalPrice, totalCount)
+            startActivity(intent)
+        }
     }
 
     private fun showSkeleton(isLoading: Boolean) {
@@ -121,36 +123,6 @@ class CartActivity :
         @StringRes messageResId: Int,
     ) {
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onClickMinus(id: Long) {
-        viewModel.decreaseQuantity(id)
-    }
-
-    override fun onClickPlus(id: Long) {
-        viewModel.increaseQuantity(id)
-    }
-
-    override fun onClickDelete(cartItem: CartItemUiModel) {
-        viewModel.deleteProduct(cartItem)
-    }
-
-    override fun onClickSelect(cartId: Long) {
-        viewModel.toggleItemChecked(cartId)
-    }
-
-    override fun onClickCheckAll() {
-        viewModel.toggleItemCheckAll()
-    }
-
-    override fun onClickRecommend() {
-        val intent =
-            RecommendActivity.newIntent(
-                this,
-                viewModel.selectedTotalPrice.value ?: 0,
-                viewModel.selectedTotalCount.value ?: 0,
-            )
-        startActivity(intent)
     }
 
     companion object {

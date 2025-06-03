@@ -34,6 +34,8 @@ class RecommendViewModel(
     val selectedTotalCount: LiveData<Int> = _selectedTotalCount
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
+    private val _navigateTo = SingleLiveData<Long>()
+    val navigateTo: LiveData<Long> = _navigateTo
 
     init {
         fetchData()
@@ -76,6 +78,7 @@ class RecommendViewModel(
     }
 
     override fun onClickProductItem(productId: Long) {
+        _navigateTo.value = productId
     }
 
     override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {

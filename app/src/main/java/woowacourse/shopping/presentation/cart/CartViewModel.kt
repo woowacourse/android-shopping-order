@@ -17,7 +17,9 @@ class CartViewModel(
     private val cartRepository: CartRepository,
     private val increaseProductQuantityUseCase: IncreaseProductQuantityUseCase,
     private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
-) : ViewModel() {
+) : ViewModel(),
+    CartPageClickListener,
+    CartCounterClickListener {
     private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
     val uiState: LiveData<ResultState<Unit>> = _uiState
     private val _cartItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
@@ -45,6 +47,8 @@ class CartViewModel(
     val isCheckAll: LiveData<Boolean> = _isCheckAll
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
+    private val _navigateTo = SingleLiveData<Pair<Int, Int>>()
+    val navigateTo: LiveData<Pair<Int, Int>> = _navigateTo
 
     fun loadItems(currentPage: Int = 0) {
         _uiState.value = ResultState.Loading
@@ -70,7 +74,7 @@ class CartViewModel(
         }
     }
 
-    fun deleteProduct(cartItem: CartItemUiModel) {
+    override fun onClickDelete(cartItem: CartItemUiModel) {
         cartRepository.deleteProduct(cartItem.product.id) { result ->
             result
                 .onSuccess {
@@ -82,17 +86,26 @@ class CartViewModel(
         }
     }
 
-    fun increaseQuantity(productId: Long) {
-        increaseProductQuantityUseCase(
-            productId,
-            onSuccess = { updateQuantity(productId, 1) },
-            onFailure = { _toastMessage.value = R.string.cart_toast_increase_fail },
-        )
+    override fun onClickSelect(cartId: Long) {
+        val newCartItems =
+            _cartItems.value?.map { if (it.id == cartId) it.copy(isSelected = !it.isSelected) else it }
+                ?: return
+        _cartItems.postValue(newCartItems)
     }
 
-    fun decreaseQuantity(productId: Long) {
+    override fun onClickCheckAll() {
+        val currentCheckState = _isCheckAll.value ?: return
+        val toggledState = !currentCheckState
+        _cartItems.value = _cartItems.value?.map { it.copy(isSelected = toggledState) }.orEmpty()
+    }
+
+    override fun onClickRecommend() {
+        _navigateTo.value = Pair(selectedTotalPrice.value ?: 0, selectedTotalCount.value ?: 0)
+    }
+
+    override fun onClickMinus(id: Long) {
         val currentItems = cartItems.value ?: emptyList()
-        val item = currentItems.find { it.product.id == productId } ?: return
+        val item = currentItems.find { it.product.id == id } ?: return
 
         if (item.quantity == 1) {
             _toastMessage.value = R.string.cart_toast_invalid_quantity
@@ -100,17 +113,18 @@ class CartViewModel(
         }
 
         decreaseProductQuantityUseCase(
-            productId,
-            onSuccess = { updateQuantity(productId, -1) },
+            id,
+            onSuccess = { updateQuantity(id, -1) },
             onFailure = { _toastMessage.value = R.string.cart_toast_decrease_fail },
         )
     }
 
-    fun toggleItemChecked(cartId: Long) {
-        val newCartItems =
-            _cartItems.value?.map { if (it.id == cartId) it.copy(isSelected = !it.isSelected) else it }
-                ?: return
-        _cartItems.postValue(newCartItems)
+    override fun onClickPlus(id: Long) {
+        increaseProductQuantityUseCase(
+            id,
+            onSuccess = { updateQuantity(id, 1) },
+            onFailure = { _toastMessage.value = R.string.cart_toast_increase_fail },
+        )
     }
 
     private fun updateQuantity(
@@ -130,11 +144,5 @@ class CartViewModel(
                 }
             }
         _cartItems.postValue(updatedItem)
-    }
-
-    fun toggleItemCheckAll() {
-        val currentCheckState = _isCheckAll.value ?: return
-        val toggledState = !currentCheckState
-        _cartItems.value = _cartItems.value?.map { it.copy(isSelected = toggledState) }.orEmpty()
     }
 }

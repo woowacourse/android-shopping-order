@@ -15,14 +15,13 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
 import woowacourse.shopping.presentation.Extra
-import woowacourse.shopping.presentation.cart.CartCounterClickListener
-import woowacourse.shopping.presentation.product.ItemClickListener
+import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 
 class RecommendActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRecommendBinding
     private val viewModel: RecommendViewModel by viewModels { RecommendViewModelFactory() }
     private val recommendAdapter: RecommendAdapter by lazy {
-        RecommendAdapter(viewModel as ItemClickListener, viewModel as CartCounterClickListener)
+        RecommendAdapter(itemClickListener = viewModel, counterClickListener = viewModel)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +74,12 @@ class RecommendActivity : AppCompatActivity() {
 
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
+        }
+
+        viewModel.navigateTo.observe(this) { productId ->
+            val intent =
+                ProductDetailActivity.newIntent(this, productId = productId)
+            startActivity(intent)
         }
     }
 

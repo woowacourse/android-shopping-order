@@ -16,28 +16,23 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductBinding
 import woowacourse.shopping.databinding.ViewCartActionBinding
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.cart.CartActivity
-import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 
-class ProductActivity :
-    AppCompatActivity(),
-    CartCounterClickListener,
-    ItemClickListener {
+class ProductActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProductBinding
     private var _toolbarBinding: ViewCartActionBinding? = null
     private val toolbarBinding get() = _toolbarBinding!!
     private val viewModel: ProductViewModel by viewModels { ProductViewModelFactory() }
     private val recentProductAdapter: RecentProductAdapter by lazy {
-        RecentProductAdapter(this)
+        RecentProductAdapter(viewModel)
     }
     private val productAdapter: ProductAdapter by lazy {
         ProductAdapter(
             onClickLoadMore = ::handleLoadMoreClick,
-            cartCounterClickListener = this,
-            itemClickListener = this,
+            cartCounterClickListener = viewModel,
+            itemClickListener = viewModel,
         )
     }
 
@@ -156,6 +151,12 @@ class ProductActivity :
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
         }
+
+        viewModel.navigateTo.observe(this) { productId ->
+            val intent =
+                ProductDetailActivity.newIntent(this, productId = productId)
+            startActivity(intent)
+        }
     }
 
     private fun showSkeleton(isLoading: Boolean) {
@@ -187,24 +188,6 @@ class ProductActivity :
     private fun navigateToCart() {
         val intent = CartActivity.newIntent(this)
         startActivity(intent)
-    }
-
-    override fun onClickProductItem(productId: Long) {
-        val intent =
-            ProductDetailActivity.newIntent(this, productId = productId)
-        startActivity(intent)
-    }
-
-    override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
-        viewModel.addToCart(cartItemUiModel)
-    }
-
-    override fun onClickMinus(id: Long) {
-        viewModel.decreaseQuantity(id)
-    }
-
-    override fun onClickPlus(id: Long) {
-        viewModel.increaseQuantity(id)
     }
 
     override fun onDestroy() {
