@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.widget.CheckBox" />
+
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.view.cart.CartViewModel" />
@@ -45,7 +47,6 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
         </Toolbar>
 
         <androidx.fragment.app.FragmentContainerView
@@ -80,6 +81,7 @@
                     android:layout_height="0dp"
                     android:background="@color/gray_55"
                     android:gravity="center_horizontal|bottom"
+                    android:onClick="@{(view) -> eventListener.onBatchSelect(((CheckBox) view).isChecked)}"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toTopOf="@id/tv_select_all_description"
@@ -99,7 +101,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/select_all" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -125,6 +126,7 @@
                 android:layout_height="0dp"
                 android:background="@color/mint"
                 android:gravity="center"
+                android:onClick="@{() -> eventListener.onPlaceOrder()}"
                 android:padding="10dp"
                 android:text="@{String.format(@string/place_order_text, vm.totalCount)}"
                 android:textColor="@color/white"
@@ -134,8 +136,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="주문하기" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

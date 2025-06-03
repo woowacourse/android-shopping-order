@@ -8,17 +8,13 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
 import woowacourse.shopping.presentation.view.common.BaseFragment
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
 
-class CartFragment :
-    BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
-    CartEventListener,
-    ItemCounterListener {
+class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
+
     private val backCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -26,9 +22,27 @@ class CartFragment :
             }
         }
 
+    private val cartEventListener =
+        object : CartEventListener {
+            override fun onPlaceOrder() {
+                childFragmentManager.commit {
+                    replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                }
+                binding.checkboxWrapper.isVisible = false
+                viewModel.fetchRecommendedProducts()
+            }
+
+            override fun onBatchSelect(isChecked: Boolean) {
+                viewModel.setAllSelections(isChecked)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        navigateToScreen()
+        childFragmentManager.commit {
+            setReorderingAllowed(true)
+            add(R.id.cart_fragment_container, CartItemFragment::class.java, null)
+        }
     }
 
     override fun onViewCreated(
@@ -36,20 +50,9 @@ class CartFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.vm = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-
+        initBinding()
         initObserver()
-        initListener()
-
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
-
-        binding.selectAll.setOnClickListener {
-            onBatchSelect(binding.selectAll.isChecked)
-        }
-        binding.btnPlaceOrder.setOnClickListener {
-            navigateToRecommendation()
-        }
     }
 
     override fun onDestroyView() {
@@ -57,10 +60,14 @@ class CartFragment :
         backCallback.remove()
     }
 
-    private fun navigateToScreen() {
-        childFragmentManager.commit {
-            setReorderingAllowed(true)
-            add(R.id.cart_fragment_container, CartItemFragment::class.java, null)
+    private fun initBinding() {
+        binding.apply {
+            vm = viewModel
+            lifecycleOwner = viewLifecycleOwner
+            eventListener = cartEventListener
+        }
+        binding.btnBack.setOnClickListener {
+            navigateBack()
         }
     }
 
@@ -70,37 +77,10 @@ class CartFragment :
         }
     }
 
-    private fun initListener() {
-        binding.btnBack.setOnClickListener {
-            navigateBack()
-        }
-        binding.eventListener = this
-    }
-
     private fun navigateBack() {
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
             remove(this@CartFragment)
         }
-    }
-
-    private fun navigateToRecommendation() {
-        childFragmentManager.commit {
-            replace(R.id.cart_fragment_container, CartRecommendationFragment())
-        }
-        binding.checkboxWrapper.isVisible = false
-        viewModel.fetchRecommendedProducts()
-    }
-
-    override fun onBatchSelect(isChecked: Boolean) {
-        viewModel.setAllSelections(isChecked)
-    }
-
-    override fun increaseQuantity(product: ProductUiModel) {
-        viewModel.increaseQuantity(product)
-    }
-
-    override fun decreaseQuantity(product: ProductUiModel) {
-        viewModel.decreaseQuantity(product)
     }
 }
