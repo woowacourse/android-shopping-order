@@ -2,6 +2,7 @@ package woowacourse.shopping.data.db
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -33,37 +34,39 @@ class HistoryDaoTest {
     }
 
     @Test
-    fun `새로운_기록을_추가한다`() {
-        // when
-        val entity = historyEntityFixture1
+    fun `새로운_기록을_추가한다`() =
+        runTest {
+            // when
+            val entity = historyEntityFixture1
 
-        // given
-        historyDao.insert(entity)
+            // given
+            historyDao.insert(entity)
 
-        // then
-        val actual = historyDao.getLatestHistory()
-        assertEquals(actual, listOf(entity))
-    }
-
-    @Test
-    fun `최근_10개의_기록을_가져온다`() {
-        // when
-        historyEntityListFixture.forEach {
-            historyDao.insert(it)
+            // then
+            val actual = historyDao.getLatestHistories()
+            assertEquals(actual, listOf(entity))
         }
 
-        // given
-        historyDao.getLatestHistory()
+    @Test
+    fun `최근_10개의_기록을_가져온다`() =
+        runTest {
+            // when
+            historyEntityListFixture.forEach {
+                historyDao.insert(it)
+            }
 
-        val expected =
-            (2L..11L).map { id ->
-                HistoryEntity(productId = id, createdAt = id)
-            }.reversed()
+            // given
+            historyDao.getLatestHistories()
 
-        // then
-        val actual = historyDao.getLatestHistory()
-        assertEquals(actual, expected)
-    }
+            val expected =
+                (2L..11L).map { id ->
+                    HistoryEntity(productId = id, createdAt = id)
+                }.reversed()
+
+            // then
+            val actual = historyDao.getLatestHistories()
+            assertEquals(actual, expected)
+        }
 
     @After
     fun tearDown() {
