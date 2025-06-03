@@ -27,7 +27,7 @@ Cart 화면 구현
 - [ ] 추천된 상품을 해당 화면에서 바로 추가하여 같이 주문할 수 있다. 구현
 - [ ] 총 가격은 변하는데 왜 체크 박스는 변하지 않는 기능 수정
 
-- [ ] ShoppingApplication에 thread { DevMockServer.start() } 삭제
+- [x] ShoppingApplication에 thread { DevMockServer.start() } 삭제
 - [ ] ShoppingApplication에서 정말 SharedPreferences에 값을 저장하고 있는 지 확인 + SharedPreference에서 어떻게 동작하는 지 확인
 - [ ] CatalogViewModel에서 catalogProduct, quantity 사용하지 않는 값 삭제
 - [ ] CatalogViewModel에서 interface에서 remoteCatalogProductRepositoryImpl 실제 구현체 주입 -> 수정
