@@ -29,6 +29,7 @@ object RetrofitProductService {
                 original
                     .newBuilder()
                     .header("Authorization", "Basic $base64Credentials")
+                    .header("accept", "*/*")
                     .build()
             chain.proceed(requestWithAuth)
         }
