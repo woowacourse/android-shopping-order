@@ -194,7 +194,7 @@ class CartRemoteDataSourceImpl(
     override fun addItem(
         itemId: Int,
         itemCount: Int,
-        onSuccess: (resultCode: Int) -> Unit,
+        onSuccess: (resultCode: Int, cartId: Int) -> Unit,
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
@@ -208,7 +208,10 @@ class CartRemoteDataSourceImpl(
                         response: Response<Unit>,
                     ) {
                         if (response.isSuccessful) {
-                            onSuccess(response.code())
+                            val location = response.headers()["Location"]
+                            val cartItemId = extractCartItemId(location)
+
+                            onSuccess(response.code(), cartItemId)
                         } else {
                             onFailure(CartFetchError.Server(response.code(), response.message()))
                         }
@@ -223,4 +226,11 @@ class CartRemoteDataSourceImpl(
                 },
             )
     }
+
+    private fun extractCartItemId(location: String?): Int =
+        try {
+            location?.substringAfterLast("/")?.toInt() ?: 0
+        } catch (e: NumberFormatException) {
+            0
+        }
 }

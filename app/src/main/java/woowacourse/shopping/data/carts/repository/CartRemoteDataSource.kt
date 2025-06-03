@@ -48,7 +48,7 @@ interface CartRemoteDataSource {
     fun addItem(
         itemId: Int,
         itemCount: Int,
-        onSuccess: (resultCode: Int) -> Unit,
+        onSuccess: (resultCode: Int, cartId: Int) -> Unit,
         onFailure: (CartFetchError) -> Unit,
     )
 }

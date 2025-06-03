@@ -103,7 +103,7 @@ class CartRepositoryImpl(
     override fun addCartItem(
         goods: Goods,
         quantity: Int,
-        onComplete: (Int) -> Unit,
+        onComplete: (resultCode: Int, cartId: Int) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
         remoteDataSource.addItem(goods.id, quantity, onComplete, onFail)

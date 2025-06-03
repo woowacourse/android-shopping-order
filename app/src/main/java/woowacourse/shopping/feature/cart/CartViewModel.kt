@@ -118,9 +118,9 @@ class CartViewModel(
                     10,
                     goods.category,
                     { goodsResponse ->
-                        val allGoodsList = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
+                        val categoryGoods = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
 
-                        filterRecommendedGoods(allGoodsList)
+                        filterAndSetRecommendedGoods(categoryGoods)
                     },
                     {
                         loadDefaultRecommendedGoods()
@@ -132,33 +132,40 @@ class CartViewModel(
         }
     }
 
-    private fun filterRecommendedGoods(allGoodsList: List<CartItem>) {
+    private fun filterAndSetRecommendedGoods(
+        recommendGoodsList: List<CartItem>,
+        pageOffset: Int = 0,
+    ) {
         cartRepository.fetchAllCartItems(
             { cartResponse: CartResponse ->
                 val cartItems = cartResponse.toCartItems()
                 val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
 
-                val filteredGoodsList =
-                    allGoodsList.filter { recommendItem ->
+                val cartFilteredGoodsList =
+                    recommendGoodsList.filter { recommendItem ->
                         !cartGoodsIds.contains(recommendItem.goods.id)
                     }
 
-                _recommendedGoods.value = filteredGoodsList
+                if (cartFilteredGoodsList.isNotEmpty()) {
+                    _recommendedGoods.value = cartFilteredGoodsList
+                } else {
+                    loadDefaultRecommendedGoods(pageOffset + 1)
+                }
             },
             {
-                _recommendedGoods.value = allGoodsList
+                _recommendedGoods.value = recommendGoodsList
             },
         )
     }
 
-    private fun loadDefaultRecommendedGoods() {
+    private fun loadDefaultRecommendedGoods(pageOffset: Int = 0) {
         goodsRepository.fetchPageGoods(
             10,
-            1,
+            pageOffset * 10,
             { response ->
                 val allGoodsList = response.content.map { CartItem(it.toDomain(), 0) }
 
-                filterRecommendedGoods(allGoodsList)
+                filterAndSetRecommendedGoods(allGoodsList, pageOffset)
             },
             {
                 _recommendedGoods.value = emptyList()
@@ -167,17 +174,42 @@ class CartViewModel(
     }
 
     fun addCartItemOrIncreaseQuantityFromRecommend(cartItem: CartItem) {
-        val currentList = _recommendedGoods.value ?: return
-        val updatedList =
-            currentList.map { item ->
-                if (item.goods.id == cartItem.goods.id) {
-                    item.copy(quantity = item.quantity + 1)
-                } else {
-                    item
-                }
+        when {
+            _carts.value?.contains(cartItem.id) == true -> {
+                val currentList = _recommendedGoods.value ?: return
+                val updatedList =
+                    currentList.map { item ->
+                        if (item.goods.id == cartItem.goods.id) {
+                            item.copy(quantity = item.quantity + 1)
+                        } else {
+                            item
+                        }
+                    }
+                _recommendedGoods.value = updatedList
+                increaseQuantity(cartItem)
             }
-        _recommendedGoods.value = updatedList
-        addCartItemOrIncreaseQuantity(cartItem)
+            else -> {
+                cartRepository.addCartItem(cartItem.goods, 1, { resultCode: Int, cartId: Int ->
+                    val currentList = _recommendedGoods.value ?: return@addCartItem
+                    val newItem = cartItem.copy(quantity = cartItem.quantity + 1, id = cartId, isSelected = true)
+                    val updatedList =
+                        currentList.map { item ->
+                            if (item.goods.id == cartItem.goods.id) {
+                                newItem
+                            } else {
+                                item
+                            }
+                        }
+                    _recommendedGoods.value = updatedList
+                    addLocalCartItem(newItem)
+                }, { })
+            }
+        }
+    }
+
+    private fun addLocalCartItem(cartItem: CartItem) {
+        val addedItem: List<CartItem> = cartsList.value?.plus(listOf<CartItem>(cartItem)) ?: emptyList()
+        _carts.value = addedItem.associateBy { it.id }.toMutableMap()
     }
 
     private fun updateCartItem(
@@ -200,12 +232,6 @@ class CartViewModel(
     ) {
         updateCartItem(cartItem.id) { item ->
             item.copy(isSelected = changeCheckValue)
-        }
-    }
-
-    fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
-        updateCartItem(cartItem.id) { item ->
-            item.copy(quantity = item.quantity + 1)
         }
     }
 

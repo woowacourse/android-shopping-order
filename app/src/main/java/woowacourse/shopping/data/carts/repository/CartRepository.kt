@@ -49,7 +49,7 @@ interface CartRepository {
     fun addCartItem(
         goods: Goods,
         quantity: Int,
-        onComplete: (Int) -> Unit,
+        onComplete: (resultCode: Int, cartId: Int) -> Unit,
         onFail: (CartFetchError) -> Unit,
     )
 }

@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.goodsdetails
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -59,15 +58,16 @@ class GoodsDetailsViewModel(
         cartItem.value?.let { item ->
 
             if (cartUiModel != null) {
-                Log.d("test", "addToCart")
                 cartRepository.updateQuantity(
                     cartUiModel.cartId,
                     CartQuantity(cartUiModel.cartQuantity + item.quantity),
                     { addedCart(item.quantity) },
-                    { Log.d("test", "fail") },
+                    { },
                 )
             } else {
-                cartRepository.addCartItem(item.goods, item.quantity, { addedCart(item.quantity) }, {})
+                cartRepository.addCartItem(item.goods, item.quantity, { resultCode: Int, cartId: Int ->
+                    addedCart(item.quantity)
+                }, {})
             }
         }
     }
