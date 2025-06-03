@@ -50,7 +50,7 @@
                 android:id="@+id/text_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="전체"
+                android:text="@string/text_select_all"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@id/checkbox_all_check"
