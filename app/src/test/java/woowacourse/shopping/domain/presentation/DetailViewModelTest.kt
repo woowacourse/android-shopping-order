@@ -27,7 +27,7 @@ class DetailViewModelTest {
     @Test
     fun `addCartItem하면 saveState가 바뀐다`() {
         val product = dummyProductUiModelFixture[1]
-        viewModel.fetchProduct(product)
+        viewModel.loadProduct(product)
 
         viewModel.addToCart()
 

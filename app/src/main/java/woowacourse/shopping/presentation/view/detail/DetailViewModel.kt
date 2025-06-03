@@ -10,7 +10,6 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
-import woowacourse.shopping.presentation.model.toProduct
 import woowacourse.shopping.presentation.model.toProductUiModel
 
 class DetailViewModel(
@@ -26,30 +25,32 @@ class DetailViewModel(
     private val _lastViewedProduct = MutableLiveData<ProductUiModel>()
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
 
-    fun fetchProduct(id: Long) {
+    fun loadProduct(id: Long) {
         productRepository.findProductById(id) { product ->
             cartRepository.findCartItemByProductId(id) { cartItem ->
                 if (cartItem == null) {
-                    _product.postValue(product?.toProductUiModel()?.copy(quantity = 1))
+                    _product.postValue(product?.toProductUiModel()?.copy(quantity = MIN_QUANTITY))
                 } else {
-                    _product.postValue(cartItem.toProductUiModel().copy(quantity = 1))
+                    _product.postValue(cartItem.toProductUiModel().copy(quantity = MIN_QUANTITY))
+                }
+                productRepository.loadRecentProducts(1) { recentProducts ->
+                    if (recentProducts.isNotEmpty()) {
+                        _lastViewedProduct.postValue(recentProducts.first().toProductUiModel())
+                    }
+                    if (product != null) productRepository.addRecentProduct(product)
                 }
             }
         }
     }
 
-    fun addRecentProduct(product: ProductUiModel) {
-        productRepository.addRecentProduct(product.toProduct())
-    }
-
     fun increaseQuantity() {
-        val currentQuantity = _product.value?.quantity ?: 1
+        val currentQuantity = _product.value?.quantity ?: MIN_QUANTITY
         _product.postValue(_product.value?.copy(quantity = currentQuantity + 1))
     }
 
     fun decreaseQuantity() {
-        val currentQuantity = _product.value?.quantity ?: 1
-        _product.postValue(_product.value?.copy(quantity = (currentQuantity - 1).coerceAtLeast(1)))
+        val currentQuantity = _product.value?.quantity ?: MIN_QUANTITY
+        _product.postValue(_product.value?.copy(quantity = (currentQuantity - 1).coerceAtLeast(MIN_QUANTITY)))
     }
 
     fun addToCart() {
@@ -70,15 +71,9 @@ class DetailViewModel(
         }
     }
 
-    fun fetchLastViewedProduct() {
-        productRepository.loadRecentProducts(1) { recentProducts ->
-            if (recentProducts.isNotEmpty()) {
-                _lastViewedProduct.postValue(recentProducts.first().toProductUiModel())
-            }
-        }
-    }
-
     companion object {
+        private const val MIN_QUANTITY = 1
+
         @Suppress("UNCHECKED_CAST")
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

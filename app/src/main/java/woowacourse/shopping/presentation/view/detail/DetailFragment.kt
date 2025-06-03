@@ -25,8 +25,8 @@ class DetailFragment :
         initObserver()
         initListener()
 
-        val product = arguments?.getLong(PRODUCT_ID) ?: 0
-        viewModel.fetchProduct(product)
+        val productId = arguments?.getLong(PRODUCT_ID) ?: 0
+        viewModel.loadProduct(productId)
 
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
@@ -49,8 +49,6 @@ class DetailFragment :
 
             product.observe(viewLifecycleOwner) { product ->
                 binding.product = product
-                addRecentProduct(product)
-                fetchLastViewedProduct()
             }
         }
     }
@@ -69,7 +67,7 @@ class DetailFragment :
     }
 
     override fun onRecentItemSelected(product: ProductUiModel) {
-        viewModel.fetchProduct(product.id)
+        viewModel.loadProduct(product.id)
     }
 
     companion object {
