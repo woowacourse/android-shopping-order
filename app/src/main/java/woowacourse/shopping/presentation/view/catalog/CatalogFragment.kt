@@ -72,13 +72,6 @@ class CatalogFragment :
                         }
                     }
             }
-
-//        binding.recyclerViewProducts.addItemDecoration(
-//            GridSpacingItemDecoration(
-//                SPAN_COUNT,
-//                ITEM_SPACING,
-//            ),
-//        )
         binding.recyclerViewProducts.adapter = catalogAdapter
     }
 
@@ -120,6 +113,5 @@ class CatalogFragment :
     companion object {
         private const val SPAN_COUNT = 2
         private const val SINGLE_SPAN_COUNT = 1
-        private const val ITEM_SPACING = 12f
     }
 }
