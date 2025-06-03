@@ -67,8 +67,9 @@ class CartViewModel(
         updateTotalCount()
     }
 
-    fun deleteCartProduct(cartProduct: ProductItem) {
-        cartProductRepository.deleteCartProduct(cartProduct.productItem.cartItemId ?: return) {
+    fun deleteCartProduct(cartItemId: Int?) {
+        cartItemId ?: return
+        cartProductRepository.deleteCartProduct(cartItemId) {
             loadCartProducts()
         }
     }

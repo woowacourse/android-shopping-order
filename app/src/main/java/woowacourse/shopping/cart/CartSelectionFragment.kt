@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -45,7 +44,7 @@ class CartSelectionFragment : Fragment() {
                     },
                 cartActionListener =
                     object : CartActionListener {
-                        override fun onDeleteProduct(product: ProductUiModel) = viewModel.deleteCartProduct(ProductItem(product))
+                        override fun onDeleteProduct(product: ProductUiModel) = viewModel.deleteCartProduct(product.cartItemId)
 
                         override fun onCheckToggle(product: ProductUiModel) = viewModel.changeProductSelection(product)
                     },
