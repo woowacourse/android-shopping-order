@@ -41,7 +41,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         super.onCreate(savedInstanceState)
         childFragmentManager.commit {
             setReorderingAllowed(true)
-            add(R.id.cart_fragment_container, CartItemFragment::class.java, null)
+            replace(R.id.cart_fragment_container, CartItemFragment::class.java, null)
         }
     }
 

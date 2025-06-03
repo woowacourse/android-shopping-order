@@ -42,7 +42,7 @@ class ShoppingActivity : AppCompatActivity() {
     private fun navigateToScreen() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            add(R.id.shopping_fragment_container, CatalogFragment::class.java, null)
+            replace(R.id.shopping_fragment_container, CatalogFragment::class.java, null)
         }
     }
 }
