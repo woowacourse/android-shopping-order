@@ -1,10 +1,9 @@
-package woowacourse.shopping.product.catalog
+package woowacourse.shopping.presentation.product.catalog
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.ProductQuantityHandler
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
 import woowacourse.shopping.presentation.product.catalog.viewHolder.LoadButtonViewHolder
 import woowacourse.shopping.presentation.product.catalog.viewHolder.ProductViewHolder

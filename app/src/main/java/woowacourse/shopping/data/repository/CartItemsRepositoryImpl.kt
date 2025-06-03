@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.CachedCartItem
-import woowacourse.shopping.data.model.Content
+import woowacourse.shopping.data.model.CartItemResponse.Content
 import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
 import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData

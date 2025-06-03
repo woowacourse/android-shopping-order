@@ -11,7 +11,7 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ProductsRepositoryImpl(
     private val productsRemoteDataSource: ProductsRemoteDataSource,
-    private val viewedItemRepository: ViewedItemRepository
+    private val viewedItemRepository: ViewedItemRepository,
 ) : ProductsRepository {
     override fun getProducts(
         page: Int,
@@ -47,7 +47,7 @@ class ProductsRepositoryImpl(
 
     override fun getRecommendedProductsFromLastViewed(
         cartProductIds: List<Long>,
-        onResult: (Result<List<ProductUiModel>>) -> Unit
+        onResult: (Result<List<ProductUiModel>>) -> Unit,
     ) {
         viewedItemRepository.getLastViewedItem { item ->
             if (item != null) {
@@ -65,7 +65,7 @@ class ProductsRepositoryImpl(
     private fun getRecommendedProducts(
         category: String,
         cartProductIds: List<Long>,
-        onResult: (Result<List<ProductUiModel>>) -> Unit
+        onResult: (Result<List<ProductUiModel>>) -> Unit,
     ) {
         productsRemoteDataSource.getProductsByCategory(category) { result ->
             result
