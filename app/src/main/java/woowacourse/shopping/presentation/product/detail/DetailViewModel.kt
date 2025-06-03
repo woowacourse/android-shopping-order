@@ -19,6 +19,7 @@ class DetailViewModel(
     private val productsRepository: ProductsRepository,
     private val cartItemRepository: CartItemRepository,
     private val viewedRepository: ViewedItemRepository,
+    private val productId: Long,
 ) : ViewModel() {
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
@@ -30,10 +31,9 @@ class DetailViewModel(
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
 
     fun setProduct(
-        id: Long,
         onInserted: () -> Unit = {},
     ) {
-        productsRepository.getProductById(id) { result ->
+        productsRepository.getProductById(productId) { result ->
             result
                 .onSuccess { product ->
                     val loadedProduct = product.copy(quantity = 1)
@@ -59,9 +59,9 @@ class DetailViewModel(
         }
     }
 
-    fun loadLastViewedItem(currentProductId: Long) {
+    fun loadLastViewedItem() {
         viewedRepository.getLastViewedItem { lastViewedItem ->
-            val filtered = if (lastViewedItem?.id == currentProductId) null else lastViewedItem
+            val filtered = if (lastViewedItem?.id == productId) null else lastViewedItem
             _lastViewed.postValue(filtered)
         }
     }
@@ -77,15 +77,20 @@ class DetailViewModel(
     }
 
     companion object {
-        val FACTORY: ViewModelProvider.Factory =
-            viewModelFactory {
+        fun provideFactory(
+            productId: Long,
+        ): ViewModelProvider.Factory {
+            return viewModelFactory {
                 initializer {
                     DetailViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartItemRepository = RepositoryProvider.cartItemRepository,
                         viewedRepository = RepositoryProvider.viewedItemRepository,
+                        productId = productId
                     )
                 }
             }
+        }
+
     }
 }

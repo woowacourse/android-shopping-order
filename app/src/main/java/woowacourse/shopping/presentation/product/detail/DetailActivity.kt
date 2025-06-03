@@ -14,14 +14,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailBinding
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
 import woowacourse.shopping.presentation.product.detail.event.DetailEventHandlerImpl
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
+    private val productId: Long by lazy { intent.getLongExtra(KEY_PRODUCT_DETAIL, 0) }
     private val viewModel: DetailViewModel by viewModels {
-        DetailViewModel.FACTORY
+        DetailViewModel.provideFactory(productId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,10 +76,8 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun loadInitialData() {
-        productFromIntent().let { id ->
-            viewModel.setProduct(id)
-            viewModel.loadLastViewedItem(id)
-        }
+        viewModel.setProduct()
+        viewModel.loadLastViewedItem()
     }
 
     private fun setupToolbar() {
