@@ -98,6 +98,12 @@ class CartActivity :
             setResult(RESULT_OK)
             finish()
         }
+
+        viewModel.allSelected.observe(this) { selectAll: Boolean ->
+            if (selectAll == true) {
+                viewModel.selectAll()
+            }
+        }
     }
 
     override fun onMinusPage() {

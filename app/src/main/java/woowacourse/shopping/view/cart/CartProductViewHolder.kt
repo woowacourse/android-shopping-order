@@ -27,18 +27,19 @@ class CartProductViewHolder(
                 override fun onMinusProductQuantity(item: CartItemType.ProductItem) {
                     onMinusQuantity(item)
                 }
+
+                override fun onCheckProduct(item: CartItemType.ProductItem) {
+                    if (item.selected) {
+                        onUnselect(item)
+                    } else {
+                        onSelect(item)
+                    }
+                }
             }
     }
 
     fun bind(item: CartItemType.ProductItem) {
         binding.productItem = item
-        binding.shoppingCartProductCheckBox.setOnClickListener {
-            if (binding.shoppingCartProductCheckBox.isChecked) {
-                onSelect(item)
-            } else {
-                onUnselect(item)
-            }
-        }
     }
 
     companion object {

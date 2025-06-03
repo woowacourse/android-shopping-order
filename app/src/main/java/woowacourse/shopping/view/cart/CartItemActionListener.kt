@@ -6,4 +6,6 @@ interface CartItemActionListener {
     fun onPlusProductQuantity(item: CartItemType.ProductItem)
 
     fun onMinusProductQuantity(item: CartItemType.ProductItem)
+
+    fun onCheckProduct(item: CartItemType.ProductItem)
 }

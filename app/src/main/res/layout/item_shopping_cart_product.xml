@@ -26,7 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:checked="@{productItem.checked}"
+            android:checked="@{productItem.selected}"
+            android:onClick="@{() -> shoppingCartItemActionListener.onCheckProduct(productItem)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,6 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="-4dp"
+            android:layout_marginEnd="20dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@{productItem.cartItem.name}"
@@ -42,6 +44,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/shoppingCartProductCheckBox"
+            app:layout_constraintEnd_toStartOf="@id/shoppingCartProductDeleteButton"
             app:layout_constraintStart_toEndOf="@id/shoppingCartProductCheckBox"
             app:layout_constraintTop_toTopOf="@id/shoppingCartProductCheckBox"
             tools:text="[든든] 동원 스위트콘" />

@@ -113,11 +113,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/mint"
+            android:enabled="@{viewModel.orderable}"
             android:onClick="@{() -> onOrder.invoke()}"
             android:paddingHorizontal="16dp"
             android:paddingTop="30dp"
             android:paddingBottom="27dp"
-            android:text="@{@string/shopping_cart_order(viewModel.selectedCartItems.size)}"
+            android:text="@{@string/shopping_cart_order(viewModel.selectedCartItemsCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -148,11 +149,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:orientation="vertical"
+            android:checked="@{viewModel.allSelected}"
+            android:onClick="@{() -> viewModel.allSelected ? viewModel.unselectAll() : viewModel.selectAll()}"
             app:layout_constraintBottom_toBottomOf="@id/shoppingCartOrderPrice"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/shoppingCartOrderPrice"
-            app:layout_constraintVertical_bias="0.542" />
+            app:layout_constraintTop_toTopOf="@id/shoppingCartOrderPrice" />
 
         <TextView
             android:layout_width="wrap_content"

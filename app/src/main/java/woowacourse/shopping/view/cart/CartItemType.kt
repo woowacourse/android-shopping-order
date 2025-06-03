@@ -7,7 +7,7 @@ sealed interface CartItemType {
 
     data class ProductItem(
         val cartItem: CartItem,
-        val checked: Boolean = false,
+        val selected: Boolean,
     ) : CartItemType {
         val cartItemId: Long = cartItem.id
         override val viewType: ItemType = ItemType.PRODUCT
