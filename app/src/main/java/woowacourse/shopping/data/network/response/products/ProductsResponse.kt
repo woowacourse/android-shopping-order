@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.network.response.products
 
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.data.network.response.common.Pageable
+import woowacourse.shopping.data.network.response.common.SortX
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
