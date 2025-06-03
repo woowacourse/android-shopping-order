@@ -157,8 +157,8 @@ class GoodsActivity : AppCompatActivity() {
         } else {
             val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
             intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
-            intent.putExtra(SELECTED_ITEM_CART_ID_KEY, viewModel.findCart(goods)?.id ?: -1)
-            intent.putExtra(MOST_RECENT_ITEM_CART_ID_KEY, viewModel.mostRecentlyViewedCart()?.id ?: -1)
+            intent.putExtra(SELECTED_ITEM_CART_ID_KEY, viewModel.findCart(goods))
+            intent.putExtra(MOST_RECENT_ITEM_CART_ID_KEY, viewModel.mostRecentlyViewedCart())
             startActivity(intent)
         }
     }

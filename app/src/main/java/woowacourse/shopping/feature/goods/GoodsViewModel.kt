@@ -43,9 +43,14 @@ class GoodsViewModel(
         updateRecentlyViewedGoods()
     }
 
-    fun findCart(goods: Goods): CartItem? = cashedCartItems.values.find { it.goods.id == goods.id }
+    fun findCart(goods: Goods): Int = cashedCartItems.values.find { it.goods.id == goods.id }?.id ?: -1
 
-    fun mostRecentlyViewedCart(): CartItem? = cashedCartItems.values.find { it.goods.id == recentlyViewedGoods.value?.get(0)?.id }
+    fun mostRecentlyViewedCart(): Int {
+        val recentGoodsId = recentlyViewedGoods.value?.firstOrNull()?.id
+        return cashedCartItems.values
+            .find { it.goods.id == recentGoodsId }
+            ?.id ?: -1
+    }
 
     private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
