@@ -89,7 +89,7 @@
             android:background="@color/cyan"
             android:clickable="true"
             android:gravity="center"
-            android:onClick="@{() -> viewModel.addToCart()}"
+            android:onClick="@{() -> viewModel.addOrIncreaseToCart()}"
             android:text="@string/goods_details_cart_button"
             android:textColor="@color/white"
             android:textSize="24sp"

@@ -9,6 +9,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
@@ -129,7 +130,7 @@ class CartRemoteDataSourceImpl(
         cartId: Int,
         cartQuantity: CartQuantity,
         onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
+        onFailure: (CartUpdateError) -> Unit,
     ) {
         retrofitService
             .updateCartCounts(
@@ -145,7 +146,11 @@ class CartRemoteDataSourceImpl(
                         if (response.isSuccessful) {
                             onSuccess(response.code())
                         } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
+                            val errorBody = response.errorBody()?.string() ?: ""
+                            when {
+                                errorBody.contains("cartItem not found") -> onFailure(CartUpdateError.NotFound)
+                                else -> onFailure(CartUpdateError.Server(response.code(), errorBody))
+                            }
                         }
                     }
 
@@ -153,7 +158,7 @@ class CartRemoteDataSourceImpl(
                         call: Call<Unit>,
                         t: Throwable,
                     ) {
-                        onFailure(CartFetchError.Network)
+                        onFailure(CartUpdateError.Network)
                     }
                 },
             )

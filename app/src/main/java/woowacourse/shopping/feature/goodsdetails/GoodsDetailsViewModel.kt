@@ -1,15 +1,16 @@
 package woowacourse.shopping.feature.goodsdetails
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
+import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
-import woowacourse.shopping.feature.CartUiModel
 import woowacourse.shopping.feature.GoodsUiModel
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -17,9 +18,9 @@ import woowacourse.shopping.util.toDomain
 
 class GoodsDetailsViewModel(
     private val goodsUiModel: GoodsUiModel,
-    private val cartUiModel: CartUiModel?,
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
+    private var cartId: Int,
 ) : ViewModel() {
     private val _cartItem: MutableLiveData<CartItem> =
         MutableLiveData(CartItem(goodsUiModel.toDomain(), 1))
@@ -54,32 +55,41 @@ class GoodsDetailsViewModel(
         }
     }
 
-    fun addToCart() {
+    fun addOrIncreaseToCart() {
         cartItem.value?.let { item ->
-
-            if (cartUiModel != null) {
-                cartRepository.updateQuantity(
-                    cartUiModel.cartId,
-                    CartQuantity(cartUiModel.cartQuantity + item.quantity),
-                    { addedCart(item.quantity) },
-                    { },
-                )
-            } else {
-                cartRepository.addCartItem(item.goods, item.quantity, { resultCode: Int, cartId: Int ->
-                    addedCart(item.quantity)
-                }, {})
-            }
+            cartRepository.updateQuantity(
+                cartId,
+                CartQuantity(item.quantity),
+                {
+                    alertMessageEvent(R.string.goods_detail_cart_update_complete_toast_message, item.quantity)
+                },
+                { cartUpdateError ->
+                    if (cartUpdateError is CartUpdateError.NotFound) {
+                        addCartItem(item)
+                    }
+                },
+            )
         }
     }
 
-    private fun addedCart(quantity: Int) {
+    private fun addCartItem(item: CartItem) {
+        cartRepository.addCartItem(item.goods, item.quantity, { resultCode: Int, cartId: Int ->
+            alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
+            this.cartId = cartId
+        }, {})
+    }
+
+    private fun alertMessageEvent(
+        @StringRes
+        messageId: Int,
+        quantity: Int,
+    ) {
         _alertEvent.setValue(
             GoodsDetailsAlertMessage(
-                R.string.goods_detail_cart_insert_complete_toast_message,
+                messageId,
                 quantity,
             ),
         )
-        _cartItem.value = _cartItem.value?.copy(quantity = 1)
     }
 
     fun onClickMostRecentlyGoodsSection() {

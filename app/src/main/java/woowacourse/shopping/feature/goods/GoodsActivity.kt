@@ -29,11 +29,11 @@ import woowacourse.shopping.feature.goods.adapter.horizontal.RecentlyViewedGoods
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
-import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.CART_KEY
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.EXTRA_SOURCE
+import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.MOST_RECENT_ITEM_CART_ID_KEY
+import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.SELECTED_ITEM_CART_ID_KEY
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.SOURCE_GOODS_LIST
 import woowacourse.shopping.feature.login.LoginActivity
-import woowacourse.shopping.feature.toUiModel
 import woowacourse.shopping.util.toUi
 
 class GoodsActivity : AppCompatActivity() {
@@ -157,7 +157,8 @@ class GoodsActivity : AppCompatActivity() {
         } else {
             val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
             intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
-            intent.putExtra(CART_KEY, viewModel.findCart(goods)?.toUiModel())
+            intent.putExtra(SELECTED_ITEM_CART_ID_KEY, viewModel.findCart(goods)?.id ?: -1)
+            intent.putExtra(MOST_RECENT_ITEM_CART_ID_KEY, viewModel.mostRecentlyViewedCart()?.id ?: -1)
             startActivity(intent)
         }
     }

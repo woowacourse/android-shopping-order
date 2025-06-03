@@ -45,6 +45,8 @@ class GoodsViewModel(
 
     fun findCart(goods: Goods): CartItem? = cashedCartItems.values.find { it.goods.id == goods.id }
 
+    fun mostRecentlyViewedCart(): CartItem? = cashedCartItems.values.find { it.goods.id == recentlyViewedGoods.value?.get(0)?.id }
+
     private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
 
     fun login(basicKey: String) {

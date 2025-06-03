@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
-import woowacourse.shopping.data.util.mapper.toCartItems
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 
 class CartRepositoryImpl(
@@ -68,13 +67,11 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
-
     override fun updateQuantity(
         cartId: Int,
         cartQuantity: CartQuantity,
         onComplete: () -> Unit,
-        onFail: (CartFetchError) -> Unit,
+        onFail: (CartUpdateError) -> Unit,
     ) {
         remoteDataSource.updateCartItemCount(
             cartId = cartId,

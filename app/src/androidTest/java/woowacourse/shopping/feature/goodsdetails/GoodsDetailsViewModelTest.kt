@@ -125,7 +125,7 @@ class GoodsDetailsViewModelTest {
     }
 
     @Test
-    fun addToCart_호출시_장바구니에_추가되고_알림_이벤트_발생() {
+    fun addOrIncreaseToCart_호출시_장바구니에_추가되고_알림_이벤트_발생() {
         // Given
         repeat(2) { viewModel.increaseSelectorQuantity() } // 수량 3
         val cartItem = viewModel.cartItem.value!!
@@ -136,7 +136,7 @@ class GoodsDetailsViewModelTest {
         assertThat(beforeAlert).isNull()
 
         // When
-        viewModel.addToCart()
+        viewModel.addOrIncreaseToCart()
         waitForCartUpdate()
 
         // Then - SingleLiveData getValue()로 이벤트 확인

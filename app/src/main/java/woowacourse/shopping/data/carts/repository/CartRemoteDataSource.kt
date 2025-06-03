@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 
@@ -36,7 +37,7 @@ interface CartRemoteDataSource {
         cartId: Int,
         cartQuantity: CartQuantity,
         onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
+        onFailure: (CartUpdateError) -> Unit,
     )
 
     fun deleteItem(

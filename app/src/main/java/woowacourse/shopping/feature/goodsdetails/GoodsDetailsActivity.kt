@@ -17,7 +17,6 @@ import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.feature.CartUiModel
 import woowacourse.shopping.feature.GoodsUiModel
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.util.toUi
@@ -25,6 +24,9 @@ import woowacourse.shopping.util.toUi
 class GoodsDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsDetailsBinding
     private lateinit var viewModel: GoodsDetailsViewModel
+    private val mostRecentItemCartId: Int by lazy {
+        intent.getIntExtra(MOST_RECENT_ITEM_CART_ID_KEY, -1)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +36,18 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
         val goodsUiModel =
             IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java) ?: return
-        val cartUiModel =
-            IntentCompat.getParcelableExtra(intent, CART_KEY, CartUiModel::class.java)
+
+        val cartId: Int = intent.getIntExtra(SELECTED_ITEM_CART_ID_KEY, -1)
 
         viewModel =
             GoodsDetailsViewModel(
                 goodsUiModel,
-                cartUiModel,
                 CartRepositoryImpl(CartRemoteDataSourceImpl()),
                 GoodsRepositoryImpl(
                     GoodsRemoteDataSourceImpl(),
                     GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
                 ),
+                cartId,
             )
 
         val source = intent.getStringExtra(EXTRA_SOURCE)
@@ -73,10 +75,12 @@ class GoodsDetailsActivity : AppCompatActivity() {
                 ),
             )
         }
+
         viewModel.clickMostRecentlyGoodsEvent.observe(this) { mostRecentGoods ->
             val intent = newIntent(this, mostRecentGoods.toUi())
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             intent.putExtra(EXTRA_SOURCE, SOURCE_RECENTLY_VIEWED)
+            intent.putExtra(SELECTED_ITEM_CART_ID_KEY, mostRecentItemCartId)
             startActivity(intent)
         }
     }
@@ -106,7 +110,6 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
     companion object {
         private const val GOODS_KEY = "GOODS"
-        const val CART_KEY = "CART"
 
         fun newIntent(
             context: Context,
@@ -117,6 +120,8 @@ class GoodsDetailsActivity : AppCompatActivity() {
             }
 
         const val EXTRA_SOURCE = "extra_source"
+        const val SELECTED_ITEM_CART_ID_KEY = "cart_id"
+        const val MOST_RECENT_ITEM_CART_ID_KEY = "most_cart_ids"
         const val SOURCE_RECENTLY_VIEWED = "recently_viewed"
         const val SOURCE_GOODS_LIST = "goods_list"
     }
