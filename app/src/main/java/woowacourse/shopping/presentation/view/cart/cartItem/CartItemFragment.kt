@@ -35,29 +35,19 @@ class CartItemFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-
-        setCartAdapter()
-        initObserver()
-    }
-
-    private fun setCartAdapter() {
         binding.recyclerViewCart.adapter = cartItemAdapter
-        viewModel.page.observe(viewLifecycleOwner) {
-            binding.recyclerViewCart.smoothScrollToPosition(0)
-        }
+        initObserver()
     }
 
     private fun initObserver() {
         viewModel.cartItems.observe(viewLifecycleOwner) {
-            cartItemAdapter.updateCartItems(it)
+            cartItemAdapter.submitList(it)
         }
 
         viewModel.deleteEvent.observe(viewLifecycleOwner) {
-            it?.let {
-                cartItemAdapter.removeProduct(it)
-                viewModel.fetchShoppingCart(isNextPage = false, isRefresh = true)
-                viewModel.fetchRecommendedProducts()
-            }
+            cartItemAdapter.removeProduct(it)
+            viewModel.fetchShoppingCart(isNextPage = false, isRefresh = true)
+            viewModel.fetchRecommendedProducts()
         }
 
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {

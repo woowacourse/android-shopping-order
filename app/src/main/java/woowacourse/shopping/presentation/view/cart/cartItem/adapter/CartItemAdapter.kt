@@ -1,20 +1,28 @@
 package woowacourse.shopping.presentation.view.cart.cartItem.adapter
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
 import woowacourse.shopping.presentation.view.common.ItemCounterListener
 
 class CartItemAdapter(
-    cartItems: List<CartItemUiModel> = emptyList(),
     private val eventListener: CartItemEventListener,
     private val itemCounterListener: ItemCounterListener,
-) : RecyclerView.Adapter<CartItemViewHolder>() {
-    private val cartItems = cartItems.toMutableList()
+) : ListAdapter<CartItemUiModel, CartItemViewHolder>(
+        object : DiffUtil.ItemCallback<CartItemUiModel>() {
+            override fun areItemsTheSame(
+                oldItem: CartItemUiModel,
+                newItem: CartItemUiModel,
+            ): Boolean = oldItem.cartItem.cartId == newItem.cartItem.cartId
 
-    override fun getItemCount(): Int = cartItems.size
-
+            override fun areContentsTheSame(
+                oldItem: CartItemUiModel,
+                newItem: CartItemUiModel,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -24,26 +32,22 @@ class CartItemAdapter(
         holder: CartItemViewHolder,
         position: Int,
     ) {
-        holder.bind(cartItems[position])
-    }
-
-    fun updateCartItems(cartItems: List<CartItemUiModel>) {
-        this.cartItems.clear()
-        this.cartItems.addAll(cartItems)
-        notifyDataSetChanged()
+        holder.bind(getItem(position))
     }
 
     fun updateItem(updatedItem: CartItemUiModel) {
-        val index = cartItems.indexOfFirst { it.cartItem.cartId == updatedItem.cartItem.cartId }
-        if (index != -1) {
-            cartItems[index] = updatedItem
-            notifyItemChanged(index)
-        }
+        val newList =
+            currentList.map {
+                if (it.cartItem.cartId == updatedItem.cartItem.cartId) updatedItem else it
+            }
+        submitList(newList)
     }
 
-    fun removeProduct(id: Long) {
-        val index = cartItems.indexOfFirst { it.cartItem.cartId == id }
-        cartItems.removeAt(index)
-        notifyItemRemoved(index)
+    fun removeProduct(cartId: Long) {
+        val newList =
+            currentList.filterNot {
+                it.cartItem.cartId == cartId
+            }
+        submitList(newList)
     }
 }
