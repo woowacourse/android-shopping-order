@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.feature.cart.CartViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".feature.cart.CartActivity">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_goods"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingHorizontal="18dp"
+            app:cartItems="@{viewModel.carts}"
+            app:visible="@{!viewModel.isLoading}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/paging"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_cart" />
+
+        <LinearLayout
+            android:id="@+id/paging"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/total_cart_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_goods"
+            app:visible="@{viewModel.showPageButton &amp;&amp; !viewModel.isLoading}">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_left_page"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/left_page_button_background"
+                android:enabled="@{viewModel.leftPageEnable}"
+                android:onClick="@{() -> viewModel.minusPage()}"
+                android:text="@string/cart_left_page_button"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/page_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:gravity="center"
+                android:text="@{String.valueOf(viewModel.page + 1)}"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                tools:text="0" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_right_page"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/right_page_button_background"
+                android:enabled="@{viewModel.rightPageEnable}"
+                android:onClick="@{() -> viewModel.plusPage()}"
+                android:text="@string/cart_right_page_button"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/total_cart_price"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@color/gray_700">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_gravity="center_vertical">
+
+                    <CheckBox
+                        android:id="@+id/cb_all_items_check"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-10dp"
+                        android:text="@string/cart_all_items_check_description"
+                        android:textColor="@color/white"
+                        app:layout_constraintTop_toBottomOf="@id/cb_all_items_check"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:textColor="@color/white"
+                    android:text="@{@string/cart_checked_items_price(viewModel.checkedItemsPrice)}"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="184,200원" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_order_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/baemin_mint"
+                android:gravity="center"
+                android:text="@{@string/cart_order_button(viewModel.totalCheckedItemsCount)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
