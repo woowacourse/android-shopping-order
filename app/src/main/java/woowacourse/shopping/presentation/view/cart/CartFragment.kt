@@ -84,7 +84,8 @@ class CartFragment :
         childFragmentManager.commit {
             replace(R.id.cart_fragment_container, CartRecommendationFragment())
         }
-        binding.checkboxWrapper.isVisible = false
+        binding.selectAll.isVisible = false
+        binding.tvSelectAllDescription.isVisible = false
         viewModel.fetchRecommendedProducts()
     }
 
