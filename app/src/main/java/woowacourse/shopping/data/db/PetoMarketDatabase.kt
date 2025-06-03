@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import woowacourse.shopping.data.db.dao.CartDao
 import woowacourse.shopping.data.db.dao.HistoryDao
 import woowacourse.shopping.data.db.entity.CartEntity
 import woowacourse.shopping.data.db.entity.HistoryEntity
@@ -14,8 +13,6 @@ import woowacourse.shopping.data.db.entity.HistoryEntity
     version = 5,
 )
 abstract class PetoMarketDatabase : RoomDatabase() {
-    abstract fun cartDao(): CartDao
-
     abstract fun historyDao(): HistoryDao
 
     companion object {
