@@ -31,6 +31,7 @@
     <string name="cart_toast_invalid_quantity">수량은 1 이상이어야 합니다</string>
     <string name="cart_toast_delete_success">장바구니에서 아이템을 삭제했습니다</string>
     <string name="cart_toast_load_fail">장바구니 DB 조회를 실패하였습니다</string>
+    <string name="cart_toast_cache_fail">장바구니 데이터 캐싱에 실패하였습니다</string>
     <string name="cart_toast_increase_fail">수량을 증가시키는 데 실패하였습니다</string>
     <string name="cart_toast_decrease_fail">수량을 감소시키는 데 실패하였습니다</string>
     <string name="cart_toast_delete_fail">상품을 삭제하는 데 실패하였습니다</string>

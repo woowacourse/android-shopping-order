@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductBinding
 import woowacourse.shopping.databinding.ViewCartActionBinding
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
@@ -55,8 +55,8 @@ class ProductActivity :
         observeViewModel()
     }
 
-    override fun onRestart() {
-        super.onRestart()
+    override fun onStart() {
+        super.onStart()
         viewModel.fetchData()
         viewModel.fetchCartItemCount()
     }
@@ -71,8 +71,6 @@ class ProductActivity :
         toolbarBinding.ivCart.setOnClickListener {
             navigateToCart()
         }
-
-        viewModel.fetchCartItemCount()
 
         return true
     }
@@ -114,15 +112,14 @@ class ProductActivity :
         }
     }
 
-    private fun createSpanSizeLookup(): GridLayoutManager.SpanSizeLookup {
-        return object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                val isLastItem = position == productAdapter.itemCount - 1
-                val shouldExpand = viewModel.showLoadMore.value == true
-                return if (isLastItem && shouldExpand) 2 else 1
-            }
+    private fun createSpanSizeLookup(): GridLayoutManager.SpanSizeLookup =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int =
+                when (productAdapter.getItemViewType(position)) {
+                    R.layout.item_product -> 1
+                    else -> 2
+                }
         }
-    }
 
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { result ->
@@ -141,9 +138,8 @@ class ProductActivity :
             }
         }
 
-        viewModel.products.observe(this) { products ->
-            val showLoadMore = viewModel.showLoadMore.value == true
-            productAdapter.setData(products, showLoadMore)
+        viewModel.products.observe(this) { productItemTypes ->
+            productAdapter.submitList(productItemTypes)
         }
 
         viewModel.recentProducts.observe(this) { recentProducts ->
@@ -155,11 +151,6 @@ class ProductActivity :
                 text = count.toString()
                 visibility = if (count > 0) View.VISIBLE else View.GONE
             }
-        }
-
-        viewModel.showLoadMore.observe(this) { showLoadMore ->
-            val productsState = viewModel.products.value ?: return@observe
-            productAdapter.setData(productsState, showLoadMore)
         }
 
         viewModel.toastMessage.observe(this) { resId ->
@@ -204,8 +195,8 @@ class ProductActivity :
         startActivity(intent)
     }
 
-    override fun onClickAddToCart(cartItem: CartItem) {
-        viewModel.addToCart(cartItem)
+    override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
+        viewModel.addToCart(cartItemUiModel)
     }
 
     override fun onClickMinus(id: Long) {

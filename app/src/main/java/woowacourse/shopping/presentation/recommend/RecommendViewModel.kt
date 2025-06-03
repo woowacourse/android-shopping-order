@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -12,6 +11,7 @@ import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.product.ItemClickListener
+import woowacourse.shopping.presentation.toDomain
 import woowacourse.shopping.presentation.toPresentation
 
 class RecommendViewModel(
@@ -70,11 +70,11 @@ class RecommendViewModel(
     override fun onClickProductItem(productId: Long) {
     }
 
-    override fun onClickAddToCart(cartItem: CartItem) {
-        cartRepository.insertProduct(cartItem.product, 1) { result ->
+    override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
+        cartRepository.insertProduct(cartItemUiModel.product.toDomain(), 1) { result ->
             result
                 .onSuccess {
-                    updateQuantity(productId = cartItem.product.productId, 1)
+                    updateQuantity(productId = cartItemUiModel.product.id, 1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_add_cart_fail
                 }

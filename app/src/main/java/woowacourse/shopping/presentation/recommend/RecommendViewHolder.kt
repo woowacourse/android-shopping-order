@@ -7,7 +7,6 @@ import woowacourse.shopping.databinding.ItemRecommendProductBinding
 import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.product.ItemClickListener
-import woowacourse.shopping.presentation.toDomain
 
 class RecommendViewHolder(
     private val binding: ItemRecommendProductBinding,
@@ -20,7 +19,7 @@ class RecommendViewHolder(
     }
 
     fun bind(cartItemUiModel: CartItemUiModel) {
-        binding.cartItem = cartItemUiModel.toDomain()
+        binding.cartItemUiModel = cartItemUiModel
     }
 
     companion object {

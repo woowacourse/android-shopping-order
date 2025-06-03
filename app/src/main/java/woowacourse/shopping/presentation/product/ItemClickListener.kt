@@ -1,9 +1,9 @@
 package woowacourse.shopping.presentation.product
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.CartItemUiModel
 
 interface ItemClickListener {
     fun onClickProductItem(productId: Long)
 
-    fun onClickAddToCart(cartItem: CartItem)
+    fun onClickAddToCart(cartItemUiModel: CartItemUiModel)
 }

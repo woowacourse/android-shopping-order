@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="cartItem"
-            type="woowacourse.shopping.domain.model.CartItem" />
+            name="cartItemUiModel"
+            type="woowacourse.shopping.presentation.CartItemUiModel" />
 
         <variable
             name="itemClickListener"
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:onClick="@{() -> itemClickListener.onClickProductItem(cartItem.product.productId)}">
+        android:onClick="@{() -> itemClickListener.onClickProductItem(cartItemUiModel.product.id)}">
 
         <ImageView
             android:id="@+id/iv_product"
@@ -31,7 +31,7 @@
             android:layout_height="180dp"
             android:contentDescription="@null"
             android:scaleType="fitXY"
-            app:imageUrl="@{cartItem.product.imageUrl}"
+            app:imageUrl="@{cartItemUiModel.product.imageUrl}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_loading" />
@@ -44,7 +44,7 @@
             android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{cartItem.product.name}"
+            android:text="@{cartItemUiModel.product.name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -60,11 +60,11 @@
             android:layout_marginBottom="8dp"
             android:contentDescription="@null"
             android:elevation="2dp"
-            android:onClick="@{() -> itemClickListener.onClickAddToCart(cartItem)}"
+            android:onClick="@{() -> itemClickListener.onClickAddToCart(cartItemUiModel)}"
             android:src="@drawable/ic_add"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="@id/iv_product"
-            app:visibleIf="@{cartItem.quantity == 0}" />
+            app:visibleIf="@{cartItemUiModel.quantity == 0}" />
 
         <include
             android:id="@+id/included_layout_cart"
@@ -74,18 +74,18 @@
             android:layout_marginHorizontal="8dp"
             android:layout_marginBottom="8dp"
             app:clickListener="@{counterClickListener}"
-            app:id="@{cartItem.product.productId}"
+            app:id="@{cartItemUiModel.product.id}"
             app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="@id/iv_product"
             app:layout_constraintStart_toStartOf="@id/iv_product"
-            app:quantity="@{cartItem.quantity}"
-            app:visibleIf="@{cartItem.quantity > 0}" />
+            app:quantity="@{cartItemUiModel.quantity}"
+            app:visibleIf="@{cartItemUiModel.quantity > 0}" />
 
         <TextView
             android:id="@+id/tv_product_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/product_price(cartItem.product.price)}"
+            android:text="@{@string/product_price(cartItemUiModel.product.price)}"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@id/tv_product_name"
             app:layout_constraintTop_toBottomOf="@id/tv_product_name"

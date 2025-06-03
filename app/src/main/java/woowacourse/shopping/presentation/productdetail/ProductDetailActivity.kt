@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailProductBinding
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.product.ItemClickListener
@@ -100,16 +100,6 @@ class ProductDetailActivity :
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
-    companion object {
-        fun newIntent(
-            context: Context,
-            productId: Long,
-        ): Intent =
-            Intent(context, ProductDetailActivity::class.java).apply {
-                putExtra(Extra.KEY_PRODUCT_ID, productId)
-            }
-    }
-
     override fun onClickProductItem(productId: Long) {
         val intent =
             newIntent(this, productId).apply {
@@ -118,6 +108,17 @@ class ProductDetailActivity :
         startActivity(intent)
     }
 
-    override fun onClickAddToCart(cartItem: CartItem) {
+    override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
+        // TODO: 여기에 이 인터페이스가 필요한가 ?
+    }
+
+    companion object {
+        fun newIntent(
+            context: Context,
+            productId: Long,
+        ): Intent =
+            Intent(context, ProductDetailActivity::class.java).apply {
+                putExtra(Extra.KEY_PRODUCT_ID, productId)
+            }
     }
 }
