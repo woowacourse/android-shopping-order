@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.main.state
 
+import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.ShoppingCart
 
 data class ProductUiState(
@@ -36,7 +37,7 @@ data class ProductUiState(
                 carts.find { it.productId == productId }?.let { cart ->
                     product.modifyQuantity(cart.quantity)
                 } ?: run {
-                    product
+                    product.copy(cartQuantity = Quantity(0))
                 }
             }
 
