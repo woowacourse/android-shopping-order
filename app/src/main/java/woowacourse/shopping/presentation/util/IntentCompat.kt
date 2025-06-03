@@ -1,19 +1,19 @@
 package woowacourse.shopping.presentation.util
 
 import android.content.Intent
+import android.os.Build.VERSION
 import android.os.Build
 import android.os.Parcelable
 
 object IntentCompat {
     @Suppress("DEPRECATION")
-    fun <T : Parcelable> getParcelableExtra(
+    inline fun <reified T : Parcelable> getParcelableArrayListExtra(
         intent: Intent,
         key: String,
-        clazz: Class<T>,
-    ): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(key, clazz)
+    ): List<T>? =
+        if (VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableArrayListExtra(key, T::class.java)
         } else {
-            intent.getParcelableExtra(key) as? T
+            intent.getParcelableArrayListExtra(key)
         }
 }
