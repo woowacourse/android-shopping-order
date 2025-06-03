@@ -5,21 +5,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentProductBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
+import woowacourse.shopping.presentation.view.catalog.CatalogEventHandler
 
 class RecentProductItemViewHolder private constructor(
     private val binding: ItemRecentProductBinding,
-    private val eventListener: CatalogEventListener,
+    private val catalogEventHandler: CatalogEventHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(product: ProductUiModel) {
         binding.product = product
-        binding.eventListener = eventListener
+        binding.eventHandler = catalogEventHandler
     }
 
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: CatalogEventListener,
+            eventHandler: CatalogEventHandler,
         ): RecentProductItemViewHolder {
             val binding =
                 ItemRecentProductBinding.inflate(
@@ -27,7 +27,7 @@ class RecentProductItemViewHolder private constructor(
                     parent,
                     false,
                 )
-            return RecentProductItemViewHolder(binding, eventListener)
+            return RecentProductItemViewHolder(binding, eventHandler)
         }
     }
 }

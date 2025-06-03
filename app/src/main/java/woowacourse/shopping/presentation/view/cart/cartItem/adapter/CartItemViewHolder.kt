@@ -6,17 +6,17 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toProductUiModel
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class CartItemViewHolder(
     private val binding: ItemCartBinding,
-    private val eventListener: CartItemEventListener,
-    itemCounterListener: ItemCounterListener,
+    private val cartItemEventHandler: CartItemEventHandler,
+    itemCounterEventHandler: ItemCounterEventHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.eventListener = eventListener
-        binding.cartItemCounter.eventListener = itemCounterListener
+        binding.eventHandler = cartItemEventHandler
+        binding.cartItemCounter.eventHandler = itemCounterEventHandler
     }
 
     fun bind(cartItem: CartItemUiModel) {
@@ -25,19 +25,19 @@ class CartItemViewHolder(
         binding.checkbox.setOnCheckedChangeListener(null)
         binding.checkbox.isChecked = cartItem.isSelected
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
-            eventListener.onProductSelectionToggle(cartItem, isChecked)
+            cartItemEventHandler.onProductSelectionToggle(cartItem, isChecked)
         }
     }
 
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: CartItemEventListener,
-            itemCounterListener: ItemCounterListener,
+            cartItemEventHandler: CartItemEventHandler,
+            itemCounterListener: ItemCounterEventHandler,
         ): CartItemViewHolder {
             val binding =
                 ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return CartItemViewHolder(binding, eventListener, itemCounterListener)
+            return CartItemViewHolder(binding, cartItemEventHandler, itemCounterListener)
         }
     }
 }

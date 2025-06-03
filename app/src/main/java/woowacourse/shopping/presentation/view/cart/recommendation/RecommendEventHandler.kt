@@ -2,6 +2,6 @@ package woowacourse.shopping.presentation.view.cart.recommendation
 
 import woowacourse.shopping.presentation.model.ProductUiModel
 
-interface RecommendEventListener {
+interface RecommendEventHandler {
     fun onInitialAddToCart(product: ProductUiModel)
 }

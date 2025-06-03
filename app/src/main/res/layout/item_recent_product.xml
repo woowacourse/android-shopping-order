@@ -10,15 +10,15 @@
             type="woowacourse.shopping.presentation.model.ProductUiModel" />
 
         <variable
-            name="eventListener"
-            type="woowacourse.shopping.presentation.view.catalog.CatalogEventListener" />
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.catalog.CatalogEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:onClick="@{() -> eventListener.onProductClicked(product)}">
+        android:onClick="@{() -> eventHandler.onProductClicked(product)}">
 
         <ImageView
             android:id="@+id/image_view_product"

@@ -12,8 +12,8 @@
             type="woowacourse.shopping.presentation.view.cart.CartViewModel" />
 
         <variable
-            name="eventListener"
-            type="woowacourse.shopping.presentation.view.cart.CartEventListener" />
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.cart.CartEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,7 +81,7 @@
                     android:layout_height="0dp"
                     android:background="@color/gray_55"
                     android:gravity="center_horizontal|bottom"
-                    android:onClick="@{(view) -> eventListener.onBatchSelect(((CheckBox) view).isChecked)}"
+                    android:onClick="@{(view) -> eventHandler.onBatchSelect(((CheckBox) view).isChecked)}"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toTopOf="@id/tv_select_all_description"
@@ -126,7 +126,7 @@
                 android:layout_height="0dp"
                 android:background="@color/mint"
                 android:gravity="center"
-                android:onClick="@{() -> eventListener.onPlaceOrder()}"
+                android:onClick="@{() -> eventHandler.onPlaceOrder()}"
                 android:padding="10dp"
                 android:text="@{String.format(@string/place_order_text, vm.totalCount)}"
                 android:textColor="@color/white"

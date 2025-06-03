@@ -4,12 +4,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventListener
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class CartItemAdapter(
-    private val eventListener: CartItemEventListener,
-    private val itemCounterListener: ItemCounterListener,
+    private val cartItemEventHandler: CartItemEventHandler,
+    private val itemCounterEventHandler: ItemCounterEventHandler,
 ) : ListAdapter<CartItemUiModel, CartItemViewHolder>(
         object : DiffUtil.ItemCallback<CartItemUiModel>() {
             override fun areItemsTheSame(
@@ -26,7 +26,7 @@ class CartItemAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CartItemViewHolder = CartItemViewHolder.from(parent, eventListener, itemCounterListener)
+    ): CartItemViewHolder = CartItemViewHolder.from(parent, cartItemEventHandler, itemCounterEventHandler)
 
     override fun onBindViewHolder(
         holder: CartItemViewHolder,

@@ -22,8 +22,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             }
         }
 
-    private val cartEventListener =
-        object : CartEventListener {
+    private val cartEventHandler =
+        object : CartEventHandler {
             override fun onPlaceOrder() {
                 childFragmentManager.commit {
                     replace(R.id.cart_fragment_container, CartRecommendationFragment())
@@ -64,7 +64,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         binding.apply {
             vm = viewModel
             lifecycleOwner = viewLifecycleOwner
-            eventListener = cartEventListener
+            eventHandler = cartEventHandler
         }
         binding.btnBack.setOnClickListener {
             navigateBack()

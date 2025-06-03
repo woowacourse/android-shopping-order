@@ -10,22 +10,41 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartViewModel
 import woowacourse.shopping.presentation.view.cart.cartItem.adapter.CartItemAdapter
 import woowacourse.shopping.presentation.view.common.BaseFragment
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
-class CartItemFragment :
-    BaseFragment<FragmentCartItemBinding>(R.layout.fragment_cart_item),
-    CartItemEventListener,
-    ItemCounterListener {
+class CartItemFragment : BaseFragment<FragmentCartItemBinding>(R.layout.fragment_cart_item) {
     private val viewModel: CartViewModel by viewModels(
         ownerProducer = { requireParentFragment() },
         factoryProducer = { CartViewModel.Factory },
     )
 
+    private val cartItemEventHandler =
+        object : CartItemEventHandler {
+            override fun onProductDeletion(cartItem: CartItemUiModel) {
+                viewModel.removeFromCart(cartItem)
+            }
+
+            override fun onProductSelectionToggle(
+                cartItem: CartItemUiModel,
+                isChecked: Boolean,
+            ) {
+                viewModel.setCartItemSelection(cartItem, isChecked)
+            }
+        }
+
+    private val itemCounterEventHandler =
+        object : ItemCounterEventHandler {
+            override fun increaseQuantity(product: ProductUiModel) {
+                viewModel.increaseQuantity(product)
+            }
+
+            override fun decreaseQuantity(product: ProductUiModel) {
+                viewModel.decreaseQuantity(product)
+            }
+        }
+
     private val cartItemAdapter: CartItemAdapter by lazy {
-        CartItemAdapter(
-            eventListener = this,
-            itemCounterListener = this,
-        )
+        CartItemAdapter(cartItemEventHandler, itemCounterEventHandler)
     }
 
     override fun onViewCreated(
@@ -33,44 +52,33 @@ class CartItemFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.vm = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.recyclerViewCart.adapter = cartItemAdapter
+        initBinding()
         initObserver()
     }
 
+    private fun initBinding() {
+        binding.apply {
+            vm = viewModel
+            lifecycleOwner = viewLifecycleOwner
+            recyclerViewCart.adapter = cartItemAdapter
+        }
+    }
+
     private fun initObserver() {
-        viewModel.cartItems.observe(viewLifecycleOwner) {
-            cartItemAdapter.submitList(it)
+        with(viewModel) {
+            cartItems.observe(viewLifecycleOwner) {
+                cartItemAdapter.submitList(it)
+            }
+
+            deleteEvent.observe(viewLifecycleOwner) {
+                cartItemAdapter.removeProduct(it)
+                fetchShoppingCart(isNextPage = false, isRefresh = true)
+                fetchRecommendedProducts()
+            }
+
+            itemUpdateEvent.observe(viewLifecycleOwner) {
+                cartItemAdapter.updateItem(it)
+            }
         }
-
-        viewModel.deleteEvent.observe(viewLifecycleOwner) {
-            cartItemAdapter.removeProduct(it)
-            viewModel.fetchShoppingCart(isNextPage = false, isRefresh = true)
-            viewModel.fetchRecommendedProducts()
-        }
-
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
-            cartItemAdapter.updateItem(it)
-        }
-    }
-
-    override fun onProductDeletion(cartItem: CartItemUiModel) {
-        viewModel.removeFromCart(cartItem)
-    }
-
-    override fun onProductSelectionToggle(
-        cartItem: CartItemUiModel,
-        isChecked: Boolean,
-    ) {
-        viewModel.setCartItemSelection(cartItem, isChecked)
-    }
-
-    override fun increaseQuantity(product: ProductUiModel) {
-        viewModel.increaseQuantity(product)
-    }
-
-    override fun decreaseQuantity(product: ProductUiModel) {
-        viewModel.decreaseQuantity(product)
     }
 }

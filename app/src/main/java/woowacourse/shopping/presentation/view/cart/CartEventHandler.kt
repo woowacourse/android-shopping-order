@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.view.cart
 
-interface CartEventListener {
+interface CartEventHandler {
+    fun onPlaceOrder()
+
     fun onBatchSelect(isChecked: Boolean)
 }

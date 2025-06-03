@@ -10,12 +10,24 @@ import woowacourse.shopping.databinding.FragmentDetailBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartFragment
 import woowacourse.shopping.presentation.view.common.BaseFragment
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
-class DetailFragment :
-    BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail),
-    DetailEventListener {
+class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {
     private val viewModel: DetailViewModel by viewModels { DetailViewModel.Factory }
+
+    private val detailEventHandler =
+        object : DetailEventHandler {
+            override fun onRecentItemSelected(product: ProductUiModel) {
+                viewModel.loadProduct(product.id)
+            }
+        }
+
+    private val itemCounterEventHandler =
+        object : ItemCounterEventHandler {
+            override fun increaseQuantity(product: ProductUiModel) = viewModel.increaseQuantity()
+
+            override fun decreaseQuantity(product: ProductUiModel) = viewModel.decreaseQuantity()
+        }
 
     override fun onViewCreated(
         view: View,
@@ -23,7 +35,7 @@ class DetailFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
         initObserver()
-        initListener()
+        initHandler()
 
         val productId = arguments?.getLong(PRODUCT_ID) ?: 0
         viewModel.loadProduct(productId)
@@ -31,13 +43,8 @@ class DetailFragment :
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
             vm = viewModel
-            eventListener = this@DetailFragment
-            detailItemCounter.eventListener =
-                object : ItemCounterListener {
-                    override fun increaseQuantity(product: ProductUiModel) = viewModel.increaseQuantity()
-
-                    override fun decreaseQuantity(product: ProductUiModel) = viewModel.decreaseQuantity()
-                }
+            eventHandler = detailEventHandler
+            detailItemCounter.eventHandler = itemCounterEventHandler
         }
     }
 
@@ -53,12 +60,6 @@ class DetailFragment :
         }
     }
 
-    private fun initListener() {
-        binding.btnClose.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
-    }
-
     private fun navigateToScreen() {
         parentFragmentManager.commit {
             setReorderingAllowed(true)
@@ -66,8 +67,10 @@ class DetailFragment :
         }
     }
 
-    override fun onRecentItemSelected(product: ProductUiModel) {
-        viewModel.loadProduct(product.id)
+    private fun initHandler() {
+        binding.btnClose.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
     }
 
     companion object {

@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="eventListener"
-            type="woowacourse.shopping.presentation.view.common.ItemCounterListener" />
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.common.ItemCounterEventHandler" />
 
         <variable
             name="product"
@@ -32,7 +32,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:onClick="@{() -> eventListener.decreaseQuantity(product)}"
+            android:onClick="@{() -> eventHandler.decreaseQuantity(product)}"
             android:text="@string/product_count_down_text"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -63,7 +63,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:onClick="@{() -> eventListener.increaseQuantity(product)}"
+            android:onClick="@{() -> eventHandler.increaseQuantity(product)}"
             android:text="@string/product_count_up_text"
             android:textSize="22sp"
             android:textStyle="bold"

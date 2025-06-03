@@ -16,8 +16,8 @@
             type="woowacourse.shopping.presentation.view.detail.DetailViewModel" />
 
         <variable
-            name="eventListener"
-            type="woowacourse.shopping.presentation.view.detail.DetailEventListener" />
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.detail.DetailEventHandler" />
 
     </data>
 
@@ -110,7 +110,7 @@
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/shape_cart_item"
-            android:onClick="@{() -> eventListener.onRecentItemSelected(vm.lastViewedProduct)}"
+            android:onClick="@{() -> eventHandler.onRecentItemSelected(vm.lastViewedProduct)}"
             android:paddingBottom="16dp"
             android:visibility="@{(vm.lastViewedProduct == null || vm.lastViewedProduct.id == product.id) ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"

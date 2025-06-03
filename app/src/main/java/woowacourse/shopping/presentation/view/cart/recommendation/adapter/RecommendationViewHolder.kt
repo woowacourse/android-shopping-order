@@ -5,17 +5,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendedProductBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventHandler
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class RecommendationViewHolder(
     private val binding: ItemRecommendedProductBinding,
-    eventListener: RecommendEventListener,
-    itemCounterListener: ItemCounterListener,
+    eventHandler: RecommendEventHandler,
+    itemCounterEventHandler: ItemCounterEventHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.eventListener = eventListener
-        binding.recommendItemCounter.eventListener = itemCounterListener
+        binding.eventHandler = eventHandler
+        binding.recommendItemCounter.eventHandler = itemCounterEventHandler
     }
 
     fun bind(product: ProductUiModel) {
@@ -25,12 +25,12 @@ class RecommendationViewHolder(
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: RecommendEventListener,
-            itemCounterListener: ItemCounterListener,
+            recommendEventHandler: RecommendEventHandler,
+            itemCounterEventHandler: ItemCounterEventHandler,
         ): RecommendationViewHolder {
             val binding =
                 ItemRecommendedProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return RecommendationViewHolder(binding, eventListener, itemCounterListener)
+            return RecommendationViewHolder(binding, recommendEventHandler, itemCounterEventHandler)
         }
     }
 }

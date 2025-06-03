@@ -11,87 +11,96 @@ import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartFragment
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter
-import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
+import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.CatalogType
 import woowacourse.shopping.presentation.view.common.BaseFragment
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 import woowacourse.shopping.presentation.view.detail.DetailFragment
 
-class CatalogFragment :
-    BaseFragment<FragmentCatalogBinding>(R.layout.fragment_catalog),
-    CatalogEventListener,
-    ItemCounterListener {
-    private val catalogAdapter: CatalogAdapter by lazy { CatalogAdapter(eventListener = this) }
+class CatalogFragment : BaseFragment<FragmentCatalogBinding>(R.layout.fragment_catalog) {
     private val viewModel: CatalogViewModel by viewModels { CatalogViewModel.Factory }
+
+    private val catalogEventHandler =
+        object : CatalogEventHandler {
+            override fun increaseQuantity(product: ProductUiModel) {
+                viewModel.increaseQuantity(product)
+            }
+
+            override fun onProductClicked(product: ProductUiModel) {
+                navigateToScreen(DetailFragment::class.java, DetailFragment.newBundle(product.id))
+            }
+
+            override fun onLoadMoreClicked() {
+                viewModel.loadCatalog(nextPage = true)
+            }
+        }
+
+    private val itemCounterEventHandler =
+        object : ItemCounterEventHandler {
+            override fun increaseQuantity(product: ProductUiModel) {
+                viewModel.increaseQuantity(product)
+            }
+
+            override fun decreaseQuantity(product: ProductUiModel) {
+                viewModel.decreaseQuantity(product)
+            }
+        }
+
+    private val catalogAdapter: CatalogAdapter by lazy {
+        CatalogAdapter(catalogEventHandler, itemCounterEventHandler)
+    }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.vm = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
 
+        initBinding()
         initObserver()
-        initListener()
-        setCatalogAdapter()
+        binding.btnNavigateCart.setOnClickListener {
+            navigateToScreen(CartFragment::class.java)
+        }
         viewModel.loadCatalog(nextPage = false)
     }
 
-    override fun onProductClicked(product: ProductUiModel) {
-        navigateToScreen(DetailFragment::class.java, DetailFragment.newBundle(product.id))
-    }
-
-    override fun onLoadMoreClicked() {
-        viewModel.loadCatalog(nextPage = true)
-    }
-
-    override fun increaseQuantity(product: ProductUiModel) {
-        viewModel.increaseQuantity(product)
-    }
-
-    override fun decreaseQuantity(product: ProductUiModel) {
-        viewModel.decreaseQuantity(product)
-    }
-
-    private fun setCatalogAdapter() {
-        binding.recyclerViewProducts.layoutManager =
-            GridLayoutManager(requireContext(), SPAN_COUNT).apply {
-                spanSizeLookup =
-                    object : GridLayoutManager.SpanSizeLookup() {
-                        override fun getSpanSize(position: Int): Int {
-                            val viewType = catalogAdapter.getItemViewType(position)
-                            return when (CatalogItem.CatalogType.entries[viewType]) {
-                                CatalogItem.CatalogType.RECENT_PRODUCTS -> SPAN_COUNT
-                                CatalogItem.CatalogType.PRODUCT -> SINGLE_SPAN_COUNT
-                                CatalogItem.CatalogType.LOAD_MORE -> SPAN_COUNT
+    private fun initBinding() {
+        binding.apply {
+            binding.vm = viewModel
+            binding.lifecycleOwner = viewLifecycleOwner
+            recyclerViewProducts.adapter = catalogAdapter
+            recyclerViewProducts.layoutManager =
+                GridLayoutManager(requireContext(), SPAN_COUNT).apply {
+                    spanSizeLookup =
+                        object : GridLayoutManager.SpanSizeLookup() {
+                            override fun getSpanSize(position: Int): Int {
+                                val viewType = catalogAdapter.getItemViewType(position)
+                                return when (CatalogType.entries[viewType]) {
+                                    CatalogType.RECENT_PRODUCTS, CatalogType.LOAD_MORE -> SPAN_COUNT
+                                    CatalogType.PRODUCT -> SINGLE_SPAN_COUNT
+                                }
                             }
                         }
-                    }
-            }
-        binding.recyclerViewProducts.adapter = catalogAdapter
+                }
+        }
     }
 
     private fun initObserver() {
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) {
-                binding.layoutCatalogShimmer.startShimmer()
-            } else {
-                binding.layoutCatalogShimmer.stopShimmer()
+        with(viewModel) {
+            isLoading.observe(viewLifecycleOwner) { isLoading ->
+                if (isLoading) {
+                    binding.layoutCatalogShimmer.startShimmer()
+                } else {
+                    binding.layoutCatalogShimmer.stopShimmer()
+                }
             }
-        }
 
-        viewModel.items.observe(viewLifecycleOwner) { products ->
-            catalogAdapter.submitList(products)
-        }
+            items.observe(viewLifecycleOwner) { products ->
+                catalogAdapter.submitList(products)
+            }
 
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) {
-            catalogAdapter.updateItem(it)
-        }
-    }
-
-    private fun initListener() {
-        binding.btnNavigateCart.setOnClickListener {
-            navigateToScreen(CartFragment::class.java)
+            itemUpdateEvent.observe(viewLifecycleOwner) {
+                catalogAdapter.updateItem(it)
+            }
         }
     }
 

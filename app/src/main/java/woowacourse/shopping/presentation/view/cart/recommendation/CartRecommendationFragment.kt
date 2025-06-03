@@ -9,22 +9,34 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartViewModel
 import woowacourse.shopping.presentation.view.cart.recommendation.adapter.RecommendationAdapter
 import woowacourse.shopping.presentation.view.common.BaseFragment
-import woowacourse.shopping.presentation.view.common.ItemCounterListener
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
-class CartRecommendationFragment :
-    BaseFragment<FragmentCartRecommendationBinding>(R.layout.fragment_cart_recommendation),
-    RecommendEventListener,
-    ItemCounterListener {
+class CartRecommendationFragment : BaseFragment<FragmentCartRecommendationBinding>(R.layout.fragment_cart_recommendation) {
     private val viewModel: CartViewModel by viewModels(
         ownerProducer = { requireParentFragment() },
         factoryProducer = { CartViewModel.Factory },
     )
 
+    private val recommendEventHandler =
+        object : RecommendEventHandler {
+            override fun onInitialAddToCart(product: ProductUiModel) {
+                viewModel.increaseQuantity(product)
+            }
+        }
+
+    private val itemCounterEventHandler =
+        object : ItemCounterEventHandler {
+            override fun increaseQuantity(product: ProductUiModel) {
+                viewModel.increaseQuantity(product)
+            }
+
+            override fun decreaseQuantity(product: ProductUiModel) {
+                viewModel.decreaseQuantity(product)
+            }
+        }
+
     private val recommendationAdapter: RecommendationAdapter by lazy {
-        RecommendationAdapter(
-            itemCounterListener = this,
-            recommendEventListener = this,
-        )
+        RecommendationAdapter(recommendEventHandler, itemCounterEventHandler)
     }
 
     override fun onViewCreated(
@@ -34,36 +46,18 @@ class CartRecommendationFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-
-        initRecommendationAdapter()
+        binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
         initObserver()
     }
 
     private fun initObserver() {
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            recommendationAdapter.submitList(products)
+        with(viewModel) {
+            recommendedProducts.observe(viewLifecycleOwner) { products ->
+                recommendationAdapter.submitList(products)
+            }
+            itemUpdateEvent.observe(viewLifecycleOwner) { product ->
+                recommendationAdapter.updateItem(product)
+            }
         }
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { product ->
-            recommendationAdapter.updateItem(product)
-        }
-    }
-
-    private fun initRecommendationAdapter() {
-        binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) {
-            recommendationAdapter.submitList(it)
-        }
-    }
-
-    override fun increaseQuantity(product: ProductUiModel) {
-        viewModel.increaseQuantity(product)
-    }
-
-    override fun decreaseQuantity(product: ProductUiModel) {
-        viewModel.decreaseQuantity(product)
-    }
-
-    override fun onInitialAddToCart(product: ProductUiModel) {
-        viewModel.increaseQuantity(product)
     }
 }

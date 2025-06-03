@@ -5,14 +5,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
+import woowacourse.shopping.presentation.view.catalog.CatalogEventHandler
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.CatalogType
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.LoadMoreItem
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.ProductItem
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.RecentProductsItem
+import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class CatalogAdapter(
-    private val eventListener: CatalogEventListener,
+    private val catalogEventHandler: CatalogEventHandler,
+    private val itemCounterEventHandler: ItemCounterEventHandler,
 ) : ListAdapter<CatalogItem, RecyclerView.ViewHolder>(
         object : DiffUtil.ItemCallback<CatalogItem>() {
             override fun areItemsTheSame(
@@ -45,9 +47,20 @@ class CatalogAdapter(
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (CatalogType.entries[viewType]) {
-            CatalogType.RECENT_PRODUCTS -> RecentProductsViewHolder.from(parent, eventListener)
-            CatalogType.PRODUCT -> ProductViewHolder.from(parent, eventListener)
-            CatalogType.LOAD_MORE -> LoadMoreViewHolder.from(parent, eventListener)
+            CatalogType.RECENT_PRODUCTS ->
+                RecentProductsViewHolder.from(
+                    parent,
+                    catalogEventHandler,
+                )
+
+            CatalogType.PRODUCT ->
+                ProductViewHolder.from(
+                    parent,
+                    catalogEventHandler,
+                    itemCounterEventHandler,
+                )
+
+            CatalogType.LOAD_MORE -> LoadMoreViewHolder.from(parent, catalogEventHandler)
         }
 
     override fun onBindViewHolder(

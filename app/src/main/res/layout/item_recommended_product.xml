@@ -12,8 +12,8 @@
             type="woowacourse.shopping.presentation.model.ProductUiModel" />
 
         <variable
-            name="eventListener"
-            type="woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener" />
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventHandler" />
 
     </data>
 
@@ -41,7 +41,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/shape_bg_circle"
             android:elevation="5dp"
-            android:onClick="@{() -> eventListener.onInitialAddToCart(product)}"
+            android:onClick="@{() -> eventHandler.onInitialAddToCart(product)}"
             android:padding="16dp"
             android:src="@drawable/ic_add"
             android:visibility="@{product.quantity != 0 ? View.GONE : View.VISIBLE}"

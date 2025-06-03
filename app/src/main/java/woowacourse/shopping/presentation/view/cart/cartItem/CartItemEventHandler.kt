@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.view.cart.cartItem
 
 import woowacourse.shopping.presentation.model.CartItemUiModel
 
-interface CartItemEventListener {
+interface CartItemEventHandler {
     fun onProductDeletion(cartItem: CartItemUiModel)
 
     fun onProductSelectionToggle(

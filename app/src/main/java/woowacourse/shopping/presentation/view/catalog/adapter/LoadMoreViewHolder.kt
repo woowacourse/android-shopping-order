@@ -4,20 +4,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemLoadMoreBinding
-import woowacourse.shopping.presentation.view.catalog.CatalogEventListener
+import woowacourse.shopping.presentation.view.catalog.CatalogEventHandler
 
 class LoadMoreViewHolder private constructor(
     binding: ItemLoadMoreBinding,
-    eventListener: CatalogEventListener,
+    catalogEventHandler: CatalogEventHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.eventListener = eventListener
+        binding.eventHandler = catalogEventHandler
     }
 
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: CatalogEventListener,
+            catalogEventHandler: CatalogEventHandler,
         ): LoadMoreViewHolder {
             val binding =
                 ItemLoadMoreBinding.inflate(
@@ -25,7 +25,7 @@ class LoadMoreViewHolder private constructor(
                     parent,
                     false,
                 )
-            return LoadMoreViewHolder(binding, eventListener)
+            return LoadMoreViewHolder(binding, catalogEventHandler)
         }
     }
 }
