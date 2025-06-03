@@ -13,17 +13,13 @@ android {
     val properties = Properties()
     properties.load(project.rootProject.file("local.properties").inputStream())
 
-    val userId = properties.getProperty("USER_ID") ?: ""
-    val userPassword = properties.getProperty("USER_PASSWORD") ?: ""
-    val baseUrl = properties.getProperty("BASE_URL") ?: ""
-
     namespace = "woowacourse.shopping"
     compileSdk = 35
 
     defaultConfig {
-        buildConfigField("String", "USER_ID", "\"$userId\"")
-        buildConfigField("String", "USER_PASSWORD", "\"$userPassword\"")
-        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField("String", "USER_ID", "\"${properties.getProperty("USER_ID")}\"")
+        buildConfigField("String", "USER_PASSWORD", "\"${properties.getProperty("USER_PASSWORD")}\"")
+        buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL")}\"")
     }
 
     defaultConfig {
@@ -87,6 +83,7 @@ dependencies {
     implementation(libs.shimmer)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.kotlinx.serialization.json.v163)
+    implementation(libs.logging.interceptor)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
