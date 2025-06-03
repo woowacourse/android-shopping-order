@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.data.RepositoryProvider
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartItemUiModel
@@ -88,12 +87,12 @@ class CartViewModel(
             return
         }
         cartRepository.increaseQuantity(cartItem) {
-            getCartItemById(cartItem.cartId) { foundItem ->
-                if (foundItem != null) {
+            cartRepository.findCartItemByProductId(product.id) { cartItem ->
+                if (cartItem != null) {
                     val updatedItem =
-                        foundItem
+                        cartItem
                             .toCartItemUiModel()
-                            .copy(isSelected = selectionStatus[foundItem.cartId] ?: false)
+                            .copy(isSelected = selectionStatus[cartItem.cartId] ?: false)
                     _itemUpdateEvent.postValue(updatedItem)
                     updateProducts(updatedItem)
                 }
@@ -108,12 +107,12 @@ class CartViewModel(
             return
         }
         cartRepository.decreaseQuantity(cartItem) {
-            getCartItemById(cartItem.cartId) { foundItem ->
-                if (foundItem != null) {
+            cartRepository.findCartItemByProductId(product.id) { cartItem ->
+                if (cartItem != null) {
                     val updatedItem =
-                        foundItem
+                        cartItem
                             .toCartItemUiModel()
-                            .copy(isSelected = selectionStatus[foundItem.cartId] ?: false)
+                            .copy(isSelected = selectionStatus[cartItem.cartId] ?: false)
                     _itemUpdateEvent.postValue(updatedItem)
                     updateProducts(updatedItem)
                 }
@@ -124,15 +123,10 @@ class CartViewModel(
     private fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
         cartRepository.addCartItem(newItem) {
-            cartRepository.loadAllCartItems { cartItems ->
-                val found =
-                    cartItems.find { it.product.id == newItem.product.id }
-                if (found != null) {
-                    _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = true))
-                    setCartItemSelection(found.toCartItemUiModel(), true)
-                } else {
-                    _itemUpdateEvent.postValue(newItem.toCartItemUiModel().copy(isSelected = true))
-                    fetchRecommendedProducts()
+            cartRepository.findCartItemByProductId(newItem.product.id) { cartItem ->
+                if (cartItem != null) {
+                    _itemUpdateEvent.postValue(cartItem.toCartItemUiModel().copy(isSelected = true))
+                    setCartItemSelection(cartItem.toCartItemUiModel(), true)
                 }
             }
         }
@@ -140,23 +134,16 @@ class CartViewModel(
 
     fun removeFromCart(cartItem: CartItemUiModel) {
         val removedItem = cartItem.cartItem.copy(quantity = 0)
-        selectionStatus.remove(cartItem.cartItem.cartId)
-        cartRepository.deleteCartItem(cartItem.cartItem.cartId) {
-            cartRepository.loadAllCartItems { cartItems ->
-                val found =
-                    cartItems.find { it.product.id == removedItem.product.id }
-                if (found != null) {
-                    _itemUpdateEvent.postValue(found.toCartItemUiModel().copy(isSelected = false))
-                } else {
-                    _itemUpdateEvent.postValue(
-                        removedItem.toCartItemUiModel().copy(isSelected = false),
-                    )
-                    fetchRecommendedProducts()
+        selectionStatus.remove(removedItem.cartId)
+        cartRepository.deleteCartItem(removedItem.cartId) {
+            cartRepository.findCartItemByProductId(removedItem.product.id) { cartItem ->
+                if (cartItem != null) {
+                    _itemUpdateEvent.postValue(cartItem.toCartItemUiModel().copy(isSelected = false))
                 }
             }
             _deleteState.postValue(removedItem.cartId)
+            updateSelectionInfo()
         }
-        updateSelectionInfo()
     }
 
     fun setCartItemSelection(
@@ -224,16 +211,6 @@ class CartViewModel(
             isNextPage -> currentPage + DEFAULT_PAGE
             else -> max(DEFAULT_PAGE, currentPage - DEFAULT_PAGE)
         }
-
-    private fun getCartItemById(
-        id: Long,
-        callback: (CartItem?) -> Unit,
-    ) {
-        cartRepository.loadAllCartItems { cartItems ->
-            val foundItem = cartItems.find { it.cartId == id }
-            callback(foundItem)
-        }
-    }
 
     private fun updateProducts(updatedItem: CartItemUiModel) {
         _cartItems.postValue(

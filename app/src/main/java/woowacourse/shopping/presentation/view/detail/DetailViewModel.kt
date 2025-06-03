@@ -28,8 +28,7 @@ class DetailViewModel(
 
     fun fetchProduct(id: Long) {
         productRepository.findProductById(id) { product ->
-            cartRepository.loadAllCartItems { cartItems ->
-                val cartItem = cartItems.find { cartItem -> cartItem.product.id == id }
+            cartRepository.findCartItemByProductId(id) { cartItem ->
                 if (cartItem == null) {
                     _product.postValue(product?.toProductUiModel()?.copy(quantity = 1))
                 } else {
@@ -55,8 +54,7 @@ class DetailViewModel(
 
     fun addToCart() {
         val product = _product.value ?: return
-        cartRepository.loadAllCartItems { cartItems ->
-            val cartItem = cartItems.find { cartItem -> cartItem.product.id == product.id }
+        cartRepository.findCartItemByProductId(product.id) { cartItem ->
             if (cartItem == null) {
                 cartRepository.addCartItem(product.toCartItem()) {
                     _saveEvent.postValue(Unit)

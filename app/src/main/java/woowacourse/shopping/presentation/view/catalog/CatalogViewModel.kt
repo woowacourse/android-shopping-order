@@ -116,71 +116,6 @@ class CatalogViewModel(
         }
     }
 
-    fun increaseQuantity(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-        if (product.quantity == 0) {
-            addToCart(cartItem.toCartItemUiModel())
-            return
-        }
-        cartRepository.increaseQuantity(cartItem) {
-            updateCartItem(cartItem.cartId)
-        }
-    }
-
-    fun decreaseQuantity(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-
-        if (cartItem.quantity <= 1) {
-            cartRepository.deleteCartItem(cartItem.cartId) {
-                _itemUpdateEvent.postValue(product.copy(quantity = 0))
-                calculateTotalCartCount()
-            }
-        } else {
-            cartRepository.decreaseQuantity(cartItem) {
-                updateCartItem(cartItem.cartId)
-            }
-        }
-    }
-
-    private fun addToCart(cartItem: CartItemUiModel) {
-        val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem) {
-            cartRepository.loadAllCartItems { cartItems ->
-                cartItems
-                    .find { cartItem -> cartItem.product.id == newItem.product.id }
-                    .let { foundItem ->
-                        _itemUpdateEvent.postValue(foundItem?.toProductUiModel())
-                        calculateTotalCartCount()
-                    }
-            }
-        }
-    }
-
-    private fun updateCartItem(cartId: Long) {
-        getCartItemByCartId(cartId) { cartItem ->
-            if (cartItem != null) {
-                _itemUpdateEvent.postValue(cartItem.toProductUiModel())
-            }
-            calculateTotalCartCount()
-        }
-    }
-
-    private fun getCartItemByCartId(
-        id: Long,
-        callback: (CartItem?) -> Unit,
-    ) {
-        cartRepository.loadAllCartItems { cartItems ->
-            val foundItem = cartItems.find { cartItem -> cartItem.cartId == id }
-            callback(foundItem)
-        }
-    }
-
-    private fun calculateTotalCartCount() {
-        cartRepository.getAllCartItemsCount { count ->
-            _totalCartCount.postValue(count)
-        }
-    }
-
     private fun loadRecentProducts() {
         productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
             val recentProductsItem =
@@ -195,6 +130,49 @@ class CatalogViewModel(
                     )
                 }
             _items.postValue(updatedItems)
+        }
+    }
+
+    fun increaseQuantity(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+        if (product.quantity == 0) {
+            addToCart(cartItem.toCartItemUiModel())
+            return
+        }
+        cartRepository.increaseQuantity(cartItem) {
+            _itemUpdateEvent.postValue(cartItem.copy(quantity = cartItem.quantity + 1).toProductUiModel())
+            calculateTotalCartCount()
+        }
+    }
+
+    fun decreaseQuantity(product: ProductUiModel) {
+        val cartItem = product.toCartItem()
+        if (cartItem.quantity == 1) {
+            cartRepository.deleteCartItem(cartItem.cartId) {
+                _itemUpdateEvent.postValue(product.copy(quantity = 0))
+                calculateTotalCartCount()
+            }
+        } else {
+            cartRepository.decreaseQuantity(cartItem) {
+                _itemUpdateEvent.postValue(cartItem.copy(quantity = cartItem.quantity - 1).toProductUiModel())
+                calculateTotalCartCount()
+            }
+        }
+    }
+
+    private fun addToCart(cartItem: CartItemUiModel) {
+        val newItem = cartItem.cartItem.copy(quantity = 1)
+        cartRepository.addCartItem(newItem) {
+            cartRepository.findCartItemByProductId(newItem.product.id) { cartItem ->
+                _itemUpdateEvent.postValue(cartItem?.toProductUiModel())
+                calculateTotalCartCount()
+            }
+        }
+    }
+
+    private fun calculateTotalCartCount() {
+        cartRepository.getAllCartItemsCount { count ->
+            _totalCartCount.postValue(count)
         }
     }
 

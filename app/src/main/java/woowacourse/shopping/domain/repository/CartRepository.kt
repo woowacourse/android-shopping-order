@@ -15,6 +15,11 @@ interface CartRepository {
 
     fun loadAllCartItems(callback: (cartItems: List<CartItem>) -> Unit)
 
+    fun findCartItemByProductId(
+        id: Long,
+        callback: (cartItem: CartItem?) -> Unit,
+    )
+
     fun getAllCartItemsCount(callback: (totalCount: Int) -> Unit)
 
     fun increaseQuantity(

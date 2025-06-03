@@ -37,6 +37,15 @@ class CartRepositoryImpl(
         }
     }
 
+    override fun findCartItemByProductId(
+        id: Long,
+        callback: (cartItem: CartItem?) -> Unit,
+    ) {
+        cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE) { response ->
+            callback(response?.content?.find { it.product.id == id }?.toCartItem())
+        }
+    }
+
     override fun getAllCartItemsCount(callback: (totalCount: Int) -> Unit) {
         cartItemDataSource.fetchCartItemsCount { quantity ->
             callback(quantity?.quantity ?: 0)
