@@ -63,13 +63,15 @@ class ProductCatalogActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.shopping_cart) {
-            val intent = ShoppingCartActivity.newIntent(this)
-            startActivity(intent)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
+            R.id.shopping_cart -> {
+                val intent = ShoppingCartActivity.newIntent(this)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
-    }
 
     private fun setUpView() {
         enableEdgeToEdge()
