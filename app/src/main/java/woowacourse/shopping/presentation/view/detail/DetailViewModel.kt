@@ -55,16 +55,19 @@ class DetailViewModel(
 
     fun addToCart() {
         val product = _product.value ?: return
-        if (product.cartId == 0L) {
-            cartRepository.addCartItem(product.toCartItem()) {
-                _saveEvent.postValue(Unit)
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                cartId = product.cartId,
-                quantity = _product.value?.quantity ?: 1,
-            ) {
-                _saveEvent.postValue(Unit)
+        cartRepository.loadAllCartItems { cartItems ->
+            val cartItem = cartItems.find { cartItem -> cartItem.product.id == product.id }
+            if (cartItem == null) {
+                cartRepository.addCartItem(product.toCartItem()) {
+                    _saveEvent.postValue(Unit)
+                }
+            } else {
+                cartRepository.updateCartItemQuantity(
+                    cartId = product.cartId,
+                    quantity = cartItem.quantity + product.quantity,
+                ) {
+                    _saveEvent.postValue(Unit)
+                }
             }
         }
     }
