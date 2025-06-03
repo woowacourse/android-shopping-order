@@ -4,21 +4,37 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 
 object CartClient {
-    fun getRetrofitService(): CartService {
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(HeaderInterceptor("rosemin928", "password"))
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient
+            .Builder()
+            .addInterceptor(HeaderInterceptor(BuildConfig.USER_ID, BuildConfig.USER_PASSWORD))
+            .addInterceptor(logging)
             .build()
+    }
 
+    private val logging =
+        HttpLoggingInterceptor().apply {
+            level = Level.BODY
+        }
+
+    private val retrofit: Retrofit by lazy {
         val contentType = "application/json".toMediaType()
-
-        return Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com")
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
-            .create(CartService::class.java)
     }
+    private val service: CartService by lazy {
+        retrofit.create(CartService::class.java)
+    }
+
+    fun getRetrofitService(): CartService = service
 }

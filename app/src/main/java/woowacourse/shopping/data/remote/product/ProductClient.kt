@@ -3,19 +3,38 @@ package woowacourse.shopping.data.remote.product
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.BuildConfig
 
 object ProductClient {
-    fun getRetrofitService(): ProductService {
-        val contentType = "application/json".toMediaType()
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient
+            .Builder()
+            .addInterceptor(logging)
+            .build()
+    }
 
-        val retrofitService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com")
+    private val logging =
+        HttpLoggingInterceptor().apply {
+            level = Level.BODY
+        }
+
+    private val retrofit: Retrofit by lazy {
+        val contentType = "application/json".toMediaType()
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
-            .create(ProductService::class.java)
-
-        return retrofitService
     }
+
+    private val service: ProductService by lazy {
+        retrofit.create(ProductService::class.java)
+    }
+
+    fun getRetrofitService(): ProductService = service
 }
