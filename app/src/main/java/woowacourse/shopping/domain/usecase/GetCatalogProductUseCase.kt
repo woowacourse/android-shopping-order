@@ -8,51 +8,43 @@ class GetCatalogProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
-        productId: Long,
-        callback: (product: Result<Product?>) -> Unit,
-    ) {
-        productRepository.fetchAllProducts { result ->
-            result
-                .onSuccess { catalogProducts ->
-                    catalogProducts.find { product -> product.productDetail.id == productId }?.let { catalogProduct ->
-                        combineCartProduct(productId, catalogProduct, callback)
-                    } ?: return@fetchAllProducts callback(Result.success(null))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+    suspend operator fun invoke(productId: Long): Result<Product> {
+        val catalogProducts =
+            productRepository.fetchAllProducts().getOrElse {
+                return Result.failure(Throwable("[GetCatalogProductUseCase] 상품 목록 불러오기 오류", it))
+            }
+
+        val catalogProduct =
+            catalogProducts.find { it.productDetail.id == productId }
+                ?: return Result.failure(Throwable("[GetCatalogProductUseCase] 찾을 수 없는 상품"))
+
+        return combineCartProduct(productId, catalogProduct)
     }
 
-    private fun combineCartProduct(
+    private suspend fun combineCartProduct(
         productId: Long,
         catalogProduct: Product,
-        callback: (product: Result<Product?>) -> Unit,
-    ) {
-        cartRepository.fetchAllCartProducts { result ->
-            result
-                .onSuccess { cartProducts ->
-                    val cartProductsByProductId: Map<Long, Product> =
-                        cartProducts.products.associateBy { product ->
-                            product.productDetail.id
-                        }
-                    val updatedProduct = getUpdatedProduct(cartProductsByProductId, productId, catalogProduct)
+    ): Result<Product> {
+        val cartProducts =
+            cartRepository.fetchAllCartProducts().getOrElse {
+                return Result.failure(Throwable("[GetCatalogProductUseCase] 장바구니 불러오기 오류", it))
+            }
+        val cartProductsByProductId = cartProducts.products.associateBy { it.productDetail.id }
 
-                    callback(Result.success(updatedProduct))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+        val updatedProduct = updateProducts(cartProductsByProductId, productId, catalogProduct)
+
+        return Result.success(updatedProduct)
     }
 
-    private fun getUpdatedProduct(
+    private fun updateProducts(
         cartProducts: Map<Long, Product>,
         productId: Long,
         catalogProduct: Product,
-    ) = cartProducts[productId]?.let { cartProduct ->
-        catalogProduct.copy(
-            cartId = cartProduct.cartId,
-            quantity = cartProduct.quantity,
-        )
-    } ?: catalogProduct
+    ): Product =
+        cartProducts[productId]?.let { cartProduct ->
+            catalogProduct.copy(
+                cartId = cartProduct.cartId,
+                quantity = cartProduct.quantity,
+            )
+        } ?: catalogProduct
 }

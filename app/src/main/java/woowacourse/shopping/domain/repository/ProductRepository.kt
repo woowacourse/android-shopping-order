@@ -4,12 +4,11 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.Products
 
 interface ProductRepository {
-    fun fetchProducts(
+    suspend fun fetchProducts(
         page: Int,
         size: Int,
         category: String? = null,
-        callback: (Result<Products>) -> Unit,
-    )
+    ): Result<Products>
 
-    fun fetchAllProducts(callback: (Result<List<Product>>) -> Unit)
+    suspend fun fetchAllProducts(): Result<List<Product>>
 }

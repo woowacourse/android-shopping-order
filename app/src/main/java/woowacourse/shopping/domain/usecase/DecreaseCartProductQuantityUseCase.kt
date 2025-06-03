@@ -7,49 +7,33 @@ import woowacourse.shopping.domain.repository.CartRepository
 class DecreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         product: Product,
         step: Int = DEFAULT_QUANTITY_STEP,
-        callback: (quantity: Result<Int>) -> Unit = {},
-    ) {
-        if (product.cartId == null) return
+    ): Result<Int> {
+        if (product.cartId == null) return Result.failure(Throwable("[DecreaseCartProductQuantityUseCase] 유효하지 않은 상품"))
+
         val newQuantity = (product.quantity - step).coerceAtLeast(MINIMUM_QUANTITY)
 
-        if (newQuantity <= MINIMUM_QUANTITY) {
-            deleteCartProduct(product.cartId, callback)
+        return if (newQuantity <= MINIMUM_QUANTITY) {
+            deleteCartProduct(product.cartId)
         } else {
-            updateCartProduct(product.cartId, newQuantity, callback)
+            updateCartProduct(product.cartId, newQuantity)
         }
     }
 
-    private fun deleteCartProduct(
-        cartId: Long,
-        callback: (Result<Int>) -> Unit,
-    ) {
-        repository.deleteCartProduct(cartId) { result ->
-            result
-                .onSuccess {
-                    callback(Result.success(MINIMUM_QUANTITY))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
-    }
+    private suspend fun deleteCartProduct(cartId: Long): Result<Int> =
+        repository
+            .deleteCartProduct(cartId)
+            .map { MINIMUM_QUANTITY }
 
-    private fun updateCartProduct(
+    private suspend fun updateCartProduct(
         cartId: Long,
         newQuantity: Int,
-        callback: (Result<Int>) -> Unit,
-    ) {
-        repository.updateCartProduct(cartId, newQuantity) { result ->
-            result
-                .onSuccess {
-                    callback(Result.success(newQuantity))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
-    }
+    ): Result<Int> =
+        repository
+            .updateCartProduct(cartId, newQuantity)
+            .map { newQuantity }
 
     companion object {
         private const val DEFAULT_QUANTITY_STEP = 1
