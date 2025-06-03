@@ -6,13 +6,11 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartProductBinding
 import woowacourse.shopping.ui.cart.adapter.CartProductAdapter
-import woowacourse.shopping.ui.cart.adapter.CartProductViewHolder
 import woowacourse.shopping.ui.common.DataBindingFragment
 
 class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.layout.fragment_cart_product) {
     private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
-    private val cartProductAdapter: CartProductAdapter =
-        CartProductAdapter(createAdapterOnClickHandler())
+    private val cartProductAdapter: CartProductAdapter by lazy { CartProductAdapter(viewModel) }
 
     override fun onViewCreated(
         view: View,
@@ -36,26 +34,4 @@ class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.la
             cartProductAdapter.submitList(products.products)
         }
     }
-
-    private fun createAdapterOnClickHandler() =
-        object : CartProductViewHolder.OnClickHandler {
-            override fun onRemoveCartProductClick(
-                cartId: Long,
-                productId: Long,
-            ) {
-                viewModel.removeCartProduct(cartId, productId)
-            }
-
-            override fun onIncreaseClick(productId: Long) {
-                viewModel.increaseCartProductQuantity(productId)
-            }
-
-            override fun onDecreaseClick(productId: Long) {
-                viewModel.decreaseCartProductQuantity(productId)
-            }
-
-            override fun onSelectClick(cartId: Long) {
-                viewModel.toggleCartProductSelection(cartId)
-            }
-        }
 }

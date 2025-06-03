@@ -20,6 +20,7 @@ import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
+import woowacourse.shopping.ui.cart.adapter.CartProductViewHolder
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
@@ -30,7 +31,8 @@ class CartViewModel(
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartRecommendProductsUseCase: GetCartRecommendProductsUseCase,
     private val orderProductsUseCase: OrderProductsUseCase,
-) : ViewModel() {
+) : ViewModel(),
+    CartProductViewHolder.OnClickHandler {
     private val _cartProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val cartProducts: LiveData<Products> get() = _cartProducts
 
@@ -70,6 +72,25 @@ class CartViewModel(
 
     init {
         loadCartProducts()
+    }
+
+    override fun onRemoveCartProductClick(
+        cartId: Long,
+        productId: Long,
+    ) {
+        removeCartProduct(cartId, productId)
+    }
+
+    override fun onIncreaseClick(productId: Long) {
+        increaseCartProductQuantity(productId)
+    }
+
+    override fun onDecreaseClick(productId: Long) {
+        decreaseCartProductQuantity(productId)
+    }
+
+    override fun onSelectClick(cartId: Long) {
+        toggleCartProductSelection(cartId)
     }
 
     private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
