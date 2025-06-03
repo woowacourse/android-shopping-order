@@ -30,6 +30,14 @@ class CartItemsRepositoryImpl(
         return pagingData.copy(products = updatedProducts)
     }
 
+    override fun getCartItemProductIds(): List<Long> {
+        return cartItemsLocalDataSource.getCartItemProductIds()
+    }
+
+    override fun getCartItemCartIds(): List<Long> {
+        return cartItemsLocalDataSource.getCartItemCartIds()
+    }
+
     override fun getInitialCartItems(
         page: Int?,
         size: Int?,
@@ -142,10 +150,6 @@ class CartItemsRepositoryImpl(
                 }
                 .let(onResult)
         }
-    }
-
-    override fun getCartItemIds(): List<Long> {
-        return cartItemsLocalDataSource.getCartItemIds()
     }
 
     private fun Content.toUiModel() =

@@ -41,7 +41,11 @@ class CartItemsLocalDataSource {
         return cache.find { it.productId == productId }?.quantity ?: 0
     }
 
-    fun getCartItemIds(): List<Long> {
+    fun getCartItemProductIds(): List<Long> {
         return cache.map { it.productId }
+    }
+
+    fun getCartItemCartIds(): List<Long> {
+        return cache.map { it.cartId }
     }
 }

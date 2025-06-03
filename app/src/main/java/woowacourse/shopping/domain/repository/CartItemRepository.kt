@@ -43,5 +43,7 @@ interface CartItemRepository {
 
     fun getQuantity(pagingData: PagingData): PagingData
 
-    fun getCartItemIds(): List<Long>
+    fun getCartItemProductIds(): List<Long>
+
+    fun getCartItemCartIds(): List<Long>
 }
