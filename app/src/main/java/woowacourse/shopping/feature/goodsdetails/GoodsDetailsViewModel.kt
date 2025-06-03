@@ -55,7 +55,7 @@ class GoodsDetailsViewModel(
         }
     }
 
-    fun addOrIncreaseToCart() {
+    fun addOrUpdateQuantityToCart() {
         cartItem.value?.let { item ->
             cartRepository.updateQuantity(
                 cartId,
