@@ -1,7 +1,6 @@
 package woowacourse.shopping.cart
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,8 +51,6 @@ class CartRecommendationFragment : Fragment() {
                             val intent = DetailActivity.newIntent(requireContext(), product)
                             startActivity(intent)
                         }
-
-                        override fun onLoadButtonClick() = Unit
                     },
                 quantityControlListener =
                     object : QuantityControlListener {
@@ -61,7 +58,6 @@ class CartRecommendationFragment : Fragment() {
                             buttonEvent: ButtonEvent,
                             product: ProductUiModel,
                         ) {
-                            Log.d("호출", "클릭 리스너, product = $product, buttonEvent = $buttonEvent")
                             cartViewModel.updateQuantity(buttonEvent, product)
                         }
 
@@ -79,11 +75,9 @@ class CartRecommendationFragment : Fragment() {
             binding.RecyclerViewCartRecommendation.adapter as ProductAdapter
 
         cartViewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            Log.d("호출", "recommendedProducts observed $products")
             recommendProductAdapter.addLoadedItems(products.map { ProductItem(it) })
         }
         cartViewModel.updatedProduct.observe(viewLifecycleOwner) { product ->
-            Log.d("호출", "observed $product")
             recommendProductAdapter.updateItem(product)
         }
     }
