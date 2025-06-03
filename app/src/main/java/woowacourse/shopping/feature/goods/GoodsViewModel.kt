@@ -185,8 +185,9 @@ class GoodsViewModel(
             limit = PAGE_SIZE,
             offset = goodsLoadOffset,
             onComplete = { goodsResponse ->
+                val loadedGoods = _goods.value ?: emptyList()
                 val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
-                _goods.value = fetchedGoods.toMutableList()
+                _goods.value = (loadedGoods + fetchedGoods).toMutableList()
                 _isFullLoaded.postValue(goodsResponse.last)
             },
             onFail = { throwable ->
