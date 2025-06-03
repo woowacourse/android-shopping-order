@@ -271,9 +271,12 @@ class CartViewModel(
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
-        updateCartItem(cartItem.id) { item ->
-            item.copy(quantity = maxOf(0, item.quantity - 1))
-        }
+        if (cartItem.quantity - 1 == 0) return
+        cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
+            updateCartItem(cartItem.id) { item ->
+                item.copy(quantity = (item.quantity - 1))
+            }
+        }, {})
     }
 
     fun delete(
