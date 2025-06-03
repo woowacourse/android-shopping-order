@@ -1,14 +1,15 @@
 package woowacourse.shopping.presentation.product.recent
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
+import woowacourse.shopping.presentation.util.DiffCallback
 
 class ViewedItemAdapter(
     private val handler: CatalogEventHandlerImpl,
-) : RecyclerView.Adapter<ViewedItemHolder>() {
-    private var viewedProducts: List<ProductUiModel> = emptyList()
+) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -16,14 +17,11 @@ class ViewedItemAdapter(
     ): ViewedItemHolder = ViewedItemHolder.from(parent, handler)
 
     override fun onBindViewHolder(
-        holder: ViewedItemHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
-    ) = holder.bind(viewedProducts[position])
-
-    override fun getItemCount(): Int = viewedProducts.size
-
-    fun setData(newItems: List<ProductUiModel>) {
-        viewedProducts = newItems
-        notifyDataSetChanged()
+    ) {
+        (holder as ViewedItemHolder).bind(getItem(position))
     }
+
+    override fun getItemCount(): Int = currentList.size
 }
