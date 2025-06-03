@@ -114,6 +114,7 @@
                 app:layout_constraintStart_toStartOf="@id/shoppingCartProductAllSelectCheckBox" />
 
             <TextView
+                android:id="@+id/shoppingCartTotalPrice"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
