@@ -25,8 +25,8 @@ class CartViewModel(
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>()
     val recommendedProducts: LiveData<List<ProductUiModel>> = _recommendedProducts
 
-    private val _deleteState = MutableLiveData<Long>()
-    val deleteState: LiveData<Long> = _deleteState
+    private val _deleteEvent = MutableLiveData<Long>()
+    val deleteEvent: LiveData<Long> = _deleteEvent
 
     private val _itemUpdateEvent = MutableLiveData<CartItemUiModel>()
     val itemUpdateEvent: LiveData<CartItemUiModel> = _itemUpdateEvent
@@ -134,15 +134,11 @@ class CartViewModel(
 
     fun removeFromCart(cartItem: CartItemUiModel) {
         val removedItem = cartItem.cartItem.copy(quantity = 0)
-        selectionStatus.remove(removedItem.cartId)
         cartRepository.deleteCartItem(removedItem.cartId) {
-            cartRepository.findCartItemByProductId(removedItem.product.id) { cartItem ->
-                if (cartItem != null) {
-                    _itemUpdateEvent.postValue(cartItem.toCartItemUiModel().copy(isSelected = false))
-                }
-            }
-            _deleteState.postValue(removedItem.cartId)
+            _deleteEvent.postValue(removedItem.cartId)
+            selectionStatus.remove(removedItem.cartId)
             updateSelectionInfo()
+            fetchRecommendedProducts()
         }
     }
 
@@ -228,7 +224,7 @@ class CartViewModel(
     private fun updateSelectionInfo() {
         cartRepository.loadAllCartItems { cartItems ->
             val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
-            val selectedItems = (cartItems).filter { selectedItemIds.contains(it.cartId) }
+            val selectedItems = cartItems.filter { selectedItemIds.contains(it.cartId) }
             _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
             _totalCount.postValue(selectedItems.sumOf { it.quantity })
             _allSelected.postValue(selectedItems.isNotEmpty() && selectedItems.size == cartItems.size)

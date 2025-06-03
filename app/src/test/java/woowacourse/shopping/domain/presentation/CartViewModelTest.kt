@@ -42,7 +42,7 @@ class CartViewModelTest {
 
         viewModel.removeFromCart(item)
 
-        val result = viewModel.deleteState.getOrAwaitValue()
+        val result = viewModel.deleteEvent.getOrAwaitValue()
         assertThat(result).isEqualTo(item.product.id)
     }
 
