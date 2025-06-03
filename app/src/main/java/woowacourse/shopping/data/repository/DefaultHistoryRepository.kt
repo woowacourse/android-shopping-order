@@ -1,22 +1,22 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.HistoryDataSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import woowacourse.shopping.data.datasource.history.HistoryDataSource
 import woowacourse.shopping.data.db.entity.HistoryEntity
 import woowacourse.shopping.domain.repository.HistoryRepository
-import kotlin.concurrent.thread
 
 class DefaultHistoryRepository(
-    private val historyDataSource: HistoryDataSource,
+    private val defaultHistoryDataSource: HistoryDataSource,
 ) : HistoryRepository {
-    override fun getHistories(onResult: (List<Long>) -> Unit) {
-        thread {
-            onResult(historyDataSource.latestHistory().map { it.productId })
+    override suspend fun getHistories() =
+        withContext(Dispatchers.IO) {
+            val result = defaultHistoryDataSource.latestHistory().map { it.productId }
+            return@withContext result
         }
-    }
 
-    override fun saveHistory(productId: Long) {
-        thread {
-            historyDataSource.insertHistory(HistoryEntity(productId))
+    override suspend fun saveHistory(productId: Long) =
+        withContext(Dispatchers.IO) {
+            defaultHistoryDataSource.insertHistory(HistoryEntity(productId))
         }
-    }
 }

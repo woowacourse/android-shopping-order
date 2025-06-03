@@ -48,24 +48,22 @@ class HistoryDaoTest {
         }
 
     @Test
-    fun `최근_10개의_기록을_가져온다`() =
+    fun `최근_10개의_기록을_최신순으로_가져온다`() =
         runTest {
-            // when
+            // given
             historyEntityListFixture.forEach {
                 historyDao.insert(it)
             }
-
-            // given
-            historyDao.getLatestHistories()
-
             val expected =
                 (2L..11L).map { id ->
                     HistoryEntity(productId = id, createdAt = id)
                 }.reversed()
 
-            // then
+            // when
             val actual = historyDao.getLatestHistories()
-            assertEquals(actual, expected)
+
+            // then
+            assertEquals(expected, actual)
         }
 
     @After

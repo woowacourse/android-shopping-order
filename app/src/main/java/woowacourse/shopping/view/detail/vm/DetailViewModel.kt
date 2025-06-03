@@ -3,6 +3,8 @@ package woowacourse.shopping.view.detail.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
@@ -129,11 +131,15 @@ class DetailViewModel(
         }
 
     fun saveLastSeenProduct(lastSeenProductId: Long) {
-        historyRepository.saveHistory(lastSeenProductId)
+        viewModelScope.launch {
+            historyRepository.saveHistory(lastSeenProductId)
+        }
     }
 
     private fun saveHistory(productId: Long) {
-        historyRepository.saveHistory(productId)
+        viewModelScope.launch {
+            historyRepository.saveHistory(productId)
+        }
     }
 
     private fun handleFailure(throwable: Throwable) {

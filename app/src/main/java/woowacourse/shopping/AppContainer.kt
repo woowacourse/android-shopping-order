@@ -3,8 +3,8 @@ package woowacourse.shopping
 import android.content.Context
 import woowacourse.shopping.data.ApiCallbackHandler
 import woowacourse.shopping.data.datasource.CartDataSource
-import woowacourse.shopping.data.datasource.HistoryDataSource
 import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.data.datasource.history.DefaultHistoryDataSource
 import woowacourse.shopping.data.db.PetoMarketDatabase
 import woowacourse.shopping.data.network.RetrofitProvider
 import woowacourse.shopping.data.network.service.CartService
@@ -25,7 +25,7 @@ class AppContainer(
 
     private val historyDao = db.historyDao()
 
-    private val historyDataSource = HistoryDataSource(historyDao)
+    private val historyDataSource = DefaultHistoryDataSource(historyDao)
 
     private val productService: ProductService = RetrofitProvider.productService
 

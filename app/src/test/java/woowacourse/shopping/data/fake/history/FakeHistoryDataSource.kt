@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.fake.history
 
-import woowacourse.shopping.data.datasource.HistoryDataSource
+import woowacourse.shopping.data.datasource.history.HistoryDataSource
 import woowacourse.shopping.data.db.dao.HistoryDao
 import woowacourse.shopping.data.db.entity.HistoryEntity
 
