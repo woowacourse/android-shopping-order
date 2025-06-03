@@ -36,12 +36,6 @@ class CatalogViewModel(
     private var currentPage = 0
     val page: Int get() = currentPage
 
-    fun initCatalog() {
-        loadCatalogProducts()
-        loadRecentViewedItems()
-        updateCartCount()
-    }
-
     fun toggleQuantity(product: ProductUiModel) {
         val toggled =
             product.copy(quantity = product.quantity + 1)
@@ -103,7 +97,7 @@ class CatalogViewModel(
         loadCatalogProducts()
     }
 
-    private fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
+    fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
         productsRepository.getProducts(currentPage, pageSize) { result ->
             result
                 .onSuccess { pagingData ->
@@ -117,14 +111,14 @@ class CatalogViewModel(
         }
     }
 
-    private fun loadRecentViewedItems() {
+    fun loadRecentViewedItems() {
         viewedRepository.getViewedItems { items ->
             _recentViewedItems.postValue(items)
             _hasRecentViewedItems.postValue(items.isNotEmpty())
         }
     }
 
-    private fun updateCartCount() {
+    fun updateCartCount() {
         cartRepository.getCartItemsCount { result ->
             result.onSuccess { cartCount ->
                 _cartCount.postValue(cartCount)

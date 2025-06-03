@@ -16,7 +16,6 @@ import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandl
 import woowacourse.shopping.presentation.product.catalog.viewHolder.CartActionViewHolder
 import woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.newIntent
 import woowacourse.shopping.presentation.product.recent.ViewedItemAdapter
-import woowacourse.shopping.product.catalog.ProductAdapter
 
 class CatalogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCatalogBinding
@@ -38,11 +37,7 @@ class CatalogActivity : AppCompatActivity() {
         binding.viewModel = viewModel
 
         observeViewModel()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.initCatalog()
+        viewModel.loadCatalogProducts()
     }
 
     private fun applyWindowInsets() {
@@ -51,6 +46,12 @@ class CatalogActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadRecentViewedItems()
+        viewModel.updateCartCount()
     }
 
     private fun initRecyclerView() {
@@ -97,7 +98,10 @@ class CatalogActivity : AppCompatActivity() {
             }
         }
         viewModel.recentViewedItems.observe(this) { recentItems ->
-            viewedAdapter.setData(recentItems)
+            viewedAdapter.submitList(recentItems)
+            binding.recyclerViewRecentView.post {
+                binding.recyclerViewRecentView.scrollToPosition(0)
+            }
         }
     }
 
