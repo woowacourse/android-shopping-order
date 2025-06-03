@@ -47,16 +47,16 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
     }
 
     private fun initObserver() {
-        viewModel.saveState.observe(viewLifecycleOwner) {
-            it?.let { navigateToCatalog() }
+        viewModel.saveState.observe(viewLifecycleOwner) { saveState ->
+            saveState?.let { navigateToCatalog() }
         }
 
-        viewModel.amount.observe(viewLifecycleOwner) {
-            binding.detailItemCounter.textViewDetailAmount.text = it.toString()
+        viewModel.amount.observe(viewLifecycleOwner) { amount ->
+            binding.detailItemCounter.textViewDetailAmount.text = amount.toString()
         }
 
-        viewModel.product.observe(viewLifecycleOwner) {
-            binding.product = it
+        viewModel.product.observe(viewLifecycleOwner) { productUiModel ->
+            binding.product = productUiModel
         }
         viewModel.lastViewedProduct.observe(viewLifecycleOwner) { recentProduct ->
             binding.viewDetailLastViewed.setOnClickListener {
