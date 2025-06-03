@@ -14,12 +14,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityCartBinding
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    val viewModel: CartViewModel by viewModels { CartViewModelFactory(application as ShoppingApplication) }
+    val viewModel: CartViewModel by viewModels { CartViewModelFactory() }
     private var hasHandledTotalCount = false
 
     override fun onCreate(savedInstanceState: Bundle?) {

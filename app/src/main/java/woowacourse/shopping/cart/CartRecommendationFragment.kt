@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartRecommendationBinding
 import woowacourse.shopping.product.catalog.CatalogItem.ProductItem
 import woowacourse.shopping.product.catalog.ProductActionListener
@@ -21,9 +20,7 @@ class CartRecommendationFragment : Fragment() {
     @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentCartRecommendationBinding? = null
     private val binding get() = _binding!!
-    private val cartViewModel: CartViewModel by activityViewModels {
-        CartViewModelFactory(requireActivity().application as ShoppingApplication)
-    }
+    private val cartViewModel: CartViewModel by activityViewModels { CartViewModelFactory() }
 
     override fun onCreateView(
         inflater: LayoutInflater,

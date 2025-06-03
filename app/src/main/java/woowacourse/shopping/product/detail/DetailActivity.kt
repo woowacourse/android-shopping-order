@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.cart.ButtonEvent
 import woowacourse.shopping.databinding.ActivityDetailBinding
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -45,7 +44,7 @@ class DetailActivity : AppCompatActivity() {
         viewModel =
             ViewModelProvider(
                 this,
-                DetailViewModelFactory(product, application as ShoppingApplication),
+                DetailViewModelFactory(product),
             )[DetailViewModel::class.java]
     }
 
