@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.binding
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.facebook.shimmer.ShimmerFrameLayout
 
 @BindingAdapter("imageUrl")
 fun setImageBindingAdapter(
@@ -13,4 +14,13 @@ fun setImageBindingAdapter(
         .with(imageView)
         .load(imageUrl)
         .into(imageView)
+}
+
+@BindingAdapter("startShimmer")
+fun ShimmerFrameLayout.setShimmer(isLoading: Boolean) {
+    if (isLoading) {
+        startShimmer()
+    } else {
+        stopShimmer()
+    }
 }

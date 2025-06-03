@@ -3,6 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.catalog.CatalogViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_catalog"
         android:layout_width="match_parent"
@@ -35,9 +44,11 @@
                 android:backgroundTint="@color/mint"
                 android:gravity="center"
                 android:padding="4dp"
+                android:text="@{String.valueOf(vm.totalCartCount)}"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold"
+                android:visibility="@{vm.totalCartCount == 0 ? View.GONE : View.VISIBLE}"
                 tools:text="10" />
 
             <ImageButton
@@ -56,19 +67,21 @@
             android:id="@+id/layout_catalog_shimmer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:visibility="@{vm.isLoading ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
             app:shimmer_auto_start="true"
             app:shimmer_duration="1500"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:startShimmer="@{vm.isLoading}">
 
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alignmentMode="alignMargins"
-                android:rowCount="4"
                 android:columnCount="2"
                 android:orientation="horizontal"
                 android:padding="8dp"
+                android:rowCount="4"
                 android:useDefaultMargins="true">
 
                 <include
@@ -76,26 +89,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1" />
+
                 <include
                     layout="@layout/item_catalog_shimmer"
                     android:layout_width="wrap_content"

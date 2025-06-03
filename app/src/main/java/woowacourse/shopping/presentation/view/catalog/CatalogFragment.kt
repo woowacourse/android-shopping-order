@@ -76,17 +76,8 @@ class CatalogFragment :
     }
 
     private fun initObserver() {
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) {
-                binding.layoutCatalogShimmer.startShimmer()
-                binding.layoutCatalogShimmer.visibility = View.VISIBLE
-                binding.recyclerViewProducts.visibility = View.GONE
-            } else {
-                binding.layoutCatalogShimmer.stopShimmer()
-                binding.layoutCatalogShimmer.visibility = View.GONE
-                binding.recyclerViewProducts.visibility = View.VISIBLE
-            }
-        }
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.items.observe(viewLifecycleOwner) { products ->
             catalogAdapter.submitList(products)
