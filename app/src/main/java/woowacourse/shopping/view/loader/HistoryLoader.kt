@@ -23,26 +23,26 @@ class HistoryLoader(
                 productRepository.loadProduct(productId) { result ->
                     if (isErrorOccurred) return@loadProduct
 
-                    result.fold(
-                        onSuccess = { product ->
-                            historyProducts.add(
-                                HistoryState(
-                                    product.id,
-                                    product.name,
-                                    product.category,
-                                    product.imgUrl,
-                                ),
-                            )
-                            remaining--
-                            if (remaining == 0) {
-                                onResult(Result.success(historyProducts))
+                    result.onSuccess { product ->
+                        val historyState = HistoryState(
+                            product.id,
+                            product.name,
+                            product.category,
+                            product.imgUrl,
+                        )
+                        historyProducts.add(historyState)
+                        remaining--
+                        if (remaining == 0) {
+                            val sorted = historyProducts.sortedBy { state ->
+                                historyIds.indexOf(state.productId)
                             }
-                        },
-                        onFailure = { throwable ->
+                            onResult(Result.success(sorted))
+                        }
+                    }
+                        .onFailure { throwable ->
                             isErrorOccurred = true
                             onResult(Result.failure(throwable))
-                        },
-                    )
+                        }
                 }
             }
         }
