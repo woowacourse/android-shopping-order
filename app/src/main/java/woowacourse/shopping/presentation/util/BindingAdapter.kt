@@ -49,13 +49,6 @@ fun setPrevButtonEnabled(
     view.isEnabled = isEnabled
 }
 
-@BindingAdapter("app:visibleIfNotSameProduct")
-fun View.visibleIfNotSameProduct(
-    recentItem: ProductUiModel?,
-    current: ProductUiModel?,
-) {
-    visibility = if (recentItem != null && recentItem.id != current?.id) View.VISIBLE else View.GONE
-}
 
 @BindingAdapter("recommendProducts")
 fun RecyclerView.setRecommendProducts(products: List<ProductUiModel>?) {
