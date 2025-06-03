@@ -6,6 +6,7 @@ data class RecommendProduct(
     var quantity: Int,
     private val product: Product,
 ) {
+    val id = product.id
     val name = product.name
     val price = product.price
     val imageUrl = product.imageUrl

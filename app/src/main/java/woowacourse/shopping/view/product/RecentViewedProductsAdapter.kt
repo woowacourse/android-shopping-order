@@ -1,14 +1,13 @@
 package woowacourse.shopping.view.product
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.domain.product.Product
 
 class RecentViewedProductsAdapter(
     private val onSelectProduct: (Product) -> Unit,
-) : RecyclerView.Adapter<RecentViewedProductViewHolder>() {
-    private var items: List<Product> = emptyList()
-
+) : ListAdapter<Product, RecentViewedProductViewHolder>(diffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -18,13 +17,21 @@ class RecentViewedProductsAdapter(
         holder: RecentViewedProductViewHolder,
         position: Int,
     ) {
-        holder.bind(items[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private val diffUtil =
+            object : DiffUtil.ItemCallback<Product>() {
+                override fun areItemsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean = oldItem.id == newItem.id
 
-    fun submitList(products: List<Product>) {
-        items = products
-        notifyDataSetChanged()
+                override fun areContentsTheSame(
+                    oldItem: Product,
+                    newItem: Product,
+                ): Boolean = oldItem == newItem
+            }
     }
 }

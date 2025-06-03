@@ -1,7 +1,8 @@
 package woowacourse.shopping.view.product
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.product.Product
 
@@ -16,10 +17,8 @@ class ProductsAdapter(
         productId: Long,
         quantity: Int,
     ) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var items: List<ProductsItem> = emptyList()
-
-    override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
+) : ListAdapter<ProductsItem, RecyclerView.ViewHolder>(diffUtil) {
+    override fun getItemViewType(position: Int): Int = currentList[position].viewType.ordinal
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -41,17 +40,29 @@ class ProductsAdapter(
         position: Int,
     ) {
         when (holder) {
-            is RecentViewedProductsViewHolder -> holder.bind(items[position] as ProductsItem.RecentViewedProductsItem)
-            is ProductViewHolder -> holder.bind(items[position] as ProductsItem.ProductItem)
-            is ProductMoreViewHolder -> holder.bind(items[position] as ProductsItem.LoadItem)
+            is RecentViewedProductsViewHolder -> holder.bind(currentList[position] as ProductsItem.RecentViewedProductsItem)
+            is ProductViewHolder -> holder.bind(currentList[position] as ProductsItem.ProductItem)
+            is ProductMoreViewHolder -> holder.bind(currentList[position] as ProductsItem.LoadItem)
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private val diffUtil =
+            object : DiffUtil.ItemCallback<ProductsItem>() {
+                override fun areItemsTheSame(
+                    oldItem: ProductsItem,
+                    newItem: ProductsItem,
+                ): Boolean =
+                    when (oldItem) {
+                        is ProductsItem.RecentViewedProductsItem -> newItem is ProductsItem.RecentViewedProductsItem
+                        is ProductsItem.ProductItem -> newItem is ProductsItem.ProductItem && oldItem.product.id == newItem.product.id
+                        is ProductsItem.LoadItem -> newItem is ProductsItem.LoadItem
+                    }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun submitList(items: List<ProductsItem>) {
-        this.items = items
-        notifyDataSetChanged()
+                override fun areContentsTheSame(
+                    oldItem: ProductsItem,
+                    newItem: ProductsItem,
+                ): Boolean = oldItem == newItem
+            }
     }
 }
