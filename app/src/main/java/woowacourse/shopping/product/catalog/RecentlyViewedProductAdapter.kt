@@ -1,20 +1,24 @@
 package woowacourse.shopping.product.catalog
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 
 class RecentlyViewedProductAdapter(
-    products: List<ProductUiModel>,
     private val recentlyViewedProductClickListener: RecentlyViewedProductClickListener,
-) : RecyclerView.Adapter<RecentlyViewedProductViewHolder>() {
-    private val products: MutableList<ProductUiModel> = products.toMutableList()
+) : ListAdapter<ProductUiModel, RecentlyViewedProductViewHolder>(
+        object : DiffUtil.ItemCallback<ProductUiModel>() {
+            override fun areItemsTheSame(
+                oldItem: ProductUiModel,
+                newItem: ProductUiModel,
+            ): Boolean = oldItem.id == newItem.id
 
-    fun setItems(products: List<ProductUiModel>) {
-        this.products.clear()
-        this.products.addAll(products)
-        notifyDataSetChanged()
-    }
-
+            override fun areContentsTheSame(
+                oldItem: ProductUiModel,
+                newItem: ProductUiModel,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -23,9 +27,5 @@ class RecentlyViewedProductAdapter(
     override fun onBindViewHolder(
         holder: RecentlyViewedProductViewHolder,
         position: Int,
-    ) {
-        holder.bind(products[position])
-    }
-
-    override fun getItemCount(): Int = products.size
+    ) = holder.bind(currentList[position])
 }

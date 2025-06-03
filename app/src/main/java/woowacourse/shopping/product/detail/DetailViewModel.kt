@@ -25,6 +25,10 @@ class DetailViewModel(
     private val _latestViewedProduct = MutableLiveData<ProductUiModel>()
     val latestViewedProduct: LiveData<ProductUiModel> = _latestViewedProduct
 
+    init {
+        recentlyViewedProductRepository.insertRecentlyViewedProductId(product.id)
+    }
+
     fun updateQuantity(buttonEvent: ButtonEvent) {
         when (buttonEvent) {
             ButtonEvent.INCREASE -> increaseQuantity()

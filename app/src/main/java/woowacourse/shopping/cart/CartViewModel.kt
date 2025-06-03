@@ -49,11 +49,12 @@ class CartViewModel(
 
     fun loadRecommendProducts() {
         recentlyViewedProductRepository.getLatestViewedProduct { product ->
-            catalogProductRepository.getProduct(product.id) { categoryProduct ->
+            catalogProductRepository.getProduct(product.id, onSuccess = { categoryProduct ->
                 val category = categoryProduct.category ?: ""
                 catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
                     _recommendedProducts.postValue(products)
                 }
+            }) {
             }
         }
     }

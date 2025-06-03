@@ -13,7 +13,9 @@ class RecentlyViewedProductRepositoryImpl(
 ) : RecentlyViewedProductRepository {
     override fun insertRecentlyViewedProductId(productId: Int) {
         thread {
-            recentlyViewedProductDao.insertRecentlyViewedProductUid(RecentlyViewedProductEntity(productId))
+            recentlyViewedProductDao.insertRecentlyViewedProductUid(
+                RecentlyViewedProductEntity(productId),
+            )
         }
     }
 
@@ -30,9 +32,9 @@ class RecentlyViewedProductRepositoryImpl(
     override fun getLatestViewedProduct(callback: (ProductUiModel) -> Unit) {
         thread {
             val productId = recentlyViewedProductDao.getLatestViewedProductId()
-            catalogProductRepository.getProduct(productId) { product ->
+            catalogProductRepository.getProduct(productId, onSuccess = { product ->
                 callback(product)
-            }
+            }) {}
         }
     }
 }

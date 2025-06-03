@@ -93,15 +93,24 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
         }
 
         productIds.forEach { uid ->
-            getProduct(uid) { product ->
-                resultsMap[uid] = product
-                completedCount++
-
-                if (completedCount == productIds.size) {
-                    val orderedResults = productIds.mapNotNull { resultsMap[it] }
-                    callback(orderedResults)
-                }
-            }
+            getProduct(
+                productId = uid,
+                onSuccess = { product ->
+                    resultsMap[uid] = product
+                    completedCount++
+                    if (completedCount == productIds.size) {
+                        val orderedResults = productIds.mapNotNull { resultsMap[it] }
+                        callback(orderedResults)
+                    }
+                },
+                onFailure = {
+                    completedCount++
+                    if (completedCount == productIds.size) {
+                        val orderedResults = productIds.mapNotNull { resultsMap[it] }
+                        callback(orderedResults)
+                    }
+                },
+            )
         }
     }
 
@@ -149,19 +158,19 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
 
     override fun getProduct(
         productId: Int,
-        callback: (ProductUiModel) -> Unit,
+        onSuccess: (ProductUiModel) -> Unit,
+        onFailure: () -> Unit,
     ) {
         retrofitService
-            .requestDetailProduct(
-                id = productId,
-            ).enqueue(
+            .requestDetailProduct(id = productId)
+            .enqueue(
                 object : Callback<Content> {
                     override fun onResponse(
                         call: Call<Content>,
                         response: Response<Content>,
                     ) {
                         if (response.isSuccessful) {
-                            val body: Content = response.body() ?: return
+                            val body = response.body() ?: return onFailure()
                             val product =
                                 ProductUiModel(
                                     id = body.id.toInt(),
@@ -170,8 +179,9 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                                     price = body.price,
                                     category = body.category,
                                 )
-                            callback(product)
-                            println("body : $body")
+                            onSuccess(product)
+                        } else {
+                            onFailure()
                         }
                     }
 
@@ -179,7 +189,8 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                         call: Call<Content>,
                         t: Throwable,
                     ) {
-                        println("error : $t")
+                        println("error: $t")
+                        onFailure()
                     }
                 },
             )

@@ -119,9 +119,7 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun setRecentlyViewedProductAdapter() {
         val adapter =
-            RecentlyViewedProductAdapter(
-                products = emptyList(),
-            ) {
+            RecentlyViewedProductAdapter {
                 val intent = DetailActivity.newIntent(this@CatalogActivity, it)
                 startActivity(intent)
             }
@@ -135,7 +133,7 @@ class CatalogActivity : AppCompatActivity() {
 
         viewModel.loadedCatalogItems.observe(this, productsAdapter::addLoadedItems)
         viewModel.updatedItem.observe(this, productsAdapter::updateItem)
-        viewModel.recentlyViewedProducts.observe(this, recentProductsAdapter::setItems)
+        viewModel.recentlyViewedProducts.observe(this, recentProductsAdapter::submitList)
         viewModel.loadingState.observe(this) { changeShimmerState(it.isLoading) }
     }
 

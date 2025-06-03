@@ -25,6 +25,7 @@ interface CatalogProductRepository {
 
     fun getProduct(
         productId: Int,
-        callback: (ProductUiModel) -> Unit,
+        onSuccess: (ProductUiModel) -> Unit,
+        onFailure: () -> Unit,
     )
 }
