@@ -1,11 +1,12 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.source.remote.products.ProductsDataSource
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.repository.ProductsRepository
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class FakeCatalogItemRepository(
     private val size: Int,
-) : ProductsDataSource {
+) : ProductsRepository {
     private val fakeProducts: List<ProductUiModel> =
         List(size) { index ->
             ProductUiModel(
@@ -16,16 +17,47 @@ class FakeCatalogItemRepository(
             )
         }
 
-    override fun getProducts(): List<ProductUiModel> = fakeProducts
+    override fun getProducts(
+        page: Int,
+        size: Int,
+        onResult: (Result<PagingData>) -> Unit,
+    ) {
+        val startIndex = page * size
+        val endIndex = (startIndex + size).coerceAtMost(fakeProducts.size)
 
-    override fun getSubListedProducts(
-        startIndex: Int,
-        lastIndex: Int,
-    ): List<ProductUiModel> =
-        fakeProducts.subList(
-            startIndex.coerceAtLeast(0),
-            lastIndex.coerceAtMost(fakeProducts.size),
+        val pageItems = if (startIndex < fakeProducts.size) {
+            fakeProducts.subList(startIndex, endIndex)
+        } else {
+            emptyList()
+        }
+
+        val pagingData = PagingData(
+            products = pageItems,
+            page = page,
+            hasNext = endIndex < fakeProducts.size,
+            hasPrevious = page > 0
         )
 
-    override fun getProductsSize(): Int = fakeProducts.size
+        onResult(Result.success(pagingData))
+    }
+
+    override fun getProductById(
+        id: Long,
+        onResult: (Result<ProductUiModel>) -> Unit,
+    ) {
+        val product = fakeProducts.find { it.id == id }
+        if (product != null) {
+            onResult(Result.success(product))
+        } else {
+            onResult(Result.failure(NoSuchElementException("product를 찾을 수 없습니다")))
+        }
+    }
+
+    override fun getRecommendedProductsFromLastViewed(
+        cartProductIds: List<Long>,
+        onResult: (Result<List<ProductUiModel>>) -> Unit,
+    ) {
+        val recommended = fakeProducts.filterNot { it.id in cartProductIds }.take(5)
+        onResult(Result.success(recommended))
+    }
 }

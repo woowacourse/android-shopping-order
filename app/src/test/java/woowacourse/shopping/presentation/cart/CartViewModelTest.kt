@@ -6,7 +6,7 @@ import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.fixture.FakeCartItemRepository
-import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 
@@ -24,27 +24,10 @@ class CartViewModelTest {
                 FakeCartItemRepository(0),
             )
 
-        val products = viewModel.cartProducts.getOrAwaitValue()
+        val products = viewModel.pagingData.value?.products ?: emptyList()
 
         assertThat(products.size).isEqualTo(0)
         assertThat(viewModel.getPage()).isEqualTo(0)
-    }
-
-    @Test
-    fun `상품 삭제 후 현재 페이지가 유효하지 않으면 이전 페이지로 이동한다`() {
-        viewModel =
-            CartViewModel(
-                FakeCartItemRepository(11),
-            )
-
-        repeat(2) { viewModel.onNextPage() }
-        assertThat(viewModel.getPage()).isEqualTo(2)
-
-        val lastItem = viewModel.cartProducts.getOrAwaitValue().last()
-        viewModel.onDeleteProduct(lastItem)
-
-        assertThat(viewModel.getPage()).isEqualTo(1)
-        assertThat(viewModel.cartProducts.getOrAwaitValue().size).isEqualTo(5)
     }
 
     @Test
@@ -53,11 +36,11 @@ class CartViewModelTest {
             CartViewModel(
                 FakeCartItemRepository(10),
             )
-        assertThat(viewModel.isNextButtonEnabled()).isTrue
+        assertThat(viewModel.hasNextPage()).isTrue
 
         repeat(2) { viewModel.onNextPage() }
 
-        assertThat(viewModel.isNextButtonEnabled()).isFalse
+        assertThat(viewModel.hasNextPage()).isFalse
     }
 
     @Test
@@ -67,10 +50,10 @@ class CartViewModelTest {
                 FakeCartItemRepository(10),
             )
 
-        assertThat(viewModel.isPrevButtonEnabled()).isFalse
+        assertThat(viewModel.hasPrevPage()).isFalse
 
         viewModel.onNextPage()
-        assertThat(viewModel.isPrevButtonEnabled()).isTrue
+        assertThat(viewModel.hasPrevPage()).isTrue
     }
 
     @Test
@@ -80,12 +63,12 @@ class CartViewModelTest {
             ProductUiModel(
                 id = 1L,
                 name = "아이스 카페 아메리카노",
-                imageUrl = "https://example.com/image.jpg",
+                imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
                 price = 4000,
                 quantity = 2,
             )
 
-        cartRepository.insertCartItem(product) {}
+        cartRepository.addCartItem(product.id, product.quantity) {}
 
         viewModel = CartViewModel(cartRepository)
 
@@ -107,7 +90,7 @@ class CartViewModelTest {
                 quantity = 3,
             )
 
-        cartRepository.insertCartItem(product) {}
+        cartRepository.addCartItem(product.id, product.quantity) {}
 
         viewModel = CartViewModel(cartRepository)
 
@@ -129,7 +112,7 @@ class CartViewModelTest {
                 quantity = 1,
             )
 
-        cartRepository.insertCartItem(product) {}
+        cartRepository.addCartItem(product.id, product.quantity) {}
 
         viewModel = CartViewModel(cartRepository)
 

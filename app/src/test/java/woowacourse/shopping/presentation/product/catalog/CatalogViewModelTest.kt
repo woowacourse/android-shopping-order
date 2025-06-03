@@ -22,16 +22,20 @@ class CatalogViewModelTest {
     fun `초기 상태 테스트`() {
         viewModel =
             CatalogViewModel(
-                FakeCatalogItemRepository(10),
+                FakeCatalogItemRepository(20),
                 FakeCartItemRepository(0),
                 FakeViewedItemRepository(0),
             )
 
-        val paging = viewModel.pagingData.getOrAwaitValue()
+        viewModel.loadCatalogProducts(10)
 
-        assertThat(viewModel.page).isEqualTo(0)
-        assertThat(paging.hasNext).isFalse
-        assertThat(paging.products).hasSize(10)
+        val hasNext = viewModel.pagingData.value?.hasNext
+        val products = viewModel.pagingData.value?.products ?: emptyList()
+        val page = viewModel.pagingData.value?.page ?: 0
+
+        assertThat(page).isEqualTo(0)
+        assertThat(hasNext).isTrue
+        assertThat(products).hasSize(10)
     }
 
     @Test
@@ -43,15 +47,17 @@ class CatalogViewModelTest {
                 FakeCartItemRepository(0),
                 FakeViewedItemRepository(0),
             )
-        val catalogProducts: List<ProductUiModel> = (viewModel.pagingData.getOrAwaitValue().products)
-        assertThat(viewModel.page).isEqualTo(0)
 
-        // when
+        viewModel.loadCatalogProducts(20)
+        val page = viewModel.pagingData.value?.page ?: 0
+        assertThat(page).isEqualTo(0)
+
         viewModel.loadNextCatalogProducts()
+        val products = viewModel.pagingData.value?.products ?: emptyList()
+        val afterPage = viewModel.pagingData.value?.page ?: 0
 
-        // then
-        assertThat(viewModel.page).isEqualTo(1)
-        assertThat(catalogProducts.size).isEqualTo(20)
+        assertThat(afterPage).isEqualTo(1)
+        assertThat(products.size).isEqualTo(30)
     }
 
     @Test
@@ -64,7 +70,8 @@ class CatalogViewModelTest {
                 FakeViewedItemRepository(0),
             )
 
-        val hasNext = viewModel.pagingData.getOrAwaitValue().hasNext
+        viewModel.loadCatalogProducts()
+        val hasNext = viewModel.pagingData.value?.hasNext
 
         assertThat(hasNext).isEqualTo(true)
     }
@@ -77,8 +84,11 @@ class CatalogViewModelTest {
                 FakeCartItemRepository(0),
                 FakeViewedItemRepository(9),
             )
-        val viewedSize = viewModel.recentViewedItems.getOrAwaitValue().size
-        val hasViewed = viewModel.hasRecentViewedItems.getOrAwaitValue()
+
+        viewModel.loadRecentViewedItems()
+
+        val viewedSize = viewModel.recentViewedItems.value?.size
+        val hasViewed = viewModel.hasRecentViewedItems.value
 
         assertThat(viewedSize).isEqualTo(9)
         assertThat(hasViewed).isEqualTo(true)
@@ -92,8 +102,10 @@ class CatalogViewModelTest {
                 FakeCartItemRepository(0),
                 FakeViewedItemRepository(20),
             )
-        val viewedSize = viewModel.recentViewedItems.getOrAwaitValue().size
-        val hasViewed = viewModel.hasRecentViewedItems.getOrAwaitValue()
+        viewModel.loadRecentViewedItems()
+
+        val viewedSize = viewModel.recentViewedItems.value?.size
+        val hasViewed = viewModel.hasRecentViewedItems.value
 
         assertThat(viewedSize).isEqualTo(10)
         assertThat(hasViewed).isEqualTo(true)
