@@ -1,20 +1,20 @@
 package woowacourse.shopping.feature.login
 
-import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
 import woowacourse.shopping.R
+import woowacourse.shopping.data.account.AccountLocalDataSource
+import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.databinding.ActivityLoginBinding
-import kotlin.getValue
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
+    private lateinit var accountLocalDataSource: AccountLocalDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,12 +25,19 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        accountLocalDataSource = AccountLocalDataSourceImpl(this)
 
         viewModel.loginSuccessEvent.observe(this) { basicKey ->
-            val sharedPreferences = this.getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
-            sharedPreferences.edit { putString("basicKey", basicKey) }
-            showToastMessage(getString(R.string.login_alert_success_login))
-            finish()
+            accountLocalDataSource.saveBasicKey(
+                basicKey = basicKey,
+                onComplete = {
+                    showToastMessage(getString(R.string.login_alert_success_login))
+                    finish()
+                },
+                onFail = {
+                    showToastMessage(getString(R.string.login_alert_save_basic_key_failed))
+                },
+            )
         }
         viewModel.loginErrorEvent.observe(this) { loginError ->
             when (loginError) {

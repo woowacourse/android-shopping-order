@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="29dp"
-            android:text="@string/recomment_item_description"
+            android:text="@string/recommend_item_description"
             android:textColor="@color/gray_800"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/rv_recommend_items"
