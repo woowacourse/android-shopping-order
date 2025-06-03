@@ -3,6 +3,7 @@ package woowacourse.shopping.data.remote.cart
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 
 class CartRepository {
@@ -52,7 +53,9 @@ class CartRepository {
                             onSuccess(it)
                         } ?: onError(Throwable("응답 본문 없음"))
                     } else {
-                        onError(Throwable("응답 실패: ${response.code()}"))
+                        onError(
+                            HttpException(response),
+                        )
                     }
                 }
 
@@ -83,8 +86,9 @@ class CartRepository {
                         if (response.isSuccessful) {
                             onResult(Result.success(response))
                         } else {
-                            val error = response.errorBody()?.string()
-                            onResult(Result.failure(Throwable("추가 실패: ${response.code()} - $error")))
+                            onResult(
+                                Result.failure(HttpException(response)),
+                            )
                         }
                     }
 
@@ -111,8 +115,9 @@ class CartRepository {
                     if (response.isSuccessful) {
                         onResult(Result.success(Unit))
                     } else {
-                        val error = response.errorBody()?.string()
-                        onResult(Result.failure(Throwable("수정 실패: ${response.code()} - $error")))
+                        onResult(
+                            Result.failure(HttpException(response)),
+                        )
                     }
                 }
 
