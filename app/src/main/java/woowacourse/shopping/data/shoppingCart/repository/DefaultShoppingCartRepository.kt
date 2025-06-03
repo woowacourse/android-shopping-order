@@ -87,6 +87,7 @@ class DefaultShoppingCartRepository(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
+        if (quantity == 0) return remove(shoppingCartId, onResult)
         updateShoppingCartQuantity(quantity, shoppingCartId, onResult)
     }
 
