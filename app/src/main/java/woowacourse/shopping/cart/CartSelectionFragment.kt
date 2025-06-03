@@ -34,12 +34,7 @@ class CartSelectionFragment : Fragment() {
     private fun setCartProductAdapter() {
         binding.recyclerViewCart.adapter =
             CartAdapter(
-                onDeleteProductClick =
-                    DeleteProductClickListener { product ->
-                        viewModel.deleteCartProduct(ProductItem(product))
-                    },
-                onPaginationButtonClick = {},
-                onQuantityControl =
+                quantityControlListener =
                     object : QuantityControlListener {
                         override fun onClick(
                             buttonEvent: ButtonEvent,
@@ -48,7 +43,12 @@ class CartSelectionFragment : Fragment() {
 
                         override fun onAdd(product: ProductUiModel) = viewModel.addProduct(product)
                     },
-                onCheckClick = viewModel::changeProductSelection,
+                cartActionListener =
+                    object : CartActionListener {
+                        override fun onDeleteProduct(product: ProductUiModel) = viewModel.deleteCartProduct(ProductItem(product))
+
+                        override fun onCheckToggle(product: ProductUiModel) = viewModel.changeProductSelection(product)
+                    },
             )
     }
 

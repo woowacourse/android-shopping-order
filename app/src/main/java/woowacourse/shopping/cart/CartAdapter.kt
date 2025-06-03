@@ -8,10 +8,8 @@ import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.product.catalog.QuantityControlListener
 
 class CartAdapter(
-    private val onDeleteProductClick: DeleteProductClickListener,
-    private val onPaginationButtonClick: PaginationButtonClickListener,
-    private val onQuantityControl: QuantityControlListener,
-    private val onCheckClick: CheckClickListener,
+    private val quantityControlListener: QuantityControlListener,
+    private val cartActionListener: CartActionListener,
 ) : ListAdapter<ProductItem, RecyclerView.ViewHolder>(
         object : DiffUtil.ItemCallback<ProductItem>() {
             override fun areItemsTheSame(
@@ -28,12 +26,7 @@ class CartAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder =
-        if (viewType == CART_PRODUCT) {
-            CartViewHolder.from(parent, onDeleteProductClick, onQuantityControl, onCheckClick)
-        } else {
-            PaginationButtonViewHolder.from(parent, onPaginationButtonClick)
-        }
+    ): RecyclerView.ViewHolder = CartViewHolder.from(parent, cartActionListener, quantityControlListener)
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,

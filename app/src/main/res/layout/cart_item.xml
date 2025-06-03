@@ -11,16 +11,12 @@
             type="woowacourse.shopping.product.catalog.ProductUiModel" />
 
         <variable
-            name="clickListener"
-            type="woowacourse.shopping.cart.DeleteProductClickListener" />
+            name="cartActionListener"
+            type="woowacourse.shopping.cart.CartActionListener" />
 
         <variable
             name="productActionListener"
             type="woowacourse.shopping.product.catalog.ProductActionListener" />
-
-        <variable
-            name="checkClickListener"
-            type="woowacourse.shopping.cart.CheckClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +30,7 @@
             android:id="@+id/checkbox_selection"
             android:minWidth="48dp"
             android:minHeight="48dp"
-            android:onClick="@{() -> checkClickListener.onClick(cartProduct)}"
+            android:onClick="@{() -> cartActionListener.onCheckToggle(cartProduct)}"
             android:checked="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -78,7 +74,7 @@
             android:layout_height="40dp"
             android:layout_margin="8dp"
             android:background="@drawable/icon_delete"
-            android:onClick="@{() -> clickListener.onClick(cartProduct)}"
+            android:onClick="@{() -> cartActionListener.onDeleteProduct(cartProduct)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
