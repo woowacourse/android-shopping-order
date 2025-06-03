@@ -1,12 +1,12 @@
-package woowacourse.shopping.presentation.view.cart.adapter
+package woowacourse.shopping.presentation.view.order.suggestion.adatper
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.SuggestionProductUiModel
-import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
+import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionStateListener
 
 class SuggestionAdapter(
-    private val eventListener: SuggestionEventListener,
+    private val eventListener: SuggestionStateListener,
 ) : ListAdapter<SuggestionProductUiModel, SuggestionProductViewHolder>(SuggestionProductDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -18,9 +18,5 @@ class SuggestionAdapter(
         position: Int,
     ) {
         holder.bind(getItem(position))
-    }
-
-    interface SuggestionEventListener : QuantityChangeListener {
-        fun onQuantitySelectorOpenButtonClick(productId: Long)
     }
 }

@@ -12,6 +12,8 @@ interface CartRepository {
 
     fun fetchAllCartItems(): List<CartProduct>
 
+    fun findCartIdByProductId(productId: Long): Long
+
     fun deleteCartItem(
         cartId: Long,
         onResult: (Result<Unit>) -> Unit,

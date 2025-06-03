@@ -15,7 +15,7 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.cart.adapter.CartAdapter.CartEventListener" />
+            type="woowacourse.shopping.presentation.view.order.cart.event.CartStateListener" />
 
     </data>
 

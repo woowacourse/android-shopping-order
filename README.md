@@ -20,8 +20,8 @@
 ### 1차 피드백 반영
 
 - [x] ShoppingApplication 인스턴스를 생성 -> dataBase의 인스턴스 생성
-- [ ] Fragment의 Tag를 통한 분기 처리 로직 수정
-- [ ] viewModel에서 수행 작업 -> ViewModel에서 리스너를 구현
+- [x] Fragment의 Tag를 통한 분기 처리 로직 수정
+- [x] ViewModel에서 수행 작업 -> ViewModel에서 리스너를 구현
 - [ ] exception이 안 터지는 곳에서 runCatching rapping 제거
 - [ ] datasource execute 동기처리 enqueue 비동기처리로 수정
   - (remoteDataSource에서 enqueue를 통한 비동기 처리중에 Cached 데이터랑 순서를 못 맞춰서 반영 실패)

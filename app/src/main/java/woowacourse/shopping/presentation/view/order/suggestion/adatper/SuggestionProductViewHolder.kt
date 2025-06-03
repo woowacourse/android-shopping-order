@@ -1,14 +1,15 @@
-package woowacourse.shopping.presentation.view.cart.adapter
+package woowacourse.shopping.presentation.view.order.suggestion.adatper
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemSuggestionBinding
 import woowacourse.shopping.presentation.model.SuggestionProductUiModel
+import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionStateListener
 
 class SuggestionProductViewHolder(
     private val binding: ItemSuggestionBinding,
-    eventListener: SuggestionAdapter.SuggestionEventListener,
+    eventListener: SuggestionStateListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.eventListener = eventListener
@@ -21,7 +22,7 @@ class SuggestionProductViewHolder(
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: SuggestionAdapter.SuggestionEventListener,
+            eventListener: SuggestionStateListener,
         ): SuggestionProductViewHolder {
             val binding =
                 ItemSuggestionBinding.inflate(LayoutInflater.from(parent.context), parent, false)

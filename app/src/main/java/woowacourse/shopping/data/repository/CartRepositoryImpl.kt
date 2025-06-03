@@ -36,12 +36,14 @@ class CartRepositoryImpl(
 
     override fun fetchAllCartItems(): List<CartProduct> = cachedCart.cachedCartProducts
 
+    override fun findCartIdByProductId(productId: Long): Long = cachedCart.findCartIdByProductId(productId)
+
     override fun deleteCartItem(
         cartId: Long,
         onResult: (Result<Unit>) -> Unit,
     ) = runCatchingInThread(onResult) {
-        cartDataSource.deleteCartItem(cartId).getOrThrow()
         cachedCart.deleteCartProductFromCartByCartId(cartId)
+        cartDataSource.deleteCartItem(cartId).getOrThrow()
         Result.success(Unit)
     }
 

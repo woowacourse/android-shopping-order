@@ -17,7 +17,7 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.cart.adapter.SuggestionAdapter.SuggestionEventListener" />
+            type="woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionStateListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

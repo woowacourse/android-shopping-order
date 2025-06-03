@@ -4,7 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="orderViewModel"
+            type="woowacourse.shopping.presentation.view.order.OrderViewModel" />
 
+        <variable
+            name="suggestionViewModel"
+            type="woowacourse.shopping.presentation.view.order.suggestion.SuggestionViewModel" />
+
+        <variable
+            name="uiEvent"
+            type="woowacourse.shopping.presentation.view.order.OrderUiEventListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -56,6 +66,18 @@
             app:layout_constraintTop_toBottomOf="@id/text_view_suggestion_description"
             tools:itemCount="3"
             tools:listitem="@layout/item_suggestion" />
+
+        <include
+            android:id="@+id/view_order"
+            layout="@layout/view_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:isCheckedAll="@{orderViewModel.isCheckAll}"
+            app:isShowCheckBox="@{false}"
+            app:orderUiEvent="@{uiEvent}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:totalCount="@{orderViewModel.totalCount + suggestionViewModel.totalPurchaseProductQuantity}"
+            app:totalPrice="@{orderViewModel.totalPrice + suggestionViewModel.totalPurchaseProductPrice}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

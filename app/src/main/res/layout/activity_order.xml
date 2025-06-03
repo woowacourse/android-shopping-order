@@ -4,10 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <variable
-            name="vm"
-            type="woowacourse.shopping.presentation.view.cart.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,19 +15,6 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/cart_fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/view_order"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <include
-            android:id="@+id/view_order"
-            layout="@layout/view_order"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:isCheckedAll="@{vm.isCheckAll}"
-            app:isShowCheckBox="@{true}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:totalCount="@{vm.totalCount}"
-            app:totalPrice="@{vm.totalPrice}" />
+            android:layout_height="match_parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

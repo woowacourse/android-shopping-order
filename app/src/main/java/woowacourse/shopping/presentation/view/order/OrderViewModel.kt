@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart
+package woowacourse.shopping.presentation.view.order
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -10,32 +10,24 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartProductUiModel
 import woowacourse.shopping.presentation.model.DisplayModel
 import woowacourse.shopping.presentation.model.FetchPageDirection
-import woowacourse.shopping.presentation.model.SuggestionProductUiModel
 import woowacourse.shopping.presentation.model.toCartItemUiModel
-import woowacourse.shopping.presentation.model.toSuggestionUiModel
 import woowacourse.shopping.presentation.util.MutableSingleLiveData
 import woowacourse.shopping.presentation.util.SingleLiveData
-import woowacourse.shopping.presentation.view.cart.event.CartMessageEvent
-import woowacourse.shopping.presentation.view.cart.event.OrderMessageEvent
+import woowacourse.shopping.presentation.view.order.cart.event.CartStateListener
 import kotlin.math.max
 
 class OrderViewModel(
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
-) : ViewModel() {
-    private val _toastCartEvent = MutableSingleLiveData<CartMessageEvent>()
-    val toastCartEvent: SingleLiveData<CartMessageEvent> = _toastCartEvent
-
+) : ViewModel(),
+    CartStateListener {
     private val _toastOrderEvent = MutableSingleLiveData<OrderMessageEvent>()
-    val toastOrderEvent: SingleLiveData<OrderMessageEvent> = _toastOrderEvent
+    val toastOrderEvent: SingleLiveData<OrderMessageEvent> = this._toastOrderEvent
 
     private val cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     private val selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
@@ -50,12 +42,6 @@ class OrderViewModel(
                 value = currentCartItems.map { DisplayModel(it, selectedCartItems.contains(it)) }
             }
         }
-
-    private val _suggestionProducts =
-        MutableLiveData<List<SuggestionProductUiModel>>(
-            emptyList(),
-        )
-    val suggestionProducts: LiveData<List<SuggestionProductUiModel>> = _suggestionProducts
 
     val totalPrice: LiveData<Int> =
         selectedCartItems.map { it.sumOf { cartProduct -> cartProduct.totalPrice } }
@@ -96,41 +82,55 @@ class OrderViewModel(
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
                 .onSuccess { onFetchCartItemsSuccess(it, newPage) }
-                .onFailure { postFailureCartEvent(CartMessageEvent.FETCH_CART_ITEMS_FAILURE) }
+                .onFailure { postFailureOrderEvent(OrderMessageEvent.FETCH_CART_ITEMS_FAILURE) }
         }
     }
 
-    fun deleteCartItem(cartId: Long) {
+    override fun onDeleteProduct(cartId: Long) {
+        deleteCartItem(cartId)
+    }
+
+    override fun increaseQuantity(productId: Long) {
+        increaseProductQuantity(productId)
+    }
+
+    override fun decreaseQuantity(productId: Long) {
+        decreaseProductQuantity(productId)
+    }
+
+    override fun onCheckOrder(cartId: Long) {
+        switchCartItemSelection(cartId)
+    }
+
+    override fun onSwitchAllOrder() {
+        selectCurrentPageCartProduct()
+    }
+
+    private fun deleteCartItem(cartId: Long) {
         cartRepository.deleteCartItem(cartId) { result ->
             result
                 .onSuccess { handleFetchCartItemDeleted(cartId) }
-                .onFailure { postFailureCartEvent(CartMessageEvent.DELETE_CART_ITEM_FAILURE) }
+                .onFailure { postFailureOrderEvent(OrderMessageEvent.DELETE_CART_ITEM_FAILURE) }
         }
     }
 
-    fun increaseProductQuantity(
-        productId: Long,
-        refreshTarget: RefreshTarget,
-    ) {
+    private fun increaseProductQuantity(productId: Long) {
         cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
             result
-                .onSuccess { refreshProductQuantity(refreshTarget) }
-                .onFailure { postFailureCartEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+                .onSuccess { refreshFetchItem() }
+                .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
-    fun decreaseProductQuantity(
-        productId: Long,
-        refreshTarget: RefreshTarget,
-    ) {
+    private fun decreaseProductQuantity(productId: Long) {
         cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
             result
-                .onSuccess { refreshProductQuantity(refreshTarget) }
-                .onFailure { postFailureCartEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+                .onSuccess { refreshFetchItem() }
+                .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
-    fun switchCartItemSelection(cartId: Long) {
+    private fun switchCartItemSelection(cartId: Long) {
         val selectedItems = selectedCartItems.value.orEmpty()
         if (selectedItems.find { it.cartId == cartId } != null) {
             selectedCartItems.value = selectedItems.filter { it.cartId != cartId }
@@ -140,21 +140,7 @@ class OrderViewModel(
         selectedCartItems.value = selectedItems + foundCartProduct
     }
 
-    fun fetchSuggestionProducts() {
-        val excludedProductIds =
-            this.cartItems.value
-                .orEmpty()
-                .filter { it.quantity != 0 }
-                .map { it.productId }
-
-        productRepository.fetchSuggestionProducts(SUGGESTION_LIMIT, excludedProductIds) { result ->
-            result
-                .onSuccess { combine(it) }
-                .onFailure { postFailureCartEvent(CartMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
-        }
-    }
-
-    fun selectCurrentPageCartProduct() {
+    private fun selectCurrentPageCartProduct() {
         _isCheckAll.value = !(_isCheckAll.value ?: false)
         val checked = (_isCheckAll.value ?: false)
         if (checked) {
@@ -165,42 +151,21 @@ class OrderViewModel(
         selectedCartItems.value = emptyList()
     }
 
-    fun orderCartItems() {
-        val selectedItemIds = selectedCartItems.value.orEmpty().map { it.cartId.toString() }
-        orderRepository.addOrder(selectedItemIds) { result ->
+    fun orderCartItems(purchaseSuggestionIds: List<Long>) {
+        val selectedItemIds = selectedCartItems.value.orEmpty().map { it.cartId }
+        val purchaseCartIds = selectedItemIds + purchaseSuggestionIds
+
+        orderRepository.addOrder(purchaseCartIds.map { it.toString() }) { result ->
             result
-                .onSuccess { deleteSelectedCartItems() }
+                .onSuccess { deleteSelectedCartItems(purchaseCartIds) }
                 .onFailure { postFailureOrderEvent(OrderMessageEvent.ORDER_CART_ITEMS_FAILURE) }
         }
     }
 
-    private fun deleteSelectedCartItems() {
-        selectedCartItems.value.orEmpty().map {
-            cartRepository.deleteCartItem(it.cartId) {
+    private fun deleteSelectedCartItems(purchaseCartIds: List<Long>) {
+        purchaseCartIds.map {
+            cartRepository.deleteCartItem(it) {
             }
-        }
-    }
-
-    private fun combine(suggestionProducts: List<Product>) {
-        val ids = suggestionProducts.map { it.id }
-        cartRepository
-            .findCartProductsByProductIds(ids)
-            .onFailure { CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE }
-            .onSuccess {
-                val updatedItems = applyCartQuantities(it, suggestionProducts)
-                _suggestionProducts.postValue(updatedItems)
-            }
-    }
-
-    private fun applyCartQuantities(
-        cartProducts: List<CartProduct>,
-        suggestionProducts: List<Product>,
-    ): List<SuggestionProductUiModel> {
-        val cartItemMap = cartProducts.associateBy { it.product.id }
-        return suggestionProducts.map { product ->
-            val found = cartItemMap[product.id]
-            if (found != null) return@map product.toSuggestionUiModel(found.quantity)
-            product.toSuggestionUiModel(DEFAULT_QUANTITY)
         }
     }
 
@@ -213,19 +178,12 @@ class OrderViewModel(
         }
     }
 
-    private fun refreshProductQuantity(refreshTarget: RefreshTarget) {
-        when (refreshTarget) {
-            RefreshTarget.CART -> refreshFetchItem()
-            RefreshTarget.SUGGESTION -> fetchSuggestionProducts()
-        }
-    }
-
     private fun refreshFetchItem() {
         val newPage = calculatePage(FetchPageDirection.CURRENT)
         cartRepository.fetchCartItems(newPage, limit) { result ->
             result
                 .onSuccess { onRefreshProductQuantitySuccess(it) }
-                .onFailure { postFailureCartEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+                .onFailure { postFailureOrderEvent(OrderMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
@@ -270,25 +228,14 @@ class OrderViewModel(
         selectedCartItems.postValue(updatedSelectedItems)
     }
 
-    private fun postFailureCartEvent(event: CartMessageEvent) {
-        _toastCartEvent.postValue(event)
-    }
-
     private fun postFailureOrderEvent(event: OrderMessageEvent) {
-        _toastOrderEvent.postValue(event)
-    }
-
-    private fun CartProduct.isSelected(): Boolean {
-        val selectedItems = selectedCartItems.value
-        return selectedItems?.any { it.cartId == cartId } ?: false
+        this._toastOrderEvent.postValue(event)
     }
 
     companion object {
         private const val DEFAULT_PAGE = 0
         private const val PAGE_STEP = 1
         private const val QUANTITY_STEP = 1
-        private const val DEFAULT_QUANTITY = 0
-        private const val SUGGESTION_LIMIT = 10
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
@@ -297,9 +244,8 @@ class OrderViewModel(
                     extras: CreationExtras,
                 ): T {
                     val cartRepository = RepositoryProvider.cartRepository
-                    val productRepository = RepositoryProvider.productRepository
                     val orderRepository = RepositoryProvider.orderRepository
-                    return OrderViewModel(cartRepository, productRepository, orderRepository) as T
+                    return OrderViewModel(cartRepository, orderRepository) as T
                 }
             }
     }

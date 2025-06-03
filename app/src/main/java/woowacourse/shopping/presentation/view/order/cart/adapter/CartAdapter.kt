@@ -1,14 +1,14 @@
-package woowacourse.shopping.presentation.view.cart.adapter
+package woowacourse.shopping.presentation.view.order.cart.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CartProductUiModel
 import woowacourse.shopping.presentation.model.DisplayModel
-import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
+import woowacourse.shopping.presentation.view.order.cart.event.CartStateListener
 
 class CartAdapter(
     initialProducts: List<DisplayModel<CartProductUiModel>> = emptyList(),
-    private val eventListener: CartEventListener,
+    private val eventListener: CartStateListener,
 ) : RecyclerView.Adapter<CartViewHolder>() {
     private val products = initialProducts.toMutableList()
 
@@ -62,11 +62,5 @@ class CartAdapter(
                 notifyItemInserted(itemCount - 1)
             }
         }
-    }
-
-    interface CartEventListener : QuantityChangeListener {
-        fun onDeleteProduct(cartId: Long)
-
-        fun onCheckOrder(cartId: Long)
     }
 }
