@@ -67,6 +67,7 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
 
     private fun initListener() {
         binding.btnClose.setOnClickListener {
+            parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
             parentFragmentManager.popBackStack()
         }
     }
