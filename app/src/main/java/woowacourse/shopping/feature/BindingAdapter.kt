@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
+import woowacourse.shopping.feature.model.GoodsItem
 
 @BindingAdapter("imgUrl")
 fun ImageView.loadImageFromUrl(url: String?) {
@@ -34,7 +35,7 @@ fun RecyclerView.bindCartItems(items: List<Cart>?) {
 }
 
 @BindingAdapter("items")
-fun RecyclerView.bindItems(items: List<Any>?) {
+fun RecyclerView.bindItems(items: List<GoodsItem>?) {
     if (adapter is GoodsAdapter && items != null) {
         (adapter as GoodsAdapter).setItems(items)
     }
