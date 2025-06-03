@@ -56,15 +56,21 @@ class ProductViewModel(
         }
     }
 
-    fun fetchData(currentPage: Int = FIRST_PAGE) {
+    fun fetchData() {
         _uiState.value = ResultState.Loading
 
         productRepository.fetchPagingProducts(currentPage, FETCH_PAGE_SIZE) { result ->
             result
                 .onSuccess { cartItems ->
                     val productItemTypes = cartItems.toProductItemTypes()
-                    _products.postValue(productItemTypes)
-                    this.currentPage = currentPage
+
+                    val isNeedUpdate = products.value?.containsAll(productItemTypes)?.not() ?: true
+                    if (isNeedUpdate) {
+                        val currentList =
+                            _products.value?.filterIsInstance<ProductItemType.Product>()
+                                ?: emptyList()
+                        _products.postValue(currentList + productItemTypes)
+                    }
                     _uiState.value = ResultState.Success(Unit)
                 }.onFailure {
                     _toastMessage.postValue(R.string.product_toast_load_failure)
