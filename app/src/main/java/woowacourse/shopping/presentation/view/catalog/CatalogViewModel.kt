@@ -33,16 +33,16 @@ class CatalogViewModel(
     private val _totalCartCount = MutableLiveData<Int>()
     val totalCartCount: LiveData<Int> = _totalCartCount
 
-    private var pageIndex = 0
-
-    init {
-        fetchProducts()
-    }
-
-    fun fetchProducts() {
+    fun loadCatalog(nextPage: Boolean) {
         _isLoading.value = true
         calculateTotalCartCount()
-        productRepository.loadPageOfProducts(pageIndex, PAGE_SIZE) { products, isLastPage ->
+
+        val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
+        val pageIndex =
+            ((productsCount - 1) / PAGE_SIZE)
+                .coerceAtLeast(0)
+                .let { if (nextPage) it + 1 else it }
+        productRepository.loadProductsUpToPage(pageIndex, PAGE_SIZE) { products, isLastPage ->
             productRepository.loadAllCartItems { cartItems ->
                 productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
                     val productUiModels = matchProductsToCartItems(products, cartItems)
@@ -57,7 +57,6 @@ class CatalogViewModel(
                             if (!isLastPage) add(CatalogItem.LoadMoreItem)
                         }
                     _items.postValue(items)
-                    pageIndex++
                 }
             }
             _isLoading.value = false
@@ -68,12 +67,6 @@ class CatalogViewModel(
         products: List<Product>,
         cartItems: List<CartItem>,
     ): List<ProductUiModel> {
-        val currentUiModels =
-            _items.value
-                .orEmpty()
-                .filterIsInstance<CatalogItem.ProductItem>()
-                .map(CatalogItem.ProductItem::product)
-
         val idToCartItem =
             cartItems.associateBy(
                 { cartItem -> cartItem.product.id },
@@ -85,52 +78,7 @@ class CatalogViewModel(
                 idToCartItem[product.id] ?: product.toProductUiModel()
             }
 
-        return (currentUiModels + fetchedUiModels)
-    }
-
-    fun refreshCatalog() {
-        val items = _items.value.orEmpty()
-
-        loadRecentProducts()
-        calculateTotalCartCount()
-
-        productRepository.loadAllCartItems { cartItems ->
-            val idToProductUiModel =
-                cartItems.associateBy(
-                    { cartItem -> cartItem.product.id },
-                    { cartItem -> cartItem.toProductUiModel() },
-                )
-
-            val updatedItems =
-                items.map { item ->
-                    if (item is CatalogItem.ProductItem) {
-                        CatalogItem.ProductItem(
-                            idToProductUiModel[item.product.id] ?: item.product,
-                        )
-                    } else {
-                        item
-                    }
-                }
-
-            _items.postValue(updatedItems)
-        }
-    }
-
-    private fun loadRecentProducts() {
-        productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
-            val recentProductsItem =
-                CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
-            val updatedItems =
-                buildList {
-                    if (recentProductsItem.products.isNotEmpty()) add(recentProductsItem)
-                    addAll(
-                        _items.value
-                            .orEmpty()
-                            .filterNot { it is CatalogItem.RecentProductsItem },
-                    )
-                }
-            _items.postValue(updatedItems)
-        }
+        return fetchedUiModels
     }
 
     fun increaseQuantity(product: ProductUiModel) {
@@ -140,7 +88,9 @@ class CatalogViewModel(
             return
         }
         cartRepository.increaseQuantity(cartItem) {
-            _itemUpdateEvent.postValue(cartItem.copy(quantity = cartItem.quantity + 1).toProductUiModel())
+            _itemUpdateEvent.postValue(
+                cartItem.copy(quantity = cartItem.quantity + 1).toProductUiModel(),
+            )
             calculateTotalCartCount()
         }
     }
@@ -154,7 +104,9 @@ class CatalogViewModel(
             }
         } else {
             cartRepository.decreaseQuantity(cartItem) {
-                _itemUpdateEvent.postValue(cartItem.copy(quantity = cartItem.quantity - 1).toProductUiModel())
+                _itemUpdateEvent.postValue(
+                    cartItem.copy(quantity = cartItem.quantity - 1).toProductUiModel(),
+                )
                 calculateTotalCartCount()
             }
         }

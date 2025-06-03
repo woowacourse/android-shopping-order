@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun loadPageOfProducts(
+    fun loadProductsUpToPage(
         pageIndex: Int,
         pageSize: Int,
         callback: (List<Product>, Boolean) -> Unit,

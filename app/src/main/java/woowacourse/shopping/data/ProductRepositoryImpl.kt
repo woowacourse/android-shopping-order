@@ -6,6 +6,7 @@ import woowacourse.shopping.data.db.RecentProductDao
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
+import woowacourse.shopping.data.model.response.ProductContent
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -16,18 +17,18 @@ class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
-    override fun loadPageOfProducts(
+    override fun loadProductsUpToPage(
         pageIndex: Int,
         pageSize: Int,
         callback: (List<Product>, Boolean) -> Unit,
     ) {
+        val sizeToLoad = pageSize * (pageIndex + 1)
         productDataSource.fetchPageOfProducts(
-            pageIndex = pageIndex,
-            pageSize = pageSize,
+            pageIndex = 0,
+            pageSize = sizeToLoad,
         ) { response ->
-            val products: List<Product> = response.productContent.map { content -> content.toProduct() }
-            val isLastPage = products.size < pageSize
-
+            val products: List<Product> = response.productContent.map(ProductContent::toProduct)
+            val isLastPage = products.size < sizeToLoad
             callback(products, isLastPage)
         }
     }
@@ -84,7 +85,8 @@ class ProductRepositoryImpl(
             pageIndex = 0,
             pageSize = Int.MAX_VALUE,
         ) { response ->
-            val products: List<Product> = response.productContent.map { content -> content.toProduct() }
+            val products: List<Product> =
+                response.productContent.map { content -> content.toProduct() }
             val filteredProducts = products.filter { product -> product.category == category }
             callback(filteredProducts)
         }

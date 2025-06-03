@@ -34,11 +34,7 @@ class CatalogFragment :
         initObserver()
         initListener()
         setCatalogAdapter()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshCatalog()
+        viewModel.loadCatalog(nextPage = false)
     }
 
     override fun onProductClicked(product: ProductUiModel) {
@@ -46,7 +42,7 @@ class CatalogFragment :
     }
 
     override fun onLoadMoreClicked() {
-        viewModel.fetchProducts()
+        viewModel.loadCatalog(nextPage = true)
     }
 
     override fun increaseQuantity(product: ProductUiModel) {
