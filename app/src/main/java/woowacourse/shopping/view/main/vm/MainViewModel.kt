@@ -166,7 +166,7 @@ class MainViewModel(
         withState(_uiState.value) { state ->
             historyLoader { historyStates ->
                 historyStates.fold(
-                    onSuccess = { _uiState.value = state.copy(historyItems = it) },
+                    onSuccess = { _uiState.postValue(state.copy(historyItems = it)) },
                     onFailure = {},
                 )
             }

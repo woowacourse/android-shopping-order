@@ -32,13 +32,17 @@ object RetrofitProvider {
             .addInterceptor(logging)
             .build()
 
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     @OptIn(ExperimentalSerializationApi::class)
     private val BASIC_AUTH_INSTANCE: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(basicAuthOkHttpClient)
             .addConverterFactory(
-                Json.asConverterFactory(contentType),
+                json.asConverterFactory(contentType),
             )
             .build()
     }
@@ -49,7 +53,7 @@ object RetrofitProvider {
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(
-                Json.asConverterFactory(contentType),
+                json.asConverterFactory(contentType),
             )
             .build()
     }
