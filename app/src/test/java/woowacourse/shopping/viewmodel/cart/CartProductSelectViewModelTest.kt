@@ -27,7 +27,7 @@ class CartProductSelectViewModelTest {
 
     @Test
     fun `초기 로드 시 첫 페이지의 상품이 로드된다`() {
-        val products = viewModel.products.getOrAwaitValue()
+        val products = viewModel.cartProductItems.getOrAwaitValue()
         assertAll(
             { assertEquals(5, products.size) },
             { assertEquals(1, viewModel.page.getOrAwaitValue()) },
@@ -43,7 +43,7 @@ class CartProductSelectViewModelTest {
         viewModel.onNextPageClick()
 
         // then
-        val products = viewModel.products.getOrAwaitValue()
+        val products = viewModel.cartProductItems.getOrAwaitValue()
         assertAll(
             { assertEquals(5, products.size) },
             { assertEquals(2, viewModel.page.getOrAwaitValue()) },
@@ -60,7 +60,7 @@ class CartProductSelectViewModelTest {
 
         // then
         assertAll(
-            { assertEquals(2, viewModel.products.getOrAwaitValue().size) },
+            { assertEquals(2, viewModel.cartProductItems.getOrAwaitValue().size) },
             { assertEquals(3, viewModel.page.getOrAwaitValue()) },
             { assertEquals(false, viewModel.hasNext.getOrAwaitValue()) },
             { assertEquals(true, viewModel.hasPrevious.getOrAwaitValue()) },
@@ -74,7 +74,7 @@ class CartProductSelectViewModelTest {
         viewModel.onPreviousPageClick()
 
         // then
-        val products = viewModel.products.value
+        val products = viewModel.cartProductItems.value
         assertAll(
             { assertEquals(5, products?.size) },
             { assertEquals(1, viewModel.page.getOrAwaitValue()) },
@@ -86,13 +86,13 @@ class CartProductSelectViewModelTest {
     @Test
     fun `상품 제거 시 repository에서 제거된다`() {
         // given
-        val productToRemove = viewModel.products.getOrAwaitValue().first()
+        val productToRemove = viewModel.cartProductItems.getOrAwaitValue().first()
 
         // when
         viewModel.onProductRemoveClick(productToRemove.cartProduct)
 
         // then
-        assertEquals(false, viewModel.products.getOrAwaitValue().contains(productToRemove))
+        assertEquals(false, viewModel.cartProductItems.getOrAwaitValue().contains(productToRemove))
     }
 
     @Test
@@ -103,13 +103,13 @@ class CartProductSelectViewModelTest {
 
         // when
         viewModel.onProductRemoveClick(
-            viewModel.products
+            viewModel.cartProductItems
                 .getOrAwaitValue()
                 .last()
                 .cartProduct,
         )
         viewModel.onProductRemoveClick(
-            viewModel.products
+            viewModel.cartProductItems
                 .getOrAwaitValue()
                 .last()
                 .cartProduct,
@@ -117,14 +117,14 @@ class CartProductSelectViewModelTest {
 
         // then
         assertEquals(2, viewModel.page.getOrAwaitValue())
-        assertTrue(viewModel.products.getOrAwaitValue().isNotEmpty())
+        assertTrue(viewModel.cartProductItems.getOrAwaitValue().isNotEmpty())
     }
 
     @Test
     fun `상품 수량 증가 클릭 시 수량이 1 증가한다`() {
         // given
         val cartProductItem =
-            viewModel.products
+            viewModel.cartProductItems
                 .getOrAwaitValue()
                 .first()
                 .cartProduct
@@ -133,7 +133,7 @@ class CartProductSelectViewModelTest {
 
         // then
         val updatedItem =
-            viewModel.products
+            viewModel.cartProductItems
                 .getOrAwaitValue()
                 .first { it.cartProduct.product.id == cartProductItem.product.id }
                 .cartProduct
@@ -144,7 +144,7 @@ class CartProductSelectViewModelTest {
     fun `상품 수량 감소 클릭 시 수량이 1 감소한다`() {
         // given
         val cartProduct =
-            viewModel.products
+            viewModel.cartProductItems
                 .getOrAwaitValue()
                 .first()
                 .cartProduct
@@ -155,7 +155,7 @@ class CartProductSelectViewModelTest {
 
         // then
         val updatedItem =
-            viewModel.products
+            viewModel.cartProductItems
                 .getOrAwaitValue()
                 .first { it.cartProduct.product.id == cartProduct.product.id }
                 .cartProduct

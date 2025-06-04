@@ -16,15 +16,19 @@ import woowacourse.shopping.view.cart.select.adapter.CartProductAdapter
 class CartProductSelectFragment(
     application: ShoppingApplication,
 ) : Fragment() {
+    private var _binding: FragmentCartProductSelectBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel by lazy {
         ViewModelProvider(
             this,
             CartProductSelectViewModelFactory(application.cartProductRepository),
         )[CartProductSelectViewModel::class.java]
     }
-    private var _binding: FragmentCartProductSelectBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var adapter: CartProductAdapter
+
+    private val adapter: CartProductAdapter by lazy {
+        CartProductAdapter(eventHandler = viewModel)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,8 +44,6 @@ class CartProductSelectFragment(
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
-        initRecyclerView()
         initBindings()
         initObservers()
     }
@@ -51,22 +53,22 @@ class CartProductSelectFragment(
         viewModel.loadPage()
     }
 
-    private fun initRecyclerView() {
-        adapter = CartProductAdapter(eventHandler = viewModel)
-        binding.rvProducts.adapter = adapter
-    }
-
     private fun initBindings() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
         binding.handler = viewModel
+        binding.rvProducts.adapter = adapter
+
         binding.btnOrder.setOnClickListener {
             parentFragmentManager.commit {
                 replace(
                     R.id.fragment,
                     CartProductRecommendFragment::class.java,
                     CartProductRecommendFragment.newBundle(
-                        viewModel.selectedIds,
+                        viewModel.selectedCartProducts.value
+                            .orEmpty()
+                            .map { it.id }
+                            .toSet(),
                         viewModel.totalPrice.value,
                         viewModel.totalCount.value,
                     ),
@@ -76,7 +78,7 @@ class CartProductSelectFragment(
     }
 
     private fun initObservers() {
-        viewModel.products.observe(viewLifecycleOwner) { value ->
+        viewModel.cartProductItems.observe(viewLifecycleOwner) { value ->
             adapter.submitList(value)
         }
     }
