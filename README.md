@@ -32,4 +32,6 @@
           Ui에 반영이 늦어져서 실패
 - [x] RecyclerViewAdatper -> ListAdapter로 수정
 - [ ] ConcatAdapter 적용
+  - viewType은 하나의 Adapter 내에서 다양한 레이아웃을 처리하며 조건 분기와 다형성으로 복잡도가 높아질 수 있습니다.
+  - ConcatAdapter는 Adapter를 단위로 분리해서 각 역할에 집중하게 만들어서 복잡도가 줄어들게 됩니다.
 - [x] domain layer 학습 후 중복 로직(상품 수량을 늘린다, 줄인다, 장바구니 담는다) 제거
