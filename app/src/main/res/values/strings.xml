@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Shopping</string>
+
+    <!-- Product Item -->
+    <string name="product_price_format">%,d원</string>
+
+    <!-- Detail Screen -->
+    <string name="detail_add_cart_button_text">장바구니 담기</string>
+    <string name="detail_price_text">가격</string>
+    <string name="detail_last_viewed_text">마지막으로 본 상품</string>
+
+    <!-- Cart Screen -->
+    <string name="toolbar_cart_title">Cart</string>
+    <string name="cart_total_check_title">전체</string>
+
+    <!-- Cart Recommendation Screen -->
+    <string name="recommendation_title">이런 상품은 어떠세요?</string>
+    <string name="recommendation_desc">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+
+    <!-- Catalog Screen -->
+    <string name="toolbar_catalog_title">Shopping</string>
+    <string name="load_more_text">더보기</string>
+    <string name="product_count_down_text">-</string>
+    <string name="product_count_up_text">+</string>
+    <string name="catalog_recent_product_title">최근 본 상품</string>
+    <string name="place_order_text">주문하기(%s)</string>
 </resources>

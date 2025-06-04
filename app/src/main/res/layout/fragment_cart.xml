@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.cart.CartViewModel" />
+
+        <variable
+            name="eventListener"
+            type="woowacourse.shopping.presentation.view.cart.CartEventListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Toolbar
+            android:id="@+id/toolbar_cart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_55"
+            android:contentInsetStart="12dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_arrow" />
+
+            <Space
+                android:layout_width="20dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/toolbar_cart_title"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </Toolbar>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/cart_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/wrapper"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart">
+
+        </androidx.fragment.app.FragmentContainerView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/gray_55"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <CheckBox
+                android:id="@+id/select_all"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="@color/gray_55"
+                android:gravity="center_horizontal|bottom"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_select_all_description"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/gray_55"
+                android:gravity="center_horizontal|top"
+                android:text="@string/cart_total_check_title"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/select_all"
+                app:layout_constraintStart_toStartOf="@id/select_all"
+                app:layout_constraintTop_toBottomOf="@id/select_all" />
+
+            <TextView
+                android:id="@+id/text_view_cart_total_price"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/gray_55"
+                android:gravity="center_vertical|end"
+                android:padding="10dp"
+                android:text="@{String.format(@string/product_price_format, vm.totalPrice)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_place_order"
+                app:layout_constraintStart_toEndOf="@+id/select_all"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="184,200원" />
+
+            <TextView
+                android:id="@+id/btn_place_order"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="@color/mint"
+                android:gravity="center"
+                android:onClick="@{() -> eventListener.onPlaceOrderClick()}"
+                android:padding="10dp"
+                android:text="@{String.format(@string/place_order_text, vm.totalCount)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="주문하기" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
