@@ -134,17 +134,18 @@ class CartProductRecommendationViewModel(
     override fun onQuantityIncreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
         viewModelScope.launch {
+            val newQuantity = cartProduct.quantity + QUANTITY_TO_ADD
             val result =
                 cartProductRepository.updateQuantity(
                     cartProduct,
-                    cartProduct.quantity + QUANTITY_TO_ADD,
+                    newQuantity,
                 )
 
             result
                 .onSuccess {
                     cartProducts.remove(cartProduct)
-                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-                    updateQuantity(item, QUANTITY_TO_ADD)
+                    cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                    updateQuantity(item, newQuantity)
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
@@ -155,22 +156,22 @@ class CartProductRecommendationViewModel(
     override fun onQuantityDecreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
         viewModelScope.launch {
+            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
             val result =
                 cartProductRepository.updateQuantity(
                     cartProduct,
-                    cartProduct.quantity - QUANTITY_TO_ADD,
+                    newQuantity,
                 )
 
             result
                 .onSuccess {
                     cartProducts.remove(cartProduct)
-                    val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
                     if (newQuantity > DEFAULT_COUNT) {
                         cartProducts.add(cartProduct.copy(quantity = newQuantity))
                     } else {
                         selectedCartIds.remove(cartProduct.id)
                     }
-                    updateQuantity(item, -QUANTITY_TO_ADD)
+                    updateQuantity(item, newQuantity)
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
@@ -180,12 +181,12 @@ class CartProductRecommendationViewModel(
 
     private fun updateQuantity(
         item: Product,
-        quantityToAdd: Int,
+        newQuantity: Int,
     ) {
         val updatedList =
             _recommendedProducts.value.orEmpty().map { recommendedProduct ->
                 if (recommendedProduct.product.id == item.id) {
-                    recommendedProduct.copy(quantity = recommendedProduct.quantity + quantityToAdd)
+                    recommendedProduct.copy(quantity = newQuantity)
                 } else {
                     recommendedProduct
                 }
