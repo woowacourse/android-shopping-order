@@ -56,8 +56,11 @@ class RemoteCartDataSource(
     override fun addCartItem(
         productId: Long,
         quantity: Int,
-    ) {
-        cartService.postCartItem(CartRequest(productId, quantity)).execute()
+    ): Long? {
+        val response = cartService.postCartItem(CartRequest(productId, quantity)).execute()
+        val cartItemId: Long? =
+            response.headers()["Location"]?.substringAfter("/cart-items/", "")?.toLongOrNull()
+        return cartItemId
     }
 
     override fun remove(cartItemId: Long) {

@@ -21,6 +21,8 @@ class RecommendViewModel(
     private val _recommendedProducts: MutableLiveData<List<RecommendProduct>> = MutableLiveData()
     val recommendedProducts: LiveData<List<RecommendProduct>> get() = _recommendedProducts
 
+    private var addedItems: Map<Long, Long> = mapOf()
+
     init {
         loadRecommendedProducts()
     }
@@ -29,13 +31,16 @@ class RecommendViewModel(
         if (product.quantity == 0) {
             cartRepository.addCartItem(product.id, 1) { result ->
                 result
-                    .onSuccess {
+                    .onSuccess { cartItemId: Long? ->
+                        if (cartItemId != null) {
+                            addedItems = addedItems.plus(product.id to cartItemId)
+                        }
                         product.update(1)
                     }.onFailure { _event.postValue(RecommendEvent.MODIfY_CART_FAILURE) }
             }
         } else {
             cartRepository.updateCartItemQuantity(
-                product.id,
+                addedItems[product.id] ?: return,
                 product.quantity + 1,
             ) { result ->
                 result
@@ -50,16 +55,22 @@ class RecommendViewModel(
 
     fun minusCartItemQuantity(product: RecommendProduct) {
         if (product.quantity == 1) {
-            cartRepository.remove(product.id) { result ->
+            cartRepository.remove(
+                addedItems[product.id] ?: return,
+            ) { result ->
                 result
                     .onSuccess {
+                        addedItems = addedItems.minus(product.id)
                         product.update(0)
                     }.onFailure {
                         _event.postValue(RecommendEvent.MODIfY_CART_FAILURE)
                     }
             }
         } else {
-            cartRepository.updateCartItemQuantity(product.id, product.quantity - 1) { result ->
+            cartRepository.updateCartItemQuantity(
+                addedItems[product.id] ?: return,
+                product.quantity - 1,
+            ) { result ->
                 result
                     .onSuccess {
                         product.update(product.quantity - 1)
@@ -84,7 +95,7 @@ class RecommendViewModel(
     }
 
     private fun RecommendProduct.update(newQuantity: Int) {
-        val index: Int? = recommendedProducts.value?.indexOf(this)
+        val index: Int? = recommendedProducts.value?.indexOf(this).takeIf { it != -1 }
         val newProducts: MutableList<RecommendProduct>? =
             recommendedProducts.value?.toMutableList()
 

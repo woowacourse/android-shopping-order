@@ -33,7 +33,7 @@ class DefaultCartRepository(
     override fun addCartItem(
         productId: Long,
         quantity: Int,
-        onAdd: (Result<Unit>) -> Unit,
+        onAdd: (Result<Long?>) -> Unit,
     ) {
         {
             cartDataSource.addCartItem(
