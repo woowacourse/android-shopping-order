@@ -14,6 +14,8 @@ import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.feature.model.GoodsItem
+import woowacourse.shopping.feature.model.State
+import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
@@ -39,11 +41,8 @@ class GoodsViewModel(
     private val _navigateToCart = MutableSingleLiveData<Cart>()
     val navigateToCart: SingleLiveData<Cart> get() = _navigateToCart
 
-    private val _isSuccess = MutableSingleLiveData<Unit>()
-    val isSuccess: SingleLiveData<Unit> get() = _isSuccess
-
-    private val _isFail = MutableSingleLiveData<Unit>()
-    val isFail: SingleLiveData<Unit> get() = _isFail
+    private val _insertState = MutableLiveData<Event<State>>()
+    val state: LiveData<Event<State>> get() = _insertState
 
     private val _isLoading = MutableLiveData<Boolean>(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -80,9 +79,9 @@ class GoodsViewModel(
 
                         updateItems(updatedCart)
                         getCartCounts()
-                        _isSuccess.setValue(Unit)
+                        _insertState.value = Event(State.Success)
                     }.onFailure {
-                        _isFail.setValue(Unit)
+                        _insertState.value = Event(State.Failure)
                     }
             }
         } else {
@@ -95,9 +94,9 @@ class GoodsViewModel(
                         val updatedCart = cart.copy(quantity = newQuantity)
                         updateItems(updatedCart)
                         getCartCounts()
-                        _isSuccess.setValue(Unit)
+                        _insertState.value = Event(State.Success)
                     }.onFailure { error ->
-                        _isFail.setValue(Unit)
+                        _insertState.value = Event(State.Failure)
                     }
             }
         }
@@ -112,7 +111,7 @@ class GoodsViewModel(
                         updateItems(updatedCart)
                         getCartCounts()
                     }.onFailure { error ->
-                        _isFail.setValue(Unit)
+                        _insertState.value = Event(State.Failure)
                     }
             }
         } else {
@@ -126,7 +125,7 @@ class GoodsViewModel(
                         updateItems(updatedCart)
                         getCartCounts()
                     }.onFailure { error ->
-                        _isFail.setValue(Unit)
+                        _insertState.value = Event(State.Failure)
                     }
             }
         }

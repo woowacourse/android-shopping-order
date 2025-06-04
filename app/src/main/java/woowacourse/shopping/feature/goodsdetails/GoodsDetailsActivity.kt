@@ -14,6 +14,7 @@ import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.feature.CustomCartQuantity
 import woowacourse.shopping.feature.CustomLastViewed
 import woowacourse.shopping.feature.model.ResultCode
+import woowacourse.shopping.feature.model.State
 import kotlin.getValue
 
 class GoodsDetailsActivity : AppCompatActivity() {
@@ -67,20 +68,26 @@ class GoodsDetailsActivity : AppCompatActivity() {
     }
 
     private fun observeCartInsertResult() {
-        viewModel.isSuccess.observe(this) {
-            Toast.makeText(this, R.string.goods_detail_cart_insert_success_toast_message, Toast.LENGTH_SHORT).show()
-            setResult(
-                ResultCode.GOODS_DETAIL_INSERT.code,
-                Intent().apply {
-                    putExtra(CART_ID, viewModel.cart.value?.id)
-                    putExtra(GOODS_ID, id)
-                    putExtra(GOODS_QUANTITY, viewModel.cart.value?.quantity)
-                },
-            )
+        viewModel.insertState.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { state ->
+                when (state) {
+                    is State.Success -> {
+                        Toast.makeText(this, R.string.goods_detail_cart_insert_success_toast_message, Toast.LENGTH_SHORT).show()
+                        setResult(
+                            ResultCode.GOODS_DETAIL_INSERT.code,
+                            Intent().apply {
+                                putExtra(CART_ID, viewModel.cart.value?.id)
+                                putExtra(GOODS_ID, id)
+                                putExtra(GOODS_QUANTITY, viewModel.cart.value?.quantity)
+                            },
+                        )
+                    }
+                    is State.Failure ->
+                        Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
-        viewModel.isFail.observe(this) {
-            Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
-        }
+
         setResult(
             ResultCode.GOODS_DETAIL_INSERT.code,
             Intent().apply {

@@ -11,6 +11,8 @@ import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.feature.model.State
+import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.updateQuantity
@@ -22,14 +24,16 @@ class GoodsDetailsViewModel(
 ) : ViewModel() {
     private val _cart = MutableLiveData<Cart>()
     val cart: LiveData<Cart> get() = _cart
+
     private val _lastViewed = MutableLiveData<History>()
     val lastViewed: LiveData<History> get() = _lastViewed
+
     private val _isLastViewedVisible = MutableLiveData<Boolean>()
     val isLastViewedVisible: LiveData<Boolean> get() = _isLastViewedVisible
-    private val _isSuccess = MutableSingleLiveData<Unit>()
-    val isSuccess: SingleLiveData<Unit> get() = _isSuccess
-    private val _isFail = MutableSingleLiveData<Unit>()
-    val isFail: SingleLiveData<Unit> get() = _isFail
+
+    private val _insertState = MutableLiveData<Event<State>>()
+    val insertState: LiveData<Event<State>> get() = _insertState
+
     private val _navigateToLastViewedCart = MutableSingleLiveData<History>()
     val navigateToLastViewedCart: SingleLiveData<History> get() = _navigateToLastViewedCart
 
@@ -66,7 +70,7 @@ class GoodsDetailsViewModel(
                         if (cart.value != null) insertToHistory(cart.value as Cart)
                     },
                     onError = {
-                        _isFail.setValue(Unit)
+                        _insertState.value = Event(State.Failure)
                     },
                 )
             },
@@ -110,9 +114,9 @@ class GoodsDetailsViewModel(
 
                             insertToHistory(cart.value as Cart)
                             updateCart(updatedCart)
-                            _isSuccess.setValue(Unit)
+                            _insertState.value = Event(State.Success)
                         }.onFailure {
-                            _isFail.setValue(Unit)
+                            _insertState.value = Event(State.Failure)
                         }
                 }
             } else {
@@ -126,9 +130,9 @@ class GoodsDetailsViewModel(
 
                             insertToHistory(cart.value as Cart)
                             updateCart(updatedCart)
-                            _isSuccess.setValue(Unit)
+                            _insertState.value = Event(State.Success)
                         }.onFailure { error ->
-                            _isFail.setValue(Unit)
+                            _insertState.value = Event(State.Failure)
                         }
                 }
             }
