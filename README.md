@@ -37,7 +37,7 @@ Cart 화면 구현
   - [ ] 레벨업 부분 ) 인증에 필요한 key은 secerets에 저장
 - CartActivity에서 생각해야 할 부분
   - [ ] CartActivity에서 hasHandledTotalCount가 정말 필요한 로직일지 생각
-  - [ ] View에서 totalCountrk 몉인지에 따라서 어떤한 fragment를 commit할지 아닌 ViewModel에서 어떠한 상태를 두고 그 상태에 따라서 화면을 이동하는 것
+  - [x] View에서 totalCount가 몇인지에 따라서 어떤한 fragment를 commit할지 아닌 ViewModel에서 어떠한 상태를 두고 그 상태에 따라서 화면을 이동하는 것
   - [ ] View까지 와서 단순 ViewModel의 함수를 호출하는 observe를 해야하는 지 생각 -> ViewModel의 일은 스스로 하게 변
 - CartRecommendationFragment
   - [ ] 로그 삭제 

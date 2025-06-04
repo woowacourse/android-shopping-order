@@ -24,7 +24,6 @@ class CartActivity : AppCompatActivity() {
             CartViewModelFactory(application as ShoppingApplication),
         )[CartViewModel::class.java]
     }
-    private var hasHandledTotalCount = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,24 +38,14 @@ class CartActivity : AppCompatActivity() {
             viewModel.postTotalAmount()
         }
 
-        viewModel.totalCount.observe(this) {
-            if (it != -1) {
-                if (it != 0) {
-                    hasHandledTotalCount = true
-                    supportFragmentManager.commit {
-                        setReorderingAllowed(true)
-                        replace(R.id.fragment_container_cart_selection, CartSelectionFragment())
-                    }
-                } else if(it == 0) {
-                    hasHandledTotalCount = true
-                    supportFragmentManager.commit {
-                        setReorderingAllowed(true)
-                        replace(
-                            R.id.fragment_container_cart_selection,
-                            CartRecommendationFragment(),
-                        )
-                    }
-                }
+        viewModel.cartItemCount.observe(this) { cartItemCount ->
+            val fragment = when (cartItemCount) {
+                0-> CartRecommendationFragment()
+                else -> CartSelectionFragment()
+            }
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.fragment_container_cart_selection, fragment)
             }
         }
 

@@ -37,8 +37,8 @@ class CartViewModel(
 
     private val productSelections = mutableMapOf<Int, Boolean>()
 
-    private val _totalCount = MutableLiveData<Int>(-1)
-    val totalCount: LiveData<Int> get() = _totalCount
+    private val _cartItemCount = MutableLiveData<Int>(-1)
+    val cartItemCount: LiveData<Int> get() = _cartItemCount
 
     private val _totalProducts = MutableLiveData<MutableSet<ProductUiModel>>()
     val totalProducts: LiveData<MutableSet<ProductUiModel>> get() = _totalProducts
@@ -57,11 +57,9 @@ class CartViewModel(
 
     fun loadRecentlyViewedProduct() {
         recentlyViewedProductRepository.getLatestViewedProduct { product ->
-            Log.d("TESTT", "마지막 상품 $product")
             catalogProductRepository.getProduct(product.id) { categoryProduct ->
                 val category = categoryProduct.category ?: ""
                 catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
-                    Log.d("TESTT", "추천 품 $products")
                     _recommendedProducts.postValue(products)
                 }
             }
@@ -70,14 +68,12 @@ class CartViewModel(
 
     fun postTotalAmount() {
         val amount = totalProducts.value?.filter { it.isChecked == true }?.sumOf { it.price * it.quantity } ?: 0
-        Log.d("COUNT", "amount : $amount")
         _totalAmount.postValue(amount)
     }
 
     fun postTotalCount() {
         val count = totalProducts.value?.size ?: 0
-        Log.d("COUNT", "count : $count")
-        _totalCount.postValue(count)
+        _cartItemCount.postValue(count)
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {

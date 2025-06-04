@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="주문하기(2)"
-            android:text="@{@string/text_order(vm.totalCount)}"
+            android:text="@{@string/text_order(vm.cartItemCount)}"
             style="@style/CartPageOrderStyle"
             app:layout_constraintTop_toTopOf="@id/view_cart_order"
             app:layout_constraintStart_toStartOf="@id/view_cart_order"
