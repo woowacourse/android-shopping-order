@@ -48,9 +48,6 @@ class CartViewModel(
 
     private val endPage: Int get() = max(1, (totalCartSizeData + PAGE_SIZE - 1) / PAGE_SIZE)
 
-    private val _loginErrorEvent = MutableSingleLiveData<CartFetchError>()
-    val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
-
     private val _removeItemEvent = MutableSingleLiveData<CartItem>()
     val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
 

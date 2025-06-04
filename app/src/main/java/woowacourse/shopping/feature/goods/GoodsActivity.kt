@@ -102,12 +102,12 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
             GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING)
         )
 
-        observeToast(viewModel.toastMessage)
-        observeNavigationToLogin(viewModel.navigateToLogin)
-
-        viewModel.navigateToCart.observe(this) {
-            val intent = CartActivity.newIntent(this)
-            startActivity(intent)
+        viewModel.uiEvent.observe(this) { event ->
+            when (event) {
+                is GoodsUiEvent.ShowToast -> Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show()
+                is GoodsUiEvent.NavigateToLogin -> startActivity(Intent(this, LoginActivity::class.java))
+                is GoodsUiEvent.NavigateToCart -> startActivity(CartActivity.newIntent(this))
+            }
         }
 
         viewModel.goodsWithCartQuantity.observe(this) {
@@ -128,8 +128,6 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
                 }
             }
         }
-        observeToast(viewModel.toastMessage)
-
     }
 
     private fun getLayoutManager(): GridLayoutManager {
