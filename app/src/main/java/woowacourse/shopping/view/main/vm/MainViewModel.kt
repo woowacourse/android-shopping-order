@@ -13,12 +13,12 @@ import woowacourse.shopping.domain.exception.onFailure
 import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.core.ext.addSourceList
-import woowacourse.shopping.view.loader.HistoryLoader
 import woowacourse.shopping.view.main.MainUiEvent
 import woowacourse.shopping.view.main.adapter.ProductAdapterEventHandler
 import woowacourse.shopping.view.main.state.HistoryState
@@ -27,7 +27,7 @@ import woowacourse.shopping.view.main.state.ProductState
 import woowacourse.shopping.view.main.state.ProductUiState
 
 class MainViewModel(
-    private val historyLoader: HistoryLoader,
+    private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
@@ -45,7 +45,7 @@ class MainViewModel(
     val uiEvent: SingleLiveData<MainUiEvent> get() = _uiEvent
 
     init {
-        loadPage()
+        fetchProducts(0)
     }
 
     fun loadPage() =
@@ -73,14 +73,37 @@ class MainViewModel(
         carts: List<ShoppingCart>,
     ) {
         val newProducts = generateProductStates(productPage, carts)
-        historyLoader { result ->
-            result.onSuccess {
-                historyItems.postValue(it)
-                productItems.postValue(newProducts)
-                loadState.postValue(LoadState.of(productPage.hasNextPage))
-            }.onFailure(::handleFailure)
+        viewModelScope.launch {
+            val newHistory = generateHistoryProductStates()
+
+            historyItems.value = newHistory
+            productItems.value = newProducts
+            loadState.value = LoadState.of(productPage.hasNextPage)
+
+            toggleFetching()
         }
-        toggleFetching()
+    }
+
+    private suspend fun generateHistoryProductStates(): List<HistoryState> {
+        val historyProducts = mutableListOf<HistoryState>()
+        val histories = historyRepository.getHistories()
+        if (histories.isEmpty()) return emptyList()
+
+        histories.forEach {
+            productRepository.loadProduct(it)
+                .onSuccess { product ->
+                    val historyState =
+                        HistoryState(
+                            product.id,
+                            product.name,
+                            product.category,
+                            product.imgUrl,
+                        )
+                    historyProducts.add(historyState)
+                }
+                .onFailure(::handleFailure)
+        }
+        return historyProducts
     }
 
     private fun generateProductStates(
@@ -124,22 +147,19 @@ class MainViewModel(
                         .onSuccess { updateUiState { modifyUiState(updated) } }
                         .onFailure(::handleFailure)
                 } else {
-                    cartRepository.deleteCart(cartId) {
-                        it
-                            .onSuccess {
-                                updateUiState { modifyUiState(updated.copy(cartId = null)) }
-                            }.onFailure(::handleFailure)
-                    }
+                    cartRepository.deleteCart(cartId)
+                        .onSuccess {
+                            updateUiState { modifyUiState(updated.copy(cartId = null)) }
+                        }.onFailure(::handleFailure)
                 }
             }
         }
 
     fun syncHistory() =
         withState(_uiState.value) {
-            historyLoader {
-                it.onSuccess { history ->
-                    updateUiState { copy(historyItems = history) }
-                }.onFailure(::handleFailure)
+            viewModelScope.launch {
+                val histories = generateHistoryProductStates()
+                updateUiState { copy(historyItems = histories) }
             }
         }
 

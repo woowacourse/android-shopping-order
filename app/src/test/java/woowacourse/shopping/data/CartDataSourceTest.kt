@@ -31,7 +31,7 @@ class CartDataSourceTest {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         cartService = retrofit.create(CartService::class.java)
-        cartDataSource = CartDataSource(cartService, ApiCallbackHandler(), NetworkResultHandler())
+        cartDataSource = CartDataSource(cartService, NetworkResultHandler())
     }
 
     @Test

@@ -111,14 +111,13 @@ class CartViewModel(
                         .onSuccess {
                             _recommendUiState.value = state.modifyUiState(updated)
                             decreaseCartQuantity(cartId)
-                        }
-                        .onFailure(::handleFailure)
+                        }.onFailure(::handleFailure)
                 } else {
-                    cartRepository.deleteCart(cartId) {
+                    cartRepository.deleteCart(cartId).onSuccess {
                         val result = updated.copy(cartId = null)
                         _recommendUiState.value = state.modifyUiState(result)
                         _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
-                    }
+                    }.onFailure(::handleFailure)
                 }
             }
         }
@@ -186,8 +185,10 @@ class CartViewModel(
     }
 
     fun deleteProduct(productId: Long) {
-        cartRepository.deleteCart(productId) {
-            refresh()
+        viewModelScope.launch {
+            cartRepository.deleteCart(productId)
+                .onSuccess { refresh() }
+                .onFailure(::handleFailure)
         }
     }
 

@@ -45,7 +45,7 @@ class DetailActivity : AppCompatActivity() {
                 NO_LAST_SEEN_PRODUCT,
             )
 
-        viewModel.load(1, lastSeenProductId)
+        viewModel.load(productId, lastSeenProductId)
 
         setUpBinding()
         setUpSystemBars()

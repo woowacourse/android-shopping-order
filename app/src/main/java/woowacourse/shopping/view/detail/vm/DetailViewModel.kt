@@ -43,8 +43,9 @@ class DetailViewModel(
             defaultProductRepository.loadProduct(productId)
                 .onSuccess { initializeUiState(productId, lastSeenProductId, it) }
                 .onFailure(::handleFailure2)
+
+            historyRepository.saveHistory(productId)
         }
-        saveHistory(productId)
     }
 
     private fun initializeUiState(
@@ -130,12 +131,6 @@ class DetailViewModel(
     fun saveLastSeenProduct(lastSeenProductId: Long) {
         viewModelScope.launch {
             historyRepository.saveHistory(lastSeenProductId)
-        }
-    }
-
-    private fun saveHistory(productId: Long) {
-        viewModelScope.launch {
-            historyRepository.saveHistory(productId)
         }
     }
 

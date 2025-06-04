@@ -13,10 +13,7 @@ interface CartRepository {
         quantity: Quantity,
     ): NetworkResult<Unit>
 
-    fun deleteCart(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCart(cartId: Long): NetworkResult<Unit>
 
     suspend fun loadSinglePage(
         page: Int?,

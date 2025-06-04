@@ -34,10 +34,8 @@ class DefaultCartRepository(
             cartDataSource.updateCartQuantity(cartId, quantity.value)
         }
 
-    override fun deleteCart(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        cartDataSource.deleteCart(cartId) { callback(it) }
-    }
+    override suspend fun deleteCart(cartId: Long): NetworkResult<Unit> =
+        withContext(Dispatchers.IO) {
+            cartDataSource.deleteCart(cartId)
+        }
 }
