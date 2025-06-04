@@ -48,7 +48,7 @@ class CartProductRecommendationFragment(
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             parentFragmentManager.commit {
                 replace(
-                    this@CartProductRecommendationFragment.id,
+                    R.id.fragment,
                     CartProductSelectionFragment::class.java,
                     null,
                 )
