@@ -27,10 +27,10 @@ fun ImageView.loadImageFromUrl(url: String?) {
 @BindingAdapter("cartItems")
 fun RecyclerView.bindCartItems(items: List<Cart>?) {
     if (adapter is CartAdapter && items != null) {
-        (adapter as CartAdapter).setItems(items)
+        (adapter as CartAdapter).submitList(items)
     }
     if (adapter is RecommendAdapter && items != null) {
-        (adapter as RecommendAdapter).setItems(items)
+        (adapter as RecommendAdapter).submitList(items)
     }
 }
 

@@ -1,20 +1,13 @@
 package woowacourse.shopping.feature.cart.adapter
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.domain.model.Cart
 
 class CartAdapter(
     private val cartClickListener: CartViewHolder.CartClickListener,
-) : RecyclerView.Adapter<CartViewHolder>() {
-    private val items: MutableList<Cart> = mutableListOf()
-
-    fun setItems(newItems: List<Cart>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
-    }
-
+) : ListAdapter<Cart, CartViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -24,9 +17,22 @@ class CartAdapter(
         holder: CartViewHolder,
         position: Int,
     ) {
-        val item: Cart = items[position]
+        val item: Cart = getItem(position)
         holder.bind(item)
     }
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<Cart>() {
+                override fun areItemsTheSame(
+                    oldItem: Cart,
+                    newItem: Cart,
+                ): Boolean = oldItem.id == newItem.id
+
+                override fun areContentsTheSame(
+                    oldItem: Cart,
+                    newItem: Cart,
+                ): Boolean = oldItem == newItem
+            }
+    }
 }

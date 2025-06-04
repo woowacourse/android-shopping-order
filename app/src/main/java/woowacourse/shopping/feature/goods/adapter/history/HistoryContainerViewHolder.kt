@@ -14,7 +14,7 @@ class HistoryContainerViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(histories: List<History>) {
         val adapter = HistoryAdapter(goodsClickListener)
-        adapter.setItems(histories)
+        adapter.submitList(histories)
         binding.rvHistory.adapter = adapter
         binding.rvHistory.layoutManager =
             LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
