@@ -97,7 +97,7 @@ class CartProductRecommendationFragment() : Fragment() {
             adapter.submitList(value)
         }
 
-        viewModel.selectedProduct.observe(viewLifecycleOwner) { value ->
+        viewModel.onSelectedProduct.observe(viewLifecycleOwner) { value ->
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
             startActivity(intent)
         }

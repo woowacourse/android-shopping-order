@@ -37,8 +37,8 @@ class CartProductRecommendationViewModel(
     private val _totalCount = MediatorLiveData<Int>()
     val totalCount: LiveData<Int> get() = _totalCount
 
-    private val _selectedProduct = MutableSingleLiveData<Product>()
-    val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
+    private val _onSelectedProduct = MutableSingleLiveData<Product>()
+    val onSelectedProduct: SingleLiveData<Product> get() = _onSelectedProduct
 
     init {
         viewModelScope.launch {
@@ -113,7 +113,7 @@ class CartProductRecommendationViewModel(
     }
 
     override fun onProductClick(item: Product) {
-        _selectedProduct.setValue(item)
+        _onSelectedProduct.setValue(item)
     }
 
     override fun onAddClick(item: Product) {
