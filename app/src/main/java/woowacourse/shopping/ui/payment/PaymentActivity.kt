@@ -17,6 +17,8 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.paymentCouponsContainer.adapter = paymentCouponAdapter
+        binding.paymentCouponsContainer.isNestedScrollingEnabled = false
+        binding.paymentCouponsContainer.itemAnimator = null
         initObservers()
     }
 
