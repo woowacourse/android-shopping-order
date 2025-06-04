@@ -34,15 +34,14 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
         super.onCreate(savedInstanceState)
         binding.lifecycleOwner = this
 
-        val goodsUiModel = IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java)
+        val goodsUiModel = intent.getParcelableExtra<GoodsUiModel>(GOODS_KEY)
         if (goodsUiModel == null) {
-            Toast.makeText(this, "상품 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.toast_fail_load_goods, Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        val cartUiModel =
-            IntentCompat.getParcelableExtra(intent, CART_KEY, CartUiModel::class.java)
+        val cartUiModel = intent.getParcelableExtra<CartUiModel>(CART_KEY)
 
         viewModel = GoodsDetailsViewModel(
             goodsUiModel,
@@ -50,41 +49,35 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
             CartRepositoryImpl(CartRemoteDataSourceImpl()),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
-                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
-            ),
+                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this))
+            )
         )
 
         binding.viewModel = viewModel
-
         binding.quantityChangeListener = object : QuantityChangeListener {
-            override fun onIncrease(cartItem: CartItem) {
-                viewModel.increaseSelectorQuantity()
-            }
-
-            override fun onDecrease(cartItem: CartItem) {
-                viewModel.decreaseSelectorQuantity()
-            }
+            override fun onIncrease(cartItem: CartItem) = viewModel.increaseSelectorQuantity()
+            override fun onDecrease(cartItem: CartItem) = viewModel.decreaseSelectorQuantity()
         }
 
-        observeUiEvent()
+        observeEvent()
+        viewModel.mostRecentlyViewedGoods.observe(this) {
+            mostRecentGoods = it.toUi()
+        }
     }
 
-    private fun observeUiEvent() {
+    private fun observeEvent() {
         viewModel.event.observe(this) { event ->
             when (event) {
                 is UiEvent.ShowToast -> {
-                    val message = when (event.messageKey) {
-                        ToastMessageKey.FAIL_CART_ADD -> getString(R.string.toast_fail_cart_add)
-                        ToastMessageKey.FAIL_CART_UPDATE -> getString(R.string.toast_fail_cart_update)
+                    val msgResId = when (event.messageKey) {
+                        ToastMessageKey.FAIL_CART_ADD -> R.string.toast_fail_cart_add
+                        ToastMessageKey.FAIL_CART_UPDATE -> R.string.toast_fail_cart_update
                     }
-                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(msgResId), Toast.LENGTH_SHORT).show()
                 }
 
                 is UiEvent.CartAddSuccess -> {
-                    val message = getString(
-                        R.string.goods_detail_cart_insert_complete_toast_message,
-                        event.quantity
-                    )
+                    val message = getString(R.string.goods_detail_cart_insert_complete_toast_message, event.quantity)
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
 
@@ -92,48 +85,40 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
                     mostRecentGoods = event.goods.toUi()
                 }
 
-                is UiEvent.ClickMostRecentlyViewed -> {
+                UiEvent.ClickMostRecentlyViewed -> {
                     mostRecentGoods?.let {
-                        val intent = newIntent(this, it).apply {
-                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            putExtra(EXTRA_SOURCE, SOURCE_RECENTLY_VIEWED)
-                        }
-                        startActivity(intent)
+                        startActivity(
+                            newIntent(this, it).apply {
+                                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                putExtra(EXTRA_SOURCE, SOURCE_RECENTLY_VIEWED)
+                            }
+                        )
                     }
                 }
             }
-        }
-        viewModel.mostRecentlyViewedGoods.observe(this) { goods ->
-            mostRecentGoods = goods.toUi()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.nav_close, menu)
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.nav_close) {
-            finish()
-            return true
-        }
+        if (item.itemId == R.id.nav_close) finish()
         return super.onOptionsItemSelected(item)
     }
 
     companion object {
         private const val GOODS_KEY = "GOODS"
         const val CART_KEY = "CART"
-
-        fun newIntent(
-            context: Context,
-            goods: GoodsUiModel,
-        ): Intent = Intent(context, GoodsDetailsActivity::class.java).apply {
-            putExtra(GOODS_KEY, goods)
-        }
-
         const val EXTRA_SOURCE = "extra_source"
         const val SOURCE_RECENTLY_VIEWED = "recently_viewed"
         const val SOURCE_GOODS_LIST = "goods_list"
+
+        fun newIntent(context: Context, goods: GoodsUiModel): Intent =
+            Intent(context, GoodsDetailsActivity::class.java).apply {
+                putExtra(GOODS_KEY, goods)
+            }
     }
 }
