@@ -5,67 +5,36 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class FakeCartRepository : CartRepository {
-    override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) {
-        onResult(Result.success(ProductsFixture.dummyCartItems.size))
-    }
+    override suspend fun fetchTotalCount(): Result<Int> = Result.success(ProductsFixture.dummyCartItems.size)
 
-    override fun fetchPagedCartItems(
+    override suspend fun fetchPagedCartItems(
         page: Int,
         pageSize: Int?,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    ) {
-        onResult(Result.success(ProductsFixture.dummyCartItems))
-    }
+    ): Result<List<CartItem>> = Result.success(ProductsFixture.dummyCartItems)
 
-    override fun fetchAllCartItems(onResult: (Result<List<CartItem>>) -> Unit) {
-        onResult(Result.success(ProductsFixture.dummyCartItems))
-    }
+    override suspend fun fetchAllCartItems(): Result<List<CartItem>> = Result.success(ProductsFixture.dummyCartItems)
 
-    override suspend fun getCartItemById(productId: Long): CartItem = ProductsFixture.dummyCartItem
-
-    override fun insertOrUpdate(
+    override suspend fun insertOrUpdate(
         product: Product,
         productQuantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        onResult(Result.success(Unit))
-    }
+    ): Result<Unit> = Result.success(Unit)
 
-    override fun insertProduct(
+    override suspend fun insertProduct(
         product: Product,
         productQuantity: Int,
-        onResult: (Result<Long>) -> Unit,
-    ) {
-        onResult(Result.success(1))
-    }
+    ): Result<Long> = Result.success(1)
 
-    override fun updateProduct(
+    override suspend fun updateProduct(
         cartId: Long,
         product: Product,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        onResult(Result.success(Unit))
-    }
+    ): Result<Unit> = Result.success(Unit)
 
-    override fun increaseQuantity(
-        productId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        onResult(Result.success(Unit))
-    }
+    override suspend fun increaseQuantity(productId: Long): Result<Unit> = Result.success(Unit)
 
-    override fun decreaseQuantity(
-        productId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        onResult(Result.success(Unit))
-    }
+    override suspend fun decreaseQuantity(productId: Long): Result<Unit> = Result.success(Unit)
 
-    override fun deleteProduct(
-        productId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        onResult(Result.success(Unit))
-    }
+    override suspend fun deleteProduct(productId: Long): Result<Unit> = Result.success(Unit)
+
+    override fun getCartItemById(productId: Long): CartItem = ProductsFixture.dummyCartItem
 }
