@@ -1,3 +1,40 @@
 <resources>
     <string name="app_name">Shopping</string>
+
+    <!--    GoodsActivity-->
+    <string name="goods_image_description">상품 이미지</string>
+    <string name="goods_price">%,d원</string>
+    <string name="goods_more_button">더보기</string>
+
+    <!--    GoodsDetailsActivity-->
+    <string name="goods_detail_action_bar_name" />
+    <string name="nav_close_icon_title">닫기 아이콘</string>
+    <string name="goods_detail_image_description">상품 상세 이미지</string>
+    <string name="goods_details_cart_button">장바구니 담기</string>
+    <string name="goods_detail_price">가격</string>
+    <string name="goods_detail_cart_update_complete_toast_message">장바구니 상품 수량을 %d개로 변경하였습니다!</string>
+    <string name="goods_detail_cart_insert_complete_toast_message">상품 %d개가 장바구니에 추가되었습니다!</string>
+    <string name="recently_viewed_header">마지막으로 본 상품</string>
+
+    <!--    CartActivity-->
+    <string name="cart_action_bar_name">Cart</string>
+    <string name="nav_cart_icon_title">카트 아이콘</string>
+    <string name="cart_item_delete_button_description">장바구니 아이템 삭제 버튼</string>
+    <string name="cart_item_image_description">장바구니 아이템 이미지</string>
+    <string name="cart_left_page_button"><![CDATA[<]]></string>
+    <string name="cart_right_page_button"><![CDATA[>]]></string>
+    <string name="recently_viewed_goods_header">최근 본 상품</string>
+
+    <!--    LoginActivity-->
+    <string name="login_form_head">환영합니다</string>
+    <string name="login_submit_button_text">로그인</string>
+    <string name="login_form_id">아이디</string>
+    <string name="login_form_pw">비밀번호</string>
+    <string name="login_alert_success_login">로그인에 성공했습니다.</string>
+    <string name="login_alert_network_error">네트워크 오류입니다.</string>
+    <string name="login_alert_wrong_account">아이디 또는 비밀번호 오류입니다.</string>
+    <string name="login_alert_save_basic_key_failed">로그인 정보 저장에 실패했습니다.</string>
+    <string name="recommend_item_title">이런 상품은 어떠세요?</string>
+    <string name="recommend_item_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+
 </resources>

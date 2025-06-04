@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="quantityChangeListener"
+            type="woowacourse.shopping.feature.QuantityChangeListener" />
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".feature.goodsdetails.GoodsDetailsActivity">
+
+        <ImageView
+            android:id="@+id/iv_goods_details"
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            android:contentDescription="@string/goods_detail_image_description"
+            app:imgUrl="@{viewModel.cartItem.goods.thumbnailUrl}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/tv_goods_details_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="16dp"
+            android:text="@{viewModel.cartItem.goods.name}"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/iv_goods_details"
+            tools:text="[든든] 동원 스위트콘" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="17dp"
+            android:background="@color/gray_400"
+            app:layout_constraintTop_toBottomOf="@id/tv_goods_details_name" />
+
+
+        <TextView
+            android:id="@+id/tv_goods_details_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="16dp"
+            android:text="@{@string/goods_price(viewModel.cartItem.goods.price * viewModel.cartItem.quantity)}"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view"
+            tools:text="99,800원" />
+
+
+        <include
+            android:id="@+id/quantitySelector"
+            layout="@layout/quantity_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="14dp"
+            app:cartItem="@{viewModel.cartItem}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view"
+            app:quantityChangeListener="@{quantityChangeListener}" />
+
+        <TextView
+            android:id="@+id/tv_add_cart_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/cyan"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="@{() -> viewModel.addOrUpdateQuantityToCart()}"
+            android:text="@string/goods_details_cart_button"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_recently_viewed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/cart_item_background"
+            android:onClick="@{() -> viewModel.onClickMostRecentlyGoodsSection()}"
+            android:padding="16dp"
+            android:visibility="@{viewModel.mostRecentlyViewedGoods == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintTop_toBottomOf="@id/quantitySelector">
+
+            <TextView
+                android:id="@+id/tv_recently_viewed_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/recently_viewed_header"
+                android:textColor="@color/cyan"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_recently_viewed_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{viewModel.mostRecentlyViewedGoods.name}"
+                android:textColor="@color/gray_700"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tv_recently_viewed_title"
+                app:layout_constraintTop_toBottomOf="@+id/tv_recently_viewed_title"
+                tools:text="PET보틀-정사각형(500ml)" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
