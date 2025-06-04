@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -6,10 +6,11 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import woowacourse.shopping.data.AuthInterceptor
 import woowacourse.shopping.data.cart.service.CartService
 import woowacourse.shopping.data.product.service.ProductService
 
-object API {
+object NetworkModule {
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
@@ -29,6 +30,6 @@ object API {
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
 
-    val productService: ProductService = retrofit.create(ProductService::class.java)
-    val cartService: CartService = retrofit.create(CartService::class.java)
+    val productService: ProductService by lazy { retrofit.create(ProductService::class.java) }
+    val cartService: CartService by lazy { retrofit.create(CartService::class.java) }
 }

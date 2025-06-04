@@ -2,10 +2,10 @@ package woowacourse.shopping.data
 
 import okhttp3.Interceptor
 import okhttp3.Response
-import woowacourse.shopping.CartApplication
+import woowacourse.shopping.di.AuthStorageModule
 
 class AuthInterceptor(
-    private val authStorage: AuthStorage = CartApplication.authStorage,
+    private val authStorage: AuthStorage = AuthStorageModule.authStorage,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val requestWithAuth =

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.product.source
 
-import woowacourse.shopping.data.API
 import woowacourse.shopping.data.product.PagedProductsData
 import woowacourse.shopping.data.product.dto.ProductResponse
 import woowacourse.shopping.data.product.dto.ProductsResponse
@@ -9,7 +8,7 @@ import woowacourse.shopping.data.product.entity.ProductEntity
 import woowacourse.shopping.data.product.service.ProductService
 
 class RemoteProductsDataSource(
-    private val productService: ProductService = API.productService,
+    private val productService: ProductService,
 ) : ProductsDataSource {
     override fun pagedProducts(
         page: Int,

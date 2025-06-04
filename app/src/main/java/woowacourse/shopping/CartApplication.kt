@@ -1,22 +1,13 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping.data.AuthStorage
-import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
+import woowacourse.shopping.di.AuthStorageModule
+import woowacourse.shopping.di.DatabaseModule
 
 class CartApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
-        LocalRecentViewedProductsDataSource.init(this)
-        instance = this
-        authStorage = AuthStorage(this)
-    }
-
-    companion object {
-        private lateinit var instance: CartApplication
-
-        lateinit var authStorage: AuthStorage
-            private set
+        AuthStorageModule.init(this)
+        DatabaseModule.init(this)
     }
 }

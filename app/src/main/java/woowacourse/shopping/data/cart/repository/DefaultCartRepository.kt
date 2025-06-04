@@ -2,13 +2,13 @@ package woowacourse.shopping.data.cart.repository
 
 import woowacourse.shopping.data.cart.PagedCartItemData
 import woowacourse.shopping.data.cart.source.CartDataSource
-import woowacourse.shopping.data.cart.source.RemoteCartDataSource
+import woowacourse.shopping.di.DataSourceModule
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PagedCartItems
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(
-    private val cartDataSource: CartDataSource = RemoteCartDataSource(),
+    private val cartDataSource: CartDataSource = DataSourceModule.remoteCartDataSource,
 ) : CartRepository {
     override fun loadPagedCartItems(
         page: Int,
