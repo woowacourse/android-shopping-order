@@ -72,9 +72,9 @@ class GoodsDetailsActivity : AppCompatActivity() {
             setResult(
                 ResultCode.GOODS_DETAIL_INSERT.code,
                 Intent().apply {
-                    putExtra("CART_ID", viewModel.cart.value?.id)
-                    putExtra("GOODS_ID", id)
-                    putExtra("GOODS_QUANTITY", viewModel.cart.value?.quantity)
+                    putExtra(CART_ID, viewModel.cart.value?.id)
+                    putExtra(GOODS_ID, id)
+                    putExtra(GOODS_QUANTITY, viewModel.cart.value?.quantity)
                 },
             )
         }
@@ -84,7 +84,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
         setResult(
             ResultCode.GOODS_DETAIL_INSERT.code,
             Intent().apply {
-                putExtra("HISTORY_ID", id)
+                putExtra(HISTORY_ID, id)
             },
         )
     }
@@ -112,6 +112,10 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
     companion object {
         private const val GOODS_KEY = "GOODS_KEY"
+        private const val CART_ID = "CART_ID"
+        private const val GOODS_ID = "GOODS_ID"
+        private const val GOODS_QUANTITY = "GOODS_QUANTITY"
+        private const val HISTORY_ID = "HISTORY_ID"
 
         fun newIntent(
             context: Context,

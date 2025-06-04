@@ -92,13 +92,11 @@ class GoodsViewModel(
             ) { result ->
                 result
                     .onSuccess {
-                        Log.e("123451", "id = ${cart.id}")
                         val updatedCart = cart.copy(quantity = newQuantity)
                         updateItems(updatedCart)
                         getCartCounts()
                         _isSuccess.setValue(Unit)
                     }.onFailure { error ->
-                        Log.e("123451", "id = ${cart.id}")
                         _isFail.setValue(Unit)
                     }
             }
@@ -236,7 +234,6 @@ class GoodsViewModel(
     private fun loadHistories() {
         historyRepository.getAll { allHistories ->
             histories.postValue(allHistories)
-            Log.e("123451", "loadHistories = $allHistories")
             refreshItems()
         }
     }

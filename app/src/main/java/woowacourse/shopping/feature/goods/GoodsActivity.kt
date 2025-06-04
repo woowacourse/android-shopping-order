@@ -148,9 +148,9 @@ class GoodsActivity : AppCompatActivity() {
     }
 
     private fun handleActivityResult(data: Intent?) {
-        val changedCartId = data?.getLongExtra("CART_ID", 0) ?: 0
-        val changedGoodsId = data?.getLongExtra("GOODS_ID", 0) ?: 0
-        val changedQuantity = data?.getIntExtra("GOODS_QUANTITY", 0) ?: 0
+        val changedCartId = data?.getLongExtra(CART_ID, 0) ?: 0
+        val changedGoodsId = data?.getLongExtra(GOODS_ID, 0) ?: 0
+        val changedQuantity = data?.getIntExtra(GOODS_QUANTITY, 0) ?: 0
         viewModel.updateItem(changedCartId, changedGoodsId, changedQuantity)
         viewModel.refreshHistoryOnly()
     }
@@ -158,5 +158,11 @@ class GoodsActivity : AppCompatActivity() {
     private fun navigate(cart: Cart) {
         val intent = GoodsDetailsActivity.newIntent(this, cart.product.id.toLong())
         activityResultLauncher.launch(intent)
+    }
+
+    companion object {
+        private const val CART_ID = "CART_ID"
+        private const val GOODS_ID = "GOODS_ID"
+        private const val GOODS_QUANTITY = "GOODS_QUANTITY"
     }
 }
