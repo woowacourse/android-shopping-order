@@ -60,17 +60,18 @@ class ProductDetailViewModel(
                     if (cartProduct == null) {
                         cartProductRepository.insert(product.id, quantityToAdd) {
                             updateQuantity(INITIAL_QUANTITY)
+                            _addToCartEvent.setValue(Unit)
                         }
                     } else {
                         cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
                             updateQuantity(INITIAL_QUANTITY)
+                            _addToCartEvent.setValue(Unit)
                         }
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
-        _addToCartEvent.setValue(Unit)
     }
 
     private fun updateQuantity(newQuantity: Int) {
