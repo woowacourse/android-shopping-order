@@ -4,7 +4,6 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -17,7 +16,6 @@ import woowacourse.shopping.data.dto.response.CartProductResponseDto
 interface CartProductApiService {
     @GET("/cart-items")
     fun getPagedProducts(
-        @Header("accept") accept: String = "application/json",
         @Query("page") page: Int?,
         @Query("size") size: Int?,
     ): Call<CartProductResponseDto>
@@ -33,9 +31,7 @@ interface CartProductApiService {
     ): Call<Unit>
 
     @GET("/cart-items/counts")
-    fun getTotalQuantity(
-        @Header("accept") accept: String = "application/json",
-    ): Call<CartProductQuantityResponseDto>
+    fun getTotalQuantity(): Call<CartProductQuantityResponseDto>
 
     @PATCH("/cart-items/{id}")
     fun updateQuantity(
