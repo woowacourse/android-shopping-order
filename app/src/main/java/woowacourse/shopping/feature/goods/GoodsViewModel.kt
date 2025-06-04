@@ -149,17 +149,18 @@ class GoodsViewModel(
         }
     }
 
-    fun updateItemQuantity(
-        id: Int,
+    fun updateItem(
+        cartId: Long,
+        goodsId: Int,
         quantity: Int,
     ) {
         val currentItems = _items.value.orEmpty().toMutableList()
 
-        val index = currentItems.indexOfFirst { it is Cart && it.product.id == id }
+        val index = currentItems.indexOfFirst { it is Cart && it.product.id == goodsId }
 
         if (index != -1) {
             val oldItem = currentItems[index] as Cart
-            val updatedItem = oldItem.copy(quantity = quantity)
+            val updatedItem = oldItem.copy(id = cartId, quantity = quantity)
 
             currentItems[index] = updatedItem
             _items.value = currentItems

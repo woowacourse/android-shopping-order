@@ -147,9 +147,10 @@ class GoodsActivity : AppCompatActivity() {
     }
 
     private fun handleActivityResult(data: Intent?) {
-        val changedId = data?.getLongExtra("GOODS_ID", 0) ?: 0
+        val changedCartId = data?.getLongExtra("CART_ID", 0) ?: 0
+        val changedGoodsId = data?.getLongExtra("GOODS_ID", 0) ?: 0
         val changedQuantity = data?.getIntExtra("GOODS_QUANTITY", 0) ?: 0
-        viewModel.updateItemQuantity(changedId.toInt(), changedQuantity)
+        viewModel.updateItem(changedCartId, changedGoodsId.toInt(), changedQuantity)
         viewModel.refreshHistoryOnly()
     }
 
