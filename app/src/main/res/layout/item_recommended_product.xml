@@ -64,11 +64,11 @@
 
         <TextView
             android:id="@+id/text_view_product_name"
-            android:layout_width="match_parent"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_marginTop="8dp"
-            android:ellipsize="marquee"
+            android:ellipsize="end"
             android:singleLine="true"
             android:text="@{product.name}"
             android:textColor="@color/black"
