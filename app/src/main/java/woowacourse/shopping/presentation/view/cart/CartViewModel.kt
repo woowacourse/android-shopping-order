@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -84,7 +83,6 @@ class CartViewModel(
             _pageIndex.postValue(newPageIndex)
             _isFirstPage.postValue(isFirstPage)
             _isLastPage.postValue(isLastPage)
-            updateSelectionInfo()
         }
     }
 
@@ -134,6 +132,7 @@ class CartViewModel(
         val newItem = cartItem.cartItem.copy(quantity = 1)
         cartRepository.addCartItem(newItem) { addedItem ->
             if (addedItem != null) {
+                _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
                 _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
                 setCartItemSelection(addedItem.toCartItemUiModel(), true)
             }
@@ -143,9 +142,13 @@ class CartViewModel(
     fun removeFromCart(cartItem: CartItemUiModel) {
         val removedItem = cartItem.cartItem.copy(quantity = 0)
         cartRepository.deleteCartItem(removedItem.cartId) {
+            _cartItems.postValue(
+                _cartItems.value?.filterNot { cartItem ->
+                    cartItem.cartItem.cartId == removedItem.cartId
+                },
+            )
             _itemDeleteEvent.postValue(removedItem.cartId)
             selectionStatus.remove(removedItem.cartId)
-            updateSelectionInfo()
             fetchRecommendedProducts()
         }
     }
@@ -168,42 +171,17 @@ class CartViewModel(
         isSelected: Boolean,
     ) {
         selectionStatus[cartItem.cartItem.cartId] = isSelected
-        val asdf =
-            _cartItems.value?.map { item ->
-                if (item.cartItem.cartId == cartItem.cartItem.cartId) {
-                    item.copy(isSelected = isSelected)
-                } else {
-                    item
-                }
-            }
-        _cartItems.postValue(
-            _cartItems.value?.map { item ->
-                if (item.cartItem.cartId == cartItem.cartItem.cartId) {
-                    item.copy(isSelected = isSelected)
-                } else {
-                    item
-                }
-            },
-        )
-        Log.wtf("asdf", "$asdf")
         updateSelectionInfo()
     }
 
-    fun setAllSelections(selectAll: Boolean) {
+    fun selectAllCartItems(selectAll: Boolean) {
         cartRepository.loadAllCartItems { allItems ->
-            allItems.forEach { cartItem ->
-                selectionStatus[cartItem.cartId] = selectAll
-                _cartItems.postValue(
-                    _cartItems.value?.map { item ->
-                        if (item.cartItem.cartId == cartItem.cartId) {
-                            item.copy(isSelected = selectAll)
-                        } else {
-                            item
-                        }
-                    },
-                )
-            }
-            updateSelectionInfo()
+            _cartItems.postValue(
+                allItems.map { cartItem ->
+                    selectionStatus[cartItem.cartId] = selectAll
+                    cartItem.toCartItemUiModel().copy(isSelected = selectAll)
+                },
+            )
             loadPageOfShoppingCart()
         }
     }
@@ -212,19 +190,24 @@ class CartViewModel(
         _canSelectItems.value = false
     }
 
-    fun fetchRecommendedProducts() {
-        productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
-            _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
-        }
-    }
-
     private fun updateSelectionInfo() {
         cartRepository.loadAllCartItems { cartItems ->
             val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
-            val selectedItems = cartItems.filter { selectedItemIds.contains(it.cartId) }
-//            totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
-//            totalCount.postValue(selectedItems.sumOf { it.quantity })
-//            allSelected.postValue(selectedItems.isNotEmpty() && selectedItems.size == cartItems.size)
+            _cartItems.postValue(
+                cartItems.map { cartItem ->
+                    if (cartItem.cartId in selectedItemIds) {
+                        cartItem.toCartItemUiModel().copy(isSelected = true)
+                    } else {
+                        cartItem.toCartItemUiModel()
+                    }
+                },
+            )
+        }
+    }
+
+    fun fetchRecommendedProducts() {
+        productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
+            _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
     }
 

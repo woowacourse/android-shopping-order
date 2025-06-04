@@ -32,7 +32,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             }
 
             override fun onBatchSelect(isChecked: Boolean) {
-                viewModel.setAllSelections(isChecked)
+                viewModel.selectAllCartItems(isChecked)
             }
         }
 
