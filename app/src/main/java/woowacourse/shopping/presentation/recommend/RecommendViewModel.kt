@@ -40,7 +40,7 @@ class RecommendViewModel(
     private var checkedProducts: List<ProductUiModel> = emptyList()
 
     init {
-        loadRecommendedProducts()
+        loadRecommendProducts()
     }
 
     fun setCheckedProducts(products: List<ProductUiModel>) {
@@ -93,21 +93,17 @@ class RecommendViewModel(
         }
     }
 
-    private fun loadRecommendedProducts() {
+    private fun loadRecommendProducts() {
         viewedItemRepository.getLastViewedItem { item ->
             item?.let { loadProductsByCategory(it.category) }
         }
     }
 
     private fun loadProductsByCategory(category: String) {
-        productsRepository.getProductsByCategory(category) { result ->
+        productsRepository.getRecommendProducts(category) { result ->
             result
                 .onSuccess { products ->
-                    _recommendedProducts.postValue(
-                        products.map { it.toUiModel() }.take(
-                            RECOMMENDED_COUNT
-                        )
-                    )
+                    _recommendedProducts.value = products.map { it.toUiModel() }
                 }
                 .onFailure {
                     emitFailEvent()

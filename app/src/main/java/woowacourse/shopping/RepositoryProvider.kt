@@ -24,7 +24,10 @@ object RepositoryProvider {
 
     fun init(context: Context) {
         productsRepository =
-            ProductsRepositoryImpl(ProductsRemoteDataSource(getProductsApiService))
+            ProductsRepositoryImpl(
+                ProductsRemoteDataSource(getProductsApiService),
+                CartItemsRemoteDataSource(getCartApiService),
+            )
         cartItemRepository =
             CartItemsRepositoryImpl(
                 CartItemsRemoteDataSource(getCartApiService),

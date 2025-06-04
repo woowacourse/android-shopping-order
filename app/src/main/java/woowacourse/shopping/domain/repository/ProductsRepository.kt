@@ -16,7 +16,7 @@ interface ProductsRepository {
         onResult: (Result<ProductUiModel>) -> Unit,
     )
 
-    fun getProductsByCategory(
+    fun getRecommendProducts(
         category: String,
         onResult: (Result<List<Product>>) -> Unit,
     )

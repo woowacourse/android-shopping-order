@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.model.ProductsResponse
+import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.model.Product
@@ -10,6 +12,7 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ProductsRepositoryImpl(
     private val productsRemoteDataSource: ProductsRemoteDataSource,
+    private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
 ) : ProductsRepository {
     override fun getProducts(
         page: Int,
@@ -42,16 +45,26 @@ class ProductsRepositoryImpl(
         }
     }
 
-    override fun getProductsByCategory(
+    override fun getRecommendProducts(
         category: String,
         onResult: (Result<List<Product>>) -> Unit,
     ) {
-        productsRemoteDataSource.getProductsByCategory(category = category) { result ->
-            result
-                .mapCatching { response ->
-                    response.content.map { it.toDomain() }
+        productsRemoteDataSource.getProductsByCategory(category = category) { categoryResult ->
+            categoryResult
+                .onSuccess { productsResponse ->
+                    val productsByCategory = productsResponse.content.map { it.toDomain() }
+                    cartItemsRemoteDataSource.getCartItems(null, null) { cartResult ->
+                        cartResult
+                            .onSuccess { cartItemResponse ->
+                                val cartProducts = cartItemResponse.content.map { it.product.id }
+                                val recommendProducts = productsByCategory
+                                    .filterNot { it.id in cartProducts }
+                                    .take(10)
+
+                                onResult(Result.success(recommendProducts))
+                            }
+                    }
                 }
-                .let(onResult)
         }
     }
 
