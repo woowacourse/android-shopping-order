@@ -1,21 +1,19 @@
 package woowacourse.shopping.presentation.view.catalog.adapter
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.CatalogItem
 import woowacourse.shopping.presentation.model.CatalogItem.CatalogType
 import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
 
 class CatalogAdapter(
-    items: List<CatalogItem> = emptyList(),
     private val eventListener: CatalogEventListener,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val recentProductsAdapter = RecentProductAdapter(emptyList(), eventListener)
-    private val catalogItems = items.toMutableList()
+) : ListAdapter<CatalogItem, RecyclerView.ViewHolder>(DiffCallBack) {
+    private val recentProductsAdapter = RecentProductAdapter(eventListener)
 
-    override fun getItemCount(): Int = catalogItems.size
-
-    override fun getItemViewType(position: Int): Int = catalogItems[position].viewType.ordinal
+    override fun getItemViewType(position: Int): Int = currentList[position].viewType.ordinal
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -36,28 +34,11 @@ class CatalogAdapter(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        val item = catalogItems[position]
+        val item = currentList[position]
         when (holder) {
             is ProductViewHolder -> holder.bind(item as CatalogItem.ProductItem)
             is RecentProductContainerViewHolder -> holder.bind(item as CatalogItem.RecentProducts)
             is LoadMoreViewHolder -> Unit
-        }
-    }
-
-    fun submitList(newItems: List<CatalogItem>) {
-        newItems.forEachIndexed { index, newItem ->
-            val oldItem = catalogItems.getOrNull(index)
-
-            if (oldItem == null) {
-                catalogItems.add(index, newItem)
-                notifyItemInserted(index)
-                return@forEachIndexed
-            }
-
-            if (oldItem != newItem) {
-                catalogItems[index] = newItem
-                notifyItemChanged(index)
-            }
         }
     }
 
@@ -67,5 +48,33 @@ class CatalogAdapter(
         fun onLoadMoreClick()
 
         fun onQuantitySelectorOpenButtonClick(productId: Long)
+    }
+
+    object DiffCallBack : DiffUtil.ItemCallback<CatalogItem>() {
+        override fun areItemsTheSame(
+            oldItem: CatalogItem,
+            newItem: CatalogItem,
+        ): Boolean {
+            if (oldItem.viewType != newItem.viewType) return false
+            return when (oldItem) {
+                is CatalogItem.ProductItem -> oldItem.productId == (newItem as CatalogItem.ProductItem).productId
+                CatalogItem.LoadMoreItem -> return false
+                is CatalogItem.RecentProducts ->
+                    oldItem.products.map { it.id } ==
+                        (newItem as CatalogItem.RecentProducts).products.map { it.id }
+            }
+        }
+
+        override fun areContentsTheSame(
+            oldItem: CatalogItem,
+            newItem: CatalogItem,
+        ): Boolean {
+            if (oldItem.viewType != newItem.viewType) return false
+            return when (oldItem) {
+                is CatalogItem.ProductItem -> oldItem == (newItem as CatalogItem.ProductItem)
+                CatalogItem.LoadMoreItem -> return false
+                is CatalogItem.RecentProducts -> oldItem == (newItem as CatalogItem.RecentProducts)
+            }
+        }
     }
 }

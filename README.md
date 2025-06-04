@@ -24,9 +24,11 @@
 - [x] ViewModel에서 수행 작업 -> ViewModel에서 리스너를 구현
 - [ ] exception이 안 터지는 곳에서 runCatching rapping 제거
 - [ ] datasource execute 동기처리 enqueue 비동기처리로 수정
-  - (remoteDataSource에서 enqueue를 통한 비동기 처리중에 Cached 데이터랑 순서를 못 맞춰서 반영 실패)
-    - CartRepository에서 cachedCart가 캐싱되기전에 Catalog 화면이 실행되어서 Catalog에서 캐싱되기전 cachedCart의 데이터로 화면을 초기화하는 부분 때문에 실패
-    - Catalog 화면에서 각 CartProductUiModel이 increase, decrease를 통한 변경에서 캐싱 데이터가 초기화 되기 이전에 값을 사용해서 Ui에 반영이 늦어져서 실패
-- [ ] recyclerView -> listAdapter로 수정
+    - (remoteDataSource에서 enqueue를 통한 비동기 처리중에 Cached 데이터랑 순서를 못 맞춰서 반영 실패)
+        - CartRepository에서 cachedCart가 캐싱되기전에 Catalog 화면이 실행되어서 Catalog에서 캐싱되기전 cachedCart의 데이터로 화면을
+          초기화하는 부분 때문에 실패
+        - Catalog 화면에서 각 CartProductUiModel이 increase, decrease를 통한 변경에서 캐싱 데이터가 초기화 되기 이전에 값을 사용해서
+          Ui에 반영이 늦어져서 실패
+- [x] RecyclerViewAdatper -> ListAdapter로 수정
 - [ ] ConcatAdapter 적용
 - [ ] domain layer 학습 후 중복 로직(상품 수량을 늘린다, 줄인다, 장바구니 담는다) 제거
