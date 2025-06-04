@@ -21,7 +21,7 @@ class FakeCartRepository : CartRepository {
         onResult(Result.success(ProductsFixture.dummyCartItems))
     }
 
-    override fun getCartItemById(productId: Long): CartItem = ProductsFixture.dummyCartItem
+    override suspend fun getCartItemById(productId: Long): CartItem = ProductsFixture.dummyCartItem
 
     override fun insertOrUpdate(
         product: Product,

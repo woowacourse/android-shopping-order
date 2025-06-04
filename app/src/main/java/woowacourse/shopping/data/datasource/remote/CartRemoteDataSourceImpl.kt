@@ -1,13 +1,7 @@
 package woowacourse.shopping.data.datasource.remote
 
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
-import woowacourse.shopping.data.datasource.handleFailure
-import woowacourse.shopping.data.dto.cart.CartItemCountResponse
 import woowacourse.shopping.data.dto.cart.CartItemRequest
-import woowacourse.shopping.data.dto.cart.CartsResponse
 import woowacourse.shopping.data.dto.cart.UpdateCartRequest
 import woowacourse.shopping.data.dto.cart.toDomain
 import woowacourse.shopping.data.service.CartItemService
@@ -16,150 +10,79 @@ import woowacourse.shopping.domain.model.CartItem
 class CartRemoteDataSourceImpl(
     private val cartItemService: CartItemService,
 ) : CartRemoteDataSource {
-    override fun fetchTotalCount(onResult: (Result<Int>) -> Unit) =
-        cartItemService.requestCartItemCount().enqueue(
-            object : Callback<CartItemCountResponse> {
-                override fun onResponse(
-                    call: Call<CartItemCountResponse>,
-                    response: Response<CartItemCountResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val quantity = response.body()?.quantity
-                        if (quantity != null) {
-                            onResult(Result.success(quantity))
-                        }
-                        return
-                    }
-                    handleFailure(onResult)
-                }
+    override suspend fun fetchTotalCount(): Result<Int> =
+        runCatching {
+            val response = cartItemService.requestCartItemCount()
+            if (!response.isSuccessful) {
+                throw Exception("장바구니 전체 수량 조회 실패: ${response.code()} ${response.message()}")
+            }
 
-                override fun onFailure(
-                    call: Call<CartItemCountResponse>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+            val quantity =
+                response.body()?.quantity ?: throw IllegalStateException("응답 바디가 null입니다.")
+            quantity
+        }.recoverCatching {
+            throw Exception("인터넷 연결을 확인해주세요.")
+        }
 
-    override fun fetchPagedCartItems(
+    override suspend fun fetchPagedCartItems(
         page: Int,
         size: Int?,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    ) = cartItemService.requestCartItems(page = page, size = size).enqueue(
-        object : Callback<CartsResponse> {
-            override fun onResponse(
-                call: Call<CartsResponse>,
-                response: Response<CartsResponse>,
-            ) {
-                if (response.isSuccessful) {
-                    onResult(
-                        Result.success(
-                            response.body()?.cartContent?.map { it.toDomain() }
-                                ?: emptyList(),
-                        ),
-                    )
-                    return
-                }
-                handleFailure(onResult)
+    ): Result<List<CartItem>> =
+        runCatching {
+            val response = cartItemService.requestCartItems(page = page, size = size)
+            if (!response.isSuccessful) {
+                throw Exception("장바구니 조회 실패: ${response.code()} ${response.message()}")
             }
 
-            override fun onFailure(
-                call: Call<CartsResponse>,
-                t: Throwable,
-            ) {
-                onResult(Result.failure(t))
-            }
-        },
-    )
+            val cartItems =
+                response.body()?.cartContent?.map { it.toDomain() }
+                    ?: throw IllegalStateException("응답 바디가 null입니다.")
+            cartItems
+        }.recoverCatching {
+            throw Exception("인터넷 연결을 확인해주세요.")
+        }
 
-    override fun insertCartItem(
+    override suspend fun insertCartItem(
         productId: Long,
         quantity: Int,
-        onResult: (Result<Long>) -> Unit,
-    ) {
-        val request = CartItemRequest(productId, quantity)
-        cartItemService.addCartItem(request).enqueue(
-            object : Callback<ResponseBody> {
-                override fun onResponse(
-                    call: Call<ResponseBody>,
-                    response: Response<ResponseBody>,
-                ) {
-                    if (response.isSuccessful) {
-                        val cartId = response.toIdOrNull()
-                        if (cartId != null) {
-                            onResult(Result.success(cartId))
-                        } else {
-                            onResult(Result.failure(IllegalStateException("응답 헤더에 cartId가 없습니다.")))
-                        }
-                        return
-                    }
-                    handleFailure(onResult)
-                }
+    ): Result<Long> =
+        runCatching {
+            val request = CartItemRequest(productId, quantity)
+            val response = cartItemService.addCartItem(request)
+            if (!response.isSuccessful) {
+                throw Exception("장바구니 추가 실패: ${response.code()} ${response.message()}")
+            }
 
-                override fun onFailure(
-                    call: Call<ResponseBody>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
+            val cartId =
+                response.toIdOrNull() ?: throw IllegalStateException("응답 헤더에 cartId가 없습니다.")
+            cartId
+        }.recoverCatching {
+            throw Exception("인터넷 연결을 확인해주세요.")
+        }
 
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartId: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val request = UpdateCartRequest(quantity)
-        cartItemService.updateCartItem(cartId, request).enqueue(
-            object : Callback<ResponseBody> {
-                override fun onResponse(
-                    call: Call<ResponseBody>,
-                    response: Response<ResponseBody>,
-                ) {
-                    if (response.isSuccessful) {
-                        onResult(Result.success(Unit))
-                        return
-                    }
-                    handleFailure(onResult)
-                }
-
-                override fun onFailure(
-                    call: Call<ResponseBody>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    override fun deleteCartItemById(
-        cartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) = cartItemService.deleteCartItem(cartId).enqueue(
-        object : Callback<ResponseBody> {
-            override fun onResponse(
-                call: Call<ResponseBody>,
-                response: Response<ResponseBody>,
-            ) {
-                if (response.isSuccessful) {
-                    onResult(Result.success(Unit))
-                    return
-                }
-                handleFailure(onResult)
+    ): Result<Unit> =
+        runCatching {
+            val request = UpdateCartRequest(quantity)
+            val response = cartItemService.updateCartItem(cartId, request)
+            if (!response.isSuccessful) {
+                throw Exception("장바구니 수량 업데이트 실패: ${response.code()} ${response.message()}")
             }
+        }.recoverCatching {
+            throw Exception("인터넷 연결을 확인해주세요.")
+        }
 
-            override fun onFailure(
-                call: Call<ResponseBody>,
-                t: Throwable,
-            ) {
-                onResult(Result.failure(t))
+    override suspend fun deleteCartItemById(cartId: Long): Result<Unit> =
+        runCatching {
+            val response = cartItemService.deleteCartItem(cartId)
+            if (!response.isSuccessful) {
+                throw Exception("아이템 삭제 실패: ${response.code()} ${response.message()}")
             }
-        },
-    )
+        }.recoverCatching {
+            throw Exception("인터넷 연결을 확인해주세요.")
+        }
 
     private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
 }

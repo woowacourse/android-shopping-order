@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
@@ -12,7 +11,6 @@ import woowacourse.shopping.presentation.Extra.KEY_SELECT_COUNT
 import woowacourse.shopping.presentation.Extra.KEY_SELECT_PRICE
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.model.toDomain
 
 class RecommendViewModel(
     private val savedStateHandle: SavedStateHandle,

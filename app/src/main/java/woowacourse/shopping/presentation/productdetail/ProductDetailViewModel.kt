@@ -48,8 +48,10 @@ class ProductDetailViewModel(
     fun addToCart() {
         val product: Product = product.value ?: return
         val productCount: Int = productCount.value ?: return
-        cartRepository.insertOrUpdate(product, productCount) { result ->
-            result
+
+        viewModelScope.launch {
+            cartRepository
+                .insertOrUpdate(product, productCount)
                 .onSuccess {
                     _toastMessage.value = R.string.product_detail_add_cart_toast_insert_success
                 }.onFailure {

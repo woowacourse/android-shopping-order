@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.ResultState
@@ -31,10 +33,11 @@ class CartViewModel(
     }
 
     fun loadItems(currentPage: Int = 0) {
-        _uiState.value = ResultState.Loading
+        viewModelScope.launch {
+            _uiState.value = ResultState.Loading
 
-        cartRepository.fetchPagedCartItems(currentPage) { result ->
-            result
+            cartRepository
+                .fetchPagedCartItems(currentPage)
                 .onSuccess { loadedItems ->
                     val oldItemsMap =
                         cartItems.value
@@ -62,8 +65,9 @@ class CartViewModel(
     }
 
     fun deleteProduct(cartItem: CartItemUiModel) {
-        cartRepository.deleteProduct(cartItem.product.id) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .deleteProduct(cartItem.product.id)
                 .onSuccess {
                     _toastMessage.value = R.string.cart_toast_delete_success
                     loadItems()
@@ -74,8 +78,9 @@ class CartViewModel(
     }
 
     fun increaseQuantity(productId: Long) {
-        cartRepository.increaseQuantity(productId) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .increaseQuantity(productId)
                 .onSuccess {
                     updateQuantity(productId, 1)
                 }.onFailure {
@@ -93,8 +98,9 @@ class CartViewModel(
             return
         }
 
-        cartRepository.decreaseQuantity(productId) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .decreaseQuantity(productId)
                 .onSuccess {
                     updateQuantity(productId, -1)
                 }.onFailure {
