@@ -7,7 +7,6 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.invoke
 import io.mockk.mockk
 import io.mockk.slot
@@ -68,42 +67,37 @@ class CartProductRecommendationViewModelTest {
                 ),
             )
 
-        every { recentProductRepository.getLastViewedProduct(captureLambda()) } answers {
-            lambda<(Result<RecentProduct?>) -> Unit>().invoke(
-                Result.success(
-                    RecentProduct(
-                        product =
+        coEvery { recentProductRepository.getLastViewedProduct() } returns
+            Result.success(
+                RecentProduct(
+                    product =
+                        Product(
+                            id = 1,
+                            imageUrl = "",
+                            name = "hwannow",
+                            price = 20000,
+                            category = "woowahan",
+                        ),
+                ),
+            )
+
+        coEvery { productRepository.getPagedProducts(any(), any()) } returns
+            Result.success(
+                PagedResult(
+                    items =
+                        List(20) {
                             Product(
-                                id = 1,
+                                id = it + 1,
                                 imageUrl = "",
-                                name = "hwannow",
+                                name = "hwannow${it + 1}",
                                 price = 20000,
                                 category = "woowahan",
-                            ),
-                    ),
+                            )
+                        },
+                    hasNext = false,
                 ),
             )
-        }
 
-        every { productRepository.getPagedProducts(any(), any(), captureLambda()) } answers {
-            lambda<(Result<PagedResult<Product>>) -> Unit>().invoke(
-                Result.success(
-                    PagedResult(
-                        items =
-                            List(20) {
-                                Product(
-                                    id = it + 1,
-                                    imageUrl = "",
-                                    name = "hwannow${it + 1}",
-                                    price = 20000,
-                                    category = "woowahan",
-                                )
-                            },
-                        hasNext = false,
-                    ),
-                ),
-            )
-        }
         viewModel =
             CartProductRecommendationViewModel(
                 productRepository,
@@ -137,7 +131,10 @@ class CartProductRecommendationViewModelTest {
         runTest {
             // given
             val id = slot<Int>()
-            coEvery { cartProductRepository.insert(capture(id), any()) } returns Result.success(10102)
+            coEvery { cartProductRepository.insert(capture(id), any()) } returns
+                Result.success(
+                    10102,
+                )
 
             val beforePrice = viewModel.totalPrice.getOrAwaitValue()
             val beforeCount = viewModel.totalCount.getOrAwaitValue()
@@ -162,7 +159,10 @@ class CartProductRecommendationViewModelTest {
             coEvery { cartProductRepository.insert(any(), any()) } returns Result.success(10102)
             viewModel.onAddClick(mockProduct.copy(id = 2))
 
-            coEvery { cartProductRepository.updateQuantity(any(), any()) } returns Result.success(Unit)
+            coEvery { cartProductRepository.updateQuantity(any(), any()) } returns
+                Result.success(
+                    Unit,
+                )
 
             val beforePrice = viewModel.totalPrice.getOrAwaitValue()
             val beforeCount = viewModel.totalCount.getOrAwaitValue()
@@ -170,7 +170,8 @@ class CartProductRecommendationViewModelTest {
             // when
             viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
             val actual =
-                viewModel.recommendedProducts.getOrAwaitValue().first { it.product.id == 2 }.quantity
+                viewModel.recommendedProducts.getOrAwaitValue()
+                    .first { it.product.id == 2 }.quantity
             val actualPrice = viewModel.totalPrice.getOrAwaitValue()
             val actualCount = viewModel.totalCount.getOrAwaitValue()
 
@@ -187,7 +188,10 @@ class CartProductRecommendationViewModelTest {
             coEvery { cartProductRepository.insert(any(), any()) } returns Result.success(10102)
             viewModel.onAddClick(mockProduct.copy(id = 2))
 
-            coEvery { cartProductRepository.updateQuantity(any(), any()) } returns Result.success(Unit)
+            coEvery { cartProductRepository.updateQuantity(any(), any()) } returns
+                Result.success(
+                    Unit,
+                )
             viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
 
             val beforePrice = viewModel.totalPrice.getOrAwaitValue()
@@ -196,7 +200,8 @@ class CartProductRecommendationViewModelTest {
             // when
             viewModel.onQuantityDecreaseClick(mockProduct.copy(id = 2))
             val actual =
-                viewModel.recommendedProducts.getOrAwaitValue().first { it.product.id == 2 }.quantity
+                viewModel.recommendedProducts.getOrAwaitValue()
+                    .first { it.product.id == 2 }.quantity
             val actualPrice = viewModel.totalPrice.getOrAwaitValue()
             val actualCount = viewModel.totalCount.getOrAwaitValue()
 
