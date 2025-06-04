@@ -52,7 +52,6 @@ class ProductAdapter(
     fun updateItem(product: ProductUiModel) {
         val index: Int =
             products.indexOfFirst { (it as CatalogItem.ProductItem).productItem.id == product.id }
-        Log.d("test", "이거 ${index}")
         products[index] = CatalogItem.ProductItem(product)
         notifyItemChanged(index)
     }
