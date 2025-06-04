@@ -87,16 +87,12 @@ class CartViewModel(
             return
         }
         cartRepository.increaseQuantity(cartItem) {
-            cartRepository.findCartItemByProductId(product.id) { cartItem ->
-                if (cartItem != null) {
-                    val updatedItem =
-                        cartItem
-                            .toCartItemUiModel()
-                            .copy(isSelected = selectionStatus[cartItem.cartId] ?: false)
-                    _itemUpdateEvent.postValue(updatedItem)
-                    updateProducts(updatedItem)
-                }
-            }
+            val updatedItem =
+                CartItemUiModel(
+                    cartItem.copy(quantity = cartItem.quantity + 1),
+                    isSelected = selectionStatus[cartItem.cartId] ?: false,
+                )
+            _itemUpdateEvent.postValue(updatedItem)
         }
     }
 
@@ -107,27 +103,21 @@ class CartViewModel(
             return
         }
         cartRepository.decreaseQuantity(cartItem) {
-            cartRepository.findCartItemByProductId(product.id) { cartItem ->
-                if (cartItem != null) {
-                    val updatedItem =
-                        cartItem
-                            .toCartItemUiModel()
-                            .copy(isSelected = selectionStatus[cartItem.cartId] ?: false)
-                    _itemUpdateEvent.postValue(updatedItem)
-                    updateProducts(updatedItem)
-                }
-            }
+            val updatedItem =
+                CartItemUiModel(
+                    cartItem.copy(quantity = cartItem.quantity - 1),
+                    isSelected = selectionStatus[cartItem.cartId] ?: false,
+                )
+            _itemUpdateEvent.postValue(updatedItem)
         }
     }
 
     private fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem) {
-            cartRepository.findCartItemByProductId(newItem.product.id) { cartItem ->
-                if (cartItem != null) {
-                    _itemUpdateEvent.postValue(cartItem.toCartItemUiModel().copy(isSelected = true))
-                    setCartItemSelection(cartItem.toCartItemUiModel(), true)
-                }
+        cartRepository.addCartItem(newItem) { addedItem ->
+            if (addedItem != null) {
+                _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
+                setCartItemSelection(addedItem.toCartItemUiModel(), true)
             }
         }
     }
