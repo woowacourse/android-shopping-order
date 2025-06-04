@@ -17,5 +17,7 @@ object DatabaseModule {
         CartDatabase.getInstance(appContext)
     }
 
-    fun provideRecentProductDao(): RecentlyProductDao = database.recentlyProductDao()
+    val recentProductDao: RecentlyProductDao by lazy {
+        database.recentlyProductDao()
+    }
 }

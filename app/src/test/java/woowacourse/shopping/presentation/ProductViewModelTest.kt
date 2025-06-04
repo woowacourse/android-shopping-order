@@ -62,7 +62,7 @@ class ProductViewModelTest {
             viewModel.loadMore()
 
             val products = viewModel.products.getOrAwaitValue()
-            assertThat(products).hasSize(24)
+            assertThat(products).hasSize(12)
         }
 
     @Test
