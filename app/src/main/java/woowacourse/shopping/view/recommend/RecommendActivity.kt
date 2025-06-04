@@ -10,9 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
 
-class RecommendActivity :
-    AppCompatActivity(),
-    RecommendProductItemActions {
+class RecommendActivity : AppCompatActivity() {
     private val binding by lazy { ActivityRecommnedBinding.inflate(layoutInflater) }
     private val viewModel: RecommendViewModel by viewModels()
 
@@ -29,16 +27,12 @@ class RecommendActivity :
         val adapter =
             RecommendProductsAdapter(
                 object : RecommendProductItemActions {
-                    override fun onSelectProduct(item: RecommendProduct) {
-                        TODO("Not yet implemented")
-                    }
-
                     override fun onPlusProductQuantity(item: RecommendProduct) {
-                        TODO("Not yet implemented")
+                        viewModel.plusCartItemQuantity(item)
                     }
 
                     override fun onMinusProductQuantity(item: RecommendProduct) {
-                        TODO("Not yet implemented")
+                        viewModel.minusCartItemQuantity(item)
                     }
                 },
             )
@@ -53,17 +47,5 @@ class RecommendActivity :
             val intent = Intent(context, RecommendActivity::class.java)
             return intent
         }
-    }
-
-    override fun onSelectProduct(item: RecommendProduct) {
-        // TODO: ViewModel 함수 사용
-    }
-
-    override fun onPlusProductQuantity(item: RecommendProduct) {
-        // TODO: ViewModel 함수 사용
-    }
-
-    override fun onMinusProductQuantity(item: RecommendProduct) {
-        // TODO: ViewModel 함수 사용
     }
 }
