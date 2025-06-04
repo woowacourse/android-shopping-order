@@ -18,11 +18,7 @@ class DefaultCartRepository(
         {
             val pageableCartItemData: PageableCartItemData =
                 cartDataSource.pageableCartItems(page, size)
-            PageableCartItems(
-                cartItems = pageableCartItemData.cartItems.map { it.toDomain() },
-                hasPrevious = pageableCartItemData.hasPrevious,
-                hasNext = pageableCartItemData.hasNext,
-            )
+            pageableCartItemData.toDomain()
         }.runAsync(onLoad)
     }
 
