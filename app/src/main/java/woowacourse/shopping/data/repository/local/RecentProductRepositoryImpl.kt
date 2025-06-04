@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.repository.local
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
 import woowacourse.shopping.data.entity.toData
@@ -13,34 +11,28 @@ class RecentProductRepositoryImpl(
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
 ) : RecentProductRepository {
     override suspend fun getRecentProducts(): Result<List<Product>> =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                recentProductLocalDataSource
-                    .getProducts()
-                    .map { recentProduct -> recentProduct.toDomain() }
-            }
+        runCatching {
+            recentProductLocalDataSource
+                .getProducts()
+                .map { recentProduct -> recentProduct.toDomain() }
         }
 
     override suspend fun getMostRecentProduct(): Result<Product?> =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                recentProductLocalDataSource.getMostRecentProduct()?.toDomain()
-            }
+        runCatching {
+            recentProductLocalDataSource.getMostRecentProduct()?.toDomain()
         }
 
     override suspend fun insertRecentProduct(product: Product): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val recentProducts = recentProductLocalDataSource.getProducts()
-                val productId = product.productId
+        runCatching {
+            val recentProducts = recentProductLocalDataSource.getProducts()
+            val productId = product.productId
 
-                if (isNewProduct(recentProducts, productId) && recentProducts.size == 10) {
-                    val oldProduct = recentProductLocalDataSource.getOldestProduct()
-                    recentProductLocalDataSource.delete(oldProduct)
-                }
-
-                recentProductLocalDataSource.insert(product.toData())
+            if (isNewProduct(recentProducts, productId) && recentProducts.size == 10) {
+                val oldProduct = recentProductLocalDataSource.getOldestProduct()
+                recentProductLocalDataSource.delete(oldProduct)
             }
+
+            recentProductLocalDataSource.insert(product.toData())
         }
 
     private fun isNewProduct(

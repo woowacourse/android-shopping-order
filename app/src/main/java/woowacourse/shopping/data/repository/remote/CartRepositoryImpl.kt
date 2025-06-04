@@ -20,131 +20,117 @@ class CartRepositoryImpl(
     ): Result<List<CartItem>> = withContext(Dispatchers.IO) { cartRemoteDataSource.fetchPagedCartItems(page, pageSize) }
 
     override suspend fun fetchAllCartItems(): Result<List<CartItem>> =
-        withContext(Dispatchers.IO) {
-            cartRemoteDataSource.fetchTotalCount().fold(
-                onSuccess = { totalCount ->
-                    cartRemoteDataSource.fetchPagedCartItems(0, totalCount).fold(
-                        onSuccess = { cartItems ->
-                            cartLocalDataSource.saveCart(cartItems)
-                            Result.success(cartItems)
-                        },
-                        onFailure = { throwable ->
-                            Result.failure(throwable)
-                        },
+        cartRemoteDataSource.fetchTotalCount().fold(
+            onSuccess = { totalCount ->
+                cartRemoteDataSource.fetchPagedCartItems(0, totalCount).fold(
+                    onSuccess = { cartItems ->
+                        cartLocalDataSource.saveCart(cartItems)
+                        Result.success(cartItems)
+                    },
+                    onFailure = { throwable ->
+                        Result.failure(throwable)
+                    },
+                )
+            },
+            onFailure = { throwable ->
+                Result.failure(throwable)
+            },
+        )
+
+    override suspend fun insertOrUpdate(
+        product: Product,
+        productQuantity: Int,
+    ): Result<Unit> =
+        if (cartLocalDataSource.exist(product.productId)) {
+            val result = findCartItemOrFail(product.productId)
+            result.fold(
+                onSuccess = { cartItem ->
+                    updateProduct(
+                        cartId = cartItem.cartId,
+                        product = product,
+                        quantity = cartItem.quantity + productQuantity,
                     )
                 },
                 onFailure = { throwable ->
                     Result.failure(throwable)
                 },
             )
-        }
-
-    override suspend fun insertOrUpdate(
-        product: Product,
-        productQuantity: Int,
-    ): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            if (cartLocalDataSource.exist(product.productId)) {
-                val result = findCartItemOrFail(product.productId)
-                result.fold(
-                    onSuccess = { cartItem ->
-                        updateProduct(
-                            cartId = cartItem.cartId,
-                            product = product,
-                            quantity = cartItem.quantity + productQuantity,
-                        )
-                    },
-                    onFailure = { throwable ->
-                        Result.failure(throwable)
-                    },
-                )
-            } else {
-                insertProduct(product, productQuantity).map { Unit }
-            }
+        } else {
+            insertProduct(product, productQuantity).map { Unit }
         }
 
     override suspend fun insertProduct(
         product: Product,
         productQuantity: Int,
     ): Result<Long> =
-        withContext(Dispatchers.IO) {
-            cartRemoteDataSource
-                .insertCartItem(product.productId, productQuantity)
-                .mapCatching { cartId ->
-                    val cartItem =
-                        CartItem(
-                            cartId = cartId,
-                            product = product,
-                            quantity = productQuantity,
-                        )
-                    cartLocalDataSource.add(cartItem)
-                    cartId
-                }
-        }
+        cartRemoteDataSource
+            .insertCartItem(product.productId, productQuantity)
+            .mapCatching { cartId ->
+                val cartItem =
+                    CartItem(
+                        cartId = cartId,
+                        product = product,
+                        quantity = productQuantity,
+                    )
+                cartLocalDataSource.add(cartItem)
+                cartId
+            }
 
     override suspend fun updateProduct(
         cartId: Long,
         product: Product,
         quantity: Int,
     ): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            cartRemoteDataSource
-                .updateQuantity(cartId, quantity)
-                .mapCatching {
-                    val updatedCartItem = CartItem(cartId, product, quantity)
-                    cartLocalDataSource.add(updatedCartItem)
-                }
-        }
+        cartRemoteDataSource
+            .updateQuantity(cartId, quantity)
+            .mapCatching {
+                val updatedCartItem = CartItem(cartId, product, quantity)
+                cartLocalDataSource.add(updatedCartItem)
+            }
 
     override suspend fun increaseQuantity(productId: Long): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            findCartItemOrFail(productId).fold(
-                onSuccess = { cartItem ->
-                    cartRemoteDataSource
-                        .updateQuantity(cartItem.cartId, cartItem.quantity + 1)
-                        .mapCatching {
-                            cartLocalDataSource.add(cartItem.copy(quantity = cartItem.quantity + 1))
-                        }
-                },
-                onFailure = { throwable ->
-                    Result.failure(throwable)
-                },
-            )
-        }
+        findCartItemOrFail(productId).fold(
+            onSuccess = { cartItem ->
+                cartRemoteDataSource
+                    .updateQuantity(cartItem.cartId, cartItem.quantity + 1)
+                    .mapCatching {
+                        cartLocalDataSource.add(cartItem.copy(quantity = cartItem.quantity + 1))
+                    }
+            },
+            onFailure = { throwable ->
+                Result.failure(throwable)
+            },
+        )
 
     override suspend fun decreaseQuantity(productId: Long): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            findCartItemOrFail(productId).fold(
-                onSuccess = { cartItem ->
-                    if (cartItem.quantity == 1) {
-                        deleteProduct(productId)
-                    } else {
-                        cartRemoteDataSource
-                            .updateQuantity(cartItem.cartId, cartItem.quantity - 1)
-                            .mapCatching {
-                                cartLocalDataSource.add(cartItem.copy(quantity = cartItem.quantity - 1))
-                            }
-                    }
-                },
-                onFailure = { throwable ->
-                    Result.failure(throwable)
-                },
-            )
-        }
+        findCartItemOrFail(productId).fold(
+            onSuccess = { cartItem ->
+                if (cartItem.quantity == 1) {
+                    deleteProduct(productId)
+                } else {
+                    cartRemoteDataSource
+                        .updateQuantity(cartItem.cartId, cartItem.quantity - 1)
+                        .mapCatching {
+                            cartLocalDataSource.add(cartItem.copy(quantity = cartItem.quantity - 1))
+                        }
+                }
+            },
+            onFailure = { throwable ->
+                Result.failure(throwable)
+            },
+        )
 
     override suspend fun deleteProduct(productId: Long): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            findCartItemOrFail(productId).fold(
-                onSuccess = { cartItem ->
-                    cartRemoteDataSource
-                        .deleteCartItemById(cartItem.cartId)
-                        .mapCatching { cartLocalDataSource.delete(productId) }
-                },
-                onFailure = { throwable ->
-                    Result.failure(throwable)
-                },
-            )
-        }
+        findCartItemOrFail(productId).fold(
+            onSuccess = { cartItem ->
+                cartRemoteDataSource
+                    .deleteCartItemById(cartItem.cartId)
+                    .mapCatching { cartLocalDataSource.delete(productId) }
+            },
+            onFailure = { throwable ->
+                Result.failure(throwable)
+            },
+        )
 
     override fun getCartItemById(productId: Long): CartItem? = cartLocalDataSource.find(productId)
 
