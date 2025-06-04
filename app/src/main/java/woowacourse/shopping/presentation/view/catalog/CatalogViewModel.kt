@@ -44,11 +44,11 @@ class CatalogViewModel(
     }
 
     override fun increase(product: ProductUiModel) {
-        increaseCartItem(product)
+        addOrIncreaseCartItem(product)
     }
 
     override fun decrease(product: ProductUiModel) {
-        decreaseCartItem(product)
+        decreaseOrDeleteCartItem(product)
     }
 
     fun fetchProducts() {
@@ -134,30 +134,31 @@ class CatalogViewModel(
         }
     }
 
-    fun initialAddToCart(product: ProductUiModel) {
-        val updatedProduct = product.copy(amount = 1)
-        cartRepository.addCartItem(updatedProduct.toCartItem()) {
-            cartRepository.getAllCartItems { cartItems ->
-                val found = cartItems?.find { it.product.id == updatedProduct.id }
-                if (found != null) {
-                    _itemUpdateEvent.postValue(found.toUiModel())
-                    handleUpdatedCartItem(found.cartId)
-                } else {
-                    _itemUpdateEvent.postValue(updatedProduct)
+    fun addRecentProduct(product: ProductUiModel) {
+        productRepository.addRecentProduct(product.toProduct()) {
+            updateRecentProducts()
+        }
+    }
+
+    fun addOrIncreaseCartItem(product: ProductUiModel) {
+        cartRepository.getAllCartItems { cartItems ->
+            val existing = cartItems?.find { it.product.id == product.id }
+
+            if (existing != null) {
+                cartRepository.increaseCartItem(existing) { id ->
+                    handleUpdatedCartItem(id)
+                }
+            } else {
+                val newItem = product.copy(amount = 1)
+                cartRepository.addCartItem(newItem.toCartItem()) {
+                    _itemUpdateEvent.postValue(newItem)
                     refreshCartState()
                 }
             }
         }
     }
 
-    private fun increaseCartItem(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-        cartRepository.increaseCartItem(cartItem) { id ->
-            handleUpdatedCartItem(id)
-        }
-    }
-
-    private fun decreaseCartItem(product: ProductUiModel) {
+    private fun decreaseOrDeleteCartItem(product: ProductUiModel) {
         val cartItem = product.toCartItem()
 
         if (cartItem.amount <= 1) {
@@ -172,18 +173,11 @@ class CatalogViewModel(
         }
     }
 
-    fun addRecentProduct(product: ProductUiModel) {
-        productRepository.addRecentProduct(product.toProduct()) {
-            updateRecentProducts()
-        }
-    }
-
     private fun handleUpdatedCartItem(cartId: Long) {
         getCartItemByCartId(cartId) { cartItem ->
             if (cartItem != null) {
                 _itemUpdateEvent.postValue(cartItem.toUiModel())
             }
-            cartRepository
             calculateTotalCartCount()
         }
     }

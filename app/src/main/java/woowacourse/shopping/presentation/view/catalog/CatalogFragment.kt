@@ -61,7 +61,7 @@ class CatalogFragment :
     }
 
     override fun onInitialAddToCartClicked(product: ProductUiModel) {
-        viewModel.initialAddToCart(product)
+        viewModel.addOrIncreaseCartItem(product)
     }
 
     private fun setCatalogAdapter() {
