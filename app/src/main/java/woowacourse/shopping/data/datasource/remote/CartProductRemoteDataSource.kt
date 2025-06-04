@@ -10,38 +10,6 @@ import woowacourse.shopping.domain.model.CartProduct
 class CartProductRemoteDataSource(
     private val cartProductService: CartProductApiService,
 ) {
-//    suspend fun getPagedProducts(
-//        page: Int?,
-//        size: Int?,
-//        onResult: () -> Unit,
-//    ): Result<PagedResult<CartProduct>> {
-//        cartProductService.getPagedProducts(page = page, size = size).enqueue(
-//            object : Callback<CartProductResponseDto> {
-//                override fun onResponse(
-//                    call: Call<CartProductResponseDto>,
-//                    response: Response<CartProductResponseDto>,
-//                ) {
-//                    if (response.isSuccessful) {
-//                        response.body()?.let { body ->
-//                            val products = body.content.map { it.toCartProduct() }
-//                            val hasNext = body.last.not()
-//                            Result.success(PagedResult(products, hasNext))
-//                        } ?: Result.success(PagedResult(emptyList(), false))
-//                    } else {
-//                        Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
-//                    }
-//                }
-//
-//                override fun onFailure(
-//                    call: Call<CartProductResponseDto>,
-//                    t: Throwable,
-//                ) {
-//                    onResult(Result.failure(t))
-//                }
-//            },
-//        )
-//    }
-
     suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
