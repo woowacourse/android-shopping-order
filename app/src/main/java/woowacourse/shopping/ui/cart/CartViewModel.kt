@@ -72,6 +72,7 @@ class CartViewModel(
                 _isLoading.value = false
             }.onFailure {
                 _isError.value = it.message
+                Log.e("CartViewModel", it.message.toString())
             }
         }
     }
@@ -87,6 +88,7 @@ class CartViewModel(
                     loadCartProducts()
                 }.onFailure {
                     _isError.value = it.message
+                    Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
@@ -160,6 +162,7 @@ class CartViewModel(
                     _recommendedProducts.value = products
                 }.onFailure {
                     _isError.value = it.message
+                    Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
@@ -216,6 +219,7 @@ class CartViewModel(
                     _isOrdered.postValue(Unit)
                 }.onFailure {
                     _isError.value = it.message
+                    Log.e("CartViewModel", it.message.toString())
                 }
         }
     }

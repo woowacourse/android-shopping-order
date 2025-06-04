@@ -67,6 +67,7 @@ class CatalogViewModel(
                     _isLoading.value = false
                 }.onFailure {
                     _isError.value = it.message
+                    Log.e("CatalogViewModel", it.message.toString())
                 }
         }
     }
@@ -113,6 +114,7 @@ class CatalogViewModel(
                     _catalogProducts.value = catalogProducts.value?.updateProduct(cartProduct)
                 }.onFailure {
                     _isError.value = it.message
+                    Log.e("CatalogViewModel", it.message.toString())
                 }
         }
     }
@@ -124,6 +126,7 @@ class CatalogViewModel(
                     _catalogProducts.value = catalogProducts.value?.updateProducts(cartProducts)
                 }.onFailure {
                     _isError.value = it.message
+                    Log.e("CatalogViewModel", it.message.toString())
                 }
         }
     }
