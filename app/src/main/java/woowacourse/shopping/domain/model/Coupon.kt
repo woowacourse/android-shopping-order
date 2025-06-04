@@ -6,7 +6,7 @@ data class Coupon(
     val code: String,
     val description: String,
     val expirationDate: LocalDate,
-    val discount: Int,
-    val minimumAmount: Int,
-    val availableTime: AvailableTime,
+    val discount: Int?,
+    val minimumAmount: Int?,
+    val availableTime: AvailableTime?,
 )

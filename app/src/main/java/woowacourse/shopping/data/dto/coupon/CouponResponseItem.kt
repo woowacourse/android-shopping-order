@@ -2,10 +2,8 @@ package woowacourse.shopping.data.dto.coupon
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.Coupon
 import java.time.LocalDate
-import java.time.LocalTime
 
 @Serializable
 data class CouponResponseItem(
@@ -36,11 +34,7 @@ fun CouponResponseItem.toDomain(): Coupon =
         code = this.code!!,
         description = this.description!!,
         expirationDate = LocalDate.parse(this.expirationDate),
-        discount = this.discount ?: 0,
-        minimumAmount = this.minimumAmount ?: 0,
-        availableTime =
-            this.availableTimeResponse?.toDomain() ?: AvailableTime(
-                LocalTime.now(),
-                LocalTime.now(),
-            ),
+        discount = this.discount,
+        minimumAmount = this.minimumAmount,
+        availableTime = this.availableTimeResponse?.toDomain(),
     )

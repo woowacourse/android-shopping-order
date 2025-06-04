@@ -7,9 +7,9 @@ data class CouponUiModel(
     val code: String,
     val description: String,
     val expirationDate: String,
-    val discount: Int,
-    val minimumAmount: Int,
-    val availableTime: AvailableTimeUiModel,
+    val discount: Int?,
+    val minimumAmount: Int?,
+    val availableTime: AvailableTimeUiModel?,
     val isSelected: Boolean = false,
 )
 
@@ -20,6 +20,6 @@ fun Coupon.toPresentation(): CouponUiModel =
         expirationDate = expirationDate.format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")),
         discount = discount,
         minimumAmount = minimumAmount,
-        availableTime = availableTime.toPresentation(),
+        availableTime = availableTime?.toPresentation(),
         isSelected = false,
     )

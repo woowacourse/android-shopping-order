@@ -7,13 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.usecase.GetAvailableCouponUseCase
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.model.toPresentation
 
 class OrderViewModel(
-    private val couponRepository: CouponRepository,
+    private val getAvailableCouponUseCase: GetAvailableCouponUseCase,
 ) : ViewModel() {
     private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
     val coupons: LiveData<List<CouponUiModel>> = _coupons
@@ -26,8 +26,8 @@ class OrderViewModel(
 
     private fun fetchData() {
         viewModelScope.launch {
-            couponRepository
-                .fetchAll()
+            getAvailableCouponUseCase
+                .invoke()
                 .onSuccess { coupons ->
                     Log.d("meeple_log", "$coupons")
                     _coupons.value = coupons.map { it.toPresentation() }
