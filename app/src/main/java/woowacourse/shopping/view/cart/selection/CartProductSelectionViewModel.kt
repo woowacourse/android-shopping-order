@@ -36,6 +36,11 @@ class CartProductSelectionViewModel(
             products.all { it.isSelected } && products.isNotEmpty()
         }
 
+    val canOrder: LiveData<Boolean> =
+        selectedProducts.map { products ->
+            products.isNotEmpty()
+        }
+
     private val _page = MutableLiveData(FIRST_PAGE_NUMBER)
     val page: LiveData<Int> get() = _page
 
