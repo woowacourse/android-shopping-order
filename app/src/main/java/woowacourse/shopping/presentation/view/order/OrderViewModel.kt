@@ -53,7 +53,11 @@ class OrderViewModel(
     val isCheckAll: LiveData<Boolean> =
         MediatorLiveData<Boolean>().apply {
             addSource(selectedCartItems) { selectedCartItems ->
-                value = selectedCartItems.size == cartRepository.fetchAllCartItems().size
+                value = selectedCartItems.size ==
+                    cartRepository
+                        .fetchAllCartItems()
+                        .getOrDefault(emptyList())
+                        .size
             }
             addSource(_isCheckAll) { isCheckAll ->
                 value = isCheckAll
@@ -145,7 +149,10 @@ class OrderViewModel(
         val checked = (_isCheckAll.value ?: false)
         if (checked) {
             selectedCartItems.value =
-                cartRepository.fetchAllCartItems().map { it.toCartItemUiModel() }
+                cartRepository
+                    .fetchAllCartItems()
+                    .getOrDefault(emptyList())
+                    .map { it.toCartItemUiModel() }
             return
         }
         selectedCartItems.value = emptyList()

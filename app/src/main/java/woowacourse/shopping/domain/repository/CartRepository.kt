@@ -10,9 +10,9 @@ interface CartRepository {
         onResult: (Result<PageableItem<CartProduct>>) -> Unit,
     )
 
-    fun fetchAllCartItems(): List<CartProduct>
+    fun fetchAllCartItems(): Result<List<CartProduct>>
 
-    fun findCartIdByProductId(productId: Long): Long
+    fun findCartIdByProductId(productId: Long): Result<Long>
 
     fun deleteCartItem(
         cartId: Long,

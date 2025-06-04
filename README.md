@@ -23,6 +23,7 @@
 - [x] Fragment의 Tag를 통한 분기 처리 로직 수정
 - [x] ViewModel에서 수행 작업 -> ViewModel에서 리스너를 구현
 - [ ] exception이 안 터지는 곳에서 runCatching rapping 제거
+  - repository에서 받은 데이터의 결과 처리를 viewModel에서 관리해야하기 때문에 repository에서 runcatching을 통해 Result로 반환
 - [ ] datasource execute 동기처리 enqueue 비동기처리로 수정
     - (remoteDataSource에서 enqueue를 통한 비동기 처리중에 Cached 데이터랑 순서를 못 맞춰서 반영 실패)
         - CartRepository에서 cachedCart가 캐싱되기전에 Catalog 화면이 실행되어서 Catalog에서 캐싱되기전 cachedCart의 데이터로 화면을

@@ -34,9 +34,12 @@ class CartRepositoryImpl(
         PageableItem(products, hasMore)
     }
 
-    override fun fetchAllCartItems(): List<CartProduct> = cachedCart.cachedCartProducts
+    override fun fetchAllCartItems(): Result<List<CartProduct>> = runCatching { cachedCart.cachedCartProducts }
 
-    override fun findCartIdByProductId(productId: Long): Long = cachedCart.findCartIdByProductId(productId)
+    override fun findCartIdByProductId(productId: Long): Result<Long> =
+        runCatching {
+            cachedCart.findCartIdByProductId(productId)
+        }
 
     override fun deleteCartItem(
         cartId: Long,

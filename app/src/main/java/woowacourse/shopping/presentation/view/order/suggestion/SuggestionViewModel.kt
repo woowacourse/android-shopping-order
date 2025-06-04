@@ -33,7 +33,7 @@ class SuggestionViewModel(
         _suggestionProducts.map { suggestionProducts ->
             suggestionProducts
                 .filter { it.quantity > 0 }
-                .map { cartRepository.findCartIdByProductId(it.productId) }
+                .mapNotNull { cartRepository.findCartIdByProductId(it.productId).getOrNull() }
         }
 
     val totalPurchaseProductQuantity: LiveData<Int> =
@@ -46,6 +46,7 @@ class SuggestionViewModel(
         val excludedProductIds =
             cartRepository
                 .fetchAllCartItems()
+                .getOrDefault(emptyList())
                 .filter { cart ->
                     !suggestionProducts.value.orEmpty().any { it.productId == cart.product.id }
                 }.map { it.product.id }
