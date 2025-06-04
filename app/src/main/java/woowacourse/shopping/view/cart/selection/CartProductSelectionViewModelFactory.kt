@@ -12,6 +12,10 @@ class CartProductSelectionViewModelFactory(
         if (modelClass.isAssignableFrom(CartProductSelectionViewModel::class.java)) {
             return CartProductSelectionViewModel(cartProductRepository) as T
         }
-        throw IllegalArgumentException()
+        throw IllegalArgumentException(INVALID_VIEWMODEL_CLASS)
+    }
+
+    companion object {
+        private const val INVALID_VIEWMODEL_CLASS: String = "생성할 수 없는 ViewModel 클래스입니다"
     }
 }
