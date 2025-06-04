@@ -10,7 +10,6 @@ import okhttp3.mockwebserver.RecordedRequest
 import woowacourse.shopping.data.local.cart.server.CartService
 import woowacourse.shopping.data.local.cart.server.DummyCarts
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Carts
 
 class TestCartServiceImpl : CartService {
     private val gson = Gson()

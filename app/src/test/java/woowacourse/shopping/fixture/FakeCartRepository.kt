@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Carts
 
 class FakeCartRepository : LocalCartRepository {
     private val cartList = mutableListOf<Cart>()
