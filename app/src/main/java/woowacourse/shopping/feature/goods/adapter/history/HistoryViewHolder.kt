@@ -9,8 +9,11 @@ class HistoryViewHolder(
     private val binding: ItemHistoryBinding,
     private val goodsClickListener: GoodsClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.goodsClickListener = goodsClickListener
+    }
+
     fun bind(history: History) {
         binding.history = history
-        binding.goodsClickListener = goodsClickListener
     }
 }

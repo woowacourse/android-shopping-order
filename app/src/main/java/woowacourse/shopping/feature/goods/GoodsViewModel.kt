@@ -39,7 +39,7 @@ class GoodsViewModel(
     val hasNextPage: LiveData<Boolean> get() = _hasNextPage
 
     private val _navigateToCartProduct = MutableSingleLiveData<CartProduct>()
-    val navigateToCart: SingleLiveData<CartProduct> get() = _navigateToCartProduct
+    val navigateToCartProduct: SingleLiveData<CartProduct> get() = _navigateToCartProduct
 
     private val _insertState = MutableLiveData<Event<State>>()
     val insertState: LiveData<Event<State>> get() = _insertState
