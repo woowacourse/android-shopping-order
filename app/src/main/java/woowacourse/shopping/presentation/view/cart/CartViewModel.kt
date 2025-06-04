@@ -94,9 +94,21 @@ class CartViewModel(
     }
 
     fun deleteProduct(cartItem: CartItemUiModel) {
-        selectedStates.remove(cartItem.cartItem.cartId)
-        cartRepository.deleteCartItem(cartItem.cartItem.cartId) {
+        val cartId = cartItem.cartItem.cartId
+
+        selectedStates.remove(cartId)
+
+        _cartItems.postValue(
+            _cartItems.value?.filterNot {
+                it.cartItem.cartId == cartId
+            },
+        )
+
+        updateProductAmountInLists(cartId, 0)
+
+        cartRepository.deleteCartItem(cartId) {
             _deleteState.postValue(it)
+            updateSelectionInfo()
         }
     }
 
