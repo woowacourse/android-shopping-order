@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.goodsdetails
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -87,25 +86,6 @@ class GoodsDetailsViewModel(
         if (current != null) {
             val updated = current.updateQuantity(current.quantity - 1)
             _cart.value = updated
-        }
-    }
-
-    fun commitCart2() {
-        runCatching {
-            _cart.value?.let { it ->
-                cartRepository.updateCart(it.id, CartQuantity(it.quantity)) { result ->
-                    result
-                        .onSuccess {
-                            insertToHistory(cart.value as Cart)
-                        }.onFailure { error ->
-                            Log.e("commitCartError", "$error")
-                        }
-                }
-            }
-        }.onSuccess {
-            _isSuccess.setValue(Unit)
-        }.onFailure {
-            _isFail.setValue(Unit)
         }
     }
 
