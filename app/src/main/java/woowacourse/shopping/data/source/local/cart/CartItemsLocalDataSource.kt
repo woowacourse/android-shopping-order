@@ -3,10 +3,13 @@ package woowacourse.shopping.data.source.local.cart
 import woowacourse.shopping.data.model.CachedCartItem
 
 class CartItemsLocalDataSource {
-    private var cache: MutableSet<CachedCartItem> = mutableSetOf()
+    private val cacheByProductId: MutableMap<Long, CachedCartItem> = mutableMapOf()
 
     fun saveCartItems(cachedCartItems: List<CachedCartItem>) {
-        cache = cachedCartItems.toMutableSet()
+        cacheByProductId.clear()
+        cachedCartItems.forEach {
+            cacheByProductId[it.productId] = it
+        }
     }
 
     fun add(
@@ -15,29 +18,29 @@ class CartItemsLocalDataSource {
         quantity: Int,
     ) {
         val item = CachedCartItem(cartId, productId, quantity)
-        cache.add(item)
+        cacheByProductId[productId] = item
     }
 
     fun update(
         productId: Long,
         quantity: Int,
     ) {
-        val existingItem = cache.find { it.productId == productId }
+        val existingItem = cacheByProductId[productId]
         if (existingItem != null) {
-            cache.remove(existingItem)
-            cache.add(existingItem.copy(quantity = quantity))
+            val updatedItem = existingItem.copy(quantity = quantity)
+            cacheByProductId[productId] = updatedItem
         }
     }
 
-    fun remove(cartId: Long) {
-        cache.removeIf { it.cartId == cartId }
+    fun remove(productId: Long) {
+        cacheByProductId.remove(productId)
     }
 
     fun getCartId(productId: Long): Long? {
-        return cache.find { it.productId == productId }?.cartId
+        return cacheByProductId[productId]?.cartId
     }
 
     fun getQuantity(productId: Long): Int {
-        return cache.find { it.productId == productId }?.quantity ?: 0
+        return cacheByProductId[productId]?.quantity ?: 0
     }
 }

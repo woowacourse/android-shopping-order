@@ -76,6 +76,7 @@ class CartItemsRepositoryImpl(
         val cartId = cartItemsLocalDataSource.getCartId(id)
 
         if (cartId != null) {
+            cartItemsLocalDataSource.remove(id)
             cartItemsRemoteDataSource.deleteCartItem(cartId) { result ->
                 cartItemsLocalDataSource.remove(cartId)
                 result.let(onResult)
