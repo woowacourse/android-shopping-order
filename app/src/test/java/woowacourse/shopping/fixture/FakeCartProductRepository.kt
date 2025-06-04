@@ -63,7 +63,7 @@ class FakeCartProductRepository : CartProductRepository {
         return Result.success(Unit)
     }
 
-    override suspend fun deleteAll(ids: Set<Int>): Result<Unit> {
+    override suspend fun deleteProductsByIds(ids: Set<Int>): Result<Unit> {
         cartProducts.removeIf { it.product.id in ids }
         return Result.success(Unit)
     }
