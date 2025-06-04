@@ -3,10 +3,10 @@ package woowacourse.shopping.presentation.product.recent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
+import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
 
 class ViewedItemAdapter(
-    private val handler: CatalogEventHandlerImpl,
+    private val handler: CatalogEventHandler,
 ) : RecyclerView.Adapter<ViewedItemHolder>() {
     private var viewedProducts: List<ProductUiModel> = emptyList()
 
