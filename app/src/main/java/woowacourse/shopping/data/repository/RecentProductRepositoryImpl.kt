@@ -53,7 +53,9 @@ class RecentProductRepositoryImpl(
                                 }
                             }
                         onResult(Result.success(recentProducts))
-                    }.onFailure {}
+                    }.onFailure {
+                        onResult(Result.failure(it))
+                    }
             }
         }
     }
