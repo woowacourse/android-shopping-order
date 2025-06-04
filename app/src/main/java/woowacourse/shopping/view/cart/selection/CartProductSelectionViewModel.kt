@@ -74,8 +74,9 @@ class CartProductSelectionViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        val cartProductItem = products.value.orEmpty().firstOrNull { it.cartProduct.product.id == item.product.id } ?: return
-        repository.updateQuantity(cartProductItem.cartProduct, 1) {
+        val cartProductItem =
+            products.value.orEmpty().firstOrNull { it.cartProduct.product.id == item.product.id } ?: return
+        repository.updateQuantity(cartProductItem.cartProduct, cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
     }
@@ -84,7 +85,7 @@ class CartProductSelectionViewModel(
         val cartProductItem =
             products.value.orEmpty().firstOrNull { it.cartProduct.product.id == item.product.id } ?: return
         if (cartProductItem.cartProduct.quantity == 1) return
-        repository.updateQuantity(cartProductItem.cartProduct, -1) {
+        repository.updateQuantity(cartProductItem.cartProduct, cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD) {
             loadPage(_page.value ?: FIRST_PAGE_NUMBER)
         }
     }
@@ -156,6 +157,7 @@ class CartProductSelectionViewModel(
     }
 
     companion object {
+        private const val QUANTITY_TO_ADD = 1
         private const val FIRST_PAGE_NUMBER = 1
         private const val PAGE_SIZE = 5
     }

@@ -61,7 +61,7 @@ class ProductCatalogViewModel(
 
     override fun onQuantityIncreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        cartProductRepository.updateQuantity(cartProduct, QUANTITY_TO_ADD) {
+        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity + QUANTITY_TO_ADD) {
             cartProducts.removeIf { it.product.id == item.id }
             cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
             updateQuantity(item, QUANTITY_TO_ADD)
@@ -70,7 +70,7 @@ class ProductCatalogViewModel(
 
     override fun onQuantityDecreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        cartProductRepository.updateQuantity(cartProduct, -QUANTITY_TO_ADD) {
+        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity - QUANTITY_TO_ADD) {
             cartProducts.removeIf { it.product.id == item.id }
             val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
             if (newQuantity > MINIMUM_QUANTITY) cartProducts.add(cartProduct.copy(quantity = newQuantity))

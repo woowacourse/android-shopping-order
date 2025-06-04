@@ -63,7 +63,7 @@ class ProductDetailViewModel(
                             _addToCartEvent.setValue(Unit)
                         }
                     } else {
-                        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+                        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity + quantityToAdd) {
                             updateQuantity(INITIAL_QUANTITY)
                             _addToCartEvent.setValue(Unit)
                         }

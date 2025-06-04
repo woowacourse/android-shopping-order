@@ -45,10 +45,9 @@ class CartProductRepositoryImpl(
 
     override fun updateQuantity(
         cartProduct: CartProduct,
-        quantityToAdd: Int,
+        newQuantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val newQuantity = cartProduct.quantity + quantityToAdd
         when {
             newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
             else ->
