@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="android.view.View" />
 
         <variable
@@ -48,10 +47,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="@{vm.isLoading() ? View.VISIBLE : View.GONE}">
 
                 <include layout="@layout/item_shimmer_cart" />
-
                 <include layout="@layout/item_shimmer_cart" />
                 <include layout="@layout/item_shimmer_cart" />
                 <include layout="@layout/item_shimmer_cart" />

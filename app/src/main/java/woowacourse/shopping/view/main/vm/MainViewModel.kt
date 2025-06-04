@@ -20,6 +20,7 @@ import woowacourse.shopping.view.main.adapter.ProductAdapterEventHandler
 import woowacourse.shopping.view.main.state.LoadState
 import woowacourse.shopping.view.main.state.ProductState
 import woowacourse.shopping.view.main.state.ProductUiState
+import kotlin.concurrent.thread
 
 class MainViewModel(
     private val historyRepository: HistoryRepository,

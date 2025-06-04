@@ -1,7 +1,6 @@
 package woowacourse.shopping.view.main
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -104,14 +103,6 @@ class MainActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { value ->
             productsAdapter.submitList(value)
-        }
-
-        viewModel.isLoading.observe(this) { value ->
-            if (value.not()) {
-                binding.shimmerLayout.stopShimmer()
-                binding.shimmerLayout.visibility = View.GONE
-                binding.recyclerViewProduct.visibility = View.VISIBLE
-            }
         }
 
         viewModel.uiEvent.observe(this) { event ->

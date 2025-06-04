@@ -34,7 +34,7 @@ class CartListFragment : Fragment(R.layout.fragment_cart_list) {
         val binding = FragmentCartListBinding.bind(view)
         setUpBinding(binding)
         initView(binding)
-        observeViewModel(binding)
+        observeViewModel()
     }
 
     private fun setUpBinding(binding: FragmentCartListBinding) {
@@ -51,16 +51,9 @@ class CartListFragment : Fragment(R.layout.fragment_cart_list) {
         }
     }
 
-    private fun observeViewModel(binding: FragmentCartListBinding) {
+    private fun observeViewModel() {
         viewModel.cartUiState.observe(viewLifecycleOwner) { value ->
             cartAdapter.submitList(value.items, value.pageState.page)
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) { value ->
-            if (!value) {
-                binding.recyclerViewCart.visibility = View.VISIBLE
-                binding.shimmerLayout.visibility = View.GONE
-            }
         }
     }
 }
