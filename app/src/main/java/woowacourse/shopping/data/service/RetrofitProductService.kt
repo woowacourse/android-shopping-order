@@ -7,6 +7,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.BuildConfig
 import java.util.Base64
 
 object RetrofitProductService {
@@ -16,8 +17,8 @@ object RetrofitProductService {
         }
 
     private val base64Credentials: String by lazy {
-        val username = "wondroid-world"
-        val password = "password"
+        val username = BuildConfig.USER_ID
+        val password = BuildConfig.USER_PASSWORD
         val credentials = "$username:$password"
         Base64.getEncoder().encodeToString(credentials.toByteArray())
     }
