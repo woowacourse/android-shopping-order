@@ -48,7 +48,6 @@ class CartViewModel(
     private val _recommendItems = MutableLiveData<List<CartProduct>>()
     val recommendItems: LiveData<List<CartProduct>> get() = _recommendItems
 
-    private val selectedItems = MutableLiveData<List<CartProduct>>(emptyList())
     private val totalItemsCount = MutableLiveData(0)
 
     init {
