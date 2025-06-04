@@ -28,12 +28,12 @@ interface CartItemService {
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
-        @Path("id") id: Long,
+        @Path("id") cartId: Long,
     ): Call<Unit>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItem(
-        @Path("id") id: Long,
+        @Path("id") cartId: Long,
         @Body body: Quantity,
     ): Call<Unit>
 

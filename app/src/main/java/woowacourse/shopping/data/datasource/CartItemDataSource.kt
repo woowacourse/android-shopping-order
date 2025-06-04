@@ -13,7 +13,7 @@ interface CartItemDataSource {
 
     fun submitCartItem(
         cartItem: CartItemRequest,
-        callback: () -> Unit,
+        callback: (Long) -> Unit,
     )
 
     fun removeCartItem(

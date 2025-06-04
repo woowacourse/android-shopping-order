@@ -10,6 +10,7 @@ import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.CartViewModel
+import woowacourse.shopping.presentation.view.cart.recommendation.adapter.RecommendEventListener
 import woowacourse.shopping.presentation.view.cart.recommendation.adapter.RecommendationAdapter
 
 class CartRecommendationFragment :
@@ -40,8 +41,8 @@ class CartRecommendationFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
 
-        initRecommendationAdapter()
         initObserver()
     }
 
@@ -59,22 +60,10 @@ class CartRecommendationFragment :
 
     private fun initObserver() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            if (!products.isNullOrEmpty()) {
-                recommendationAdapter.updateRecommendedProducts(products)
-            } else {
-                recommendationAdapter.updateRecommendedProducts(emptyList())
-            }
+            recommendationAdapter.submitList(products ?: emptyList())
         }
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { updatedProduct ->
             recommendationAdapter.updateItem(updatedProduct)
         }
     }
-
-    private fun initRecommendationAdapter() {
-        binding.recyclerViewRecommendationProduct.adapter = recommendationAdapter
-    }
-}
-
-interface RecommendEventListener {
-    fun onInitialAddToCart(product: ProductUiModel)
 }

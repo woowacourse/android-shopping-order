@@ -41,7 +41,7 @@ class CartItemDataSourceImpl(
 
     override fun submitCartItem(
         cartItem: CartItemRequest,
-        callback: () -> Unit,
+        callback: (Long) -> Unit,
     ) {
         cartItemService.postCartItem(cartItem).enqueue(
             object : Callback<Unit> {
@@ -51,8 +51,9 @@ class CartItemDataSourceImpl(
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body()
+                        val cartId = response.extractCartItemId()
                         println("body : $body")
-                        callback()
+                        cartId?.let { callback(it) }
                     }
                 }
 
@@ -67,10 +68,10 @@ class CartItemDataSourceImpl(
     }
 
     override fun removeCartItem(
-        id: Long,
+        cartId: Long,
         callback: (Long) -> Unit,
     ) {
-        cartItemService.deleteCartItem(id).enqueue(
+        cartItemService.deleteCartItem(cartId).enqueue(
             object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -79,7 +80,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        callback(id)
+                        callback(cartId)
                     }
                 }
 
@@ -94,11 +95,11 @@ class CartItemDataSourceImpl(
     }
 
     override fun updateCartItem(
-        id: Long,
+        cartId: Long,
         quantity: Quantity,
         onResult: (Long) -> Unit,
     ) {
-        cartItemService.patchCartItem(id, quantity).enqueue(
+        cartItemService.patchCartItem(cartId, quantity).enqueue(
             object : Callback<Unit> {
                 override fun onResponse(
                     call: Call<Unit>,
@@ -107,7 +108,7 @@ class CartItemDataSourceImpl(
                     if (response.isSuccessful) {
                         val body = response.body()
                         println("body : $body")
-                        onResult(id)
+                        onResult(cartId)
                     }
                 }
 
@@ -143,5 +144,18 @@ class CartItemDataSourceImpl(
                 }
             },
         )
+    }
+
+    private fun Response<*>.extractCartItemId(): Long? {
+        val locationHeader = this.headers()[HEADER_LOCATION]
+        return locationHeader
+            ?.substringAfter(HEADER_CART_ID_PREFIX)
+            ?.takeWhile { it.isDigit() }
+            ?.toLongOrNull()
+    }
+
+    companion object {
+        private const val HEADER_LOCATION = "Location"
+        private const val HEADER_CART_ID_PREFIX = "/cart-items/"
     }
 }

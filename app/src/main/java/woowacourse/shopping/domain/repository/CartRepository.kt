@@ -28,7 +28,7 @@ interface CartRepository {
 
     fun addCartItem(
         cartItem: CartItem,
-        callback: () -> Unit,
+        callback: (Long) -> Unit,
     )
 
     fun increaseCartItem(

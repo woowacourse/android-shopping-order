@@ -59,24 +59,23 @@ class CartRepositoryImpl(
             }
         } else {
             val request = CartItemRequest(productId, quantity)
-            cartItemDataSource.submitCartItem(request) {
-                callback(-1L)
+            cartItemDataSource.submitCartItem(request) { cartId ->
+                callback(cartId)
             }
         }
     }
 
     override fun addCartItem(
         cartItem: CartItem,
-        callback: () -> Unit,
+        callback: (Long) -> Unit,
     ) {
         val item =
             CartItemRequest(
                 productId = cartItem.product.id,
                 quantity = cartItem.amount,
             )
-
-        cartItemDataSource.submitCartItem(item) {
-            callback()
+        cartItemDataSource.submitCartItem(item) { cartId ->
+            callback(cartId)
         }
     }
 

@@ -13,7 +13,7 @@
 
         <variable
             name="eventListener"
-            type="woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener" />
+            type="woowacourse.shopping.presentation.view.cart.recommendation.adapter.RecommendEventListener" />
 
     </data>
 
