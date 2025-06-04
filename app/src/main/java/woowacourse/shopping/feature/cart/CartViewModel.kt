@@ -70,16 +70,24 @@ class CartViewModel(
     }
 
     fun toggleCheck(cart: Cart) {
-        val currentList = selectedItems.value ?: emptyList()
-        if (currentList.contains(cart)) {
-            selectedItems.value = currentList.minus(cart)
-            _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.minus(cart.quantity)
-            _checkedItemsPrice.value = _checkedItemsPrice.value?.minus(cart.product.price * cart.quantity)
-        } else {
-            selectedItems.value = currentList.plus(cart)
-            _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.plus(cart.quantity)
-            _checkedItemsPrice.value = _checkedItemsPrice.value?.plus(cart.product.price * cart.quantity)
-        }
+        val updatedList =
+            _carts.value?.map {
+                if (it.id == cart.id) it.copy(isChecked = !it.isChecked) else it
+            } ?: return
+        _carts.value = updatedList
+        updateCheckedSummary(updatedList)
+    }
+
+    fun selectAllCarts() {
+        val updatedList = _carts.value?.map { it.copy(isChecked = true) } ?: return
+        _carts.value = updatedList
+        updateCheckedSummary(updatedList)
+    }
+
+    fun unselectAllCarts() {
+        val updatedList = _carts.value?.map { it.copy(isChecked = false) } ?: return
+        _carts.value = updatedList
+        updateCheckedSummary(updatedList)
     }
 
     fun updatePageButtonStates(
@@ -159,6 +167,12 @@ class CartViewModel(
                     }
             }
         }
+    }
+
+    private fun updateCheckedSummary(updatedList: List<Cart>) {
+        val checked = updatedList.filter { it.isChecked }
+        _totalCheckedItemsCount.value = checked.sumOf { it.quantity }
+        _checkedItemsPrice.value = checked.sumOf { it.product.price * it.quantity }
     }
 
     private fun fetchTotalItemsCount() {

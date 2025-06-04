@@ -48,6 +48,14 @@ class CartProductFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
+
+        binding.cbAllItemsCheck.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.selectAllCarts()
+            } else {
+                viewModel.unselectAllCarts()
+            }
+        }
     }
 
     private fun setupAdapter() {
