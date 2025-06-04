@@ -5,5 +5,5 @@ import woowacourse.shopping.data.model.response.CouponResponse
 
 interface CouponApi {
     @GET("/coupons")
-    fun getCoupon(): List<CouponResponse>
+    suspend fun getCoupons(): List<CouponResponse>
 }

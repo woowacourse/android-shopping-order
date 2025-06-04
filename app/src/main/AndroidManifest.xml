@@ -35,5 +35,4 @@
             android:name=".ui.payment.PaymentActivity"
             android:exported="false" />
     </application>
-
 </manifest>

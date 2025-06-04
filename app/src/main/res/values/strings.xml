@@ -27,4 +27,6 @@
     <string name="cart_recommend_title">이런 상품은 어떠세요?</string>
     <string name="cart_recommend_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="cart_order_success">성공적으로 주문이 완료되었습니다!</string>
+    <string name="payment_coupon_expiration">만료일: %d년 %d월 %d일</string>
+    <string name="payment_coupon_minimum_purchase">최소 주문 금액: %,d원</string>
 </resources>

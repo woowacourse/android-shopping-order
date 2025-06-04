@@ -2,6 +2,11 @@ package woowacourse.shopping.data.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponCodeType
+import woowacourse.shopping.domain.model.CouponDiscountType
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Serializable
 data class CouponResponse(
@@ -33,4 +38,27 @@ data class CouponResponse(
         @SerialName("end")
         val end: String,
     )
+
+    companion object {
+        fun CouponResponse.toDomain(): Coupon? {
+            return Coupon(
+                id = id,
+                code = CouponCodeType.from(code) ?: return null,
+                name = description,
+                expirationDate = LocalDate.parse(expirationDate),
+                discount = discount,
+                minimumPurchase = minimumAmount,
+                discountType = CouponDiscountType.from(discountType) ?: return null,
+                buyQuantity = buyQuantity,
+                getQuantity = getQuantity,
+                availableTime =
+                    availableTime?.let {
+                        Coupon.AvailableTime(
+                            start = LocalTime.parse(it.start),
+                            end = LocalTime.parse(it.end),
+                        )
+                    },
+            )
+        }
+    }
 }

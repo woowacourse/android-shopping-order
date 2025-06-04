@@ -1,6 +1,7 @@
 package woowacourse.shopping.di
 
 import woowacourse.shopping.di.RepositoryModule.cartRepository
+import woowacourse.shopping.di.RepositoryModule.couponRepository
 import woowacourse.shopping.di.RepositoryModule.historyRepository
 import woowacourse.shopping.di.RepositoryModule.orderRepository
 import woowacourse.shopping.di.RepositoryModule.productRepository
@@ -12,6 +13,7 @@ import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
+import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
@@ -74,5 +76,8 @@ object UseCaseModule {
 
     val orderProductsUseCase by lazy {
         OrderProductsUseCase(productRepository, cartRepository, orderRepository)
+    }
+    val getCouponsUseCase by lazy {
+        GetCouponsUseCase(couponRepository)
     }
 }

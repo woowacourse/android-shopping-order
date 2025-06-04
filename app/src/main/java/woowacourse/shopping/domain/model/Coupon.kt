@@ -5,15 +5,16 @@ import java.time.LocalTime
 
 data class Coupon(
     val id: Int,
-    val code: CouponType,
+    val code: CouponCodeType,
     val name: String,
     val expirationDate: LocalDate,
     val discount: Int?,
-    val minimumAmount: Int?,
-    val discountType: String,
+    val minimumPurchase: Int?,
+    val discountType: CouponDiscountType,
     val buyQuantity: Int?,
     val getQuantity: Int?,
     val availableTime: AvailableTime?,
+    val isSelected: Boolean = false,
 ) {
     data class AvailableTime(
         val start: LocalTime,

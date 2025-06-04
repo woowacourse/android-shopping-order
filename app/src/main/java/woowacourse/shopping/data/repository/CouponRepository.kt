@@ -1,14 +1,15 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.api.CouponApi
-import woowacourse.shopping.data.model.entity.HistoryProductEntity.Companion.toDomain
+import woowacourse.shopping.data.model.response.CouponResponse.Companion.toDomain
+import woowacourse.shopping.domain.model.Coupons
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepository(
     private val api: CouponApi,
 ) : CouponRepository {
-    override suspend fun fetchAllCopuons(): Result<List<Coupon>> =
+    override suspend fun fetchAllCoupons(): Result<Coupons> =
         runCatching {
-            dao.getHistoryProducts().map { it.toDomain() }
+            Coupons(api.getCoupons().mapNotNull { it.toDomain() })
         }
 }

@@ -10,9 +10,6 @@ enum class CouponDiscountType(
     ;
 
     companion object {
-        fun from(code: String): CouponDiscountType =
-            entries.find {
-                it.code == code
-            } ?: throw IllegalArgumentException("[CouponDiscountType] 알 수 없는 코드")
+        fun from(type: String): CouponDiscountType? = entries.find { it.code == type }
     }
 }
