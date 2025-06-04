@@ -8,3 +8,10 @@ fun Context.showToast(
 ) {
     android.widget.Toast.makeText(this, message, duration).show()
 }
+
+fun Context.showToast(
+    messageResourceId: Int,
+    duration: Int = android.widget.Toast.LENGTH_SHORT,
+) {
+    android.widget.Toast.makeText(this, messageResourceId, duration).show()
+}
