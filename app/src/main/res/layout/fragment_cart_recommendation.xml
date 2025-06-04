@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textView_cart_recommendation_title"
+            style="@style/CartStyleRecommendationTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="이런 상품은 어떠세요?"
+            app:layout_constraintBottom_toTopOf="@id/textView_cart_recommendation_subtitle"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_cart_recommendation_subtitle"
+            style="@style/CartStyleRecommendationSubTitleStyle"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
+            app:layout_constraintBottom_toTopOf="@id/RecyclerView_cart_recommendation"
+            app:layout_constraintStart_toStartOf="@id/textView_cart_recommendation_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/RecyclerView_cart_recommendation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/product_item" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
