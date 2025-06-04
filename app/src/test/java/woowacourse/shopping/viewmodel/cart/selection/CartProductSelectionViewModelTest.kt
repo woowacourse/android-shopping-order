@@ -208,6 +208,7 @@ class CartProductSelectionViewModelTest {
     fun `전체 상품이 담긴 상태에서 상품 전체 선택 시 선택된 상품에서 제거된다`() {
         // given
         viewModel.onSelectAllItems()
+        viewModel.isSelectedAll.getOrAwaitValue()
 
         // when
         viewModel.onSelectAllItems()

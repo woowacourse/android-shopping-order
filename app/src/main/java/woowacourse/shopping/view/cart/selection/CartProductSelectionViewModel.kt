@@ -25,9 +25,15 @@ class CartProductSelectionViewModel(
         selectedProducts.map { products ->
             products.sumOf { it.totalPrice }
         }
+
     val totalCount: LiveData<Int> =
         selectedProducts.map { products ->
             products.sumOf { it.quantity }
+        }
+
+    val isSelectedAll: LiveData<Boolean> =
+        _products.map { products ->
+            products.all { it.isSelected } && products.isNotEmpty()
         }
 
     private val _page = MutableLiveData(FIRST_PAGE_NUMBER)
@@ -41,9 +47,6 @@ class CartProductSelectionViewModel(
 
     private val _isSinglePage = MutableLiveData(true)
     val isSinglePage: LiveData<Boolean> get() = _isSinglePage
-
-    private val _isSelectedAll = MutableLiveData(false)
-    val isSelectedAll: LiveData<Boolean> get() = _isSelectedAll
 
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
@@ -98,7 +101,8 @@ class CartProductSelectionViewModel(
                     loadPage(_page.value ?: FIRST_PAGE_NUMBER)
                     val currentSelected = selectedProducts.value.orEmpty()
                     if (item in currentSelected) {
-                        val newItem = item.copy(quantity = cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD)
+                        val newItem =
+                            item.copy(quantity = cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD)
                         selectedProducts.value = currentSelected - item + newItem
                     }
                 }.onFailure {
@@ -126,7 +130,8 @@ class CartProductSelectionViewModel(
                     loadPage(_page.value ?: FIRST_PAGE_NUMBER)
                     val currentSelected = selectedProducts.value.orEmpty()
                     if (item in currentSelected) {
-                        val newItem = item.copy(quantity = cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD)
+                        val newItem =
+                            item.copy(quantity = cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD)
                         selectedProducts.value = currentSelected - item + newItem
                     }
                 }.onFailure {
@@ -151,20 +156,20 @@ class CartProductSelectionViewModel(
                     it
                 }
             }
-        updateIsSelectedAll()
     }
 
     override fun onSelectAllItems() {
         val currentProducts = _products.value.orEmpty()
         val currentSelected = selectedProducts.value.orEmpty()
-        val isSelectedAll = isSelectedAll.value ?: false
-        if (isSelectedAll) {
-            selectedProducts.value = currentSelected - currentProducts.map { it.cartProduct }.toSet()
+        val isAllSelected = isSelectedAll.value == true
+        if (isAllSelected == true) {
+            selectedProducts.value =
+                currentSelected - currentProducts.map { it.cartProduct }.toSet()
         } else {
-            selectedProducts.value = currentSelected + currentProducts.map { it.cartProduct }.toSet()
+            selectedProducts.value =
+                currentSelected + currentProducts.map { it.cartProduct }.toSet()
         }
-        val updatedProducts = currentProducts.map { it.copy(isSelected = !isSelectedAll) }
-        _isSelectedAll.value = !isSelectedAll
+        val updatedProducts = currentProducts.map { it.copy(isSelected = !isAllSelected) }
         _products.value = updatedProducts
     }
 
@@ -184,16 +189,10 @@ class CartProductSelectionViewModel(
                         )
                     val hasNext = pagedResult.hasNext
                     updatePageState(page, hasNext)
-                    updateIsSelectedAll()
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
-    }
-
-    private fun updateIsSelectedAll() {
-        val isAllSelected = products.value?.all { it.isSelected } ?: false
-        _isSelectedAll.value = isAllSelected
     }
 
     private fun updatePageState(
