@@ -44,10 +44,6 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
             saveState?.let { navigateToCatalog() }
         }
 
-        viewModel.amount.observe(viewLifecycleOwner) { amount ->
-            binding.detailItemCounter.textViewDetailAmount.text = amount.toString()
-        }
-
         viewModel.product.observe(viewLifecycleOwner) { productUiModel ->
             binding.product = productUiModel
         }
