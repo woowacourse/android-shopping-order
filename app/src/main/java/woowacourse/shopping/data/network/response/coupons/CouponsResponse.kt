@@ -6,6 +6,7 @@ import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeshippingCoupon
 import woowacourse.shopping.domain.coupon.MiracleSaleCoupon
+import java.time.LocalDate
 
 @Serializable
 data class CouponsResponse(
@@ -31,12 +32,13 @@ data class CouponsResponse(
                     code = code,
                     description = description,
                     discountType = discountType,
+                    expirationDate = LocalDate.parse(expirationDate),
                     minimumAmount = minimumAmount,
                     discount = discount,
                 )
             }
 
-            "FREESHIP" -> {
+            "FREESHIPPING" -> {
                 requireNotNull(minimumAmount) { ERROR_FREESHIP_MINIMUM_NULL }
 
                 FreeshippingCoupon(
@@ -44,6 +46,7 @@ data class CouponsResponse(
                     code = code,
                     description = description,
                     discountType = discountType,
+                    expirationDate = LocalDate.parse(expirationDate),
                     minimumAmount = minimumAmount,
                 )
             }
@@ -58,6 +61,7 @@ data class CouponsResponse(
                     description = description,
                     discountType = discountType,
                     buyQuantity = buyQuantity,
+                    expirationDate = LocalDate.parse(expirationDate),
                     getQuantity = getQuantity,
                 )
             }
@@ -70,11 +74,12 @@ data class CouponsResponse(
                     code = code,
                     description = description,
                     discountType = discountType,
+                    expirationDate = LocalDate.parse(expirationDate),
                     availableTime = time.toDomain(),
                 )
             }
 
-            else -> throw IllegalArgumentException(ERROR_INVALID_CODE)
+            else -> throw IllegalArgumentException(ERROR_INVALID_CODE + code)
         }
     }
 
