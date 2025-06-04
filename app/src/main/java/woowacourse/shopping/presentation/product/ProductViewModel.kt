@@ -42,19 +42,26 @@ class ProductViewModel(
     }
 
     fun fetchData(currentPage: Int = FIRST_PAGE) {
-        _uiState.value = ResultState.Loading
+        viewModelScope.launch {
+            _uiState.value = ResultState.Loading
 
-        productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) { result ->
-            result
+            productRepository
+                .fetchPagingProducts(currentPage, PAGE_SIZE)
                 .onSuccess { cartItems ->
-                    this.currentPage = currentPage
                     _products.postValue(cartItems)
                     _uiState.value = ResultState.Success(Unit)
+                }.onFailure { throwable ->
+                    _uiState.postValue(ResultState.Failure(throwable))
+                }
+
+            recentProductRepository
+                .getRecentProducts()
+                .onSuccess { recentProducts ->
+                    _recentProducts.postValue(recentProducts)
                 }.onFailure {
-                    _uiState.postValue(ResultState.Failure(it))
+                    _toastMessage.postValue(R.string.recommend_toast_recent_load_fail)
                 }
         }
-        fetchRecentData()
     }
 
     fun fetchCartItemCount() {
@@ -70,18 +77,17 @@ class ProductViewModel(
 
     fun loadMore() {
         this.currentPage++
-        productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) { result ->
-            result.fold(
-                onSuccess = { newItems ->
+        viewModelScope.launch {
+            productRepository
+                .fetchPagingProducts(currentPage, PAGE_SIZE)
+                .onSuccess { newItems ->
                     val currentList = _products.value.orEmpty()
                     val updatedList = currentList + newItems
                     _products.postValue(updatedList)
                     _showLoadMore.postValue(updatedList.size < 100)
-                },
-                onFailure = {
+                }.onFailure {
                     _toastMessage.postValue(R.string.product_toast_load_failure)
-                },
-            )
+                }
         }
     }
 
@@ -117,18 +123,6 @@ class ProductViewModel(
                     fetchCartItemCount()
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_add_cart_fail
-                }
-        }
-    }
-
-    private fun fetchRecentData() {
-        viewModelScope.launch {
-            recentProductRepository
-                .getRecentProducts()
-                .onSuccess { recentProducts ->
-                    _recentProducts.postValue(recentProducts)
-                }.onFailure {
-                    _uiState.postValue(ResultState.Failure(it))
                 }
         }
     }

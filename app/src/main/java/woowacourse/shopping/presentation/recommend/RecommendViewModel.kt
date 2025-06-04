@@ -13,7 +13,6 @@ import woowacourse.shopping.presentation.Extra.KEY_SELECT_PRICE
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toDomain
-import woowacourse.shopping.presentation.model.toPresentation
 
 class RecommendViewModel(
     private val savedStateHandle: SavedStateHandle,

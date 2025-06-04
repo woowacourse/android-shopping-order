@@ -32,8 +32,9 @@ class ProductDetailViewModel(
     val toastMessage: LiveData<Int> = _toastMessage
 
     fun fetchData(productId: Long) {
-        productRepository.fetchProductById(productId) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchProductById(productId)
                 .onSuccess { product ->
                     _product.postValue(product)
                     handleRecentProduct(productId)
