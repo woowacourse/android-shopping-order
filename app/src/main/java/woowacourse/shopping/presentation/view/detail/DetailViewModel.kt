@@ -33,10 +33,8 @@ class DetailViewModel(
                 } else {
                     _product.postValue(cartItem.toProductUiModel().copy(quantity = MIN_QUANTITY))
                 }
-                productRepository.loadRecentProducts(1) { recentProducts ->
-                    if (recentProducts.isNotEmpty()) {
-                        _lastViewedProduct.postValue(recentProducts.first().toProductUiModel())
-                    }
+                productRepository.getMostRecentProduct { recentProduct ->
+                    _lastViewedProduct.postValue(recentProduct?.toProductUiModel())
                     if (product != null) productRepository.addRecentProduct(product)
                 }
             }
