@@ -27,6 +27,7 @@ class CartFragment :
         (requireActivity() as CartActivity).sharedViewModelFactory
     }
 
+
     private val cartAdapter: CartAdapter by lazy {
         CartAdapter(
             cartClickListener = this,

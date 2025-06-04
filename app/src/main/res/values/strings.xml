@@ -35,5 +35,15 @@
     <string name="recommend_item_title">이런 상품은 어떠세요?</string>
     <string name="recomment_item_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
 
+    <!-- Toast Error Message -->
+    <string name="toast_fail_login">로그인에 실패하였습니다.</string>
+    <string name="toast_fail_cart_load">카트 아이템을 불러오는 데에 실패했습니다.</string>
+    <string name="toast_fail_cart_add">카트 아이템 추가에 실패했습니다.</string>
+    <string name="toast_fail_cart_update">카트 수량 변경에 실패했습니다.</string>
+    <string name="toast_fail_cart_delete">카트 아이템 삭제에 실패했습니다.</string>
+    <string name="toast_fail_increase">수량 증가에 실패했습니다.</string>
+    <string name="toast_fail_decrease">수량 감소에 실패했습니다.</string>
+    <string name="toast_fail_delete">카트 아이템 삭제에 실패했습니다.</string>
+    <string name="toast_fail_select_all">전체 선택에 실패했습니다.</string>
 
 </resources>

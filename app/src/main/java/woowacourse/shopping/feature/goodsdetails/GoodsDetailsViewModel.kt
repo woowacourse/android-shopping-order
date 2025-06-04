@@ -1,10 +1,8 @@
 package woowacourse.shopping.feature.goodsdetails
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
@@ -16,94 +14,90 @@ import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
 
+sealed class UiEvent {
+    data class ShowToast(val messageKey: ToastMessageKey) : UiEvent()
+    data class CartAddSuccess(val quantity: Int) : UiEvent()
+    data class ShowMostRecentlyViewed(val goods: Goods) : UiEvent()
+    data object ClickMostRecentlyViewed : UiEvent()
+}
+
+enum class ToastMessageKey {
+    FAIL_CART_ADD,
+    FAIL_CART_UPDATE
+}
+
 class GoodsDetailsViewModel(
     private val goodsUiModel: GoodsUiModel,
     private val cartUiModel: CartUiModel?,
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
+
     private val _cartItem: MutableLiveData<CartItem> =
         MutableLiveData(CartItem(goodsUiModel.toDomain(), 1))
     val cartItem: LiveData<CartItem> get() = _cartItem
 
-    private val _alertEvent = MutableSingleLiveData<GoodsDetailsAlertMessage>()
-    val alertEvent: SingleLiveData<GoodsDetailsAlertMessage> = _alertEvent
+    private val _event = MutableSingleLiveData<UiEvent>()
+    val event: SingleLiveData<UiEvent> get() = _event
 
-    private val _mostRecentlyViewedGoods: MutableLiveData<Goods?> = MutableLiveData(null)
-    val mostRecentlyViewedGoods: LiveData<Goods?> get() = _mostRecentlyViewedGoods
-
-    private val _clickMostRecentlyGoodsEvent = MutableSingleLiveData<Goods>()
-    val clickMostRecentlyGoodsEvent: SingleLiveData<Goods> get() = _clickMostRecentlyGoodsEvent
-
-    private val _toastMessage = MutableSingleLiveData<String>()
-    val toastMessage: SingleLiveData<String> get() = _toastMessage
+    private val _mostRecentlyViewedGoods = MutableLiveData<Goods>()
+    val mostRecentlyViewedGoods: LiveData<Goods> get() = _mostRecentlyViewedGoods
 
     fun initMostRecentlyViewedGoods() {
         goodsRepository.fetchMostRecentGoods { goods ->
             goods?.let {
-                if (goodsUiModel.id != goods.id) _mostRecentlyViewedGoods.postValue(it)
+                if (goodsUiModel.id != goods.id) {
+                    _event.setValue(UiEvent.ShowMostRecentlyViewed(it))
+                }
             }
             loggingRecentViewedGoods(goodsUiModel.toDomain())
         }
     }
 
     fun increaseSelectorQuantity() {
-        _cartItem.value?.let { currentItem ->
-            _cartItem.value = currentItem.copy(quantity = currentItem.quantity + 1)
+        _cartItem.value?.let {
+            _cartItem.value = it.copy(quantity = it.quantity + 1)
         }
     }
 
     fun decreaseSelectorQuantity() {
-        _cartItem.value?.let { currentItem ->
-            if (currentItem.quantity > 1) {
-                _cartItem.value = currentItem.copy(quantity = currentItem.quantity - 1)
+        _cartItem.value?.let {
+            if (it.quantity > 1) {
+                _cartItem.value = it.copy(quantity = it.quantity - 1)
             }
         }
     }
 
     fun addToCart() {
         cartItem.value?.let { item ->
-
             if (cartUiModel != null) {
                 cartRepository.updateQuantity(
                     cartUiModel.cartId,
                     CartQuantity(cartUiModel.cartQuantity + item.quantity),
-                    { addedCart(item.quantity) },
-                    { _toastMessage.postValue(TOAST_FAIL_CART_UPDATE) },
+                    { onCartAdded(item.quantity) },
+                    { _event.setValue(UiEvent.ShowToast(ToastMessageKey.FAIL_CART_UPDATE)) },
                 )
             } else {
                 cartRepository.addCartItem(
                     item.goods,
                     item.quantity,
-                    { addedCart(item.quantity) },
-                    { _toastMessage.postValue(TOAST_FAIL_CART_ADD) },
+                    { onCartAdded(item.quantity) },
+                    { _event.setValue(UiEvent.ShowToast(ToastMessageKey.FAIL_CART_ADD)) },
                 )
             }
         }
     }
 
-    private fun addedCart(quantity: Int) {
-        _alertEvent.setValue(
-            GoodsDetailsAlertMessage(
-                R.string.goods_detail_cart_insert_complete_toast_message,
-                quantity,
-            ),
-        )
+    private fun onCartAdded(quantity: Int) {
+        _event.setValue(UiEvent.CartAddSuccess(quantity))
         _cartItem.value = _cartItem.value?.copy(quantity = 1)
     }
 
     fun onClickMostRecentlyGoodsSection() {
-        _mostRecentlyViewedGoods.value?.let {
-            _clickMostRecentlyGoodsEvent.setValue(it)
-        }
+        _event.setValue(UiEvent.ClickMostRecentlyViewed)
     }
 
     fun loggingRecentViewedGoods(goods: Goods) {
         goodsRepository.loggingRecentGoods(goods) {}
-    }
-
-    companion object {
-        private const val TOAST_FAIL_CART_ADD = "카트 아이템 추가에 실패했습니다."
-        private const val TOAST_FAIL_CART_UPDATE = "카트 수량 변경에 실패했습니다."
     }
 }

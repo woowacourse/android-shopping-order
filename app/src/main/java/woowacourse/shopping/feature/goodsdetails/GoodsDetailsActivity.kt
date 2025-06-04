@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
@@ -26,6 +25,7 @@ import woowacourse.shopping.util.toUi
 class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
 
     private lateinit var viewModel: GoodsDetailsViewModel
+    private var mostRecentGoods: GoodsUiModel? = null
 
     override fun inflateBinding(): ActivityGoodsDetailsBinding =
         ActivityGoodsDetailsBinding.inflate(layoutInflater)
@@ -40,6 +40,7 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
             finish()
             return
         }
+
         val cartUiModel =
             IntentCompat.getParcelableExtra(intent, CART_KEY, CartUiModel::class.java)
 
@@ -65,23 +66,46 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
             }
         }
 
-        viewModel.alertEvent.observe(this) { goodsDetailsAlertMessage ->
-            Toast.makeText(
-                this,
-                getString(goodsDetailsAlertMessage.resourceId, goodsDetailsAlertMessage.quantity),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        observeUiEvent()
+    }
 
-        viewModel.clickMostRecentlyGoodsEvent.observe(this) { mostRecentGoods ->
-            val intent = newIntent(this, mostRecentGoods.toUi()).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra(EXTRA_SOURCE, SOURCE_RECENTLY_VIEWED)
+    private fun observeUiEvent() {
+        viewModel.event.observe(this) { event ->
+            when (event) {
+                is UiEvent.ShowToast -> {
+                    val message = when (event.messageKey) {
+                        ToastMessageKey.FAIL_CART_ADD -> getString(R.string.toast_fail_cart_add)
+                        ToastMessageKey.FAIL_CART_UPDATE -> getString(R.string.toast_fail_cart_update)
+                    }
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+
+                is UiEvent.CartAddSuccess -> {
+                    val message = getString(
+                        R.string.goods_detail_cart_insert_complete_toast_message,
+                        event.quantity
+                    )
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+
+                is UiEvent.ShowMostRecentlyViewed -> {
+                    mostRecentGoods = event.goods.toUi()
+                }
+
+                is UiEvent.ClickMostRecentlyViewed -> {
+                    mostRecentGoods?.let {
+                        val intent = newIntent(this, it).apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            putExtra(EXTRA_SOURCE, SOURCE_RECENTLY_VIEWED)
+                        }
+                        startActivity(intent)
+                    }
+                }
             }
-            startActivity(intent)
         }
-
-        observeToast(viewModel.toastMessage)
+        viewModel.mostRecentlyViewedGoods.observe(this) { goods ->
+            mostRecentGoods = goods.toUi()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

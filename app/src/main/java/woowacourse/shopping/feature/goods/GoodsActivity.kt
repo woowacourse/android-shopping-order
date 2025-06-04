@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.component1
 import androidx.core.util.component2
 import androidx.recyclerview.widget.ConcatAdapter
@@ -37,6 +36,7 @@ import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.
 import woowacourse.shopping.feature.login.LoginActivity
 import woowacourse.shopping.feature.toUiModel
 import woowacourse.shopping.util.toUi
+
 class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
 
     private val viewModel: GoodsViewModel by viewModels {
@@ -102,13 +102,7 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
             GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING)
         )
 
-        viewModel.uiEvent.observe(this) { event ->
-            when (event) {
-                is GoodsUiEvent.ShowToast -> Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show()
-                is GoodsUiEvent.NavigateToLogin -> startActivity(Intent(this, LoginActivity::class.java))
-                is GoodsUiEvent.NavigateToCart -> startActivity(CartActivity.newIntent(this))
-            }
-        }
+        observeUiEvent()
 
         viewModel.goodsWithCartQuantity.observe(this) {
             viewModel.fetchAndSetCartCache()
@@ -126,6 +120,27 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
                 if (!concatAdapter.adapters.contains(goodsSkeletonAdapter)) {
                     concatAdapter.addAdapter(1, goodsSkeletonAdapter)
                 }
+            }
+        }
+
+    }
+
+    private fun observeUiEvent() {
+        viewModel.uiEvent.observe(this) { event ->
+            when (event) {
+                is GoodsUiEvent.ShowToast -> {
+                    val message = when (event.messageKey) {
+                        ToastMessageKey.FAIL_LOGIN -> getString(R.string.toast_fail_login)
+                        ToastMessageKey.FAIL_CART_LOAD -> getString(R.string.toast_fail_cart_load)
+                        ToastMessageKey.FAIL_CART_ADD -> getString(R.string.toast_fail_cart_add)
+                        ToastMessageKey.FAIL_CART_UPDATE -> getString(R.string.toast_fail_cart_update)
+                        ToastMessageKey.FAIL_CART_DELETE -> getString(R.string.toast_fail_cart_delete)
+                    }
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+
+                is GoodsUiEvent.NavigateToLogin -> startActivity(Intent(this, LoginActivity::class.java))
+                is GoodsUiEvent.NavigateToCart -> startActivity(CartActivity.newIntent(this))
             }
         }
     }
@@ -166,11 +181,6 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
         val intent = GoodsDetailsActivity.newIntent(this, goods.toUi())
         intent.putExtra(EXTRA_SOURCE, SOURCE_GOODS_LIST)
         intent.putExtra(CART_KEY, viewModel.findCart(goods)?.toUiModel())
-        startActivity(intent)
-    }
-
-    private fun navigateGoodsLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }
 
