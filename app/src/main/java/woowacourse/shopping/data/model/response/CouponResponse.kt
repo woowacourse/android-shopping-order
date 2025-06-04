@@ -6,19 +6,25 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CouponResponse(
     @SerialName("id")
-    val id: Long,
+    val id: Int,
     @SerialName("code")
     val code: String,
     @SerialName("description")
     val description: String,
     @SerialName("expirationDate")
     val expirationDate: String,
+    @SerialName("discount")
+    val discount: Int?,
+    @SerialName("minimumAmount")
+    val minimumAmount: Int?,
     @SerialName("discountType")
     val discountType: String,
-    @SerialName("discount")
-    val discount: Int,
+    @SerialName("buyQuantity")
+    val buyQuantity: Int?,
+    @SerialName("getQuantity")
+    val getQuantity: Int?,
     @SerialName("availableTime")
-    val availableTime: AvailableTime,
+    val availableTime: AvailableTime?,
 ) {
     @Serializable
     data class AvailableTime(

@@ -39,7 +39,7 @@
             app:layout_constraintTop_toTopOf="@id/paymentCouponSelection" />
 
         <TextView
-            android:id="@+id/paymentCouponDeadline"
+            android:id="@+id/paymentCouponExpiration"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -65,8 +65,8 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/paymentCouponDeadline"
-            app:layout_constraintTop_toBottomOf="@id/paymentCouponDeadline"
+            app:layout_constraintStart_toStartOf="@id/paymentCouponExpiration"
+            app:layout_constraintTop_toBottomOf="@id/paymentCouponExpiration"
             tools:text="최소 주문 금액: 1,000,000원" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
