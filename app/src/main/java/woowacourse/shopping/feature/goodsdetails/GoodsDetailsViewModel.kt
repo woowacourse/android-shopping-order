@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.goodsdetails
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
@@ -29,14 +30,18 @@ class GoodsDetailsViewModel(
     private val _lastViewed = MutableLiveData<History>()
     val lastViewed: LiveData<History> get() = _lastViewed
 
-    private val _isLastViewedVisible = MutableLiveData<Boolean>()
-    val isLastViewedVisible: LiveData<Boolean> get() = _isLastViewedVisible
-
     private val _insertState = MutableLiveData<Event<State>>()
     val insertState: LiveData<Event<State>> get() = _insertState
 
     private val _navigateToLastViewedCart = MutableSingleLiveData<History>()
     val navigateToLastViewedCart: SingleLiveData<History> get() = _navigateToLastViewedCart
+
+    private val _shouldShowLastViewed = MediatorLiveData<Boolean>()
+    val shouldShowLastViewed: LiveData<Boolean> get() = _shouldShowLastViewed
+
+    init {
+        _shouldShowLastViewed.addSource(cartProduct) { updateLastViewedVisibility() }
+    }
 
     fun setInitialCart(id: Long) {
         loadProductDetails(productId = id)
@@ -131,22 +136,21 @@ class GoodsDetailsViewModel(
         }
     }
 
-    fun updateLastViewedVisibility() {
-        val lastName = _lastViewed.value?.name
-        val currentName = cartProduct.value?.product?.name
-        _isLastViewedVisible.postValue(lastName != null && currentName != null && lastName != currentName)
-    }
-
     fun loadLastViewed() {
         historyRepository.findLatest { lastViewed ->
             _lastViewed.postValue(lastViewed)
-            updateLastViewedVisibility()
         }
     }
 
     fun emitLastViewedCart() {
         val history = _lastViewed.value
         if (history != null) _navigateToLastViewedCart.postValue(history)
+    }
+
+    private fun updateLastViewedVisibility() {
+        val history = lastViewed.value
+        val currentCart = cartProduct.value
+        _shouldShowLastViewed.value = history != null && history.name != currentCart?.product?.name
     }
 
     private fun updateCart(updatedCart: CartProduct?) {

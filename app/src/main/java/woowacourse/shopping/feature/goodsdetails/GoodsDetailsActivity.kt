@@ -35,10 +35,6 @@ class GoodsDetailsActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        viewModel.lastViewed.observe(this) {
-            viewModel.updateLastViewedVisibility()
-        }
-
         sendHistoryResult()
         setOnClickListener()
         setupObservers()

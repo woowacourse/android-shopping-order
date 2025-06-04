@@ -75,13 +75,14 @@
             android:id="@+id/custom_last_viewed"
             android:layout_width="0dp"
             android:layout_height="80dp"
-            android:layout_marginTop="36dp"
             android:layout_marginHorizontal="18dp"
-            app:name="@{String.valueOf(viewModel.lastViewed.name)}"
-            app:visible="@{viewModel.isLastViewedVisible}"
-            app:layout_constraintTop_toBottomOf="@id/tv_goods_details_price"
+            android:layout_marginTop="36dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.542"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_goods_details_price"
+            app:name="@{String.valueOf(viewModel.lastViewed.name)}"
+            app:visible="@{viewModel.shouldShowLastViewed}" />
 
         <TextView
             android:id="@+id/tv_add_cart_button"
