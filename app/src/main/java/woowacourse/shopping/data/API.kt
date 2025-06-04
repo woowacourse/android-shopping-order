@@ -13,6 +13,7 @@ object API {
     private val client: OkHttpClient =
         OkHttpClient
             .Builder()
+            .addInterceptor(AuthInterceptor())
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY

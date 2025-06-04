@@ -9,6 +9,14 @@ class CartApplication : Application() {
         super.onCreate()
 
         LocalRecentViewedProductsDataSource.init(this)
-        AuthStorage.init(this)
+        instance = this
+        authStorage = AuthStorage(this)
+    }
+
+    companion object {
+        private lateinit var instance: CartApplication
+
+        lateinit var authStorage: AuthStorage
+            private set
     }
 }
