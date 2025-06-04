@@ -23,20 +23,28 @@ class CartViewModel(
 
     private val _showPageButton = MutableLiveData(false)
     val showPageButton: LiveData<Boolean> get() = _showPageButton
+
     private val _isLeftPageEnable = MutableLiveData(false)
     val isLeftPageEnable: LiveData<Boolean> get() = _isLeftPageEnable
+
     private val _isRightPageEnable = MutableLiveData(false)
     val isRightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
+
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
+
     private val _carts = MutableLiveData<List<Cart>>()
     val carts: LiveData<List<Cart>> get() = _carts
+
     private val _totalCheckedItemsCount = MutableLiveData(0)
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
+
     private val _checkedItemsPrice = MutableLiveData(0)
     val checkedItemsPrice: LiveData<Int> get() = _checkedItemsPrice
+
     private val _isLoading = MutableLiveData<Boolean>(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
+
     private val _recommendItems = MutableLiveData<List<Cart>>()
     val recommendItems: LiveData<List<Cart>> get() = _recommendItems
 
@@ -97,13 +105,7 @@ class CartViewModel(
             result
                 .onSuccess {
                     val updatedList =
-                        _carts.value?.map {
-                            if (it.product.id == cart.product.id) {
-                                it.updateQuantity(it.quantity - 1)
-                            } else {
-                                it
-                            }
-                        } ?: emptyList()
+                        _carts.value?.filter { it.id != cart.id } ?: emptyList()
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
                 }.onFailure { error ->
