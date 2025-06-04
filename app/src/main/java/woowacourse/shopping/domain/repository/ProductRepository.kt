@@ -1,13 +1,11 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 
 interface ProductRepository {
-    fun loadProduct(
-        productId: Long,
-        callback: (Result<Product>) -> Unit,
-    )
+    suspend fun loadProduct(productId: Long): NetworkResult<Product>
 
     fun loadSinglePage(
         category: String? = null,

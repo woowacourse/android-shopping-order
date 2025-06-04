@@ -25,7 +25,7 @@ class AppContainer(
 
     private val historyDao = db.historyDao()
 
-    private val historyDataSource = DefaultHistoryDataSource(historyDao)
+    private val defaultHistoryDataSource = DefaultHistoryDataSource(historyDao)
 
     private val productService: ProductService = RetrofitProvider.productService
 
@@ -38,7 +38,7 @@ class AppContainer(
     val productRepository: ProductRepository =
         DefaultProductRepository(productsDataSource)
 
-    val historyRepository: HistoryRepository = DefaultHistoryRepository(historyDataSource)
+    val historyRepository: HistoryRepository = DefaultHistoryRepository(defaultHistoryDataSource)
 
     val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
 

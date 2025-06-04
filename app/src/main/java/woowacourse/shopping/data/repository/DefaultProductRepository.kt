@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -17,10 +18,7 @@ class DefaultProductRepository(
         productDataSource.singlePage(category, page, pageSize) { callback(it) }
     }
 
-    override fun loadProduct(
-        productId: Long,
-        callback: (Result<Product>) -> Unit,
-    ) {
-        productDataSource.getProduct(productId) { callback(it) }
+    override suspend fun loadProduct(productId: Long): NetworkResult<Product> {
+        return productDataSource.getProduct(productId)
     }
 }

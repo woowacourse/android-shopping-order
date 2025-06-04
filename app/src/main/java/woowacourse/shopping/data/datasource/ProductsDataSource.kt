@@ -8,6 +8,7 @@ import woowacourse.shopping.domain.product.ProductSinglePage
 class ProductsDataSource(
     private val service: ProductService,
     private val handler: ApiCallbackHandler,
+    private val handler: NetworkResultHandler = NetworkResultHandler(),
 ) {
     fun singlePage(
         category: String?,
@@ -16,8 +17,5 @@ class ProductsDataSource(
         callback: (Result<ProductSinglePage>) -> Unit,
     ) = handler.enqueueWithDomainTransform(service.requestProducts(category, page, size), callback)
 
-    fun getProduct(
-        productId: Long,
-        callback: (Result<Product>) -> Unit,
-    ) = handler.enqueueWithDomainTransform(service.getProduct(productId), callback)
+    suspend fun getProduct(productId: Long): NetworkResult<Product> = handler.execute { service.getProduct(productId).toDomain() }
 }

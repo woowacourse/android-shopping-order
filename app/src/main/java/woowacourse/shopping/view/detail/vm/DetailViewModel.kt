@@ -8,6 +8,9 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.exception.NetworkError
+import woowacourse.shopping.domain.exception.onFailure
+import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
@@ -36,10 +39,10 @@ class DetailViewModel(
         productId: Long,
         lastSeenProductId: Long,
     ) {
-        defaultProductRepository.loadProduct(productId) { result ->
-            result
-                .onSuccess { product -> initializeUiState(productId, lastSeenProductId, product) }
-                .onFailure(::handleFailure)
+        viewModelScope.launch {
+            defaultProductRepository.loadProduct(productId)
+                .onSuccess { initializeUiState(productId, lastSeenProductId, it) }
+                .onFailure(::handleFailure2)
         }
         saveHistory(productId)
     }
@@ -52,11 +55,7 @@ class DetailViewModel(
         if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
             loadLastSeenProduct(productId, product)
         } else {
-            _uiState.value =
-                DetailUiState(
-                    ProductState(item = product, cartQuantity = Quantity(1)),
-                    lastSeenProduct = null,
-                )
+            _uiState.value = DetailUiState(ProductState(item = product, cartQuantity = Quantity(1)))
         }
     }
 
@@ -64,18 +63,16 @@ class DetailViewModel(
         lastSeenProductId: Long,
         product: Product,
     ) {
-        defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
-            lastSeenProduct.onSuccess { lastSeenProductValue ->
-                _uiState.value =
-                    DetailUiState(
-                        ProductState(
-                            item = product,
-                            cartQuantity = Quantity(1),
-                        ),
-                        lastSeenProduct = lastSeenProductValue,
-                    )
-            }
-                .onFailure(::handleFailure)
+        viewModelScope.launch {
+            defaultProductRepository.loadProduct(lastSeenProductId)
+                .onSuccess { lastSeenProduct ->
+                    _uiState.value =
+                        DetailUiState(
+                            ProductState(item = product, cartQuantity = Quantity(1)),
+                            lastSeenProduct,
+                        )
+                }
+                .onFailure(::handleFailure2)
         }
     }
 
@@ -143,6 +140,10 @@ class DetailViewModel(
     }
 
     private fun handleFailure(throwable: Throwable) {
+        // _uiEvent.setValue(DetailUiEvent.ShowErrorMessage(throwable))
+    }
+
+    private fun handleFailure2(throwable: NetworkError) {
         _uiEvent.setValue(DetailUiEvent.ShowErrorMessage(throwable))
     }
 
