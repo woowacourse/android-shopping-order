@@ -19,9 +19,8 @@ interface CartRepository {
         callback: (Result<Unit>) -> Unit,
     )
 
-    fun loadSinglePage(
+    suspend fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage>) -> Unit,
-    )
+    ): NetworkResult<CartsSinglePage>
 }

@@ -90,8 +90,8 @@ class DetailViewModel(
         }
 
     fun saveCart(productId: Long) {
-        defaultCartRepository.loadSinglePage(null, null) { result ->
-            result
+        viewModelScope.launch {
+            defaultCartRepository.loadSinglePage(null, null)
                 .onSuccess { value ->
                     value.isSavedInCart(productId)
                         ?.let { whenProductSavedInCart(it) }

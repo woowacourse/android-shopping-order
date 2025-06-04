@@ -24,8 +24,8 @@ class NetworkResultHandler {
             }
 
             else -> {
-//                Log.e("API_ERROR", "Throwable: ${throwable::class.java.simpleName}")
-//                Log.e("API_ERROR", "message: ${throwable.message}")
+                Log.e("API_ERROR", "Throwable: ${throwable::class.java.simpleName}")
+                Log.e("API_ERROR", "message: ${throwable.message}")
             }
         }
     }

@@ -11,6 +11,7 @@ import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.CartsSinglePage
 import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CartRepository
 
@@ -41,5 +42,19 @@ class DefaultCartRepositoryTest {
             // then
             assertEquals(NetworkResult.Success(expectedId), result)
             coVerify(exactly = 1) { cartDataSource.addCart(cart.toRequest()) }
+        }
+
+    @Test
+    fun `loadPage - 첫 번째 페이지의 장바구니 상품 목록을 불러온다`() =
+        runTest {
+            val expectedPage = mockk<CartsSinglePage>()
+            val expectedResult = NetworkResult.Success(expectedPage)
+
+            coEvery { cartDataSource.singlePage(1, 10) } returns expectedResult
+
+            val result = repository.loadSinglePage(1, 10)
+
+            assertEquals(expectedResult, result)
+            coVerify(exactly = 1) { cartDataSource.singlePage(1, 10) }
         }
 }

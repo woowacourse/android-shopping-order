@@ -19,10 +19,10 @@ interface CartService {
     ): Response<Unit>
 
     @GET("/cart-items")
-    fun getCartSinglePage(
+    suspend fun getCartSinglePage(
         @Query("page") page: Int?,
         @Query("size") size: Int?,
-    ): Call<CartsResponse>
+    ): CartsResponse
 
     @PATCH("/cart-items/{id}")
     fun updateCart(

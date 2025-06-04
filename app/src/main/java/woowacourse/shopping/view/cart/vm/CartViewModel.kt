@@ -154,12 +154,11 @@ class CartViewModel(
     fun loadCarts() {
         toggleFetching()
         val nextPage = paging.getPageNo() - 1
-        cartRepository.loadSinglePage(
-            nextPage,
-            PAGE_SIZE,
-        ) { result ->
-
-            result
+        viewModelScope.launch {
+            cartRepository.loadSinglePage(
+                nextPage,
+                PAGE_SIZE,
+            )
                 .onSuccess { value ->
                     val pageState = paging.createPageState(!value.hasNextPage)
                     val newItems =
@@ -210,19 +209,20 @@ class CartViewModel(
 
     private fun refresh() {
         withState(_cartUiState.value) { state ->
-            cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
-                result.onSuccess { value ->
+            viewModelScope.launch {
+                cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE)
+                    .onSuccess { value ->
 
-                    if (paging.resetToLastPageIfEmpty(value.carts)) {
-                        refresh()
-                        return@loadSinglePage
+                        if (paging.resetToLastPageIfEmpty(value.carts)) {
+                            refresh()
+                            return@onSuccess
+                        }
+
+                        val pageState = paging.createPageState(!value.hasNextPage)
+                        val carts = value.carts.map { CartState(it, state.allChecked) }
+
+                        _cartUiState.value = CartUiState(items = carts, pageState = pageState)
                     }
-
-                    val pageState = paging.createPageState(!value.hasNextPage)
-                    val carts = value.carts.map { CartState(it, state.allChecked) }
-
-                    _cartUiState.value = CartUiState(items = carts, pageState = pageState)
-                }
                     .onFailure(::handleFailure)
             }
         }

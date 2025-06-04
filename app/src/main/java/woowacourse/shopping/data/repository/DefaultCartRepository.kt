@@ -11,33 +11,33 @@ import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
-    private val dataSource: CartDataSource,
+    private val cartDataSource: CartDataSource,
 ) : CartRepository {
     override suspend fun addCart(cart: Cart): NetworkResult<Long> =
         withContext(Dispatchers.IO) {
-            dataSource.addCart(cart.toRequest())
+            cartDataSource.addCart(cart.toRequest())
         }
 
-    override fun loadSinglePage(
+    override suspend fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage>) -> Unit,
-    ) {
-        dataSource.singlePage(page, pageSize) { callback(it) }
-    }
+    ): NetworkResult<CartsSinglePage> =
+        withContext(Dispatchers.IO) {
+            cartDataSource.singlePage(page, pageSize)
+        }
 
     override fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
         callback: (Result<Unit>) -> Unit,
     ) {
-        dataSource.updateCartQuantity(cartId, quantity.value) { callback(it) }
+        cartDataSource.updateCartQuantity(cartId, quantity.value) { callback(it) }
     }
 
     override fun deleteCart(
         cartId: Long,
         callback: (Result<Unit>) -> Unit,
     ) {
-        dataSource.deleteCart(cartId) { callback(it) }
+        cartDataSource.deleteCart(cartId) { callback(it) }
     }
 }

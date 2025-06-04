@@ -56,14 +56,15 @@ class MainViewModel(
 
     private fun fetchProducts(pageIndex: Int) {
         viewModelScope.launch {
-            productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE)
-                .onSuccess { productPage ->
-                    cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
-                        cartResult.onSuccess { cartPage ->
-                            applyMergedUiState(productPage, cartPage.carts)
-                        }.onFailure(::handleFailure)
-                    }
-                }.onFailure(::handleFailure2)
+            val productResult =
+                productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE)
+            val cartResult = cartRepository.loadSinglePage(pageIndex, PAGE_SIZE)
+
+            productResult.onSuccess { productPage ->
+                cartResult.onSuccess { cartPage ->
+                    applyMergedUiState(productPage, cartPage.carts)
+                }.onFailure(::handleFailure)
+            }.onFailure(::handleFailure)
         }
     }
 
@@ -144,10 +145,11 @@ class MainViewModel(
 
     fun syncCartQuantities() =
         withState(_uiState.value) {
-            cartRepository.loadSinglePage(null, null) {
-                it.onSuccess { result ->
-                    updateUiState { modifyQuantity(result.carts) }
-                }.onFailure(::handleFailure)
+            viewModelScope.launch {
+                cartRepository.loadSinglePage(null, null)
+                    .onSuccess { result ->
+                        updateUiState { modifyQuantity(result.carts) }
+                    }.onFailure(::handleFailure)
             }
         }
 
@@ -173,7 +175,7 @@ class MainViewModel(
         // _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
     }
 
-    private fun handleFailure2(throwable: NetworkError) {
+    private fun handleFailure(throwable: NetworkError) {
         _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
     }
 
