@@ -2,10 +2,9 @@ package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.dto.request.CartProductQuantityRequestDto
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
-import woowacourse.shopping.data.dto.response.toCartProduct
+import woowacourse.shopping.data.dto.response.CartProductDto
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.CartProductApiService
-import woowacourse.shopping.domain.model.CartProduct
 
 class CartProductRemoteDataSource(
     private val cartProductService: CartProductApiService,
@@ -13,13 +12,13 @@ class CartProductRemoteDataSource(
     suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-    ): Result<PagedResult<CartProduct>> {
+    ): Result<PagedResult<CartProductDto>> {
         val response = cartProductService.getPagedProducts(page = page, size = size)
 
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                val products = body.content.map { it.toCartProduct() }
+                val products = body.content
                 val hasNext = !body.last
                 Result.success(PagedResult(products, hasNext))
             } else {

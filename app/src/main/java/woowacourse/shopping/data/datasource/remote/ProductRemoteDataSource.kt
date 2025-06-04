@@ -1,20 +1,19 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.data.dto.response.toProduct
+import woowacourse.shopping.data.dto.response.ProductDto
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.ProductApiService
-import woowacourse.shopping.domain.model.Product
 
 class ProductRemoteDataSource(
     private val productService: ProductApiService,
 ) {
-    suspend fun getProductById(id: Int): Result<Product?> {
+    suspend fun getProductById(id: Int): Result<ProductDto?> {
         val response = productService.getProductById(id = id)
 
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                return Result.success(body.toProduct())
+                return Result.success(body)
             } else {
                 Result.success(null)
             }
@@ -23,8 +22,8 @@ class ProductRemoteDataSource(
         }
     }
 
-    suspend fun getProductsByIds(ids: List<Int>): Result<List<Product>?> {
-        val products = mutableListOf<Product>()
+    suspend fun getProductsByIds(ids: List<Int>): Result<List<ProductDto>?> {
+        val products = mutableListOf<ProductDto>()
         val exceptions = mutableListOf<Throwable>()
 
         ids.forEach { id ->
@@ -46,13 +45,13 @@ class ProductRemoteDataSource(
     suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-    ): Result<PagedResult<Product>> {
+    ): Result<PagedResult<ProductDto>> {
         val response = productService.getPagedProducts(page = page, size = size)
 
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                val products = body.content.map { it.toProduct() }
+                val products = body.content
                 val hasNext = body.last.not()
                 Result.success(PagedResult(products, hasNext))
             } else {

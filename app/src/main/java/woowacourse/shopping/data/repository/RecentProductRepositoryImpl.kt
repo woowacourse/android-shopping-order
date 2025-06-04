@@ -3,9 +3,10 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
+import woowacourse.shopping.data.entity.toEntity
+import woowacourse.shopping.data.entity.toRecentProduct
 import woowacourse.shopping.data.util.toLocalDateTime
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.model.toEntity
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -21,7 +22,7 @@ class RecentProductRepositoryImpl(
 
                 result.mapCatching { product ->
                     product?.let {
-                        RecentProduct(it, entity.viewedAt.toLocalDateTime())
+                        entity.toRecentProduct(it)
                     }
                 }
             } else {

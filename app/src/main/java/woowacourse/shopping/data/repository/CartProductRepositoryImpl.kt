@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
+import woowacourse.shopping.data.dto.response.toCartProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -23,7 +24,12 @@ class CartProductRepositoryImpl(
         size: Int?,
     ): Result<PagedResult<CartProduct>> =
         withContext(Dispatchers.IO) {
-            remoteDataSource.getPagedProducts(page = page, size = size)
+            remoteDataSource.getPagedProducts(page = page, size = size).mapCatching { pagedResult ->
+                PagedResult(
+                    items = pagedResult.items.map { it.toCartProduct() },
+                    hasNext = pagedResult.hasNext,
+                )
+            }
         }
 
     override suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?> =
