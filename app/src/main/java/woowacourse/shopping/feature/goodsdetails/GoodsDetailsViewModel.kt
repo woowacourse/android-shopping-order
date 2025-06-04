@@ -159,7 +159,7 @@ class GoodsDetailsViewModel(
 
     private fun insertToHistory(cart: Cart) {
         historyRepository.insert(
-            History(cart.id, cart.product.name, cart.product.imageUrl),
+            History(cart.product.id, cart.product.name, cart.product.imageUrl),
         )
     }
 }

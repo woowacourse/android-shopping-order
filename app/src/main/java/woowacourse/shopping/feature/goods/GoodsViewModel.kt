@@ -233,6 +233,7 @@ class GoodsViewModel(
     private fun loadHistories() {
         historyRepository.getAll { allHistories ->
             histories.postValue(allHistories)
+            Log.e("123451", "loadHistories = $allHistories")
             refreshItems()
         }
     }
