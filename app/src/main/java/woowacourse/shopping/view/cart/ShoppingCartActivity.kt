@@ -9,7 +9,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
 
@@ -17,13 +16,6 @@ class ShoppingCartActivity : AppCompatActivity() {
     private val binding by lazy { ActivityShoppingCartBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val application = application as ShoppingApplication
-        supportFragmentManager.fragmentFactory =
-            ShoppingCartFragmentFactory(
-                application.productRepository,
-                application.cartProductRepository,
-                application.recentProductRepository,
-            )
         super.onCreate(savedInstanceState)
         setUpView()
         supportActionBar?.title = getString(R.string.action_bar_title)

@@ -13,29 +13,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendationBinding
-import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.cart.recommendation.adapter.RecommendationAdapter
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
-class CartProductRecommendationFragment(
-    private val productRepository: ProductRepository,
-    private val cartProductRepository: CartProductRepository,
-    private val recentProductRepository: RecentProductRepository,
-) : Fragment() {
+class CartProductRecommendationFragment() : Fragment() {
     private var _binding: FragmentCartProductRecommendationBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
+        val app = requireContext().applicationContext as ShoppingApplication
         ViewModelProvider(
             this,
             CartProductRecommendationViewModelFactory(
-                productRepository,
-                cartProductRepository,
-                recentProductRepository,
+                app.productRepository,
+                app.cartProductRepository,
+                app.recentProductRepository,
             ),
         )[CartProductRecommendationViewModel::class.java]
     }

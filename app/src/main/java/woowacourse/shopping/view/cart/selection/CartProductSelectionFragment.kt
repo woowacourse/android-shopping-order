@@ -8,18 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductSelectionBinding
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
 import woowacourse.shopping.view.cart.selection.adapter.CartProductAdapter
 
-class CartProductSelectionFragment(
-    repository: CartProductRepository,
-) : Fragment() {
+class CartProductSelectionFragment() : Fragment() {
     private val viewModel by lazy {
+        val app = requireContext().applicationContext as ShoppingApplication
         ViewModelProvider(
             this,
-            CartProductSelectionViewModelFactory(repository),
+            CartProductSelectionViewModelFactory(app.cartProductRepository),
         )[CartProductSelectionViewModel::class.java]
     }
     private var _binding: FragmentCartProductSelectionBinding? = null
