@@ -26,7 +26,7 @@ class ShoppingCartActivity : AppCompatActivity() {
             )
         super.onCreate(savedInstanceState)
         setUpView()
-        supportActionBar?.title = ACTION_BAR_TITLE
+        supportActionBar?.title = getString(R.string.action_bar_title)
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
@@ -51,7 +51,5 @@ class ShoppingCartActivity : AppCompatActivity() {
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, ShoppingCartActivity::class.java)
-
-        private const val ACTION_BAR_TITLE = "Cart"
     }
 }
