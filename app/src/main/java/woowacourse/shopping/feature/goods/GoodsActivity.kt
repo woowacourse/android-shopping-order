@@ -76,13 +76,14 @@ class GoodsActivity : AppCompatActivity() {
         gridLayoutManager.spanSizeLookup = GoodsSpanSizeLookup(adapter)
         binding.rvGoods.layoutManager = gridLayoutManager
         binding.rvGoods.adapter = adapter
+        binding.rvGoods.itemAnimator = null
     }
 
     private fun observeViewModel() {
         viewModel.hasNextPage.observe(this) { hasNext ->
             adapter.setHasNextPage(hasNext)
         }
-        viewModel.navigateToCart.observe(this) { cart ->
+        viewModel.navigateToCartProduct.observe(this) { cart ->
             navigate(cart)
         }
     }

@@ -16,6 +16,7 @@ class HistoryContainerViewHolder(
         val adapter = HistoryAdapter(goodsClickListener)
         adapter.submitList(histories)
         binding.rvHistory.adapter = adapter
+        binding.rvHistory.itemAnimator = null
         binding.rvHistory.layoutManager =
             LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
     }
