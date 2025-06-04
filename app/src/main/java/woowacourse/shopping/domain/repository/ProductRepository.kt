@@ -22,6 +22,11 @@ interface ProductRepository {
         callback: (List<Product>) -> Unit,
     )
 
+    fun loadRecommendedProducts(
+        count: Int,
+        callback: (List<Product>) -> Unit,
+    )
+
     fun loadAllCartItems(callback: (List<CartItem>) -> Unit)
 
     fun findProductById(

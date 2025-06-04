@@ -77,6 +77,25 @@ class ProductRepositoryImpl(
         }
     }
 
+    override fun loadRecommendedProducts(
+        count: Int,
+        callback: (List<Product>) -> Unit,
+    ) {
+        getMostRecentProduct { mostRecentProduct ->
+            val recommendedCategory = mostRecentProduct?.category
+            if (recommendedCategory != null) {
+                loadAllCartItems { cartItems ->
+                    loadProductsByCategory(recommendedCategory) { productsInCategory ->
+                        val productsInCart = cartItems.map(CartItem::product).toSet()
+                        val recommendedProducts =
+                            productsInCategory.filterNot { product -> product in productsInCart }
+                        callback(recommendedProducts.take(count))
+                    }
+                }
+            }
+        }
+    }
+
     override fun loadProductsByCategory(
         category: String,
         callback: (List<Product>) -> Unit,

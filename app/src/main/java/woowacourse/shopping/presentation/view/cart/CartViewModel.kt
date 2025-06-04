@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.data.RepositoryProvider
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.CartItemUiModel
@@ -159,21 +160,8 @@ class CartViewModel(
     }
 
     fun fetchRecommendedProducts() {
-        productRepository.getMostRecentProduct { mostRecentProduct ->
-            val recommendedCategory = mostRecentProduct?.category
-            productRepository.loadProductsByCategory(recommendedCategory.orEmpty()) { productsInRecommendedCategory ->
-                cartRepository.loadAllCartItems { allCartItems ->
-                    val recommendedProducts =
-                        productsInRecommendedCategory
-                            .filterNot { productInRecommendedCategory ->
-                                allCartItems
-                                    .map { cartItem ->
-                                        cartItem.product.id
-                                    }.contains(productInRecommendedCategory.id)
-                            }.take(10)
-                    _recommendedProducts.postValue(recommendedProducts.map { it.toProductUiModel() })
-                }
-            }
+        productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
+            _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
     }
 
@@ -190,6 +178,7 @@ class CartViewModel(
     companion object {
         private const val INITIAL_PAGE_INDEX = 0
         private const val PAGE_SIZE = 5
+        private const val RECOMMENDED_PRODUCTS_SIZE = 10
 
         @Suppress("UNCHECKED_CAST")
         val Factory: ViewModelProvider.Factory =
