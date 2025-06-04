@@ -32,7 +32,7 @@ class CartViewModel(
     private val _selectedEvent = MutableLiveData<Unit>()
     val selectedEvent: LiveData<Unit> = _selectedEvent
 
-    private val selectedState: MutableMap<Int, Boolean> = mutableMapOf()
+    private val selectedState: MutableMap<Long, Boolean> = mutableMapOf()
 
     private val _isAllSelected = MutableLiveData<Boolean>(true)
     val isAllSelected: LiveData<Boolean> = _isAllSelected
@@ -67,7 +67,7 @@ class CartViewModel(
         updateTotalCount()
     }
 
-    fun deleteCartProduct(cartItemId: Int?) {
+    fun deleteCartProduct(cartItemId: Long?) {
         cartItemId ?: return
         cartProductRepository.deleteCartProduct(cartItemId) {
             loadCartProducts()

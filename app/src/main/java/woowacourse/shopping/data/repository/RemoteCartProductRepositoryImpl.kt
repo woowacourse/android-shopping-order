@@ -33,7 +33,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                     ) {
                         if (response.isSuccessful) {
                             val locationHeader = response.headers()["location"]
-                            val id = locationHeader?.substringAfterLast("/")?.toIntOrNull()
+                            val id = locationHeader?.substringAfterLast("/")?.toLong()
                             callback(cartProduct.copy(cartItemId = id))
                         }
                     }
@@ -49,7 +49,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     }
 
     override fun deleteCartProduct(
-        cartItemId: Int,
+        cartItemId: Long,
         callback: (Boolean) -> Unit,
     ) {
         retrofitService.deleteCartItem(cartItemId = cartItemId).enqueue(
@@ -93,11 +93,11 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                             val products: List<ProductUiModel> =
                                 content.map {
                                     ProductUiModel(
-                                        id = it.product.id.toInt(),
+                                        id = it.product.id,
                                         imageUrl = it.product.imageUrl,
                                         name = it.product.name,
                                         price = it.product.price,
-                                        cartItemId = it.id.toInt(),
+                                        cartItemId = it.id,
                                         quantity = it.quantity,
                                     )
                                 }
@@ -117,7 +117,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     }
 
     override fun updateProduct(
-        cartItemId: Int,
+        cartItemId: Long,
         quantity: Int,
         callback: (Boolean) -> Unit,
     ) {
@@ -220,12 +220,12 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
                             val products: List<ProductUiModel> =
                                 content.map {
                                     ProductUiModel(
-                                        id = it.product.id.toInt(),
+                                        id = it.product.id,
                                         imageUrl = it.product.imageUrl,
                                         name = it.product.name,
                                         price = it.product.price,
                                         quantity = it.quantity,
-                                        cartItemId = it.id.toInt(),
+                                        cartItemId = it.id,
                                     )
                                 }
                             callback(products)

@@ -12,8 +12,8 @@ interface RecentlyViewedProductDao {
     fun insertRecentlyViewedProductUid(recentlyViewedProductEntity: RecentlyViewedProductEntity)
 
     @Query("SELECT productUid FROM RecentlyViewedProducts ORDER BY timestamp DESC")
-    fun getRecentlyViewedProductIds(): List<Int>
+    fun getRecentlyViewedProductIds(): List<Long>
 
     @Query("SELECT productUid FROM RecentlyViewedProducts ORDER BY timestamp DESC LIMIT 1")
-    fun getLatestViewedProductId(): Int
+    fun getLatestViewedProductId(): Long
 }

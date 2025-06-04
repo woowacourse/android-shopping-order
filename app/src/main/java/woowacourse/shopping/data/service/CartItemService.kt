@@ -27,15 +27,15 @@ interface CartItemService {
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
-        @Path("id") cartItemId: Int,
+        @Path("id") cartItemId: Long,
     ): Call<Void>
 
     @PATCH("/cart-items/{id}")
     fun patchCartItemQuantity(
-        @Path("id") cartItemId: Int,
+        @Path("id") cartItemId: Long,
         @Body quantity: Quantity,
     ): Call<Void>
 
-    @PATCH("/cart-items/counts")
+    @GET("/cart-items/counts")
     fun getCartItemsCount(): Call<Quantity>
 }

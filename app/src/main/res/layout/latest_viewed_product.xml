@@ -7,7 +7,7 @@
 
         <variable
             name="parentUid"
-            type="int" />
+            type="Long" />
 
         <variable
             name="product"

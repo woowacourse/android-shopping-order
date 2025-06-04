@@ -17,6 +17,6 @@ interface ProductService {
 
     @GET("/products/{id}")
     fun requestDetailProduct(
-        @Path("id") id: Int = 0,
+        @Path("id") id: Long = 0,
     ): Call<Content>
 }

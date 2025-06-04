@@ -10,10 +10,10 @@ interface CatalogProductRepository {
         callback: (List<ProductUiModel>) -> Unit,
     )
 
-    fun getAllProductsSize(callback: (Int) -> Unit)
+    fun getAllProductsSize(callback: (Long) -> Unit)
 
     fun getCartProductsByIds(
-        productIds: List<Int>,
+        productIds: List<Long>,
         callback: (List<ProductUiModel>) -> Unit,
     )
 
@@ -24,7 +24,7 @@ interface CatalogProductRepository {
     )
 
     fun getProduct(
-        productId: Int,
+        productId: Long,
         onSuccess: (ProductUiModel) -> Unit,
         onFailure: () -> Unit,
     )

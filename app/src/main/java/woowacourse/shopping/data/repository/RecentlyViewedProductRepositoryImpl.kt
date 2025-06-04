@@ -11,7 +11,7 @@ class RecentlyViewedProductRepositoryImpl(
     private val recentlyViewedProductDao: RecentlyViewedProductDao,
     private val catalogProductRepository: CatalogProductRepository,
 ) : RecentlyViewedProductRepository {
-    override fun insertRecentlyViewedProductId(productId: Int) {
+    override fun insertRecentlyViewedProductId(productId: Long) {
         thread {
             recentlyViewedProductDao.insertRecentlyViewedProductUid(
                 RecentlyViewedProductEntity(productId),

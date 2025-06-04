@@ -1,5 +1,6 @@
 package woowacourse.shopping.product.catalog
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -88,14 +89,16 @@ class CatalogViewModel(
         page: Int,
         endIndex: Int,
         size: Int = 20,
-        allProductsSize: Int,
+        allProductsSize: Long,
     ) {
         _loadingState.postValue(LoadingState.loading())
 
         catalogProductRepository.getProductsByPage(page, size) { pagedProducts ->
             cartProductRepository.getTotalElements { totalElements ->
                 cartProductRepository.getCartProducts(totalElements) { cartProducts ->
-                    val cartProductMap: Map<Int, ProductUiModel> =
+
+                    Log.d("loadCatalog", "$page, $size, $pagedProducts, $cartProducts")
+                    val cartProductMap: Map<Long, ProductUiModel> =
                         cartProducts.associateBy { it.id }
 
                     val mergedProducts =
