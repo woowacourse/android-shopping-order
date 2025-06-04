@@ -32,6 +32,7 @@ Cart 화면 구현
 - [x] CatalogViewModel에서 catalogProduct, quantity 사용하지 않는 값 삭제
 - [x] CatalogViewModel에서 interface에서 remoteCatalogProductRepositoryImpl 실제 구현체 주입 -> 수정
 - [x] 최근 상품 목록이 0개인 경우, 최근 본 상품 목록 뷰가 보이지 않게 하기
+- [x] baseUrl 노출하지 않도록 수정
 - [x] 사용자 정보 local.properties에 저장 -> BuildConfig로 갖고 오게 끔 구현
   - [ ] 레벨업 부분 ) 인증에 필요한 key은 secerets에 저장
 - CartActivity에서 생각해야 할 부분

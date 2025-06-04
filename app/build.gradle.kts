@@ -29,8 +29,9 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
 
-        buildConfigField("String", "USER_ID", localProperties.getProperty("USER_ID"))
-        buildConfigField("String", "USER_PASSWORD", localProperties.getProperty("USER_PASSWORD"))
+        buildConfigField("String", "USER_ID", "\"${localProperties.getProperty("USER_ID")}\"")
+        buildConfigField("String", "USER_PASSWORD", "\"${localProperties.getProperty("USER_PASSWORD")}\"")
+        buildConfigField("String", "BASE_URL", "\"${localProperties.getProperty("BASE_URL")}\"")
     }
 
     buildTypes {
