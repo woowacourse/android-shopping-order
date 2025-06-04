@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -50,8 +50,14 @@ class RecommendActivity : AppCompatActivity() {
         binding.recommendCartItems.adapter = adapter
         viewModel.recommendedProducts.observe(this) { adapter.submitList(it) }
 
-        viewModel.selectedCartItems.observe(this) {
-            Log.e("TAG", "selectedCartItems: $it")
+        binding.recommendBackButton.setOnClickListener {
+            setResult(RESULT_OK)
+            finish()
+        }
+
+        onBackPressedDispatcher.addCallback {
+            setResult(RESULT_OK)
+            finish()
         }
     }
 
