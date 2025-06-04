@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_payment_white_radius_4dp_stroke_gray_4"
+        android:minHeight="104dp">
+
+        <CheckBox
+            android:id="@+id/paymentCouponSelection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:checked="true" />
+
+        <TextView
+            android:id="@+id/paymentCouponName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:layout_marginEnd="18dp"
+            android:text="적용 가능한 쿠폰"
+            android:textAlignment="textStart"
+            android:textColor="@color/gray_5"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/paymentCouponSelection"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/paymentCouponSelection" />
+
+        <TextView
+            android:id="@+id/paymentCouponDeadline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="18dp"
+            android:text="만료일: %d년 %d월 %d일"
+            android:textAlignment="textStart"
+            android:textColor="@color/gray_5"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/paymentCouponSelection"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/paymentCouponMinimumPurchase"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:text="최소 주문 금액: %,d원"
+            android:textAlignment="textStart"
+            android:textColor="@color/gray_5"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/paymentCouponDeadline"
+            app:layout_constraintTop_toBottomOf="@id/paymentCouponDeadline"
+            tools:text="최소 주문 금액: 1,000,000원" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

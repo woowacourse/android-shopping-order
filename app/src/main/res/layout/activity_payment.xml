@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/paymentCouponTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="30dp"
+                    android:text="적용 가능한 쿠폰"
+                    android:textColor="@color/gray_6"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/paymentCouponDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="* 쿠폰은 %d개만 적용 가능합니다."
+                    android:textColor="@color/gray_5"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@id/paymentCouponTitle"
+                    app:layout_constraintTop_toBottomOf="@id/paymentCouponTitle" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/paymentCouponsContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="18dp"
+                    android:layout_marginTop="10dp"
+                    android:columnCount="1"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentCouponDescription"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_payment_coupon" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/paymentDividerBottomOfCoupon"
+                    android:layout_width="0dp"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentCouponsContainer" />
+
+                <TextView
+                    android:id="@+id/paymentOrderPriceTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="18dp"
+                    android:text="주문 금액"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentDividerBottomOfCoupon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="18dp"
+                    android:text="%,d원"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/paymentOrderPriceTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/paymentOrderPriceTitle" />
+
+                <TextView
+                    android:id="@+id/paymentCouponDiscountTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="16dp"
+                    android:text="쿠폰 할인 금액"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentOrderPriceTitle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="18dp"
+                    android:text="%,d원"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/paymentCouponDiscountTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/paymentCouponDiscountTitle" />
+
+                <TextView
+                    android:id="@+id/paymentShipPriceTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="16dp"
+                    android:text="배송비"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentCouponDiscountTitle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="18dp"
+                    android:text="%,d원"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/paymentShipPriceTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/paymentShipPriceTitle" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/paymentDividerBottomOfPriceInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentShipPriceTitle" />
+
+                <TextView
+                    android:id="@+id/paymentTotalPriceTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="16dp"
+                    android:text="총 결제 금액"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/paymentDividerBottomOfPriceInfo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="18dp"
+                    android:text="%,d원"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/gray_6"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/paymentTotalPriceTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/paymentTotalPriceTitle" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/paymentPayButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/mint_1"
+            android:paddingVertical="12dp"
+            android:text="결제하기"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
