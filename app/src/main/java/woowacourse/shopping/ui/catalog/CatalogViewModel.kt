@@ -77,8 +77,11 @@ class CatalogViewModel(
     }
 
     fun loadHistoryProducts() {
-        getSearchHistoryUseCase { historyProducts ->
-            _historyProducts.postValue(historyProducts)
+        getSearchHistoryUseCase { newHistory ->
+            val isChanged = newHistory != _historyProducts.value
+            if (isChanged) {
+                _historyProducts.postValue(newHistory)
+            }
         }
     }
 
