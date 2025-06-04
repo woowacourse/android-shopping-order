@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.product
 
-class RecentViewedCategoryBasedAlgorithm(
+class RecentViewedCategoryBasedStrategy(
     private val maxSize: Int = DEFAULT_MAX_SIZE,
-) : ProductsRecommendAlgorithm {
+) : ProductRecommendationStrategy {
     override fun recommendedProducts(
         products: List<Product>,
         prohibitedProducts: List<Product>,

@@ -9,8 +9,8 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.ProductsRecommendAlgorithm
-import woowacourse.shopping.domain.product.RecentViewedCategoryBasedAlgorithm
+import woowacourse.shopping.domain.product.ProductRecommendationStrategy
+import woowacourse.shopping.domain.product.RecentViewedCategoryBasedStrategy
 
 class RecommendViewModel(
     private val productsRepository: ProductsRepository = DefaultProductsRepository(),
@@ -59,7 +59,7 @@ class RecommendViewModel(
                     this.categoryProducts = categoryProducts
                     _recommendProducts.postValue(
                         turnToRecommendProducts(
-                            RecentViewedCategoryBasedAlgorithm(),
+                            RecentViewedCategoryBasedStrategy(),
                         ),
                     )
                 }.onFailure {
@@ -142,9 +142,9 @@ class RecommendViewModel(
         }
     }
 
-    private fun turnToRecommendProducts(productsRecommendAlgorithm: ProductsRecommendAlgorithm): List<RecommendProduct> {
+    private fun turnToRecommendProducts(productRecommendationStrategy: ProductRecommendationStrategy): List<RecommendProduct> {
         val products: List<Product> =
-            productsRecommendAlgorithm.recommendedProducts(
+            productRecommendationStrategy.recommendedProducts(
                 products = categoryProducts,
                 prohibitedProducts = recentProducts,
             )

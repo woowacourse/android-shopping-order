@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.product
 
-interface ProductsRecommendAlgorithm {
+interface ProductRecommendationStrategy {
     fun recommendedProducts(
         products: List<Product>,
         prohibitedProducts: List<Product>,

@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class RecentViewedCategoryBasedAlgorithmTest {
+class RecentViewedCategoryBasedStategyTest {
     @Test
     fun `상품 추천 알고리즘은 최근 본 상품 카테고리를 기반으로 최대 10개 노출한다`() {
         // given
@@ -17,7 +17,7 @@ class RecentViewedCategoryBasedAlgorithmTest {
                     imageUrl = null,
                 )
             }
-        val algorithm = RecentViewedCategoryBasedAlgorithm("카테고리1")
+        val algorithm = RecentViewedCategoryBasedStrategy("카테고리1")
 
         // when
         val expected =
@@ -49,7 +49,7 @@ class RecentViewedCategoryBasedAlgorithmTest {
                     imageUrl = null,
                 )
             }
-        val algorithm = RecentViewedCategoryBasedAlgorithm("카테고리1")
+        val algorithm = RecentViewedCategoryBasedStrategy("카테고리1")
 
         // when
         val expected =
@@ -91,7 +91,7 @@ class RecentViewedCategoryBasedAlgorithmTest {
                     imageUrl = null,
                 )
             }
-        val algorithm = RecentViewedCategoryBasedAlgorithm("카테고리1")
+        val algorithm = RecentViewedCategoryBasedStrategy("카테고리1")
 
         // when
         val expected =
