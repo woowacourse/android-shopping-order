@@ -11,8 +11,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
-import woowacourse.shopping.data.AuthStorage
-import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
 import woowacourse.shopping.databinding.ActivityProductsBinding
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.cart.CartActivity
@@ -55,14 +53,11 @@ class ProductsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.productsRoot)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.productsRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        LocalRecentViewedProductsDataSource.init(applicationContext)
-        AuthStorage.init(applicationContext)
 
         initDataBinding()
         handleEventsFromViewModel()
