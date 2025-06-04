@@ -3,13 +3,16 @@ package woowacourse.shopping
 import android.content.Context
 import woowacourse.shopping.data.NetworkResultHandler
 import woowacourse.shopping.data.datasource.CartDataSource
+import woowacourse.shopping.data.datasource.CouponDataSource
 import woowacourse.shopping.data.datasource.ProductsDataSource
 import woowacourse.shopping.data.datasource.history.DefaultHistoryDataSource
 import woowacourse.shopping.data.db.PetoMarketDatabase
 import woowacourse.shopping.data.network.RetrofitProvider
 import woowacourse.shopping.data.network.service.CartService
+import woowacourse.shopping.data.network.service.CouponService
 import woowacourse.shopping.data.network.service.ProductService
 import woowacourse.shopping.data.repository.DefaultCartRepository
+import woowacourse.shopping.data.repository.DefaultCouponRepository
 import woowacourse.shopping.data.repository.DefaultHistoryRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
@@ -30,9 +33,15 @@ class AppContainer(
 
     private val cartService: CartService = RetrofitProvider.cartService
 
+    private val couponService: CouponService = RetrofitProvider.couponService
+
+    private val couponDataSource = CouponDataSource(couponService, networkResultHandler)
+
     private val cartDataSource = CartDataSource(cartService, networkResultHandler)
 
     private val productsDataSource = ProductsDataSource(productService, networkResultHandler)
+
+    val couponRepository: DefaultCouponRepository = DefaultCouponRepository(couponDataSource)
 
     val productRepository: ProductRepository =
         DefaultProductRepository(productsDataSource)

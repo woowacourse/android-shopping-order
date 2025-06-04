@@ -10,6 +10,7 @@ import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.network.service.CartService
+import woowacourse.shopping.data.network.service.CouponService
 import woowacourse.shopping.data.network.service.ProductService
 
 object RetrofitProvider {
@@ -53,6 +54,8 @@ object RetrofitProvider {
             )
             .build()
     }
+
+    val couponService: CouponService = INSTANCE.create(CouponService::class.java)
 
     val productService: ProductService = INSTANCE.create(ProductService::class.java)
 
