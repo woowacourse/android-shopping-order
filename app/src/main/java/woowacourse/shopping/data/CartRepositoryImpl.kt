@@ -47,6 +47,24 @@ class CartRepositoryImpl(
         }
     }
 
+    override fun upsertCartItemQuantity(
+        productId: Long,
+        cartId: Long?,
+        quantity: Int,
+        callback: (Long) -> Unit,
+    ) {
+        if (cartId != null) {
+            cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
+                callback(cartId)
+            }
+        } else {
+            val request = CartItemRequest(productId, quantity)
+            cartItemDataSource.submitCartItem(request) {
+                callback(-1L)
+            }
+        }
+    }
+
     override fun addCartItem(
         cartItem: CartItem,
         callback: () -> Unit,
@@ -71,15 +89,6 @@ class CartRepositoryImpl(
         }
     }
 
-    override fun decreaseCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    ) {
-        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount - 1)) {
-            callback(it)
-        }
-    }
-
     override fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
@@ -87,6 +96,15 @@ class CartRepositoryImpl(
     ) {
         cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
             callback(cartId)
+        }
+    }
+
+    override fun decreaseCartItem(
+        cartItem: CartItem,
+        callback: (Long) -> Unit,
+    ) {
+        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount - 1)) {
+            callback(it)
         }
     }
 }

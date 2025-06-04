@@ -9,7 +9,6 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 
@@ -69,18 +68,16 @@ class DetailViewModel(
 
     fun addCartItem() {
         val product = _product.value ?: return
-        if (product.cartId == 0L) {
-            cartRepository.addCartItem(product.toCartItem()) {
-                _saveState.postValue(Unit)
-            }
-        } else {
-            val totalAmount = (_product.value?.amount ?: 0) + (_amount.value ?: 0)
-            cartRepository.updateCartItemQuantity(
-                cartId = product.cartId,
-                quantity = totalAmount,
-            ) {
-                _saveState.postValue(Unit)
-            }
+        val amountToAdd = _amount.value ?: 1
+        val updatedAmount = product.amount + amountToAdd
+
+        cartRepository.upsertCartItemQuantity(
+            productId = product.id,
+            cartId = if (product.cartId != 0L) product.cartId else null,
+            quantity = updatedAmount,
+        ) {
+            _product.postValue(product.copy(amount = updatedAmount))
+            _saveState.postValue(Unit)
         }
     }
 

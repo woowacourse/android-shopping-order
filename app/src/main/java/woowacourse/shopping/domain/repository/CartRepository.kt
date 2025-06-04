@@ -19,6 +19,13 @@ interface CartRepository {
         callback: (Long) -> Unit,
     )
 
+    fun upsertCartItemQuantity(
+        productId: Long,
+        cartId: Long? = null,
+        quantity: Int,
+        callback: (Long) -> Unit,
+    )
+
     fun addCartItem(
         cartItem: CartItem,
         callback: () -> Unit,
