@@ -25,9 +25,7 @@ class GoodsSkeletonAdapter : RecyclerView.Adapter<GoodsSkeletonAdapter.SkeletonV
         holder: SkeletonViewHolder,
         position: Int,
     ) {
-        holder.binding.shimmerImage.startShimmer()
-        holder.binding.shimmerName.startShimmer()
-        holder.binding.shimmerPrice.startShimmer()
+        holder.binding.shimmerFrame.startShimmer()
     }
 
     override fun getItemCount(): Int = skeletonCount
