@@ -4,8 +4,10 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartProductRepository {
     fun insertCartProduct(
-        cartProduct: ProductUiModel,
-        callback: (ProductUiModel) -> Unit,
+        productId: Long,
+        quantity: Int,
+        callback: (Int?) -> Unit,
+        // cartItemId 반환
     )
 
     fun deleteCartProduct(
@@ -25,12 +27,14 @@ interface CartProductRepository {
         callback: (Boolean) -> Unit,
     )
 
+    // 장바구니에 담긴 아이템들의 개수 반환
     fun getCartItemSize(callback: (Int) -> Unit)
 
-    fun getTotalElements(callback: (Int) -> Unit)
+    // 장바구니 상품 종류 개수 반환
+    fun getTotalElements(callback: (Long) -> Unit)
 
     fun getCartProducts(
-        totalElements: Int,
+        totalElements: Long,
         callback: (List<ProductUiModel>) -> Unit,
     )
 }

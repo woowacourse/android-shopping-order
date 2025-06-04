@@ -1,6 +1,5 @@
 package woowacourse.shopping.product.catalog
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,11 +37,15 @@ class CatalogViewModel(
 
     fun increaseQuantity(product: ProductUiModel) {
         if (product.quantity == 0) {
-            cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
-                _updatedItem.postValue(product)
+            cartProductRepository.insertCartProduct(product.id, quantity = 1) { cartItemId ->
+                val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId?.toLong())
+                _updatedItem.postValue(addedProduct)
             }
         } else if (product.cartItemId != null) {
-            cartProductRepository.updateProduct(product.cartItemId, product.quantity + 1) { result ->
+            cartProductRepository.updateProduct(
+                product.cartItemId,
+                product.quantity + 1,
+            ) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                 }
@@ -60,7 +63,10 @@ class CatalogViewModel(
                 }
             }
         } else if (product.cartItemId != null) {
-            cartProductRepository.updateProduct(product.cartItemId, product.quantity - 1) { result ->
+            cartProductRepository.updateProduct(
+                product.cartItemId,
+                product.quantity - 1,
+            ) { result ->
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                 }
@@ -96,8 +102,6 @@ class CatalogViewModel(
         catalogProductRepository.getProductsByPage(page, size) { pagedProducts ->
             cartProductRepository.getTotalElements { totalElements ->
                 cartProductRepository.getCartProducts(totalElements) { cartProducts ->
-
-                    Log.d("loadCatalog", "$page, $size, $pagedProducts, $cartProducts")
                     val cartProductMap: Map<Long, ProductUiModel> =
                         cartProducts.associateBy { it.id }
 

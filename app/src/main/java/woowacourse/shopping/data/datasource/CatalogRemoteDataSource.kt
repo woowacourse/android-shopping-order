@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.dto.product.Content
+import woowacourse.shopping.data.dto.product.ProductContent
 import woowacourse.shopping.data.dto.product.ProductResponse
 
 interface CatalogRemoteDataSource {
@@ -19,7 +19,7 @@ interface CatalogRemoteDataSource {
 
     fun fetchProductDetail(
         id: Long,
-        onSuccess: (Content) -> Unit,
+        onSuccess: (ProductContent) -> Unit,
         onFailure: (Throwable) -> Unit,
     )
 }

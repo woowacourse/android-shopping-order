@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import woowacourse.shopping.data.datasource.CatalogRemoteDataSource
 import woowacourse.shopping.data.dto.product.toUiModel
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -19,7 +18,7 @@ class RemoteCatalogProductRepositoryImpl(
             page = page,
             size = size,
             onSuccess = { response ->
-                val products = response.content.map { it.toUiModel() }
+                val products = response.productContent.map { it.toUiModel() }
                 callback(products)
             },
             onFailure = {
@@ -77,8 +76,7 @@ class RemoteCatalogProductRepositoryImpl(
             page = page,
             size = size,
             onSuccess = { response ->
-                Log.d("getProductsByPage", "${response.content}")
-                val products = response.content.map { it.toUiModel() }
+                val products = response.productContent.map { it.toUiModel() }
                 callback(products)
             },
             onFailure = { callback(emptyList()) },

@@ -42,7 +42,7 @@ class DetailViewModel(
         if (addedProduct.cartItemId != null) {
             cartProductRepository.updateProduct(addedProduct.id, addedProduct.quantity) {}
         } else {
-            cartProductRepository.insertCartProduct(addedProduct) {}
+            cartProductRepository.insertCartProduct(addedProduct.id, addedProduct.quantity) {}
         }
     }
 

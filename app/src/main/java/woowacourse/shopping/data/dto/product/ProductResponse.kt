@@ -1,11 +1,10 @@
 package woowacourse.shopping.data.dto.product
 
-
 import com.google.gson.annotations.SerializedName
 
 data class ProductResponse(
     @SerializedName("content")
-    val content: List<Content>,
+    val productContent: List<ProductContent>,
     @SerializedName("empty")
     val empty: Boolean,
     @SerializedName("first")
@@ -25,5 +24,5 @@ data class ProductResponse(
     @SerializedName("totalElements")
     val totalElements: Long,
     @SerializedName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 )

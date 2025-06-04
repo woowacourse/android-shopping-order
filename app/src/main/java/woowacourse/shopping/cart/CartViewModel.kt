@@ -108,8 +108,12 @@ class CartViewModel(
     }
 
     fun addProduct(product: ProductUiModel) {
-        cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
-            _updatedProduct.postValue(product)
+        cartProductRepository.insertCartProduct(
+            productId = product.id,
+            quantity = 1,
+        ) { cartItemId ->
+            val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId?.toLong())
+            _updatedProduct.postValue(addedProduct)
             refreshProductsInfo()
             loadCartProducts()
         }
@@ -167,7 +171,7 @@ class CartViewModel(
         }
 
         cartProductRepository.getTotalElements { totalSize ->
-            cartProductRepository.getCartProductsInRange(0, totalSize) { cartProducts ->
+            cartProductRepository.getCartProductsInRange(0, totalSize.toInt()) { cartProducts ->
                 val pagedProducts: List<ProductItem> =
                     cartProducts
                         .map {

@@ -11,7 +11,8 @@ object RepositoryProvider {
     fun provideCatalogProductRepository(): CatalogProductRepository =
         RemoteCatalogProductRepositoryImpl(DataSourceProvider.provideProductRemoteDataSource())
 
-    fun provideCartProductRepository(): CartProductRepository = RemoteCartProductRepositoryImpl()
+    fun provideCartProductRepository(): CartProductRepository =
+        RemoteCartProductRepositoryImpl(DataSourceProvider.provideCartRemoteDataSource())
 
     fun provideRecentlyViewedProductRepository(): RecentlyViewedProductRepository =
         RecentlyViewedProductRepositoryImpl(

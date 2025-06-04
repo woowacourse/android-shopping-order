@@ -15,13 +15,13 @@ import woowacourse.shopping.data.dto.cartitem.UpdateCartItemRequest
 interface CartItemService {
     @GET("/cart-items")
     fun requestCartItems(
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 1,
+        @Query("page") page: Int? = 0,
+        @Query("size") size: Int? = 1,
         @Query("sort") sort: List<String> = listOf(),
     ): Call<ProductResponse>
 
     @POST("/cart-items")
-    fun postCartItems(
+    fun postCartItem(
         @Body request: UpdateCartItemRequest,
     ): Call<Void>
 
