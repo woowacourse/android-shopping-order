@@ -65,9 +65,9 @@ class ProductDetailViewModelTest {
     @Test
     fun `최근 본 상품 클릭 시 이벤트가 발생한다`() {
         // when
-        viewModel.onLastProductClick()
+        viewModel.onLastViewedProductClick()
 
         // then
-        assertEquals(Unit, viewModel.lastProductClickEvent.getValue())
+        assertEquals(Unit, viewModel.lastViewedProductClickEvent.getValue())
     }
 }

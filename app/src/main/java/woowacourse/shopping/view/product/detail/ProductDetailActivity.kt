@@ -76,7 +76,7 @@ class ProductDetailActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.message_add_to_cart, Toast.LENGTH_SHORT).show()
         }
 
-        viewModel.lastProductClickEvent.observe(this) {
+        viewModel.lastViewedProductClickEvent.observe(this) {
             val intent = newIntent(this, viewModel.lastViewedProduct.value?.product ?: return@observe)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(intent)

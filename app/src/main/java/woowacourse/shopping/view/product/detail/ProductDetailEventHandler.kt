@@ -6,5 +6,5 @@ import woowacourse.shopping.view.util.product.QuantityControlEventHandler
 interface ProductDetailEventHandler : QuantityControlEventHandler<Product> {
     fun onAddToCartClick()
 
-    fun onLastProductClick()
+    fun onLastViewedProductClick()
 }

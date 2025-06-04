@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -17,20 +18,19 @@ class ProductDetailViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
     ProductDetailEventHandler {
-    private val _lastViewedProduct = MutableLiveData<RecentProduct?>()
-    val lastViewedProduct: LiveData<RecentProduct?> get() = _lastViewedProduct
-
-    private val _quantity = MutableLiveData(INITIAL_QUANTITY)
+    private val _quantity = MutableLiveData(MINIMUM_QUANTITY)
     val quantity: LiveData<Int> get() = _quantity
 
-    private val _totalPrice = MutableLiveData(product.price)
-    val totalPrice: LiveData<Int> get() = _totalPrice
+    val totalPrice: LiveData<Int> = _quantity.map { it * product.price }
+
+    private val _lastViewedProduct = MutableLiveData<RecentProduct?>()
+    val lastViewedProduct: LiveData<RecentProduct?> get() = _lastViewedProduct
 
     private val _addToCartEvent = MutableSingleLiveData<Unit>()
     val addToCartEvent: SingleLiveData<Unit> get() = _addToCartEvent
 
-    private val _lastProductClickEvent = MutableSingleLiveData<Unit>()
-    val lastProductClickEvent: SingleLiveData<Unit> get() = _lastProductClickEvent
+    private val _lastViewedProductClickEvent = MutableSingleLiveData<Unit>()
+    val lastViewedProductClickEvent: SingleLiveData<Unit> get() = _lastViewedProductClickEvent
 
     init {
         loadLastViewedProduct()
@@ -38,44 +38,38 @@ class ProductDetailViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
-        updateQuantity((quantity.value ?: INITIAL_QUANTITY) + 1)
+        val newQuantity = (quantity.value ?: MINIMUM_QUANTITY) + QUANTITY_TO_ADD
+        _quantity.postValue(newQuantity)
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
-        val quantity = (quantity.value ?: INITIAL_QUANTITY) - 1
-        if (quantity > 0) {
-            updateQuantity(quantity)
+        val newQuantity = (quantity.value ?: MINIMUM_QUANTITY) - QUANTITY_TO_ADD
+        if (newQuantity > 0) {
+            _quantity.postValue(newQuantity)
         }
     }
 
-    override fun onLastProductClick() {
-        _lastProductClickEvent.setValue(Unit)
-    }
-
     override fun onAddToCartClick() {
-        val quantityToAdd = quantity.value ?: INITIAL_QUANTITY
         cartProductRepository.getCartProductByProductId(product.id) { result ->
             result
                 .onSuccess { cartProduct ->
+                    val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
                     if (cartProduct == null) {
                         cartProductRepository.insert(product.id, quantityToAdd) {
-                            updateQuantity(INITIAL_QUANTITY)
+                            _quantity.postValue(MINIMUM_QUANTITY)
                         }
                     } else {
                         cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
-                            updateQuantity(INITIAL_QUANTITY)
+                            _quantity.postValue(MINIMUM_QUANTITY)
                         }
                     }
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
         _addToCartEvent.setValue(Unit)
     }
 
-    private fun updateQuantity(newQuantity: Int) {
-        _quantity.postValue(newQuantity)
-        _totalPrice.postValue(newQuantity * product.price)
+    override fun onLastViewedProductClick() {
+        _lastViewedProductClickEvent.setValue(Unit)
     }
 
     private fun loadLastViewedProduct() {
@@ -83,9 +77,7 @@ class ProductDetailViewModel(
             result
                 .onSuccess {
                     _lastViewedProduct.postValue(it)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
@@ -97,6 +89,7 @@ class ProductDetailViewModel(
     }
 
     companion object {
-        private const val INITIAL_QUANTITY = 1
+        private const val MINIMUM_QUANTITY = 1
+        private const val QUANTITY_TO_ADD = 1
     }
 }
