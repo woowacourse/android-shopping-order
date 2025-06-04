@@ -103,12 +103,12 @@ class MainViewModel(
                 if (updated.cartId == null) {
                     cartRepository.addCart(request)
                         .onSuccess { newId ->
-                            updateUiState { modifyUiState(updated.copy(cartId = newId.toLong())) }
+                            updateUiState { modifyUiState(updated.copy(cartId = newId)) }
                         }.onFailure(::handleFailure)
                 } else {
-                    cartRepository.updateQuantity(updated.cartId, updated.cartQuantity) {
-                        updateUiState { modifyUiState(updated) }
-                    }
+                    cartRepository.updateQuantity(updated.cartId, updated.cartQuantity)
+                        .onSuccess { updateUiState { modifyUiState(updated) } }
+                        .onFailure(::handleFailure)
                 }
             }
         }
@@ -118,18 +118,18 @@ class MainViewModel(
             val updated = state.decreaseCartQuantity(productId)
             val cartId = updated.cartId ?: return
 
-            if (updated.hasCartQuantity) {
-                cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                    it
+            viewModelScope.launch {
+                if (updated.hasCartQuantity) {
+                    cartRepository.updateQuantity(cartId, updated.cartQuantity)
                         .onSuccess { updateUiState { modifyUiState(updated) } }
                         .onFailure(::handleFailure)
-                }
-            } else {
-                cartRepository.deleteCart(cartId) {
-                    it
-                        .onSuccess {
-                            updateUiState { modifyUiState(updated.copy(cartId = null)) }
-                        }.onFailure(::handleFailure)
+                } else {
+                    cartRepository.deleteCart(cartId) {
+                        it
+                            .onSuccess {
+                                updateUiState { modifyUiState(updated.copy(cartId = null)) }
+                            }.onFailure(::handleFailure)
+                    }
                 }
             }
         }

@@ -103,11 +103,11 @@ class DetailViewModel(
 
     private fun whenProductSavedInCart(cart: ShoppingCart) =
         withState(_uiState.value) { state ->
-            defaultCartRepository.updateQuantity(
-                cart.id,
-                state.addQuantity(cart.quantity),
-            ) { result ->
-                result
+            viewModelScope.launch {
+                defaultCartRepository.updateQuantity(
+                    cart.id,
+                    state.addQuantity(cart.quantity),
+                )
                     .onSuccess {
                         _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
                     }

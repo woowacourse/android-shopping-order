@@ -57,4 +57,22 @@ class DefaultCartRepositoryTest {
             assertEquals(expectedResult, result)
             coVerify(exactly = 1) { cartDataSource.singlePage(1, 10) }
         }
+
+    @Test
+    fun `updateQuantity - 장바구니 상품의 수량을 업데이트한다`() =
+        runTest {
+            val cartId = 1L
+            val quantity = Quantity(3)
+
+            val expectedResult = NetworkResult.Success(Unit)
+
+            coEvery { cartDataSource.updateCartQuantity(cartId, quantity.value) } returns expectedResult
+
+            // when
+            val result = repository.updateQuantity(cartId, quantity)
+
+            // then
+            assertEquals(expectedResult, result)
+            coVerify { cartDataSource.updateCartQuantity(cartId, quantity.value) }
+        }
 }

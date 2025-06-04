@@ -25,10 +25,10 @@ interface CartService {
     ): CartsResponse
 
     @PATCH("/cart-items/{id}")
-    fun updateCart(
+    suspend fun updateCart(
         @Path("id") id: Long,
         @Body request: Int,
-    ): Call<Unit>
+    )
 
     @DELETE("/cart-items/{id}")
     fun deleteCart(

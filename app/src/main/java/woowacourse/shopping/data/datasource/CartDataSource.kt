@@ -34,16 +34,12 @@ class CartDataSource(
     suspend fun singlePage(
         page: Int?,
         size: Int?,
-    ): NetworkResult<CartsSinglePage> =
-        handler2.execute {
-            service.getCartSinglePage(page, size).toDomain()
-        }
+    ): NetworkResult<CartsSinglePage> = handler2.execute { service.getCartSinglePage(page, size).toDomain() }
 
-    fun updateCartQuantity(
+    suspend fun updateCartQuantity(
         cartId: Long,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    ) = handler.enqueueWithResult(service.updateCart(cartId, quantity), callback)
+    ) = handler2.execute { service.updateCart(cartId, quantity) }
 
     fun deleteCart(
         cartId: Long,

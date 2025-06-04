@@ -8,11 +8,10 @@ import woowacourse.shopping.domain.exception.NetworkResult
 interface CartRepository {
     suspend fun addCart(cart: Cart): NetworkResult<Long>
 
-    fun updateQuantity(
+    suspend fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
-    )
+    ): NetworkResult<Unit>
 
     fun deleteCart(
         cartId: Long,
