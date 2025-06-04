@@ -25,12 +25,34 @@ class CartRecommendationFragment : Fragment() {
             CartViewModelFactory(requireActivity().application as ShoppingApplication),
         )[CartViewModel::class.java]
     }
+    private val adapter: ProductAdapter by lazy {
+        ProductAdapter(
+            products = emptyList(),
+            productActionListener =
+                object : ProductActionListener {
+                    override fun onProductClick(product: ProductUiModel) {
+                        val intent = DetailActivity.newIntent(requireContext(), product)
+                        startActivity(intent)
+                    }
+                    override fun onQuantityAddClick(product: ProductUiModel) {
+                        viewModel.increaseQuantity(product)
+                    }
+                },
+            quantityControlListener = { event, product -> },
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        initViewBinding(inflater, container)
+        observeData()
+        return binding.root
+    }
+
+    private fun initViewBinding(inflater: LayoutInflater, container: ViewGroup?) {
         binding =
             DataBindingUtil.inflate(
                 inflater,
@@ -38,32 +60,17 @@ class CartRecommendationFragment : Fragment() {
                 container,
                 false,
             )
-        binding.lifecycleOwner = this
-        setProductAdapter()
-        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map { ProductItem(it) })
-        }
-        return binding.root
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.RecyclerViewCartRecommendation.adapter = adapter
     }
 
-    private fun setProductAdapter() {
-        val adapter =
-            ProductAdapter(
-                products = emptyList(),
-                productActionListener =
-                    object : ProductActionListener {
-                        override fun onProductClick(product: ProductUiModel) {
-                            val intent = DetailActivity.newIntent(requireContext(), product)
-                            startActivity(intent)
-                        }
-
-                        override fun onLoadButtonClick() = Unit
-
-                        override fun onQuantityAddClick(product: ProductUiModel) = Unit
-                    },
-                quantityControlListener = { event, product -> },
-            )
-
-        binding.RecyclerViewCartRecommendation.adapter = adapter
+    private fun observeData() {
+        viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
+            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map {
+                ProductItem(
+                    it
+                )
+            })
+        }
     }
 }
