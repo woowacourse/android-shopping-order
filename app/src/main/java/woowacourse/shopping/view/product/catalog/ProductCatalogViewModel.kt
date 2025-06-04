@@ -126,7 +126,7 @@ class ProductCatalogViewModel(
 
             result
                 .onSuccess {
-                    _totalQuantity.postValue(it)
+                    _totalQuantity.value = it
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -207,8 +207,8 @@ class ProductCatalogViewModel(
             val updatedItem = currentItem.copy(quantity = currentItem.quantity + quantityToAdd)
             productItems[index] = updatedItem
         }
-        _totalQuantity.postValue((totalQuantity.value ?: MINIMUM_QUANTITY) + quantityToAdd)
-        _productCatalogItems.postValue(buildCatalogItems())
+        _totalQuantity.value = (totalQuantity.value ?: MINIMUM_QUANTITY) + quantityToAdd
+        _productCatalogItems.value = buildCatalogItems()
     }
 
     private fun buildCatalogItems(): List<ProductCatalogItem> =
