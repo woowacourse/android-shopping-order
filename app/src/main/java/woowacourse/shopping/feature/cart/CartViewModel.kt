@@ -217,32 +217,19 @@ class CartViewModel(
                 onSuccess = { cartResponse ->
                     val cartProductIds = cartResponse.content.map { it.product.id }
 
-                    productRepository.fetchAllProducts(
-                        onSuccess = { response ->
-                            val matchedProduct =
-                                response.content.find { it.id == latestProduct.id }
-                            val category = matchedProduct?.category
-
-                            val recommendProducts =
-                                response.content
-                                    .filter {
-                                        it.category == category &&
-                                            it.id != latestProduct.id &&
-                                            it.id !in cartProductIds
-                                    }.take(10)
-
-                            _recommendItems.value =
-                                recommendProducts.map {
-                                    CartProduct(id = 0, product = it.toDomain(), quantity = 0)
-                                }
+                    productRepository.fetchRecommendProducts(
+                        latestProductId = latestProduct.id,
+                        cartProductIds = cartProductIds,
+                        onSuccess = { recommendedList ->
+                            _recommendItems.value = recommendedList
                         },
                         onError = {
-                            Log.e("loadProductsInRange", "상품 요청 실패", it)
+                            Log.e("loadProductsByCategory", "추천 상품 요청 실패", it)
                         },
                     )
                 },
                 onError = {
-                    Log.e("loadProductsInRange", "장바구니 요청 실패", it)
+                    Log.e("loadProductsByCategory", "장바구니 요청 실패", it)
                 },
             )
         }

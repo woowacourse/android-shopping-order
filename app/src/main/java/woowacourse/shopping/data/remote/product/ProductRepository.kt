@@ -3,6 +3,8 @@ package woowacourse.shopping.data.remote.product
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.util.toDomain
 
 class ProductRepository {
     fun fetchProducts(
@@ -36,6 +38,40 @@ class ProductRepository {
                     }
                 },
             )
+    }
+
+    fun fetchRecommendProducts(
+        latestProductId: Long,
+        cartProductIds: List<Long>,
+        onSuccess: (List<CartProduct>) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        fetchAllProducts(
+            onSuccess = { response ->
+                val matchedProduct = response.content.find { it.id == latestProductId }
+                val category = matchedProduct?.category
+
+                if (category == null) {
+                    onSuccess(emptyList())
+                    return@fetchAllProducts
+                }
+
+                val recommendProducts =
+                    response.content
+                        .filter {
+                            it.category == category &&
+                                it.id != latestProductId &&
+                                it.id !in cartProductIds
+                        }.take(10)
+
+                onSuccess(
+                    recommendProducts.map {
+                        CartProduct(id = 0, product = it.toDomain(), quantity = 0)
+                    },
+                )
+            },
+            onError = { onError(it) },
+        )
     }
 
     fun fetchAllProducts(
