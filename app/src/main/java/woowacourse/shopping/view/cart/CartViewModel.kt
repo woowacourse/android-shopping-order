@@ -83,12 +83,18 @@ class CartViewModel(
     }
 
     fun select(cartItem: CartItemType.ProductItem) {
-        _selectedCartItems.value = selectedCartItems.value?.minus(cartItem) ?: emptySet()
-        _selectedCartItems.value = selectedCartItems.value?.plus(cartItem) ?: setOf(cartItem)
+        val oldSet: Set<CartItemType.ProductItem> = selectedCartItems.value.orEmpty()
+        val filtered: Set<CartItemType.ProductItem> = oldSet.filterOutById(cartItem.cartItemId)
+        _selectedCartItems.value = filtered + cartItem
     }
 
     fun unselect(cartItem: CartItemType.ProductItem) {
-        _selectedCartItems.value = selectedCartItems.value?.minus(cartItem) ?: emptySet()
+        val updated =
+            selectedCartItems.value
+                .orEmpty()
+                .filterOutById(cartItem.cartItemId)
+                .toSet()
+        _selectedCartItems.value = updated
     }
 
     fun plusCartItemQuantity(cartItem: CartItemType.ProductItem) {
@@ -111,12 +117,14 @@ class CartViewModel(
             cartRepository.remove(cartItemId) { result ->
                 result
                     .onSuccess {
+                        _selectedCartItems.postValue(
+                            run {
+                                selectedCartItems.value
+                                    ?.filterOutById(cartItem.cartItemId)
+                                    ?.toSet()
+                            },
+                        )
                         loadCartItems()
-                        val oldSelectedCartItems: Set<CartItemType.ProductItem> =
-                            selectedCartItems.value ?: emptySet()
-                        val newSelectedCartItems: Set<CartItemType.ProductItem> =
-                            (oldSelectedCartItems - cartItem)
-                        _selectedCartItems.postValue(newSelectedCartItems)
                     }.onFailure {
                         _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
                     }
@@ -139,20 +147,22 @@ class CartViewModel(
                 .onSuccess { pageableCartItems: PageableCartItems ->
                     val cartItems: List<CartItemType.ProductItem> =
                         pageableCartItems.cartItems.map { newCartItem: CartItem ->
-                            val checked =
-                                selectedCartItems.value?.any { selectedProductItem: CartItemType.ProductItem ->
-                                    newCartItem == selectedProductItem.cartItem
-                                } ?: false
+                            val selectedItem =
+                                selectedCartItems.value
+                                    .orEmpty()
+                                    .find { it.cartItem.id == newCartItem.id }
 
-                            val newProductItem: CartItemType.ProductItem =
-                                CartItemType.ProductItem(newCartItem, checked)
+                            val checked = selectedItem != null
+
+                            val newProductItem = CartItemType.ProductItem(newCartItem, checked)
 
                             if (checked) {
-                                val oldSelectedCartItems: Set<CartItemType.ProductItem> =
-                                    selectedCartItems.value ?: emptySet()
-                                val newSelectedCartItems: Set<CartItemType.ProductItem> =
-                                    oldSelectedCartItems.minus(newProductItem).plus(newProductItem)
-                                _selectedCartItems.postValue(newSelectedCartItems)
+                                val updated =
+                                    selectedCartItems.value
+                                        .orEmpty()
+                                        .filterOutById(newCartItem.id)
+                                        .toSet() + newProductItem
+                                _selectedCartItems.postValue(updated)
                             }
 
                             newProductItem
@@ -183,7 +193,7 @@ class CartViewModel(
                         loadCartItems()
                     }
                     val oldSelectedCartItems: Set<CartItemType.ProductItem> =
-                        selectedCartItems.value ?: emptySet()
+                        selectedCartItems.value.orEmpty()
                     val newSelectedCartItems: Set<CartItemType.ProductItem> =
                         (oldSelectedCartItems - cartItem)
                     _selectedCartItems.postValue(newSelectedCartItems)
@@ -202,6 +212,12 @@ class CartViewModel(
         page++
         loadCartItems()
     }
+
+    private fun Set<CartItemType.ProductItem>.filterOutById(id: Long): Set<CartItemType.ProductItem> =
+        this
+            .filterNot {
+                it.cartItemId == id
+            }.toSet()
 
     companion object {
         private const val MIN_PAGE = 1
