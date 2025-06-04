@@ -37,7 +37,7 @@ class CartViewModel(
 
     private val productSelections = mutableMapOf<Int, Boolean>()
 
-    private val _cartItemCount = MutableLiveData<Int>(-1)
+    private val _cartItemCount = MutableLiveData<Int>(INITIAL_CART_ITEM_COUNT)
     val cartItemCount: LiveData<Int> get() = _cartItemCount
 
     private val _totalProducts = MutableLiveData<MutableSet<ProductUiModel>>()
@@ -223,5 +223,6 @@ class CartViewModel(
         private const val NEXT_BUTTON = 2
         private const val DECREASE_BUTTON = 0
         private const val INCREASE_BUTTON = 1
+        private const val INITIAL_CART_ITEM_COUNT = 0
     }
 }
