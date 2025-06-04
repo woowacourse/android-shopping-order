@@ -49,12 +49,8 @@ class CartFragment :
         initListener()
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
-
         binding.selectAll.setOnClickListener { view ->
             onBatchSelect(binding.selectAll.isChecked)
-        }
-        binding.btnPlaceOrder.setOnClickListener {
-            navigateToRecommendation()
         }
     }
 
@@ -96,6 +92,10 @@ class CartFragment :
 
     override fun onBatchSelect(isChecked: Boolean) {
         viewModel.setAllSelections(isChecked)
+    }
+
+    override fun onPlaceOrderClick() {
+        navigateToRecommendation()
     }
 
     override fun increase(product: ProductUiModel) {
