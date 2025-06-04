@@ -1,90 +1,45 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import woowacourse.shopping.data.dto.product.Content
-import woowacourse.shopping.data.dto.product.ProductResponse
-import woowacourse.shopping.data.service.ProductService
-import woowacourse.shopping.data.service.RetrofitProductService
+import android.util.Log
+import woowacourse.shopping.data.datasource.CatalogRemoteDataSource
+import woowacourse.shopping.data.dto.product.toUiModel
 import woowacourse.shopping.product.catalog.ProductUiModel
 
-class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
-    val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
-
+class RemoteCatalogProductRepositoryImpl(
+    private val remoteDataSource: CatalogRemoteDataSource,
+) : CatalogProductRepository {
     override fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
         callback: (List<ProductUiModel>) -> Unit,
     ) {
-        retrofitService
-            .requestProducts(
-                category = category,
-                page = page,
-                size = size,
-            ).enqueue(
-                object : Callback<ProductResponse> {
-                    override fun onResponse(
-                        call: Call<ProductResponse>,
-                        response: Response<ProductResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body: ProductResponse? = response.body()
-                            val content: List<Content>? = body?.content
-                            val products: List<ProductUiModel>? =
-                                content?.mapNotNull {
-                                    ProductUiModel(
-                                        id = it.id.toInt(),
-                                        imageUrl = it.imageUrl,
-                                        name = it.name,
-                                        price = it.price,
-                                    )
-                                }
-                            callback(products ?: emptyList())
-                            println("body : $body")
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<ProductResponse>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
-            )
-    }
-
-    override fun getAllProductsSize(callback: (Int) -> Unit) {
-        retrofitService.requestProducts().enqueue(
-            object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val body: ProductResponse? = response.body()
-                        callback(body?.totalElements?.toInt() ?: 0)
-                        println("body : $body")
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ProductResponse>,
-                    t: Throwable,
-                ) {
-                    println("error : $t")
-                }
+        remoteDataSource.fetchProducts(
+            category = category,
+            page = page,
+            size = size,
+            onSuccess = { response ->
+                val products = response.content.map { it.toUiModel() }
+                callback(products)
+            },
+            onFailure = {
+                callback(emptyList())
             },
         )
     }
 
+    override fun getAllProductsSize(callback: (Long) -> Unit) {
+        remoteDataSource.fetchAllProducts(
+            onSuccess = { response -> callback(response.totalElements) },
+            onFailure = { callback(0) },
+        )
+    }
+
     override fun getCartProductsByIds(
-        productIds: List<Int>,
+        productIds: List<Long>,
         callback: (List<ProductUiModel>) -> Unit,
     ) {
-        val resultsMap = mutableMapOf<Int, ProductUiModel>()
+        val resultsMap = mutableMapOf<Long, ProductUiModel>()
         var completedCount = 0
 
         if (productIds.isEmpty()) {
@@ -99,15 +54,13 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
                     resultsMap[uid] = product
                     completedCount++
                     if (completedCount == productIds.size) {
-                        val orderedResults = productIds.mapNotNull { resultsMap[it] }
-                        callback(orderedResults)
+                        callback(productIds.mapNotNull { resultsMap[it] })
                     }
                 },
                 onFailure = {
                     completedCount++
                     if (completedCount == productIds.size) {
-                        val orderedResults = productIds.mapNotNull { resultsMap[it] }
-                        callback(orderedResults)
+                        callback(productIds.mapNotNull { resultsMap[it] })
                     }
                 },
             )
@@ -119,80 +72,28 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
         size: Int,
         callback: (List<ProductUiModel>) -> Unit,
     ) {
-        retrofitService
-            .requestProducts(
-                page = page,
-                size = size,
-            ).enqueue(
-                object : Callback<ProductResponse> {
-                    override fun onResponse(
-                        call: Call<ProductResponse>,
-                        response: Response<ProductResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body: ProductResponse? = response.body()
-                            val content: List<Content>? = body?.content
-                            val products: List<ProductUiModel>? =
-                                content?.mapNotNull {
-                                    ProductUiModel(
-                                        id = it.id.toInt(),
-                                        imageUrl = it.imageUrl,
-                                        name = it.name,
-                                        price = it.price,
-                                    )
-                                }
-                            callback(products ?: emptyList())
-                            println("body : $body")
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<ProductResponse>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
-            )
+        remoteDataSource.fetchProducts(
+            category = null,
+            page = page,
+            size = size,
+            onSuccess = { response ->
+                Log.d("getProductsByPage", "${response.content}")
+                val products = response.content.map { it.toUiModel() }
+                callback(products)
+            },
+            onFailure = { callback(emptyList()) },
+        )
     }
 
     override fun getProduct(
-        productId: Int,
+        productId: Long,
         onSuccess: (ProductUiModel) -> Unit,
         onFailure: () -> Unit,
     ) {
-        retrofitService
-            .requestDetailProduct(id = productId)
-            .enqueue(
-                object : Callback<Content> {
-                    override fun onResponse(
-                        call: Call<Content>,
-                        response: Response<Content>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body = response.body() ?: return onFailure()
-                            val product =
-                                ProductUiModel(
-                                    id = body.id.toInt(),
-                                    imageUrl = body.imageUrl,
-                                    name = body.name,
-                                    price = body.price,
-                                    category = body.category,
-                                )
-                            onSuccess(product)
-                        } else {
-                            onFailure()
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Content>,
-                        t: Throwable,
-                    ) {
-                        println("error: $t")
-                        onFailure()
-                    }
-                },
-            )
+        remoteDataSource.fetchProductDetail(
+            id = productId,
+            onSuccess = { content -> onSuccess(content.toUiModel()) },
+            onFailure = { onFailure() },
+        )
     }
 }

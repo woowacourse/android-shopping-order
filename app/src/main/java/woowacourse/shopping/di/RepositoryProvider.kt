@@ -8,7 +8,8 @@ import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 
 object RepositoryProvider {
-    fun provideCatalogProductRepository(): CatalogProductRepository = RemoteCatalogProductRepositoryImpl()
+    fun provideCatalogProductRepository(): CatalogProductRepository =
+        RemoteCatalogProductRepositoryImpl(DataSourceProvider.provideProductRemoteDataSource())
 
     fun provideCartProductRepository(): CartProductRepository = RemoteCartProductRepositoryImpl()
 
