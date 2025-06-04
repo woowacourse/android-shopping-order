@@ -3,8 +3,13 @@ package woowacourse.shopping.view.cart.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.exception.onFailure
+import woowacourse.shopping.domain.exception.onSuccess
+import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.cart.CartUiEvent
@@ -46,23 +51,27 @@ class CartViewModel(
         lastSeenCategory = category
     }
 
-    fun loadRecommendProduct() =
-        withState(_cartUiState.value) { state ->
-            productRepository.loadSinglePage(lastSeenCategory, null, null) { products ->
-                products.onSuccess { result ->
-                    val recommendProduct =
-                        result
-                            .products
-                            .asSequence()
-                            .filter { it.id !in state.cartIds }
-                            .shuffled()
-                            .take(RECOMMEND_SIZE)
-                            .map { ProductState(item = it, cartQuantity = Quantity(0)) }
-                            .toList()
-                    _recommendUiState.value = RecommendUiState(recommendProduct)
+    fun loadRecommendProduct() {
+        viewModelScope.launch {
+            productRepository.loadSinglePage(lastSeenCategory, null, null)
+                .onSuccess { result ->
+                    val products = extractRecommendProduct(result)
+                    _recommendUiState.value = RecommendUiState(products)
                 }.onFailure(::handleFailure)
-            }
         }
+    }
+
+    private fun extractRecommendProduct(page: ProductSinglePage): List<ProductState> {
+        val currentIds = _cartUiState.value?.cartIds ?: emptyList()
+        return page
+            .products
+            .asSequence()
+            .filter { it.id !in currentIds }
+            .shuffled()
+            .take(RECOMMEND_SIZE)
+            .map { ProductState(item = it, cartQuantity = Quantity(0)) }
+            .toList()
+    }
 
     fun increaseRecommendProductQuantity(productId: Long) =
         withState(_recommendUiState.value) { state ->

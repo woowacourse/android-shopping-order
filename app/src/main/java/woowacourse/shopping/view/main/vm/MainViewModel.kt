@@ -4,8 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.exception.NetworkError
+import woowacourse.shopping.domain.exception.onFailure
+import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -50,14 +55,15 @@ class MainViewModel(
         }
 
     private fun fetchProducts(pageIndex: Int) {
-        productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE) { result ->
-            result.onSuccess { productPage ->
-                cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
-                    cartResult.onSuccess { cartPage ->
-                        applyMergedUiState(productPage, cartPage.carts)
-                    }.onFailure(::handleFailure)
-                }
-            }.onFailure(::handleFailure)
+        viewModelScope.launch {
+            productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE)
+                .onSuccess { productPage ->
+                    cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
+                        cartResult.onSuccess { cartPage ->
+                            applyMergedUiState(productPage, cartPage.carts)
+                        }.onFailure(::handleFailure)
+                    }
+                }.onFailure(::handleFailure)
         }
     }
 
@@ -164,6 +170,10 @@ class MainViewModel(
     }
 
     private fun handleFailure(throwable: Throwable) {
+        // _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
+    }
+
+    private fun handleFailure2(throwable: NetworkError) {
         _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
     }
 

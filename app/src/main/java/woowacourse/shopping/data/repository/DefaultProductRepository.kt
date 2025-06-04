@@ -9,13 +9,12 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class DefaultProductRepository(
     private val productDataSource: ProductsDataSource,
 ) : ProductRepository {
-    override fun loadSinglePage(
+    override suspend fun loadSinglePage(
         category: String?,
         page: Int?,
         pageSize: Int?,
-        callback: (Result<ProductSinglePage>) -> Unit,
-    ) {
-        productDataSource.singlePage(category, page, pageSize) { callback(it) }
+    ): NetworkResult<ProductSinglePage> {
+        return productDataSource.singlePage(category, page, pageSize)
     }
 
     override suspend fun loadProduct(productId: Long): NetworkResult<Product> {
