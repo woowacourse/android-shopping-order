@@ -1,15 +1,15 @@
 package woowacourse.shopping.data.cart
 
 import woowacourse.shopping.data.product.entity.CartItemEntity
-import woowacourse.shopping.domain.cart.PageableCartItems
+import woowacourse.shopping.domain.cart.PagedCartItems
 
-class PageableCartItemData(
+class PagedCartItemData(
     private val cartItems: List<CartItemEntity>,
     private val hasPrevious: Boolean,
     val hasNext: Boolean,
 ) {
-    fun toDomain(): PageableCartItems =
-        PageableCartItems(
+    fun toDomain(): PagedCartItems =
+        PagedCartItems(
             this.cartItems.map { it.toDomain() },
             this.hasPrevious,
             this.hasNext,
@@ -20,7 +20,7 @@ class PageableCartItemData(
             cartItems: List<CartItemEntity>,
             pageNumber: Int?,
             totalPages: Int?,
-        ): PageableCartItemData {
+        ): PagedCartItemData {
             val hasPrevious: Boolean = if (pageNumber == null) false else pageNumber > 0
 
             val hasNext: Boolean =
@@ -30,7 +30,7 @@ class PageableCartItemData(
 
                     pageNumber + 1 < totalPages
                 }
-            return PageableCartItemData(
+            return PagedCartItemData(
                 cartItems,
                 hasPrevious,
                 hasNext,

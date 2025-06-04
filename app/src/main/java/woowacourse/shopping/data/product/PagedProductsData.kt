@@ -2,7 +2,7 @@ package woowacourse.shopping.data.product
 
 import woowacourse.shopping.data.product.entity.ProductEntity
 
-class PageableProductData(
+class PagedProductsData(
     val products: List<ProductEntity>,
     val loadable: Boolean,
 ) {
@@ -11,11 +11,11 @@ class PageableProductData(
             products: List<ProductEntity>,
             pageNumber: Int?,
             totalPages: Int?,
-        ): PageableProductData =
+        ): PagedProductsData =
             if (pageNumber == null || totalPages == null) {
-                PageableProductData(products, false)
+                PagedProductsData(products, false)
             } else {
-                PageableProductData(products, pageNumber + 1 < totalPages)
+                PagedProductsData(products, pageNumber + 1 < totalPages)
             }
     }
 }

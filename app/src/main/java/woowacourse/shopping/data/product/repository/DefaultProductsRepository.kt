@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.product.repository
 
-import woowacourse.shopping.data.product.PageableProductData
+import woowacourse.shopping.data.product.PagedProductsData
 import woowacourse.shopping.data.product.entity.ProductEntity
 import woowacourse.shopping.data.product.entity.RecentViewedProductEntity
 import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
 import woowacourse.shopping.data.product.source.ProductsDataSource
 import woowacourse.shopping.data.product.source.RecentViewedProductsDataSource
 import woowacourse.shopping.data.product.source.RemoteProductsDataSource
-import woowacourse.shopping.domain.product.PageableProducts
+import woowacourse.shopping.domain.product.PagedProducts
 import woowacourse.shopping.domain.product.Product
 import java.time.LocalDateTime
 import kotlin.concurrent.thread
@@ -16,20 +16,20 @@ class DefaultProductsRepository(
     private val productsDataSource: ProductsDataSource = RemoteProductsDataSource(),
     private val recentViewedProductsDataSource: RecentViewedProductsDataSource = LocalRecentViewedProductsDataSource,
 ) : ProductsRepository {
-    override fun loadPageableProducts(
+    override fun loadPagedProducts(
         page: Int,
         size: Int,
-        onLoad: (Result<PageableProducts>) -> Unit,
+        onLoad: (Result<PagedProducts>) -> Unit,
     ) {
         {
-            val pageableProductData: PageableProductData =
-                productsDataSource.pageableProducts(
+            val pagedProductsData: PagedProductsData =
+                productsDataSource.pagedProducts(
                     page = page,
                     size = size,
                 )
-            PageableProducts(
-                products = pageableProductData.products.map { it.toDomain() },
-                loadable = pageableProductData.loadable,
+            PagedProducts(
+                products = pagedProductsData.products.map { it.toDomain() },
+                loadable = pagedProductsData.loadable,
             )
         }.runAsync(onLoad)
     }

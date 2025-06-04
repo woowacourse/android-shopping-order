@@ -7,7 +7,7 @@ import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.cart.PageableCartItems
+import woowacourse.shopping.domain.cart.PagedCartItems
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
@@ -142,11 +142,11 @@ class CartViewModel(
     }
 
     fun loadCartItems() {
-        cartRepository.loadPageableCartItems(page - 1, COUNT_PER_PAGE) { result ->
+        cartRepository.loadPagedCartItems(page - 1, COUNT_PER_PAGE) { result ->
             result
-                .onSuccess { pageableCartItems: PageableCartItems ->
+                .onSuccess { pagedCartItems: PagedCartItems ->
                     val cartItems: List<CartItemType.ProductItem> =
-                        pageableCartItems.cartItems.map { newCartItem: CartItem ->
+                        pagedCartItems.cartItems.map { newCartItem: CartItem ->
                             val selectedItem =
                                 selectedCartItems.value
                                     .orEmpty()
@@ -170,8 +170,8 @@ class CartViewModel(
                     val paginationItem: CartItemType.PaginationItem =
                         CartItemType.PaginationItem(
                             page = page,
-                            previousEnabled = pageableCartItems.hasPrevious,
-                            nextEnabled = pageableCartItems.hasNext,
+                            previousEnabled = pagedCartItems.hasPrevious,
+                            nextEnabled = pagedCartItems.hasNext,
                         )
 
                     _cartItems.postValue(cartItems + paginationItem)

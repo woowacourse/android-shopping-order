@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.product.source
 
 import woowacourse.shopping.data.API
-import woowacourse.shopping.data.product.PageableProductData
+import woowacourse.shopping.data.product.PagedProductsData
 import woowacourse.shopping.data.product.dto.ProductResponse
 import woowacourse.shopping.data.product.dto.ProductsResponse
 import woowacourse.shopping.data.product.dto.ProductsResponse.Content
@@ -11,13 +11,13 @@ import woowacourse.shopping.data.product.service.ProductService
 class RemoteProductsDataSource(
     private val productService: ProductService = API.productService,
 ) : ProductsDataSource {
-    override fun pageableProducts(
+    override fun pagedProducts(
         page: Int,
         size: Int,
-    ): PageableProductData {
+    ): PagedProductsData {
         val response: ProductsResponse? = productService.getProducts(page, size).execute().body()
 
-        return PageableProductData.from(
+        return PagedProductsData.from(
             products = response?.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList(),
             pageNumber = response?.pageable?.pageNumber,
             totalPages = response?.totalPages,

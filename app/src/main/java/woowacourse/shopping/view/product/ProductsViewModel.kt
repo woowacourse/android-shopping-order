@@ -8,7 +8,7 @@ import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.product.PageableProducts
+import woowacourse.shopping.domain.product.PagedProducts
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
@@ -63,14 +63,14 @@ class ProductsViewModel(
     }
 
     private fun loadProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
-        productsRepository.loadPageableProducts(
+        productsRepository.loadPagedProducts(
             page = page,
             size = LOAD_PRODUCTS_SIZE,
         ) { result ->
             result
-                .onSuccess { pageableProducts: PageableProducts ->
+                .onSuccess { pagedProducts: PagedProducts ->
                     val productItems =
-                        pageableProducts.products.map { product: Product ->
+                        pagedProducts.products.map { product: Product ->
                             ProductsItem.ProductItem(
                                 product = product,
                                 quantity =
@@ -80,7 +80,7 @@ class ProductsViewModel(
                                         }?.quantity ?: 0,
                             )
                         }
-                    val loadItem = ProductsItem.LoadItem(pageableProducts.loadable)
+                    val loadItem = ProductsItem.LoadItem(pagedProducts.loadable)
                     _productsItems.postValue(listOf(recentViewedProductsItem) + productItems + loadItem)
                     Thread.sleep(1000)
                     loading.postValue(false)
@@ -91,12 +91,12 @@ class ProductsViewModel(
     }
 
     fun loadMoreProducts() {
-        productsRepository.loadPageableProducts(
+        productsRepository.loadPagedProducts(
             ++page,
             LOAD_PRODUCTS_SIZE,
-        ) { result: Result<PageableProducts> ->
+        ) { result: Result<PagedProducts> ->
             result
-                .onSuccess { pageableProducts: PageableProducts ->
+                .onSuccess { pagedProducts: PagedProducts ->
                     val recentViewedProductsItem =
                         productsItems.value?.first() ?: ProductsItem.RecentViewedProductsItem(
                             emptyList(),
@@ -105,7 +105,7 @@ class ProductsViewModel(
                         productsItems.value?.filterIsInstance<ProductsItem.ProductItem>()
                             ?: emptyList()
                     val productItems =
-                        pageableProducts.products.map { product: Product ->
+                        pagedProducts.products.map { product: Product ->
                             ProductsItem.ProductItem(
                                 product = product,
                                 quantity =
@@ -115,7 +115,7 @@ class ProductsViewModel(
                                         }?.quantity ?: 0,
                             )
                         }
-                    val loadItem = ProductsItem.LoadItem(pageableProducts.loadable)
+                    val loadItem = ProductsItem.LoadItem(pagedProducts.loadable)
 
                     _productsItems.postValue(listOf(recentViewedProductsItem) + oldProductItems + productItems + loadItem)
                 }.onFailure {

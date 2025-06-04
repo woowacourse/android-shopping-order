@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.cart
 
-class PageableCartItems(
+class PagedCartItems(
     val cartItems: List<CartItem>,
     val hasPrevious: Boolean,
     val hasNext: Boolean,

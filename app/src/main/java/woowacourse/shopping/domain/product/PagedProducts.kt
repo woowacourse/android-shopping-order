@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.product
 
-class PageableProducts(
+class PagedProducts(
     val products: List<Product>,
     val loadable: Boolean,
 )

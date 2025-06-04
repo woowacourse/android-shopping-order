@@ -1,24 +1,24 @@
 package woowacourse.shopping.data.cart.repository
 
-import woowacourse.shopping.data.cart.PageableCartItemData
+import woowacourse.shopping.data.cart.PagedCartItemData
 import woowacourse.shopping.data.cart.source.CartDataSource
 import woowacourse.shopping.data.cart.source.RemoteCartDataSource
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.cart.PageableCartItems
+import woowacourse.shopping.domain.cart.PagedCartItems
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(
     private val cartDataSource: CartDataSource = RemoteCartDataSource(),
 ) : CartRepository {
-    override fun loadPageableCartItems(
+    override fun loadPagedCartItems(
         page: Int,
         size: Int,
-        onLoad: (Result<PageableCartItems>) -> Unit,
+        onLoad: (Result<PagedCartItems>) -> Unit,
     ) {
         {
-            val pageableCartItemData: PageableCartItemData =
-                cartDataSource.pageableCartItems(page, size)
-            pageableCartItemData.toDomain()
+            val pagedCartItemData: PagedCartItemData =
+                cartDataSource.pagedCartItems(page, size)
+            pagedCartItemData.toDomain()
         }.runAsync(onLoad)
     }
 

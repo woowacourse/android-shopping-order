@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.cart.source
 
 import woowacourse.shopping.data.API
-import woowacourse.shopping.data.cart.PageableCartItemData
+import woowacourse.shopping.data.cart.PagedCartItemData
 import woowacourse.shopping.data.cart.dto.CartItemQuantityRequest
 import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.cart.service.CartService
@@ -11,13 +11,13 @@ import woowacourse.shopping.data.product.entity.CartItemEntity
 class RemoteCartDataSource(
     private val cartService: CartService = API.cartService,
 ) : CartDataSource {
-    override fun pageableCartItems(
+    override fun pagedCartItems(
         page: Int,
         size: Int,
-    ): PageableCartItemData {
+    ): PagedCartItemData {
         val response: CartResponse? = cartService.getCart(page = page, size = size).execute().body()
 
-        return PageableCartItemData.from(
+        return PagedCartItemData.from(
             cartItems =
                 response?.content?.mapNotNull { it.toCartItemEntityOrNull() }
                     ?: emptyList(),
