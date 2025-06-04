@@ -4,7 +4,6 @@ import woowacourse.shopping.data.dto.response.toProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.ProductApiService
 import woowacourse.shopping.domain.model.Product
-import java.util.concurrent.CountDownLatch
 
 class ProductRemoteDataSource(
     private val productService: ProductApiService,
@@ -25,7 +24,6 @@ class ProductRemoteDataSource(
     }
 
     suspend fun getProductsByIds(ids: List<Int>): Result<List<Product>?> {
-        val latch = CountDownLatch(ids.size)
         val products = mutableListOf<Product>()
         val exceptions = mutableListOf<Throwable>()
 
@@ -37,9 +35,7 @@ class ProductRemoteDataSource(
                 }.onFailure { throwable ->
                     exceptions.add(throwable)
                 }
-            latch.countDown()
         }
-        latch.await()
         return if (exceptions.isNotEmpty()) {
             Result.failure(exceptions.first())
         } else {

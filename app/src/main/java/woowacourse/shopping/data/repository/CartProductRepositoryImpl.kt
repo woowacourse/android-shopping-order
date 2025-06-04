@@ -51,19 +51,7 @@ class CartProductRepositoryImpl(
         return remoteDataSource.delete(id)
     }
 
-    override suspend fun deleteAll(ids: Set<Int>): Result<Unit> {
-        val exception = mutableListOf<Throwable>()
-        ids.forEach { id ->
-            val result = delete(id)
-            result
-                .onFailure {
-                    exception.add(it)
-                }
-        }
-        return if (exception.isEmpty()) {
-            Result.success(Unit)
-        } else {
-            Result.failure(exception.first())
-        }
+    override suspend fun deleteProductsByIds(ids: Set<Int>): Result<Unit> {
+        return remoteDataSource.deleteProductsByIds(ids)
     }
 }

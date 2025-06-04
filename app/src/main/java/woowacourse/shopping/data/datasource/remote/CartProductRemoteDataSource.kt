@@ -56,6 +56,23 @@ class CartProductRemoteDataSource(
         }
     }
 
+    suspend fun deleteProductsByIds(ids: Set<Int>): Result<Unit> {
+        val exceptions = mutableListOf<Throwable>()
+
+        ids.forEach { id ->
+            val result = delete(id)
+            result
+                .onFailure { throwable ->
+                    exceptions.add(throwable)
+                }
+        }
+        return if (exceptions.isNotEmpty()) {
+            Result.failure(exceptions.first())
+        } else {
+            Result.success(Unit)
+        }
+    }
+
     suspend fun getTotalQuantity(): Result<Int> {
         val response = cartProductService.getTotalQuantity()
 

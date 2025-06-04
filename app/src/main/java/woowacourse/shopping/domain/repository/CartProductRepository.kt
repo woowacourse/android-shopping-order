@@ -25,5 +25,5 @@ interface CartProductRepository {
 
     suspend fun delete(id: Int): Result<Unit>
 
-    suspend fun deleteAll(ids: Set<Int>): Result<Unit>
+    suspend fun deleteProductsByIds(ids: Set<Int>): Result<Unit>
 }

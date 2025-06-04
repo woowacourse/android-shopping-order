@@ -198,13 +198,14 @@ class CartProductRecommendationViewModel(
         _recommendedProducts.value = updatedList
     }
 
-    fun finishOrder() {
-        viewModelScope.launch {
-            val result = cartProductRepository.deleteAll(selectedCartIds)
-
-            result.onFailure {
-                Log.e("error", it.message.toString())
+    suspend fun finishOrder() {
+        val result =
+            withContext(Dispatchers.IO) {
+                cartProductRepository.deleteProductsByIds(selectedCartIds)
             }
+
+        result.onFailure {
+            Log.e("error", it.message.toString())
         }
     }
 

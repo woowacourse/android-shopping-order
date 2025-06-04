@@ -52,16 +52,18 @@ class ProductCatalogViewModel(
     }
 
     override fun onAddClick(item: Product) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = cartProductRepository.insert(item.id, QUANTITY_TO_ADD)
 
-            result
-                .onSuccess { cartProductId ->
-                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-                    updateQuantity(item, QUANTITY_TO_ADD)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+            withContext(Dispatchers.Main) {
+                result
+                    .onSuccess { cartProductId ->
+                        cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+                        updateQuantity(item, QUANTITY_TO_ADD)
+                    }.onFailure {
+                        Log.e("error", it.message.toString())
+                    }
+            }
         }
     }
 
@@ -98,7 +100,13 @@ class ProductCatalogViewModel(
                 .onSuccess {
                     cartProducts.removeIf { it.product.id == item.id }
                     val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
-                    if (newQuantity > MINIMUM_QUANTITY) cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                    if (newQuantity > MINIMUM_QUANTITY) {
+                        cartProducts.add(
+                            cartProduct.copy(
+                                quantity = newQuantity,
+                            ),
+                        )
+                    }
                     updateQuantity(item, -QUANTITY_TO_ADD)
                 }.onFailure {
                     Log.e("error", it.message.toString())
@@ -144,16 +152,14 @@ class ProductCatalogViewModel(
     }
 
     private fun loadRecentProducts() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT)
 
-            withContext(Dispatchers.Main) {
-                result.onSuccess {
-                    recentProducts = it
-                    _productCatalogItems.value = buildCatalogItems()
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+            result.onSuccess {
+                recentProducts = it
+                _productCatalogItems.postValue(buildCatalogItems())
+            }.onFailure {
+                Log.e("error", it.message.toString())
             }
         }
     }
@@ -197,8 +203,8 @@ class ProductCatalogViewModel(
             },
         )
         hasNext = pagedResult.hasNext
-        _onFinishLoading.postValue(true)
-        _productCatalogItems.postValue(buildCatalogItems())
+        _onFinishLoading.value = true
+        _productCatalogItems.value = buildCatalogItems()
     }
 
     private fun updateQuantity(
