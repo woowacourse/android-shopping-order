@@ -5,12 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import woowacourse.shopping.data.db.dao.HistoryDao
-import woowacourse.shopping.data.db.entity.CartEntity
 import woowacourse.shopping.data.db.entity.HistoryEntity
 
 @Database(
-    entities = [CartEntity::class, HistoryEntity::class],
-    version = 5,
+    entities = [HistoryEntity::class],
+    version = 6,
 )
 abstract class PetoMarketDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
