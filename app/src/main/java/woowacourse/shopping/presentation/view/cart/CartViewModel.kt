@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -93,7 +94,7 @@ class CartViewModel(
                     cartItem.copy(quantity = cartItem.quantity + 1),
                     isSelected = selectionStatus[cartItem.cartId] ?: false,
                 )
-            _itemUpdateEvent.postValue(updatedItem)
+            updateCartItems(updatedItem)
             isProcessingRequest = false
         }
     }
@@ -113,7 +114,7 @@ class CartViewModel(
                     cartItem.copy(quantity = cartItem.quantity - 1),
                     isSelected = selectionStatus[cartItem.cartId] ?: false,
                 )
-            _itemUpdateEvent.postValue(updatedItem)
+            updateCartItems(updatedItem)
             isProcessingRequest = false
         }
     }
@@ -138,11 +139,32 @@ class CartViewModel(
         }
     }
 
+    private fun updateCartItems(modifiedCartItem: CartItemUiModel) {
+        val newCartItems =
+            _cartItems.value.orEmpty().map { cartItem ->
+                if (modifiedCartItem.cartItem.cartId == cartItem.cartItem.cartId) {
+                    modifiedCartItem
+                } else {
+                    cartItem
+                }
+            }
+        _cartItems.postValue(newCartItems)
+        _itemUpdateEvent.postValue(modifiedCartItem)
+    }
+
     fun setCartItemSelection(
         cartItem: CartItemUiModel,
         isSelected: Boolean,
     ) {
         selectionStatus[cartItem.cartItem.cartId] = isSelected
+        val asdf =
+            _cartItems.value?.map { item ->
+                if (item.cartItem.cartId == cartItem.cartItem.cartId) {
+                    item.copy(isSelected = isSelected)
+                } else {
+                    item
+                }
+            }
         _cartItems.postValue(
             _cartItems.value?.map { item ->
                 if (item.cartItem.cartId == cartItem.cartItem.cartId) {
@@ -152,6 +174,7 @@ class CartViewModel(
                 }
             },
         )
+        Log.wtf("asdf", "$asdf")
         updateSelectionInfo()
     }
 
