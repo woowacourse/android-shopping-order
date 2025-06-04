@@ -26,10 +26,6 @@ class CartRecommendationFragment : Fragment() {
         )[CartViewModel::class.java]
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,7 +41,6 @@ class CartRecommendationFragment : Fragment() {
         binding.lifecycleOwner = this
         setProductAdapter()
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            Log.d("TESTT", "$products")
             (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map { ProductItem(it) })
         }
         return binding.root
