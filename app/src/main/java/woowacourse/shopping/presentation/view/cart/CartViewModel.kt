@@ -111,7 +111,7 @@ class CartViewModel(
                 ?.map { product ->
                     if (product.cartId == cartId) {
                         val updated = product.copy(amount = newAmount)
-                        _itemUpdateEvent.postValue(updated) // 상품 수량 변경 시 이벤트 발생
+                        _itemUpdateEvent.postValue(updated)
                         updated
                     } else {
                         product
