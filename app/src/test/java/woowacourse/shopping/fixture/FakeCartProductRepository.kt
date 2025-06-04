@@ -21,6 +21,7 @@ class FakeCartProductRepository : CartProductRepository {
                 price = 1000,
             )
         cartProducts.add(CartProduct(id = product.id, product = product, quantity = quantity))
+        onResult(Result.success(product.id))
     }
 
     override fun getPagedProducts(
