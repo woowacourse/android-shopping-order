@@ -1,20 +1,15 @@
 package woowacourse.shopping.presentation.view.cart.recommendation.adapter
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
-import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
 
 class RecommendationAdapter(
-    recommendedProducts: List<ProductUiModel> = emptyList(),
     private val recommendEventListener: RecommendEventListener,
     private val itemCounterListener: ItemCounterListener,
-) : RecyclerView.Adapter<RecommendationViewHolder>() {
-    private val items = mutableListOf<ProductUiModel>()
-
-    override fun getItemCount(): Int = items.size
-
+) : ListAdapter<ProductUiModel, RecommendationViewHolder>(productDiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -24,21 +19,30 @@ class RecommendationAdapter(
         holder: RecommendationViewHolder,
         position: Int,
     ) {
-        holder.bind(items[position])
-    }
-
-    fun updateRecommendedProducts(newProducts: List<ProductUiModel>) {
-        items.clear()
-        items.addAll(newProducts)
-        notifyDataSetChanged()
+        holder.bind(getItem(position))
     }
 
     fun updateItem(updatedProduct: ProductUiModel) {
-        val index = items.indexOfFirst { it.id == updatedProduct.id }
+        val currentList = currentList.toMutableList()
+        val index = currentList.indexOfFirst { it.id == updatedProduct.id }
         if (index != -1) {
-            items[index] = updatedProduct
-            notifyItemChanged(index)
-        } else {
+            currentList[index] = updatedProduct
+            submitList(currentList)
         }
+    }
+
+    companion object {
+        private val productDiffCallback =
+            object : DiffUtil.ItemCallback<ProductUiModel>() {
+                override fun areItemsTheSame(
+                    oldItem: ProductUiModel,
+                    newItem: ProductUiModel,
+                ): Boolean = oldItem.id == newItem.id
+
+                override fun areContentsTheSame(
+                    oldItem: ProductUiModel,
+                    newItem: ProductUiModel,
+                ): Boolean = oldItem == newItem
+            }
     }
 }

@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendedProductBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
-import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventListener
 
 class RecommendationViewHolder(
     private val binding: ItemRecommendedProductBinding,
