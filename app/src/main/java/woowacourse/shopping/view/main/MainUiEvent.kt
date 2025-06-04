@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.main
 
+import woowacourse.shopping.domain.exception.NetworkError
+
 sealed interface MainUiEvent {
     data class ShowCannotIncrease(val quantity: Int) : MainUiEvent
 
@@ -12,5 +14,5 @@ sealed interface MainUiEvent {
         val lastSeenProductCategory: String?,
     ) : MainUiEvent
 
-    data class ShowErrorMessage(val throwable: Throwable) : MainUiEvent
+    data class ShowErrorMessage(val throwable: NetworkError) : MainUiEvent
 }

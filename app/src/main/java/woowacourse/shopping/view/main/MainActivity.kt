@@ -14,6 +14,7 @@ import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityMainBinding
+import woowacourse.shopping.view.NetworkExceptionDelegator
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.detail.DetailActivity
@@ -23,6 +24,7 @@ import woowacourse.shopping.view.main.vm.MainViewModel
 import woowacourse.shopping.view.main.vm.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var networkExceptionDelegator: NetworkExceptionDelegator
     private val activityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -132,18 +134,9 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 is MainUiEvent.ShowErrorMessage -> {
-                    val messageResId = getErrorMessage(event.throwable)
-                    showToast(getString(messageResId))
+                    networkExceptionDelegator.showErrorMessage(event.throwable)
                 }
             }
-        }
-    }
-
-    private fun getErrorMessage(throwable: Throwable): Int {
-        return when (throwable) {
-            is NullPointerException -> R.string.error_text_null_result
-            is HttpException -> R.string.error_text_network_error
-            else -> R.string.error_text_unknown
         }
     }
 
