@@ -28,10 +28,11 @@ Cart 화면 구현
 - [ ] 총 가격은 변하는데 왜 체크 박스는 변하지 않는 기능 수정
 
 - [x] ShoppingApplication에 thread { DevMockServer.start() } 삭제
-- [ ] ShoppingApplication에서 정말 SharedPreferences에 값을 저장하고 있는 지 확인 + SharedPreference에서 어떻게 동작하는 지 확인
+- [x] ShoppingApplication에서 정말 SharedPreferences에 값을 저장하고 있는 지 확인 + SharedPreference에서 어떻게 동작하는 지 확인
 - [ ] CatalogViewModel에서 catalogProduct, quantity 사용하지 않는 값 삭제
 - [ ] CatalogViewModel에서 interface에서 remoteCatalogProductRepositoryImpl 실제 구현체 주입 -> 수정
-- [ ] 사용자 정보 local.properties에 저장 -> BuildConfig로 갖고 오게 끔 구현
+- [x] 최근 상품 목록이 0개인 경우, 최근 본 상품 목록 뷰가 보이지 않게 하기
+- [x] 사용자 정보 local.properties에 저장 -> BuildConfig로 갖고 오게 끔 구현
   - [ ] 레벨업 부분 ) 인증에 필요한 key은 secerets에 저장
 - CartActivity에서 생각해야 할 부분
   - [ ] CartActivity에서 hasHandledTotalCount가 정말 필요한 로직일지 생각

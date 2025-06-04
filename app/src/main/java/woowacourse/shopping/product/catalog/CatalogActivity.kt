@@ -21,19 +21,27 @@ import woowacourse.shopping.product.detail.DetailActivity
 
 class CatalogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCatalogBinding
-    private lateinit var viewModel: CatalogViewModel
+    private val viewModel: CatalogViewModel by lazy {
+        ViewModelProvider(
+            this,
+            CatalogViewModelFactory(application as ShoppingApplication),
+        )[CatalogViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog)
+
         applyWindowInsets()
 
-        setViewModel()
         setProductAdapter()
         setRecentlyViewedProductAdapter()
         observeCatalogProducts()
+
+        binding.vm = viewModel
+        binding.lifecycleOwner = this
     }
 
     override fun onResume() {
@@ -62,14 +70,6 @@ class CatalogActivity : AppCompatActivity() {
 
         menuItem?.actionView = binding.root
         return true
-    }
-
-    private fun setViewModel() {
-        viewModel =
-            ViewModelProvider(
-                this,
-                CatalogViewModelFactory(application as ShoppingApplication),
-            )[CatalogViewModel::class.java]
     }
 
     private fun setProductAdapter() {
@@ -104,7 +104,8 @@ class CatalogActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int = spanSizeByPosition(position, adapter.itemCount)
+                override fun getSpanSize(position: Int): Int =
+                    spanSizeByPosition(position, adapter.itemCount)
             }
         binding.recyclerViewProducts.layoutManager = gridLayoutManager
     }
@@ -122,11 +123,9 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun observeCatalogProducts() {
         viewModel.catalogItems.observe(this) { value ->
-            Log.d("CATALOG", "$value")
             (binding.recyclerViewProducts.adapter as ProductAdapter).setItems(value)
         }
         viewModel.updatedItem.observe(this) { product ->
-            Log.d("test", "프로덕트 ${product}")
             if (product != null) {
                 (binding.recyclerViewProducts.adapter as ProductAdapter).updateItem(product)
             }

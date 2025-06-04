@@ -3,7 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data></data>
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.product.catalog.CatalogViewModel" />
+    </data>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -22,6 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:text="@string/text_recently_viewed_product"
+                android:visibility="@{vm.recentlyViewedProducts.isEmpty() ? View.GONE : View.VISIBLE}"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -34,13 +42,16 @@
                 android:orientation="horizontal"
                 android:overScrollMode="never"
                 android:scrollbars="horizontal"
+                android:visibility="@{vm.recentlyViewedProducts.isEmpty() ? View.GONE : View.VISIBLE}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="10"
                 tools:listitem="@layout/recently_viewed_product_item" />
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="16dp" />
+                android:layout_height="16dp"
+                android:visibility="@{vm.recentlyViewedProducts.isEmpty() ? View.GONE : View.VISIBLE}"
+                />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_products"
