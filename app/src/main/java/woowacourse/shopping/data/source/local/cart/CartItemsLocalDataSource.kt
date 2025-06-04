@@ -5,6 +5,10 @@ import woowacourse.shopping.data.model.CachedCartItem
 class CartItemsLocalDataSource {
     private var cache: MutableSet<CachedCartItem> = mutableSetOf()
 
+    fun saveCartItems(cachedCartItems: List<CachedCartItem>) {
+        cache = cachedCartItems.toMutableSet()
+    }
+
     fun add(
         cartId: Long,
         productId: Long,
@@ -29,12 +33,8 @@ class CartItemsLocalDataSource {
         cache.removeIf { it.cartId == cartId }
     }
 
-    fun findCachedCartId(productId: Long): Long? {
+    fun getCartId(productId: Long): Long? {
         return cache.find { it.productId == productId }?.cartId
-    }
-
-    fun getCachedCartItem(cachedCartItems: List<CachedCartItem>) {
-        cache = cachedCartItems.toMutableSet()
     }
 
     fun getQuantity(productId: Long): Int {

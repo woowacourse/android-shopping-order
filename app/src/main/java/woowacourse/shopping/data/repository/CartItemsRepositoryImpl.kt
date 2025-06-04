@@ -16,7 +16,7 @@ class CartItemsRepositoryImpl(
         getInitialCartItems(null, null) { result ->
             result
                 .onSuccess { cachedCartItems ->
-                    cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
+                    cartItemsLocalDataSource.saveCartItems(cachedCartItems)
                 }
         }
     }
@@ -73,7 +73,7 @@ class CartItemsRepositoryImpl(
         id: Long,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+        val cartId = cartItemsLocalDataSource.getCartId(id)
 
         if (cartId != null) {
             cartItemsRemoteDataSource.deleteCartItem(cartId) { result ->
@@ -102,7 +102,7 @@ class CartItemsRepositoryImpl(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+        val cartId = cartItemsLocalDataSource.getCartId(id)
         if (cartId != null) {
             cartItemsLocalDataSource.update(id, quantity)
             cartItemsRemoteDataSource.updateCartItem(cartId, quantity) { result ->
@@ -116,7 +116,7 @@ class CartItemsRepositoryImpl(
         quantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+        val cartId = cartItemsLocalDataSource.getCartId(id)
         val updatedQuantity = cartItemsLocalDataSource.getQuantity(id) + quantity
         if (cartId != null) {
             cartItemsLocalDataSource.update(id, updatedQuantity)
