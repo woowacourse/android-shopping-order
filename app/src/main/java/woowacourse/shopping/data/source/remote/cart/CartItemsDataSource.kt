@@ -27,5 +27,5 @@ interface CartItemsDataSource {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun getCarItemsCount(onResult: (Result<ItemCount>) -> Unit)
+    fun getCartCount(onResult: (Result<ItemCount>) -> Unit)
 }
