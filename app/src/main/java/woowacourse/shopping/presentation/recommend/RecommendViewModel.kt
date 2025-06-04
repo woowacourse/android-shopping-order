@@ -1,9 +1,13 @@
 package woowacourse.shopping.presentation.recommend
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
@@ -11,6 +15,8 @@ import woowacourse.shopping.presentation.Extra.KEY_SELECT_COUNT
 import woowacourse.shopping.presentation.Extra.KEY_SELECT_PRICE
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CartItemUiModel
+import woowacourse.shopping.presentation.model.toDomain
+import woowacourse.shopping.presentation.model.toPresentation
 
 class RecommendViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -33,27 +39,30 @@ class RecommendViewModel(
     }
 
     private fun fetchData() {
-        recentProductRepository.getMostRecentProduct { result ->
-            result
+        viewModelScope.launch {
+            recentProductRepository
+                .getMostRecentProduct()
                 .onSuccess { recentProduct ->
                     recentCategory = recentProduct?.category ?: ""
 
-                    recommendProductsUseCase(recentCategory) { result ->
-                        result
-                            .onSuccess { products ->
-                                val recommendItems = products.map { it.toPresentation() }
-                                _recommendProducts.postValue(recommendItems)
-                            }.onFailure { _toastMessage.postValue(R.string.recommend_toast_load_fail) }
-                    }
+                    recommendProductsUseCase(recentCategory)
+                        .onSuccess { products ->
+                            Log.d("meeple_log", "$products")
+                            val recommendItems = products.map { it.toPresentation() }
+                            _recommendProducts.value = recommendItems
+                        }.onFailure {
+                            _toastMessage.value = R.string.recommend_toast_load_fail
+                        }
                 }.onFailure {
-                    _toastMessage.postValue(R.string.recommend_toast_recent_load_fail)
+                    _toastMessage.value = R.string.recommend_toast_recent_load_fail
                 }
         }
     }
 
     fun addToCart(cartItem: CartItemUiModel) {
-        cartRepository.insertProduct(cartItem.product.toDomain(), 1) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .insertProduct(cartItem.product.toDomain(), 1)
                 .onSuccess {
                     updateQuantity(productId = cartItem.product.id, 1)
                 }.onFailure {
@@ -63,8 +72,9 @@ class RecommendViewModel(
     }
 
     fun increaseQuantity(id: Long) {
-        cartRepository.increaseQuantity(id) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .increaseQuantity(id)
                 .onSuccess {
                     updateQuantity(id, 1)
                 }.onFailure {
@@ -74,8 +84,9 @@ class RecommendViewModel(
     }
 
     fun decreaseQuantity(id: Long) {
-        cartRepository.decreaseQuantity(id) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .decreaseQuantity(id)
                 .onSuccess {
                     updateQuantity(id, -1)
                 }.onFailure {
@@ -98,7 +109,7 @@ class RecommendViewModel(
                     it
                 }
             }
-        _recommendProducts.postValue(updatedItem)
+        _recommendProducts.value = updatedItem
     }
 
     private fun updateSelectedInfo(

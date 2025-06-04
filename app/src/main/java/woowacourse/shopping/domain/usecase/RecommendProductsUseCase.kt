@@ -12,7 +12,7 @@ class RecommendProductsUseCase(
                 page = null,
                 pageSize = null,
                 category = category,
-            ).onSuccess { products ->
+            ).mapCatching { products ->
                 products
                     .asSequence()
                     .filter { it.quantity == 0 }
