@@ -45,7 +45,7 @@ class MainViewModel(
     val uiEvent: SingleLiveData<MainUiEvent> get() = _uiEvent
 
     init {
-        fetchProducts(0)
+        fetchProducts(INITIAL_PAGE)
     }
 
     fun loadPage() =
@@ -189,10 +189,6 @@ class MainViewModel(
 
     private fun updateUiState(transform: ProductUiState.() -> ProductUiState) {
         _uiState.value = _uiState.value?.let(transform)
-    }
-
-    private fun handleFailure(throwable: Throwable) {
-        // _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
     }
 
     private fun handleFailure(throwable: NetworkError) {

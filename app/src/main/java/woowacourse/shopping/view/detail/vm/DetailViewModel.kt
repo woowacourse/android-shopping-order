@@ -22,11 +22,10 @@ import woowacourse.shopping.view.core.handler.CartQuantityHandler
 import woowacourse.shopping.view.detail.DetailActivity.Companion.NO_LAST_SEEN_PRODUCT
 import woowacourse.shopping.view.detail.DetailUiEvent
 import woowacourse.shopping.view.main.state.ProductState
-import kotlin.onFailure
 
 class DetailViewModel(
-    private val defaultProductRepository: ProductRepository,
-    private val defaultCartRepository: CartRepository,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
 ) : ViewModel() {
     private val _uiState = MutableLiveData<DetailUiState>()
@@ -40,9 +39,10 @@ class DetailViewModel(
         lastSeenProductId: Long,
     ) {
         viewModelScope.launch {
-            defaultProductRepository.loadProduct(productId)
-                .onSuccess { initializeUiState(productId, lastSeenProductId, it) }
-                .onFailure(::handleFailure)
+            val result = productRepository.loadProduct(productId)
+            result.onSuccess { product ->
+                initializeUiState(productId, lastSeenProductId, product)
+            }.onFailure(::handleFailure)
 
             historyRepository.saveHistory(productId)
         }
@@ -65,73 +65,78 @@ class DetailViewModel(
         product: Product,
     ) {
         viewModelScope.launch {
-            defaultProductRepository.loadProduct(lastSeenProductId)
-                .onSuccess { lastSeenProduct ->
-                    _uiState.value =
-                        DetailUiState(
-                            ProductState(item = product, cartQuantity = Quantity(1)),
-                            lastSeenProduct,
-                        )
-                }
-                .onFailure(::handleFailure)
+            val result = productRepository.loadProduct(lastSeenProductId)
+            result.onSuccess { lastSeenProduct ->
+                _uiState.value =
+                    DetailUiState(
+                        product = ProductState(item = product, cartQuantity = Quantity(1)),
+                        lastSeenProduct = lastSeenProduct,
+                    )
+            }.onFailure(::handleFailure)
         }
     }
 
-    fun increaseCartQuantity() =
+    fun increaseCartQuantity() {
         withState(_uiState.value) { state ->
             _uiState.value = state.increaseQuantity()
         }
+    }
 
-    fun decreaseCartQuantity() =
+    fun decreaseCartQuantity() {
         withState(_uiState.value) { state ->
             val (newState, event) = state.decreaseQuantity()
-
             _uiState.value = newState
             event?.let(_uiEvent::setValue)
         }
+    }
 
     fun saveCart(productId: Long) {
         viewModelScope.launch {
-            defaultCartRepository.loadSinglePage(null, null)
-                .onSuccess { value ->
-                    value.isSavedInCart(productId)
-                        ?.let { whenProductSavedInCart(it) }
-                        ?: run { whenProductNotSavedInCart(productId) }
+            val result = cartRepository.loadSinglePage(null, null)
+            result.onSuccess { carts ->
+                val savedCart = carts.isSavedInCart(productId)
+                if (savedCart != null) {
+                    updateExistingCart(savedCart)
+                } else {
+                    addNewCart(productId)
                 }
-                .onFailure(::handleFailure)
+            }.onFailure(::handleFailure)
         }
     }
 
-    private fun whenProductSavedInCart(cart: ShoppingCart) =
-        withState(_uiState.value) { state ->
-            viewModelScope.launch {
-                defaultCartRepository.updateQuantity(
-                    cart.id,
-                    state.addQuantity(cart.quantity),
-                )
-                    .onSuccess {
-                        _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
-                    }
-                    .onFailure(::handleFailure)
-            }
-        }
+    private fun updateExistingCart(cart: ShoppingCart) {
+        val state = _uiState.value ?: return
+        val newQuantity = state.addQuantity(cart.quantity)
 
-    private fun whenProductNotSavedInCart(productId: Long) =
-        withState(_uiState.value) { state ->
-            val cart = Cart(state.cartQuantity, productId)
-            viewModelScope.launch {
-                defaultCartRepository.addCart(cart)
-                    .onSuccess {
-                        _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
-                    }
-                    .onFailure(::handleFailure)
-            }
+        viewModelScope.launch {
+            val result = cartRepository.updateQuantity(cart.id, newQuantity)
+            result.onSuccess {
+                navigateToCart(state.category)
+            }.onFailure(::handleFailure)
         }
+    }
+
+    private fun addNewCart(productId: Long) {
+        val state = _uiState.value ?: return
+        val cart = Cart(state.cartQuantity, productId)
+
+        viewModelScope.launch {
+            val result = cartRepository.addCart(cart)
+            result.onSuccess {
+                navigateToCart(state.category)
+            }.onFailure(::handleFailure)
+        }
+    }
 
     fun saveLastSeenProduct(lastSeenProductId: Long) {
         viewModelScope.launch {
             historyRepository.saveHistory(lastSeenProductId)
         }
+        _uiEvent.setValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
+    }
+
+    private fun navigateToCart(category: String) {
+        _uiEvent.setValue(DetailUiEvent.NavigateToCart(category))
     }
 
     private fun handleFailure(throwable: NetworkError) {
