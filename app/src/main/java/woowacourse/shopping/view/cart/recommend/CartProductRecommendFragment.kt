@@ -17,13 +17,12 @@ import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapte
 import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
-class CartProductRecommendFragment(
-    application: ShoppingApplication,
-) : Fragment() {
+class CartProductRecommendFragment : Fragment() {
     private var _binding: FragmentCartProductRecommendBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
+        val application = requireActivity().application as ShoppingApplication
         ViewModelProvider(
             this,
             CartProductRecommendViewModelFactory(

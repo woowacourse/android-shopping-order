@@ -13,13 +13,12 @@ import woowacourse.shopping.databinding.FragmentCartProductSelectBinding
 import woowacourse.shopping.view.cart.recommend.CartProductRecommendFragment
 import woowacourse.shopping.view.cart.select.adapter.CartProductAdapter
 
-class CartProductSelectFragment(
-    application: ShoppingApplication,
-) : Fragment() {
+class CartProductSelectFragment : Fragment() {
     private var _binding: FragmentCartProductSelectBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
+        val application = requireActivity().application as ShoppingApplication
         ViewModelProvider(
             this,
             CartProductSelectViewModelFactory(application.cartProductRepository),
