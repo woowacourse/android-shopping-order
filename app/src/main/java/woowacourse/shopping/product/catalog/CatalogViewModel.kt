@@ -1,6 +1,5 @@
 package woowacourse.shopping.product.catalog
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,7 +40,7 @@ class CatalogViewModel(
 
     init {
         catalogProductRepository.getAllProductsSize { allProductsSize ->
-            loadCatalog(0, PAGE_SIZE, 20, allProductsSize)
+            loadCatalog(PAGE_SIZE, 20, allProductsSize)
         }
     }
 
@@ -62,10 +61,6 @@ class CatalogViewModel(
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val catalogProduct: CatalogItem? =
-            catalogItems.value?.find { (it as ProductItem).productItem.id == product.id }
-        val quantity = (catalogProduct as ProductItem).productItem.quantity
-
         if (product.quantity == 1) {
             cartProductRepository.deleteCartProduct(product)
             _updatedItem.postValue(product.copy(quantity = 0))
@@ -87,8 +82,7 @@ class CatalogViewModel(
         remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
             val startIndex = currentPage * PAGE_SIZE
             val endIndex = minOf(startIndex + PAGE_SIZE, allProductSize)
-
-            loadCatalog(startIndex, endIndex, 20, allProductSize)
+            loadCatalog(endIndex, 20, allProductSize)
         }
     }
 
@@ -97,15 +91,13 @@ class CatalogViewModel(
         val currentPage = page.value ?: 0
 
         remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
-            val startIndex = 0
             val endIndex = minOf((currentPage + 1) * PAGE_SIZE, allProductSize)
 
-            loadCatalog(startIndex, endIndex, 20, allProductSize)
+            loadCatalog(endIndex, 20, allProductSize)
         }
     }
 
     fun loadCatalog(
-        startIndex: Int,
         endIndex: Int,
         size: Int = 20,
         allProductsSize: Int,
