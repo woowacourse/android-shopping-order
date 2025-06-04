@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
+import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.feature.CustomCartQuantity
 import woowacourse.shopping.feature.CustomLastViewed
 import woowacourse.shopping.feature.model.ResultCode
@@ -38,9 +39,9 @@ class GoodsDetailsActivity : AppCompatActivity() {
             viewModel.updateLastViewedVisibility()
         }
 
-        observeCartInsertResult()
+        sendHistoryResult()
         setOnClickListener()
-        navigateToLastViewed()
+        setupObservers()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,13 +58,23 @@ class GoodsDetailsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun navigateToLastViewed() {
+    private fun sendHistoryResult() {
+        setResult(
+            ResultCode.GOODS_DETAIL_INSERT.code,
+            Intent().apply {
+                putExtra(HISTORY_ID, id)
+            },
+        )
+    }
+
+    private fun setupObservers() {
+        observeCartInsertResult()
+        observeNavigateToLastViewedCart()
+    }
+
+    private fun observeNavigateToLastViewedCart() {
         viewModel.navigateToLastViewedCart.observe(this) { lastViewedCart ->
-            lastViewedCart.let {
-                val intent = newIntent(this@GoodsDetailsActivity, it.id)
-                startActivity(intent)
-                finish()
-            }
+            navigateToLastViewed(lastViewedCart)
         }
     }
 
@@ -87,13 +98,14 @@ class GoodsDetailsActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
-        setResult(
-            ResultCode.GOODS_DETAIL_INSERT.code,
-            Intent().apply {
-                putExtra(HISTORY_ID, id)
-            },
-        )
+    private fun navigateToLastViewed(lastViewedCart: History) {
+        lastViewedCart.let {
+            val intent = newIntent(this@GoodsDetailsActivity, it.id)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun setOnClickListener() {
