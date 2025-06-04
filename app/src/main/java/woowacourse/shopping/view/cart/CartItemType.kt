@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.cart
 
 import woowacourse.shopping.domain.cart.CartItem
+import java.io.Serializable
 
 sealed interface CartItemType {
     val viewType: ItemType
@@ -8,7 +9,8 @@ sealed interface CartItemType {
     data class ProductItem(
         val cartItem: CartItem,
         val selected: Boolean,
-    ) : CartItemType {
+    ) : CartItemType,
+        Serializable {
         val cartItemId: Long = cartItem.id
         override val viewType: ItemType = ItemType.PRODUCT
         val imageUrl = cartItem.imageUrl

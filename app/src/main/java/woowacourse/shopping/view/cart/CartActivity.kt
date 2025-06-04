@@ -56,7 +56,8 @@ class CartActivity :
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.onOrder = {
-            val intent = RecommendActivity.newIntent(this)
+            val intent =
+                RecommendActivity.newIntent(this, viewModel.selectedCartItems.value ?: emptySet())
             startActivity(intent)
         }
     }

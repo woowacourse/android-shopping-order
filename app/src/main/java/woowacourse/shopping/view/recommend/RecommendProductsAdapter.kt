@@ -29,7 +29,7 @@ class RecommendProductsAdapter(
                 override fun areItemsTheSame(
                     oldItem: RecommendProduct,
                     newItem: RecommendProduct,
-                ): Boolean = oldItem.id == newItem.id
+                ): Boolean = oldItem.productId == newItem.productId
 
                 override fun areContentsTheSame(
                     oldItem: RecommendProduct,

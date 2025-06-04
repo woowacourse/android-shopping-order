@@ -3,10 +3,12 @@ package woowacourse.shopping.view.recommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
@@ -23,59 +25,121 @@ class RecommendViewModel(
 
     private var addedItems: Map<Long, Long> = mapOf()
 
+    val selectedCartItems: MutableLiveData<List<CartItem>> = MutableLiveData()
+
+    val totalPrice: LiveData<Int> =
+        selectedCartItems.map { cart: List<CartItem> ->
+            cart.sumOf(CartItem::price)
+        }
+
+    val cartSize: LiveData<Int> =
+        selectedCartItems.map { cart: List<CartItem> ->
+            cart.sumOf(CartItem::quantity)
+        }
+
     init {
         loadRecommendedProducts()
     }
 
-    fun plusCartItemQuantity(product: RecommendProduct) {
-        if (product.quantity == 0) {
-            cartRepository.addCartItem(product.id, 1) { result ->
+    fun addAlreadyAddedCartItems(alreadyAddedCartItems: List<CartItem>) {
+        selectedCartItems.value = alreadyAddedCartItems
+    }
+
+    fun plusCartItemQuantity(recommend: RecommendProduct) {
+        if (recommend.quantity == 0) {
+            cartRepository.addCartItem(recommend.productId, 1) { result ->
                 result
                     .onSuccess { cartItemId: Long? ->
-                        if (cartItemId != null) {
-                            addedItems = addedItems.plus(product.id to cartItemId)
-                        }
-                        product.update(1)
-                    }.onFailure { _event.postValue(RecommendEvent.MODIfY_CART_FAILURE) }
+                        cartItemId ?: return@onSuccess
+
+                        addedItems = addedItems.plus(recommend.productId to cartItemId)
+                        recommend.update(1)
+                        selectedCartItems.postValue(
+                            selectedCartItems.value?.plus(
+                                CartItem(cartItemId, recommend.product, 1),
+                            ),
+                        )
+                    }.onFailure { _event.postValue(RecommendEvent.MODIFY_CART_FAILURE) }
             }
         } else {
             cartRepository.updateCartItemQuantity(
-                addedItems[product.id] ?: return,
-                product.quantity + 1,
+                addedItems[recommend.productId] ?: return,
+                recommend.quantity + 1,
             ) { result ->
                 result
                     .onSuccess {
-                        product.update(product.quantity + 1)
+                        recommend.update(recommend.quantity + 1)
+                        selectedCartItems.postValue(
+                            selectedCartItems.value
+                                ?.minus(
+                                    CartItem(
+                                        addedItems[recommend.productId] ?: return@onSuccess,
+                                        recommend.product,
+                                        recommend.quantity,
+                                    ),
+                                )?.plus(
+                                    CartItem(
+                                        addedItems[recommend.productId] ?: return@onSuccess,
+                                        recommend.product,
+                                        recommend.quantity + 1,
+                                    ),
+                                ),
+                        )
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIfY_CART_FAILURE)
+                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
                     }
             }
         }
     }
 
-    fun minusCartItemQuantity(product: RecommendProduct) {
-        if (product.quantity == 1) {
+    fun minusCartItemQuantity(recommend: RecommendProduct) {
+        if (recommend.quantity == 1) {
             cartRepository.remove(
-                addedItems[product.id] ?: return,
+                addedItems[recommend.productId] ?: return,
             ) { result ->
                 result
                     .onSuccess {
-                        addedItems = addedItems.minus(product.id)
-                        product.update(0)
+                        recommend.update(0)
+                        selectedCartItems.postValue(
+                            selectedCartItems.value?.minus(
+                                CartItem(
+                                    addedItems[recommend.productId] ?: return@onSuccess,
+                                    recommend.product,
+                                    1,
+                                ),
+                            ),
+                        )
+                        addedItems = addedItems.minus(recommend.productId)
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIfY_CART_FAILURE)
+                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
                     }
             }
         } else {
             cartRepository.updateCartItemQuantity(
-                addedItems[product.id] ?: return,
-                product.quantity - 1,
+                addedItems[recommend.productId] ?: return,
+                recommend.quantity - 1,
             ) { result ->
                 result
                     .onSuccess {
-                        product.update(product.quantity - 1)
+                        recommend.update(recommend.quantity - 1)
+                        selectedCartItems.postValue(
+                            selectedCartItems.value
+                                ?.minus(
+                                    CartItem(
+                                        addedItems[recommend.productId] ?: return@onSuccess,
+                                        recommend.product,
+                                        recommend.quantity,
+                                    ),
+                                )?.plus(
+                                    CartItem(
+                                        addedItems[recommend.productId] ?: return@onSuccess,
+                                        recommend.product,
+                                        recommend.quantity - 1,
+                                    ),
+                                ),
+                        )
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIfY_CART_FAILURE)
+                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
                     }
             }
         }

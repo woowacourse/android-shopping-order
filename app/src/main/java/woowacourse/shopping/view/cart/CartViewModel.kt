@@ -26,7 +26,7 @@ class CartViewModel(
     private val _cartItems: MutableLiveData<List<CartItemType>> = MutableLiveData()
     val cartItems: LiveData<List<CartItemType>> get() = _cartItems
 
-    private val selectedCartItems: MutableLiveData<Set<CartItemType.ProductItem>> =
+    val selectedCartItems: MutableLiveData<Set<CartItemType.ProductItem>> =
         MutableLiveData(emptySet())
     val totalPrice: LiveData<Int> = selectedCartItems.map { it.sumOf { it.price } }
     val selectedCartItemsCount = selectedCartItems.map { it.sumOf { it.quantity } }
