@@ -28,10 +28,6 @@ class GoodsViewModel(
     private val _items = MutableLiveData<List<GoodsItem>>()
     val items: LiveData<List<GoodsItem>> get() = _items
 
-    private val products = MutableLiveData<List<CartProduct>>()
-
-    private val histories = MutableLiveData<List<History>>()
-
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
@@ -48,6 +44,8 @@ class GoodsViewModel(
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     private var page: Int = INITIAL_PAGE
+    private val products: MutableList<CartProduct> = mutableListOf()
+    private val histories: MutableList<History> = mutableListOf()
 
     init {
         loadProducts()
@@ -204,9 +202,10 @@ class GoodsViewModel(
                                     )
                                 }
 
-                            val currentProducts = products.value.orEmpty()
+                            val currentProducts = products
                             val combinedCarts = currentProducts + newCarts
-                            products.value = combinedCarts
+                            products.clear()
+                            products.addAll(combinedCarts)
 
                             _hasNextPage.value = !response.last
 
@@ -230,14 +229,15 @@ class GoodsViewModel(
 
     private fun loadHistories() {
         historyRepository.getAll { allHistories ->
-            histories.postValue(allHistories)
+            histories.clear()
+            histories.addAll(allHistories)
             refreshItems()
         }
     }
 
     private fun refreshItems() {
-        val historyList = histories.value.orEmpty()
-        val productList = products.value.orEmpty()
+        val historyList = histories
+        val productList = products
 
         val combined: MutableList<GoodsItem> = mutableListOf()
         if (historyList.isNotEmpty()) {
