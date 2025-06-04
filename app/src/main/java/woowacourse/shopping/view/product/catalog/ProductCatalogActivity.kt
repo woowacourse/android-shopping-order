@@ -51,12 +51,12 @@ class ProductCatalogActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_shopping_cart, menu)
 
-        val binding = CustomToolbarShoppingCartBinding.inflate(layoutInflater)
-        binding.viewmodel = viewModel
-        binding.lifecycleOwner = this
+        val toolbarBinding = CustomToolbarShoppingCartBinding.inflate(layoutInflater)
+        toolbarBinding.viewmodel = viewModel
+        toolbarBinding.lifecycleOwner = this
 
         val menuItem = menu.findItem(R.id.shopping_cart)
-        menuItem.actionView = binding.root
+        menuItem.actionView = toolbarBinding.root
         menuItem.actionView?.setOnClickListener {
             onOptionsItemSelected(menuItem)
         }
