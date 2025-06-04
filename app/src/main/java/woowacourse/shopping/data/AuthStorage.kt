@@ -21,11 +21,11 @@ class AuthStorage(
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
 
-    private var id: String?
+    private var id: String? // = BuildConfig.AUTH_ID
         get() = storage.getString(KEY_ID, DEFAULT_ID)
         set(value) = storage.edit { putString(KEY_ID, value) }
 
-    private var pw: String?
+    private var pw: String? // = BuildConfig.AUTH_PW
         get() = storage.getString(KEY_PW, DEFAULT_PW)
         set(value) = storage.edit { putString(KEY_PW, value) }
 
