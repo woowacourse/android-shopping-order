@@ -41,7 +41,7 @@ interface CartItemService {
         @Body quantity: Quantity,
     ): Call<Void>
 
-    @PATCH("/cart-items/counts")
+    @GET("/cart-items/counts")
     fun getCartItemsCount(
         @Header("accept") accept: String = "*/*",
     ): Call<Quantity>
