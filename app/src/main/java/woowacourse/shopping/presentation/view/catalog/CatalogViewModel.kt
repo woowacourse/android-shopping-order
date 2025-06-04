@@ -4,7 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
@@ -45,24 +48,27 @@ class CatalogViewModel(
     fun loadProducts() {
         _isLoading.value = true
 
-        productRepository.fetchProducts(page, PRODUCT_LOAD_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchProducts(page, PRODUCT_LOAD_LIMIT)
                 .onSuccess { handleProductPageLoad(it) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_PRODUCTS_FAILURE) }
         }
     }
 
     fun increaseProductQuantity(productId: Long) {
-        cartRepository.increaseQuantity(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .increaseQuantity(productId, QUANTITY_STEP)
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
     fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseQuantity(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .decreaseQuantity(productId, QUANTITY_STEP)
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
@@ -90,8 +96,9 @@ class CatalogViewModel(
     }
 
     private fun loadRecentProducts(onSuccess: (CatalogItem.RecentProducts) -> Unit) {
-        recentRepository.getRecentProducts(RECENT_PRODUCT_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            recentRepository
+                .getRecentProducts(RECENT_PRODUCT_LIMIT)
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_RECENT_PRODUCT_FAILURE) }
                 .onSuccess {
                     val uiModels = it.map { product -> product.toUiModel() }
@@ -105,7 +112,7 @@ class CatalogViewModel(
         currentItems: List<CatalogItem> = _products.value.orEmpty(),
     ) {
         val ids = currentItems.filterIsInstance<CatalogItem.ProductItem>().map { it.productId }
-        val newCartProducts = cartRepository.findCartProductsByProductIds(ids)
+        val newCartProducts = runBlocking { cartRepository.findCartProductsByProductIds(ids) }
 
         newCartProducts
             .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
@@ -120,10 +127,12 @@ class CatalogViewModel(
     }
 
     private fun updateProductQuantityInList(productId: Long) {
-        cartRepository
-            .findQuantityByProductId(productId)
-            .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
-            .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+        viewModelScope.launch {
+            cartRepository
+                .findQuantityByProductId(productId)
+                .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
+                .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+        }
     }
 
     private fun applyProductQuantityUpdate(
@@ -133,19 +142,18 @@ class CatalogViewModel(
         val currentProducts = _products.value.orEmpty()
         val updatedProducts =
             currentProducts.map { item ->
-                if (item is CatalogItem.ProductItem && item.productId == productId) {
-                    item.copy(quantity = quantity)
-                } else {
-                    item
-                }
+                if (item !is CatalogItem.ProductItem) return@map item
+                if (item.productId != productId) return@map item
+                item.copy(quantity = quantity)
             }
         _products.postValue(updatedProducts)
         updateCartItemCount()
     }
 
     private fun updateCartItemCount() {
-        cartRepository.fetchCartProductCount { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .fetchCartProductCount()
                 .onSuccess { _cartItemCount.postValue(it) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
         }

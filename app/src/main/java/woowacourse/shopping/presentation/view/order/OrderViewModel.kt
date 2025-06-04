@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
@@ -55,8 +58,9 @@ class OrderViewModel(
     }
 
     override fun increaseQuantity(productId: Long) {
-        cartRepository.increaseQuantity(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .increaseQuantity(productId, QUANTITY_STEP)
                 .onFailure { postToastEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
                 .onSuccess {
                     refreshCurrentPageItems(productId)
@@ -66,16 +70,18 @@ class OrderViewModel(
     }
 
     override fun decreaseQuantity(productId: Long) {
-        cartRepository.decreaseQuantity(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .decreaseQuantity(productId, QUANTITY_STEP)
                 .onSuccess { refreshCurrentPageItems(productId) }
                 .onFailure { postToastEvent(CartMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
     override fun onDeleteProduct(cartId: Long) {
-        cartRepository.deleteCartProduct(cartId) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .deleteCartProduct(cartId)
                 .onSuccess { handleCartItemDeletionSuccess(cartId) }
                 .onFailure { postToastEvent(CartMessageEvent.DELETE_CART_ITEM_FAILURE) }
         }
@@ -89,8 +95,9 @@ class OrderViewModel(
         val targetPage = calculateTargetPage(direction)
         startLoading()
 
-        cartRepository.fetchCartProducts(targetPage, ITEMS_PER_PAGE) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .fetchCartProducts(targetPage, ITEMS_PER_PAGE)
                 .onSuccess { handleCartItemsFetchSuccess(it, targetPage) }
                 .onFailure { postToastEvent(CartMessageEvent.FETCH_CART_ITEMS_FAILURE) }
         }
@@ -158,7 +165,11 @@ class OrderViewModel(
         val itemsWithSelectionState = convertPageableToUiModels(pageableItem)
         updateOrderProductsWithLatestData(targetProductId)
         val removedProductIds = findRemovedProductIds(itemsWithSelectionState)
-        updateUiStateAfterRefresh(itemsWithSelectionState, pageableItem.hasMore, removedProductIds)
+        updateUiStateAfterRefresh(
+            itemsWithSelectionState,
+            pageableItem.hasMore,
+            removedProductIds,
+        )
     }
 
     private fun convertPageableToUiModels(pageableItem: PageableItem<CartProduct>): List<CartProductUiModel> {
@@ -185,8 +196,10 @@ class OrderViewModel(
 
     private fun refreshCurrentPageItems(targetProductId: Long) {
         val currentPage = getCurrentPage()
-        cartRepository.fetchCartProducts(currentPage, ITEMS_PER_PAGE) { result ->
-            result
+
+        viewModelScope.launch {
+            cartRepository
+                .fetchCartProducts(currentPage, ITEMS_PER_PAGE)
                 .onSuccess { handleQuantityRefreshSuccess(targetProductId, it) }
                 .onFailure { postToastEvent(CartMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
         }
@@ -223,7 +236,7 @@ class OrderViewModel(
         val wasRemoved = mutableProducts.removeIf { it.productId == productId }
 
         if (!wasRemoved) {
-            val cartProduct = cartRepository.findCartProductByProductId(productId).getOrNull()
+            val cartProduct = runBlocking { cartRepository.findCartProductByProductId(productId).getOrNull() }
             cartProduct?.let { mutableProducts.add(it.toCartItemUiModel()) }
         }
 
@@ -255,7 +268,7 @@ class OrderViewModel(
 
     private fun updateOrderProductsWithLatestData(targetProductId: Long) {
         val targetCartProduct =
-            cartRepository.findCartProductByProductId(targetProductId).getOrNull()
+            runBlocking { cartRepository.findCartProductByProductId(targetProductId).getOrNull() }
         val currentOrderProducts = getCurrentOrderProducts().toMutableList()
 
         if (targetCartProduct == null) {
@@ -293,7 +306,7 @@ class OrderViewModel(
         return if (isLastItemOnPage) FetchPageDirection.PREVIOUS else FetchPageDirection.CURRENT
     }
 
-    private fun getAllCartProducts(): List<CartProduct> = cartRepository.getAllCartProducts().getOrNull().orEmpty()
+    private fun getAllCartProducts(): List<CartProduct> = runBlocking { cartRepository.getAllCartProducts().getOrNull().orEmpty() }
 
     private fun getCurrentCartItems(): List<CartProductUiModel> = _cartProducts.value.orEmpty()
 

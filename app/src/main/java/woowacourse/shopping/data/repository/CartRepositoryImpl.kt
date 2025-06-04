@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.datasource.CartLocalDataSource
 import woowacourse.shopping.data.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.ProductRemoteDataSource
@@ -7,7 +10,7 @@ import woowacourse.shopping.data.model.cart.AddCartItemCommand
 import woowacourse.shopping.data.model.cart.CartItemResponse
 import woowacourse.shopping.data.model.cart.Quantity
 import woowacourse.shopping.data.model.product.toDomain
-import woowacourse.shopping.data.util.runCatchingInThread
+import woowacourse.shopping.data.util.runCatchingDebugLog
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.repository.CartRepository
@@ -21,76 +24,63 @@ class CartRepositoryImpl(
         fetchCart()
     }
 
-    override fun fetchCartProducts(
+    override suspend fun fetchCartProducts(
         page: Int,
         size: Int,
-        onResult: (Result<PageableItem<CartProduct>>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        val result = cartRemoteDataSource.fetchCartItems(page, size).getOrThrow()
-        val products = result.content.map { it.toDomain() }
-        cartLocalDataSource.addAllCartProducts(products)
-        val hasMore = !result.last
-        PageableItem(products, hasMore)
-    }
+    ): Result<PageableItem<CartProduct>> =
+        runCatchingDebugLog {
+            val result = cartRemoteDataSource.fetchCartItems(page, size).getOrThrow()
+            val products = result.content.map { it.toDomain() }
+            cartLocalDataSource.addAllCartProducts(products)
+            val hasMore = !result.last
+            PageableItem(products, hasMore)
+        }
 
-    override fun deleteCartProduct(
-        cartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        cartRemoteDataSource.deleteCartItem(cartId).getOrThrow()
-        cartLocalDataSource.removeCartProductByCartId(cartId)
-        Result.success(Unit)
-    }
+    override suspend fun deleteCartProduct(cartId: Long): Result<Unit> =
+        runCatchingDebugLog {
+            cartRemoteDataSource.deleteCartItem(cartId).getOrThrow()
+            cartLocalDataSource.removeCartProductByCartId(cartId)
+            Result.success(Unit)
+        }
 
-    override fun increaseQuantity(
+    override suspend fun increaseQuantity(
         productId: Long,
         increaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        val currentQuantity = cartLocalDataSource.getQuantity(productId)
-        if (currentQuantity == 0) {
-            val newCartId =
-                cartRemoteDataSource
-                    .addCartItem(AddCartItemCommand(productId, increaseCount))
-                    .getOrThrow()
-            addCartProductToCart(newCartId, productId, increaseCount)
-            return@runCatchingInThread
+    ): Result<Unit> =
+        runCatchingDebugLog {
+            val currentQuantity = cartLocalDataSource.getQuantity(productId)
+            if (currentQuantity == 0) {
+                addCartProductToCart(productId, increaseCount)
+                return@runCatchingDebugLog
+            }
+
+            patchCartItemQuantity(productId, currentQuantity + increaseCount)
         }
 
-        patchCartItemQuantity(productId, currentQuantity + increaseCount)
-    }
-
-    override fun decreaseQuantity(
+    override suspend fun decreaseQuantity(
         productId: Long,
         decreaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        val currentQuantity = cartLocalDataSource.getQuantity(productId)
-        patchCartItemQuantity(productId, currentQuantity + (-decreaseCount))
-    }
-
-    override fun fetchCartProductCount(onResult: (Result<Int>) -> Unit) =
-        runCatchingInThread(onResult) {
-            val result = cartRemoteDataSource.fetchCartItemCount().getOrThrow()
-            result.quantity
+    ): Result<Unit> =
+        runCatchingDebugLog {
+            val currentQuantity = cartLocalDataSource.getQuantity(productId)
+            patchCartItemQuantity(productId, currentQuantity + (-decreaseCount))
         }
 
-    override fun findQuantityByProductId(productId: Long): Result<Int> =
-        runCatching {
-            cartLocalDataSource.getQuantity(productId)
-        }
+    override suspend fun fetchCartProductCount(): Result<Int> =
+        runCatchingDebugLog { cartRemoteDataSource.fetchCartItemCount().getOrThrow().quantity }
 
-    override fun findCartProductByProductId(productId: Long): Result<CartProduct> =
-        runCatching { requireNotNull(cartLocalDataSource.getCartProduct(productId)) {} }
+    override suspend fun findQuantityByProductId(productId: Long): Result<Int> =
+        runCatchingDebugLog { cartLocalDataSource.getQuantity(productId) }
 
-    override fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> =
-        runCatching {
-            productIds.mapNotNull { cartLocalDataSource.getCartProduct(it) }
-        }
+    override suspend fun findCartProductByProductId(productId: Long): Result<CartProduct> =
+        runCatchingDebugLog { requireNotNull(cartLocalDataSource.getCartProduct(productId)) {} }
 
-    override fun getAllCartProducts(): Result<List<CartProduct>> = runCatching { cartLocalDataSource.getCartProducts() }
+    override suspend fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> =
+        runCatchingDebugLog { productIds.mapNotNull { cartLocalDataSource.getCartProduct(it) } }
 
-    private fun patchCartItemQuantity(
+    override suspend fun getAllCartProducts(): Result<List<CartProduct>> = runCatchingDebugLog { cartLocalDataSource.getCartProducts() }
+
+    private suspend fun patchCartItemQuantity(
         productId: Long,
         quantity: Int,
     ) {
@@ -101,21 +91,26 @@ class CartRepositoryImpl(
     }
 
     private fun fetchCart() =
-        runCatchingInThread {
-            val totalElements = cartRemoteDataSource.fetchCartItems(0, 1).getOrThrow().totalElements
-            val result = cartRemoteDataSource.fetchCartItems(0, totalElements).getOrThrow().content
-            cartLocalDataSource.addAllCartProducts(result.map { it.toDomain() })
+        runCatchingDebugLog {
+            CoroutineScope(Dispatchers.IO).launch {
+                val totalElements =
+                    cartRemoteDataSource.fetchCartItems(0, 1).getOrThrow().totalElements
+                val result =
+                    cartRemoteDataSource.fetchCartItems(0, totalElements).getOrThrow().content
+                cartLocalDataSource.addAllCartProducts(result.map { it.toDomain() })
+            }
         }
 
     private fun CartItemResponse.toDomain() = CartProduct(cartId, product.toDomain(), quantity)
 
-    private fun addCartProductToCart(
-        cartId: Long,
+    private suspend fun addCartProductToCart(
         productId: Long,
         quantity: Int,
     ) {
+        val requestBody = AddCartItemCommand(productId, quantity)
+        val newCartId = cartRemoteDataSource.addCartItem(requestBody).getOrThrow()
         val product = productDataSource.fetchProduct(productId).getOrThrow().toDomain()
-        val cartProduct = CartProduct(cartId, product, quantity)
+        val cartProduct = CartProduct(newCartId, product, quantity)
         cartLocalDataSource.addCartProduct(cartProduct)
     }
 }

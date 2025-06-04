@@ -1,35 +1,47 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.model.product.toDomain
-import woowacourse.shopping.data.util.runCatchingInThread
+import woowacourse.shopping.data.util.runCatchingDebugLog
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class RecentProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
-    private val recentProductLimit: Int = 10,
 ) : RecentProductRepository {
-    override fun getRecentProducts(
-        limit: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        recentProductLocalDataSource
-            .getRecentProducts(limit)
-            .mapNotNull {
-                productRemoteDataSource.fetchProduct(it.productId).getOrNull()?.toDomain()
-            }
-    }
+    override suspend fun getRecentProducts(limit: Int): Result<List<Product>> =
+        runCatchingDebugLog {
+            val recentEntities = recentProductLocalDataSource.getRecentProducts(limit)
+            fetchAllProductsConcurrently(recentEntities.map { it.productId })
+        }
 
-    override fun insertAndTrimToLimit(
+    override suspend fun insertAndTrimToLimit(
         productId: Long,
         category: String,
-        onResult: (Result<Unit>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        recentProductLocalDataSource.insertRecentProduct(RecentProductEntity(productId, category))
-        recentProductLocalDataSource.trimToLimit(recentProductLimit)
-    }
+        recentProductLimit: Int,
+    ): Result<Unit> =
+        runCatchingDebugLog {
+            recentProductLocalDataSource.insertRecentProduct(
+                RecentProductEntity(productId, category),
+            )
+            recentProductLocalDataSource.trimToLimit(recentProductLimit)
+        }
+
+    private suspend fun fetchAllProductsConcurrently(productIds: List<Long>): List<Product> =
+        coroutineScope {
+            val deferredProducts =
+                productIds.map { productId -> async { fetchAndConvertToDomain(productId) } }
+            deferredProducts.mapNotNull { it.await() }
+        }
+
+    private suspend fun fetchAndConvertToDomain(productId: Long): Product? =
+        productRemoteDataSource
+            .fetchProduct(productId)
+            .getOrNull()
+            ?.toDomain()
 }
