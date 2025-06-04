@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.order.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -90,12 +93,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="204,000원"
+            android:text="@{@string/order_price(vm.orderPrice)}"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_payment_price_text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_payment_price_text" />
+            app:layout_constraintTop_toTopOf="@id/tv_payment_price_text"
+            tools:text="204,000원" />
 
         <TextView
             android:id="@+id/tv_discount_price_text"

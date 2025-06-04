@@ -5,20 +5,24 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.presentation.Extra
 
 class OrderActivity :
     AppCompatActivity(),
     CouponClickListener {
     private lateinit var binding: ActivityOrderBinding
-    private val viewModel: OrderViewModel by viewModels { OrderViewModelFactory() }
+    private lateinit var viewModel: OrderViewModel
     private val couponAdapter: CouponAdapter by lazy {
         CouponAdapter(this)
     }
@@ -27,7 +31,7 @@ class OrderActivity :
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setupBinding()
-//        setupViewModel()
+        setupViewModel()
         initInsets()
         setupToolbar()
         initAdapter()
@@ -37,6 +41,26 @@ class OrderActivity :
     private fun setupBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
         binding.lifecycleOwner = this
+    }
+
+    private fun setupViewModel() {
+        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
+        val defaultArgs =
+            bundleOf(
+                Extra.KEY_SELECT_PRICE to price,
+            )
+        val creationExtras =
+            MutableCreationExtras(defaultViewModelCreationExtras).apply {
+                this[VIEW_MODEL_DEFAULT_ARGS_KEY] = defaultArgs
+            }
+        val factory = OrderViewModelFactory()
+        viewModel =
+            ViewModelProvider(
+                viewModelStore,
+                factory,
+                creationExtras,
+            )[OrderViewModel::class.java]
+        binding.vm = viewModel
     }
 
     private fun initInsets() {
@@ -80,11 +104,19 @@ class OrderActivity :
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
-    companion object {
-        fun newIntent(context: Context): Intent = Intent(context, OrderActivity::class.java)
-    }
-
     override fun onClickSelect(cartId: Long) {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        fun newIntent(
+            context: Context,
+            totalPrice: Int,
+        ): Intent =
+            Intent(context, OrderActivity::class.java).apply {
+                putExtra(Extra.KEY_SELECT_PRICE, totalPrice)
+            }
+
+        private val VIEW_MODEL_DEFAULT_ARGS_KEY = object : CreationExtras.Key<Bundle> {}
     }
 }

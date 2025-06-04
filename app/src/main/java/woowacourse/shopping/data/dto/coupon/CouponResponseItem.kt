@@ -12,9 +12,9 @@ data class CouponResponseItem(
     @SerialName("buyQuantity")
     val buyQuantity: Int? = 0,
     @SerialName("code")
-    val code: String?,
+    val code: String,
     @SerialName("description")
-    val description: String?,
+    val description: String,
     @SerialName("discount")
     val discount: Int? = 0,
     @SerialName("discountType")
@@ -31,10 +31,12 @@ data class CouponResponseItem(
 
 fun CouponResponseItem.toDomain(): Coupon =
     Coupon(
-        code = this.code!!,
-        description = this.description!!,
+        code = this.code,
+        description = this.description,
         expirationDate = LocalDate.parse(this.expirationDate),
         discount = this.discount,
         minimumAmount = this.minimumAmount,
+        buyQuantity = this.buyQuantity,
+        getQuantity = this.getQuantity,
         availableTime = this.availableTimeResponse?.toDomain(),
     )

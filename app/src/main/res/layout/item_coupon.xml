@@ -12,22 +12,22 @@
         <variable
             name="itemClickListener"
             type="woowacourse.shopping.presentation.order.CouponClickListener" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_coupon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/bg_cart_item"
         android:paddingHorizontal="12dp"
-        android:paddingBottom="12dp">
+        android:paddingBottom="20dp">
 
         <CheckBox
             android:id="@+id/checkbox_coupon"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:buttonTint="@color/baemin"
             android:checked="false"
             app:layout_constraintStart_toStartOf="parent"
@@ -72,6 +72,7 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/tv_expiration_date"
+            app:visibleIfNotNull="@{coupon.minimumAmount}"
             tools:text="최소 주문 금액: 100,000원" />
 
         <TextView
@@ -80,13 +81,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
             android:text="@{@string/item_coupon_available_time(coupon.availableTime.timeRange)}"
             android:textColor="@color/gray5"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/tv_minimum_amount"
+            app:visibleIfNotNull="@{coupon.availableTime}"
             tools:text="사용 가능 시간: 04시 ~ 07시" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

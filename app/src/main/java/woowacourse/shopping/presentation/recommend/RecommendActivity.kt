@@ -119,7 +119,11 @@ class RecommendActivity :
     }
 
     override fun onClickOrder() {
-        val intent = OrderActivity.newIntent(this)
+        val intent =
+            OrderActivity.newIntent(
+                this,
+                viewModel.selectedTotalPrice.value ?: 0,
+            )
         startActivity(intent)
     }
 
