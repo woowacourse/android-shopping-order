@@ -27,6 +27,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 childFragmentManager.commit {
                     replace(R.id.cart_fragment_container, CartRecommendationFragment())
                 }
+                viewModel.disableSelection()
                 viewModel.fetchRecommendedProducts()
             }
 

@@ -197,11 +197,14 @@ class CartViewModel(
         }
     }
 
+    fun disableSelection() {
+        _canSelectItems.value = false
+    }
+
     fun fetchRecommendedProducts() {
         productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
             _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
-        _canSelectItems.value = false
     }
 
     private fun updateSelectionInfo() {
