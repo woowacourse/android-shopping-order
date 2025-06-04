@@ -14,7 +14,7 @@ class CartProductSelectionViewModel(
 ) : ViewModel(),
     CartProductSelectionEventHandler {
     private val _selectedIds: MutableSet<Int> = mutableSetOf()
-    val selectedIds: Set<Int> get() = _selectedIds
+    val selectedIds: Set<Int> get() = _selectedIds.toSet()
 
     private val _products = MutableLiveData<List<CartProductItem>>()
     val products: LiveData<List<CartProductItem>> get() = _products
