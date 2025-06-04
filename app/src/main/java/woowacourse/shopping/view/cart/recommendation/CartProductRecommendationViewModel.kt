@@ -6,9 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -78,23 +76,21 @@ class CartProductRecommendationViewModel(
     }
 
     private fun loadRecommendedProducts() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = recentProductRepository.getLastViewedProduct()
 
             result
                 .onSuccess { recentProduct ->
                     recentProduct ?: return@launch
-                    val result = productRepository.getPagedProducts()
+                    val pagedProductsResult = productRepository.getPagedProducts()
 
-                    withContext(Dispatchers.Main) {
-                        result
-                            .onSuccess { products ->
-                                _recommendedProducts.value =
-                                    getRecommendationProducts(products, recentProduct)
-                            }.onFailure {
-                                Log.e("error", it.message.toString())
-                            }
-                    }
+                    pagedProductsResult
+                        .onSuccess { products ->
+                            _recommendedProducts.value =
+                                getRecommendationProducts(products, recentProduct)
+                        }.onFailure {
+                            Log.e("error", it.message.toString())
+                        }
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -199,10 +195,7 @@ class CartProductRecommendationViewModel(
     }
 
     suspend fun finishOrder() {
-        val result =
-            withContext(Dispatchers.IO) {
-                cartProductRepository.deleteProductsByIds(selectedCartIds)
-            }
+        val result = cartProductRepository.deleteProductsByIds(selectedCartIds)
 
         result.onFailure {
             Log.e("error", it.message.toString())

@@ -5,9 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -52,18 +50,16 @@ class ProductCatalogViewModel(
     }
 
     override fun onAddClick(item: Product) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = cartProductRepository.insert(item.id, QUANTITY_TO_ADD)
 
-            withContext(Dispatchers.Main) {
-                result
-                    .onSuccess { cartProductId ->
-                        cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-                        updateQuantity(item, QUANTITY_TO_ADD)
-                    }.onFailure {
-                        Log.e("error", it.message.toString())
-                    }
-            }
+            result
+                .onSuccess { cartProductId ->
+                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+                    updateQuantity(item, QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -121,62 +117,56 @@ class ProductCatalogViewModel(
 
     fun loadCatalog() {
         _onFinishLoading.value = false
-        loadRecentProducts()
-        loadCartProducts()
 
         viewModelScope.launch {
+            loadRecentProducts()
+            loadCartProducts()
+
             val result = cartProductRepository.getTotalQuantity()
 
             result
                 .onSuccess {
-                    _totalQuantity.value = it
+                    _totalQuantity.postValue(it)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
     }
 
-    private fun loadCartProducts() {
-        viewModelScope.launch {
-            val result = cartProductRepository.getPagedProducts()
+    private suspend fun loadCartProducts() {
+        val result = cartProductRepository.getPagedProducts()
 
-            result
-                .onSuccess {
-                    cartProducts.clear()
-                    cartProducts.addAll(it.items)
-                    loadProducts()
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
-        }
-    }
-
-    private fun loadRecentProducts() {
-        viewModelScope.launch {
-            val result = recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT)
-
-            result.onSuccess {
-                recentProducts = it
-                _productCatalogItems.postValue(buildCatalogItems())
+        result
+            .onSuccess {
+                cartProducts.clear()
+                cartProducts.addAll(it.items)
+                loadProducts()
             }.onFailure {
                 Log.e("error", it.message.toString())
             }
+    }
+
+    private suspend fun loadRecentProducts() {
+        val result = recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT)
+
+        result.onSuccess {
+            recentProducts = it
+            _productCatalogItems.value = buildCatalogItems()
+        }.onFailure {
+            Log.e("error", it.message.toString())
         }
     }
 
-    private fun loadProducts() {
-        viewModelScope.launch {
-            val result =
-                productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
+    private suspend fun loadProducts() {
+        val result = productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
 
-            result
-                .onSuccess { pagedResult ->
-                    productItems.clear()
-                    applyLoadedProducts(pagedResult)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
-        }
+        result
+            .onSuccess { pagedResult ->
+                productItems.clear()
+                applyLoadedProducts(pagedResult)
+            }.onFailure {
+                Log.e("error", it.message.toString())
+            }
     }
 
     private fun loadMoreProducts() {

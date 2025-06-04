@@ -5,9 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -99,23 +97,21 @@ class ProductDetailViewModel(
     }
 
     private fun loadLastViewedProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = recentProductRepository.getLastViewedProduct()
 
-            withContext(Dispatchers.Main) {
-                result
-                    .onSuccess {
-                        _lastViewedProduct.value = it
-                    }.onFailure {
-                        Log.e("error", it.message.toString())
-                    }
-            }
+            result
+                .onSuccess {
+                    _lastViewedProduct.value = it
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
     private fun updateRecentProduct() {
         val recentProduct = RecentProduct(product = product)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = recentProductRepository.replaceRecentProduct(recentProduct)
 
             result
