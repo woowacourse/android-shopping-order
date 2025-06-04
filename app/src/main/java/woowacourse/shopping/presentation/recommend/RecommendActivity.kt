@@ -53,27 +53,29 @@ class RecommendActivity : AppCompatActivity() {
     }
 
     private fun setUpAdapter() {
-        binding.recyclerViewRecommendProducts.adapter = RecommendAdapter(
-            catalogEventHandler = object : CatalogEventHandler {
-                override fun onProductClick(product: ProductUiModel) {}
+        binding.recyclerViewRecommendProducts.adapter =
+            RecommendAdapter(
+                catalogEventHandler =
+                    object : CatalogEventHandler {
+                        override fun onProductClick(product: ProductUiModel) {}
 
-                override fun onLoadButtonClick() {}
+                        override fun onLoadButtonClick() {}
 
-                override fun onOpenProductQuantitySelector(product: ProductUiModel) {
-                    viewModel.addProduct(product)
-                }
+                        override fun onOpenProductQuantitySelector(product: ProductUiModel) {
+                            viewModel.addProduct(product)
+                        }
+                    },
+                quantityHandler =
+                    object : ProductQuantityHandler {
+                        override fun onPlusQuantity(product: ProductUiModel) {
+                            viewModel.increaseQuantity(product)
+                        }
 
-            },
-            quantityHandler = object : ProductQuantityHandler {
-                override fun onPlusQuantity(product: ProductUiModel) {
-                    viewModel.increaseQuantity(product)
-                }
-
-                override fun onMinusQuantity(product: ProductUiModel) {
-                    viewModel.decreaseQuantity(product)
-                }
-            },
-        )
+                        override fun onMinusQuantity(product: ProductUiModel) {
+                            viewModel.decreaseQuantity(product)
+                        }
+                    },
+            )
     }
 
     private fun setOrderInfo() {

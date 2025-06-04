@@ -14,8 +14,8 @@ class CartViewHolder(
     cartHandler: CartEventHandler,
     quantityHandler: ProductQuantityHandler,
 ) : RecyclerView.ViewHolder(
-    LayoutInflater.from(parent.context).inflate(R.layout.cart_item, parent, false)
-) {
+        LayoutInflater.from(parent.context).inflate(R.layout.cart_item, parent, false),
+    ) {
     private val binding: CartItemBinding = CartItemBinding.bind(itemView)
 
     init {

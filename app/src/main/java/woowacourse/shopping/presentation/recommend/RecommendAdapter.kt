@@ -19,7 +19,10 @@ class RecommendAdapter(
         return RecommendViewHolder(parent, catalogEventHandler, quantityHandler)
     }
 
-    override fun onBindViewHolder(holder: RecommendViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecommendViewHolder,
+        position: Int,
+    ) {
         holder.bind(items[position])
     }
 

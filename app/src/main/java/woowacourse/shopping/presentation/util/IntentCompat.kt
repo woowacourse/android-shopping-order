@@ -14,4 +14,3 @@ fun <T : Parcelable> Intent.getArrayListExtraCompat(
     } else {
         this.getParcelableArrayListExtra(key)
     }
-

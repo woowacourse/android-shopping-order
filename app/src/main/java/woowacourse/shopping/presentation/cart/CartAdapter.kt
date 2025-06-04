@@ -65,8 +65,7 @@ class CartAdapter(
         }
     }
 
-    private fun shouldShowPagination(): Boolean =
-        pagingData?.hasPrevious == true || pagingData?.hasNext == true
+    private fun shouldShowPagination(): Boolean = pagingData?.hasPrevious == true || pagingData?.hasNext == true
 
     override fun getItemCount(): Int = cartProducts.size + if (shouldShowPagination()) 1 else 0
 

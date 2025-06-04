@@ -53,11 +53,14 @@ class RecommendViewModel(
 
     fun addProduct(productUiModel: ProductUiModel) {
         val updated = productUiModel.copy(quantity = productUiModel.quantity + 1, isExpanded = true)
-        _recommendedProducts.value = _recommendedProducts.value?.map {
-            if (it.id == updated.id) {
-                updated
-            } else it
-        }
+        _recommendedProducts.value =
+            _recommendedProducts.value?.map {
+                if (it.id == updated.id) {
+                    updated
+                } else {
+                    it
+                }
+            }
         cartItemRepository.addCartItem(updated.id, updated.quantity) { result ->
             result
                 .onFailure {
@@ -79,7 +82,9 @@ class RecommendViewModel(
             if (updated.quantity <= 0) {
                 deleteProduct(it)
                 updated.copy(isExpanded = false)
-            } else updated
+            } else {
+                updated
+            }
         }
         updateOrderInfo(-productUiModel.price, -1)
     }
@@ -115,13 +120,16 @@ class RecommendViewModel(
         target: ProductUiModel,
         transform: (ProductUiModel) -> ProductUiModel?,
     ) {
-        _recommendedProducts.value = _recommendedProducts.value?.mapNotNull { product ->
-            if (product.id == target.id) {
-                transform(product)?.also {
-                    updateQuantity(it)
+        _recommendedProducts.value =
+            _recommendedProducts.value?.mapNotNull { product ->
+                if (product.id == target.id) {
+                    transform(product)?.also {
+                        updateQuantity(it)
+                    }
+                } else {
+                    product
                 }
-            } else product
-        }
+            }
     }
 
     private fun updateQuantity(productUiModel: ProductUiModel) {
@@ -129,7 +137,7 @@ class RecommendViewModel(
 
         cartItemRepository.updateCartItemQuantity(
             productUiModel.id,
-            productUiModel.quantity
+            productUiModel.quantity,
         ) { result ->
             result
                 .onFailure {
@@ -153,14 +161,15 @@ class RecommendViewModel(
     companion object {
         private const val RECOMMENDED_COUNT = 10
 
-        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                RecommendViewModel(
-                    productsRepository = RepositoryProvider.productsRepository,
-                    cartItemRepository = RepositoryProvider.cartItemRepository,
-                    viewedItemRepository = RepositoryProvider.viewedItemRepository,
-                )
+        val FACTORY: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    RecommendViewModel(
+                        productsRepository = RepositoryProvider.productsRepository,
+                        cartItemRepository = RepositoryProvider.cartItemRepository,
+                        viewedItemRepository = RepositoryProvider.viewedItemRepository,
+                    )
+                }
             }
-        }
     }
 }

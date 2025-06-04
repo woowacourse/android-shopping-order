@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.ProductResponse
-import woowacourse.shopping.data.model.ProductsResponse
 import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData
@@ -57,9 +56,10 @@ class ProductsRepositoryImpl(
                         cartResult
                             .onSuccess { cartItemResponse ->
                                 val cartProducts = cartItemResponse.content.map { it.product.id }
-                                val recommendProducts = productsByCategory
-                                    .filterNot { it.id in cartProducts }
-                                    .take(10)
+                                val recommendProducts =
+                                    productsByCategory
+                                        .filterNot { it.id in cartProducts }
+                                        .take(10)
 
                                 onResult(Result.success(recommendProducts))
                             }

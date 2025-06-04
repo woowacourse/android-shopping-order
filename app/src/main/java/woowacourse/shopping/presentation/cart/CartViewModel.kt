@@ -30,13 +30,15 @@ class CartViewModel(
     private val _checkedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
     val checkedProducts: LiveData<List<ProductUiModel>> = _checkedProducts
 
-    val totalOrderPrice: LiveData<Int> = _checkedProducts.map { products ->
-        products.sumOf { it.price * it.quantity }
-    }
+    val totalOrderPrice: LiveData<Int> =
+        _checkedProducts.map { products ->
+            products.sumOf { it.price * it.quantity }
+        }
 
-    val checkedProductCount: LiveData<Int> = _checkedProducts.map { products ->
-        products.size
-    }
+    val checkedProductCount: LiveData<Int> =
+        _checkedProducts.map { products ->
+            products.size
+        }
 
     val isAllChecked = MutableLiveData(false)
 
@@ -59,7 +61,7 @@ class CartViewModel(
     private fun setCheckedProducts(cartProduct: ProductUiModel) {
         val currentCheckedProducts = _checkedProducts.value ?: emptyList()
         _checkedProducts.postValue(
-            currentCheckedProducts.filterNot { it.id == cartProduct.id }
+            currentCheckedProducts.filterNot { it.id == cartProduct.id },
         )
     }
 
@@ -134,7 +136,7 @@ class CartViewModel(
         pagingData.value?.let { currentPagingData ->
             val updatedProducts =
                 currentPagingData.products.map {
-                    it.copy(isChecked = isAllChecked.value!!)
+                    it.copy(isChecked = isAllChecked.value ?: it.isChecked)
                 }
             _pagingData.value = currentPagingData.copy(products = updatedProducts)
             setOrderData()

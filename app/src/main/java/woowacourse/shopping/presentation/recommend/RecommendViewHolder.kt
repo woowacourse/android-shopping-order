@@ -14,8 +14,8 @@ class RecommendViewHolder(
     catalogEventHandler: CatalogEventHandler,
     quantityHandler: ProductQuantityHandler,
 ) : RecyclerView.ViewHolder(
-    LayoutInflater.from(parent.context).inflate(R.layout.recommend_item, parent, false)
-) {
+        LayoutInflater.from(parent.context).inflate(R.layout.recommend_item, parent, false),
+    ) {
     private val binding = RecommendItemBinding.bind(itemView)
 
     init {

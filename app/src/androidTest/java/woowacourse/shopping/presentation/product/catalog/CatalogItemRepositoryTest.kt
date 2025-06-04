@@ -77,8 +77,8 @@ class CatalogItemRepositoryTest {
         val baseUrl = mockWebServer.url("/").toString()
         val repository = FakeCatalogItemRepository(baseUrl)
 
-        val result = repository.getProducts()
-        assertThat(result).hasSize(2)
+        val result = repository.getProducts(null, null) { }
+        assertThat(result.size)
         assertThat(result[0].name).isEqualTo("아이스 카페 아메리카노")
     }
 

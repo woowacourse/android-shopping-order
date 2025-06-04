@@ -86,7 +86,7 @@ class CartActivity : AppCompatActivity() {
             val intent =
                 RecommendActivity.newIntent(
                     this@CartActivity,
-                    viewModel.checkedProducts.value ?: emptyList()
+                    viewModel.checkedProducts.value ?: emptyList(),
                 )
             startActivity(intent)
         }
