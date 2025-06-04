@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.ProductsDataSource
 import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Product
@@ -13,11 +15,13 @@ class DefaultProductRepository(
         category: String?,
         page: Int?,
         pageSize: Int?,
-    ): NetworkResult<ProductSinglePage> {
-        return productDataSource.singlePage(category, page, pageSize)
-    }
+    ): NetworkResult<ProductSinglePage> =
+        withContext(Dispatchers.IO) {
+            productDataSource.singlePage(category, page, pageSize)
+        }
 
-    override suspend fun loadProduct(productId: Long): NetworkResult<Product> {
-        return productDataSource.getProduct(productId)
-    }
+    override suspend fun loadProduct(productId: Long): NetworkResult<Product> =
+        withContext(Dispatchers.IO) {
+            productDataSource.getProduct(productId)
+        }
 }

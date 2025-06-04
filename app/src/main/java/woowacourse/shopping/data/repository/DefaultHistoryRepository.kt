@@ -11,8 +11,7 @@ class DefaultHistoryRepository(
 ) : HistoryRepository {
     override suspend fun getHistories() =
         withContext(Dispatchers.IO) {
-            val result = defaultHistoryDataSource.latestHistory().map { it.productId }
-            return@withContext result
+            defaultHistoryDataSource.latestHistory().map { it.productId }
         }
 
     override suspend fun saveHistory(productId: Long) =
