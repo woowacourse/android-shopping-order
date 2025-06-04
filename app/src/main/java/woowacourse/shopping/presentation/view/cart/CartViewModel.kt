@@ -13,7 +13,6 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toCartItemUiModel
 import woowacourse.shopping.presentation.model.toProductUiModel
-import kotlin.math.max
 
 class CartViewModel(
     private val productRepository: ProductRepository,
@@ -25,14 +24,14 @@ class CartViewModel(
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>()
     val recommendedProducts: LiveData<List<ProductUiModel>> = _recommendedProducts
 
-    private val _deleteEvent = MutableLiveData<Long>()
-    val deleteEvent: LiveData<Long> = _deleteEvent
+    private val _itemDeleteEvent = MutableLiveData<Long>()
+    val itemDeleteEvent: LiveData<Long> = _itemDeleteEvent
 
     private val _itemUpdateEvent = MutableLiveData<CartItemUiModel>()
     val itemUpdateEvent: LiveData<CartItemUiModel> = _itemUpdateEvent
 
-    private val _page = MutableLiveData(START_PAGE)
-    val page: LiveData<Int> = _page
+    private val _pageIndex = MutableLiveData(INITIAL_PAGE_INDEX)
+    val pageIndex: LiveData<Int> = _pageIndex
 
     private var _isFirstPage = MutableLiveData<Boolean>()
     val isFirstPage: LiveData<Boolean> = _isFirstPage
@@ -51,19 +50,10 @@ class CartViewModel(
 
     private val selectionStatus = mutableMapOf<Long, Boolean>()
 
-    init {
-        fetchShoppingCart(false)
-    }
-
-    fun fetchShoppingCart(
-        isNextPage: Boolean,
-        isRefresh: Boolean = false,
-    ) {
-        val currentPage = _page.value ?: DEFAULT_PAGE
-        val newPage = calculatePage(isNextPage, currentPage, isRefresh)
-
+    fun loadPageOfShoppingCart(indexOffset: Int = 0) {
+        val newPageIndex = ((_pageIndex.value ?: 0) + indexOffset).coerceAtLeast(0)
         cartRepository.loadPageOfCartItems(
-            pageIndex = newPage - DEFAULT_PAGE,
+            pageIndex = newPageIndex,
             pageSize = PAGE_SIZE,
         ) { products, isFirstPage, isLastPage ->
             val updatedItems =
@@ -73,7 +63,7 @@ class CartViewModel(
                         .copy(isSelected = selectionStatus[product.cartId] ?: false)
                 }
             _cartItems.postValue(updatedItems)
-            _page.postValue(newPage)
+            _pageIndex.postValue(newPageIndex)
             _isFirstPage.postValue(isFirstPage)
             _isLastPage.postValue(isLastPage)
             updateSelectionInfo()
@@ -125,7 +115,7 @@ class CartViewModel(
     fun removeFromCart(cartItem: CartItemUiModel) {
         val removedItem = cartItem.cartItem.copy(quantity = 0)
         cartRepository.deleteCartItem(removedItem.cartId) {
-            _deleteEvent.postValue(removedItem.cartId)
+            _itemDeleteEvent.postValue(removedItem.cartId)
             selectionStatus.remove(removedItem.cartId)
             updateSelectionInfo()
             fetchRecommendedProducts()
@@ -164,7 +154,7 @@ class CartViewModel(
                 )
             }
             updateSelectionInfo()
-            fetchShoppingCart(isNextPage = false, isRefresh = true)
+            loadPageOfShoppingCart()
         }
     }
 
@@ -187,30 +177,6 @@ class CartViewModel(
         }
     }
 
-    private fun calculatePage(
-        isNextPage: Boolean,
-        currentPage: Int,
-        isRefresh: Boolean,
-    ): Int =
-        when {
-            isRefresh -> currentPage
-            isNextPage -> currentPage + DEFAULT_PAGE
-            else -> max(DEFAULT_PAGE, currentPage - DEFAULT_PAGE)
-        }
-
-    private fun updateProducts(updatedItem: CartItemUiModel) {
-        _cartItems.postValue(
-            _cartItems.value?.map { cartItem ->
-                if (cartItem.cartItem.cartId == updatedItem.cartItem.cartId) {
-                    updatedItem
-                } else {
-                    cartItem
-                }
-            },
-        )
-        updateSelectionInfo()
-    }
-
     private fun updateSelectionInfo() {
         cartRepository.loadAllCartItems { cartItems ->
             val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
@@ -222,8 +188,7 @@ class CartViewModel(
     }
 
     companion object {
-        private const val START_PAGE = 0
-        private const val DEFAULT_PAGE = 1
+        private const val INITIAL_PAGE_INDEX = 0
         private const val PAGE_SIZE = 5
 
         @Suppress("UNCHECKED_CAST")

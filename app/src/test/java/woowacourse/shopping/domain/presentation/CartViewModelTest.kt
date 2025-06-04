@@ -30,7 +30,7 @@ class CartViewModelTest {
 
     @Test
     fun `fetchShoppingCart를 호출하면 장바구니 목록이 LiveData에 반영된다`() {
-        viewModel.fetchShoppingCart(isNextPage = false)
+        viewModel.loadPageOfShoppingCart(isNextPage = false)
 
         val result = viewModel.cartItems.getOrAwaitValue()
         assertThat(result).isEqualTo(dummyCartItemList)
@@ -42,7 +42,7 @@ class CartViewModelTest {
 
         viewModel.removeFromCart(item)
 
-        val result = viewModel.deleteEvent.getOrAwaitValue()
+        val result = viewModel.itemDeleteEvent.getOrAwaitValue()
         assertThat(result).isEqualTo(item.product.id)
     }
 

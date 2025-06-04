@@ -54,6 +54,7 @@ class CartItemFragment : BaseFragment<FragmentCartItemBinding>(R.layout.fragment
         super.onViewCreated(view, savedInstanceState)
         initBinding()
         initObserver()
+        viewModel.loadPageOfShoppingCart()
     }
 
     private fun initBinding() {
@@ -70,9 +71,9 @@ class CartItemFragment : BaseFragment<FragmentCartItemBinding>(R.layout.fragment
                 cartItemAdapter.submitList(it)
             }
 
-            deleteEvent.observe(viewLifecycleOwner) {
+            itemDeleteEvent.observe(viewLifecycleOwner) {
                 cartItemAdapter.removeProduct(it)
-                fetchShoppingCart(isNextPage = false, isRefresh = true)
+                loadPageOfShoppingCart()
                 fetchRecommendedProducts()
             }
 
