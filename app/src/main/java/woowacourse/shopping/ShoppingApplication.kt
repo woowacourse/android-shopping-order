@@ -10,5 +10,7 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         database = ShoppingDatabase.getInstance(applicationContext)
+        val userId = BuildConfig.USER_ID
+        val userPassword = BuildConfig.USER_PASSWORD
     }
 }
