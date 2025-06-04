@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
+import woowacourse.shopping.presentation.product.ProductQuantityHandler
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
+import woowacourse.shopping.presentation.product.detail.CartEvent
+import woowacourse.shopping.presentation.util.getArrayListExtraCompat
 
 class RecommendActivity : AppCompatActivity() {
     private val binding: ActivityRecommendBinding by lazy {
@@ -25,7 +31,9 @@ class RecommendActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpScreen()
         setUpBinding()
+        setUpAdapter()
         setOrderInfo()
+        observeCartEvent()
     }
 
     private fun setUpScreen() {
@@ -44,24 +52,64 @@ class RecommendActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUpAdapter() {
+        binding.recyclerViewRecommendProducts.adapter = RecommendAdapter(
+            catalogEventHandler = object : CatalogEventHandler {
+                override fun onProductClick(product: ProductUiModel) {}
+
+                override fun onLoadButtonClick() {}
+
+                override fun onOpenProductQuantitySelector(product: ProductUiModel) {
+                    viewModel.addProduct(product)
+                }
+
+            },
+            quantityHandler = object : ProductQuantityHandler {
+                override fun onPlusQuantity(product: ProductUiModel) {
+                    viewModel.increaseQuantity(product)
+                }
+
+                override fun onMinusQuantity(product: ProductUiModel) {
+                    viewModel.decreaseQuantity(product)
+                }
+            },
+        )
+    }
+
     private fun setOrderInfo() {
-        val price = intent.getIntExtra(TOTAL_PRICE_KEY, 0)
-        val count = intent.getIntExtra(TOTAL_COUNT_KEY, 0)
-        viewModel.setOrderInfo(price, count)
+        val checkedProducts =
+            intent.getArrayListExtraCompat(CHECKED_PRODUCTS_KEY, ProductUiModel::class.java)
+                ?: emptyList()
+        viewModel.setCheckedProducts(checkedProducts.toList())
+    }
+
+    private fun observeCartEvent() {
+        viewModel.cartEvent.observe(this) { event ->
+            when(event) {
+                CartEvent.ADD_TO_CART_SUCCESS -> {
+                    showToast(R.string.text_add_to_cart_success)
+                }
+
+                CartEvent.ADD_TO_CART_FAILURE -> {
+                    showToast(R.string.text_unInserted_toast)
+                }
+            }
+        }
+    }
+
+    private fun showToast(resId: Int) {
+        Toast.makeText(this, getString(resId), Toast.LENGTH_SHORT).show()
     }
 
     companion object {
-        private const val TOTAL_PRICE_KEY = "Price"
-        private const val TOTAL_COUNT_KEY = "Count"
+        private const val CHECKED_PRODUCTS_KEY = "Products"
 
         fun newIntent(
             context: Context,
-            price: Int,
-            count: Int,
+            products: List<ProductUiModel>,
         ): Intent {
             return Intent(context, RecommendActivity::class.java).apply {
-                putExtra(TOTAL_PRICE_KEY, price)
-                putExtra(TOTAL_COUNT_KEY, count)
+                putParcelableArrayListExtra(CHECKED_PRODUCTS_KEY, ArrayList(products))
             }
         }
     }
