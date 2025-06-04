@@ -5,6 +5,8 @@ import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
 
@@ -28,5 +30,9 @@ object DataSourceModule {
         check(::appContext.isInitialized) { ERROR_APP_CONTEXT_NOT_INITIALIZE }
         val dao = DatabaseModule.provideRecentProductDao()
         RecentProductLocalDataSourceImpl(dao)
+    }
+
+    val couponRemoteDataSource: CouponRemoteDataSource by lazy {
+        CouponRemoteDataSourceImpl(NetworkModule.couponService)
     }
 }

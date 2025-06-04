@@ -3,8 +3,10 @@ package woowacourse.shopping.presentation.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,9 +14,14 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 
-class OrderActivity : AppCompatActivity() {
+class OrderActivity :
+    AppCompatActivity(),
+    CouponClickListener {
     private lateinit var binding: ActivityOrderBinding
     private val viewModel: OrderViewModel by viewModels { OrderViewModelFactory() }
+    private val couponAdapter: CouponAdapter by lazy {
+        CouponAdapter(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,8 +30,8 @@ class OrderActivity : AppCompatActivity() {
 //        setupViewModel()
         initInsets()
         setupToolbar()
-//        initAdapter()
-//        observeViewModel()
+        initAdapter()
+        observeViewModel()
     }
 
     private fun setupBinding() {
@@ -50,7 +57,34 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
+    private fun initAdapter() {
+        binding.rvCoupon.apply {
+            adapter = couponAdapter
+            itemAnimator = null
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.coupons.observe(this) { coupons ->
+            couponAdapter.submitList(coupons)
+        }
+
+        viewModel.toastMessage.observe(this) { resId ->
+            showToast(resId)
+        }
+    }
+
+    private fun showToast(
+        @StringRes messageResId: Int,
+    ) {
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, OrderActivity::class.java)
+    }
+
+    override fun onClickSelect(cartId: Long) {
+        TODO("Not yet implemented")
     }
 }

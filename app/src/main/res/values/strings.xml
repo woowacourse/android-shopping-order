@@ -56,4 +56,9 @@
     <string name="order_tv_discount_price">쿠폰 할인 금액</string>
     <string name="order_tv_delivery_fee">배송비</string>
     <string name="order_tv_total_payment_price">총 결제 금액</string>
+    <string name="order_toast_coupon_load_fail">쿠폰 목록 조회에 실패했습니다</string>
+
+    <string name="item_coupon_expiration_date">만료일: %s</string>
+    <string name="item_coupon_minimum_amount">최소 주문 금액: %,d원</string>
+    <string name="item_coupon_available_time">사용 가능 시간: %s</string>
 </resources>
