@@ -21,6 +21,8 @@ import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
 class ProductCatalogActivity : AppCompatActivity() {
     private val binding by lazy { ActivityProductCatalogBinding.inflate(layoutInflater) }
+    private val toolbarBinding by lazy { CustomToolbarShoppingCartBinding.inflate(layoutInflater) }
+
     private val viewModel by lazy {
         val app = application as ShoppingApplication
         ViewModelProvider(
@@ -51,7 +53,6 @@ class ProductCatalogActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_shopping_cart, menu)
 
-        val toolbarBinding = CustomToolbarShoppingCartBinding.inflate(layoutInflater)
         toolbarBinding.viewmodel = viewModel
         toolbarBinding.lifecycleOwner = this
 
