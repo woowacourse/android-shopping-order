@@ -8,11 +8,10 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 class FakeCartProductRepository : CartProductRepository {
     private val cartProducts = mutableListOf<CartProduct>()
 
-    override fun insert(
+    override suspend fun insert(
         productId: Int,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
-    ) {
+    ): Result<Int> {
         val product =
             Product(
                 id = productId,
@@ -21,64 +20,51 @@ class FakeCartProductRepository : CartProductRepository {
                 price = 1000,
             )
         cartProducts.add(CartProduct(id = product.id, product = product, quantity = quantity))
-        onResult(Result.success(product.id))
+        return Result.success(product.id)
     }
 
-    override fun getPagedProducts(
+    override suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
-    ) {
+    ): Result<PagedResult<CartProduct>> {
         if (page == null || size == null) {
-            onResult(Result.success(PagedResult(cartProducts, false)))
-            return
+            return Result.success(PagedResult(cartProducts, false))
         }
         val pagedItems = cartProducts.drop(page * size).take(size)
         val hasNext = page * size + pagedItems.size < cartProducts.size
-        onResult(Result.success(PagedResult(pagedItems, hasNext)))
+        return Result.success(PagedResult(pagedItems, hasNext))
     }
 
-    override fun getCartProductByProductId(
-        productId: Int,
-        onResult: (Result<CartProduct?>) -> Unit,
-    ) {
-        onResult(Result.success(cartProducts.find { it.product.id == productId }))
+    override suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?> {
+        return Result.success(cartProducts.find { it.product.id == productId })
     }
 
-    override fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
-        onResult(Result.success(cartProducts.sumOf { it.quantity }))
+    override suspend fun getTotalQuantity(): Result<Int> {
+        return Result.success(cartProducts.sumOf { it.quantity })
     }
 
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartProduct: CartProduct,
         newQuantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        when {
-            newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
+    ): Result<Unit> {
+        return when {
+            newQuantity == 0 -> return delete(cartProduct.id)
             else -> {
                 cartProducts.replaceAll {
                     if (it.product.id == cartProduct.product.id) it.copy(quantity = newQuantity) else it
                 }
-                onResult(Result.success(Unit))
+                Result.success(Unit)
             }
         }
-        return
     }
 
-    override fun delete(
-        id: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    override suspend fun delete(id: Int): Result<Unit> {
         cartProducts.removeIf { it.product.id == id }
-        onResult(Result.success(Unit))
+        return Result.success(Unit)
     }
 
-    override fun deleteAll(
-        ids: Set<Int>,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    override suspend fun deleteAll(ids: Set<Int>): Result<Unit> {
         cartProducts.removeIf { it.product.id in ids }
-        onResult(Result.success(Unit))
+        return Result.success(Unit)
     }
 }

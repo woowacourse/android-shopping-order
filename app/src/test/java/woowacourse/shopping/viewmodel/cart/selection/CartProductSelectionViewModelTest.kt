@@ -3,6 +3,8 @@ package woowacourse.shopping.viewmodel.cart.selection
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -10,23 +12,27 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.fixture.CoroutinesTestExtension
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.selection.CartProductSelectionViewModel
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartProductSelectionViewModelTest {
     private lateinit var viewModel: CartProductSelectionViewModel
     private lateinit var cartProductRepository: CartProductRepository
 
     @BeforeEach
-    fun setup() {
-        cartProductRepository = FakeCartProductRepository()
-        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
-        viewModel = CartProductSelectionViewModel(cartProductRepository)
-        viewModel.loadPage(1)
-    }
+    fun setup() =
+        runTest {
+            cartProductRepository = FakeCartProductRepository()
+            repeat(12) { id -> cartProductRepository.insert(id, 1) }
+            viewModel = CartProductSelectionViewModel(cartProductRepository)
+            viewModel.loadPage(1)
+        }
 
     @Test
     fun `초기 로드 시 첫 페이지의 상품이 로드된다`() {
