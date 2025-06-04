@@ -114,11 +114,9 @@ class CatalogViewModel(
 
     private fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem) {
-            cartRepository.findCartItemByProductId(newItem.product.id) { cartItem ->
-                _itemUpdateEvent.postValue(cartItem?.toProductUiModel())
-                calculateTotalCartCount()
-            }
+        cartRepository.addCartItem(newItem) { addedCartItem ->
+            _itemUpdateEvent.postValue(addedCartItem?.toProductUiModel())
+            calculateTotalCartCount()
         }
     }
 

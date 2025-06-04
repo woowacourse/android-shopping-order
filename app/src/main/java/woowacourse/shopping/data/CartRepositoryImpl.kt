@@ -78,16 +78,13 @@ class CartRepositoryImpl(
 
     override fun addCartItem(
         cartItem: CartItem,
-        callback: () -> Unit,
+        callback: (addedCartItem: CartItem?) -> Unit,
     ) {
-        val item =
-            CartItemRequest(
-                productId = cartItem.product.id,
-                quantity = cartItem.quantity,
-            )
-
+        val item = CartItemRequest(cartItem.product.id, cartItem.quantity)
         cartItemDataSource.submitCartItem(item) {
-            callback()
+            findCartItemByProductId(cartItem.product.id) { addedCartItem ->
+                callback(addedCartItem)
+            }
         }
     }
 

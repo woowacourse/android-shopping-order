@@ -34,7 +34,7 @@ interface CartRepository {
 
     fun addCartItem(
         cartItem: CartItem,
-        callback: () -> Unit,
+        callback: (addedCartItem: CartItem?) -> Unit,
     )
 
     fun deleteCartItem(
