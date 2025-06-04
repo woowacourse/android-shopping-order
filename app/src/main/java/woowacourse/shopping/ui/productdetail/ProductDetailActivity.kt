@@ -52,12 +52,8 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
                 }
 
                 override fun onLastHistoryProductClick(productId: Long) {
-                    setResult(
-                        ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.code,
-                        Intent().apply {
-                            putExtra(ActivityResult.PRODUCT_DETAIL_HISTORY_PRODUCT_CLICKED.key, productId)
-                        },
-                    )
+                    val intent = newIntent(this@ProductDetailActivity, productId, false)
+                    startActivity(intent)
                     finish()
                 }
             }
@@ -82,7 +78,12 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
                     putExtra(ActivityResult.PRODUCT_DETAIL_CART_UPDATED.key, productId)
                 },
             )
-            Toast.makeText(this, getString(R.string.product_detail_cart_add_success), Toast.LENGTH_SHORT).show()
+            Toast
+                .makeText(
+                    this,
+                    getString(R.string.product_detail_cart_add_success),
+                    Toast.LENGTH_SHORT,
+                ).show()
             finish()
         }
     }
