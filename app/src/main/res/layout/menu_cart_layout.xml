@@ -29,9 +29,9 @@
             android:layout_height="24dp"
             android:background="@drawable/badge_background"
             android:gravity="center"
-            android:text="@{vm.cartItemSize.toString()}"
+            android:text="@{vm.cartItemCount.toString()}"
             android:textColor="@android:color/white"
             android:textSize="12sp"
-            android:visibility="@{vm.cartItemSize > 0 ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{vm.cartItemCount > 0 ? View.VISIBLE : View.GONE}" />
     </LinearLayout>
 </layout>

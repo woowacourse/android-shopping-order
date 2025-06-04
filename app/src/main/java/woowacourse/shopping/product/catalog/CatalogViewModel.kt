@@ -25,9 +25,6 @@ class CatalogViewModel(
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
 
-    private val _cartItemSize = MutableLiveData<Int>(0)
-    val cartItemSize: LiveData<Int> = _cartItemSize
-
     private val _recentlyViewedProducts =
         MutableLiveData<List<ProductUiModel>>(emptyList<ProductUiModel>())
     val recentlyViewedProducts: LiveData<List<ProductUiModel>> = _recentlyViewedProducts
@@ -36,9 +33,19 @@ class CatalogViewModel(
         MutableLiveData(LoadingState.loaded())
     val loadingState: LiveData<LoadingState> get() = _loadingState
 
+    private val _cartItemCount = MutableLiveData<Int>(INITIAL_CART_ITEM_COUNT)
+    val cartItemCount: LiveData<Int> get() = _cartItemCount
+
     init {
+        fetchTotalCount()
         catalogProductRepository.getAllProductsSize { allProductsSize ->
             loadCatalog(PAGE_SIZE, 20, allProductsSize)
+        }
+    }
+
+    fun fetchTotalCount() {
+        cartProductRepository.getTotalElements { count ->
+            _cartItemCount.postValue(count)
         }
     }
 
@@ -55,7 +62,7 @@ class CatalogViewModel(
             }
         }
 
-        loadCartItemSize()
+        fetchTotalCount()
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
@@ -70,7 +77,7 @@ class CatalogViewModel(
             }
         }
 
-        loadCartItemSize()
+        fetchTotalCount()
     }
 
     fun loadNextCatalogProducts() {
@@ -144,12 +151,6 @@ class CatalogViewModel(
         }
     }
 
-    fun loadCartItemSize() {
-        cartProductRepository.getCartItemSize { size ->
-            _cartItemSize.postValue(size)
-        }
-    }
-
     fun loadRecentlyViewedProducts() {
         recentlyViewedProductRepository.getRecentlyViewedProducts { products ->
             _recentlyViewedProducts.postValue(products.map { it.toUiModel() })
@@ -163,5 +164,6 @@ class CatalogViewModel(
     companion object {
         private const val PAGE_SIZE = 20
         private const val INITIAL_PAGE = 0
+        private const val INITIAL_CART_ITEM_COUNT = 0
     }
 }

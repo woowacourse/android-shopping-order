@@ -47,7 +47,7 @@ class CatalogActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.loadCatalogUntilCurrentPage()
-        viewModel.loadCartItemSize()
+        viewModel.fetchTotalCount()
         viewModel.loadRecentlyViewedProducts()
     }
 
