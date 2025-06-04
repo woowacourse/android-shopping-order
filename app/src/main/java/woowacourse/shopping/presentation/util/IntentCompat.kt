@@ -4,16 +4,14 @@ import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
 
-object IntentCompat {
-    @Suppress("DEPRECATION")
-    fun <T : Parcelable> getParcelableExtra(
-        intent: Intent,
-        key: String,
-        clazz: Class<T>,
-    ): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(key, clazz)
-        } else {
-            intent.getParcelableExtra(key) as? T
-        }
-}
+@Suppress("DEPRECATION")
+fun <T : Parcelable> Intent.getArrayListExtraCompat(
+    key: String,
+    clazz: Class<T>,
+): ArrayList<T>? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this.getParcelableArrayListExtra(key, clazz)
+    } else {
+        this.getParcelableArrayListExtra(key)
+    }
+

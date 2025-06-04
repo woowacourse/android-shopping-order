@@ -14,7 +14,10 @@ import woowacourse.shopping.presentation.cart.event.CartEventHandlerImpl
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
 class CartActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityCartBinding
+    private val binding: ActivityCartBinding by lazy {
+        DataBindingUtil.setContentView(this, R.layout.activity_cart)
+    }
+
     private val viewModel: CartViewModel by viewModels {
         CartViewModel.FACTORY
     }
@@ -22,7 +25,6 @@ class CartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
 
         setupWindowInsets()
         setupToolbar()
@@ -30,20 +32,12 @@ class CartActivity : AppCompatActivity() {
         initRecyclerView()
         observeCartProducts()
         observePagination()
+        setUpOrderButtonListener()
     }
 
     private fun initBinding() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.buttonOrder.setOnClickListener {
-            val intent =
-                RecommendActivity.newIntent(
-                    this@CartActivity,
-                    viewModel.totalOrderPrice.value!!,
-                    viewModel.checkedProductCount.value!!
-                )
-            startActivity(intent)
-        }
     }
 
     private fun setupToolbar() {
@@ -84,6 +78,17 @@ class CartActivity : AppCompatActivity() {
             val adapter = getCartAdapter()
             val paginationPos = adapter.itemCount - 1
             adapter.notifyItemChanged(paginationPos)
+        }
+    }
+
+    private fun setUpOrderButtonListener() {
+        binding.buttonOrder.setOnClickListener {
+            val intent =
+                RecommendActivity.newIntent(
+                    this@CartActivity,
+                    viewModel.checkedProducts.value ?: emptyList()
+                )
+            startActivity(intent)
         }
     }
 
