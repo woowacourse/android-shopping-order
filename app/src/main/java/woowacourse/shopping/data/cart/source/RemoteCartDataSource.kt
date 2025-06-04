@@ -16,12 +16,13 @@ class RemoteCartDataSource(
         size: Int,
     ): PageableCartItemData {
         val response: CartResponse? = cartService.getCart(page = page, size = size).execute().body()
-        return PageableCartItemData(
+
+        return PageableCartItemData.from(
             cartItems =
                 response?.content?.mapNotNull { it.toCartItemEntityOrNull() }
                     ?: emptyList(),
-            hasPrevious = response?.hasPrevious ?: false,
-            hasNext = response?.hasNext ?: false,
+            pageNumber = response?.pageable?.pageNumber,
+            totalPages = response?.totalPages,
         )
     }
 
