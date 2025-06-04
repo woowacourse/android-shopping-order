@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <import type="android.widget.CheckBox" />
 
         <variable
@@ -14,6 +16,10 @@
         <variable
             name="eventHandler"
             type="woowacourse.shopping.presentation.view.cart.CartEventHandler" />
+
+        <variable
+            name="canSelectItems"
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -84,6 +90,7 @@
                     android:onClick="@{(view) -> eventHandler.onBatchSelect(((CheckBox) view).isChecked)}"
                     android:textColor="@color/white"
                     android:textSize="12sp"
+                    android:visibility="@{canSelectItems ? View.VISIBLE : View.GONE}"
                     app:layout_constraintBottom_toTopOf="@id/tv_select_all_description"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

@@ -49,6 +49,9 @@ class CartViewModel(
     private val _allSelected = MutableLiveData<Boolean>()
     val allSelected: LiveData<Boolean> = _allSelected
 
+    private val _canSelectItems = MutableLiveData(true)
+    val canSelectItems: LiveData<Boolean> = _canSelectItems
+
     private val selectionStatus = mutableMapOf<Long, Boolean>()
 
     fun loadPageOfShoppingCart(indexOffset: Int = 0) {
@@ -163,6 +166,7 @@ class CartViewModel(
         productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
             _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
+        _canSelectItems.value = false
     }
 
     private fun updateSelectionInfo() {

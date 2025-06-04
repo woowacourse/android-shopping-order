@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.view.cart
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
@@ -28,7 +27,6 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 childFragmentManager.commit {
                     replace(R.id.cart_fragment_container, CartRecommendationFragment())
                 }
-                binding.checkboxWrapper.isVisible = false
                 viewModel.fetchRecommendedProducts()
             }
 
@@ -74,6 +72,10 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private fun initObserver() {
         viewModel.allSelected.observe(viewLifecycleOwner) {
             binding.selectAll.isChecked = it
+        }
+
+        viewModel.canSelectItems.observe(viewLifecycleOwner) {
+            binding.canSelectItems = it
         }
     }
 
