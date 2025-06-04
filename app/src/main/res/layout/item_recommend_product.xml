@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="productItem"
+            type="woowacourse.shopping.view.product.ProductsItem.ProductItem" />
+
+        <variable
+            name="productClickListener"
+            type="woowacourse.shopping.view.common.ProductQuantityClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingEnd="12dp">
+
+        <ImageView
+            android:id="@+id/productImage"
+            android:layout_width="154dp"
+            android:layout_height="0dp"
+            android:background="@color/gray_a"
+            android:contentDescription="@{productItem.product.name}"
+            app:imageUrl="@{productItem.product.imageUrl}"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/productPlusQuantityButtonDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:onClick="@{() -> productClickListener.onPlusShoppingCartClick(productItem)}"
+            android:src="@drawable/btn_product_plus"
+            app:layout_constraintBottom_toBottomOf="@id/productImage"
+            app:layout_constraintEnd_toEndOf="@id/productImage" />
+
+        <include
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:id="@+id/productQuantityComponent"
+            layout="@layout/component_product_quantity"
+            app:productQuantityClickListener="@{productClickListener}"
+            app:quantityObservable="@{productItem}"
+            app:layout_constraintBottom_toBottomOf="@id/productImage"
+            app:layout_constraintEnd_toEndOf="@id/productImage"
+            app:layout_constraintStart_toStartOf="@id/productImage"
+
+            />
+
+        <TextView
+            android:id="@+id/productName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{productItem.product.name}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/productImage"
+            app:layout_constraintEnd_toEndOf="@id/productImage"
+            app:layout_constraintTop_toBottomOf="@id/productImage"
+            tools:text="PET보틀-정사각형어쩌구저쩌구" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{@string/product_price_format(productItem.product.price)}"
+            android:textColor="@color/gray_5"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/productName"
+            app:layout_constraintStart_toStartOf="@id/productName"
+            app:layout_constraintTop_toBottomOf="@id/productName"
+            tools:text="10,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
