@@ -45,7 +45,7 @@ class CartFragment :
         binding.uiEvent = this
 
         viewModel.cartDisplayItems.observe(viewLifecycleOwner) { cartItems ->
-            cartAdapter.updateItemsManually(cartItems)
+            cartAdapter.submitList(cartItems)
         }
 
         viewModel.toastOrderEvent.observe(viewLifecycleOwner) { event ->

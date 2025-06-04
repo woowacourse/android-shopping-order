@@ -22,12 +22,12 @@ import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
-import woowacourse.shopping.presentation.view.cart.CartFragment
+import woowacourse.shopping.presentation.view.order.cart.CartFragment
 import woowacourse.shopping.util.clickOnViewChild
 import woowacourse.shopping.util.nthChildOf
 
 class CartFragmentTest {
-    private lateinit var fragmentScenario: FragmentScenario<CartFragment>
+    private lateinit var fragmentScenario: FragmentScenario<woowacourse.shopping.presentation.view.order.cart.CartFragment>
 
     @BeforeEach
     fun setupCartAdapter() {
@@ -45,7 +45,10 @@ class CartFragmentTest {
         fragmentScenario =
             launchFragmentInContainer(
                 themeResId = R.style.Theme_Shopping,
-            ) { CartFragment() }
+            ) {
+                woowacourse.shopping.presentation.view.order.cart
+                    .CartFragment()
+            }
     }
 
     @Test
