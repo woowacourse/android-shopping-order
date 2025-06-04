@@ -33,6 +33,9 @@ class NetworkExceptionDelegator(
             NetworkError.UnknownError -> {
                 R.string.error_text_unknown
             }
+            NetworkError.MissingLocationHeaderError -> {
+                R.string.error_missing_location_header_message
+            }
         }
     }
 }

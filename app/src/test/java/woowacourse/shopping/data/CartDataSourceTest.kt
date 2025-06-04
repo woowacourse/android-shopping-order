@@ -25,10 +25,11 @@ class CartDataSourceTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val retrofit =
+            Retrofit.Builder()
+                .baseUrl(mockWebServer.url("/"))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
         cartService = retrofit.create(CartService::class.java)
         cartDataSource = CartDataSource(cartService, ApiCallbackHandler(), NetworkResultHandler())
     }
@@ -37,9 +38,10 @@ class CartDataSourceTest {
     fun `장바구니 상품을 추가 후 헤더에 Location이 비어있으면 MissingLocationHeaderError이 발생한다`() =
         runTest {
             // given
-            val mockResponse = MockResponse()
-                .setResponseCode(201)
-                .setHeader("Location", "")
+            val mockResponse =
+                MockResponse()
+                    .setResponseCode(201)
+                    .setHeader("Location", "")
 
             mockWebServer.enqueue(mockResponse)
 

@@ -1,21 +1,22 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
+import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
     private val dataSource: CartDataSource,
 ) : CartRepository {
-    override fun addCart(
-        cart: Cart,
-        callback: (Result<String>) -> Unit,
-    ) {
-        dataSource.addCart(cart.toRequest()) { callback(it) }
-    }
+    override suspend fun addCart(cart: Cart): NetworkResult<Long> =
+        withContext(Dispatchers.IO) {
+            dataSource.addCart(cart.toRequest())
+        }
 
     override fun loadSinglePage(
         page: Int?,

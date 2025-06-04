@@ -118,8 +118,8 @@ class DetailViewModel(
     private fun whenProductNotSavedInCart(productId: Long) =
         withState(_uiState.value) { state ->
             val cart = Cart(state.cartQuantity, productId)
-            defaultCartRepository.addCart(cart) { result ->
-                result
+            viewModelScope.launch {
+                defaultCartRepository.addCart(cart)
                     .onSuccess {
                         _uiEvent.setValue(DetailUiEvent.NavigateToCart(state.category))
                     }

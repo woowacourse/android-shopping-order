@@ -3,6 +3,8 @@ package woowacourse.shopping.domain.exception
 sealed class NetworkError : Throwable() {
     data object UnknownError : NetworkError()
 
+    data object MissingLocationHeaderError : NetworkError()
+
     sealed class HttpError : NetworkError() {
         data object BadRequestError : HttpError()
 

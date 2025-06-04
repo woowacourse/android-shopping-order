@@ -3,12 +3,10 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
+import woowacourse.shopping.domain.exception.NetworkResult
 
 interface CartRepository {
-    fun addCart(
-        cart: Cart,
-        callback: (Result<String>) -> Unit,
-    )
+    suspend fun addCart(cart: Cart): NetworkResult<Long>
 
     fun updateQuantity(
         cartId: Long,

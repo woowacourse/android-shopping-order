@@ -24,14 +24,15 @@ class NetworkResultHandler {
             }
 
             else -> {
-                Log.e("API_ERROR", "Throwable: ${throwable::class.java.simpleName}")
-                Log.e("API_ERROR", "message: ${throwable.message}")
+//                Log.e("API_ERROR", "Throwable: ${throwable::class.java.simpleName}")
+//                Log.e("API_ERROR", "message: ${throwable.message}")
             }
         }
     }
 
     fun handleNetworkError(e: Throwable): NetworkError {
         return when (e) {
+            is NetworkError.MissingLocationHeaderError -> e
             is HttpException -> {
                 when (e.code()) {
                     400 -> NetworkError.HttpError.BadRequestError

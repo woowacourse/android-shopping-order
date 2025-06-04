@@ -76,29 +76,28 @@ class CartViewModel(
     fun increaseRecommendProductQuantity(productId: Long) =
         withState(_recommendUiState.value) { state ->
             val updated = state.increaseQuantity(productId)
-
-            when (val cartId = updated.cartId) {
-                null -> {
-                    cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it
+            viewModelScope.launch {
+                when (val cartId = updated.cartId) {
+                    null -> {
+                        cartRepository.addCart(Cart(updated.cartQuantity, productId))
                             .onSuccess { value ->
-                                val cartId = value.toLong()
+                                val cartId = value
                                 _recommendUiState.value =
                                     state.modifyUiState(updated.copy(cartId = cartId))
                                 _cartUiState.value = _cartUiState.value?.addCart(cartId, updated)
                             }
                             .onFailure(::handleFailure)
                     }
-                }
 
-                else -> {
-                    cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
-                        value
-                            .onSuccess {
-                                _recommendUiState.value = state.modifyUiState(updated)
-                                increaseCartQuantity(cartId)
-                            }
-                            .onFailure(::handleFailure)
+                    else -> {
+                        cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
+                            value
+                                .onSuccess {
+                                    _recommendUiState.value = state.modifyUiState(updated)
+                                    increaseCartQuantity(cartId)
+                                }
+                                .onFailure(::handleFailure)
+                        }
                     }
                 }
             }

@@ -98,16 +98,16 @@ class MainViewModel(
         withState(_uiState.value) { state ->
             val updated = state.increaseCartQuantity(productId)
             val request = Cart(updated.cartQuantity, productId)
-
-            if (updated.cartId == null) {
-                cartRepository.addCart(request) {
-                    it.onSuccess { newId ->
-                        updateUiState { modifyUiState(updated.copy(cartId = newId.toLong())) }
-                    }.onFailure(::handleFailure)
-                }
-            } else {
-                cartRepository.updateQuantity(updated.cartId, updated.cartQuantity) {
-                    updateUiState { modifyUiState(updated) }
+            viewModelScope.launch {
+                if (updated.cartId == null) {
+                    cartRepository.addCart(request)
+                        .onSuccess { newId ->
+                            updateUiState { modifyUiState(updated.copy(cartId = newId.toLong())) }
+                        }.onFailure(::handleFailure)
+                } else {
+                    cartRepository.updateQuantity(updated.cartId, updated.cartQuantity) {
+                        updateUiState { modifyUiState(updated) }
+                    }
                 }
             }
         }

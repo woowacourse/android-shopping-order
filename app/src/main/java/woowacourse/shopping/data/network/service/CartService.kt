@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.network.service
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -13,9 +14,9 @@ import woowacourse.shopping.data.network.response.carts.CartsResponse
 
 interface CartService {
     @POST("/cart-items")
-    fun addCart(
+    suspend fun addCart(
         @Body request: CartItemRequest,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @GET("/cart-items")
     fun getCartSinglePage(
