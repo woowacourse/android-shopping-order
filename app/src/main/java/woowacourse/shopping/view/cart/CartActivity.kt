@@ -67,7 +67,7 @@ class CartActivity : AppCompatActivity() {
                     showToast(getString(R.string.text_over_quantity).format(it.quantity))
                 }
 
-                CartUiEvent.RecommendScreenRequested -> onClickOrderButton()
+                CartUiEvent.NavigationToRecommendScree -> onClickOrderButton()
             }
         }
     }

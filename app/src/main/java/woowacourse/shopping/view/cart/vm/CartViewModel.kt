@@ -247,8 +247,8 @@ class CartViewModel(
         }
     }
 
-    fun onRecommendScreenRequested() {
-        _event.setValue(CartUiEvent.RecommendScreenRequested)
+    fun requestNavigationToRecommendScreen() {
+        _event.setValue(CartUiEvent.NavigationToRecommendScree)
     }
 
     private fun setLoading(isLoading: Boolean) {
