@@ -23,7 +23,6 @@ class CatalogViewModelFactory(
                         RemoteCatalogProductRepositoryImpl(),
                     ),
                 catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
-                remoteCatalogProductRepositoryImpl = RemoteCatalogProductRepositoryImpl(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

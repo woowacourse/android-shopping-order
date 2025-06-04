@@ -7,7 +7,6 @@ import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.CatalogItem.ProductItem
 
@@ -15,7 +14,6 @@ class CatalogViewModel(
     private val catalogProductRepository: CatalogProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val remoteCatalogProductRepositoryImpl: RemoteCatalogProductRepositoryImpl,
 ) : ViewModel() {
     private val _catalogItems =
         MutableLiveData<List<CatalogItem>>(emptyList<CatalogItem>())
@@ -79,7 +77,7 @@ class CatalogViewModel(
         increasePage()
         val currentPage = page.value ?: 0
 
-        remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
+        catalogProductRepository.getAllProductsSize { allProductSize ->
             val startIndex = currentPage * PAGE_SIZE
             val endIndex = minOf(startIndex + PAGE_SIZE, allProductSize)
             loadCatalog(endIndex, 20, allProductSize)
@@ -90,7 +88,7 @@ class CatalogViewModel(
         _catalogItems.value = emptyList()
         val currentPage = page.value ?: 0
 
-        remoteCatalogProductRepositoryImpl.getAllProductsSize { allProductSize ->
+        catalogProductRepository.getAllProductsSize { allProductSize ->
             val endIndex = minOf((currentPage + 1) * PAGE_SIZE, allProductSize)
 
             loadCatalog(endIndex, 20, allProductSize)
@@ -104,7 +102,7 @@ class CatalogViewModel(
     ) {
         _loadingState.postValue(LoadingState.loading())
 
-        remoteCatalogProductRepositoryImpl.getProductsByPage(
+        catalogProductRepository.getProductsByPage(
             page.value ?: 0,
             size,
         ) { pagedProducts ->
