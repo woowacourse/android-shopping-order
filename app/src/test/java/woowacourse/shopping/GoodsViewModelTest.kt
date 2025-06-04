@@ -15,7 +15,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.feature.goods.GoodsViewModel
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.server.TestCartServiceImpl
@@ -47,19 +47,19 @@ class GoodsViewModelTest {
 
         historyRepository =
             object : HistoryRepository {
-                override fun getAll(callback: (List<Cart>) -> Unit) {
+                override fun getAll(callback: (List<CartProduct>) -> Unit) {
                     callback(
                         listOf(
-                            Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 1),
+                            CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1),
                         ),
                     )
                 }
 
-                override fun insert(history: Cart) {
+                override fun insert(history: CartProduct) {
                     // 테스트용 빈 구현
                 }
 
-                override fun findLatest(callback: (Cart?) -> Unit) {
+                override fun findLatest(callback: (CartProduct?) -> Unit) {
                 }
             }
 
@@ -80,7 +80,7 @@ class GoodsViewModelTest {
             val items = viewModel.items.getOrAwaitValue()
             assert(items.isNotEmpty())
             assert(items.first() is List<*>)
-            assert(items.drop(1).all { it is Cart })
+            assert(items.drop(1).all { it is CartProduct })
         }
 
     @Test
@@ -140,7 +140,7 @@ class GoodsViewModelTest {
     @Test
     fun `insertToCart 호출시 isSuccess LiveData를 호출한다`() =
         runTest(testDispatcher) {
-            val cart = Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 1)
+            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1)
 
             viewModel.insertToCart(cart)
 
@@ -153,7 +153,7 @@ class GoodsViewModelTest {
     @Test
     fun `removeFromCart 호출시 quantity 감소 및 LiveData를 변경한다`() =
         runTest(testDispatcher) {
-            val cart = Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
+            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
 
             viewModel.insertToCart(cart)
             testScheduler.advanceUntilIdle()
@@ -163,7 +163,7 @@ class GoodsViewModelTest {
 
             val updatedCart =
                 viewModel.items.value
-                    ?.filterIsInstance<Cart>()
+                    ?.filterIsInstance<CartProduct>()
                     ?.find { it.goods.id == cart.goods.id }
             assertNotNull(updatedCart)
             assertTrue(updatedCart.quantity < cart.quantity)

@@ -3,9 +3,9 @@ package woowacourse.shopping.feature.cart.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 
-class RecommendAdapter : ListAdapter<Cart, RecommendViewHolder>(DIFF_CALLBACK) {
+class RecommendAdapter : ListAdapter<CartProduct, RecommendViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -15,21 +15,21 @@ class RecommendAdapter : ListAdapter<Cart, RecommendViewHolder>(DIFF_CALLBACK) {
         holder: RecommendViewHolder,
         position: Int,
     ) {
-        val item: Cart = getItem(position)
+        val item: CartProduct = getItem(position)
         holder.bind(item)
     }
 
     companion object {
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<Cart>() {
+            object : DiffUtil.ItemCallback<CartProduct>() {
                 override fun areItemsTheSame(
-                    oldItem: Cart,
-                    newItem: Cart,
+                    oldItem: CartProduct,
+                    newItem: CartProduct,
                 ): Boolean = oldItem.id == newItem.id
 
                 override fun areContentsTheSame(
-                    oldItem: Cart,
-                    newItem: Cart,
+                    oldItem: CartProduct,
+                    newItem: CartProduct,
                 ): Boolean = oldItem == newItem
             }
     }

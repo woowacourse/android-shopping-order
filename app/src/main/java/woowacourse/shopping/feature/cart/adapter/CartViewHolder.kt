@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.feature.CustomCartQuantity
 
 class CartViewHolder(
@@ -15,7 +15,7 @@ class CartViewHolder(
         binding.cartClickListener = cartClickListener
     }
 
-    fun bind(cart: Cart) {
+    fun bind(cart: CartProduct) {
         binding.cart = cart
         binding.customCartQuantity.setClickListener(
             object : CustomCartQuantity.CartQuantityClickListener {
@@ -42,12 +42,12 @@ class CartViewHolder(
     }
 
     interface CartClickListener {
-        fun onClickDeleteButton(cart: Cart)
+        fun onClickDeleteButton(cart: CartProduct)
 
-        fun addToCart(cart: Cart)
+        fun addToCart(cart: CartProduct)
 
-        fun removeFromCart(cart: Cart)
+        fun removeFromCart(cart: CartProduct)
 
-        fun toggleCheckedItem(cart: Cart)
+        fun toggleCheckedItem(cart: CartProduct)
     }
 }

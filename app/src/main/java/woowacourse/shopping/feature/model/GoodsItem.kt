@@ -1,6 +1,6 @@
 package woowacourse.shopping.feature.model
 
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.History
 
 sealed class GoodsItem {
@@ -9,7 +9,7 @@ sealed class GoodsItem {
     ) : GoodsItem()
 
     data class Product(
-        val cart: Cart,
+        val cart: CartProduct,
     ) : GoodsItem()
 
     object LoadMore : GoodsItem()

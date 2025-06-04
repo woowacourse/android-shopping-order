@@ -5,7 +5,7 @@
     <data>
         <variable
             name="cart"
-            type="woowacourse.shopping.domain.model.Cart" />
+            type="woowacourse.shopping.domain.model.CartProduct" />
         <variable
             name="cartClickListener"
             type="woowacourse.shopping.feature.CustomCartQuantity.CartQuantityClickListener" />

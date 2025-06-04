@@ -10,7 +10,7 @@ import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
@@ -33,8 +33,8 @@ class CartViewModel(
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
 
-    private val _carts = MutableLiveData<List<Cart>>()
-    val carts: LiveData<List<Cart>> get() = _carts
+    private val _carts = MutableLiveData<List<CartProduct>>()
+    val carts: LiveData<List<CartProduct>> get() = _carts
 
     private val _totalCheckedItemsCount = MutableLiveData(0)
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
@@ -45,10 +45,10 @@ class CartViewModel(
     private val _isLoading = MutableLiveData<Boolean>(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _recommendItems = MutableLiveData<List<Cart>>()
-    val recommendItems: LiveData<List<Cart>> get() = _recommendItems
+    private val _recommendItems = MutableLiveData<List<CartProduct>>()
+    val recommendItems: LiveData<List<CartProduct>> get() = _recommendItems
 
-    private val selectedItems = MutableLiveData<List<Cart>>(emptyList())
+    private val selectedItems = MutableLiveData<List<CartProduct>>(emptyList())
     private val totalItemsCount = MutableLiveData(0)
 
     init {
@@ -69,7 +69,7 @@ class CartViewModel(
         loadCarts()
     }
 
-    fun toggleCheck(cart: Cart) {
+    fun toggleCheck(cart: CartProduct) {
         val updatedList =
             _carts.value?.map {
                 if (it.id == cart.id) it.copy(isChecked = !it.isChecked) else it
@@ -100,7 +100,7 @@ class CartViewModel(
         _showPageButton.value = total > PAGE_SIZE
     }
 
-    fun delete(cart: Cart) {
+    fun delete(cart: CartProduct) {
         val total = totalItemsCount.value ?: 0
         val endPage = ((total - 1) / PAGE_SIZE) + 1
 
@@ -122,7 +122,7 @@ class CartViewModel(
         }
     }
 
-    fun addToCart(cart: Cart) {
+    fun addToCart(cart: CartProduct) {
         cartRepository.updateCart(cart.id, CartQuantity(cart.quantity + 1)) { result ->
             result
                 .onSuccess {
@@ -142,7 +142,7 @@ class CartViewModel(
         }
     }
 
-    fun removeFromCart(cart: Cart) {
+    fun removeFromCart(cart: CartProduct) {
         if (cart.quantity == 1) {
             delete(cart)
         } else {
@@ -169,7 +169,7 @@ class CartViewModel(
         }
     }
 
-    private fun updateCheckedSummary(updatedList: List<Cart>) {
+    private fun updateCheckedSummary(updatedList: List<CartProduct>) {
         val checked = updatedList.filter { it.isChecked }
         _totalCheckedItemsCount.value = checked.sumOf { it.quantity }
         _checkedItemsPrice.value = checked.sumOf { it.product.price * it.quantity }
@@ -191,7 +191,7 @@ class CartViewModel(
                 onSuccess = { response ->
                     val cartList =
                         response.content.map {
-                            Cart(
+                            CartProduct(
                                 id = it.id,
                                 product = it.product.toDomain(),
                                 quantity = it.quantity,
@@ -234,7 +234,7 @@ class CartViewModel(
 
                             _recommendItems.value =
                                 recommendProducts.map {
-                                    Cart(id = 0, product = it.toDomain(), quantity = 0)
+                                    CartProduct(id = 0, product = it.toDomain(), quantity = 0)
                                 }
                         },
                         onError = {

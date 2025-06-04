@@ -9,7 +9,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import woowacourse.shopping.data.local.cart.server.CartService
 import woowacourse.shopping.data.local.cart.server.DummyCarts
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 
 class TestCartServiceImpl : CartService {
     private val gson = Gson()
@@ -82,13 +82,13 @@ class TestCartServiceImpl : CartService {
         return gson.fromJson(body, Carts::class.java)
     }
 
-    override fun getCartById(id: Long): Cart? {
+    override fun getCartById(id: Long): CartProduct? {
         val url = server.url("$BASE_PATH/$id").toString()
         val request = Request.Builder().url(url).build()
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) return null
         val body = response.body?.string() ?: throw IllegalStateException(ERROR_MESSAGE)
-        return gson.fromJson(body, Cart::class.java)
+        return gson.fromJson(body, CartProduct::class.java)
     }
 
     override fun getPagedCarts(

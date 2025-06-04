@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecommendBinding
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 
 class RecommendViewHolder(
     private val binding: ItemRecommendBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(cart: Cart) {
+    fun bind(cart: CartProduct) {
         binding.cart = cart
     }
 

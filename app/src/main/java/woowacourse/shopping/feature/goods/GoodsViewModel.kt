@@ -11,7 +11,7 @@ import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.feature.model.GoodsItem
 import woowacourse.shopping.feature.model.State
@@ -28,7 +28,7 @@ class GoodsViewModel(
     private val _items = MutableLiveData<List<GoodsItem>>()
     val items: LiveData<List<GoodsItem>> get() = _items
 
-    private val products = MutableLiveData<List<Cart>>()
+    private val products = MutableLiveData<List<CartProduct>>()
 
     private val histories = MutableLiveData<List<History>>()
 
@@ -38,8 +38,8 @@ class GoodsViewModel(
     private val _hasNextPage = MutableLiveData(true)
     val hasNextPage: LiveData<Boolean> get() = _hasNextPage
 
-    private val _navigateToCart = MutableSingleLiveData<Cart>()
-    val navigateToCart: SingleLiveData<Cart> get() = _navigateToCart
+    private val _navigateToCartProduct = MutableSingleLiveData<CartProduct>()
+    val navigateToCart: SingleLiveData<CartProduct> get() = _navigateToCartProduct
 
     private val _insertState = MutableLiveData<Event<State>>()
     val insertState: LiveData<Event<State>> get() = _insertState
@@ -60,7 +60,7 @@ class GoodsViewModel(
         loadProducts()
     }
 
-    fun addToCart(cart: Cart) {
+    fun addToCart(cart: CartProduct) {
         val newQuantity = cart.quantity + 1
 
         if (cart.quantity == 0) {
@@ -100,7 +100,7 @@ class GoodsViewModel(
         }
     }
 
-    fun removeFromCart(cart: Cart) {
+    fun removeFromCart(cart: CartProduct) {
         if (cart.quantity == 1) {
             cartRepository.deleteCart(cart.id) { result ->
                 result
@@ -146,7 +146,7 @@ class GoodsViewModel(
     fun findCartFromHistory(history: History) {
         val product = _items.value?.filterIsInstance<GoodsItem.Product>()?.find { it.cart.product.id == history.id }
         if (product != null) {
-            _navigateToCart.setValue(product.cart)
+            _navigateToCartProduct.setValue(product.cart)
         }
     }
 
@@ -171,7 +171,7 @@ class GoodsViewModel(
         }
     }
 
-    private fun updateItems(updatedCart: Cart) {
+    private fun updateItems(updatedCart: CartProduct) {
         val currentItems = _items.value.orEmpty().toMutableList()
         val index =
             currentItems.indexOfFirst {
@@ -197,7 +197,7 @@ class GoodsViewModel(
                             val newCarts =
                                 response.content.map { product ->
                                     val matchedCart = cartByProductId[product.id]
-                                    Cart(
+                                    CartProduct(
                                         id = matchedCart?.id?.toLong() ?: 0,
                                         product = product.toDomain(),
                                         quantity = matchedCart?.quantity ?: 0,

@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartProductBinding
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.cart.adapter.CartViewHolder
 import woowacourse.shopping.feature.model.ResultCode
@@ -62,22 +62,22 @@ class CartProductFragment : Fragment() {
         adapter =
             CartAdapter(
                 object : CartViewHolder.CartClickListener {
-                    override fun onClickDeleteButton(cart: Cart) {
+                    override fun onClickDeleteButton(cart: CartProduct) {
                         viewModel.delete(cart)
                         sendCartResult(cart, 0)
                     }
 
-                    override fun addToCart(cart: Cart) {
+                    override fun addToCart(cart: CartProduct) {
                         viewModel.addToCart(cart)
                         sendCartResult(cart, cart.quantity + 1)
                     }
 
-                    override fun removeFromCart(cart: Cart) {
+                    override fun removeFromCart(cart: CartProduct) {
                         viewModel.removeFromCart(cart)
                         sendCartResult(cart, cart.quantity - 1)
                     }
 
-                    override fun toggleCheckedItem(cart: Cart) {
+                    override fun toggleCheckedItem(cart: CartProduct) {
                         viewModel.toggleCheck(cart)
                     }
                 },
@@ -85,7 +85,7 @@ class CartProductFragment : Fragment() {
     }
 
     private fun sendCartResult(
-        cart: Cart,
+        cart: CartProduct,
         quantity: Int,
     ) {
         requireActivity().setResult(

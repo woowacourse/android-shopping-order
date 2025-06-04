@@ -14,7 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsBinding
 import woowacourse.shopping.databinding.MenuCartActionViewBinding
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
@@ -114,7 +114,7 @@ class GoodsActivity : AppCompatActivity() {
         adapter =
             GoodsAdapter(
                 object : GoodsClickListener {
-                    override fun onClickGoods(cart: Cart) {
+                    override fun onClickGoods(cart: CartProduct) {
                         navigate(cart)
                     }
 
@@ -122,11 +122,11 @@ class GoodsActivity : AppCompatActivity() {
                         viewModel.findCartFromHistory(history)
                     }
 
-                    override fun insertToCart(cart: Cart) {
+                    override fun insertToCart(cart: CartProduct) {
                         viewModel.addToCart(cart)
                     }
 
-                    override fun removeFromCart(cart: Cart) {
+                    override fun removeFromCart(cart: CartProduct) {
                         viewModel.removeFromCart(cart)
                     }
 
@@ -160,8 +160,8 @@ class GoodsActivity : AppCompatActivity() {
         viewModel.refreshHistoryOnly()
     }
 
-    private fun navigate(cart: Cart) {
-        val intent = GoodsDetailsActivity.newIntent(this, cart.product.id.toLong())
+    private fun navigate(cartProduct: CartProduct) {
+        val intent = GoodsDetailsActivity.newIntent(this, cartProduct.product.id.toLong())
         activityResultLauncher.launch(intent)
     }
 

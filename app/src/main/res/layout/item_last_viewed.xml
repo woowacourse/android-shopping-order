@@ -6,7 +6,7 @@
     <data>
         <variable
             name="cart"
-            type="woowacourse.shopping.domain.model.Cart" />
+            type="woowacourse.shopping.domain.model.CartProduct" />
         <variable
             name="lastViewedClickListener"
             type="woowacourse.shopping.feature.CustomLastViewed.LastViewedClickListener" />

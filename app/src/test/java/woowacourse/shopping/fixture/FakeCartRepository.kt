@@ -3,13 +3,13 @@ package woowacourse.shopping.fixture
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 
 class FakeCartRepository : LocalCartRepository {
-    private val cartList = mutableListOf<Cart>()
-    private val cartLiveData = MutableLiveData<List<Cart>>()
+    private val cartList = mutableListOf<CartProduct>()
+    private val cartLiveData = MutableLiveData<List<CartProduct>>()
     private var sizeLiveData: Int = 0
-    var savedCart: Cart? = null
+    var savedCart: CartProduct? = null
 
     init {
         updateLiveData()
@@ -20,24 +20,24 @@ class FakeCartRepository : LocalCartRepository {
         sizeLiveData = cartList.size
     }
 
-    override fun insert(cart: Cart) {
+    override fun insert(cart: CartProduct) {
         cartList.add(cart)
         savedCart = cart
         updateLiveData()
     }
 
-    override fun insertAll(cart: Cart) {
+    override fun insertAll(cart: CartProduct) {
         cartList.add(cart)
         savedCart = cart
         updateLiveData()
     }
 
-    override fun delete(cart: Cart) {
+    override fun delete(cart: CartProduct) {
         cartList.removeIf { it.goods.id == cart.goods.id }
         updateLiveData()
     }
 
-    override fun deleteAll(cart: Cart) {
+    override fun deleteAll(cart: CartProduct) {
         TODO("Not yet implemented")
     }
 

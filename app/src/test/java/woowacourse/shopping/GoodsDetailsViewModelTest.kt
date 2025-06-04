@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.server.TestCartServiceImpl
@@ -46,20 +46,20 @@ class GoodsDetailsViewModelTest {
 
         historyRepository =
             object : HistoryRepository {
-                override fun getAll(callback: (List<Cart>) -> Unit) {
+                override fun getAll(callback: (List<CartProduct>) -> Unit) {
                     callback(
                         listOf(
-                            Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 1),
+                            CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1),
                         ),
                     )
                 }
 
-                override fun insert(history: Cart) {
+                override fun insert(history: CartProduct) {
                     // 테스트용 빈 구현
                 }
 
-                override fun findLatest(callback: (Cart?) -> Unit) {
-                    callback(Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 1))
+                override fun findLatest(callback: (CartProduct?) -> Unit) {
+                    callback(CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1))
                 }
             }
 
@@ -75,7 +75,7 @@ class GoodsDetailsViewModelTest {
     @Test
     fun 수량_증가시_장바구니_수량이_증가한다() =
         runTest(testDispatcher) {
-            val cart = Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 1)
+            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1)
             viewModel.setInitialCart(cart)
             advanceUntilIdle()
 
@@ -88,7 +88,7 @@ class GoodsDetailsViewModelTest {
     @Test
     fun 수량_감소시_장바구니_수량이_감소한다() =
         runTest(testDispatcher) {
-            val cart = Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
+            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
             viewModel.setInitialCart(cart)
             advanceUntilIdle()
 
@@ -101,12 +101,12 @@ class GoodsDetailsViewModelTest {
     @Test
     fun 최근_히스토리와_일치하는_카트를_찾는다() =
         runTest(testDispatcher) {
-            val cart = Cart(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
+            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
             cartRepository.insert(cart)
             viewModel.setInitialCart(cart)
             advanceUntilIdle()
 
-            var emitted: Cart? = null
+            var emitted: CartProduct? = null
             viewModel.navigateToLastViewedCart.observe(
                 object : LifecycleOwner {
                     override val lifecycle: Lifecycle
