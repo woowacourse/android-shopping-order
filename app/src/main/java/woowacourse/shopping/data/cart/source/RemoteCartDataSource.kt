@@ -2,10 +2,10 @@ package woowacourse.shopping.data.cart.source
 
 import woowacourse.shopping.data.API
 import woowacourse.shopping.data.cart.PageableCartItemData
-import woowacourse.shopping.data.cart.dto.CartItemRequest
+import woowacourse.shopping.data.cart.dto.CartItemQuantityRequest
 import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.cart.service.CartService
-import woowacourse.shopping.data.product.dto.CartRequest
+import woowacourse.shopping.data.product.dto.CartItemRequest
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 class RemoteCartDataSource(
@@ -55,7 +55,7 @@ class RemoteCartDataSource(
         productId: Long,
         quantity: Int,
     ) {
-        cartService.postCartItem(CartRequest(productId, quantity)).execute()
+        cartService.postCartItem(CartItemRequest(productId, quantity)).execute()
     }
 
     override fun remove(cartItemId: Long) {
@@ -69,7 +69,7 @@ class RemoteCartDataSource(
         cartService
             .patchCartItemQuantity(
                 cartItemId,
-                CartItemRequest(newQuantity),
+                CartItemQuantityRequest(newQuantity),
             ).execute()
     }
 

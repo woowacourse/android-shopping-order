@@ -4,6 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartItemRequest(
+data class CartItemQuantityRequest(
     @SerialName("quantity") val quantity: Int,
 )
