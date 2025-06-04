@@ -7,7 +7,6 @@
     android:padding="10dp">
 
     <data>
-
         <import type="android.view.View" />
 
         <variable
@@ -98,9 +97,9 @@
                 app:layout_constraintBottom_toBottomOf="@id/image_view_product"
                 app:layout_constraintEnd_toEndOf="@id/image_view_product"
                 app:layout_constraintStart_toStartOf="@id/image_view_product"
+                android:visibility="@{model.hasCartQuantity ? View.VISIBLE : View.GONE}"
                 bind:eventHandler="@{cartQuantityEventHandler}"
                 app:quantity="@{model.cartQuantityValue}"
-                app:containerVisibility="@{model.hasCartQuantity}"
                 app:cartId="@{model.item.id}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

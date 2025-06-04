@@ -3,8 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View"/>
-
         <variable
             name="cartId"
             type="long" />
@@ -14,10 +12,6 @@
             type="int" />
 
         <variable
-            name="containerVisibility"
-            type="Boolean" />
-
-        <variable
             name="eventHandler"
             type="woowacourse.shopping.view.core.handler.CartQuantityHandler" />
     </data>
@@ -25,8 +19,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/product_quantity_background"
-        android:visibility="@{containerVisibility ? View.VISIBLE : View.GONE}">
+        android:background="@drawable/product_quantity_background">
 
         <ImageView
             android:id="@+id/image_view_minus"
