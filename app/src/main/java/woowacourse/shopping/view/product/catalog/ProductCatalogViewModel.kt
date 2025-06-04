@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -48,7 +50,9 @@ class ProductCatalogViewModel(
     }
 
     override fun onAddClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
+        viewModelScope.launch {
+            val result = cartProductRepository.insert(item.id, QUANTITY_TO_ADD)
+
             result
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
@@ -61,20 +65,42 @@ class ProductCatalogViewModel(
 
     override fun onQuantityIncreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity + QUANTITY_TO_ADD) {
-            cartProducts.removeIf { it.product.id == item.id }
-            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-            updateQuantity(item, QUANTITY_TO_ADD)
+        viewModelScope.launch {
+            val result =
+                cartProductRepository.updateQuantity(
+                    cartProduct,
+                    cartProduct.quantity + QUANTITY_TO_ADD,
+                )
+
+            result
+                .onSuccess {
+                    cartProducts.removeIf { it.product.id == item.id }
+                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
+                    updateQuantity(item, QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity - QUANTITY_TO_ADD) {
-            cartProducts.removeIf { it.product.id == item.id }
-            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
-            if (newQuantity > MINIMUM_QUANTITY) cartProducts.add(cartProduct.copy(quantity = newQuantity))
-            updateQuantity(item, -QUANTITY_TO_ADD)
+        viewModelScope.launch {
+            val result =
+                cartProductRepository.updateQuantity(
+                    cartProduct,
+                    cartProduct.quantity - QUANTITY_TO_ADD,
+                )
+
+            result
+                .onSuccess {
+                    cartProducts.removeIf { it.product.id == item.id }
+                    val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+                    if (newQuantity > MINIMUM_QUANTITY) cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                    updateQuantity(item, -QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -87,10 +113,13 @@ class ProductCatalogViewModel(
         _onFinishLoading.value = false
         loadRecentProducts()
         loadCartProducts()
-        cartProductRepository.getTotalQuantity { result ->
+
+        viewModelScope.launch {
+            val result = cartProductRepository.getTotalQuantity()
+
             result
                 .onSuccess {
-                    _totalQuantity.postValue(it)
+                    _totalQuantity.value = it
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -98,7 +127,9 @@ class ProductCatalogViewModel(
     }
 
     private fun loadCartProducts() {
-        cartProductRepository.getPagedProducts { result ->
+        viewModelScope.launch {
+            val result = cartProductRepository.getPagedProducts()
+
             result
                 .onSuccess {
                     cartProducts.clear()

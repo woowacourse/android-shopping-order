@@ -5,8 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -37,7 +41,9 @@ class CartProductRecommendationViewModel(
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
     init {
-        cartProductRepository.getPagedProducts { result ->
+        viewModelScope.launch {
+            val result = cartProductRepository.getPagedProducts()
+
             result
                 .onSuccess {
                     cartProducts.addAll(it.items)
@@ -77,18 +83,8 @@ class CartProductRecommendationViewModel(
                     productRepository.getPagedProducts { result ->
                         result
                             .onSuccess { products ->
-                                val cartProductIds =
-                                    cartProducts.map { it.product.id }.toSet()
-                                val recommended =
-                                    products.items
-                                        .asSequence()
-                                        .filter { it.category == recentProduct.product.category }
-                                        .filter { it.id !in cartProductIds }
-                                        .take(RECOMMEND_SIZE)
-                                        .map { ProductItem(it) }
-                                        .toList()
-
-                                _recommendedProducts.postValue(recommended)
+                                _recommendedProducts.value =
+                                    getRecommendationProducts(products, recentProduct)
                             }.onFailure {
                                 Log.e("error", it.message.toString())
                             }
@@ -99,12 +95,29 @@ class CartProductRecommendationViewModel(
         }
     }
 
+    private fun getRecommendationProducts(
+        products: PagedResult<Product>,
+        recentProduct: RecentProduct,
+    ): List<ProductItem> {
+        val cartProductIds =
+            cartProducts.map { it.product.id }.toSet()
+        return products.items
+            .asSequence()
+            .filter { it.category == recentProduct.product.category }
+            .filter { it.id !in cartProductIds }
+            .take(RECOMMEND_SIZE)
+            .map { ProductItem(it) }
+            .toList()
+    }
+
     override fun onProductClick(item: Product) {
         _selectedProduct.setValue(item)
     }
 
     override fun onAddClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
+        viewModelScope.launch {
+            val result = cartProductRepository.insert(item.id, QUANTITY_TO_ADD)
+
             result
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
@@ -118,24 +131,48 @@ class CartProductRecommendationViewModel(
 
     override fun onQuantityIncreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity + QUANTITY_TO_ADD) {
-            cartProducts.remove(cartProduct)
-            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-            updateQuantity(item, QUANTITY_TO_ADD)
+        viewModelScope.launch {
+            val result =
+                cartProductRepository.updateQuantity(
+                    cartProduct,
+                    cartProduct.quantity + QUANTITY_TO_ADD,
+                )
+
+            result
+                .onSuccess {
+                    cartProducts.remove(cartProduct)
+                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
+                    updateQuantity(item, QUANTITY_TO_ADD)
+                }
+                .onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        cartProductRepository.updateQuantity(cartProduct, cartProduct.quantity - QUANTITY_TO_ADD) {
-            cartProducts.remove(cartProduct)
-            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
-            if (newQuantity > DEFAULT_COUNT) {
-                cartProducts.add(cartProduct.copy(quantity = newQuantity))
-            } else {
-                selectedCartIds.remove(cartProduct.id)
-            }
-            updateQuantity(item, -QUANTITY_TO_ADD)
+        viewModelScope.launch {
+            val result =
+                cartProductRepository.updateQuantity(
+                    cartProduct,
+                    cartProduct.quantity - QUANTITY_TO_ADD,
+                )
+
+            result
+                .onSuccess {
+                    cartProducts.remove(cartProduct)
+                    val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+                    if (newQuantity > DEFAULT_COUNT) {
+                        cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                    } else {
+                        selectedCartIds.remove(cartProduct.id)
+                    }
+                    updateQuantity(item, -QUANTITY_TO_ADD)
+                }
+                .onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -152,22 +189,16 @@ class CartProductRecommendationViewModel(
                 }
             }
 
-        _recommendedProducts.postValue(updatedList)
+        _recommendedProducts.value = updatedList
     }
 
     fun finishOrder() {
-        selectedCartIds.forEach { id ->
-            cartProductRepository.delete(id) { result ->
-                result.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+        viewModelScope.launch {
+            val result = cartProductRepository.deleteAll(selectedCartIds)
+
+            result.onFailure {
+                Log.e("error", it.message.toString())
             }
-        }
-        cartProductRepository.deleteAll(selectedCartIds) { result ->
-            result
-                .onFailure {
-                    Log.e("error", it.message.toString())
-                }
         }
     }
 
