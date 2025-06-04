@@ -85,7 +85,7 @@ class RecommendActivity : AppCompatActivity() {
 
     private fun observeCartEvent() {
         viewModel.cartEvent.observe(this) { event ->
-            when(event) {
+            when (event) {
                 CartEvent.ADD_TO_CART_SUCCESS -> {
                     showToast(R.string.text_add_to_cart_success)
                 }

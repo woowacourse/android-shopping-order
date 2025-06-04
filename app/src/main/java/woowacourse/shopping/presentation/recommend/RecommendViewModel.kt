@@ -29,6 +29,14 @@ class RecommendViewModel(
     val cartEvent: LiveData<CartEvent>
         get() = _cartEvent
 
+    private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val totalPrice: LiveData<Int>
+        get() = _totalPrice
+
+    private val _totalCount: MutableLiveData<Int> = MutableLiveData(0)
+    val totalCount: LiveData<Int>
+        get() = _totalCount
+
     private var checkedProducts: List<ProductUiModel> = emptyList()
 
     init {
@@ -37,6 +45,10 @@ class RecommendViewModel(
 
     fun setCheckedProducts(products: List<ProductUiModel>) {
         checkedProducts = products
+        checkedProducts.apply {
+            _totalPrice.value = this.sumOf { it.price * it.quantity }
+            _totalCount.value = this.count()
+        }
     }
 
     fun addProduct(productUiModel: ProductUiModel) {
@@ -52,10 +64,12 @@ class RecommendViewModel(
                     emitFailEvent()
                 }
         }
+        updateOrderInfo(productUiModel.price, 1)
     }
 
     fun increaseQuantity(productUiModel: ProductUiModel) {
         updateProducts(productUiModel) { it.copy(quantity = it.quantity + 1) }
+        updateOrderInfo(productUiModel.price, 1)
     }
 
     fun decreaseQuantity(productUiModel: ProductUiModel) {
@@ -67,6 +81,7 @@ class RecommendViewModel(
                 updated.copy(isExpanded = false)
             } else updated
         }
+        updateOrderInfo(-productUiModel.price, -1)
     }
 
     private fun deleteProduct(productUiModel: ProductUiModel) {
@@ -114,6 +129,8 @@ class RecommendViewModel(
     }
 
     private fun updateQuantity(productUiModel: ProductUiModel) {
+        if (productUiModel.quantity <= 0) return
+
         cartItemRepository.updateCartItemQuantity(
             productUiModel.id,
             productUiModel.quantity
@@ -123,6 +140,14 @@ class RecommendViewModel(
                     emitFailEvent()
                 }
         }
+    }
+
+    private fun updateOrderInfo(
+        price: Int,
+        count: Int,
+    ) {
+        _totalPrice.value = _totalPrice.value?.plus(price)
+        _totalCount.value = _totalCount.value?.plus(count)
     }
 
     private fun emitFailEvent() {
