@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -142,16 +144,25 @@ class ProductCatalogViewModel(
     }
 
     private fun loadRecentProducts() {
-        recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT) { result ->
-            result.onSuccess {
-                recentProducts = it
-                _productCatalogItems.postValue(buildCatalogItems())
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT)
+
+            withContext(Dispatchers.Main) {
+                result.onSuccess {
+                    recentProducts = it
+                    _productCatalogItems.value = buildCatalogItems()
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
             }
         }
     }
 
     private fun loadProducts() {
-        productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1)) { result ->
+        viewModelScope.launch {
+            val result =
+                productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
+
             result
                 .onSuccess { pagedResult ->
                     productItems.clear()
@@ -163,7 +174,9 @@ class ProductCatalogViewModel(
     }
 
     private fun loadMoreProducts() {
-        productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
+        viewModelScope.launch {
+            val result = productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT)
+
             result
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult)

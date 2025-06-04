@@ -1,10 +1,5 @@
 package woowacourse.shopping.data.datasource.remote
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import woowacourse.shopping.data.dto.response.ProductDto
-import woowacourse.shopping.data.dto.response.ProductResponseDto
 import woowacourse.shopping.data.dto.response.toProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.ProductApiService
@@ -14,92 +9,61 @@ import java.util.concurrent.CountDownLatch
 class ProductRemoteDataSource(
     private val productService: ProductApiService,
 ) {
-    fun getProductById(
-        id: Int,
-        onResult: (Result<Product?>) -> Unit,
-    ) {
-        productService.getProductById(id = id).enqueue(
-            object : Callback<ProductDto> {
-                override fun onResponse(
-                    call: Call<ProductDto>,
-                    response: Response<ProductDto>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { body ->
-                            onResult(Result.success(body.toProduct()))
-                        } ?: onResult(Result.success(null))
-                    } else {
-                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                    }
-                }
+    suspend fun getProductById(id: Int): Result<Product?> {
+        val response = productService.getProductById(id = id)
 
-                override fun onFailure(
-                    call: Call<ProductDto>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+        return if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                return Result.success(body.toProduct())
+            } else {
+                Result.success(null)
+            }
+        } else {
+            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+        }
     }
 
-    fun getProductsByIds(
-        ids: List<Int>,
-        onResult: (Result<List<Product>?>) -> Unit,
-    ) {
+    suspend fun getProductsByIds(ids: List<Int>): Result<List<Product>?> {
         val latch = CountDownLatch(ids.size)
         val products = mutableListOf<Product>()
         val exceptions = mutableListOf<Throwable>()
 
         ids.forEach { id ->
-            getProductById(id) { result ->
-                result
-                    .onSuccess { product ->
-                        product?.let { products.add(it) }
-                    }.onFailure { throwable ->
-                        exceptions.add(throwable)
-                    }
-                latch.countDown()
-            }
+            val result = getProductById(id)
+            result
+                .onSuccess { product ->
+                    product?.let { products.add(it) }
+                }.onFailure { throwable ->
+                    exceptions.add(throwable)
+                }
+            latch.countDown()
         }
         latch.await()
-        if (exceptions.isNotEmpty()) {
-            onResult(Result.failure(exceptions.first()))
+        return if (exceptions.isNotEmpty()) {
+            Result.failure(exceptions.first())
         } else {
-            onResult(Result.success(products))
+            Result.success(products)
         }
     }
 
-    fun getPagedProducts(
+    suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagedResult<Product>>) -> Unit,
-    ) {
-        productService.getPagedProducts(page = page, size = size).enqueue(
-            object :
-                Callback<ProductResponseDto> {
-                override fun onResponse(
-                    call: Call<ProductResponseDto>,
-                    response: Response<ProductResponseDto>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { body ->
-                            val products = body.content.map { it.toProduct() }
-                            val hasNext = body.last.not()
-                            onResult(Result.success(PagedResult(products, hasNext)))
-                        } ?: onResult(Result.success(PagedResult(emptyList(), false)))
-                    } else {
-                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                    }
-                }
+    ): Result<PagedResult<Product>> {
+        val response = productService.getPagedProducts(page = page, size = size)
 
-                override fun onFailure(
-                    call: Call<ProductResponseDto>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+        return if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                val products = body.content.map { it.toProduct() }
+                val hasNext = body.last.not()
+                Result.success(PagedResult(products, hasNext))
+            } else {
+                Result.success(PagedResult(emptyList(), false))
+            }
+        } else {
+            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+        }
     }
 }
