@@ -16,8 +16,6 @@
         <variable
             name="eventHandler"
             type="woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler" />
-
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,6 +28,9 @@
 
         <CheckBox
             android:id="@+id/checkbox"
+            cartItem="@{cartItem}"
+            isChecked="@{cartItem.isSelected}"
+            onCheckedChanged="@{eventHandler}"
             android:layout_width="40dp"
             android:layout_height="0dp"
             android:gravity="center"

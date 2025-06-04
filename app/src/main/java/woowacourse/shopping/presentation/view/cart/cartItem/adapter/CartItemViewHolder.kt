@@ -22,11 +22,6 @@ class CartItemViewHolder(
     fun bind(cartItem: CartItemUiModel) {
         binding.cartItem = cartItem
         binding.product = cartItem.cartItem.toProductUiModel()
-        binding.checkbox.setOnCheckedChangeListener(null)
-        binding.checkbox.isChecked = cartItem.isSelected
-        binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
-            cartItemEventHandler.onProductSelectionToggle(cartItem, isChecked)
-        }
     }
 
     companion object {
