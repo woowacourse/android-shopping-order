@@ -6,7 +6,6 @@ import woowacourse.shopping.view.main.state.ProductState
 data class CartUiState(
     val items: List<CartState> = emptyList(),
     val pageState: PageState = PageState(),
-    val allChecked: Boolean = false,
     val isFetching: Boolean = true,
 ) {
     val totalPrice: Int
@@ -17,6 +16,8 @@ data class CartUiState(
 
     val cartIds: List<Long>
         get() = items.map { it.cart.productId }
+
+    val allChecked: Boolean = items.all { it.checked }
 
     fun findCart(cartId: Long) = items.find { it.cartId == cartId } ?: throw IllegalArgumentException()
 
@@ -40,7 +41,7 @@ data class CartUiState(
 
     fun setAllItemsChecked(isChecked: Boolean): CartUiState {
         val updatedItems = items.map { it.modifyChecked(isChecked) }
-        return copy(items = updatedItems, allChecked = isChecked)
+        return copy(items = updatedItems)
     }
 
     fun modifyCheckedState(
