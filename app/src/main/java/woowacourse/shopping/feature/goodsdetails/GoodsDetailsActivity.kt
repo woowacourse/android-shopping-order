@@ -34,8 +34,12 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
         super.onCreate(savedInstanceState)
         binding.lifecycleOwner = this
 
-        val goodsUiModel =
-            IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java) ?: return
+        val goodsUiModel = IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java)
+        if (goodsUiModel == null) {
+            Toast.makeText(this, "상품 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
         val cartUiModel =
             IntentCompat.getParcelableExtra(intent, CART_KEY, CartUiModel::class.java)
 
