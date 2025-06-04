@@ -18,20 +18,32 @@ class ProductRepositoryImpl(
         category: String?,
     ): Result<List<CartItem>> =
         withContext(Dispatchers.IO) {
-            runCatching {
-                productRemoteDataSource
-                    .fetchPagingProducts(page, pageSize, category)
-                    .map { product ->
-                        cartRepository.getCartItemById(product.productId)
-                            ?: CartItem(product = product, quantity = 0)
-                    }
-            }
+            val result = productRemoteDataSource.fetchPagingProducts(page, pageSize, category)
+            result.fold(
+                onSuccess = { products ->
+                    Result.success(
+                        products.map { product ->
+                            cartRepository.getCartItemById(product.productId)
+                                ?: CartItem(product = product, quantity = 0)
+                        },
+                    )
+                },
+                onFailure = { throwable ->
+                    Result.failure(throwable)
+                },
+            )
         }
 
     override suspend fun fetchProductById(productId: Long): Result<Product> =
         withContext(Dispatchers.IO) {
-            runCatching {
-                productRemoteDataSource.fetchProductById(productId)
-            }
+            val result = productRemoteDataSource.fetchProductById(productId)
+            result.fold(
+                onSuccess = { product ->
+                    Result.success(product)
+                },
+                onFailure = { throwable ->
+                    Result.failure(throwable)
+                },
+            )
         }
 }

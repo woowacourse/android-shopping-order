@@ -11,23 +11,26 @@ class ProductRemoteDataSourceImpl(
         page: Int?,
         pageSize: Int?,
         category: String?,
-    ): List<Product> {
-        try {
+    ): Result<List<Product>> =
+        handleApiCall(
+            errorMessage = "상품 목록 조회 실패",
+        ) {
             val response = productService.requestProducts(page, pageSize, category)
-            if (response.content.isEmpty()) {
-                throw NoSuchElementException("상품 데이터가 없습니다.")
+            if (!response.isSuccessful) {
+                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
             }
-            return response.content.map { it.toDomain() }
-        } catch (e: Exception) {
-            throw Exception("인터넷 연결을 확인해주세요.")
+            response.body()?.content?.map { it.toDomain() }
+                ?: throw IllegalStateException("응답 바디가 null입니다.")
         }
-    }
 
-    override suspend fun fetchProductById(id: Long): Product {
-        try {
-            return productService.requestProductById(id).toDomain()
-        } catch (e: Exception) {
-            throw Exception("인터넷 연결을 확인해주세요.")
+    override suspend fun fetchProductById(id: Long): Result<Product> =
+        handleApiCall(
+            errorMessage = "Id로 상품 조회 실패",
+        ) {
+            val response = productService.requestProductById(id)
+            if (!response.isSuccessful) {
+                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
+            }
+            response.body()?.toDomain() ?: throw IllegalStateException("응답 바디가 null입니다.")
         }
-    }
 }

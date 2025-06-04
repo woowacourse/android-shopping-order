@@ -7,7 +7,7 @@ interface ProductRemoteDataSource {
         page: Int?,
         pageSize: Int?,
         category: String?,
-    ): List<Product>
+    ): Result<List<Product>>
 
-    suspend fun fetchProductById(id: Long): Product
+    suspend fun fetchProductById(id: Long): Result<Product>
 }
