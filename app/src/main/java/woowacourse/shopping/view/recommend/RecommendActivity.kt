@@ -28,11 +28,24 @@ class RecommendActivity :
 
         val adapter =
             RecommendProductsAdapter(
-                recommendProductItemActions = this,
+                object : RecommendProductItemActions {
+                    override fun onSelectProduct(item: RecommendProduct) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onPlusProductQuantity(item: RecommendProduct) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onMinusProductQuantity(item: RecommendProduct) {
+                        TODO("Not yet implemented")
+                    }
+                },
             )
 
         binding.lifecycleOwner = this
         binding.recommendCartItems.adapter = adapter
+        viewModel.recommendedProducts.observe(this) { adapter.submitList(it) }
     }
 
     companion object {

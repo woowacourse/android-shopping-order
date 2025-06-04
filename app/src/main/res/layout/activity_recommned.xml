@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.recommend.RecommendViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -93,6 +97,7 @@
             android:paddingHorizontal="16dp"
             android:paddingTop="30dp"
             android:paddingBottom="27dp"
+            android:text="{@string/shopping_cart_order(viewModel.selectedCartItemsCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"

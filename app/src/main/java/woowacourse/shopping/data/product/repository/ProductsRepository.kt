@@ -23,4 +23,9 @@ interface ProductsRepository {
         product: Product,
         onLoad: (Result<Unit>) -> Unit,
     )
+
+    fun loadRecommendedProducts(
+        size: Int,
+        onLoad: (Result<List<Product>>) -> Unit,
+    )
 }

@@ -10,8 +10,9 @@ import woowacourse.shopping.data.product.dto.ProductsResponse
 interface ProductService {
     @GET("/products")
     fun getProducts(
-        @Query("page") page: Int,
-        @Query("size") size: Int,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Query("category") category: String? = null,
     ): Call<ProductsResponse>
 
     @GET("/products/{id}")

@@ -13,6 +13,13 @@ class RemoteProductsDataSource(
     private val productsHttpClient: ProductsHttpClient = ProductsHttpClient(),
     private val productService: ProductService = API.productService,
 ) : ProductsDataSource {
+    override fun products(category: String): List<ProductEntity> {
+        val response: ProductsResponse? =
+            productService.getProducts(category = category).execute().body()
+
+        return response?.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList()
+    }
+
     override fun pageableProducts(
         page: Int,
         size: Int,

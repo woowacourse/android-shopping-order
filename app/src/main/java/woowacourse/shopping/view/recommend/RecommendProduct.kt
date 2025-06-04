@@ -3,8 +3,8 @@ package woowacourse.shopping.view.recommend
 import woowacourse.shopping.domain.product.Product
 
 data class RecommendProduct(
-    var quantity: Int,
     private val product: Product,
+    val quantity: Int = 0,
 ) {
     val id = product.id
     val name = product.name
