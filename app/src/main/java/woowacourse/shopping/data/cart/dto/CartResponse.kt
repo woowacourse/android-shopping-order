@@ -65,7 +65,7 @@ data class CartResponse(
         @SerialName("sort")
         val sort: Sort?,
         @SerialName("unpaged")
-        val unpaged: Boolean?,
+        val unPaged: Boolean?,
     )
 
     @Serializable
