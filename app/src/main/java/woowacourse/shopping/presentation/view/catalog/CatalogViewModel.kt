@@ -6,12 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.di.provider.RepositoryProvider
+import woowacourse.shopping.di.provider.UseCaseProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.presentation.model.CatalogItem
 import woowacourse.shopping.presentation.model.toCatalogProductItem
 import woowacourse.shopping.presentation.model.toUiModel
@@ -23,6 +26,8 @@ class CatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentRepository: RecentProductRepository,
+    private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
+    private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
 ) : ViewModel() {
     private val _toastEvent = MutableSingleLiveData<CatalogMessageEvent>()
     val toastEvent: SingleLiveData<CatalogMessageEvent> = _toastEvent
@@ -53,7 +58,7 @@ class CatalogViewModel(
     }
 
     fun increaseProductQuantity(productId: Long) {
-        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
+        increaseCartProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -61,7 +66,7 @@ class CatalogViewModel(
     }
 
     fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
+        decreaseProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -123,8 +128,9 @@ class CatalogViewModel(
     private fun updateProductQuantityInList(productId: Long) {
         cartRepository
             .findQuantityByProductId(productId)
-            .onSuccess { newQuantity -> applyProductQuantityUpdate(productId, newQuantity) }
-            .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+            .onSuccess { newQuantity ->
+                applyProductQuantityUpdate(productId, newQuantity)
+            }.onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 
     private fun applyProductQuantityUpdate(
@@ -208,6 +214,8 @@ class CatalogViewModel(
                         RepositoryProvider.productRepository,
                         RepositoryProvider.cartRepository,
                         RepositoryProvider.recentProductRepository,
+                        UseCaseProvider.increaseCartProductQuantityUseCase,
+                        UseCaseProvider.decreaseProductQuantityUseCase,
                     ) as T
             }
     }

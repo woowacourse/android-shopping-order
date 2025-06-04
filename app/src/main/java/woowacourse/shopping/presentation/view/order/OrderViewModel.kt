@@ -8,10 +8,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.di.provider.RepositoryProvider
+import woowacourse.shopping.di.provider.UseCaseProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.presentation.model.CartProductUiModel
 import woowacourse.shopping.presentation.model.DisplayModel
 import woowacourse.shopping.presentation.model.FetchPageDirection
@@ -24,6 +27,8 @@ import kotlin.math.max
 class OrderViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
+    private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
+    private val decreaseProductQuantityUseCase: DecreaseProductQuantityUseCase,
 ) : ViewModel(),
     CartStateListener {
     private val _toastOrderEvent = MutableSingleLiveData<OrderMessageEvent>()
@@ -119,7 +124,7 @@ class OrderViewModel(
     }
 
     private fun increaseProductQuantity(productId: Long) {
-        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
+        increaseCartProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { refreshFetchItem() }
                 .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -127,7 +132,7 @@ class OrderViewModel(
     }
 
     private fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
+        decreaseProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
             result
                 .onSuccess { refreshFetchItem() }
                 .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
@@ -252,7 +257,16 @@ class OrderViewModel(
                 ): T {
                     val cartRepository = RepositoryProvider.cartRepository
                     val orderRepository = RepositoryProvider.orderRepository
-                    return OrderViewModel(cartRepository, orderRepository) as T
+                    val increaseCartProductQuantityUseCase =
+                        UseCaseProvider.increaseCartProductQuantityUseCase
+                    val decreaseProductQuantityUseCase =
+                        UseCaseProvider.decreaseProductQuantityUseCase
+                    return OrderViewModel(
+                        cartRepository,
+                        orderRepository,
+                        increaseCartProductQuantityUseCase,
+                        decreaseProductQuantityUseCase,
+                    ) as T
                 }
             }
     }

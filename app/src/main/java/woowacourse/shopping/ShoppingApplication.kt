@@ -8,6 +8,9 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.di.provider.DataSourceProvider
 import woowacourse.shopping.di.provider.RepositoryProvider
+import woowacourse.shopping.di.provider.UseCaseProvider
+import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 
 class ShoppingApplication : Application() {
     override fun onCreate() {
@@ -22,6 +25,7 @@ class ShoppingApplication : Application() {
         initCartRepository()
         initRecentProductRepository()
         initOrderRepository()
+        initCartUseCases()
     }
 
     private fun initProductRepository() {
@@ -36,6 +40,14 @@ class ShoppingApplication : Application() {
         val productDataSource = DataSourceProvider.productRemoteDataSource
         val repository = CartRepositoryImpl(cartDataSource, productDataSource)
         RepositoryProvider.initCartRepository(repository)
+    }
+
+    private fun initCartUseCases() {
+        val repository = RepositoryProvider.cartRepository
+        val increaseCartProductQuantityUseCase = IncreaseCartProductQuantityUseCase(repository)
+        val decreaseProductQuantityUseCase = DecreaseProductQuantityUseCase(repository)
+        UseCaseProvider.initIncreaseCartProductQuantityUseCase(increaseCartProductQuantityUseCase)
+        UseCaseProvider.initDecreaseProductQuantityUseCase(decreaseProductQuantityUseCase)
     }
 
     private fun initRecentProductRepository() {

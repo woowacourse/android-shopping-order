@@ -32,4 +32,4 @@
           Ui에 반영이 늦어져서 실패
 - [x] RecyclerViewAdatper -> ListAdapter로 수정
 - [ ] ConcatAdapter 적용
-- [ ] domain layer 학습 후 중복 로직(상품 수량을 늘린다, 줄인다, 장바구니 담는다) 제거
+- [x] domain layer 학습 후 중복 로직(상품 수량을 늘린다, 줄인다, 장바구니 담는다) 제거
