@@ -51,10 +51,9 @@ class FakeCartProductRepository : CartProductRepository {
 
     override fun updateQuantity(
         cartProduct: CartProduct,
-        quantityToAdd: Int,
+        newQuantity: Int,
         onResult: (Result<Unit>) -> Unit,
     ) {
-        val newQuantity = cartProduct.quantity + quantityToAdd
         when {
             newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
             else -> {
@@ -72,6 +71,14 @@ class FakeCartProductRepository : CartProductRepository {
         onResult: (Result<Unit>) -> Unit,
     ) {
         cartProducts.removeIf { it.product.id == id }
+        onResult(Result.success(Unit))
+    }
+
+    override fun deleteAll(
+        ids: Set<Int>,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        cartProducts.removeIf { it.product.id in ids }
         onResult(Result.success(Unit))
     }
 }
