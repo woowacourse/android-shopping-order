@@ -105,13 +105,7 @@ class CartViewModel(
             result
                 .onSuccess {
                     val updatedList =
-                        _carts.value?.map {
-                            if (it.product.id == cart.product.id) {
-                                it.updateQuantity(it.quantity - 1)
-                            } else {
-                                it
-                            }
-                        } ?: emptyList()
+                        _carts.value?.filter { it.id != cart.id } ?: emptyList()
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
                 }.onFailure { error ->
