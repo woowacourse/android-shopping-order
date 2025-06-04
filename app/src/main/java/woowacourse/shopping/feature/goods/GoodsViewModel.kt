@@ -92,11 +92,13 @@ class GoodsViewModel(
             ) { result ->
                 result
                     .onSuccess {
+                        Log.e("123451", "id = ${cart.id}")
                         val updatedCart = cart.copy(quantity = newQuantity)
                         updateItems(updatedCart)
                         getCartCounts()
                         _isSuccess.setValue(Unit)
                     }.onFailure { error ->
+                        Log.e("123451", "id = ${cart.id}")
                         _isFail.setValue(Unit)
                     }
             }
@@ -153,17 +155,18 @@ class GoodsViewModel(
         }
     }
 
-    fun updateItemQuantity(
-        id: Long,
+    fun updateItem(
+        cartId: Long,
+        goodsId: Long,
         quantity: Int,
     ) {
         val currentItems = _items.value.orEmpty().toMutableList()
 
-        val index = currentItems.indexOfFirst { it is GoodsItem.Product && it.cart.product.id == id }
+        val index = currentItems.indexOfFirst { it is GoodsItem.Product && it.cart.product.id == goodsId }
 
         if (index != -1) {
             val oldItem = currentItems[index] as GoodsItem.Product
-            val updatedItem = oldItem.copy(cart = oldItem.cart.copy(quantity = quantity))
+            val updatedItem = oldItem.copy(cart = oldItem.cart.copy(id = cartId, quantity = quantity))
 
             currentItems[index] = updatedItem
             _items.value = currentItems

@@ -3,7 +3,6 @@ package woowacourse.shopping.feature.goodsdetails
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -73,9 +72,9 @@ class GoodsDetailsActivity : AppCompatActivity() {
             setResult(
                 ResultCode.GOODS_DETAIL_INSERT.code,
                 Intent().apply {
+                    putExtra("CART_ID", viewModel.cart.value?.id)
                     putExtra("GOODS_ID", id)
                     putExtra("GOODS_QUANTITY", viewModel.cart.value?.quantity)
-                    Log.e("123451", "${viewModel.cart.value?.quantity}")
                 },
             )
         }
