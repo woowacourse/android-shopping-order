@@ -1,13 +1,9 @@
 package woowacourse.shopping.feature.goods.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.databinding.ItemGoodsBinding
-import woowacourse.shopping.databinding.ItemHistoryContainerBinding
-import woowacourse.shopping.databinding.ItemLoadMoreBinding
 import woowacourse.shopping.feature.goods.adapter.history.HistoryContainerViewHolder
 import woowacourse.shopping.feature.model.GoodsItem
 
@@ -65,23 +61,18 @@ class GoodsAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return when (ItemViewType.from(viewType)) {
+    ): RecyclerView.ViewHolder =
+        when (ItemViewType.from(viewType)) {
             ItemViewType.HISTORY -> {
-                val binding = ItemHistoryContainerBinding.inflate(inflater, parent, false)
-                HistoryContainerViewHolder(binding, goodsClickListener)
+                HistoryContainerViewHolder.create(parent, goodsClickListener)
             }
             ItemViewType.GOODS -> {
-                val binding = ItemGoodsBinding.inflate(inflater, parent, false)
-                GoodsViewHolder(binding, goodsClickListener)
+                GoodsViewHolder.create(parent, goodsClickListener)
             }
             ItemViewType.LOAD_MORE -> {
-                val binding = ItemLoadMoreBinding.inflate(inflater, parent, false)
-                LoadMoreViewHolder(binding, goodsClickListener)
+                LoadMoreViewHolder.create(parent, goodsClickListener)
             }
         }
-    }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,

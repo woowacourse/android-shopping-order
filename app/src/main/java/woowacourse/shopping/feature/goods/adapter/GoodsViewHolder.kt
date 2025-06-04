@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.goods.adapter
 
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemGoodsBinding
 import woowacourse.shopping.domain.model.Cart
@@ -23,5 +25,16 @@ class GoodsViewHolder(
                 }
             },
         )
+    }
+
+    companion object {
+        fun create(
+            parent: ViewGroup,
+            listener: GoodsClickListener,
+        ): GoodsViewHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            val binding = ItemGoodsBinding.inflate(inflater, parent, false)
+            return GoodsViewHolder(binding, listener)
+        }
     }
 }
