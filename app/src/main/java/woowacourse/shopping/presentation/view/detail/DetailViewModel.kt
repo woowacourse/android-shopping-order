@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.view.detail
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +29,26 @@ class DetailViewModel(
 
     private val _lastViewedProduct = MutableLiveData<ProductUiModel>()
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
+
+    private val _showLastViewedProduct = MediatorLiveData<Boolean>()
+    val showLastViewedProduct: LiveData<Boolean> = _showLastViewedProduct
+
+    init {
+        _showLastViewedProduct.addSource(_product) { updateShowLastViewedProduct() }
+        _showLastViewedProduct.addSource(_lastViewedProduct) { updateShowLastViewedProduct() }
+    }
+
+    private fun updateShowLastViewedProduct() {
+        val currentProduct = _product.value
+        val lastViewedProduct = _lastViewedProduct.value
+
+        val canShow =
+            currentProduct != null &&
+                lastViewedProduct != null &&
+                currentProduct.id != lastViewedProduct.id
+
+        _showLastViewedProduct.value = canShow
+    }
 
     fun decreaseAmount() {
         val current = _amount.value ?: 1
@@ -73,7 +94,9 @@ class DetailViewModel(
 
     fun fetchLastViewedProduct(currentProductId: Long) {
         productRepository.loadLastViewedProduct(currentProductId) { product ->
-            product?.let { _lastViewedProduct.postValue(it.toUiModel()) }
+            if (product != null) {
+                _lastViewedProduct.postValue(product.toUiModel())
+            }
         }
     }
 

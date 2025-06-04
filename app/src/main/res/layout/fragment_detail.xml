@@ -107,7 +107,7 @@
             android:layout_marginTop="32dp"
             android:background="@drawable/shape_cart_item"
             android:paddingBottom="16dp"
-            android:visibility="@{(vm.lastViewedProduct == null || vm.lastViewedProduct.id == product.id) ? View.GONE : View.VISIBLE}"
+            android:visibility="@{vm.showLastViewedProduct ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_view_detail_price">
