@@ -59,7 +59,7 @@ class CartActivity : AppCompatActivity() {
             CartAdapter(
                 cartProducts = emptyList(),
                 cartHandler = handler,
-                handler = handler,
+                quantityHandler = handler,
             )
     }
 

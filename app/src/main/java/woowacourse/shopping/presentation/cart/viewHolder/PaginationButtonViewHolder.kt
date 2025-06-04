@@ -3,22 +3,18 @@ package woowacourse.shopping.presentation.cart.viewHolder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.PaginationButtonItemBinding
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 
 class PaginationButtonViewHolder(
-    private val binding: PaginationButtonItemBinding,
-) : RecyclerView.ViewHolder(binding.root) {
+    parent: ViewGroup,
+) : RecyclerView.ViewHolder(
+    LayoutInflater.from(parent.context).inflate(R.layout.pagination_button_item, parent, false)
+) {
+    private val binding: PaginationButtonItemBinding = PaginationButtonItemBinding.bind(itemView)
+
     fun bind(handler: CartEventHandler) {
         binding.handler = handler
-        binding.executePendingBindings()
-    }
-
-    companion object {
-        fun from(parent: ViewGroup): PaginationButtonViewHolder {
-            val inflater = LayoutInflater.from(parent.context)
-            val binding = PaginationButtonItemBinding.inflate(inflater, parent, false)
-            return PaginationButtonViewHolder(binding)
-        }
     }
 }

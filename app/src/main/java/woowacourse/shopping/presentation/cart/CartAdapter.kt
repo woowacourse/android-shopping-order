@@ -13,7 +13,7 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 class CartAdapter(
     private var cartProducts: List<ProductUiModel>,
     private val cartHandler: CartEventHandler,
-    private val handler: ProductQuantityHandler,
+    private val quantityHandler: ProductQuantityHandler,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var pagingData: PagingData? = null
 
@@ -22,9 +22,9 @@ class CartAdapter(
         viewType: Int,
     ): RecyclerView.ViewHolder =
         if (viewType == VIEW_TYPE_CART_PRODUCT) {
-            CartViewHolder.from(parent, cartHandler, handler)
+            CartViewHolder(parent, cartHandler, quantityHandler)
         } else {
-            PaginationButtonViewHolder.from(parent)
+            PaginationButtonViewHolder(parent)
         }
 
     override fun onBindViewHolder(
@@ -33,8 +33,7 @@ class CartAdapter(
     ) {
         when (holder) {
             is CartViewHolder -> holder.bind(cartProducts[position])
-            is PaginationButtonViewHolder ->
-                holder.bind(cartHandler)
+            is PaginationButtonViewHolder -> holder.bind(cartHandler)
         }
     }
 
@@ -66,7 +65,8 @@ class CartAdapter(
         }
     }
 
-    private fun shouldShowPagination(): Boolean = pagingData?.hasPrevious == true || pagingData?.hasNext == true
+    private fun shouldShowPagination(): Boolean =
+        pagingData?.hasPrevious == true || pagingData?.hasNext == true
 
     override fun getItemCount(): Int = cartProducts.size + if (shouldShowPagination()) 1 else 0
 

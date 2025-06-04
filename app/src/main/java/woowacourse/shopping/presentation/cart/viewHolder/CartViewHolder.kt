@@ -3,34 +3,28 @@ package woowacourse.shopping.presentation.cart.viewHolder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.CartItemBinding
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class CartViewHolder(
-    private val binding: CartItemBinding,
-    private val cartHandler: CartEventHandler,
-    private val handler: ProductQuantityHandler,
-) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(cartProduct: ProductUiModel) {
-        binding.product = cartProduct
+    parent: ViewGroup,
+    cartHandler: CartEventHandler,
+    quantityHandler: ProductQuantityHandler,
+) : RecyclerView.ViewHolder(
+    LayoutInflater.from(parent.context).inflate(R.layout.cart_item, parent, false)
+) {
+    private val binding: CartItemBinding = CartItemBinding.bind(itemView)
+
+    init {
         binding.cartHandler = cartHandler
-        binding.handler = handler
-        binding.executePendingBindings()
+        binding.quantityHandler = quantityHandler
     }
 
-    companion object {
-        fun from(
-            parent: ViewGroup,
-            cartHandler: CartEventHandler,
-            handler: ProductQuantityHandler,
-        ): CartViewHolder {
-            val inflater = LayoutInflater.from(parent.context)
-            val binding = CartItemBinding.inflate(inflater, parent, false)
-            binding.cartHandler = cartHandler
-            binding.handler = handler
-            return CartViewHolder(binding, cartHandler, handler)
-        }
+    fun bind(cartProduct: ProductUiModel) {
+        binding.product = cartProduct
+        binding.executePendingBindings()
     }
 }
