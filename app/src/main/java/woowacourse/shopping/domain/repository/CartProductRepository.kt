@@ -33,4 +33,9 @@ interface CartProductRepository {
         id: Int,
         onResult: (Result<Unit>) -> Unit,
     )
+
+    fun deleteAll(
+        ids: Set<Int>,
+        onResult: (Result<Unit>) -> Unit,
+    )
 }

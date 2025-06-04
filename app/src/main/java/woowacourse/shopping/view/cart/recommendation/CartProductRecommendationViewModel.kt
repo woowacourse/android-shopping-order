@@ -163,6 +163,12 @@ class CartProductRecommendationViewModel(
                 }
             }
         }
+        cartProductRepository.deleteAll(selectedCartIds) { result ->
+            result
+                .onFailure {
+                    Log.e("error", it.message.toString())
+                }
+        }
     }
 
     companion object {

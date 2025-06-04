@@ -65,4 +65,17 @@ class CartProductRepositoryImpl(
     ) {
         remoteDataSource.delete(id, onResult)
     }
+
+    override fun deleteAll(
+        ids: Set<Int>,
+        onResult: (Result<Unit>) -> Unit,
+    ) {
+        ids.forEach { id ->
+            delete(id) { result ->
+                result.onFailure {
+                    onResult(Result.failure(it))
+                }
+            }
+        }
+    }
 }
