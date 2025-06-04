@@ -58,7 +58,8 @@ class CatalogViewModel(
         ) { result ->
             result
                 .onSuccess { newProducts ->
-                    _products.postValue(products.value?.plus(newProducts))
+
+                    _products.value = products.value?.plus(newProducts)
                     _isLoading.value = false
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
@@ -105,11 +106,10 @@ class CatalogViewModel(
         getCatalogProductUseCase(productId) { result ->
             result
                 .onSuccess { cartProduct ->
-                    _products.postValue(
+                    _products.value =
                         products.value?.updateProduct(
                             cartProduct ?: return@getCatalogProductUseCase,
-                        ),
-                    )
+                        )
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
                 }
@@ -120,7 +120,7 @@ class CatalogViewModel(
         getCatalogProductsByIdsUseCase(ids) { result ->
             result
                 .onSuccess { cartProducts ->
-                    _products.postValue(products.value?.updateProducts(cartProducts))
+                    _products.value = products.value?.updateProducts(cartProducts)
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
                 }
@@ -131,7 +131,7 @@ class CatalogViewModel(
         getCartProductsQuantityUseCase { result ->
             result
                 .onSuccess { quantity ->
-                    _cartProductsQuantity.postValue(quantity)
+                    _cartProductsQuantity.value = quantity
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
                 }

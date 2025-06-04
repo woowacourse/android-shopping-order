@@ -93,37 +93,6 @@ class CartViewModel(
         toggleCartProductSelection(cartId)
     }
 
-    private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
-        _isLoading.value = true
-        getCartProductsUseCase(
-            page = page.current,
-            size = DEFAULT_PAGE_SIZE,
-        ) { result ->
-            result
-                .onSuccess { cartProducts ->
-                    _cartProducts.postValue(cartProducts)
-                    _isLoading.postValue(false)
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
-        }
-    }
-
-    fun removeCartProduct(
-        cartId: Long,
-        productId: Long,
-    ) {
-        removeCartProductUseCase(cartId) { result ->
-            result
-                .onSuccess {
-                    _editedProductIds.postValue(editedProductIds.value?.plus(productId))
-                    loadCartProducts()
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
-        }
-    }
-
     fun increasePage(step: Int = DEFAULT_PAGE_STEP) {
         val page = cartProducts.value?.page ?: EMPTY_PAGE
         loadCartProducts(page.copy(current = page.current + step))
@@ -134,52 +103,6 @@ class CartViewModel(
         loadCartProducts(page.copy(current = page.current - step))
     }
 
-    fun increaseCartProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(
-            product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
-            result
-                .onSuccess { newQuantity ->
-                    _cartProducts.postValue(
-                        cartProducts.value?.updateProductQuantity(
-                            productId,
-                            newQuantity,
-                        ),
-                    )
-                    _editedProductIds.value = editedProductIds.value?.plus(productId)
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
-        }
-    }
-
-    fun decreaseCartProductQuantity(productId: Long) {
-        decreaseCartProductQuantityUseCase(
-            product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
-            result
-                .onSuccess { newQuantity ->
-                    if (newQuantity > MINIMUM_QUANTITY) {
-                        _cartProducts.postValue(
-                            cartProducts.value?.updateProductQuantity(
-                                productId,
-                                newQuantity,
-                            ),
-                        )
-                    } else {
-                        loadCartProducts()
-                    }
-                    _editedProductIds.value = editedProductIds.value?.plus(productId)
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
-        }
-    }
-
-    fun toggleCartProductSelection(cartId: Long) {
-        _cartProducts.value = cartProducts.value?.toggleSelectionByCartId(cartId)
-    }
-
     fun toggleAllCartProductsSelection() {
         _cartProducts.value = cartProducts.value?.updateAllSelection()
     }
@@ -188,7 +111,7 @@ class CartViewModel(
         getCartRecommendProductsUseCase { result ->
             result
                 .onSuccess { products ->
-                    _recommendedProducts.postValue(products)
+                    _recommendedProducts.value = products
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
                 }
@@ -201,12 +124,12 @@ class CartViewModel(
         ) { result ->
             result
                 .onSuccess { newQuantity ->
-                    _recommendedProducts.postValue(
+                    _recommendedProducts.value =
                         recommendedProducts.value?.updateProductQuantity(
                             productId,
                             newQuantity,
-                        ),
-                    )
+                        )
+
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
@@ -221,12 +144,11 @@ class CartViewModel(
             result
                 .onSuccess { newQuantity ->
                     if (newQuantity > MINIMUM_QUANTITY) {
-                        _recommendedProducts.postValue(
+                        _recommendedProducts.value =
                             recommendedProducts.value?.updateProductQuantity(
                                 productId,
                                 newQuantity,
-                            ),
-                        )
+                            )
                     } else {
                         loadCartProducts()
                     }
@@ -250,12 +172,88 @@ class CartViewModel(
         orderProductsUseCase.invoke(selectedProductIds) { result ->
             result
                 .onSuccess {
-                    _editedProductIds.postValue(selectedProductIds)
-                    _isOrdered.postValue(Unit)
+                    _editedProductIds.value = selectedProductIds
+                    _isOrdered.setValue(Unit)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
+    }
+
+    private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
+        _isLoading.value = true
+        getCartProductsUseCase(
+            page = page.current,
+            size = DEFAULT_PAGE_SIZE,
+        ) { result ->
+            result
+                .onSuccess { cartProducts ->
+                    _cartProducts.value = cartProducts
+                    _isLoading.value = false
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
+        }
+    }
+
+    private fun removeCartProduct(
+        cartId: Long,
+        productId: Long,
+    ) {
+        removeCartProductUseCase(cartId) { result ->
+            result
+                .onSuccess {
+                    _editedProductIds.value = editedProductIds.value?.plus(productId)
+                    loadCartProducts()
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
+        }
+    }
+
+    private fun increaseCartProductQuantity(productId: Long) {
+        increaseCartProductQuantityUseCase(
+            product = cartProducts.value?.getProductByProductId(productId) ?: return,
+        ) { result ->
+            result
+                .onSuccess { newQuantity ->
+                    _cartProducts.value =
+                        cartProducts.value?.updateProductQuantity(
+                            productId,
+                            newQuantity,
+                        )
+
+                    _editedProductIds.value = editedProductIds.value?.plus(productId)
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
+        }
+    }
+
+    private fun decreaseCartProductQuantity(productId: Long) {
+        decreaseCartProductQuantityUseCase(
+            product = cartProducts.value?.getProductByProductId(productId) ?: return,
+        ) { result ->
+            result
+                .onSuccess { newQuantity ->
+                    if (newQuantity > MINIMUM_QUANTITY) {
+                        _cartProducts.value =
+                            cartProducts.value?.updateProductQuantity(
+                                productId,
+                                newQuantity,
+                            )
+                    } else {
+                        loadCartProducts()
+                    }
+                    _editedProductIds.value = editedProductIds.value?.plus(productId)
+                }.onFailure {
+                    Log.e("CartViewModel", it.message.toString())
+                }
+        }
+    }
+
+    private fun toggleCartProductSelection(cartId: Long) {
+        _cartProducts.value = cartProducts.value?.toggleSelectionByCartId(cartId)
     }
 
     companion object {

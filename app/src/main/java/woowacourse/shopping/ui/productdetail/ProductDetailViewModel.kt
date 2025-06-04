@@ -40,7 +40,7 @@ class ProductDetailViewModel(
         getCatalogProductUseCase(id) { result ->
             result
                 .onSuccess { catalogProduct ->
-                    _product.postValue(catalogProduct ?: EMPTY_PRODUCT)
+                    _product.value = catalogProduct ?: EMPTY_PRODUCT
                 }.onFailure {
                     Log.e("ProductDetailViewModel", it.message.toString())
                 }
@@ -74,7 +74,7 @@ class ProductDetailViewModel(
         ) { result ->
             result
                 .onSuccess {
-                    _onCartProductAddSuccess.postValue(true)
+                    _onCartProductAddSuccess.setValue(true)
                 }.onFailure {
                     Log.e("ProductDetailViewModel", it.message.toString())
                 }
