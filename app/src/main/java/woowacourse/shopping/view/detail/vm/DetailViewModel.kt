@@ -42,7 +42,7 @@ class DetailViewModel(
         viewModelScope.launch {
             defaultProductRepository.loadProduct(productId)
                 .onSuccess { initializeUiState(productId, lastSeenProductId, it) }
-                .onFailure(::handleFailure2)
+                .onFailure(::handleFailure)
 
             historyRepository.saveHistory(productId)
         }
@@ -54,7 +54,7 @@ class DetailViewModel(
         product: Product,
     ) {
         if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
-            loadLastSeenProduct(productId, product)
+            loadLastSeenProduct(lastSeenProductId, product)
         } else {
             _uiState.value = DetailUiState(ProductState(item = product, cartQuantity = Quantity(1)))
         }
@@ -73,7 +73,7 @@ class DetailViewModel(
                             lastSeenProduct,
                         )
                 }
-                .onFailure(::handleFailure2)
+                .onFailure(::handleFailure)
         }
     }
 
@@ -134,11 +134,7 @@ class DetailViewModel(
         }
     }
 
-    private fun handleFailure(throwable: Throwable) {
-        // _uiEvent.setValue(DetailUiEvent.ShowErrorMessage(throwable))
-    }
-
-    private fun handleFailure2(throwable: NetworkError) {
+    private fun handleFailure(throwable: NetworkError) {
         _uiEvent.setValue(DetailUiEvent.ShowErrorMessage(throwable))
     }
 
