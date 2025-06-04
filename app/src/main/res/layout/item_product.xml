@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="cartItemUiModel"
+            type="woowacourse.shopping.presentation.CartItemUiModel" />
+
+        <variable
+            name="itemClickListener"
+            type="woowacourse.shopping.presentation.product.ItemClickListener" />
+
+        <variable
+            name="counterClickListener"
+            type="woowacourse.shopping.presentation.cart.CartCounterClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_product_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:onClick="@{() -> itemClickListener.onClickProductItem(cartItemUiModel.product.id)}">
+
+        <ImageView
+            android:id="@+id/iv_product"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:contentDescription="@null"
+            android:scaleType="fitXY"
+            app:imageUrl="@{cartItemUiModel.product.imageUrl}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_loading" />
+
+        <TextView
+            android:id="@+id/tv_product_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{cartItemUiModel.product.name}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/iv_product"
+            app:layout_constraintTop_toBottomOf="@id/iv_product"
+            tools:text="맥심" />
+
+        <ImageView
+            android:id="@+id/iv_add_cart"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@null"
+            android:elevation="2dp"
+            android:onClick="@{() -> itemClickListener.onClickAddToCart(cartItemUiModel)}"
+            android:src="@drawable/ic_add"
+            app:layout_constraintBottom_toBottomOf="@id/iv_product"
+            app:layout_constraintEnd_toEndOf="@id/iv_product"
+            app:visibleIf="@{cartItemUiModel.quantity == 0}" />
+
+        <include
+            android:id="@+id/included_layout_cart"
+            layout="@layout/layout_cart_quantity_box"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="8dp"
+            app:clickListener="@{counterClickListener}"
+            app:id="@{cartItemUiModel.product.id}"
+            app:layout_constraintBottom_toBottomOf="@id/iv_product"
+            app:layout_constraintEnd_toEndOf="@id/iv_product"
+            app:layout_constraintStart_toStartOf="@id/iv_product"
+            app:quantity="@{cartItemUiModel.quantity}"
+            app:visibleIf="@{cartItemUiModel.quantity > 0}" />
+
+        <TextView
+            android:id="@+id/tv_product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/product_price(cartItemUiModel.product.price)}"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/tv_product_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_product_name"
+            tools:text="10,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
