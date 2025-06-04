@@ -4,6 +4,7 @@ import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import woowacourse.shopping.data.remote.cart.CartResponse.Content
 
 class CartRepository {
     fun fetchAllCart(
@@ -33,6 +34,20 @@ class CartRepository {
                     onError(t)
                 }
             },
+        )
+    }
+
+    fun findCartByProductId(
+        productId: Long,
+        onResult: (Content?) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        fetchAllCart(
+            onSuccess = { response ->
+                val matched = response.content.find { it.product.id == productId }
+                onResult(matched)
+            },
+            onError = onError,
         )
     }
 

@@ -11,11 +11,11 @@ import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProduct.Companion.EMPTY_CART_PRODUCT
 import woowacourse.shopping.domain.model.History
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.model.State
 import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
+import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
 class GoodsDetailsViewModel(
@@ -44,38 +44,30 @@ class GoodsDetailsViewModel(
     }
 
     fun loadProductDetails(productId: Long) {
-        cartRepository.fetchAllCart(
-            onSuccess = { response ->
-                productRepository.requestProductDetails(
-                    productId = productId,
-                    onSuccess = { content ->
-                        _cartProduct.value =
+        productRepository.requestProductDetails(
+            productId = productId,
+            onSuccess = { productContent ->
+                cartRepository.findCartByProductId(
+                    productId = productContent.id,
+                    onResult = { matchedCart ->
+                        val cartProduct =
                             CartProduct(
-                                id =
-                                    response.content
-                                        .find {
-                                            it.product.id == content.id
-                                        }?.id ?: 0,
-                                product =
-                                    Product(
-                                        id = content.id,
-                                        name = content.name,
-                                        price = content.price,
-                                        imageUrl = content.imageUrl,
-                                        category = content.category,
-                                    ),
-                                quantity =
-                                    response.content.find { it.product.id == content.id }?.quantity
-                                        ?: 1,
+                                id = matchedCart?.id ?: 0,
+                                product = productContent.toDomain(),
+                                quantity = matchedCart?.quantity ?: 1,
                             )
-                        if (cartProduct.value != null) insertToHistory(cartProduct.value as CartProduct)
+
+                        _cartProduct.value = cartProduct
+                        insertToHistory(cartProduct)
                     },
                     onError = {
                         _insertState.value = Event(State.Failure)
                     },
                 )
             },
-            onError = {},
+            onError = {
+                _insertState.value = Event(State.Failure)
+            },
         )
     }
 
