@@ -9,6 +9,7 @@ import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProduct.Companion.EMPTY_CART_PRODUCT
 import woowacourse.shopping.domain.model.History
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.model.State
@@ -23,7 +24,7 @@ class GoodsDetailsViewModel(
     private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _cartProduct = MutableLiveData<CartProduct>()
-    val cart: LiveData<CartProduct> get() = _cartProduct
+    val cartProduct: LiveData<CartProduct> get() = _cartProduct
 
     private val _lastViewed = MutableLiveData<History>()
     val lastViewed: LiveData<History> get() = _lastViewed
@@ -67,7 +68,7 @@ class GoodsDetailsViewModel(
                                     response.content.find { it.product.id == content.id }?.quantity
                                         ?: 1,
                             )
-                        if (cart.value != null) insertToHistory(cart.value as CartProduct)
+                        if (cartProduct.value != null) insertToHistory(cartProduct.value as CartProduct)
                     },
                     onError = {
                         _insertState.value = Event(State.Failure)
@@ -95,22 +96,23 @@ class GoodsDetailsViewModel(
     }
 
     fun commitCart() {
-        if (cart.value != null) {
-            val newQuantity = cart.value?.quantity ?: 0
+        if (cartProduct.value != null) {
+            val currentCart = cartProduct.value ?: EMPTY_CART_PRODUCT
+            val newQuantity = currentCart.quantity
 
-            if (cart.value?.quantity == 1) {
+            if (currentCart.quantity == 1) {
                 val cartRequest =
                     CartRequest(
-                        productId = cart.value?.product?.id ?: 0,
+                        productId = currentCart.product.id,
                         quantity = newQuantity,
                     )
 
                 cartRepository.addToCart(cartRequest) { result ->
                     result
                         .onSuccess { newCartId ->
-                            val updatedCart = cart.value?.copy(id = newCartId, quantity = newQuantity)
+                            val updatedCart = cartProduct.value?.copy(id = newCartId, quantity = newQuantity)
 
-                            insertToHistory(cart.value as CartProduct)
+                            insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
                         }.onFailure {
@@ -119,14 +121,14 @@ class GoodsDetailsViewModel(
                 }
             } else {
                 cartRepository.updateCart(
-                    id = cart.value?.id ?: 0,
+                    id = currentCart.id,
                     cartQuantity = CartQuantity(newQuantity),
                 ) { result ->
                     result
                         .onSuccess {
-                            val updatedCart = cart.value?.copy(quantity = newQuantity)
+                            val updatedCart = cartProduct.value?.copy(quantity = newQuantity)
 
-                            insertToHistory(cart.value as CartProduct)
+                            insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
                         }.onFailure { error ->
@@ -139,7 +141,7 @@ class GoodsDetailsViewModel(
 
     fun updateLastViewedVisibility() {
         val lastName = _lastViewed.value?.name
-        val currentName = cart.value?.product?.name
+        val currentName = cartProduct.value?.product?.name
         _isLastViewedVisible.postValue(lastName != null && currentName != null && lastName != currentName)
     }
 

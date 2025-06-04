@@ -82,7 +82,7 @@ class GoodsDetailsViewModelTest {
             viewModel.increaseQuantity()
             advanceUntilIdle()
 
-            assertEquals(2, viewModel.cart.getOrAwaitValue().quantity)
+            assertEquals(2, viewModel.cartProduct.getOrAwaitValue().quantity)
         }
 
     @Test
@@ -95,7 +95,7 @@ class GoodsDetailsViewModelTest {
             viewModel.decreaseQuantity()
             advanceUntilIdle()
 
-            assertEquals(1, viewModel.cart.getOrAwaitValue().quantity)
+            assertEquals(1, viewModel.cartProduct.getOrAwaitValue().quantity)
         }
 
     @Test

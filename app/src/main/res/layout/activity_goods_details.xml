@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="360dp"
             android:contentDescription="@string/goods_detail_image_description"
-            app:imgUrl="@{viewModel.cart.product.imageUrl}"
+            app:imgUrl="@{viewModel.cartProduct.product.imageUrl}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_launcher_background" />
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{viewModel.cart.product.name}"
+            android:text="@{viewModel.cartProduct.product.name}"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginStart="18dp"
-            android:text="@{@string/goods_price(viewModel.cart.product.price)}"
+            android:text="@{@string/goods_price(viewModel.cartProduct.product.price)}"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -67,7 +67,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="18dp"
-            app:count="@{viewModel.cart.quantity}"
+            app:count="@{viewModel.cartProduct.quantity}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view"/>
 
