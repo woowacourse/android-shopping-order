@@ -86,7 +86,7 @@ class CatalogFragment : BaseFragment<FragmentCatalogBinding>(R.layout.fragment_c
 
     private fun initObserver() {
         with(viewModel) {
-            isLoading.observe(viewLifecycleOwner) { isLoading ->
+            isLoadingData.observe(viewLifecycleOwner) { isLoading ->
                 if (isLoading) {
                     binding.layoutCatalogShimmer.startShimmer()
                 } else {

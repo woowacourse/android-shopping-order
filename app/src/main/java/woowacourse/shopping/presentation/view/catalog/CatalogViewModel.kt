@@ -21,8 +21,8 @@ class CatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoadingData = MutableLiveData<Boolean>()
+    val isLoadingData: LiveData<Boolean> = _isLoadingData
 
     private val _items = MutableLiveData<List<CatalogItem>>()
     val items: LiveData<List<CatalogItem>> = _items
@@ -33,8 +33,10 @@ class CatalogViewModel(
     private val _totalCartCount = MutableLiveData<Int>()
     val totalCartCount: LiveData<Int> = _totalCartCount
 
+    private var isProcessingRequest = false
+
     fun loadCatalog(nextPage: Boolean) {
-        _isLoading.value = true
+        _isLoadingData.value = true
         calculateTotalCartCount()
 
         val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
@@ -58,8 +60,8 @@ class CatalogViewModel(
                         }
                     _items.postValue(items)
                 }
+                _isLoadingData.value = false
             }
-            _isLoading.value = false
         }
     }
 
@@ -82,9 +84,12 @@ class CatalogViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
+        if (isProcessingRequest) return
+        isProcessingRequest = true
         val cartItem = product.toCartItem()
         if (product.quantity == 0) {
             addToCart(cartItem.toCartItemUiModel())
+            isProcessingRequest = false
             return
         }
         cartRepository.increaseQuantity(cartItem) {
@@ -92,6 +97,7 @@ class CatalogViewModel(
                 cartItem.copy(quantity = cartItem.quantity + 1).toProductUiModel(),
             )
             calculateTotalCartCount()
+            isProcessingRequest = false
         }
     }
 
@@ -101,13 +107,17 @@ class CatalogViewModel(
             cartRepository.deleteCartItem(cartItem.cartId) {
                 _itemUpdateEvent.postValue(product.copy(quantity = 0))
                 calculateTotalCartCount()
+                isProcessingRequest = false
             }
         } else {
+            if (isProcessingRequest) return
+            isProcessingRequest = true
             cartRepository.decreaseQuantity(cartItem) {
                 _itemUpdateEvent.postValue(
                     cartItem.copy(quantity = cartItem.quantity - 1).toProductUiModel(),
                 )
                 calculateTotalCartCount()
+                isProcessingRequest = false
             }
         }
     }

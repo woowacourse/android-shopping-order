@@ -54,6 +54,8 @@ class CartViewModel(
 
     private val selectionStatus = mutableMapOf<Long, Boolean>()
 
+    private var isProcessingRequest = false
+
     fun loadPageOfShoppingCart(indexOffset: Int = 0) {
         val newPageIndex = ((_pageIndex.value ?: 0) + indexOffset).coerceAtLeast(0)
         cartRepository.loadPageOfCartItems(
@@ -75,11 +77,16 @@ class CartViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
+        if (isProcessingRequest) return
+
+        isProcessingRequest = true
         val cartItem = product.toCartItem()
         if (product.quantity == 0) {
             addToCart(cartItem.toCartItemUiModel())
+            isProcessingRequest = false
             return
         }
+
         cartRepository.increaseQuantity(cartItem) {
             val updatedItem =
                 CartItemUiModel(
@@ -87,6 +94,7 @@ class CartViewModel(
                     isSelected = selectionStatus[cartItem.cartId] ?: false,
                 )
             _itemUpdateEvent.postValue(updatedItem)
+            isProcessingRequest = false
         }
     }
 
@@ -96,6 +104,9 @@ class CartViewModel(
             removeFromCart(cartItem.toCartItemUiModel())
             return
         }
+
+        if (isProcessingRequest) return
+        isProcessingRequest = true
         cartRepository.decreaseQuantity(cartItem) {
             val updatedItem =
                 CartItemUiModel(
@@ -103,6 +114,7 @@ class CartViewModel(
                     isSelected = selectionStatus[cartItem.cartId] ?: false,
                 )
             _itemUpdateEvent.postValue(updatedItem)
+            isProcessingRequest = false
         }
     }
 
