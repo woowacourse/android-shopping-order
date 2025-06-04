@@ -33,7 +33,7 @@ class CartProductSelectionViewModel(
                 .sumOf { it.cartProduct.quantity }
         }
 
-    private var _page = MutableLiveData(FIRST_PAGE_NUMBER)
+    private val _page = MutableLiveData(FIRST_PAGE_NUMBER)
     val page: LiveData<Int> get() = _page
 
     private val _hasNext = MutableLiveData(false)
