@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import woowacourse.shopping.RepositoryProvider
@@ -17,33 +18,29 @@ class CartViewModel(
     private val cartRepository: CartItemRepository,
 ) : ViewModel(),
     CartEventHandler {
-    private val _isNextButtonEnabled = MutableLiveData(false)
-    val isNextButtonEnabled: LiveData<Boolean> = _isNextButtonEnabled
-
-    private val _isPrevButtonEnabled = MutableLiveData(false)
-    val isPrevButtonEnabled: LiveData<Boolean> = _isPrevButtonEnabled
-
     private val _pageEvent = SingleLiveEvent<Int>()
     val pageEvent: LiveData<Int> = _pageEvent
 
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
 
-    private var currentPage: Int = INITIAL_PAGE
-
     private val _pagingData = MutableLiveData<PagingData>()
     val pagingData: LiveData<PagingData> = _pagingData
 
-    private val _totalOrderPrice = MutableLiveData<Int>(0)
-    val totalOrderPrice: LiveData<Int> = _totalOrderPrice
+    private val _checkedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
+    val checkedProducts: LiveData<List<ProductUiModel>> = _checkedProducts
 
-    private val _checkedProductCount = MutableLiveData<Int>(0)
-    val checkedProductCount: LiveData<Int> = _checkedProductCount
+    val totalOrderPrice: LiveData<Int> = _checkedProducts.map { products ->
+        products.sumOf { it.price * it.quantity }
+    }
 
-    private val _checkedProducts = MutableLiveData<List<ProductUiModel>>()
-    val checkProducts: LiveData<List<ProductUiModel>> = _checkedProducts
+    val checkedProductCount: LiveData<Int> = _checkedProducts.map { products ->
+        products.size
+    }
 
     val isAllChecked = MutableLiveData(false)
+
+    private var currentPage: Int = INITIAL_PAGE
 
     init {
         loadCartProducts()
@@ -60,14 +57,14 @@ class CartViewModel(
     }
 
     private fun setCheckedProducts(cartProduct: ProductUiModel) {
-        _checkedProducts.value = _checkedProducts.value?.filterNot { it.id == cartProduct.id }
-        val newTotalOrderPrice = _checkedProducts.value?.sumOf { it.quantity * it.price } ?: 0
-        _totalOrderPrice.postValue(newTotalOrderPrice)
-        _checkedProductCount.postValue(_checkedProducts.value?.count() ?: 0)
+        val currentCheckedProducts = _checkedProducts.value ?: emptyList()
+        _checkedProducts.postValue(
+            currentCheckedProducts.filterNot { it.id == cartProduct.id }
+        )
     }
 
     override fun onNextPage() {
-        if (currentPage >= 0 && _pagingData.value?.hasNext == true) {
+        if (currentPage >= INITIAL_PAGE && _pagingData.value?.hasNext == true) {
             currentPage++
             _pageEvent.postValue(currentPage)
             loadCartProducts()
@@ -76,7 +73,7 @@ class CartViewModel(
     }
 
     override fun onPrevPage() {
-        if (currentPage > 0) {
+        if (currentPage > INITIAL_PAGE) {
             currentPage--
             _pageEvent.postValue(currentPage)
             loadCartProducts()
@@ -113,7 +110,7 @@ class CartViewModel(
 
     override fun isPrevButtonEnabled(): Boolean = _pagingData.value?.hasPrevious == true
 
-    override fun isPaginationEnabled(): Boolean = (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
+    override fun isPaginationEnabled(): Boolean = isNextButtonEnabled() && isPrevButtonEnabled()
 
     override fun getPage(): Int = currentPage
 
@@ -158,19 +155,18 @@ class CartViewModel(
             (remainedCheckedProducts + currentCheckedProducts).distinctBy { it.id }
 
         _checkedProducts.postValue(newCheckedProducts)
-        _totalOrderPrice.postValue(newCheckedProducts.sumOf { it.quantity * it.price })
-        _checkedProductCount.postValue(newCheckedProducts.count())
         isAllChecked.value = currentProducts.isNotEmpty() && currentProducts.all { it.isChecked }
     }
 
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
         cartRepository.getCartItems(currentPage, pageSize) { result ->
             result.onSuccess { pagingData ->
-                if (pagingData.products.isEmpty() && currentPage > 0) {
+                if (pagingData.products.isEmpty() && currentPage > INITIAL_PAGE) {
                     currentPage--
                     _pageEvent.postValue(currentPage)
                     loadCartProducts()
-                    isAllChecked.value = pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
+                    isAllChecked.value =
+                        pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
                 } else {
                     val checkedProductIds = _checkedProducts.value?.map { it.id } ?: emptyList()
                     val updatedProducts =
