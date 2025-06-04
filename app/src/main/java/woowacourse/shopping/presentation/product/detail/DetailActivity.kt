@@ -44,12 +44,12 @@ class DetailActivity : AppCompatActivity() {
     private fun initObservers() {
         viewModel.uiState.observe(this) { state ->
             when (state) {
-                CartUiState.SUCCESS -> {
+                CartEvent.ADD_TO_CART_SUCCESS -> {
                     showToast(R.string.text_add_to_cart_success)
                     finish()
                 }
 
-                CartUiState.FAILURE -> {
+                CartEvent.ADD_TO_CART_FAILURE -> {
                     showToast(R.string.text_unInserted_toast)
                 }
             }

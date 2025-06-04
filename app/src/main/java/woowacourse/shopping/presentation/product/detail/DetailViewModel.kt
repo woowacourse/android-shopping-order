@@ -21,8 +21,8 @@ class DetailViewModel(
     private val _product = MutableLiveData<ProductUiModel>()
     val product: LiveData<ProductUiModel> = _product
 
-    private val _uiState = SingleLiveEvent<CartUiState>()
-    val uiState: LiveData<CartUiState> = _uiState
+    private val _uiState = SingleLiveEvent<CartEvent>()
+    val uiState: LiveData<CartEvent> = _uiState
 
     private val _lastViewed = MutableLiveData<ProductUiModel?>()
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
@@ -49,10 +49,10 @@ class DetailViewModel(
         cartItemRepository.addCartItemQuantity(product.id, product.quantity) { result ->
             result
                 .onSuccess {
-                    _uiState.postValue(CartUiState.SUCCESS)
+                    _uiState.postValue(CartEvent.ADD_TO_CART_SUCCESS)
                 }
                 .onFailure {
-                    _uiState.postValue(CartUiState.FAILURE)
+                    _uiState.postValue(CartEvent.ADD_TO_CART_FAILURE)
                 }
         }
     }
