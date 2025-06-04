@@ -69,7 +69,7 @@ class CartRepository {
 
     fun addToCart(
         cartRequest: CartRequest,
-        onResult: (Result<Response<Unit>>) -> Unit,
+        onResult: (Result<Long>) -> Unit,
     ) {
         CartClient
             .getRetrofitService()
@@ -81,7 +81,8 @@ class CartRepository {
                         response: Response<Unit>,
                     ) {
                         if (response.isSuccessful) {
-                            onResult(Result.success(response))
+                            val newCartId = response.headers()["Location"]?.substringAfterLast("/")?.toLongOrNull() ?: 0
+                            onResult(Result.success(newCartId))
                         } else {
                             val error = response.errorBody()?.string()
                             onResult(Result.failure(Throwable("추가 실패: ${response.code()} - $error")))

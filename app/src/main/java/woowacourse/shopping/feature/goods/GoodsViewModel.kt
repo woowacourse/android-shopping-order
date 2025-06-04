@@ -42,7 +42,7 @@ class GoodsViewModel(
     val navigateToCart: SingleLiveData<Cart> get() = _navigateToCart
 
     private val _insertState = MutableLiveData<Event<State>>()
-    val state: LiveData<Event<State>> get() = _insertState
+    val insertState: LiveData<Event<State>> get() = _insertState
 
     private val _isLoading = MutableLiveData<Boolean>(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -72,10 +72,8 @@ class GoodsViewModel(
 
             cartRepository.addToCart(cartRequest) { result ->
                 result
-                    .onSuccess { response ->
-                        val locationHeader = response.headers()["Location"]
-                        val newId = locationHeader?.substringAfterLast("/")?.toLongOrNull() ?: 0
-                        val updatedCart = cart.copy(id = newId, quantity = newQuantity)
+                    .onSuccess { newCartId ->
+                        val updatedCart = cart.copy(id = newCartId, quantity = newQuantity)
 
                         updateItems(updatedCart)
                         getCartCounts()

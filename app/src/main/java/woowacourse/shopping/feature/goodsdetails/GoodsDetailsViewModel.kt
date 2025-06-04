@@ -107,10 +107,8 @@ class GoodsDetailsViewModel(
 
                 cartRepository.addToCart(cartRequest) { result ->
                     result
-                        .onSuccess { response ->
-                            val locationHeader = response.headers()["Location"]
-                            val newId = locationHeader?.substringAfterLast("/")?.toLongOrNull() ?: 0
-                            val updatedCart = cart.value?.copy(id = newId, quantity = newQuantity)
+                        .onSuccess { newCartId ->
+                            val updatedCart = cart.value?.copy(id = newCartId, quantity = newQuantity)
 
                             insertToHistory(cart.value as Cart)
                             updateCart(updatedCart)

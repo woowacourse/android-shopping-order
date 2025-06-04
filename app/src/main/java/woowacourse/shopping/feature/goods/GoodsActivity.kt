@@ -88,7 +88,7 @@ class GoodsActivity : AppCompatActivity() {
     }
 
     private fun observeCartInsertResult() {
-        viewModel.state.observe(this) { event ->
+        viewModel.insertState.observe(this) { event ->
             event.getContentIfNotHandled()?.let { state ->
                 when (state) {
                     is State.Success ->
