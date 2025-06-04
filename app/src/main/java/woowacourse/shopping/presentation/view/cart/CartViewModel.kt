@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.data.RepositoryProvider
 import woowacourse.shopping.domain.model.Product
@@ -41,14 +42,24 @@ class CartViewModel(
     private var _isLastPage = MutableLiveData<Boolean>()
     val isLastPage: LiveData<Boolean> = _isLastPage
 
-    private val _totalPrice = MutableLiveData<Int>()
-    val totalPrice: LiveData<Int> = _totalPrice
+    val totalPrice: LiveData<Int> =
+        _cartItems.map { cartItems ->
+            cartItems
+                .filter { cartItem -> cartItem.isSelected }
+                .sumOf { selectedItem -> selectedItem.cartItem.totalPrice }
+        }
 
-    private val _totalCount = MutableLiveData<Int>()
-    val totalCount: LiveData<Int> = _totalCount
+    val totalCount: LiveData<Int> =
+        _cartItems.map { cartItems ->
+            cartItems
+                .filter { cartItem -> cartItem.isSelected }
+                .sumOf { selectedItem -> selectedItem.cartItem.quantity }
+        }
 
-    private val _allSelected = MutableLiveData<Boolean>()
-    val allSelected: LiveData<Boolean> = _allSelected
+    val allSelected: LiveData<Boolean> =
+        _cartItems.map { cartItems ->
+            cartItems.all { cartItem -> cartItem.isSelected }
+        }
 
     private val _canSelectItems = MutableLiveData(true)
     val canSelectItems: LiveData<Boolean> = _canSelectItems
@@ -211,9 +222,9 @@ class CartViewModel(
         cartRepository.loadAllCartItems { cartItems ->
             val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
             val selectedItems = cartItems.filter { selectedItemIds.contains(it.cartId) }
-            _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
-            _totalCount.postValue(selectedItems.sumOf { it.quantity })
-            _allSelected.postValue(selectedItems.isNotEmpty() && selectedItems.size == cartItems.size)
+//            totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
+//            totalCount.postValue(selectedItems.sumOf { it.quantity })
+//            allSelected.postValue(selectedItems.isNotEmpty() && selectedItems.size == cartItems.size)
         }
     }
 

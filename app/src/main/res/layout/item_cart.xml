@@ -26,17 +26,17 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="16dp">
 
-        <CheckBox
-            android:id="@+id/checkbox"
-            cartItem="@{cartItem}"
-            isChecked="@{cartItem.isSelected}"
-            onCheckedChanged="@{eventHandler}"
-            android:layout_width="40dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<CheckBox
+    android:id="@+id/checkbox"
+    cartItem="@{cartItem}"
+    isChecked="@{cartItem.isSelected}"
+    onCheckedChanged="@{eventHandler}"
+    android:layout_width="40dp"
+    android:layout_height="0dp"
+    android:gravity="center"
+    app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/btn_remove_cart"
