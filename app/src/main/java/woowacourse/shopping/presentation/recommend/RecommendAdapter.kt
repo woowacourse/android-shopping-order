@@ -7,7 +7,7 @@ import woowacourse.shopping.presentation.cart.CartItemDiffCallback
 import woowacourse.shopping.presentation.model.CartItemUiModel
 
 class RecommendAdapter(
-    private val itemClickListener: RecommendItemClickListener,
+    private val itemClickListener: RecommendClickListener,
     private val counterClickListener: CartCounterClickListener,
 ) : ListAdapter<CartItemUiModel, RecommendViewHolder>(CartItemDiffCallback()) {
     override fun onCreateViewHolder(

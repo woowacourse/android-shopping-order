@@ -34,6 +34,9 @@
         <activity
             android:name=".presentation.recommend.RecommendActivity"
             android:exported="false" />
+        <activity
+            android:name=".presentation.order.OrderActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

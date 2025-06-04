@@ -46,4 +46,14 @@
     <string name="recommend_text">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="recommend_toast_recent_load_fail">가장 최근 본 상품 조회에 실패했습니다</string>
     <string name="recommend_toast_load_fail">추천 상품 목록 조회에 실패했습니다</string>
+
+    <string name="order_toolbar_text">결제하기</string>
+    <string name="order_tv_possible_coupon">적용 가능한 쿠폰</string>
+    <string name="order_tv_coupon_limit">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price">%,d원</string>
+    <string name="order_btn_order_text">결제하기</string>
+    <string name="order_tv_payment_price">주문 금액</string>
+    <string name="order_tv_discount_price">쿠폰 할인 금액</string>
+    <string name="order_tv_delivery_fee">배송비</string>
+    <string name="order_tv_total_payment_price">총 결제 금액</string>
 </resources>

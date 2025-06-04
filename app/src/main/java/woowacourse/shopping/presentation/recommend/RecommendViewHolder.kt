@@ -9,7 +9,7 @@ import woowacourse.shopping.presentation.model.CartItemUiModel
 
 class RecommendViewHolder(
     private val binding: ItemRecommendProductBinding,
-    itemClickListener: RecommendItemClickListener,
+    itemClickListener: RecommendClickListener,
     counterClickListener: CartCounterClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
@@ -24,7 +24,7 @@ class RecommendViewHolder(
     companion object {
         fun create(
             parent: ViewGroup,
-            itemClickListener: RecommendItemClickListener,
+            itemClickListener: RecommendClickListener,
             counterClickListener: CartCounterClickListener,
         ): RecommendViewHolder =
             RecommendViewHolder(

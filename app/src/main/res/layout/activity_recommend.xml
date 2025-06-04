@@ -8,6 +8,10 @@
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.recommend.RecommendViewModel" />
+
+        <variable
+            name="clickListener"
+            type="woowacourse.shopping.presentation.recommend.RecommendClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,7 +85,7 @@
             android:layout_height="78dp"
             android:background="@color/gray5"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/layout_cart_recommend"
+            app:layout_constraintEnd_toStartOf="@id/btn_cart_order"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -107,11 +111,12 @@
             app:layout_constraintGuide_percent="0.66" />
 
         <TextView
-            android:id="@+id/layout_cart_recommend"
+            android:id="@+id/btn_cart_order"
             android:layout_width="0dp"
             android:layout_height="78dp"
             android:background="@color/baemin"
             android:gravity="center"
+            android:onClick="@{() -> clickListener.onClickOrder()}"
             android:text="@{@string/cart_order_text(vm.selectedTotalCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"

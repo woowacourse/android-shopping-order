@@ -48,7 +48,7 @@
             android:layout_height="78dp"
             android:background="@color/gray5"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/layout_cart_recommend"
+            app:layout_constraintEnd_toStartOf="@id/btn_cart_recommend"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -98,7 +98,7 @@
             app:layout_constraintGuide_percent="0.66" />
 
         <TextView
-            android:id="@+id/layout_cart_recommend"
+            android:id="@+id/btn_cart_recommend"
             android:layout_width="0dp"
             android:layout_height="78dp"
             android:background="@color/baemin"

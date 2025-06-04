@@ -20,10 +20,11 @@ import woowacourse.shopping.databinding.ActivityRecommendBinding
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.model.CartItemUiModel
+import woowacourse.shopping.presentation.order.OrderActivity
 
 class RecommendActivity :
     AppCompatActivity(),
-    RecommendItemClickListener,
+    RecommendClickListener,
     CartCounterClickListener {
     private lateinit var binding: ActivityRecommendBinding
     private lateinit var viewModel: RecommendViewModel
@@ -44,6 +45,7 @@ class RecommendActivity :
 
     private fun setupBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_recommend)
+        binding.clickListener = this
         binding.lifecycleOwner = this
     }
 
@@ -114,6 +116,11 @@ class RecommendActivity :
 
     override fun onClickAddToCart(cartItem: CartItemUiModel) {
         viewModel.addToCart(cartItem)
+    }
+
+    override fun onClickOrder() {
+        val intent = OrderActivity.newIntent(this)
+        startActivity(intent)
     }
 
     override fun onClickPlus(id: Long) {
