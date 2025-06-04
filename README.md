@@ -35,7 +35,7 @@
 
 ### 비동기 처리
 
-- [ ] 모든 API 및 DAO 함수에 `suspend` 적용
+- [x] 모든 API 및 DAO 함수에 `suspend` 적용
     - 단, `Flow`는 사용하지 않음
 
 ### 결제
