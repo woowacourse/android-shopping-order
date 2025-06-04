@@ -18,7 +18,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
-    val viewModel: CartViewModel by lazy {
+    private val viewModel: CartViewModel by lazy {
         ViewModelProvider(
             this,
             CartViewModelFactory(application as ShoppingApplication),
@@ -29,31 +29,22 @@ class CartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
-        binding.vm = viewModel
-        binding.lifecycleOwner = this
-
-        viewModel.totalProducts.observe(this) {
-            viewModel.postTotalCount()
-            viewModel.postTotalAmount()
-        }
-
-        viewModel.cartItemCount.observe(this) { cartItemCount ->
-            val fragment = when (cartItemCount) {
-                0-> CartRecommendationFragment()
-                else -> CartSelectionFragment()
-            }
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragment_container_cart_selection, fragment)
-            }
-        }
-
-        applyWindowInsets()
-        setSupportActionBar()
+        initView()
+        initActionBar()
+        initDataBinding()
+        observeData()
     }
 
-    private fun setSupportActionBar() {
+    private fun initView() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+    }
+
+    private fun initActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.text_cart_action_bar)
     }
@@ -63,11 +54,21 @@ class CartActivity : AppCompatActivity() {
         return super.onSupportNavigateUp()
     }
 
-    private fun applyWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    private fun initDataBinding() {
+        binding.vm = viewModel
+        binding.lifecycleOwner = this
+    }
+
+    private fun observeData() {
+        viewModel.cartItemCount.observe(this) { cartItemCount ->
+            val fragment = when (cartItemCount) {
+                0 -> CartRecommendationFragment()
+                else -> CartSelectionFragment()
+            }
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.fragment_container_cart_selection, fragment)
+            }
         }
     }
 
