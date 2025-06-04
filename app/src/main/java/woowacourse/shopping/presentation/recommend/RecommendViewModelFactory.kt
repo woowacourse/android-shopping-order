@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import woowacourse.shopping.di.RepositoryModule
-import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
+import woowacourse.shopping.di.UseCaseModule
 
 class RecommendViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(
@@ -13,11 +13,9 @@ class RecommendViewModelFactory : ViewModelProvider.Factory {
         extras: CreationExtras,
     ): T {
         val savedStateHandle = extras.createSavedStateHandle()
-
-        val productRepository = RepositoryModule.productRepository
         val recentProductRepository = RepositoryModule.recentProductRepository
         val cartRepository = RepositoryModule.cartRepository
-        val recommendProductsUseCase = RecommendProductsUseCase(productRepository)
+        val recommendProductsUseCase = UseCaseModule.recommendProductsUseCase
         return RecommendViewModel(
             savedStateHandle,
             recentProductRepository,
