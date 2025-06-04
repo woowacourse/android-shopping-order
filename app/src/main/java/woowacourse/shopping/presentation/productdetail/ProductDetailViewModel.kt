@@ -36,11 +36,11 @@ class ProductDetailViewModel(
             productRepository
                 .fetchProductById(productId)
                 .onSuccess { product ->
-                    _product.postValue(product)
+                    _product.value = product
                     handleRecentProduct(productId)
                     insertCurrentProductToRecent(product)
                 }.onFailure {
-                    _toastMessage.postValue(R.string.product_detail_toast_load_fail)
+                    _toastMessage.value = R.string.product_detail_toast_load_fail
                 }
         }
     }
@@ -79,7 +79,7 @@ class ProductDetailViewModel(
             recentProductRepository
                 .insertRecentProduct(product)
                 .onFailure {
-                    _toastMessage.postValue(R.string.product_detail_toast_most_recent_insert_fail)
+                    _toastMessage.value = R.string.product_detail_toast_most_recent_insert_fail
                 }
         }
     }
@@ -89,11 +89,11 @@ class ProductDetailViewModel(
             recentProductRepository
                 .getMostRecentProduct()
                 .onSuccess { recentProduct ->
-                    _recentProduct.postValue(recentProduct)
+                    _recentProduct.value = recentProduct
 
                     val isSame =
                         recentProduct == null || recentProduct.productId == currentProductId
-                    _isRecentProduct.postValue(isSame)
+                    _isRecentProduct.value = isSame
                 }.onFailure {
                     _toastMessage.postValue(R.string.product_detail_toast_most_recent_load_fail)
                 }

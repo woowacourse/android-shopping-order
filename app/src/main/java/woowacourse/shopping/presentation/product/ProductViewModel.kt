@@ -82,7 +82,7 @@ class ProductViewModel(
                     val currentList = _products.value.orEmpty()
                     val updatedList = currentList + newItems
                     _products.value = updatedList
-                    _showLoadMore.postValue(updatedList.size < 100)
+                    _showLoadMore.value = updatedList.size < 100
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_load_failure
                 }

@@ -49,10 +49,10 @@ class CartViewModel(
                             oldItemsMap[newItem.cartId] ?: newItem.toPresentation()
                         }
 
-                    _cartItems.postValue(newItems)
-                    _uiState.postValue(ResultState.Success(Unit))
+                    _cartItems.value = newItems
+                    _uiState.value = ResultState.Success(Unit)
                 }.onFailure {
-                    _uiState.postValue(ResultState.Failure(it))
+                    _uiState.value = ResultState.Failure(it)
                 }
         }
     }
@@ -60,8 +60,8 @@ class CartViewModel(
     fun fetchSelectedInfo() {
         val checkedItem = cartItems.value?.filter { it.isSelected } ?: return
         allCheckOrUnchecked()
-        _selectedTotalCount.postValue(checkedItem.sumOf { it.quantity })
-        _selectedTotalPrice.postValue(checkedItem.sumOf { it.totalPrice })
+        _selectedTotalCount.value = checkedItem.sumOf { it.quantity }
+        _selectedTotalPrice.value = checkedItem.sumOf { it.totalPrice }
     }
 
     fun deleteProduct(cartItem: CartItemUiModel) {
@@ -113,7 +113,7 @@ class CartViewModel(
         val newCartItems =
             _cartItems.value?.map { if (it.id == cartId) it.copy(isSelected = !it.isSelected) else it }
                 ?: return
-        _cartItems.postValue(newCartItems)
+        _cartItems.value = newCartItems
 
         fetchSelectedInfo()
     }
@@ -146,7 +146,7 @@ class CartViewModel(
                     cartItem
                 }
             }
-        _cartItems.postValue(updatedItem)
+        _cartItems.value = updatedItem
         fetchSelectedInfo()
     }
 }
