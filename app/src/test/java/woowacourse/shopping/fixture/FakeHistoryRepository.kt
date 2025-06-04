@@ -1,0 +1,27 @@
+package woowacourse.shopping.fixture
+
+import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.domain.model.CartProduct
+
+class FakeHistoryRepository : HistoryRepository {
+    val historyList = mutableListOf<CartProduct>()
+    var savedHistory: CartProduct? = null
+
+    override fun getAll(callback: (List<CartProduct>) -> Unit) {
+        callback(historyList.toList())
+    }
+
+    override fun insert(history: CartProduct) {
+        if (historyList.none { it.goods.id == history.goods.id }) {
+            if (historyList.size == 10) {
+                historyList.removeAt(0)
+            }
+            historyList.add(history)
+            savedHistory = history
+        }
+    }
+
+    override fun findLatest(callback: (CartProduct?) -> Unit) {
+        callback(historyList.lastOrNull())
+    }
+}
