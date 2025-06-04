@@ -8,12 +8,12 @@ import woowacourse.shopping.view.core.ext.showToast
 class NetworkExceptionDelegator(
     private val context: Context,
 ) {
-    fun showErrorMessage(error: NetworkError)  {
+    fun showErrorMessage(error: NetworkError) {
         val resId = asResourceId(error)
         context.showToast(resId)
     }
 
-    private fun asResourceId(error: NetworkError): Int  {
+    private fun asResourceId(error: NetworkError): Int {
         return when (error) {
             NetworkError.HttpError.AuthenticationError -> {
                 R.string.http_error_authentication_message
