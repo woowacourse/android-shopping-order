@@ -85,46 +85,29 @@ class CartFragment :
     }
 
     private fun setupBottomBar() {
-        // 전체선택 체크박스 누를 때
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
         binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, isChecked ->
             viewModel.selectAllItems(isChecked)
-            cartAdapter.notifyDataSetChanged() // ① 전체선택 후 즉시 개별 체크박스 갱신
+            cartAdapter.notifyDataSetChanged()
         }
 
-        // 뷰모델이 isAllSelected 변경될 때
         viewModel.isAllSelected.observe(viewLifecycleOwner) { isAll ->
             binding.bottomBar.checkboxAll.setOnCheckedChangeListener(null)
             binding.bottomBar.checkboxAll.isChecked = isAll
             binding.bottomBar.checkboxAll.setOnCheckedChangeListener { _, checked ->
                 viewModel.selectAllItems(checked)
-                cartAdapter.notifyDataSetChanged() // ② “전체선택” 에서 해제 시에도 반영
+                cartAdapter.notifyDataSetChanged()
             }
-            cartAdapter.notifyDataSetChanged() // ③ 개별 해제 시 전체선택 해제되고 UI 갱신
+            cartAdapter.notifyDataSetChanged()
+        }
+
+        viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+
         }
     }
 
     private fun observeViewModel() {
-        viewModel.loginErrorEvent.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                CartFetchError.Network ->
-                    Toast
-                        .makeText(
-                            requireContext(),
-                            "네트워크 에러 발생",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-
-                is CartFetchError.Server ->
-                    Toast
-                        .makeText(
-                            requireContext(),
-                            "로그인 실패",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-            }
-            requireActivity().finish()
-        }
 
         viewModel.removeItemEvent.observe(viewLifecycleOwner) { cartItem ->
             onCartItemDelete(cartItem)

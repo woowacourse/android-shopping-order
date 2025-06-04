@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.goods
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
@@ -20,16 +21,22 @@ class GoodsViewModel(
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
+
     private val goods = mutableListOf<Goods>()
     private var page: Int = 1
+
     private val _isFullLoaded = MutableLiveData(false)
     val isFullLoaded: LiveData<Boolean> get() = _isFullLoaded
+
     private val _goodsWithCartQuantity = MutableLiveData<List<CartItem>>()
     val goodsWithCartQuantity: LiveData<List<CartItem>> get() = _goodsWithCartQuantity
-    private var _totalCartItemSize: MutableLiveData<String> = MutableLiveData("0")
+
+    private var _totalCartItemSize: MutableLiveData<String> = MutableLiveData(CART_EMPTY)
     val totalCartItemSize: LiveData<String> get() = _totalCartItemSize
+
     private val _navigateToCart = MutableSingleLiveData<Unit>()
     val navigateToCart: SingleLiveData<Unit> get() = _navigateToCart
+
     private val _recentlyViewedGoods: MutableLiveData<List<Goods>> = MutableLiveData()
     val recentlyViewedGoods: LiveData<List<Goods>> get() = _recentlyViewedGoods
 
@@ -38,6 +45,9 @@ class GoodsViewModel(
 
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _toastMessage = MutableSingleLiveData<String>()
+    val toastMessage: SingleLiveData<String> get() = _toastMessage
 
     private var cashedCartItems: MutableMap<Int, CartItem> = mutableMapOf()
 
@@ -48,16 +58,16 @@ class GoodsViewModel(
 
     fun findCart(goods: Goods): CartItem? = cashedCartItems.values.find { it.goods.id == goods.id }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
+        cartResponse.toCartItems()
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
         cartRepository.checkValidBasicKey(basicKey, { response ->
-            when {
-                response == 200 -> Authorization.setLoginStatus(true)
-                else -> Authorization.setLoginStatus(false)
-            }
-        }, {})
+            Authorization.setLoginStatus(response == 200)
+        }, {
+            _toastMessage.postValue(TOAST_FAIL_LOGIN)
+        })
     }
 
     fun onCartClicked() {
@@ -80,8 +90,9 @@ class GoodsViewModel(
                 _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
                 _isLoading.postValue(false)
             },
-            onFail = { throwable ->
-                throw (throwable)
+            onFail = {
+                _toastMessage.postValue(TOAST_FAIL_CART_LOAD)
+                _isLoading.postValue(false)
             },
         )
     }
@@ -95,16 +106,12 @@ class GoodsViewModel(
     fun fetchAndSetCartCache() {
         cartRepository.fetchAllCartItems({ cartResponse ->
             val cartItems = getCartItemByCartResponse(cartResponse)
-            cashedCartItems =
-                cartItems
-                    .associateBy(
-                        { it.goods.id },
-                        { it },
-                    ).toMutableMap()
-
+            cashedCartItems = cartItems.associateBy({ it.goods.id }, { it }).toMutableMap()
             setTotalCartItemSize(cartItems.sumOf { it.quantity })
             bindCartCache()
-        }, {})
+        }, {
+            _toastMessage.postValue(TOAST_FAIL_CART_LOAD)
+        })
     }
 
     private fun bindCartCache() {
@@ -115,12 +122,11 @@ class GoodsViewModel(
     }
 
     private fun setTotalCartItemSize(totalCartQuantity: Int) {
-        val sizeText =
-            when {
-                totalCartQuantity < 1 -> "0"
-                totalCartQuantity in 1..99 -> totalCartQuantity.toString()
-                else -> "99+"
-            }
+        val sizeText = when {
+            totalCartQuantity < 1 -> CART_EMPTY
+            totalCartQuantity in 1..99 -> totalCartQuantity.toString()
+            else -> CART_MAX
+        }
         _totalCartItemSize.postValue(sizeText)
     }
 
@@ -154,6 +160,8 @@ class GoodsViewModel(
                     cartRepository.delete(cartItemWillRemove.id, {
                         cashedCartItems.remove(cartItemWillRemove.goods.id)
                         bindCartCache()
+                    }, {
+                        _toastMessage.postValue(TOAST_FAIL_CART_DELETE)
                     })
                 } else {
                     updateCartItemQuantity(
@@ -166,15 +174,16 @@ class GoodsViewModel(
     }
 
     private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> {
-        val contents = goodsResponse.content
-        return contents.map { it.toDomain() }
+        return goodsResponse.content.map { it.toDomain() }
     }
 
     private fun addCartItem(cartItem: CartItem) {
         cartRepository.addCartItem(cartItem.goods, 1, {
             cashedCartItems[cartItem.goods.id] = cartItem.copy(quantity = 1)
             bindCartCache()
-        }, {})
+        }, {
+            _toastMessage.postValue(TOAST_FAIL_CART_ADD)
+        })
     }
 
     private fun updateCartItemQuantity(
@@ -185,10 +194,20 @@ class GoodsViewModel(
             cashedCartItems.replace(cartItem.goods.id, cartItem)
             bindCartCache()
         }, {
+            _toastMessage.postValue(TOAST_FAIL_CART_UPDATE)
         })
     }
 
     companion object {
         private const val PAGE_SIZE = 20
+
+        private const val CART_EMPTY = "0"
+        private const val CART_MAX = "99+"
+
+        private const val TOAST_FAIL_LOGIN = "로그인에 실패하였습니다."
+        private const val TOAST_FAIL_CART_LOAD = "카트 아이템을 불러오는 데에 실패했습니다."
+        private const val TOAST_FAIL_CART_ADD = "카트 아이템 추가에 실패했습니다."
+        private const val TOAST_FAIL_CART_UPDATE = "카트 수량 변경에 실패했습니다."
+        private const val TOAST_FAIL_CART_DELETE = "카트 아이템 삭제에 실패했습니다."
     }
 }

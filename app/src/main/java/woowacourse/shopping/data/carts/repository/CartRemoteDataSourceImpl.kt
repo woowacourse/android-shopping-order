@@ -160,6 +160,7 @@ class CartRemoteDataSourceImpl(
     override fun deleteItem(
         cartId: Int,
         onSuccess: (resultCode: Int) -> Unit,
+        onFailure: (CartFetchError) -> Unit
     ) {
         retrofitService
             .deleteCartItem(
@@ -181,6 +182,7 @@ class CartRemoteDataSourceImpl(
                         call: Call<Unit>,
                         t: Throwable,
                     ) {
+                        onFailure(CartFetchError.Network)
                     }
                 },
             )

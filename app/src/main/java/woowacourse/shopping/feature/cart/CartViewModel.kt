@@ -14,11 +14,14 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import kotlin.math.max
-
 class CartViewModel(
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
+
+    private val _toastMessage = MutableSingleLiveData<String>()
+    val toastMessage: SingleLiveData<String> get() = _toastMessage
+
     private val _isMultiplePages = MutableLiveData(false)
     val isMultiplePages: LiveData<Boolean> get() = _isMultiplePages
 
@@ -64,8 +67,13 @@ class CartViewModel(
 
     private val _selectedItemCount = MutableLiveData(0)
     val selectedItemCount: LiveData<Int> get() = _selectedItemCount
+
     private val _recommendedGoods = MutableLiveData<List<CartItem>>()
     val recommendedGoods: LiveData<List<CartItem>> = _recommendedGoods
+
+    init {
+        updateCartQuantity()
+    }
 
     fun loadRecommendedGoods() {
         goodsRepository.fetchMostRecentGoods { goods ->
@@ -75,7 +83,6 @@ class CartViewModel(
                     goods.category,
                     { goodsResponse ->
                         val allGoodsList = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
-
                         filterRecommendedGoods(allGoodsList)
                     },
                     {
@@ -93,12 +100,7 @@ class CartViewModel(
             { cartResponse: CartResponse ->
                 val cartItems = cartResponse.toCartItems()
                 val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
-
-                val filteredGoodsList =
-                    allGoodsList.filter { recommendItem ->
-                        !cartGoodsIds.contains(recommendItem.goods.id)
-                    }
-
+                val filteredGoodsList = allGoodsList.filter { !cartGoodsIds.contains(it.goods.id) }
                 _recommendedGoods.value = filteredGoodsList
             },
             {
@@ -113,17 +115,12 @@ class CartViewModel(
             1,
             { response ->
                 val allGoodsList = response.content.map { CartItem(it.toDomain(), 0) }
-
                 filterRecommendedGoods(allGoodsList)
             },
             {
                 _recommendedGoods.value = emptyList()
             },
         )
-    }
-
-    init {
-        updateCartQuantity()
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
@@ -138,16 +135,19 @@ class CartViewModel(
         updateTotalPriceAndCount()
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
+    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
+        cartResponse.toCartItems()
 
-    fun getPosition(cartItem: CartItem): Int? = _visibleCart.value?.indexOf(cartItem)?.takeIf { it >= 0 }
+    fun getPosition(cartItem: CartItem): Int? =
+        _visibleCart.value?.indexOf(cartItem)?.takeIf { it >= 0 }
 
     fun increaseQuantity(cartItem: CartItem) {
         cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
             updateCartQuantity()
-            selectedCartMap[cartItem.id]?.quantity =
-                (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
-        }, {})
+            selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
+        }, {
+            _toastMessage.postValue(TOAST_FAIL_INCREASE)
+        })
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
@@ -156,17 +156,20 @@ class CartViewModel(
         } else {
             cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
                 updateCartQuantity()
-                selectedCartMap[cartItem.id]?.quantity =
-                    (selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
-            }, {})
+                selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
+            }, {
+                _toastMessage.postValue(TOAST_FAIL_DECREASE)
+            })
         }
     }
 
     fun delete(cartItem: CartItem) {
         selectedCartMap.remove(cartItem.id)
-        cartRepository.delete(cartItem.id) {
+        cartRepository.delete(cartItem.id, {
             updateCartQuantity()
-        }
+        }, {
+            _toastMessage.postValue(TOAST_FAIL_DELETE)
+        })
     }
 
     fun updateCartQuantity() {
@@ -185,7 +188,7 @@ class CartViewModel(
                     updateCartQuantity()
                 }
             },
-            { _loginErrorEvent.setValue(it) },
+            { _toastMessage.postValue(TOAST_FAIL_LOGIN) }
         )
     }
 
@@ -209,10 +212,7 @@ class CartViewModel(
         _isRightPageEnable.value = !response.last
     }
 
-    fun setItemSelection(
-        cartItem: CartItem,
-        isSelected: Boolean,
-    ) {
+    fun setItemSelection(cartItem: CartItem, isSelected: Boolean) {
         val foundItem = _visibleCart.value?.find { it.id == cartItem.id }
         foundItem?.let {
             if (isSelected) {
@@ -233,7 +233,9 @@ class CartViewModel(
             allItems.toCartItems().forEach { selectedCartMap[it.id] = it }
             _isAllSelected.value = true
             updateTotalPriceAndCount()
-        }, {})
+        }, {
+            _toastMessage.postValue(TOAST_FAIL_SELECT_ALL)
+        })
     }
 
     fun selectAllItems(isSelected: Boolean) {
@@ -260,5 +262,11 @@ class CartViewModel(
     companion object {
         private const val MINIMUM_PAGE = 1
         private const val PAGE_SIZE = 5
+
+        private const val TOAST_FAIL_INCREASE = "수량 증가에 실패했습니다."
+        private const val TOAST_FAIL_DECREASE = "수량 감소에 실패했습니다."
+        private const val TOAST_FAIL_DELETE = "카트 아이템 삭제에 실패했습니다."
+        private const val TOAST_FAIL_SELECT_ALL = "전체 선택에 실패했습니다."
+        private const val TOAST_FAIL_LOGIN = "로그인에 실패했습니다."
     }
 }

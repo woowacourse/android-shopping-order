@@ -25,12 +25,18 @@ class GoodsDetailsViewModel(
     private val _cartItem: MutableLiveData<CartItem> =
         MutableLiveData(CartItem(goodsUiModel.toDomain(), 1))
     val cartItem: LiveData<CartItem> get() = _cartItem
+
     private val _alertEvent = MutableSingleLiveData<GoodsDetailsAlertMessage>()
     val alertEvent: SingleLiveData<GoodsDetailsAlertMessage> = _alertEvent
+
     private val _mostRecentlyViewedGoods: MutableLiveData<Goods?> = MutableLiveData(null)
     val mostRecentlyViewedGoods: LiveData<Goods?> get() = _mostRecentlyViewedGoods
+
     private val _clickMostRecentlyGoodsEvent = MutableSingleLiveData<Goods>()
     val clickMostRecentlyGoodsEvent: SingleLiveData<Goods> get() = _clickMostRecentlyGoodsEvent
+
+    private val _toastMessage = MutableSingleLiveData<String>()
+    val toastMessage: SingleLiveData<String> get() = _toastMessage
 
     fun initMostRecentlyViewedGoods() {
         goodsRepository.fetchMostRecentGoods { goods ->
@@ -59,15 +65,19 @@ class GoodsDetailsViewModel(
         cartItem.value?.let { item ->
 
             if (cartUiModel != null) {
-                Log.d("test", "addToCart")
                 cartRepository.updateQuantity(
                     cartUiModel.cartId,
                     CartQuantity(cartUiModel.cartQuantity + item.quantity),
                     { addedCart(item.quantity) },
-                    { Log.d("test", "fail") },
+                    { _toastMessage.postValue(TOAST_FAIL_CART_UPDATE) },
                 )
             } else {
-                cartRepository.addCartItem(item.goods, item.quantity, { addedCart(item.quantity) }, {})
+                cartRepository.addCartItem(
+                    item.goods,
+                    item.quantity,
+                    { addedCart(item.quantity) },
+                    { _toastMessage.postValue(TOAST_FAIL_CART_ADD) },
+                )
             }
         }
     }
@@ -90,5 +100,10 @@ class GoodsDetailsViewModel(
 
     fun loggingRecentViewedGoods(goods: Goods) {
         goodsRepository.loggingRecentGoods(goods) {}
+    }
+
+    companion object {
+        private const val TOAST_FAIL_CART_ADD = "카트 아이템 추가에 실패했습니다."
+        private const val TOAST_FAIL_CART_UPDATE = "카트 수량 변경에 실패했습니다."
     }
 }

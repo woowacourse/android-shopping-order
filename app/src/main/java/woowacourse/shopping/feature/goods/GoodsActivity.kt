@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.component1
@@ -21,6 +22,7 @@ import woowacourse.shopping.databinding.ActivityGoodsBinding
 import woowacourse.shopping.databinding.MenuCartNavbarBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
+import woowacourse.shopping.feature.BaseActivity
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.goods.adapter.horizontal.HorizontalSectionAdapter
@@ -35,67 +37,74 @@ import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity.Companion.
 import woowacourse.shopping.feature.login.LoginActivity
 import woowacourse.shopping.feature.toUiModel
 import woowacourse.shopping.util.toUi
+class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
 
-class GoodsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityGoodsBinding
-    private lateinit var navbarBinding: MenuCartNavbarBinding
     private val viewModel: GoodsViewModel by viewModels {
         GoodsViewModelFactory(
             CartRepositoryImpl(CartRemoteDataSourceImpl()),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
-                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
-            ),
+                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this))
+            )
         )
     }
+
+    override fun inflateBinding(): ActivityGoodsBinding = ActivityGoodsBinding.inflate(layoutInflater)
 
     private val recentlyViewedGoodsAdapter by lazy {
         RecentlyViewedGoodsAdapter(this) { goods -> navigateGoodsDetails(goods) }
     }
+
     private val horizontalSelectionAdapter by lazy {
         HorizontalSectionAdapter(this, viewModel, recentlyViewedGoodsAdapter)
     }
+
     private val goodsAdapter by lazy {
         GoodsAdapter(
             goodsClickListener = { goods -> navigateGoodsDetails(goods) },
-            quantityChangeListener =
-                object : QuantityChangeListener {
-                    override fun onIncrease(cartItem: CartItem) {
-                        viewModel.addCartItemOrIncreaseQuantity(cartItem)
-                    }
+            quantityChangeListener = object : QuantityChangeListener {
+                override fun onIncrease(cartItem: CartItem) {
+                    viewModel.addCartItemOrIncreaseQuantity(cartItem)
+                }
 
-                    override fun onDecrease(cartItem: CartItem) {
-                        viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
-                    }
-                },
+                override fun onDecrease(cartItem: CartItem) {
+                    viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
+                }
+            }
         )
     }
-    private val goodsSkeletonAdapter by lazy {
-        GoodsSkeletonAdapter()
-    }
+
+    private val goodsSkeletonAdapter by lazy { GoodsSkeletonAdapter() }
+
     private val moreButtonAdapter by lazy {
         MoreButtonAdapter {
             viewModel.addPage()
             viewModel.fetchAndSetCartCache()
         }
     }
+
     private val concatAdapter by lazy {
         ConcatAdapter(
             horizontalSelectionAdapter,
             goodsSkeletonAdapter,
-            moreButtonAdapter,
+            moreButtonAdapter
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityGoodsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.lifecycleOwner = this
-        binding.rvGoodsItems.adapter = concatAdapter
-        binding.viewModel = viewModel
 
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+        binding.rvGoodsItems.adapter = concatAdapter
         binding.rvGoodsItems.layoutManager = getLayoutManager()
+        binding.rvGoodsItems.addItemDecoration(
+            GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING)
+        )
+
+        observeToast(viewModel.toastMessage)
+        observeNavigationToLogin(viewModel.navigateToLogin)
+
         viewModel.navigateToCart.observe(this) {
             val intent = CartActivity.newIntent(this)
             startActivity(intent)
@@ -104,42 +113,36 @@ class GoodsActivity : AppCompatActivity() {
         viewModel.goodsWithCartQuantity.observe(this) {
             viewModel.fetchAndSetCartCache()
         }
-        binding.rvGoodsItems.addItemDecoration(
-            GoodsGridItemDecoration(concatAdapter, GRID_GOODS_ITEM_HORIZONTAL_PADDING),
-        )
 
         viewModel.recentlyViewedGoods.observe(this) { goods ->
             recentlyViewedGoodsAdapter.setItems(goods)
         }
 
-        viewModel.navigateToLogin.observe(this) {
-            navigateGoodsLogin()
-        }
         viewModel.isLoading.observe(this) { isLoading ->
             if (!isLoading) {
                 concatAdapter.removeAdapter(goodsSkeletonAdapter)
                 concatAdapter.addAdapter(1, goodsAdapter)
             } else {
-                if (concatAdapter.adapters.contains(goodsSkeletonAdapter).not()) {
+                if (!concatAdapter.adapters.contains(goodsSkeletonAdapter)) {
                     concatAdapter.addAdapter(1, goodsSkeletonAdapter)
                 }
             }
         }
+        observeToast(viewModel.toastMessage)
+
     }
 
     private fun getLayoutManager(): GridLayoutManager {
         val layoutManager = GridLayoutManager(this, 2)
-        layoutManager.spanSizeLookup =
-            object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    val (adapter, _) = concatAdapter.getWrappedAdapterAndPosition(position)
-                    return when (adapter) {
-                        is GoodsAdapter -> 1
-                        is GoodsSkeletonAdapter -> 1
-                        else -> 2
-                    }
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                val (adapter, _) = concatAdapter.getWrappedAdapterAndPosition(position)
+                return when (adapter) {
+                    is GoodsAdapter, is GoodsSkeletonAdapter -> 1
+                    else -> 2
                 }
             }
+        }
         return layoutManager
     }
 
@@ -154,11 +157,10 @@ class GoodsActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.nav_cart, menu)
         val menuItem = menu?.findItem(R.id.nav_cart)
-        navbarBinding = MenuCartNavbarBinding.inflate(layoutInflater)
+        val navbarBinding = MenuCartNavbarBinding.inflate(layoutInflater)
         navbarBinding.lifecycleOwner = this
         navbarBinding.viewModel = viewModel
         menuItem?.actionView = navbarBinding.root
-
         return super.onCreateOptionsMenu(menu)
     }
 
