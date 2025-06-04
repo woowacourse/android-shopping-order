@@ -15,7 +15,7 @@ class ProductAdapter(
     items: List<ProductRvItems>,
     private val handler: ProductAdapterEventHandler,
 ) : RecyclerView.Adapter<BaseViewHolder<ViewBinding>>() {
-    private val items: MutableList<ProductRvItems> = items.toMutableList()
+    private val _items: MutableList<ProductRvItems> = items.toMutableList()
     private var historyItemsCache: List<HistoryState> = emptyList()
 
     override fun onCreateViewHolder(
@@ -45,7 +45,7 @@ class ProductAdapter(
         holder: BaseViewHolder<ViewBinding>,
         position: Int,
     ) {
-        when (val item = items[position]) {
+        when (val item = _items[position]) {
             is ProductRvItems.ProductItem -> (holder as ProductViewHolder).bind(item)
             is ProductRvItems.LoadItem -> (holder as LoadViewHolder).bind(item)
             is ProductRvItems.RecentProductItem -> (holder as RecentProductViewHolder).bind(item)
@@ -53,9 +53,9 @@ class ProductAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = _items.size
 
-    override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
+    override fun getItemViewType(position: Int): Int = _items[position].viewType.ordinal
 
     fun submitList(newUiState: ProductUiState) {
         removeLoadItem()
@@ -67,13 +67,13 @@ class ProductAdapter(
     private fun updateHistorySection(newHistories: List<HistoryState>) {
         if (newHistories == historyItemsCache) return
 
-        val recentIndex = items.indexOfFirst { it is ProductRvItems.RecentProductItem }
+        val recentIndex = _items.indexOfFirst { it is ProductRvItems.RecentProductItem }
         if (recentIndex != -1) {
-            items[recentIndex] = ProductRvItems.RecentProductItem(newHistories)
+            _items[recentIndex] = ProductRvItems.RecentProductItem(newHistories)
             notifyItemChanged(recentIndex)
         } else {
-            items.add(HISTORY_INSERT_POSITION, ProductRvItems.RecentProductItem(newHistories))
-            items.add(DIVIDER_INSERT_POSITION, ProductRvItems.DividerItem)
+            _items.add(HISTORY_INSERT_POSITION, ProductRvItems.RecentProductItem(newHistories))
+            _items.add(DIVIDER_INSERT_POSITION, ProductRvItems.DividerItem)
             notifyItemRangeInserted(HISTORY_INSERT_POSITION, WHEN_HAS_HISTORY_PRODUCT_POSITION)
         }
 
@@ -84,7 +84,7 @@ class ProductAdapter(
         newProducts.forEachIndexed { index, newState ->
             val offset = getProductItemOffset()
             val actualIndex = offset + index
-            val existingItem = items.getOrNull(actualIndex) as? ProductRvItems.ProductItem
+            val existingItem = _items.getOrNull(actualIndex) as? ProductRvItems.ProductItem
             val newItem = ProductRvItems.ProductItem(newState)
 
             applyItemChange(existingItem, newItem, actualIndex)
@@ -98,12 +98,12 @@ class ProductAdapter(
     ) {
         when {
             existingItem == null -> {
-                items.add(index, newItem)
+                _items.add(index, newItem)
                 notifyItemInserted(index)
             }
 
             !areContentsTheSame(existingItem, newItem) -> {
-                items[index] = newItem
+                _items[index] = newItem
                 notifyItemChanged(index)
             }
 
@@ -121,21 +121,21 @@ class ProductAdapter(
 
     private fun generateLoad(load: LoadState) {
         if (load is LoadState.CanLoad) {
-            items.add(ProductRvItems.LoadItem)
-            notifyItemInserted(items.size - 1)
+            _items.add(ProductRvItems.LoadItem)
+            notifyItemInserted(_items.size - 1)
         }
     }
 
     private fun removeLoadItem() {
-        val index = items.indexOfFirst { it is ProductRvItems.LoadItem }
+        val index = _items.indexOfFirst { it is ProductRvItems.LoadItem }
         if (index != -1) {
-            items.removeAt(index)
+            _items.removeAt(index)
             notifyItemRemoved(index)
         }
     }
 
     private fun getProductItemOffset(): Int {
-        val hasHistory = items.any { it is ProductRvItems.RecentProductItem }
+        val hasHistory = _items.any { it is ProductRvItems.RecentProductItem }
         return if (hasHistory) WHEN_HAS_HISTORY_PRODUCT_POSITION else DEFAULT_PRODUCT_POSITION
     }
 

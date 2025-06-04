@@ -25,16 +25,14 @@ data class CartUiState(
     ): CartUiState {
         val shoppingCart = ShoppingCart(cartId, productState.item, productState.cartQuantity)
         val cartState = CartState(shoppingCart, true)
-        val mutableItems = items.toMutableList()
-        mutableItems.add(cartState)
-        return copy(items = mutableItems)
+        return copy(items = items + cartState)
     }
 
     fun deleteCart(cartId: Long): CartUiState {
         val targetIndex = items.indexOfFirst { it.cartId == cartId }
-        val mutableItems = items.toMutableList()
-        mutableItems.removeAt(targetIndex)
-        return copy(items = mutableItems)
+        val frontItems = items.subList(0, targetIndex)
+        val backItems = items.subList(targetIndex + 1, items.size)
+        return copy(items = frontItems + backItems)
     }
 
     fun setAllItemsChecked(isChecked: Boolean): CartUiState {
@@ -63,7 +61,6 @@ data class CartUiState(
     ): CartUiState {
         val index = items.indexOfFirst { it.cartId == cartId }
         if (index == -1) return this
-
         val updatedItems = items.toMutableList()
         updatedItems[index] = transform(items[index])
         return copy(items = updatedItems)

@@ -22,10 +22,9 @@ data class ProductUiState(
 
     fun modifyUiState(newState: ProductState): ProductUiState {
         val targetIndex = targetIndex(newState.item.id)
-        val mutableItems = productItems.toMutableList()
-        mutableItems[targetIndex] = newState
-
-        return copy(productItems = mutableItems)
+        val frontItems = productItems.subList(0, targetIndex)
+        val backItems = productItems.subList(targetIndex + 1, productItems.size)
+        return copy(productItems = frontItems + newState + backItems)
     }
 
     fun modifyQuantity(carts: List<ShoppingCart>): ProductUiState {
