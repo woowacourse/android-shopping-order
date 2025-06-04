@@ -10,11 +10,13 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.view.ItemCounterListener
 
 class DetailViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
-) : ViewModel() {
+) : ViewModel(),
+    ItemCounterListener {
     private val _saveState = MutableLiveData<Unit>()
     val saveState: LiveData<Unit> = _saveState
 
@@ -73,6 +75,14 @@ class DetailViewModel(
         productRepository.loadLastViewedProduct(currentProductId) { product ->
             product?.let { _lastViewedProduct.postValue(it.toUiModel()) }
         }
+    }
+
+    override fun increase(product: ProductUiModel) {
+        increaseAmount()
+    }
+
+    override fun decrease(product: ProductUiModel) {
+        decreaseAmount()
     }
 
     companion object {

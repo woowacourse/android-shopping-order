@@ -11,7 +11,6 @@ import woowacourse.shopping.databinding.FragmentDetailBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.extension.getParcelableCompat
 import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.CartFragment
 
 class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {
@@ -33,20 +32,14 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
         val product = arguments.getParcelableCompat<ProductUiModel>(EXTRA_PRODUCT)
         product.let { viewModel.fetchProduct(it) }
 
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.vm = viewModel
-
         viewModel.fetchLastViewedProduct(product.id)
-
-        binding.detailItemCounter.listener =
-            object : ItemCounterListener {
-                override fun increase(product: ProductUiModel) = viewModel.increaseAmount()
-
-                override fun decrease(product: ProductUiModel) = viewModel.decreaseAmount()
-            }
     }
 
     private fun initObserver() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.vm = viewModel
+        binding.detailItemCounter.listener = viewModel
+
         viewModel.saveState.observe(viewLifecycleOwner) { saveState ->
             saveState?.let { navigateToCatalog() }
         }
