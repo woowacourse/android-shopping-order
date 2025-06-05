@@ -2,22 +2,14 @@ package woowacourse.shopping.feature.goods.adapter.history
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.databinding.ItemHistoryBinding
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.goods.adapter.GoodsClickListener
 
 class HistoryAdapter(
     private val goodsClickListener: GoodsClickListener,
-) : RecyclerView.Adapter<HistoryViewHolder>() {
-    private val items: MutableList<Cart> = mutableListOf()
-
-    fun setItems(newItems: List<Cart>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
-    }
-
+) : ListAdapter<Cart, HistoryViewHolder>(HistoryDiffUtil()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -31,8 +23,6 @@ class HistoryAdapter(
         holder: HistoryViewHolder,
         position: Int,
     ) {
-        holder.bind(items[position])
+        holder.bind(getItem(position))
     }
-
-    override fun getItemCount(): Int = items.size
 }
