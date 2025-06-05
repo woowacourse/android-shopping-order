@@ -1,0 +1,10 @@
+package woowacourse.shopping.presentation.view.order
+
+enum class OrderMessageEvent {
+    FETCH_CART_ITEMS_FAILURE,
+    DELETE_CART_ITEM_FAILURE,
+    PATCH_CART_PRODUCT_QUANTITY_FAILURE,
+    FIND_PRODUCT_QUANTITY_FAILURE,
+    FETCH_SUGGESTION_PRODUCT_FAILURE,
+    ORDER_CART_ITEMS_FAILURE,
+}

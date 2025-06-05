@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="orderViewModel"
+            type="woowacourse.shopping.presentation.view.order.OrderViewModel" />
+
+        <variable
+            name="suggestionViewModel"
+            type="woowacourse.shopping.presentation.view.order.suggestion.SuggestionViewModel" />
+
+        <variable
+            name="uiEvent"
+            type="woowacourse.shopping.presentation.view.order.OrderUiEventListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_cart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_55"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/toolbar_cart_title"
+            app:titleTextColor="@color/white" />
+
+        <TextView
+            android:id="@+id/text_view_suggestion_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/suggestion_screen_title"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/text_view_suggestion_description"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/text_view_suggestion_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/suggestion_screen_description"
+            android:textColor="@color/gray_55"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/recycler_view_suggestion"
+            app:layout_constraintTop_toBottomOf="@id/text_view_suggestion_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_suggestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_suggestion_description"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_suggestion" />
+
+        <include
+            android:id="@+id/view_order"
+            layout="@layout/view_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:isCheckedAll="@{orderViewModel.isCheckAll}"
+            app:isShowCheckBox="@{false}"
+            app:orderUiEvent="@{uiEvent}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:totalCount="@{orderViewModel.totalCount + suggestionViewModel.totalPurchaseProductQuantity}"
+            app:totalPrice="@{orderViewModel.totalPrice + suggestionViewModel.totalPurchaseProductPrice}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
