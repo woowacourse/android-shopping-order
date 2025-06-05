@@ -91,7 +91,8 @@ class GoodsViewModel(
             limit = PAGE_SIZE,
             offset = offset,
             onComplete = { goodsResponse ->
-                val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
+                val fetchedGoods =
+                    goodsResponse.content.map { it.toDomain() }
                 goods.addAll(fetchedGoods)
                 _isFullLoaded.postValue(goodsResponse.last)
                 _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
@@ -166,7 +167,10 @@ class GoodsViewModel(
                         _uiEvent.setValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_DELETE))
                     })
                 } else {
-                    updateCartItemQuantity(existing.id, cartItem.copy(quantity = existing.quantity - 1))
+                    updateCartItemQuantity(
+                        existing.id,
+                        cartItem.copy(quantity = existing.quantity - 1)
+                    )
                 }
             }
         }
@@ -190,8 +194,6 @@ class GoodsViewModel(
         })
     }
 
-    private fun getGoodsByGoodsResponse(response: GoodsResponse): List<Goods> =
-        response.content.map { it.toDomain() }
 
     companion object {
         private const val PAGE_SIZE = 20

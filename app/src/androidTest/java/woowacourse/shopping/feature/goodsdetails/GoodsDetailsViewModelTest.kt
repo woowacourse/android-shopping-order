@@ -209,7 +209,7 @@ class GoodsDetailsViewModelTest {
     }
 
     @Test
-    fun onClickMostRecentlyGoodsSection_클릭_이벤트_발생() {
+    fun handleClickMostRecentlyGoodsSection_클릭_이벤트_발생() {
         // Given
         val recentGoods = fixtureGoodsItem[2] // id=3인 fixture 상품
         fixtureGoodsRepository.loggingRecentGoods(recentGoods) { }
@@ -229,7 +229,7 @@ class GoodsDetailsViewModelTest {
             assertThat(setupLatch.await(3, TimeUnit.SECONDS)).isTrue()
 
             // When
-            viewModel.onClickMostRecentlyGoodsSection()
+            viewModel.handleClickMostRecentlyGoodsSection()
 
             // Then
             val clickEvent = viewModel.clickMostRecentlyGoodsEvent.getValue()

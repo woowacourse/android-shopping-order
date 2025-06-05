@@ -74,26 +74,26 @@ class GoodsDetailsViewModel(
                 cartRepository.updateQuantity(
                     cartUiModel.cartId,
                     CartQuantity(cartUiModel.cartQuantity + item.quantity),
-                    { onCartAdded(item.quantity) },
+                    { handleCartAdded(item.quantity) },
                     { _event.setValue(UiEvent.ShowToast(ToastMessageKey.FAIL_CART_UPDATE)) },
                 )
             } else {
                 cartRepository.addCartItem(
                     item.goods,
                     item.quantity,
-                    { onCartAdded(item.quantity) },
+                    { handleCartAdded(item.quantity) },
                     { _event.setValue(UiEvent.ShowToast(ToastMessageKey.FAIL_CART_ADD)) },
                 )
             }
         }
     }
 
-    private fun onCartAdded(quantity: Int) {
+    private fun handleCartAdded(quantity: Int) {
         _event.setValue(UiEvent.CartAddSuccess(quantity))
         _cartItem.value = _cartItem.value?.copy(quantity = 1)
     }
 
-    fun onClickMostRecentlyGoodsSection() {
+    fun handleClickMostRecentlyGoodsSection() {
         _event.setValue(UiEvent.ClickMostRecentlyViewed)
     }
 
