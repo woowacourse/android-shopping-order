@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.fragment.app.commit
 import com.google.android.material.snackbar.Snackbar
@@ -14,6 +13,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.CartActivity.OnClickHandler
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.payment.PaymentActivity
 
 class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
     private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
@@ -62,7 +62,10 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                         binding.cartCheckAllButtonText.visibility = View.GONE
                     }
 
-                    is CartRecommendFragment -> viewModel.orderProducts()
+                    is CartRecommendFragment -> {
+                        val intent = PaymentActivity.newIntent(this, viewModel.getSelectedProductIds().toLongArray())
+                        startActivity(intent)
+                    }
                 }
             }
     }
@@ -78,11 +81,6 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                     )
                 },
             )
-        }
-
-        viewModel.isOrdered.observe(this) {
-            Toast.makeText(this, getString(R.string.cart_order_success), Toast.LENGTH_SHORT).show()
-            finish()
         }
 
         viewModel.isError.observe(this) { errorMessage ->

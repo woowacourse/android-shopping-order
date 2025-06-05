@@ -19,7 +19,7 @@ data class Product(
             copy(quantity = 0)
         }
 
-    fun toggleSelection(): Product = copy(isSelected = !isSelected)
+    fun updateSelection(isSelected: Boolean = this.isSelected.not()): Product = copy(isSelected = isSelected)
 
     companion object {
         const val MINIMUM_QUANTITY = 0

@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
-import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
 
 data class Products(
     val products: List<Product>,
@@ -54,32 +53,27 @@ data class Products(
 
     fun getProductByProductId(productId: Long): Product? = products.find { it.productDetail.id == productId }
 
-    fun toggleSelectionByCartId(cartId: Long): Products =
+    fun updateSelectionByProductId(cartId: Long): Products =
         copy(
             products =
                 products.map { product ->
                     if (product.cartId == cartId) {
-                        product.toggleSelection()
+                        product.updateSelection()
                     } else {
                         product
                     }
                 },
         )
 
-    fun getSelectedCartProductsPrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
+    fun toggleAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
 
-    fun getSelectedCartRecommendProductsPrice(): Int =
-        products.filter { it.quantity > MINIMUM_QUANTITY }.sumOf { it.productDetail.price * it.quantity }
+    fun getSelectedProductsPrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
 
-    fun updateAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
+    fun getSelectedProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
 
-    fun getSelectedCartProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
+    fun getSelectedCartProductIds(): Set<Long> = products.filter { it.isSelected }.mapNotNull { it.cartId }.toSet()
 
-    fun getSelectedCartProductQuantity(): Int = products.filter { it.isSelected }.sumOf { it.quantity }
-
-    fun getSelectedCartRecommendProductIds(): List<Long> = products.filter { it.quantity > MINIMUM_QUANTITY }.map { it.productDetail.id }
-
-    fun getSelectedCartRecommendProductQuantity(): Int = products.filter { it.quantity > MINIMUM_QUANTITY }.sumOf { it.quantity }
+    fun getSelectedProductsQuantity(): Int = products.filter { it.isSelected }.sumOf { it.quantity }
 
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)

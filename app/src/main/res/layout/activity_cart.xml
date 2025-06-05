@@ -88,7 +88,7 @@
                 android:maxWidth="156dp"
                 android:onClick="@{()->onClickHandler.onOrderClick()}"
                 android:paddingHorizontal="16dp"
-                android:text="@{@string/cart_order(viewModel.cartProducts.getSelectedCartProductQuantity() + viewModel.recommendedProducts.getSelectedCartRecommendProductQuantity())}"
+                android:text="@{@string/cart_order(viewModel.cartProducts.getSelectedProductsQuantity() + viewModel.recommendedProducts.getSelectedProductsQuantity())}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
