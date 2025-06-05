@@ -95,21 +95,17 @@ class CartProductSelectionViewModel(
                 ?: return
 
         viewModelScope.launch {
+            val newQuantity = cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD
             val result =
                 repository.updateQuantity(
                     cartProductItem.cartProduct,
-                    cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD,
+                    newQuantity,
                 )
 
             result
                 .onSuccess {
                     loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-                    val currentSelected = selectedProducts.value.orEmpty()
-                    if (item in currentSelected) {
-                        val newItem =
-                            item.copy(quantity = cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD)
-                        selectedProducts.value = currentSelected - item + newItem
-                    }
+                    updateSelectedProducts(item, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -124,35 +120,45 @@ class CartProductSelectionViewModel(
         if (cartProductItem.cartProduct.quantity == 1) return
 
         viewModelScope.launch {
+            val newQuantity = cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD
             val result =
                 repository.updateQuantity(
                     cartProductItem.cartProduct,
-                    cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD,
+                    newQuantity,
                 )
 
             result
                 .onSuccess {
                     loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-                    val currentSelected = selectedProducts.value.orEmpty()
-                    if (item in currentSelected) {
-                        val newItem =
-                            item.copy(quantity = cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD)
-                        selectedProducts.value = currentSelected - item + newItem
-                    }
+                    updateSelectedProducts(item, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
     }
 
-    override fun onSelectItem(item: CartProduct) {
-        val isSelected = selectedProducts.value?.contains(item) == true
+    private fun updateSelectedProducts(
+        item: CartProduct,
+        newQuantity: Int,
+    ) {
         val currentSelected = selectedProducts.value.orEmpty()
-        if (currentSelected.contains(item)) {
-            selectedProducts.value = currentSelected - item
-        } else {
-            selectedProducts.value = currentSelected + item
+        if (item in currentSelected) {
+            val newItem =
+                item.copy(quantity = newQuantity)
+            selectedProducts.value = currentSelected - item + newItem
         }
+    }
+
+    override fun onSelectItem(item: CartProduct) {
+        val currentSelected = selectedProducts.value.orEmpty()
+        val isSelected = item in currentSelected
+
+        selectedProducts.value =
+            if (isSelected) {
+                currentSelected - item
+            } else {
+                currentSelected + item
+            }
         _products.value =
             products.value.orEmpty().map {
                 if (it.cartProduct.id == item.id) {
