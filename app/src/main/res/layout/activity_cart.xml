@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.ui.cart.CartViewModel" />
+
+        <variable
+            name="onClickHandler"
+            type="woowacourse.shopping.ui.cart.CartActivity.OnClickHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/cartContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/cartOrderInfoContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@color/gray_4" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cartOrderInfoContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_5"
+            android:minHeight="78dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <CheckBox
+                android:id="@+id/cartCheckAllButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="12dp"
+                android:checked="@{viewModel.cartProducts.allSelected}"
+                android:onClick="@{() -> viewModel.toggleAllCartProductsSelection()}"
+                app:isGone="@{viewModel.cartProducts.products.empty}"
+                app:layout_constraintBottom_toBottomOf="@id/cartOrderInfoContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/cartOrderInfoContainer"
+                tools:checked="true" />
+
+            <TextView
+                android:id="@+id/cartCheckAllButtonText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="-8dp"
+                android:text="@string/cart_select_all"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:isGone="@{viewModel.cartProducts.products.empty}"
+                app:layout_constraintBottom_toBottomOf="@id/cartCheckAllButton"
+                app:layout_constraintEnd_toEndOf="@id/cartCheckAllButton"
+                app:layout_constraintStart_toStartOf="@id/cartCheckAllButton" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="@{@string/cart_order_price(viewModel.totalOrderPrice)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/cartOrderButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/cartOrderButton"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="@color/mint_1"
+                android:gravity="center"
+                android:maxWidth="156dp"
+                android:onClick="@{()->onClickHandler.onOrderClick()}"
+                android:paddingHorizontal="16dp"
+                android:text="@{@string/cart_order(viewModel.totalQuantity)}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

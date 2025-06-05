@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="catalogProduct"
+            type="woowacourse.shopping.domain.model.Product" />
+
+        <variable
+            name="onClickHandler"
+            type="woowacourse.shopping.ui.catalog.adapter.product.ProductViewHolder.OnClickHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{()->onClickHandler.onProductClick(catalogProduct.productDetail.id)}"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/productPreviewImage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:imageUrl="@{catalogProduct.productDetail.imageUrl}"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/productNameText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="9dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{catalogProduct.productDetail.name}"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productPreviewImage"
+            tools:text="PET 보틀 - 정사각형 어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구어쩌구저쩌구" />
+
+        <TextView
+            android:id="@+id/productPriceText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="9dp"
+            android:text="@{@string/catalog_price(catalogProduct.productDetail.price)}"
+            android:textColor="@color/gray_5"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productNameText"
+            tools:text="10,000원" />
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:onClick="@{() -> onClickHandler.onIncreaseClick(catalogProduct.productDetail.id)}"
+            android:src="@drawable/ic_products_cart_add"
+            app:isGone="@{catalogProduct.quantity != 0}"
+            app:layout_constraintBottom_toBottomOf="@id/productPreviewImage"
+            app:layout_constraintEnd_toEndOf="@id/productPreviewImage" />
+
+        <woowacourse.shopping.ui.custom.CartCountView
+            android:id="@+id/productCartProductCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginBottom="8dp"
+            app:count="@{catalogProduct.quantity}"
+            app:isGone="@{catalogProduct.quantity == 0}"
+            app:layout_constraintBottom_toBottomOf="@id/productPreviewImage"
+            app:layout_constraintEnd_toEndOf="@id/productPreviewImage"
+            app:layout_constraintStart_toStartOf="@id/productPreviewImage" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
