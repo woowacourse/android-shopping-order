@@ -8,16 +8,16 @@ import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 
 object CartClient {
-    fun getRetrofitService(): CartService {
-        val okHttpClient =
-            OkHttpClient
-                .Builder()
-                .addInterceptor(HeaderInterceptor(BuildConfig.USER_ID, BuildConfig.USER_PASSWORD))
-                .build()
+    private val contentType = "application/json".toMediaType()
 
-        val contentType = "application/json".toMediaType()
+    private val okHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(HeaderInterceptor(BuildConfig.USER_ID, BuildConfig.USER_PASSWORD))
+            .build()
 
-        return Retrofit
+    private val _retrofitService: CartService by lazy {
+        Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
@@ -25,4 +25,6 @@ object CartClient {
             .build()
             .create(CartService::class.java)
     }
+
+    fun getRetrofitService(): CartService = _retrofitService
 }

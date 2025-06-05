@@ -7,17 +7,16 @@ import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 
 object ProductClient {
-    fun getRetrofitService(): ProductService {
-        val contentType = "application/json".toMediaType()
+    private val contentType = "application/json".toMediaType()
 
-        val retrofitService =
-            Retrofit
-                .Builder()
-                .baseUrl(BuildConfig.BASE_URL)
-                .addConverterFactory(Json.asConverterFactory(contentType))
-                .build()
-                .create(ProductService::class.java)
-
-        return retrofitService
+    private val _retrofitService: ProductService by lazy {
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .build()
+            .create(ProductService::class.java)
     }
+
+    fun getRetrofitService(): ProductService = _retrofitService
 }
