@@ -237,12 +237,9 @@ class CartViewModel(
         _carts.value = newMap
     }
 
-    fun updateCartItemCheck(
-        cartItem: CartItem,
-        changeCheckValue: Boolean,
-    ) {
+    fun toggleCartItemCheck(cartItem: CartItem) {
         updateCartItem(cartItem.id) { item ->
-            item.copy(isSelected = changeCheckValue)
+            item.copy(isSelected = !item.isSelected)
         }
     }
 
@@ -279,10 +276,7 @@ class CartViewModel(
         }, {})
     }
 
-    fun delete(
-        cartItem: CartItem,
-        cartAdaptorItemDelete: () -> Unit?,
-    ) {
+    fun delete(cartItem: CartItem) {
         cartRepository.delete(
             cartItem.id,
             {
@@ -296,7 +290,6 @@ class CartViewModel(
                 if (currentPage > newEndPage) {
                     _page.value = newEndPage
                 }
-                cartAdaptorItemDelete()
             },
             {},
         )

@@ -10,13 +10,4 @@ class CartViewHolder(
     fun bind(cartItem: CartItem) {
         binding.cartItem = cartItem
     }
-
-    interface CartClickListener {
-        fun onCartItemDelete(cartItem: CartItem)
-
-        fun onCartItemChecked(
-            cartItem: CartItem,
-            changeCheck: Boolean,
-        )
-    }
 }

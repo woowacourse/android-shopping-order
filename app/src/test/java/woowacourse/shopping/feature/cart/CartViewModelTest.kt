@@ -102,7 +102,7 @@ class CartViewModelTest {
     fun `아이템 체크 상태가 변경된다`() {
         viewModel.setTestCarts(listOf(sampleCartItem1))
 
-        viewModel.updateCartItemCheck(sampleCartItem1, false)
+        viewModel.toggleCartItemCheck(sampleCartItem1)
 
         assertThat(
             viewModel.cartsList.value

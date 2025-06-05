@@ -12,11 +12,8 @@ import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
-import woowacourse.shopping.feature.cart.adapter.CartViewHolder
 
-class CartFragment :
-    Fragment(),
-    CartViewHolder.CartClickListener {
+class CartFragment : Fragment() {
     @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
@@ -27,7 +24,7 @@ class CartFragment :
 
     private val cartAdapter: CartAdapter by lazy {
         CartAdapter(
-            cartClickListener = this,
+            viewModel = viewModel,
             quantityChangeListener =
                 object : QuantityChangeListener {
                     override fun onIncrease(cartItem: CartItem) {
@@ -94,9 +91,6 @@ class CartFragment :
             requireActivity().finish()
         }
 
-        viewModel.removeItemEvent.observe(viewLifecycleOwner) { cartItem ->
-            onCartItemDelete(cartItem)
-        }
         binding.bottomBar.orderButton.setOnClickListener {
             (requireActivity() as CartActivity).navigateToRecommend()
         }
@@ -110,19 +104,6 @@ class CartFragment :
                 binding.rvCartItems.scrollToPosition(0)
             }
         }
-    }
-
-    override fun onCartItemDelete(cartItem: CartItem) {
-        viewModel.delete(cartItem) {
-            cartAdapter.removeItem(cartItem)
-        }
-    }
-
-    override fun onCartItemChecked(
-        cartItem: CartItem,
-        changeCheckValue: Boolean,
-    ) {
-        viewModel.updateCartItemCheck(cartItem, changeCheckValue)
     }
 
     override fun onDestroyView() {
