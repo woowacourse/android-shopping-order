@@ -1,0 +1,33 @@
+package woowacourse.shopping.data.cart.repository
+
+import woowacourse.shopping.domain.Pageable
+import woowacourse.shopping.domain.cart.CartItem
+
+interface CartRepository {
+    fun loadPageableCartItems(
+        page: Int,
+        size: Int,
+        onLoad: (Result<Pageable<CartItem>>) -> Unit,
+    )
+
+    fun loadCart(onLoad: (Result<List<CartItem>>) -> Unit)
+
+    fun addCartItem(
+        productId: Long,
+        quantity: Int,
+        onAdd: (Result<Long?>) -> Unit,
+    )
+
+    fun remove(
+        cartItemId: Long,
+        onRemove: (Result<Unit>) -> Unit,
+    )
+
+    fun updateCartItemQuantity(
+        cartItemId: Long,
+        quantity: Int,
+        onUpdate: (Result<Unit>) -> Unit,
+    )
+
+    fun cartItemsSize(onResult: (Result<Int>) -> Unit)
+}

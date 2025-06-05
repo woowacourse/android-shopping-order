@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.product.ProductsViewModel" />
+
+        <variable
+            name="adapter"
+            type="woowacourse.shopping.view.product.ProductsAdapter" />
+
+        <variable
+            name="onClickShoppingCartButton"
+            type="kotlin.jvm.functions.Function0" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/productsRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.product.ProductsActivity">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/productsToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_5"
+            android:gravity="center_vertical"
+            android:minHeight="?attr/actionBarSize"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="26dp"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/productsShoppingCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="22dp"
+                android:onClick="@{() -> onClickShoppingCartButton.invoke()}"
+                android:padding="12dp"
+                android:src="@drawable/ic_shopping_cart"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/productsShoppingCartSize"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/productsShoppingCartSize"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="22dp"
+                android:background="@drawable/background_shopping_cart_size"
+                android:gravity="center"
+                android:onClick="@{() -> onClickShoppingCartButton.invoke()}"
+                android:paddingVertical="5dp"
+                android:text="@{String.valueOf(viewModel.cartItemsSize)}"
+                android:textColor="@color/white"
+                android:textSize="14dp"
+                android:visibility="@{viewModel.cartItemsSize > 0 ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SpUsage"
+                tools:text="2" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/products"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"
+            android:visibility="@{viewModel.loading ? View.GONE: View.VISIBLE}"
+            app:adapter="@{adapter}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productsToolbar"
+            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            tools:listitem="@layout/item_product"
+            tools:spanCount="2" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"
+            android:visibility="@{viewModel.loading ? View.VISIBLE: View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productsToolbar">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:columnCount="2"
+                android:rowCount="5">
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+
+                <include layout="@layout/item_product_shimmer" />
+            </GridLayout>
+
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
