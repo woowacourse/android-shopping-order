@@ -11,6 +11,7 @@ import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
@@ -33,8 +34,8 @@ class CartViewModel(
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
 
-    private val _carts = MutableLiveData<List<Cart>>()
-    val carts: LiveData<List<Cart>> get() = _carts
+    private val _carts = MutableLiveData<List<CartGoodsItem>>()
+    val carts: LiveData<List<CartGoodsItem>> get() = _carts
 
     private val _totalCheckedItemsCount = MutableLiveData(0)
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
@@ -82,6 +83,12 @@ class CartViewModel(
         }
     }
 
+    fun changeAllChecked() {
+        val currentList = carts.value ?: emptyList()
+        val newState = currentList.map { it.copy(isChecked = !it.isChecked) }
+        _carts.value = newState
+    }
+
     fun updatePageButtonStates(
         first: Boolean,
         last: Boolean,
@@ -105,7 +112,7 @@ class CartViewModel(
             result
                 .onSuccess {
                     val updatedList =
-                        _carts.value?.filter { it.id != cart.id } ?: emptyList()
+                        _carts.value?.filter { it.cart.id != cart.id } ?: emptyList()
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
                 }.onFailure { error ->
@@ -120,8 +127,10 @@ class CartViewModel(
                 .onSuccess {
                     val updatedList =
                         _carts.value?.map {
-                            if (it.product.id == cart.product.id) {
-                                it.updateQuantity(it.quantity + 1)
+                            val updatedCart = it.cart
+                            if (updatedCart.product.id == cart.product.id) {
+                                updatedCart.updateQuantity(updatedCart.quantity + 1)
+                                it.copy(cart = updatedCart)
                             } else {
                                 it
                             }
@@ -146,8 +155,10 @@ class CartViewModel(
                     .onSuccess {
                         val updatedList =
                             _carts.value?.map {
-                                if (it.product.id == cart.product.id) {
-                                    it.updateQuantity(it.quantity - 1)
+                                val updatedCart = it.cart
+                                if (updatedCart.product.id == cart.product.id) {
+                                    updatedCart.updateQuantity(updatedCart.quantity - 1)
+                                    it.copy(cart = updatedCart)
                                 } else {
                                     it
                                 }
@@ -177,10 +188,12 @@ class CartViewModel(
                 onSuccess = { response ->
                     val cartList =
                         response.content.map {
-                            Cart(
-                                id = it.id,
-                                product = it.product.toDomain(),
-                                quantity = it.quantity,
+                            CartGoodsItem(
+                                Cart(
+                                    id = it.id,
+                                    product = it.product.toDomain(),
+                                    quantity = it.quantity,
+                                ),
                             )
                         }
                     _carts.postValue(cartList)

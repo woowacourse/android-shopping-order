@@ -1,16 +1,15 @@
 package woowacourse.shopping.feature.cart.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.domain.model.Cart
 
-class CartDiffUtil : DiffUtil.ItemCallback<Cart>() {
+class CartDiffUtil : DiffUtil.ItemCallback<CartGoodsItem>() {
     override fun areItemsTheSame(
-        oldItem: Cart,
-        newItem: Cart,
-    ): Boolean = oldItem.id == newItem.id
+        oldItem: CartGoodsItem,
+        newItem: CartGoodsItem,
+    ): Boolean = oldItem.cart.id == newItem.cart.id
 
     override fun areContentsTheSame(
-        oldItem: Cart,
-        newItem: Cart,
+        oldItem: CartGoodsItem,
+        newItem: CartGoodsItem,
     ): Boolean = oldItem == newItem
 }
