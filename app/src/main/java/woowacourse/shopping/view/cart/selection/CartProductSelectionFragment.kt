@@ -66,9 +66,7 @@ class CartProductSelectionFragment() : Fragment() {
                     R.id.fragment,
                     CartProductRecommendationFragment::class.java,
                     CartProductRecommendationFragment.newBundle(
-                        viewModel.selectedIds,
-                        viewModel.totalPrice.value,
-                        viewModel.totalCount.value,
+                        viewModel.selectedProducts,
                     ),
                 )
             }

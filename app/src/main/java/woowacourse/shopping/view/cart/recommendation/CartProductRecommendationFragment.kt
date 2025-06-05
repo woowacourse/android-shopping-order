@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendationBinding
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.view.cart.recommendation.adapter.RecommendationAdapter
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
@@ -71,10 +72,8 @@ class CartProductRecommendationFragment() : Fragment() {
     }
 
     private fun initInformation() {
-        val selectedIds = arguments?.getIntArray(KEY_SELECTED_IDS)?.toSet() ?: emptySet()
-        val totalPrice = arguments?.getInt(KEY_TOTAL_PRICE)
-        val totalCount = arguments?.getInt(KEY_TOTAL_COUNT)
-        viewModel.initShoppingCartInfo(selectedIds, totalPrice, totalCount)
+        val selectedProducts: List<CartProduct> = arguments?.getSerializable(KEY_SELECTED_IDS) as ArrayList<CartProduct>
+        viewModel.initShoppingCartInfo(selectedProducts)
     }
 
     private fun initBindings() {
@@ -106,18 +105,10 @@ class CartProductRecommendationFragment() : Fragment() {
 
     companion object {
         private const val KEY_SELECTED_IDS = "selectedIds"
-        private const val KEY_TOTAL_PRICE = "totalPrice"
-        private const val KEY_TOTAL_COUNT = "totalCount"
 
-        fun newBundle(
-            selectedIds: Set<Int>,
-            totalPrice: Int?,
-            totalCount: Int?,
-        ): Bundle =
+        fun newBundle(selectedCartProducts: Set<CartProduct>): Bundle =
             Bundle().apply {
-                putIntArray(KEY_SELECTED_IDS, selectedIds.toIntArray())
-                putSerializable(KEY_TOTAL_PRICE, totalPrice)
-                putSerializable(KEY_TOTAL_COUNT, totalCount)
+                putSerializable(KEY_SELECTED_IDS, ArrayList(selectedCartProducts))
             }
     }
 }

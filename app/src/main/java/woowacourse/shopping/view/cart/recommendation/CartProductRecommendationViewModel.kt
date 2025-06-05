@@ -29,7 +29,8 @@ class CartProductRecommendationViewModel(
     private val _recommendedProducts = MutableLiveData<List<ProductItem>>()
     val recommendedProducts: LiveData<List<ProductItem>> get() = _recommendedProducts
 
-    private val selectedCartIds: MutableSet<Int> = mutableSetOf()
+    private val _selectedProducts = MutableLiveData<List<CartProduct>>()
+    val selectedProducts: LiveData<List<CartProduct>> get() = _selectedProducts
 
     private val _totalPrice = MediatorLiveData<Int>()
     val totalPrice: LiveData<Int> get() = _totalPrice
@@ -54,24 +55,18 @@ class CartProductRecommendationViewModel(
         }
     }
 
-    fun initShoppingCartInfo(
-        selectedIds: Set<Int>,
-        totalPrice: Int?,
-        totalCount: Int?,
-    ) {
-        selectedCartIds.addAll(selectedIds)
-        _totalPrice.value = totalPrice ?: DEFAULT_PRICE
-        _totalCount.value = totalCount ?: DEFAULT_COUNT
-
+    fun initShoppingCartInfo(selectedCartProducts: List<CartProduct>) {
+        _selectedProducts.value = _selectedProducts.value.orEmpty().plus(selectedCartProducts)
         _totalPrice.removeSource(_recommendedProducts)
         _totalCount.removeSource(_recommendedProducts)
 
-        _totalPrice.addSource(_recommendedProducts) { list ->
+        _totalPrice.addSource(_selectedProducts) { list ->
             _totalPrice.value =
-                totalPrice?.plus(list.sumOf { it.product.price * it.quantity })
+                list.sumOf { it.product.price * it.quantity }
         }
-        _totalCount.addSource(_recommendedProducts) { list ->
-            _totalCount.value = totalCount?.plus(list.sumOf { it.quantity })
+        _totalCount.addSource(_selectedProducts) { list ->
+            _totalCount.value =
+                list.sumOf { it.quantity }
         }
     }
 
@@ -123,7 +118,14 @@ class CartProductRecommendationViewModel(
             result
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-                    selectedCartIds.add(cartProductId)
+                    _selectedProducts.value =
+                        _selectedProducts.value.orEmpty().plus(
+                            CartProduct(
+                                cartProductId,
+                                item,
+                                QUANTITY_TO_ADD,
+                            ),
+                        )
                     updateQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure {
                     Log.e("error", it.message.toString())
@@ -145,6 +147,10 @@ class CartProductRecommendationViewModel(
                 .onSuccess {
                     cartProducts.remove(cartProduct)
                     cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                    _selectedProducts.value =
+                        _selectedProducts.value.orEmpty().minus(cartProduct).plus(
+                            cartProduct.copy(quantity = newQuantity),
+                        )
                     updateQuantity(item, newQuantity)
                 }
                 .onFailure {
@@ -168,8 +174,12 @@ class CartProductRecommendationViewModel(
                     cartProducts.remove(cartProduct)
                     if (newQuantity > DEFAULT_COUNT) {
                         cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                        _selectedProducts.value =
+                            _selectedProducts.value.orEmpty().minus(cartProduct).plus(
+                                cartProduct.copy(quantity = newQuantity),
+                            )
                     } else {
-                        selectedCartIds.remove(cartProduct.id)
+                        _selectedProducts.value = _selectedProducts.value?.minus(cartProduct)
                     }
                     updateQuantity(item, newQuantity)
                 }
@@ -197,7 +207,11 @@ class CartProductRecommendationViewModel(
 
     fun finishOrder() {
         viewModelScope.launch {
-            val result = cartProductRepository.deleteProductsByIds(selectedCartIds)
+            val result =
+                cartProductRepository.deleteProductsByIds(
+                    _selectedProducts.value.orEmpty().map { it.id }
+                        .toSet(),
+                )
 
             result.onFailure {
                 Log.e("error", it.message.toString())
@@ -209,6 +223,5 @@ class CartProductRecommendationViewModel(
         private const val RECOMMEND_SIZE = 10
         private const val QUANTITY_TO_ADD = 1
         private const val DEFAULT_COUNT = 0
-        private const val DEFAULT_PRICE = 0
     }
 }

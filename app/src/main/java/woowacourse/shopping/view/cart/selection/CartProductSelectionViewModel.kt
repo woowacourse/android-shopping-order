@@ -15,19 +15,19 @@ class CartProductSelectionViewModel(
     private val repository: CartProductRepository,
 ) : ViewModel(),
     CartProductSelectionEventHandler {
-    private val selectedProducts = MutableLiveData<Set<CartProduct>>(emptySet())
-    val selectedIds get() = selectedProducts.value.orEmpty().map { it.id }.toSet()
+    private val _selectedProducts = MutableLiveData<Set<CartProduct>>(emptySet())
+    val selectedProducts get() = _selectedProducts.value.orEmpty()
 
     private val _products = MutableLiveData<List<CartProductItem>>()
     val products: LiveData<List<CartProductItem>> get() = _products
 
     val totalPrice: LiveData<Int> =
-        selectedProducts.map { products ->
+        _selectedProducts.map { products ->
             products.sumOf { it.totalPrice }
         }
 
     val totalCount: LiveData<Int> =
-        selectedProducts.map { products ->
+        _selectedProducts.map { products ->
             products.sumOf { it.quantity }
         }
 
@@ -37,7 +37,7 @@ class CartProductSelectionViewModel(
         }
 
     val canOrder: LiveData<Boolean> =
-        selectedProducts.map { products ->
+        _selectedProducts.map { products ->
             products.isNotEmpty()
         }
 
@@ -79,9 +79,9 @@ class CartProductSelectionViewModel(
                     } else {
                         loadPage(currentPage)
                     }
-                    val currentSelected = selectedProducts.value.orEmpty()
+                    val currentSelected = _selectedProducts.value.orEmpty()
                     if (item in currentSelected) {
-                        selectedProducts.value = currentSelected - item
+                        _selectedProducts.value = currentSelected - item
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
@@ -141,19 +141,19 @@ class CartProductSelectionViewModel(
         item: CartProduct,
         newQuantity: Int,
     ) {
-        val currentSelected = selectedProducts.value.orEmpty()
+        val currentSelected = _selectedProducts.value.orEmpty()
         if (item in currentSelected) {
             val newItem =
                 item.copy(quantity = newQuantity)
-            selectedProducts.value = currentSelected - item + newItem
+            _selectedProducts.value = currentSelected - item + newItem
         }
     }
 
     override fun onSelectItem(item: CartProduct) {
-        val currentSelected = selectedProducts.value.orEmpty()
+        val currentSelected = _selectedProducts.value.orEmpty()
         val isSelected = item in currentSelected
 
-        selectedProducts.value =
+        _selectedProducts.value =
             if (isSelected) {
                 currentSelected - item
             } else {
@@ -171,13 +171,13 @@ class CartProductSelectionViewModel(
 
     override fun onSelectAllItems() {
         val currentProducts = _products.value.orEmpty()
-        val currentSelected = selectedProducts.value.orEmpty()
+        val currentSelected = _selectedProducts.value.orEmpty()
         val isAllSelected = isSelectedAll.value == true
         if (isAllSelected == true) {
-            selectedProducts.value =
+            _selectedProducts.value =
                 currentSelected - currentProducts.map { it.cartProduct }.toSet()
         } else {
-            selectedProducts.value =
+            _selectedProducts.value =
                 currentSelected + currentProducts.map { it.cartProduct }.toSet()
         }
         val updatedProducts = currentProducts.map { it.copy(isSelected = !isAllSelected) }
@@ -195,7 +195,7 @@ class CartProductSelectionViewModel(
                     _products.value =
                         (
                             pagedResult.items.map {
-                                CartProductItem(it, it in selectedProducts.value.orEmpty())
+                                CartProductItem(it, it in _selectedProducts.value.orEmpty())
                             }
                         )
                     val hasNext = pagedResult.hasNext
