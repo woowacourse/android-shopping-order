@@ -4,10 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.view.common.MutableSingleLiveData
+import woowacourse.shopping.view.common.SingleLiveData
+import woowacourse.shopping.view.product.ProductsEvent
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 class ShoppingCartViewModel(
@@ -30,6 +34,15 @@ class ShoppingCartViewModel(
 
     private var isApiLoading: Boolean = false
 
+    private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ProductsEvent> get() = _event
+
+    private val handler =
+        CoroutineExceptionHandler { _, exception ->
+            _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
+            _isLoading.value = false
+        }
+
     init {
         loadShoppingCart()
     }
@@ -43,8 +56,8 @@ class ShoppingCartViewModel(
         val page = this.page - 1
         val size = COUNT_PER_PAGE
 
-        viewModelScope.launch {
-            val shoppingCarts = shoppingCartRepository.load(page, size)
+        viewModelScope.launch(handler) {
+            val shoppingCarts = shoppingCartRepository.load(page, size).getOrThrow()
             loadable = !shoppingCarts.last
 
             loadShoppingCartItems(
@@ -65,7 +78,7 @@ class ShoppingCartViewModel(
 
     private suspend fun updateShoppingCartItems() {
         val shoppingCarts =
-            shoppingCartRepository.load(0, COUNT_PER_PAGE * page).shoppingCartItems
+            shoppingCartRepository.load(0, COUNT_PER_PAGE * page).getOrThrow().shoppingCartItems
         _shoppingCart.value =
             _shoppingCart.value?.mapNotNull { item ->
                 shoppingCarts.find { it.id == item.shoppingCartProduct.id }
@@ -81,8 +94,9 @@ class ShoppingCartViewModel(
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         if (isApiLoading) return
         isApiLoading = true
-        viewModelScope.launch {
+        viewModelScope.launch(handler) {
             shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id)
+                .getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.postValue(true)
             isApiLoading = false
@@ -96,7 +110,7 @@ class ShoppingCartViewModel(
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
                 shoppingCartProductItem.shoppingCartProduct.quantity - 1,
-            )
+            ).getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
             isApiLoading = false
@@ -110,7 +124,7 @@ class ShoppingCartViewModel(
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
                 shoppingCartProductItem.shoppingCartProduct.quantity + 1,
-            )
+            ).getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
             isApiLoading = false

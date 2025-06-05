@@ -42,10 +42,11 @@ class ProductsViewModel(
 
     private var isApiLoading: Boolean = false
 
-    val handler =
+    private val handler =
         CoroutineExceptionHandler { _, exception ->
             _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
             _isLoading.value = false
+            isApiLoading = false
         }
 
     init {
@@ -67,7 +68,7 @@ class ProductsViewModel(
         size: Int = LOAD_PRODUCTS_SIZE,
     ) {
         viewModelScope.launch(handler) {
-            productsDomain = productsRepository.load(offset, size)
+            productsDomain = productsRepository.load(offset, size).getOrThrow()
             loadable = productsDomain.size == LOAD_PRODUCTS_SIZE
             updateProductsShoppingCartQuantity()
             _isLoading.value = false
@@ -75,8 +76,8 @@ class ProductsViewModel(
     }
 
     private fun updateShoppingCartQuantity() {
-        viewModelScope.launch {
-            _shoppingCartQuantity.value = shoppingCartRepository.fetchAllQuantity()
+        viewModelScope.launch(handler) {
+            _shoppingCartQuantity.value = shoppingCartRepository.fetchAllQuantity().getOrThrow()
         }
     }
 
@@ -112,12 +113,12 @@ class ProductsViewModel(
         viewModelScope.launch(handler) {
             val uploaded =
                 if (productItem.shoppingCartId == null) {
-                    shoppingCartRepository.add(productItem.product, quantity)
+                    shoppingCartRepository.add(productItem.product, quantity).getOrThrow()
                 } else {
                     shoppingCartRepository.updateQuantity(
                         productItem.shoppingCartId,
                         quantity,
-                    )
+                    ).getOrThrow()
                 }
 
             _productsUi.value =
@@ -136,7 +137,7 @@ class ProductsViewModel(
     }
 
     private suspend fun updateProductsShoppingCartQuantity() {
-        shoppingCartDomain = shoppingCartRepository.load().shoppingCartItems
+        shoppingCartDomain = shoppingCartRepository.load().getOrThrow().shoppingCartItems
         val productUi =
             productsDomain.map { product ->
                 val target = shoppingCartDomain.find { it.product.id == product.id }

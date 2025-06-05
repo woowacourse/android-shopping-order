@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
@@ -43,9 +44,14 @@ class ProductDetailViewModel(
     private val _recentProductBoxVisible: MutableLiveData<Boolean> = MutableLiveData(false)
     val recentProductBoxVisible: LiveData<Boolean> get() = _recentProductBoxVisible
 
+    private val handler =
+        CoroutineExceptionHandler { _, exception ->
+            _event.postValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
+        }
+
     init {
-        viewModelScope.launch {
-            val product = productsRepository.getProduct(productId)
+        viewModelScope.launch(handler) {
+            val product = productsRepository.getProduct(productId).getOrThrow()
             if (product == null) {
                 _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
             } else {
@@ -63,7 +69,7 @@ class ProductDetailViewModel(
 
     private fun updateRecentWatchingProduct() {
         viewModelScope.launch {
-            val recentProducts = productsRepository.getRecentWatchingProducts(1)
+            val recentProducts = productsRepository.getRecentWatchingProducts(1).getOrThrow()
             if (recentProducts.isEmpty()) return@launch updateRecentWatching()
             val isLastWatchingProduct =
                 recentProducts.first() == product.value?.product
@@ -87,20 +93,20 @@ class ProductDetailViewModel(
         val product = requireNotNull(product.value) { "product.value가 null입니다." }
         val totalQuantity = quantity.value?.plus(product.selectedQuantity) ?: 0
         if (product.shoppingCartId == null) {
-            viewModelScope.launch {
+            viewModelScope.launch(handler) {
                 shoppingCartRepository.add(
                     product.product,
                     totalQuantity,
-                )
+                ).getOrThrow()
                 _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
             }
             return
         }
-        viewModelScope.launch {
+        viewModelScope.launch(handler) {
             shoppingCartRepository.updateQuantity(
                 product.shoppingCartId,
                 totalQuantity,
-            )
+            ).getOrThrow()
             _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
         }
     }

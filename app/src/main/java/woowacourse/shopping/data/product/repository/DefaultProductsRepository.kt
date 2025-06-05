@@ -12,33 +12,43 @@ class DefaultProductsRepository(
     override suspend fun load(
         page: Int,
         size: Int,
-    ): List<Product> {
+    ): Result<List<Product>> {
         val result = productService.getProducts(page = page, size = size)
-        return result.products.map { it.toDomain() }
+        return runCatching {
+            result.products.map { it.toDomain() }
+        }
     }
 
-    override suspend fun getRecentWatchingProducts(size: Int): List<Product> {
+    override suspend fun getRecentWatchingProducts(size: Int): Result<List<Product>> {
         val result = recentWatchingDao.getRecentWatchingProducts(size)
-        return result.map { it.product }
+        return runCatching {
+            result.map { it.product }
+        }
     }
 
-    override suspend fun getRecentRecommendWatchingProducts(size: Int): List<Product> {
+    override suspend fun getRecentRecommendWatchingProducts(size: Int): Result<List<Product>> {
         val result = recentWatchingDao.getRecentRecommendWatchingProducts(size)
-        return result.map { it.product }
+        return runCatching {
+            result.map { it.product }
+        }
     }
 
-    override suspend fun updateRecentWatchingProduct(product: Product) {
-        recentWatchingDao.insertRecentWatching(
-            RecentWatchingEntity(
-                productId = product.id,
-                product = product,
-            ),
-        )
+    override suspend fun updateRecentWatchingProduct(product: Product): Result<Unit> {
+        return runCatching {
+            recentWatchingDao.insertRecentWatching(
+                RecentWatchingEntity(
+                    productId = product.id,
+                    product = product,
+                ),
+            )
+        }
     }
 
-    override suspend fun getProduct(productId: Long): Product? {
+    override suspend fun getProduct(productId: Long): Result<Product?> {
         val result = productService.getProductDetail(productId)
-        return result.toDomain()
+        return runCatching {
+            result.toDomain()
+        }
     }
 
     companion object {

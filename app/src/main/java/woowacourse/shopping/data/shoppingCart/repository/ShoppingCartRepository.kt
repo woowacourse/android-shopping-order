@@ -8,19 +8,19 @@ interface ShoppingCartRepository {
     suspend fun load(
         page: Int = 0,
         size: Int = Integer.MAX_VALUE,
-    ): ShoppingCarts
+    ): Result<ShoppingCarts>
 
     suspend fun add(
         product: Product,
         quantity: Int,
-    ): ShoppingCartProduct
+    ): Result<ShoppingCartProduct>
 
     suspend fun updateQuantity(
         shoppingCartId: Long,
         quantity: Int,
-    ): ShoppingCartProduct?
+    ): Result<ShoppingCartProduct?>
 
-    suspend fun remove(shoppingCartId: Long)
+    suspend fun remove(shoppingCartId: Long): Result<Unit>
 
-    suspend fun fetchAllQuantity(): Int
+    suspend fun fetchAllQuantity(): Result<Int>
 }
