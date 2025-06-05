@@ -18,8 +18,8 @@ import woowacourse.shopping.view.product.ProductsEvent
 import woowacourse.shopping.view.product.ProductsItem
 
 class ProductsViewModel(
-    private val productsRepository: ProductsRepository = DefaultProductsRepository.Companion.get(),
-    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.Companion.get(),
+    private val productsRepository: ProductsRepository = DefaultProductsRepository.get(),
+    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
 ) : ViewModel() {
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
