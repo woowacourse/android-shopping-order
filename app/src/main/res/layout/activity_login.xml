@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.feature.login.LoginViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".feature.login.LoginActivity">
+
+        <TextView
+            android:id="@+id/tv_login_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:text="@string/login_form_head"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_login_id"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:hint="@string/login_form_id"
+            android:autofillHints="username"
+            android:text="@={viewModel.id}"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_login_title"
+            tools:ignore="LabelFor" />
+
+        <EditText
+            android:id="@+id/et_login_pw"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:inputType="textPassword"
+            android:hint="@string/login_form_pw"
+            android:autofillHints="password"
+            android:text="@={viewModel.pw}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_login_id"
+            tools:ignore="LabelFor" />
+
+        <Button
+            android:id="@+id/btn_login_submit"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_submit_button_text"
+            android:onClick="@{() -> viewModel.login()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_login_pw" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
