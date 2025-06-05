@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0-RC"
+    alias(libs.plugins.kotlinSerializaitons)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
