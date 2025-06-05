@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.binding
+package woowacourse.shopping.presentation.common.binding
 
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter

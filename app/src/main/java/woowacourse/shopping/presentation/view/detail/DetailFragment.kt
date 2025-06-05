@@ -6,7 +6,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentDetailBinding
-import woowacourse.shopping.presentation.base.BaseFragment
+import woowacourse.shopping.presentation.common.base.BaseFragment
 import woowacourse.shopping.presentation.view.detail.event.DetailMessageEvent
 
 class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {

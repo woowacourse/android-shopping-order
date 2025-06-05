@@ -7,7 +7,7 @@
 
         <variable
             name="recentProduct"
-            type="woowacourse.shopping.presentation.model.ProductUiModel" />
+            type="woowacourse.shopping.presentation.common.model.ProductUiModel" />
 
         <variable
             name="eventListener"

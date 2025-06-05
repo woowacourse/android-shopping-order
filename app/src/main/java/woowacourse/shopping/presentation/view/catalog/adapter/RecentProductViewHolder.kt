@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemRecentProductBinding
-import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.common.model.ProductUiModel
 
 class RecentProductViewHolder private constructor(
     private val binding: ItemRecentProductBinding,

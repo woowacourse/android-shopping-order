@@ -13,10 +13,10 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.presentation.model.SuggestionProductUiModel
-import woowacourse.shopping.presentation.model.toSuggestionUiModel
-import woowacourse.shopping.presentation.util.MutableSingleLiveData
-import woowacourse.shopping.presentation.util.SingleLiveData
+import woowacourse.shopping.presentation.common.model.SuggestionProductUiModel
+import woowacourse.shopping.presentation.common.model.toSuggestionUiModel
+import woowacourse.shopping.presentation.common.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.common.util.SingleLiveData
 import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionMessageEvent
 
 class SuggestionViewModel(

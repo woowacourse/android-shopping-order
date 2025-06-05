@@ -4,9 +4,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.presentation.model.CatalogItem
-import woowacourse.shopping.presentation.model.CatalogItem.CatalogType
-import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
+import woowacourse.shopping.presentation.common.model.CatalogItem
+import woowacourse.shopping.presentation.common.model.CatalogItem.CatalogType
+import woowacourse.shopping.presentation.common.ui.layout.QuantityChangeListener
 
 class CatalogAdapter(
     private val eventListener: CatalogEventListener,

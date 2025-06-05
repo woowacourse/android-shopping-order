@@ -2,8 +2,8 @@ package woowacourse.shopping.presentation.view.order.suggestion.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.presentation.model.SuggestionProductUiModel
-import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
+import woowacourse.shopping.presentation.common.model.SuggestionProductUiModel
+import woowacourse.shopping.presentation.common.ui.layout.QuantityChangeListener
 
 class SuggestionAdapter(
     private val eventListener: SuggestionEventListener,

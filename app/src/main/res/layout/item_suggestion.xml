@@ -9,7 +9,7 @@
 
         <variable
             name="product"
-            type="woowacourse.shopping.presentation.model.SuggestionProductUiModel" />
+            type="woowacourse.shopping.presentation.common.model.SuggestionProductUiModel" />
 
         <variable
             name="adapterPosition"

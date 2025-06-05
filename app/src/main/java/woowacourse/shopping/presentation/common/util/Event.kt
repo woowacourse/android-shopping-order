@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.util
+package woowacourse.shopping.presentation.common.util
 
 class Event<out T>(
     private val content: T,

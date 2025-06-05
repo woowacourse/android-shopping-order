@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="woowacourse.shopping.presentation.model.FetchPageDirection" />
+        <import type="woowacourse.shopping.presentation.common.model.FetchPageDirection" />
 
         <variable
             name="vm"

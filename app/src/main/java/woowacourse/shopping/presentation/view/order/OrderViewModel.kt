@@ -13,11 +13,11 @@ import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.presentation.model.CartProductUiModel
-import woowacourse.shopping.presentation.model.FetchPageDirection
-import woowacourse.shopping.presentation.model.toCartItemUiModel
-import woowacourse.shopping.presentation.util.MutableSingleLiveData
-import woowacourse.shopping.presentation.util.SingleLiveData
+import woowacourse.shopping.presentation.common.model.CartProductUiModel
+import woowacourse.shopping.presentation.common.model.FetchPageDirection
+import woowacourse.shopping.presentation.common.model.toCartItemUiModel
+import woowacourse.shopping.presentation.common.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.common.util.SingleLiveData
 import woowacourse.shopping.presentation.view.order.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.cart.event.CartMessageEvent
 import woowacourse.shopping.presentation.view.order.suggestion.adapter.SuggestionAdapter

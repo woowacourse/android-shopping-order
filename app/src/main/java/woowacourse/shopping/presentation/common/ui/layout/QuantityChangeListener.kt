@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.ui.layout
+package woowacourse.shopping.presentation.common.ui.layout
 
 interface QuantityChangeListener {
     fun increaseQuantity(productId: Long)
