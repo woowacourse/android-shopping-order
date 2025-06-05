@@ -55,7 +55,8 @@ class ShoppingCartViewModel(
 
     private var loadable: Boolean = false
 
-    private var isApiLoading: Boolean = false
+    private val _isSingleShoppingCartLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSingleShoppingCartLoading: LiveData<Boolean> get() = _isSingleShoppingCartLoading
 
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
@@ -118,20 +119,20 @@ class ShoppingCartViewModel(
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleShoppingCartLoading.value ?: false) return
+        _isSingleShoppingCartLoading.value = true
         viewModelScope.launch(handler) {
             shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id)
                 .getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.postValue(true)
-            isApiLoading = false
+            _isSingleShoppingCartLoading.value = false
         }
     }
 
     fun decreaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleShoppingCartLoading.value ?: false) return
+        _isSingleShoppingCartLoading.value = true
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
@@ -139,13 +140,13 @@ class ShoppingCartViewModel(
             ).getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
-            isApiLoading = false
+            _isSingleShoppingCartLoading.value = false
         }
     }
 
     fun increaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleShoppingCartLoading.value ?: false) return
+        _isSingleShoppingCartLoading.value = true
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
@@ -153,7 +154,7 @@ class ShoppingCartViewModel(
             ).getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
-            isApiLoading = false
+            _isSingleShoppingCartLoading.value = false
         }
     }
 

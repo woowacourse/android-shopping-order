@@ -40,13 +40,14 @@ class ProductsViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private var isApiLoading: Boolean = false
+    private val _isSingleProductLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSingleProductLoading: LiveData<Boolean> get() = _isSingleProductLoading
 
     private val handler =
         CoroutineExceptionHandler { _, exception ->
             _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
             _isLoading.value = false
-            isApiLoading = false
+            _isSingleProductLoading.value = false
         }
 
     init {
@@ -85,12 +86,12 @@ class ProductsViewModel(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleProductLoading.value ?: false) return
+        _isSingleProductLoading.value = true
         viewModelScope.launch(handler) {
             updateProductQuantity(productItem, quantity + 1)
             _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
-            isApiLoading = false
+            _isSingleProductLoading.value = false
         }
     }
 
@@ -98,12 +99,12 @@ class ProductsViewModel(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleProductLoading.value ?: false) return
+        _isSingleProductLoading.value = true
         viewModelScope.launch(handler) {
             updateProductQuantity(productItem, quantity - 1)
             _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
-            isApiLoading = false
+            _isSingleProductLoading.value = false
         }
     }
 
