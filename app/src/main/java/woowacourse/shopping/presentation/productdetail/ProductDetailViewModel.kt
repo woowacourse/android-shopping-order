@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.productdetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -72,21 +74,20 @@ class ProductDetailViewModel(
     }
 
     private fun insertCurrentProductToRecent(product: Product) {
-        recentProductRepository.insertRecentProduct(product) { result ->
-            result.onFailure {
-                _toastMessage.postValue(R.string.product_detail_toast_most_recent_insert_fail)
-            }
+        viewModelScope.launch {
+            val result = recentProductRepository.insertRecentProduct(product)
+            result.onFailure { _toastMessage.postValue(R.string.product_detail_toast_most_recent_insert_fail) }
         }
     }
 
     private fun handleRecentProduct(currentProductId: Long) {
-        recentProductRepository.getMostRecentProduct { result ->
-            result
-                .onSuccess { recentProduct ->
-                    _recentProduct.postValue(recentProduct)
+        viewModelScope.launch {
+            val recentProduct = recentProductRepository.getMostRecentProduct()
+            recentProduct
+                .onSuccess {
+                    _recentProduct.postValue(it)
 
-                    val isSame =
-                        recentProduct == null || recentProduct.productId == currentProductId
+                    val isSame = (it == null || it.productId == currentProductId)
                     _isRecentProduct.postValue(isSame)
                 }.onFailure {
                     _toastMessage.postValue(R.string.product_detail_toast_most_recent_load_fail)

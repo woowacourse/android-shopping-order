@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.recommend
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -42,9 +44,10 @@ class RecommendViewModel(
     }
 
     private fun fetchData() {
-        recentProductRepository.getMostRecentProduct { result ->
-            result.onSuccess { recentProduct ->
-                recentCategory = recentProduct?.category ?: ""
+        viewModelScope.launch {
+            val recentProduct = recentProductRepository.getMostRecentProduct()
+            recentProduct.onSuccess {
+                recentCategory = it?.category ?: ""
                 productRepository.fetchPagingProducts(category = recentCategory) { result ->
                     result
                         .onSuccess { products ->

@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.product
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -77,13 +79,11 @@ class ProductViewModel(
                 }
         }
 
-        recentProductRepository.getRecentProducts { result ->
-            result
-                .onSuccess { products ->
-                    _recentProducts.postValue(products)
-                }.onFailure {
-                    _toastMessage.postValue(R.string.product_toast_load_failure)
-                }
+        viewModelScope.launch {
+            val recentProducts = recentProductRepository.getRecentProducts()
+            recentProducts
+                .onSuccess { _recentProducts.postValue(it) }
+                .onFailure { _toastMessage.postValue(R.string.product_toast_load_failure) }
         }
     }
 
