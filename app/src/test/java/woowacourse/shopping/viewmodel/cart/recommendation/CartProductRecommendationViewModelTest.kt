@@ -11,7 +11,6 @@ import io.mockk.invoke
 import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -127,87 +126,84 @@ class CartProductRecommendationViewModelTest {
     }
 
     @Test
-    fun `장바구니에 상품을 추가한다`() =
-        runTest {
-            // given
-            val id = slot<Int>()
-            coEvery { cartProductRepository.insert(capture(id), any()) } returns
-                Result.success(
-                    10102,
-                )
+    fun `장바구니에 상품을 추가한다`() {
+        // given
+        val id = slot<Int>()
+        coEvery { cartProductRepository.insert(capture(id), any()) } returns
+            Result.success(
+                10102,
+            )
 
-            val beforePrice = viewModel.totalPrice.getOrAwaitValue()
-            val beforeCount = viewModel.totalCount.getOrAwaitValue()
+        val beforePrice = viewModel.totalPrice.getOrAwaitValue()
+        val beforeCount = viewModel.totalCount.getOrAwaitValue()
 
-            // when
-            viewModel.onAddClick(mockProduct.copy(id = 2))
-            val actualPrice = viewModel.totalPrice.getOrAwaitValue()
-            val actualCount = viewModel.totalCount.getOrAwaitValue()
+        // when
+        viewModel.onAddClick(mockProduct.copy(id = 2))
+        val actualPrice = viewModel.totalPrice.getOrAwaitValue()
+        val actualCount = viewModel.totalCount.getOrAwaitValue()
 
-            // then
-            coVerify { cartProductRepository.insert(any(), any()) }
+        // then
+        coVerify { cartProductRepository.insert(any(), any()) }
 
-            id.captured shouldBe 2
-            actualPrice shouldBeGreaterThan beforePrice
-            actualCount shouldBeGreaterThan beforeCount
-        }
-
-    @Test
-    fun `장바구니에 추가한 상품의 개수를 증가한다`() =
-        runTest {
-            // given
-            coEvery { cartProductRepository.insert(any(), any()) } returns Result.success(10102)
-            viewModel.onAddClick(mockProduct.copy(id = 2))
-
-            coEvery { cartProductRepository.updateQuantity(any(), any()) } returns
-                Result.success(
-                    Unit,
-                )
-
-            val beforePrice = viewModel.totalPrice.getOrAwaitValue()
-            val beforeCount = viewModel.totalCount.getOrAwaitValue()
-
-            // when
-            viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
-            val actual =
-                viewModel.recommendedProducts.getOrAwaitValue()
-                    .first { it.product.id == 2 }.quantity
-            val actualPrice = viewModel.totalPrice.getOrAwaitValue()
-            val actualCount = viewModel.totalCount.getOrAwaitValue()
-
-            // then
-            actual shouldBe 2
-            actualPrice shouldBeGreaterThan beforePrice
-            actualCount shouldBeGreaterThan beforeCount
-        }
+        id.captured shouldBe 2
+        actualPrice shouldBeGreaterThan beforePrice
+        actualCount shouldBeGreaterThan beforeCount
+    }
 
     @Test
-    fun `장바구니에 추가한 상품의 개수를 감소한다`() =
-        runTest {
-            // given
-            coEvery { cartProductRepository.insert(any(), any()) } returns Result.success(10102)
-            viewModel.onAddClick(mockProduct.copy(id = 2))
+    fun `장바구니에 추가한 상품의 개수를 증가한다`() {
+        // given
+        coEvery { cartProductRepository.insert(any(), any()) } returns Result.success(10102)
+        viewModel.onAddClick(mockProduct.copy(id = 2))
 
-            coEvery { cartProductRepository.updateQuantity(any(), any()) } returns
-                Result.success(
-                    Unit,
-                )
-            viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
+        coEvery { cartProductRepository.updateQuantity(any(), any()) } returns
+            Result.success(
+                Unit,
+            )
 
-            val beforePrice = viewModel.totalPrice.getOrAwaitValue()
-            val beforeCount = viewModel.totalCount.getOrAwaitValue()
+        val beforePrice = viewModel.totalPrice.getOrAwaitValue()
+        val beforeCount = viewModel.totalCount.getOrAwaitValue()
 
-            // when
-            viewModel.onQuantityDecreaseClick(mockProduct.copy(id = 2))
-            val actual =
-                viewModel.recommendedProducts.getOrAwaitValue()
-                    .first { it.product.id == 2 }.quantity
-            val actualPrice = viewModel.totalPrice.getOrAwaitValue()
-            val actualCount = viewModel.totalCount.getOrAwaitValue()
+        // when
+        viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
+        val actual =
+            viewModel.recommendedProducts.getOrAwaitValue()
+                .first { it.product.id == 2 }.quantity
+        val actualPrice = viewModel.totalPrice.getOrAwaitValue()
+        val actualCount = viewModel.totalCount.getOrAwaitValue()
 
-            // then
-            actual shouldBe 1
-            actualPrice shouldBeLessThan beforePrice
-            actualCount shouldBeLessThan beforeCount
-        }
+        // then
+        actual shouldBe 2
+        actualPrice shouldBeGreaterThan beforePrice
+        actualCount shouldBeGreaterThan beforeCount
+    }
+
+    @Test
+    fun `장바구니에 추가한 상품의 개수를 감소한다`() {
+        // given
+        coEvery { cartProductRepository.insert(any(), any()) } returns Result.success(10102)
+        viewModel.onAddClick(mockProduct.copy(id = 2))
+
+        coEvery { cartProductRepository.updateQuantity(any(), any()) } returns
+            Result.success(
+                Unit,
+            )
+        viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
+
+        val beforePrice = viewModel.totalPrice.getOrAwaitValue()
+        val beforeCount = viewModel.totalCount.getOrAwaitValue()
+
+        // when
+        viewModel.onQuantityDecreaseClick(mockProduct.copy(id = 2))
+        val actual =
+            viewModel.recommendedProducts.getOrAwaitValue()
+                .first { it.product.id == 2 }.quantity
+        val actualPrice = viewModel.totalPrice.getOrAwaitValue()
+        val actualCount = viewModel.totalCount.getOrAwaitValue()
+
+        // then
+        actual shouldBe 1
+        actualPrice shouldBeLessThan beforePrice
+        actualCount shouldBeLessThan beforeCount
+    }
 }

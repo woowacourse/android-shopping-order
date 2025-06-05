@@ -1,7 +1,6 @@
 package woowacourse.shopping.viewmodel.product
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,14 +58,13 @@ class ProductDetailViewModelTest {
     }
 
     @Test
-    fun `장바구니 담기 클릭 시 이벤트가 발생한다`() =
-        runTest {
-            // when
-            viewModel.onAddToCartClick()
+    fun `장바구니 담기 클릭 시 이벤트가 발생한다`() {
+        // when
+        viewModel.onAddToCartClick()
 
-            // then
-            assertEquals(Unit, viewModel.addToCartEvent.getValue())
-        }
+        // then
+        assertEquals(Unit, viewModel.addToCartEvent.getValue())
+    }
 
     @Test
     fun `최근 본 상품 클릭 시 이벤트가 발생한다`() {
