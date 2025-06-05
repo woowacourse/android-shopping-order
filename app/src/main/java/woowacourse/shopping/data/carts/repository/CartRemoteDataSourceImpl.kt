@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -10,17 +11,24 @@ import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.AppInterceptor
 import woowacourse.shopping.data.util.RetrofitService
 import woowacourse.shopping.domain.model.Authorization
 
 class CartRemoteDataSourceImpl(
     baseUrl: String = BuildConfig.BASE_URL,
 ) : CartRemoteDataSource {
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(AppInterceptor())
+        .build()
+
+
     private val retrofitService: RetrofitService =
         Retrofit
             .Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
             .build()
             .create(RetrofitService::class.java)
 
@@ -35,7 +43,11 @@ class CartRemoteDataSourceImpl(
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
-            .requestCartProduct(page = page, size = size, authorization = "Basic " + Authorization.basicKey)
+            .requestCartProduct(
+                page = page,
+                size = size,
+                authorization = "Basic " + Authorization.basicKey
+            )
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(

@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.util
 
+import okhttp3.Interceptor
+import okhttp3.Response
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,7 +20,6 @@ import woowacourse.shopping.data.goods.dto.GoodsResponse
 interface RetrofitService {
     @GET("/products")
     fun requestProducts(
-        @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
         @Query("category") category: String? = null,
@@ -26,13 +27,11 @@ interface RetrofitService {
 
     @GET("/products/{id}")
     fun requestProductDetail(
-        @Header("accept") accept: String = "*/*",
         @Path("id") id: Long = 0,
     ): Call<Content>
 
     @GET("/cart-items")
     fun requestCartProduct(
-        @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
         @Query("sort") sort: String = "id,desc",
@@ -41,7 +40,6 @@ interface RetrofitService {
 
     @GET("/cart-items/counts")
     fun requestCartCounts(
-        @Header("accept") accept: String = "*/*",
         @Header("Authorization") authorization: String,
     ): Call<CartQuantity>
 
@@ -49,21 +47,27 @@ interface RetrofitService {
     fun updateCartCounts(
         @Path("id") cartId: Int,
         @Body requestBody: CartQuantity,
-        @Header("accept") accept: String = "*/*",
         @Header("Authorization") authorization: String,
     ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
     fun deleteCartItem(
         @Path("id") cartId: Int,
-        @Header("accept") accept: String = "*/*",
         @Header("Authorization") authorization: String,
     ): Call<Unit>
 
     @POST("/cart-items")
     fun addCartItem(
-        @Header("accept") accept: String = "*/*",
         @Body cartItem: CartItemRequest,
         @Header("Authorization") authorization: String,
     ): Call<Unit>
+}
+
+class AppInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val requestWithHeaders = chain.request().newBuilder()
+            .addHeader("accept", "*/*")
+            .build()
+        return chain.proceed(requestWithHeaders)
+    }
 }
