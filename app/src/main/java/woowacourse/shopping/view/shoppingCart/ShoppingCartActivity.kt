@@ -114,7 +114,7 @@ class ShoppingCartActivity :
         shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
         isSelected: Boolean,
     ) {
-        viewModel.selectShoppingCartProduct(shoppingCartProductItem, isSelected)
+        viewModel.toggleShoppingCartProduct(shoppingCartProductItem)
     }
 
     override fun onPlusShoppingCartClick(quantityObservable: QuantityObservable) {

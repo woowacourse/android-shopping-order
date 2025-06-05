@@ -164,15 +164,12 @@ class ShoppingCartViewModel(
         loadShoppingCart()
     }
 
-    fun selectShoppingCartProduct(
-        shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
-        selected: Boolean,
-    ) {
+    fun toggleShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         _shoppingCart.value =
             _shoppingCart.value?.map { item ->
                 if (item.shoppingCartProduct.id == shoppingCartProductItem.shoppingCartProduct.id) {
                     return@map shoppingCartProductItem.copy(
-                        isChecked = selected,
+                        isChecked = item.isChecked.not(),
                     )
                 }
                 return@map item
