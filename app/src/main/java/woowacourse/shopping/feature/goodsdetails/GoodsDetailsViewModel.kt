@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -50,23 +52,18 @@ class GoodsDetailsViewModel(
 
     suspend fun loadProductDetails(productId: Long) {
         val productContent = productRepository.requestProductDetails(productId = productId)
-        cartRepository.findCartByProductId(
-            productId = productContent.id,
-            onResult = { matchedCart ->
-                val cartProduct =
-                    CartProduct(
-                        id = matchedCart?.id ?: 0,
-                        product = productContent.toDomain(),
-                        quantity = matchedCart?.quantity ?: 1,
-                    )
+        viewModelScope.launch {
+            val matchedCart = cartRepository.findCartByProductId(productContent.id)
+            val cartProduct =
+                CartProduct(
+                    id = matchedCart?.id ?: 0,
+                    product = productContent.toDomain(),
+                    quantity = matchedCart?.quantity ?: 1,
+                )
 
-                _cartProduct.value = cartProduct
-                insertToHistory(cartProduct)
-            },
-            onError = {
-                _insertState.value = Event(State.Failure)
-            },
-        )
+            _cartProduct.value = cartProduct
+            insertToHistory(cartProduct)
+        }
     }
 
     fun increaseQuantity() {

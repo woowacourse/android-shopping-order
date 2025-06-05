@@ -12,11 +12,11 @@ import retrofit2.http.Query
 
 interface CartService {
     @GET("/cart-items")
-    fun requestCart(
+    suspend fun requestCart(
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
-    ): Call<CartResponse>
+    ): CartResponse
 
     @POST("/cart-items")
     fun addToCart(

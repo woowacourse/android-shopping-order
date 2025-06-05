@@ -1,7 +1,5 @@
 package woowacourse.shopping.feature.cart
 
-import android.os.Handler
-import android.os.Looper.getMainLooper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +13,7 @@ import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
+import kotlin.text.toInt
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -54,20 +53,26 @@ class CartViewModel(
 
     init {
         fetchTotalItemsCount()
-        loadCarts()
+        viewModelScope.launch {
+            loadCarts()
+        }
         loadProductsByCategory()
     }
 
     fun plusPage() {
         currentPage++
         _page.value = currentPage
-        loadCarts()
+        viewModelScope.launch {
+            loadCarts()
+        }
     }
 
     fun minusPage() {
         currentPage--
         _page.value = currentPage
-        loadCarts()
+        viewModelScope.launch {
+            loadCarts()
+        }
     }
 
     fun toggleCheck(cart: CartProduct) {
@@ -185,49 +190,36 @@ class CartViewModel(
         )
     }
 
-    private fun loadCarts() {
+    private suspend fun loadCarts() {
         _isLoading.postValue(true)
-        Handler(getMainLooper()).postDelayed({
-            cartRepository.fetchCart(
-                onSuccess = { response ->
-                    val cartList =
-                        response.content.map {
-                            CartProduct(
-                                id = it.id,
-                                product = it.product.toDomain(),
-                                quantity = it.quantity,
-                            )
-                        }
-                    _carts.postValue(cartList)
-                    _page.postValue(response.number)
-                    updatePageButtonStates(
-                        response.first,
-                        response.last,
-                        response.totalElements.toInt(),
-                    )
-                },
-                onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
-                page = currentPage,
-            )
-            _isLoading.postValue(false)
-        }, 1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
+        val response = cartRepository.fetchCart(page = currentPage)
+        val cartList =
+            response.content.map {
+                CartProduct(
+                    id = it.id,
+                    product = it.product.toDomain(),
+                    quantity = it.quantity,
+                )
+            }
+        _carts.postValue(cartList)
+        _page.postValue(response.number)
+        updatePageButtonStates(
+            response.first,
+            response.last,
+            response.totalElements.toInt(),
+        )
+        _isLoading.postValue(false)
     }
 
     fun loadProductsByCategory() {
         historyRepository.findLatest { latestProduct ->
-            cartRepository.fetchAllCart(
-                onSuccess = { cartResponse ->
-                    val cartProductIds = cartResponse.content.map { it.product.id }
+            viewModelScope.launch {
+                val response = cartRepository.fetchAllCart()
+                val cartProductIds = response.content.map { it.product.id }
 
-                    viewModelScope.launch {
-                        val recommendedList = productRepository.fetchRecommendProducts(latestProduct.id, cartProductIds)
-                        _recommendItems.value = recommendedList
-                    }
-                },
-                onError = {
-                    Log.e("loadProductsByCategory", "장바구니 요청 실패", it)
-                },
-            )
+                val recommendedList = productRepository.fetchRecommendProducts(latestProduct.id, cartProductIds)
+                _recommendItems.value = recommendedList
+            }
         }
     }
 
