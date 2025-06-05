@@ -10,8 +10,6 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendationBinding
@@ -84,11 +82,9 @@ class CartProductRecommendationFragment() : Fragment() {
         binding.lifecycleOwner = this
         binding.rvRecommendedProducts.adapter = adapter
         binding.btnOrder.setOnClickListener {
-            lifecycleScope.launch {
-                Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
-                viewModel.finishOrder()
-                requireActivity().finish()
-            }
+            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
+            viewModel.finishOrder()
+            requireActivity().finish()
         }
     }
 

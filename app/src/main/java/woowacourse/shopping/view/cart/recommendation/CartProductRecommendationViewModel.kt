@@ -195,11 +195,13 @@ class CartProductRecommendationViewModel(
         _recommendedProducts.value = updatedList
     }
 
-    suspend fun finishOrder() {
-        val result = cartProductRepository.deleteProductsByIds(selectedCartIds)
+    fun finishOrder() {
+        viewModelScope.launch {
+            val result = cartProductRepository.deleteProductsByIds(selectedCartIds)
 
-        result.onFailure {
-            Log.e("error", it.message.toString())
+            result.onFailure {
+                Log.e("error", it.message.toString())
+            }
         }
     }
 
