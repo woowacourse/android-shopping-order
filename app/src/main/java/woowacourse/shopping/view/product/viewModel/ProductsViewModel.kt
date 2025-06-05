@@ -87,8 +87,11 @@ class ProductsViewModel(
     ) {
         if (isApiLoading) return
         isApiLoading = true
-        updateProductQuantity(productItem, quantity + 1)
-        _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
+        viewModelScope.launch(handler) {
+            updateProductQuantity(productItem, quantity + 1)
+            _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
+            isApiLoading = false
+        }
     }
 
     fun minusProductToShoppingCart(
@@ -97,8 +100,11 @@ class ProductsViewModel(
     ) {
         if (isApiLoading) return
         isApiLoading = true
-        updateProductQuantity(productItem, quantity - 1)
-        _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
+        viewModelScope.launch(handler) {
+            updateProductQuantity(productItem, quantity - 1)
+            _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
+            isApiLoading = false
+        }
     }
 
     fun updateMoreProducts() {
@@ -106,36 +112,33 @@ class ProductsViewModel(
         updateProducts()
     }
 
-    private fun updateProductQuantity(
+    private suspend fun updateProductQuantity(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
-        viewModelScope.launch(handler) {
-            val uploaded =
-                if (productItem.shoppingCartId == null) {
-                    shoppingCartRepository.add(productItem.product, quantity).getOrThrow()
-                } else {
-                    shoppingCartRepository.updateQuantity(
-                        productItem.shoppingCartId,
-                        quantity,
-                    ).getOrThrow()
-                }
+        val uploaded =
+            if (productItem.shoppingCartId == null) {
+                shoppingCartRepository.add(productItem.product, quantity).getOrThrow()
+            } else {
+                shoppingCartRepository.updateQuantity(
+                    productItem.shoppingCartId,
+                    quantity,
+                ).getOrThrow()
+            }
 
-            _products.value =
-                products.value
-                    ?.filterIsInstance<ProductsItem.ProductItem>()
-                    ?.map { item ->
-                        if (item.product.id == productItem.product.id) {
-                            item.copy(
-                                selectedQuantity = uploaded?.quantity ?: 0,
-                                shoppingCartId = uploaded?.id,
-                            )
-                        } else {
-                            item
-                        }
+        _products.value =
+            products.value
+                ?.filterIsInstance<ProductsItem.ProductItem>()
+                ?.map { item ->
+                    if (item.product.id == productItem.product.id) {
+                        item.copy(
+                            selectedQuantity = uploaded?.quantity ?: 0,
+                            shoppingCartId = uploaded?.id,
+                        )
+                    } else {
+                        item
                     }
-            isApiLoading = false
-        }
+                }
     }
 
     private suspend fun updateProductsShoppingCartQuantity() {
