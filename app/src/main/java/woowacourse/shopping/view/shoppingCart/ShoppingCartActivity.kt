@@ -15,8 +15,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
-import woowacourse.shopping.view.shoppingCart.viewModel.OrderBarViewModel
-import woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
 
 class ShoppingCartActivity :
@@ -24,7 +22,6 @@ class ShoppingCartActivity :
     ShoppingCartProductAdapter.ShoppingCartListener,
     ShoppingCartClickListener {
     private val viewModel: ShoppingCartViewModel by viewModels()
-    private val orderBarViewModel: OrderBarViewModel by viewModels()
 
     private val binding: ActivityShoppingCartBinding by lazy {
         ActivityShoppingCartBinding.inflate(layoutInflater)
@@ -59,7 +56,6 @@ class ShoppingCartActivity :
     private fun initDataBinding() {
         binding.adapter = shoppingCartProductAdapter
         binding.viewModel = this.viewModel
-        binding.orderBarViewModel = this.orderBarViewModel
         binding.lifecycleOwner = this@ShoppingCartActivity
         binding.shoppingCartListener = this@ShoppingCartActivity
     }
@@ -92,16 +88,15 @@ class ShoppingCartActivity :
     private fun setupObservers() {
         viewModel.shoppingCart.observe(this) { shoppingCart ->
             shoppingCartProductAdapter.submitList(shoppingCart)
-            orderBarViewModel.update(shoppingCart)
         }
 
-        orderBarViewModel.event.observe(this) { event ->
+        viewModel.orderEvent.observe(this) { event ->
             when (event) {
                 OrderEvent.PROCEED -> {
                     activityResultLauncher.launch(
                         ShoppingCartRecommendActivity.newIntent(
                             this,
-                            orderBarViewModel.shoppingCartProductsToOrder.value?.toTypedArray()
+                            viewModel.shoppingCartProductsToOrder.value?.toTypedArray()
                                 ?: emptyArray(),
                         ),
                     )
@@ -141,12 +136,11 @@ class ShoppingCartActivity :
     }
 
     override fun onAllSelectedButtonClick() {
-        val isAllSelected = !(orderBarViewModel.isAllSelected.value ?: false)
-        viewModel.selectAllShoppingCartProducts(isAllSelected)
+        viewModel.selectAllShoppingCartProducts()
     }
 
     override fun onOrderButtonClick() {
-        orderBarViewModel.checkoutIfPossible()
+        viewModel.checkoutIfPossible()
     }
 
     companion object {

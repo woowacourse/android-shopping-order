@@ -1,8 +1,9 @@
-package woowacourse.shopping.view.shoppingCart.viewModel
+package woowacourse.shopping.view.shoppingCart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -12,7 +13,6 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
 import woowacourse.shopping.view.product.ProductsEvent
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.Companion.get(),
@@ -28,6 +28,29 @@ class ShoppingCartViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    val orderBarState: LiveData<ShoppingCartItem.OrderBarItem> =
+        shoppingCart.map {
+            ShoppingCartItem.OrderBarItem(
+                totalPrice =
+                    it
+                        .filter { item -> item.isChecked }
+                        .sumOf { item -> item.shoppingCartProduct.price },
+                totalQuantity =
+                    it
+                        .filter { item -> item.isChecked }
+                        .sumOf { item -> item.shoppingCartProduct.quantity },
+                isAllSelected = it.all { item -> item.isChecked },
+                shoppingCartProductsToOrder =
+                    it.filter { item -> item.isChecked }
+                        .map { item -> item.shoppingCartProduct },
+                isOrderEnabled = it.any { item -> item.isChecked },
+            )
+        }
+
+    private val _shoppingCartProductsToOrder: MutableLiveData<List<ShoppingCartProduct>> =
+        MutableLiveData(emptyList())
+    val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
+
     private var page: Int = MINIMUM_PAGE
 
     private var loadable: Boolean = false
@@ -36,6 +59,9 @@ class ShoppingCartViewModel(
 
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
+
+    private val _orderEvent: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
+    val orderEvent: SingleLiveData<OrderEvent> get() = _orderEvent
 
     private val handler =
         CoroutineExceptionHandler { _, exception ->
@@ -152,13 +178,21 @@ class ShoppingCartViewModel(
             }
     }
 
-    fun selectAllShoppingCartProducts(isChecked: Boolean) {
+    fun selectAllShoppingCartProducts() {
         _shoppingCart.value =
             _shoppingCart.value?.map { item ->
                 item.copy(
-                    isChecked = isChecked,
+                    isChecked = true,
                 )
             }
+    }
+
+    fun checkoutIfPossible() {
+        if (orderBarState.value?.isOrderEnabled ?: false) {
+            _orderEvent.setValue(OrderEvent.PROCEED)
+        } else {
+            _orderEvent.setValue(OrderEvent.ABORT)
+        }
     }
 
     companion object {

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
-import woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel
+import woowacourse.shopping.view.shoppingCart.ShoppingCartViewModel
 import woowacourse.shopping.viewModel.common.InstantTaskExecutorExtension
 
 @ExtendWith(InstantTaskExecutorExtension::class)

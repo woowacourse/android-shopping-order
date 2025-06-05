@@ -14,8 +14,19 @@ sealed interface ShoppingCartItem {
         override val viewType: ItemType = ItemType.PRODUCT
     }
 
+    data class OrderBarItem(
+        val totalPrice: Int,
+        val totalQuantity: Int,
+        val isAllSelected: Boolean,
+        val shoppingCartProductsToOrder: List<ShoppingCartProduct>,
+        val isOrderEnabled: Boolean,
+    ) : ShoppingCartItem {
+        override val viewType: ItemType = ItemType.ORDER_BAR
+    }
+
     enum class ItemType {
         PRODUCT,
+        ORDER_BAR,
         ;
 
         companion object {
