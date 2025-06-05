@@ -7,6 +7,8 @@ data class Products(
     val page: Page = EMPTY_PAGE,
 ) {
     val isAllSelected: Boolean get() = products.all { it.isSelected }
+    val selectedProductsQuantity: Int get() = products.filter { it.isSelected }.sumOf { it.quantity }
+    val selectedProductsPrice: Int = products.filter { it.isSelected }.sumOf { it.totalPrice }
 
     operator fun plus(other: Products): Products {
         val mergedProducts = products + other.products
@@ -16,20 +18,15 @@ data class Products(
         )
     }
 
-    fun updateProductQuantity(
-        productId: Long,
+    fun updateSelection(
+        product: Product,
+        isSelected: Boolean = !product.isSelected,
+    ): Products = updateProduct(product.copy(isSelected = isSelected))
+
+    fun updateQuantity(
+        product: Product,
         quantity: Int,
-    ): Products {
-        val updatedProducts =
-            products.map { product ->
-                if (product.productDetail.id == productId) {
-                    product.copy(quantity = quantity)
-                } else {
-                    product
-                }
-            }
-        return copy(products = updatedProducts)
-    }
+    ): Products = updateProduct(product.copy(quantity = quantity))
 
     fun updateProduct(newProduct: Product): Products {
         val updatedProducts =
@@ -53,27 +50,11 @@ data class Products(
 
     fun getProductByProductId(productId: Long): Product? = products.find { it.productDetail.id == productId }
 
-    fun updateSelectionByProductId(cartId: Long): Products =
-        copy(
-            products =
-                products.map { product ->
-                    if (product.cartId == cartId) {
-                        product.updateSelection()
-                    } else {
-                        product
-                    }
-                },
-        )
+    fun getProductByCartId(cartId: Long): Product? = products.find { it.cartId == cartId }
 
     fun toggleAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
 
-    fun getSelectedProductsPrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
-
     fun getSelectedProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
-
-    fun getSelectedCartProductIds(): Set<Long> = products.filter { it.isSelected }.mapNotNull { it.cartId }.toSet()
-
-    fun getSelectedProductsQuantity(): Int = products.filter { it.isSelected }.sumOf { it.quantity }
 
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)

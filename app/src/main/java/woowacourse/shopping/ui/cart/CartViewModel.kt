@@ -43,9 +43,6 @@ class CartViewModel(
     private val _editedProductIds: MutableLiveData<Set<Long>> = MutableLiveData(emptySet())
     val editedProductIds: LiveData<Set<Long>> get() = _editedProductIds
 
-    private val _totalOrderPrice: MutableLiveData<Int> = MutableLiveData(0)
-    val totalOrderPrice: LiveData<Int> get() = _totalOrderPrice
-
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
@@ -103,7 +100,7 @@ class CartViewModel(
             val product = cartProducts.value?.getProductByProductId(productId) ?: return@launch
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
-                    _cartProducts.value = cartProducts.value?.updateProductQuantity(productId, newQuantity)
+                    _cartProducts.value = cartProducts.value?.updateQuantity(product, newQuantity)
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
@@ -117,7 +114,7 @@ class CartViewModel(
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     when (newQuantity > MINIMUM_QUANTITY) {
-                        true -> _cartProducts.value = cartProducts.value?.updateProductQuantity(productId, newQuantity)
+                        true -> _cartProducts.value = cartProducts.value?.updateQuantity(product, newQuantity)
                         false -> loadCartProducts()
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
@@ -128,17 +125,12 @@ class CartViewModel(
     }
 
     fun toggleCartProductSelection(cartId: Long) {
-        _cartProducts.value = cartProducts.value?.updateSelectionByProductId(cartId)
+        val cartProduct = cartProducts.value?.getProductByCartId(cartId) ?: return
+        _cartProducts.value = cartProducts.value?.updateSelection(cartProduct)
     }
 
     fun toggleAllCartProductsSelection() {
         _cartProducts.value = cartProducts.value?.toggleAllSelection()
-    }
-
-    fun updateOrderInfo() {
-        _totalOrderPrice.value =
-            (cartProducts.value?.getSelectedProductsPrice() ?: 0) +
-            (recommendedProducts.value?.getSelectedProductsPrice() ?: 0)
     }
 
     fun loadRecommendedProducts() {
@@ -159,8 +151,8 @@ class CartViewModel(
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     when (product.quantity <= MINIMUM_QUANTITY) {
-                        true -> loadCartProduct(productId)
-                        false -> _recommendedProducts.value = recommendedProducts.value?.updateProductQuantity(productId, newQuantity)
+                        true -> updateRecommendedProduct(productId)
+                        false -> _recommendedProducts.value = recommendedProducts.value?.updateQuantity(product, newQuantity)
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
@@ -169,7 +161,7 @@ class CartViewModel(
         }
     }
 
-    private fun loadCartProduct(productId: Long) {
+    private fun updateRecommendedProduct(productId: Long) {
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
@@ -186,7 +178,7 @@ class CartViewModel(
             val product = recommendedProducts.value?.getProductByProductId(productId) ?: return@launch
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
-                    _recommendedProducts.value = recommendedProducts.value?.updateProductQuantity(productId, newQuantity)
+                    _recommendedProducts.value = recommendedProducts.value?.updateQuantity(product, newQuantity)
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
@@ -204,7 +196,7 @@ class CartViewModel(
     companion object {
         const val DEFAULT_PAGE_STEP: Int = 1
         const val PAGE_INDEX_OFFSET: Int = 1
-        const val DEFAULT_PAGE_SIZE: Int = 5
+        private const val DEFAULT_PAGE_SIZE: Int = 5
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
