@@ -150,7 +150,7 @@ class ProductsViewModelTest {
             )
 
         // then
-        assertThat(viewModel.productsUi.getOrAwaitValue()).isEqualTo(
+        assertThat(viewModel.products.getOrAwaitValue()).isEqualTo(
             listOf(
                 ProductsItem.ProductItem(
                     shoppingCartId = 1,

@@ -30,9 +30,9 @@ class ProductsViewModel(
     private var loadable: Boolean = false
     private var page: Int = MINIMUM_PAGE
 
-    private val _productsUi: MutableLiveData<List<ProductsItem>> =
+    private val _products: MutableLiveData<List<ProductsItem>> =
         MutableLiveData(emptyList())
-    val productsUi: LiveData<List<ProductsItem>> get() = _productsUi
+    val products: LiveData<List<ProductsItem>> get() = _products
 
     private var shoppingCartDomain = emptyList<ShoppingCartProduct>()
     private var productsDomain = emptyList<Product>()
@@ -56,7 +56,7 @@ class ProductsViewModel(
 
     fun reload() {
         _isLoading.value = true
-        _productsUi.value = emptyList()
+        _products.value = emptyList()
         shoppingCartDomain = emptyList()
 
         updateProducts(0, LOAD_PRODUCTS_SIZE * page)
@@ -121,8 +121,8 @@ class ProductsViewModel(
                     ).getOrThrow()
                 }
 
-            _productsUi.value =
-                productsUi.value
+            _products.value =
+                products.value
                     ?.filterIsInstance<ProductsItem.ProductItem>()
                     ?.map { item ->
                         if (item.product.id == productItem.product.id) {
@@ -151,8 +151,8 @@ class ProductsViewModel(
                 )
             }
 
-        _productsUi.value =
-            _productsUi.value
+        _products.value =
+            _products.value
                 ?.filterIsInstance<ProductsItem.ProductItem>()
                 ?.plus(productUi)
                 ?.plus(ProductsItem.LoadItem)
