@@ -103,11 +103,7 @@ class CartViewModel(
             val product = cartProducts.value?.getProductByProductId(productId) ?: return@launch
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
-                    _cartProducts.value =
-                        cartProducts.value?.updateProductQuantity(
-                            productId,
-                            newQuantity,
-                        )
+                    _cartProducts.value = cartProducts.value?.updateProductQuantity(productId, newQuantity)
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())
@@ -121,14 +117,7 @@ class CartViewModel(
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     when (newQuantity > MINIMUM_QUANTITY) {
-                        true -> {
-                            _cartProducts.value =
-                                cartProducts.value?.updateProductQuantity(
-                                    productId,
-                                    newQuantity,
-                                )
-                        }
-
+                        true -> _cartProducts.value = cartProducts.value?.updateProductQuantity(productId, newQuantity)
                         false -> loadCartProducts()
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)

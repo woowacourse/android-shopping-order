@@ -10,15 +10,12 @@ class PaymentCouponViewHolder private constructor(
     private val binding: ItemPaymentCouponBinding,
     onClickHandler: OnClickHandler,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private lateinit var item: Coupon
-
     init {
         binding.onClickHandler = onClickHandler
     }
 
     fun bind(item: Coupon) {
-        this.item = item
-        binding.coupon = this.item
+        binding.coupon = item
     }
 
     fun interface OnClickHandler {
