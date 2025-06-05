@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.remote
 
 import retrofit2.Response
 import woowacourse.shopping.BuildConfig
@@ -15,7 +15,14 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchCartItems(
         page: Int,
         size: Int,
-    ): Result<PageableResponse<CartItemResponse>> = safeApiCall { cartService.fetchCartItems(AUTHORIZATION_KEY, page, size) }
+    ): Result<PageableResponse<CartItemResponse>> =
+        safeApiCall {
+            cartService.fetchCartItems(
+                AUTHORIZATION_KEY,
+                page,
+                size,
+            )
+        }
 
     override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
         runCatching {
@@ -24,7 +31,13 @@ class CartRemoteDataSourceImpl(
             requireNotNull(cartId) { ADD_CART_PRODUCT_FAILURE_MESSAGE.format(addCartItemCommand.productId) }
         }
 
-    override suspend fun deleteCartItem(cartId: Long): Result<Unit> = safeApiCall { cartService.deleteCartItem(AUTHORIZATION_KEY, cartId) }
+    override suspend fun deleteCartItem(cartId: Long): Result<Unit> =
+        safeApiCall {
+            cartService.deleteCartItem(
+                AUTHORIZATION_KEY,
+                cartId,
+            )
+        }
 
     override suspend fun patchCartItemQuantity(
         cartId: Long,
@@ -34,7 +47,12 @@ class CartRemoteDataSourceImpl(
             cartService.patchCartItemQuantity(AUTHORIZATION_KEY, cartId, quantity)
         }
 
-    override suspend fun fetchCartItemCount(): Result<Quantity> = safeApiCall { cartService.fetchCartItem(AUTHORIZATION_KEY) }
+    override suspend fun fetchCartItemCount(): Result<Quantity> =
+        safeApiCall {
+            cartService.fetchCartItem(
+                AUTHORIZATION_KEY,
+            )
+        }
 
     private fun Response<*>.extractCartItemId(): Long? {
         val locationHeader = this.headers()[HEADER_LOCATION]

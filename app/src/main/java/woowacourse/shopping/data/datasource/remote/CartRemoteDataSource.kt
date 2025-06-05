@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.model.cart.AddCartItemCommand
 import woowacourse.shopping.data.model.cart.CartItemResponse

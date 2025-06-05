@@ -2,8 +2,8 @@ package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import woowacourse.shopping.data.datasource.ProductRemoteDataSource
-import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.RecentProductLocalDataSource
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.data.util.runCatchingDebugLog

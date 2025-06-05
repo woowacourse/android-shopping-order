@@ -3,9 +3,9 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.datasource.CartLocalDataSource
-import woowacourse.shopping.data.datasource.CartRemoteDataSource
-import woowacourse.shopping.data.datasource.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.local.CartLocalDataSource
+import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.model.cart.AddCartItemCommand
 import woowacourse.shopping.data.model.cart.CartItemResponse
 import woowacourse.shopping.data.model.cart.Quantity
