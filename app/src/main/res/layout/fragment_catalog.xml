@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.catalog.CatalogViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_catalog"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.view.catalog.CatalogFragment">
+
+        <Toolbar
+            android:id="@+id/toolbar_catalog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_55"
+            android:contentInsetStart="24dp"
+            android:contentInsetEnd="24dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/toolbar_catalog_title"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_view_cart_total_quantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_margin="10dp"
+                android:background="@drawable/shape_bg_cart_counter"
+                android:backgroundTint="@color/mint"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="@{vm.totalCartCount.toString()}"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="@{(vm.totalCartCount == 0) ? View.GONE : View.VISIBLE}"
+                tools:text="10" />
+
+            <ImageButton
+                android:id="@+id/btn_navigate_cart"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_cart" />
+
+        </Toolbar>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/layout_catalog_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="@{vm.isLoadingData() ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
+            app:shimmer_auto_start="true"
+            app:shimmer_duration="1500">
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alignmentMode="alignMargins"
+                android:columnCount="2"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:rowCount="4"
+                android:useDefaultMargins="true">
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_catalog_shimmer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" />
+            </GridLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_products"
+            android:visibility="@{vm.isLoadingData() ? View.GONE : View.VISIBLE}"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_catalog"
+            tools:listitem="@layout/item_product" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
