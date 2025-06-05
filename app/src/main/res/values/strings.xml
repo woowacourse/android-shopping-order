@@ -30,4 +30,10 @@
     <string name="http_error_server_message">서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.</string>
 
     <string name="error_missing_location_header_message">서버 응답에 필요한 정보가 누락되었습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="text_delivery_price_title">배송비</string>
+    <string name="text_total_price_title">총 결제 금액</string>
+    <string name="text_origin_price">주문 금액</string>
+    <string name="text_coupon_discount_price">쿠폰 할인 금액</string>
+    <string name="text_guide_coupon">*쿠폰은 1개만 적용 가능합니다</string>
+    <string name="text_available_coupon">적용 가능한 쿠폰</string>
 </resources>

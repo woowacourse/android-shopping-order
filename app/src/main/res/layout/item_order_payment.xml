@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="woowacourse.shopping.domain.Payment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/top_divider"
+            layout="@layout/item_divider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/text_view_origin_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_origin_price"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            android:layout_marginStart="20dp"
+            app:layout_constraintTop_toBottomOf="@id/top_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_origin_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(model.originPayment)}"
+            tools:text="204,200원"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toTopOf="@id/text_view_origin_price_title"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_origin_price_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/text_view_coupon_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_coupon_discount_price"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginStart="20dp"
+            android:textColor="@color/gray"
+            app:layout_constraintTop_toBottomOf="@id/text_view_origin_price_title"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_coupon_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(model.couponDiscount)}"
+            tools:text="-5,000원"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toTopOf="@id/text_view_coupon_price_title"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_coupon_price_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/text_view_delivery_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_delivery_price_title"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            android:layout_marginStart="20dp"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupon_price_title"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_delivery_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(model.deliveryFee)}"
+            tools:text="3,000원"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toTopOf="@id/text_view_delivery_price_title"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_delivery_price_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <include
+            android:id="@+id/bottom_divider"
+            layout="@layout/item_divider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/text_view_delivery_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_total_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="@string/text_total_price_title"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            app:layout_constraintTop_toBottomOf="@id/bottom_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="@{String.valueOf(model.totalPayment)}"
+            tools:text="202,200원"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            app:layout_constraintTop_toTopOf="@id/text_view_total_price_title"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_total_price_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

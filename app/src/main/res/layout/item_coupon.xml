@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="woowacourse.shopping.view.order.state.CouponState" />
+
+        <variable
+            name="eventHandler"
+            type="woowacourse.shopping.view.order.adapter.CouponViewHolder.Handler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/cart_border"
+        android:layout_marginVertical="10dp"
+        android:layout_marginHorizontal="10dp"
+        android:padding="10dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onCheckedChanged="@{(button, isChecked) -> eventHandler.onChangeCheckedState(model.item.id)}"
+            android:checked="@{model.checked}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_view_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="@{model.item.description}"
+            app:layout_constraintStart_toEndOf="@id/checkbox_apply"
+            app:layout_constraintTop_toTopOf="@id/checkbox_apply"
+            app:layout_constraintBottom_toBottomOf="@id/checkbox_apply"
+            tools:text="5,000원" />
+
+        <TextView
+            android:id="@+id/text_view_expired_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@{String.valueOf(model.item.expirationDate)}"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/checkbox_apply"
+            app:layout_constraintTop_toBottomOf="@id/text_view_title"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/text_view_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/text_view_expired_date"
+            app:layout_constraintTop_toBottomOf="@id/text_view_expired_date"
+            tools:text="최소 주문 금액: 100,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
