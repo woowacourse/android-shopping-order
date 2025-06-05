@@ -64,14 +64,13 @@ class ProductAdapter(
     }
 
     override fun submitList(item: List<ProductsItem>?) {
-        item?.let {
-            if (it.isEmpty()) return
-            val viewType = it.first().viewType
-            items[viewType] = it
+        if (item.isNullOrEmpty()) return
+        if (item.isEmpty()) return
+        val viewType = item.first().viewType
+        items[viewType] = item
 
-            if (existsAllViewType) {
-                super.submitList(items.flatMap { entry -> entry.value })
-            }
+        if (existsAllViewType) {
+            super.submitList(items.flatMap { entry -> entry.value })
         }
     }
 
