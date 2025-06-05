@@ -96,8 +96,7 @@ class ShoppingCartActivity :
                     activityResultLauncher.launch(
                         ShoppingCartRecommendActivity.newIntent(
                             this,
-                            viewModel.shoppingCartProductsToOrder.value?.toTypedArray()
-                                ?: emptyArray(),
+                            viewModel.shoppingCartProductsToOrder.toTypedArray(),
                         ),
                     )
                 }

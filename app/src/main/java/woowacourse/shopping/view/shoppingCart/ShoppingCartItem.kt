@@ -18,7 +18,6 @@ sealed interface ShoppingCartItem {
         val totalPrice: Int,
         val totalQuantity: Int,
         val isAllSelected: Boolean,
-        val shoppingCartProductsToOrder: List<ShoppingCartProduct>,
         val isOrderEnabled: Boolean,
     ) : ShoppingCartItem {
         override val viewType: ItemType = ItemType.ORDER_BAR

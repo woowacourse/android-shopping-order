@@ -40,16 +40,16 @@ class ShoppingCartViewModel(
                         .filter { item -> item.isChecked }
                         .sumOf { item -> item.shoppingCartProduct.quantity },
                 isAllSelected = it.all { item -> item.isChecked },
-                shoppingCartProductsToOrder =
-                    it.filter { item -> item.isChecked }
-                        .map { item -> item.shoppingCartProduct },
                 isOrderEnabled = it.any { item -> item.isChecked },
             )
         }
 
-    private val _shoppingCartProductsToOrder: MutableLiveData<List<ShoppingCartProduct>> =
-        MutableLiveData(emptyList())
-    val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
+    val shoppingCartProductsToOrder: List<ShoppingCartProduct>
+        get() =
+            shoppingCart.value
+                ?.filter { item -> item.isChecked }
+                ?.map { item -> item.shoppingCartProduct }
+                ?: emptyList()
 
     private var page: Int = MINIMUM_PAGE
 
