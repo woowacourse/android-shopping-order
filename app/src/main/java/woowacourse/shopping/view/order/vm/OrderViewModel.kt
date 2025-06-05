@@ -1,0 +1,57 @@
+package woowacourse.shopping.view.order.vm
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.exception.onFailure
+import woowacourse.shopping.domain.exception.onSuccess
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.view.cart.CartUiEvent
+import woowacourse.shopping.view.core.common.withState
+import woowacourse.shopping.view.core.event.MutableSingleLiveData
+import woowacourse.shopping.view.core.event.SingleLiveData
+import woowacourse.shopping.view.order.adapter.OrderAdapter
+import woowacourse.shopping.view.order.state.OrderUiState
+
+class OrderViewModel(
+    private val couponRepository: CouponRepository,
+) : ViewModel() {
+    private val _uiState = MutableLiveData<OrderUiState>()
+    val uiState: LiveData<OrderUiState> get() = _uiState
+
+    private val _uiEvent = MutableSingleLiveData<CartUiEvent>()
+    val uiEvent: SingleLiveData<CartUiEvent> get() = _uiEvent
+
+    init {
+        loadCoupons()
+    }
+
+    private fun loadCoupons() {
+        viewModelScope.launch {
+            couponRepository.getCoupons()
+                .onSuccess { result ->
+                    _uiState.value = OrderUiState.of(result)
+                }
+                .onFailure(::handleFailure)
+        }
+    }
+
+    private fun changeCouponCheckState(couponId: Int) {
+        withState(_uiState.value) { state ->
+            _uiState.value = state.changeCouponCheckState(couponId)
+        }
+    }
+
+    private fun handleFailure(throwable: Throwable) {
+        _uiEvent.setValue(CartUiEvent.ShowErrorMessage(throwable))
+    }
+
+    val couponHandler =
+        object : OrderAdapter.Handler {
+            override fun onChangeCheckedState(couponId: Int) {
+                changeCouponCheckState(couponId)
+            }
+        }
+}

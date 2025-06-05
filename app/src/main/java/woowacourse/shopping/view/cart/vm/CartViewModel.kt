@@ -148,7 +148,7 @@ class CartViewModel(
         }
     }
 
-    fun loadCarts() {
+    private fun loadCarts() {
         toggleFetching()
         val nextPage = paging.getPageNo() - 1
         viewModelScope.launch {
