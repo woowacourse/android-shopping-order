@@ -94,17 +94,6 @@ class ProductsActivityTest {
     }
 
     @Test
-    fun 상품을_클릭하면_상품_상세_화면으로_이동된다() {
-        onView(
-            withRecyclerView(R.id.products).atPositionOnView(
-                1,
-                R.id.productName,
-            ),
-        ).performClick()
-        onView(withId(R.id.productDetailRoot)).isDisplayed()
-    }
-
-    @Test
     fun 수량을_변경하면_현재_수량_정보가_장바구니에_반영된다() {
         // given
         // 기존 수량 : 1

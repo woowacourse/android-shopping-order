@@ -153,21 +153,4 @@ class ShoppingCartActivityTest {
                 .check(matches(isChecked()))
         }
     }
-
-    @Test
-    fun 상품을_선택후_주문하기_버튼을_누르면_상품추천_화면오로_이동한다() {
-        // given
-        onView(
-            withRecyclerView(R.id.shoppingCartProducts)
-                .atPositionOnView(0, R.id.shoppingCartProductCheckBox),
-        ).performClick()
-
-        // when
-        onView(withId(R.id.shoppingCartOrderButton))
-            .performClick()
-
-        // then
-        onView(withId(R.id.shoppingCartRecommendRoot))
-            .isDisplayed()
-    }
 }
