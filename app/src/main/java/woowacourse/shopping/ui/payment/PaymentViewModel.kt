@@ -64,7 +64,12 @@ class PaymentViewModel(
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { products ->
-                    _products.value = Products(products.filterNot { it.cartId == null })
+                    _products.value =
+                        Products(
+                            products
+                                .filterNot { it.cartId == null }
+                                .map { it.copy(isSelected = true) },
+                        )
                 }.onFailure {
                     _isNetworkError.value = it.message.toString()
                     Log.e("PaymentViewModel", it.toString())
@@ -72,8 +77,8 @@ class PaymentViewModel(
         }
     }
 
-    fun toggleCoupon(couponId: Int) {
-        _coupons.value = coupons.value?.toggleCoupon(couponId)
+    fun selectCoupon(couponId: Int) {
+        _coupons.value = coupons.value?.selectCoupon(couponId)
     }
 
     fun orderProducts() {

@@ -178,7 +178,10 @@ class CartViewModel(
             val product = recommendedProducts.value?.getProductByProductId(productId) ?: return@launch
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
-                    _recommendedProducts.value = recommendedProducts.value?.updateQuantity(product, newQuantity)
+                    when (product.quantity <= MINIMUM_QUANTITY) {
+                        true -> _recommendedProducts.value = recommendedProducts.value?.updateQuantity(product, newQuantity)
+                        false -> updateRecommendedProduct(productId)
+                    }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
                     Log.e("CartViewModel", it.message.toString())

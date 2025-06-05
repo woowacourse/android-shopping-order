@@ -1,23 +1,16 @@
 package woowacourse.shopping.domain.model
 
-import java.time.LocalDate
-import java.time.LocalTime
+sealed interface Coupon {
+    val detail: CouponDetail
 
-data class Coupon(
-    val id: Int,
-    val code: CouponCodeType,
-    val name: String,
-    val expirationDate: LocalDate,
-    val discount: Int?,
-    val minimumPurchase: Int?,
-    val discountType: CouponDiscountType,
-    val buyQuantity: Int?,
-    val getQuantity: Int?,
-    val availableTime: AvailableTime?,
-    val isSelected: Boolean = false,
-) {
-    data class AvailableTime(
-        val start: LocalTime,
-        val end: LocalTime,
-    )
+    val isSelected: Boolean
+
+    fun apply(products: Products): Price
+
+    fun getIsAvailable(products: Products): Boolean
+
+    fun copy(
+        detail: CouponDetail = this.detail,
+        isSelected: Boolean = this.isSelected,
+    ): Coupon
 }

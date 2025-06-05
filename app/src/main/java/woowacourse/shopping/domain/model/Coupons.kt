@@ -4,20 +4,25 @@ package woowacourse.shopping.domain.model
 value class Coupons(
     val value: List<Coupon>,
 ) {
-    fun toggleCoupon(couponId: Int): Coupons {
-        val selectedCoupon = value.find { it.id == couponId } ?: return this
+    fun selectCoupon(couponId: Int): Coupons {
+        val selectedCoupon = value.find { it.detail.id == couponId } ?: return this
 
         return Coupons(
             value.map {
                 when {
-                    it.id == couponId -> it.copy(isSelected = !selectedCoupon.isSelected)
+                    it.detail.id == couponId -> it.copy(isSelected = !selectedCoupon.isSelected)
                     else -> it.copy(isSelected = false)
                 }
             },
         )
     }
 
+    fun applyCoupon(products: Products): Price =
+        value.find { it.isSelected }?.apply(products)
+            ?: Price(products.selectedProductsPrice)
+
     companion object {
+        const val MAX_USABLE_COUNT = 1
         val EMPTY_COUPONS: Coupons = Coupons(emptyList())
     }
 }

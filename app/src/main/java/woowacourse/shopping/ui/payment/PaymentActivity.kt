@@ -15,11 +15,12 @@ import woowacourse.shopping.ui.payment.adapter.PaymentCouponAdapter
 class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.activity_payment) {
     private val viewModel: PaymentViewModel by viewModels { PaymentViewModel.Factory }
     private val paymentCouponAdapter: PaymentCouponAdapter by lazy {
-        PaymentCouponAdapter { couponId -> viewModel.toggleCoupon(couponId) }
+        PaymentCouponAdapter { couponId -> viewModel.selectCoupon(couponId) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding.viewModel = viewModel
         initPaymentProductsInfo()
         initCouponsView()
         initObservers()
