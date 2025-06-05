@@ -31,8 +31,8 @@ class ProductAdapter(
     ) {
     private var items: MutableMap<ProductsItem.ItemType, List<ProductsItem>> =
         mutableMapOf(
-            ProductsItem.ItemType.PRODUCT to emptyList(),
             ProductsItem.ItemType.RECENT_WATCHING to emptyList(),
+            ProductsItem.ItemType.PRODUCT to emptyList(),
         )
 
     private val existsAllViewType: Boolean
