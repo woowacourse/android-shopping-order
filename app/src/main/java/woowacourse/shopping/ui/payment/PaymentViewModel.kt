@@ -13,6 +13,8 @@ import woowacourse.shopping.di.UseCaseModule.getCouponsUseCase
 import woowacourse.shopping.di.UseCaseModule.orderProductsUseCase
 import woowacourse.shopping.domain.model.Coupons
 import woowacourse.shopping.domain.model.Coupons.Companion.EMPTY_COUPONS
+import woowacourse.shopping.domain.model.Price
+import woowacourse.shopping.domain.model.Price.Companion.EMPTY_PRICE
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
@@ -29,6 +31,9 @@ class PaymentViewModel(
 
     private val _coupons: MutableLiveData<Coupons> = MutableLiveData(EMPTY_COUPONS)
     val coupons: LiveData<Coupons> get() = _coupons
+
+    private val _price: MutableLiveData<Price> = MutableLiveData(EMPTY_PRICE)
+    val price: LiveData<Price> get() = _price
 
     private val _isCouponsLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     val isCouponsLoading: LiveData<Boolean> get() = _isCouponsLoading
@@ -79,6 +84,7 @@ class PaymentViewModel(
 
     fun selectCoupon(couponId: Int) {
         _coupons.value = coupons.value?.selectCoupon(couponId)
+        _price.value = coupons.value?.applyCoupon(products.value ?: return)
     }
 
     fun orderProducts() {

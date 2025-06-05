@@ -34,12 +34,10 @@
     <string name="payment_coupon_title">적용 가능한 쿠폰</string>
     <string name="payment_coupon_guide">* 쿠폰은 %d개만 적용 가능합니다.</string>
     <string name="payment_order_price_title">주문 금액</string>
-    <string name="payment_order_price_label">%,d원</string>
     <string name="payment_discount_price_title">쿠폰 할인 금액</string>
-    <string name="payment_discount_price_label">%,d원</string>
     <string name="payment_shipping_price_title">배송비</string>
-    <string name="payment_shipping_price_label">%,d원</string>
     <string name="payment_total_price_title">총 결제 금액</string>
-    <string name="payment_total_price_label">%,d원</string>
+    <string name="payment_default_price_label">%,d원</string>
+    <string name="payment_discount_price_label">-%,d원</string>
     <string name="payment_perform_pay">결제하기</string>
 </resources>

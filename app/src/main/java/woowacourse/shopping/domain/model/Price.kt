@@ -7,6 +7,7 @@ data class Price(
     val result: Int = original,
 ) {
     companion object {
+        val EMPTY_PRICE: Price = Price(0)
         private const val DEFAULT_DISCOUNT_PRICE: Int = 0
         private const val DEFAULT_SHIPPING_PRICE: Int = 3_000
     }
