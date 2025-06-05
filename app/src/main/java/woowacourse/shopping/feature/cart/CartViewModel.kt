@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -217,16 +219,10 @@ class CartViewModel(
                 onSuccess = { cartResponse ->
                     val cartProductIds = cartResponse.content.map { it.product.id }
 
-                    productRepository.fetchRecommendProducts(
-                        latestProductId = latestProduct.id,
-                        cartProductIds = cartProductIds,
-                        onSuccess = { recommendedList ->
-                            _recommendItems.value = recommendedList
-                        },
-                        onError = {
-                            Log.e("loadProductsByCategory", "추천 상품 요청 실패", it)
-                        },
-                    )
+                    viewModelScope.launch {
+                        val recommendedList = productRepository.fetchRecommendProducts(latestProduct.id, cartProductIds)
+                        _recommendItems.value = recommendedList
+                    }
                 },
                 onError = {
                     Log.e("loadProductsByCategory", "장바구니 요청 실패", it)

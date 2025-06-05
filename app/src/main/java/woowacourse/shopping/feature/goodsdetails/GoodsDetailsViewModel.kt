@@ -43,32 +43,25 @@ class GoodsDetailsViewModel(
         _shouldShowLastViewed.addSource(cartProduct) { updateLastViewedVisibility() }
     }
 
-    fun setInitialCart(id: Long) {
+    suspend fun setInitialCart(id: Long) {
         loadProductDetails(productId = id)
         loadLastViewed()
     }
 
-    fun loadProductDetails(productId: Long) {
-        productRepository.requestProductDetails(
-            productId = productId,
-            onSuccess = { productContent ->
-                cartRepository.findCartByProductId(
-                    productId = productContent.id,
-                    onResult = { matchedCart ->
-                        val cartProduct =
-                            CartProduct(
-                                id = matchedCart?.id ?: 0,
-                                product = productContent.toDomain(),
-                                quantity = matchedCart?.quantity ?: 1,
-                            )
+    suspend fun loadProductDetails(productId: Long) {
+        val productContent = productRepository.requestProductDetails(productId = productId)
+        cartRepository.findCartByProductId(
+            productId = productContent.id,
+            onResult = { matchedCart ->
+                val cartProduct =
+                    CartProduct(
+                        id = matchedCart?.id ?: 0,
+                        product = productContent.toDomain(),
+                        quantity = matchedCart?.quantity ?: 1,
+                    )
 
-                        _cartProduct.value = cartProduct
-                        insertToHistory(cartProduct)
-                    },
-                    onError = {
-                        _insertState.value = Event(State.Failure)
-                    },
-                )
+                _cartProduct.value = cartProduct
+                insertToHistory(cartProduct)
             },
             onError = {
                 _insertState.value = Event(State.Failure)

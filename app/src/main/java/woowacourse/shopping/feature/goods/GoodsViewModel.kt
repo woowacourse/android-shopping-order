@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -190,34 +192,29 @@ class GoodsViewModel(
                 onSuccess = { cartList ->
                     val cartByProductId = cartList.content.associateBy { it.product.id }
 
-                    productRepository.fetchProducts(
-                        onSuccess = { response ->
-                            val newCarts =
-                                response.content.map { product ->
-                                    val matchedCart = cartByProductId[product.id]
-                                    CartProduct(
-                                        id = matchedCart?.id?.toLong() ?: 0,
-                                        product = product.toDomain(),
-                                        quantity = matchedCart?.quantity ?: 0,
-                                    )
-                                }
+                    viewModelScope.launch {
+                        val response = productRepository.fetchProducts(page)
 
-                            val currentProducts = products
-                            val combinedCarts = currentProducts + newCarts
-                            products.clear()
-                            products.addAll(combinedCarts)
+                        val newCarts =
+                            response.content.map { product ->
+                                val matchedCart = cartByProductId[product.id]
+                                CartProduct(
+                                    id = matchedCart?.id?.toLong() ?: 0,
+                                    product = product.toDomain(),
+                                    quantity = matchedCart?.quantity ?: 0,
+                                )
+                            }
 
-                            _hasNextPage.value = !response.last
+                        val currentProducts = products
+                        val combinedCarts = currentProducts + newCarts
+                        products.clear()
+                        products.addAll(combinedCarts)
 
-                            refreshItems()
-                            _isLoading.postValue(false)
-                        },
-                        onError = {
-                            Log.e("loadProductsInRange", "상품 API 실패", it)
-                            _isLoading.postValue(false)
-                        },
-                        page = page,
-                    )
+                        _hasNextPage.value = !response.last
+
+                        refreshItems()
+                        _isLoading.postValue(false)
+                    }
                 },
                 onError = {
                     Log.e("loadProductsInRange", "장바구니 API 실패", it)

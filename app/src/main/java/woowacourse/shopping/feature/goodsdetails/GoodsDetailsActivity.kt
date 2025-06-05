@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
@@ -31,7 +33,9 @@ class GoodsDetailsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         id = intent.getLongExtra(GOODS_KEY, 0)
-        viewModel.setInitialCart(id)
+        lifecycleScope.launch {
+            viewModel.setInitialCart(id)
+        }
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
