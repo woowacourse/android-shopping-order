@@ -56,6 +56,8 @@ data class Products(
 
     fun getSelectedProductIds(): List<Long> = products.filter { it.isSelected }.map { it.productDetail.id }
 
+    fun getSelectedCartIds(): Set<Long> = products.filter { it.isSelected }.mapNotNull { it.cartId }.toSet()
+
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)
     }

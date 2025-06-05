@@ -78,7 +78,7 @@ class PaymentViewModel(
 
     fun orderProducts() {
         viewModelScope.launch {
-            val cartIds: Set<Long> = products.value?.getSelectedCartProductIds() ?: emptySet()
+            val cartIds: Set<Long> = products.value?.getSelectedCartIds() ?: emptySet()
 
             orderProductsUseCase(cartIds)
                 .onSuccess {
