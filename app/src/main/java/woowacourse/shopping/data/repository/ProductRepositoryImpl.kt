@@ -33,7 +33,7 @@ class ProductRepositoryImpl(
         excludedProductIds: List<Long>,
     ): Result<List<Product>> =
         runCatchingDebugLog {
-            val category = recentProductLocalDataSource.getRecentViewedProductCategory()
+            val category = recentProductLocalDataSource.getRecentViewedProductCategory().getOrNull()
 
             val fetchLimit = limit + excludedProductIds.size
             val response =

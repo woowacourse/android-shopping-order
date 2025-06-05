@@ -16,8 +16,10 @@ class RecentProductRepositoryImpl(
 ) : RecentProductRepository {
     override suspend fun getRecentProducts(limit: Int): Result<List<Product>> =
         runCatchingDebugLog {
-            val recentEntities = recentProductLocalDataSource.getRecentProducts(limit)
-            fetchAllProductsConcurrently(recentEntities.map { it.productId })
+            val recentEntities = recentProductLocalDataSource.getRecentProducts(limit).getOrNull()
+            val recentProductIds = recentEntities?.map { it.productId } ?: emptyList()
+
+            fetchAllProductsConcurrently(recentProductIds)
         }
 
     override suspend fun insertAndTrimToLimit(
