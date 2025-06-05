@@ -13,13 +13,11 @@ data class Product(
     fun increaseQuantity(delta: Int = DEFAULT_QUANTITY_DELTA): Product = copy(quantity = quantity + delta)
 
     fun decreaseQuantity(delta: Int = DEFAULT_QUANTITY_DELTA): Product =
-        if (quantity - delta >= 0) {
+        if (quantity - delta >= MINIMUM_QUANTITY) {
             copy(quantity = quantity - delta)
         } else {
-            copy(quantity = 0)
+            copy(quantity = MINIMUM_QUANTITY)
         }
-
-    fun updateSelection(isSelected: Boolean = this.isSelected.not()): Product = copy(isSelected = isSelected)
 
     companion object {
         const val MINIMUM_QUANTITY = 0

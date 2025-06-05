@@ -68,13 +68,15 @@ class PaymentViewModel(
     fun loadProducts(productIds: List<Long>) {
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
-                .onSuccess { products ->
-                    _products.value =
+                .onSuccess { newProducts ->
+                    val products =
                         Products(
-                            products
+                            newProducts
                                 .filterNot { it.cartId == null }
                                 .map { it.copy(isSelected = true) },
                         )
+                    _products.value = products
+                    _price.value = coupons.value?.applyCoupon(products)
                 }.onFailure {
                     _isNetworkError.value = it.message.toString()
                     Log.e("PaymentViewModel", it.toString())

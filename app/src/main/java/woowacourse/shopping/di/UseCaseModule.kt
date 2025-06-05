@@ -75,7 +75,7 @@ object UseCaseModule {
     }
 
     val orderProductsUseCase by lazy {
-        OrderProductsUseCase(productRepository, cartRepository, orderRepository)
+        OrderProductsUseCase(orderRepository)
     }
     val getCouponsUseCase by lazy {
         GetCouponsUseCase(couponRepository)

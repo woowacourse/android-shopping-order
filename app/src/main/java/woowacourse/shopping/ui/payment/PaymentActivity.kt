@@ -20,7 +20,7 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding.viewModel = viewModel
+        initViewBinding()
         initPaymentProductsInfo()
         initCouponsView()
         initObservers()
@@ -30,6 +30,11 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) finish()
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun initViewBinding() {
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
     }
 
     private fun initPaymentProductsInfo() {
@@ -54,6 +59,7 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
         }
         viewModel.isOrderSuccess.observe(this) {
             Toast.makeText(this, getString(R.string.payment_order_success), Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 

@@ -2,13 +2,14 @@ package woowacourse.shopping.domain.model
 
 data class Price(
     val original: Int,
-    val discount: Int = DEFAULT_DISCOUNT_PRICE,
+    val discount: Int = MINIMUM_PRICE,
     val shipping: Int = DEFAULT_SHIPPING_PRICE,
-    val result: Int = original,
 ) {
+    val result: Int get() = (original - discount + shipping).coerceAtLeast(MINIMUM_PRICE)
+
     companion object {
         val EMPTY_PRICE: Price = Price(0)
-        private const val DEFAULT_DISCOUNT_PRICE: Int = 0
-        private const val DEFAULT_SHIPPING_PRICE: Int = 3_000
+        const val MINIMUM_PRICE: Int = 0
+        const val DEFAULT_SHIPPING_PRICE: Int = 3_000
     }
 }
