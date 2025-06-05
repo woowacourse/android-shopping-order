@@ -57,8 +57,8 @@ class CartProductRecommendationViewModel(
 
     fun initShoppingCartInfo(selectedCartProducts: List<CartProduct>) {
         _selectedProducts.value = _selectedProducts.value.orEmpty().plus(selectedCartProducts)
-        _totalPrice.removeSource(_recommendedProducts)
-        _totalCount.removeSource(_recommendedProducts)
+        _totalPrice.removeSource(_selectedProducts)
+        _totalCount.removeSource(_selectedProducts)
 
         _totalPrice.addSource(_selectedProducts) { list ->
             _totalPrice.value =
