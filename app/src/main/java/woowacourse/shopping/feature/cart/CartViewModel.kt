@@ -52,11 +52,9 @@ class CartViewModel(
 
     private val _isLeftPageEnable = MutableLiveData(false)
     val isLeftPageEnable: LiveData<Boolean> get() = _isLeftPageEnable
-    val leftPageEnable: LiveData<Boolean> get() = _isLeftPageEnable
 
     private val _isRightPageEnable = MutableLiveData(false)
     val isRightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
-    val rightPageEnable: LiveData<Boolean> get() = _isRightPageEnable
 
     private val _removeItemEvent = MutableSingleLiveData<CartItem>()
     val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
