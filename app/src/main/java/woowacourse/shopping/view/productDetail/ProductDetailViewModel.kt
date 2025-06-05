@@ -69,15 +69,13 @@ class ProductDetailViewModel(
 
     private fun updateRecentWatchingProduct() {
         viewModelScope.launch {
-            val recentProducts = productsRepository.getRecentWatchingProducts(1).getOrThrow()
-            if (recentProducts.isEmpty()) return@launch updateRecentWatching()
-            val isLastWatchingProduct =
-                recentProducts.first() == product.value?.product
+            val recentProducts = productsRepository.getLatestRecentWatchingProduct().getOrThrow()
+            val isLastWatchingProduct = recentProducts == product.value?.product
             if (isLastWatchingProduct) {
                 _recentProductBoxVisible.postValue(false)
                 return@launch
             }
-            _recentWatchingProduct.postValue(recentProducts[0])
+            _recentWatchingProduct.postValue(recentProducts)
             _recentProductBoxVisible.postValue(true)
             updateRecentWatching()
         }

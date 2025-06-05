@@ -26,6 +26,13 @@ class DefaultProductsRepository(
         }
     }
 
+    override suspend fun getLatestRecentWatchingProduct(): Result<Product> {
+        val result = recentWatchingDao.getRecentWatchingProducts(1)
+        return runCatching {
+            result.map { it.product }.first()
+        }
+    }
+
     override suspend fun getRecentRecommendWatchingProducts(size: Int): Result<List<Product>> {
         val result = recentWatchingDao.getRecentRecommendWatchingProducts(size)
         return runCatching {
