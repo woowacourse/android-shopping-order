@@ -30,9 +30,9 @@ class ProductsViewModel(
     private var loadable: Boolean = false
     private var page: Int = MINIMUM_PAGE
 
-    private val _productsUi: MutableLiveData<List<ProductsItem.ProductItem>> =
+    private val _productsUi: MutableLiveData<List<ProductsItem>> =
         MutableLiveData(emptyList())
-    val productsUi: LiveData<List<ProductsItem.ProductItem>> get() = _productsUi
+    val productsUi: LiveData<List<ProductsItem>> get() = _productsUi
 
     private var shoppingCartDomain = emptyList<ShoppingCartProduct>()
     private var productsDomain = emptyList<Product>()
@@ -122,16 +122,18 @@ class ProductsViewModel(
                 }
 
             _productsUi.value =
-                productsUi.value?.map { item ->
-                    if (item.product.id == productItem.product.id) {
-                        item.copy(
-                            selectedQuantity = uploaded?.quantity ?: 0,
-                            shoppingCartId = uploaded?.id,
-                        )
-                    } else {
-                        item
+                productsUi.value
+                    ?.filterIsInstance<ProductsItem.ProductItem>()
+                    ?.map { item ->
+                        if (item.product.id == productItem.product.id) {
+                            item.copy(
+                                selectedQuantity = uploaded?.quantity ?: 0,
+                                shoppingCartId = uploaded?.id,
+                            )
+                        } else {
+                            item
+                        }
                     }
-                }
             isApiLoading = false
         }
     }
@@ -149,7 +151,11 @@ class ProductsViewModel(
                 )
             }
 
-        _productsUi.value = _productsUi.value?.plus(productUi)
+        _productsUi.value =
+            _productsUi.value
+                ?.filterIsInstance<ProductsItem.ProductItem>()
+                ?.plus(productUi)
+                ?.plus(ProductsItem.LoadItem)
     }
 
     companion object {

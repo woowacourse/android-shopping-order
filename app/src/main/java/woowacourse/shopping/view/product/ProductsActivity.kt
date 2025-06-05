@@ -88,7 +88,6 @@ class ProductsActivity :
     }
 
     private fun setupObservers() {
-        productAdapter.submitList(listOf(ProductsItem.LoadItem))
         viewModel.productsUi.observe(this) { products ->
             productAdapter.submitList(products)
         }
