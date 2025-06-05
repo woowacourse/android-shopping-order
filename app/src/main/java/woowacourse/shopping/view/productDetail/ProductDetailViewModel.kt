@@ -84,8 +84,10 @@ class ProductDetailViewModel(
     }
 
     private fun updateRecentWatching() {
+        val productDomain = product.value?.product
+        if (productDomain == null) return
         viewModelScope.launch {
-            productsRepository.updateRecentWatchingProduct(product.value?.product ?: return@launch)
+            productsRepository.updateRecentWatchingProduct(productDomain)
         }
     }
 
