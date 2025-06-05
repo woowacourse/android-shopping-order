@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.product.repository
 
-import woowacourse.shopping.data.product.PagedProductsData
+import woowacourse.shopping.data.product.dto.ProductsResponse
+import woowacourse.shopping.data.product.dto.ProductsResponse.Content
 import woowacourse.shopping.data.product.entity.ProductEntity
 import woowacourse.shopping.data.product.entity.RecentViewedProductEntity
 import woowacourse.shopping.data.product.source.ProductsDataSource
@@ -21,14 +22,18 @@ class DefaultProductsRepository(
         onLoad: (Result<PagedProducts>) -> Unit,
     ) {
         {
-            val pagedProductsData: PagedProductsData =
+            val productsResponse: ProductsResponse? =
                 productsDataSource.pagedProducts(
                     page = page,
                     size = size,
                 )
-            PagedProducts(
-                products = pagedProductsData.products.map { it.toDomain() },
-                loadable = pagedProductsData.loadable,
+
+            PagedProducts.from(
+                products =
+                    productsResponse?.content?.mapNotNull { it.toDomainOrNull() }
+                        ?: emptyList(),
+                pageNumber = productsResponse?.pageable?.pageNumber,
+                totalPages = productsResponse?.totalPages,
             )
         }.runAsync(onLoad)
     }
@@ -86,6 +91,16 @@ class DefaultProductsRepository(
                 ),
             )
         }.runAsync(onLoad)
+    }
+
+    private fun Content.toDomainOrNull(): Product? {
+        return Product(
+            id = id ?: return null,
+            name = name ?: return null,
+            price = price ?: return null,
+            category = category ?: return null,
+            imageUrl = imageUrl,
+        )
     }
 
     private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {

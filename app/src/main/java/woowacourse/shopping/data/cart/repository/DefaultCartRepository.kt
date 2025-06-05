@@ -1,10 +1,11 @@
 package woowacourse.shopping.data.cart.repository
 
-import woowacourse.shopping.data.cart.PagedCartItemData
+import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.cart.source.CartDataSource
 import woowacourse.shopping.di.DataSourceModule
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PagedCartItems
+import woowacourse.shopping.domain.product.Product
 import kotlin.concurrent.thread
 
 class DefaultCartRepository(
@@ -16,9 +17,16 @@ class DefaultCartRepository(
         onLoad: (Result<PagedCartItems>) -> Unit,
     ) {
         {
-            val pagedCartItemData: PagedCartItemData =
+            val cartResponse: CartResponse? =
                 cartDataSource.pagedCartItems(page, size)
-            pagedCartItemData.toDomain()
+
+            PagedCartItems.from(
+                cartItems =
+                    cartResponse?.content?.mapNotNull { it.toDomainOrNull() }
+                        ?: emptyList(),
+                pageNumber = cartResponse?.pageable?.pageNumber,
+                totalPages = cartResponse?.totalPages,
+            )
         }.runAsync(onLoad)
     }
 
@@ -62,6 +70,31 @@ class DefaultCartRepository(
     override fun cartItemsSize(onResult: (Result<Int>) -> Unit) {
         { cartDataSource.cartItemsSize() }.runAsync(onResult)
     }
+
+    private fun CartResponse.Content.toDomainOrNull(): CartItem? =
+        if (id == null ||
+            product?.id == null ||
+            product.name == null ||
+            product.price == null ||
+            product.category == null ||
+            product.imageUrl == null ||
+            quantity == null
+        ) {
+            null
+        } else {
+            CartItem(
+                id = id,
+                product =
+                    Product(
+                        id = product.id,
+                        name = product.name,
+                        price = product.price,
+                        category = product.category,
+                        imageUrl = product.imageUrl,
+                    ),
+                quantity = quantity,
+            )
+        }
 
     private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {
         thread {

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.cart.source
 
-import woowacourse.shopping.data.cart.PagedCartItemData
 import woowacourse.shopping.data.cart.dto.CartItemQuantityRequest
 import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.cart.service.CartService
@@ -13,16 +12,10 @@ class RemoteCartDataSource(
     override fun pagedCartItems(
         page: Int,
         size: Int,
-    ): PagedCartItemData {
+    ): CartResponse? {
         val response: CartResponse? = cartService.getCart(page = page, size = size).execute().body()
 
-        return PagedCartItemData.from(
-            cartItems =
-                response?.content?.mapNotNull { it.toCartItemEntityOrNull() }
-                    ?: emptyList(),
-            pageNumber = response?.pageable?.pageNumber,
-            totalPages = response?.totalPages,
-        )
+        return response
     }
 
     override fun cart(): List<CartItemEntity> {

@@ -14,27 +14,4 @@ class PagedCartItemData(
             this.hasPrevious,
             this.hasNext,
         )
-
-    companion object {
-        fun from(
-            cartItems: List<CartItemEntity>,
-            pageNumber: Int?,
-            totalPages: Int?,
-        ): PagedCartItemData {
-            val hasPrevious: Boolean = if (pageNumber == null) false else pageNumber > 0
-
-            val hasNext: Boolean =
-                run {
-                    pageNumber ?: return@run false
-                    totalPages ?: return@run false
-
-                    pageNumber + 1 < totalPages
-                }
-            return PagedCartItemData(
-                cartItems,
-                hasPrevious,
-                hasNext,
-            )
-        }
-    }
 }

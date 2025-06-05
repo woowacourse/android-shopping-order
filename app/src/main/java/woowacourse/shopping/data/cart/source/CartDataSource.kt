@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.cart.source
 
-import woowacourse.shopping.data.cart.PagedCartItemData
+import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 interface CartDataSource {
     fun pagedCartItems(
         page: Int,
         size: Int,
-    ): PagedCartItemData
+    ): CartResponse?
 
     fun cart(): List<CartItemEntity>
 
