@@ -129,8 +129,8 @@ class CartViewModel(
                         _carts.value?.map {
                             val updatedCart = it.cart
                             if (updatedCart.product.id == cart.product.id) {
-                                updatedCart.updateQuantity(updatedCart.quantity + 1)
-                                it.copy(cart = updatedCart)
+                                val updated = updatedCart.updateQuantity(updatedCart.quantity + 1)
+                                it.copy(cart = updated)
                             } else {
                                 it
                             }
@@ -157,8 +157,8 @@ class CartViewModel(
                             _carts.value?.map {
                                 val updatedCart = it.cart
                                 if (updatedCart.product.id == cart.product.id) {
-                                    updatedCart.updateQuantity(updatedCart.quantity - 1)
-                                    it.copy(cart = updatedCart)
+                                    val updated = updatedCart.updateQuantity(updatedCart.quantity - 1)
+                                    it.copy(cart = updated)
                                 } else {
                                     it
                                 }
