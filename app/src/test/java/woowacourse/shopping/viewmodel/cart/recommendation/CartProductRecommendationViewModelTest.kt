@@ -104,7 +104,7 @@ class CartProductRecommendationViewModelTest {
                 recentProductRepository,
             )
 
-        viewModel.initShoppingCartInfo(emptySet(), 0, 0)
+        viewModel.initShoppingCartInfo(emptyList())
     }
 
     @Test

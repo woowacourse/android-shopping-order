@@ -182,10 +182,10 @@ class CartProductSelectionViewModelTest {
 
         // when
         viewModel.onSelectItem(cartProduct)
-        val actual = viewModel.selectedIds
+        val actual = viewModel.selectedProducts
 
         // then
-        actual shouldContain cartProduct.id
+        actual shouldContain cartProduct
     }
 
     @Test
@@ -198,10 +198,10 @@ class CartProductSelectionViewModelTest {
 
         // when
         viewModel.onSelectAllItems()
-        val actual = viewModel.selectedIds
+        val actual = viewModel.selectedProducts
 
         // then
-        actual shouldContainAll cartProducts.map { it.id }
+        actual shouldContainAll cartProducts
     }
 
     @Test
@@ -212,7 +212,7 @@ class CartProductSelectionViewModelTest {
 
         // when
         viewModel.onSelectAllItems()
-        val actual = viewModel.selectedIds
+        val actual = viewModel.selectedProducts
 
         // then
         actual shouldHaveSize 0
