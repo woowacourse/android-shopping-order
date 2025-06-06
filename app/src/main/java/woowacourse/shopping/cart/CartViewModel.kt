@@ -81,15 +81,17 @@ class CartViewModel(
         val set = _totalProducts.value ?: mutableSetOf()
         set.remove(cartProduct.productItem)
         _totalProducts.postValue(set.toMutableSet())
-        cartProductRepository.deleteCartProduct(cartProduct.productItem)
-
-        cartProductRepository.getTotalElements { updatedSize ->
-            val currentPage = page.value ?: INITIAL_PAGE
-            val startIndex = currentPage * PAGE_SIZE
-            if (startIndex >= updatedSize && currentPage > 0) {
-                decreasePage()
+        cartProductRepository.deleteCartProduct(cartProduct.productItem) { result ->
+            if (result == true) {
+                cartProductRepository.getTotalElements { updatedSize ->
+                    val currentPage = page.value ?: INITIAL_PAGE
+                    val startIndex = currentPage * PAGE_SIZE
+                    if (startIndex >= updatedSize && currentPage > 0) {
+                        decreasePage()
+                    }
+                    loadCartProducts()
+                }
             }
-            loadCartProducts()
         }
     }
 

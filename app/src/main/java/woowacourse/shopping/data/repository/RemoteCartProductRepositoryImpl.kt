@@ -48,14 +48,23 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
             )
     }
 
-    override fun deleteCartProduct(cartProduct: ProductUiModel) {
+    override fun deleteCartProduct(
+        cartProduct: ProductUiModel,
+        callback: (Boolean) -> Unit,
+    ) {
         if (cartProduct.cartItemId != null) {
             retrofitService.deleteCartItem(cartItemId = cartProduct.cartItemId).enqueue(
                 object : Callback<Void> {
                     override fun onResponse(
                         call: Call<Void>,
                         response: Response<Void>,
-                    ) = Unit
+                    ) {
+                        if (response.isSuccessful) {
+                            callback(true)
+                        } else {
+                            callback(false)
+                        }
+                    }
 
                     override fun onFailure(
                         call: Call<Void>,

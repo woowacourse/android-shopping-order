@@ -51,50 +51,60 @@ class CartRecommendationFragmentViewModel(
         val amount =
             _recommendedProducts.value?.sumOf { it.price * it.quantity }
                 ?: 0
-        Log.d("test", "실행됨? ${_recommendedProducts.value}")
         _totalPurchasePrice.postValue(amount)
     }
 
     fun increaseQuantity(product: ProductUiModel) {
         if (product.quantity == 0) {
             val newProduct = product.copy(quantity = 1)
-            cartProductRepository.insertCartProduct(newProduct) { }
-            _updatedItem.postValue(newProduct)
-            _recommendedProducts.value = _recommendedProducts.value?.map {
-                if (it.id == newProduct.id) newProduct else it
+            cartProductRepository.insertCartProduct(newProduct) { product ->
+                _updatedItem.postValue(product)
+                _recommendedProducts.value = _recommendedProducts.value?.map {
+                    if (it.id == product.id) product else it
+                }
+                fetchTotalCount()
+                fetchPurchasePrice()
             }
         } else {
             cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
                 if (result == true) {
-                    _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
+                    val newProduct = product.copy(quantity = product.quantity + 1)
+                    _updatedItem.postValue(newProduct)
                     _recommendedProducts.value = _recommendedProducts.value?.map {
-                        if (it.id == product.id) product else it
+                        if (it.id == newProduct.id) newProduct else it
                     }
+                    fetchTotalCount()
+                    fetchPurchasePrice()
                 }
             }
         }
-        fetchTotalCount()
-        fetchPurchasePrice()
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
         if (product.quantity == 1) {
-            cartProductRepository.deleteCartProduct(product)
-            _updatedItem.postValue(product.copy(quantity = 0))
-            _recommendedProducts.value = _recommendedProducts.value?.map {
-                if (it.id == product.id) product else it
+            val newProduct = product.copy(quantity = 0)
+            cartProductRepository.deleteCartProduct(product) {result ->
+                if (result == true) {
+                    _updatedItem.postValue(newProduct)
+                    _recommendedProducts.value = _recommendedProducts.value?.map {
+                        if (it.id == newProduct.id) newProduct else it
+                    }
+                    fetchTotalCount()
+                    fetchPurchasePrice()
+                }
             }
         } else {
             cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
                 if (result == true) {
-                    _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
+                    val newProduct = product.copy(quantity = product.quantity - 1)
+                    _updatedItem.postValue(newProduct)
                     _recommendedProducts.value = _recommendedProducts.value?.map {
-                        if (it.id == product.id) product else it
+                        if (it.id == newProduct.id) newProduct else it
                     }
+                    fetchTotalCount()
+                    fetchPurchasePrice()
                 }
             }
         }
-        fetchTotalCount()
-        fetchPurchasePrice()
     }
 }

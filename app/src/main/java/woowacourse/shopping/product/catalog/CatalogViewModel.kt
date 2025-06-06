@@ -66,8 +66,11 @@ class CatalogViewModel(
 
     fun decreaseQuantity(product: ProductUiModel) {
         if (product.quantity == 1) {
-            cartProductRepository.deleteCartProduct(product)
-            _updatedItem.postValue(product.copy(quantity = 0))
+            cartProductRepository.deleteCartProduct(product) { result ->
+                if (result == true) {
+                    _updatedItem.postValue(product.copy(quantity = 0))
+                }
+            }
         } else {
             cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
                 if (result == true) {
