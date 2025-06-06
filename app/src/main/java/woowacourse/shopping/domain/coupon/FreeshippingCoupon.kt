@@ -9,4 +9,15 @@ data class FreeshippingCoupon(
     override val discountType: String,
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
-) : Coupon
+) : Coupon {
+    fun isUsable(
+        standardDate: LocalDate,
+        standardAmount: Int,
+    ): Boolean {
+        if (isExpired(standardDate)) return false
+        if (!isMinimumAmountSatisfied(standardAmount)) return false
+        return true
+    }
+
+    private fun isMinimumAmountSatisfied(standardAmount: Int) = standardAmount >= minimumAmount
+}
