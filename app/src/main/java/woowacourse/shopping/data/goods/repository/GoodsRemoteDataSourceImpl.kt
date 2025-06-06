@@ -32,70 +32,23 @@ class GoodsRemoteDataSourceImpl(
             .build()
             .create(RetrofitService::class.java)
 
-    override fun fetchPageGoods(
+    override suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onSuccess: (GoodsResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    ) {
+    ): GoodsResponse =
         retrofitService
             .requestProducts(page = offset / limit, size = limit)
-            .enqueue(
-                object : Callback<GoodsResponse> {
-                    override fun onResponse(
-                        call: Call<GoodsResponse>,
-                        response: Response<GoodsResponse>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!)
-                        } else {
-                            onFailure(Throwable("응답 없음 또는 실패: ${response.code()}"))
-                        }
-                    }
 
-                    override fun onFailure(
-                        call: Call<GoodsResponse>,
-                        t: Throwable,
-                    ) {
-                        onFailure(t)
-                    }
-                },
-            )
-    }
-
-    override fun fetchGoodsByCategory(
+    override suspend fun fetchGoodsByCategory(
         limit: Int,
         category: String,
-        onSuccess: (GoodsResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    ) {
+    ): GoodsResponse =
         retrofitService
             .requestProducts(
                 page = 0,
                 size = limit,
                 category = category,
-            ).enqueue(
-                object : Callback<GoodsResponse> {
-                    override fun onResponse(
-                        call: Call<GoodsResponse>,
-                        response: Response<GoodsResponse>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!)
-                        } else {
-                            onFailure(Throwable("응답 없음 또는 실패: ${response.code()}"))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<GoodsResponse>,
-                        t: Throwable,
-                    ) {
-                        onFailure(t)
-                    }
-                },
             )
-    }
 
     override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
     }

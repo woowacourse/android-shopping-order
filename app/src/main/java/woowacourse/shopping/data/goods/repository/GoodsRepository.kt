@@ -6,19 +6,15 @@ import woowacourse.shopping.domain.model.Goods
 interface GoodsRepository {
     fun fetchGoodsSize(onComplete: (Int) -> Unit)
 
-    fun fetchPageGoods(
+    suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    )
+    ): GoodsResponse
 
-    fun fetchCategoryGoods(
+    suspend fun fetchCategoryGoods(
         limit: Int,
         category: String,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    )
+    ): GoodsResponse
 
     fun fetchGoodsById(
         id: Int,

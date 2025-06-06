@@ -205,19 +205,17 @@ class GoodsViewModel(
 
     private fun appendCartItemsWithZeroQuantity() {
         val goodsLoadOffset = (currentPage - 1) * PAGE_SIZE
-        goodsRepository.fetchPageGoods(
-            limit = PAGE_SIZE,
-            offset = goodsLoadOffset,
-            onComplete = { goodsResponse ->
-                val loadedGoods = _goods.value ?: emptyList()
-                val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
-                _goods.value = (loadedGoods + fetchedGoods).toMutableList()
-                _isFullLoaded.postValue(goodsResponse.last)
-            },
-            onFail = { throwable ->
-                throw throwable
-            },
-        )
+        viewModelScope.launch {
+            val goodsResponse =
+                goodsRepository.fetchPageGoods(
+                    limit = PAGE_SIZE,
+                    offset = goodsLoadOffset,
+                )
+            val loadedGoods = _goods.value ?: emptyList()
+            val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
+            _goods.value = (loadedGoods + fetchedGoods).toMutableList()
+            _isFullLoaded.postValue(goodsResponse.last)
+        }
     }
 
     private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> = goodsResponse.content.map { it.toDomain() }

@@ -12,37 +12,23 @@ class GoodsRepositoryImpl(
         remoteDataSource.fetchGoodsSize(onComplete)
     }
 
-    override fun fetchPageGoods(
+    override suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    ) {
+    ): GoodsResponse =
         remoteDataSource.fetchPageGoods(
             limit,
             offset,
-            { response ->
-                onComplete(response)
-            },
-            onFail,
         )
-    }
 
-    override fun fetchCategoryGoods(
+    override suspend fun fetchCategoryGoods(
         limit: Int,
         category: String,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    ) {
+    ): GoodsResponse =
         remoteDataSource.fetchGoodsByCategory(
             limit,
             category,
-            { response ->
-                onComplete(response)
-            },
-            onFail,
         )
-    }
 
     override fun fetchGoodsById(
         id: Int,

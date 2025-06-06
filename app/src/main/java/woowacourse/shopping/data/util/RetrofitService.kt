@@ -17,11 +17,11 @@ import woowacourse.shopping.data.goods.dto.GoodsResponse
 
 interface RetrofitService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20,
         @Query("category") category: String? = null,
-    ): Call<GoodsResponse>
+    ): GoodsResponse
 
     @GET("/products/{id}")
     fun requestProductDetail(
