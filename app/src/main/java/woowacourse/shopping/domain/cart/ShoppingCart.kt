@@ -9,6 +9,9 @@ data class ShoppingCart(
     val product: Product,
     val quantity: Quantity,
 ) : Serializable {
+    val payment: Int
+        get() = product.priceValue * quantity.value
+
     val productId: Long
         get() = product.id
 

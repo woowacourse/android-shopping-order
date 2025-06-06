@@ -24,6 +24,7 @@ class OrderActivity : AppCompatActivity() {
         val container = (application as App).container
         OrderViewModelFactory(
             couponRepository = container.couponRepository,
+            couponValidator = container.couponValidator,
         )
     }
 

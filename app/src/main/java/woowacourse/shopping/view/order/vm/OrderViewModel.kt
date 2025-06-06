@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.coupon.CouponValidate
 import woowacourse.shopping.domain.exception.onFailure
 import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -17,6 +19,7 @@ import woowacourse.shopping.view.order.state.OrderUiState
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,
+    private val couponValidator: CouponValidate,
 ) : ViewModel() {
     private val _uiState = MutableLiveData<OrderUiState>()
     val uiState: LiveData<OrderUiState> get() = _uiState
@@ -24,15 +27,12 @@ class OrderViewModel(
     private val _uiEvent = MutableSingleLiveData<CartUiEvent>()
     val uiEvent: SingleLiveData<CartUiEvent> get() = _uiEvent
 
-    init {
-        loadCoupons()
-    }
-
-    private fun loadCoupons() {
+    fun loadCoupons(order: List<ShoppingCart>) {
         viewModelScope.launch {
             couponRepository.getCoupons()
                 .onSuccess { result ->
-                    _uiState.value = OrderUiState.of(result)
+                    val coupons = couponValidator.validCoupon(result, order)
+                    _uiState.value = OrderUiState.of(coupons)
                 }
                 .onFailure(::handleFailure)
         }
