@@ -8,30 +8,32 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 class FakeCartItemRepository(
     private val size: Int,
 ) : CartItemRepository {
-    private val fakeCartItems = mutableListOf<ProductUiModel>(
-        *List(size) { index ->
-            ProductUiModel(
-                id = (index + 1).toLong(),
-                name = "${index + 1} 아이스 카페 아메리카노",
-                imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
-                price = 1000 * (index + 1),
-                quantity = (index + 1),
-            )
-        }.toTypedArray()
-    )
+    private val fakeCartItems =
+        mutableListOf<ProductUiModel>(
+            *List(size) { index ->
+                ProductUiModel(
+                    id = (index + 1).toLong(),
+                    name = "${index + 1} 아이스 카페 아메리카노",
+                    imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
+                    price = 1000 * (index + 1),
+                    quantity = (index + 1),
+                )
+            }.toTypedArray(),
+        )
 
     override fun getInitialCartItems(
         page: Int?,
         size: Int?,
         onResult: (Result<List<CachedCartItem>>) -> Unit,
     ) {
-        val cachedItems = fakeCartItems.map { product ->
-            CachedCartItem(
-                cartId = product.id,
-                productId = product.id,
-                quantity = product.quantity
-            )
-        }
+        val cachedItems =
+            fakeCartItems.map { product ->
+                CachedCartItem(
+                    cartId = product.id,
+                    productId = product.id,
+                    quantity = product.quantity,
+                )
+            }
 
         onResult(Result.success(cachedItems))
     }
@@ -45,18 +47,20 @@ class FakeCartItemRepository(
             val startIndex = page * size
             val endIndex = (startIndex + size).coerceAtMost(fakeCartItems.size)
 
-            val pageItems = if (startIndex < fakeCartItems.size) {
-                fakeCartItems.subList(startIndex, endIndex)
-            } else {
-                emptyList()
-            }
+            val pageItems =
+                if (startIndex < fakeCartItems.size) {
+                    fakeCartItems.subList(startIndex, endIndex)
+                } else {
+                    emptyList()
+                }
 
-            val pagingData = PagingData(
-                products = pageItems,
-                page = page,
-                hasNext = endIndex < fakeCartItems.size,
-                hasPrevious = page > 0
-            )
+            val pagingData =
+                PagingData(
+                    products = pageItems,
+                    page = page,
+                    hasNext = endIndex < fakeCartItems.size,
+                    hasPrevious = page > 0,
+                )
 
             onResult(Result.success(pagingData))
         }
@@ -83,8 +87,8 @@ class FakeCartItemRepository(
                     name = "$id 아이스 카페 아메리카노",
                     imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
                     price = 1000 * id.toInt(),
-                    quantity = quantity
-                )
+                    quantity = quantity,
+                ),
             )
         }
         onResult(Result.success(Unit))
@@ -104,7 +108,6 @@ class FakeCartItemRepository(
         onResult(Result.success(Unit))
     }
 
-
     override fun addCartItemQuantity(
         id: Long,
         quantity: Int,
@@ -122,8 +125,8 @@ class FakeCartItemRepository(
                     name = "$id 아이스 카페 아메리카노",
                     imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
                     price = 1000 * id.toInt(),
-                    quantity = quantity
-                )
+                    quantity = quantity,
+                ),
             )
         }
         onResult(Result.success(Unit))
@@ -135,10 +138,11 @@ class FakeCartItemRepository(
     }
 
     override fun getQuantity(pagingData: PagingData): PagingData {
-        val updatedProducts = pagingData.products.map { product ->
-            val cartItem = fakeCartItems.find { it.id == product.id }
-            product.copy(quantity = cartItem?.quantity ?: 0)
-        }
+        val updatedProducts =
+            pagingData.products.map { product ->
+                val cartItem = fakeCartItems.find { it.id == product.id }
+                product.copy(quantity = cartItem?.quantity ?: 0)
+            }
 
         return pagingData.copy(products = updatedProducts)
     }

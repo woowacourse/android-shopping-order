@@ -30,15 +30,16 @@ object RepositoryProvider {
         productsRepository =
             ProductsRepositoryImpl(
                 ProductsRemoteDataSource(getProductRetrofitService),
-                viewedItemRepository
+                viewedItemRepository,
             )
         cartItemRepository =
             CartItemsRepositoryImpl(
                 CartItemsRemoteDataSource(getCartRetrofitService),
                 CartItemsLocalDataSource(),
             )
-        orderRepository = OrderRepositoryImpl(
-            OrderRemoteDataSource(getOrderRetrofitService),
-        )
+        orderRepository =
+            OrderRepositoryImpl(
+                OrderRemoteDataSource(getOrderRetrofitService),
+            )
     }
 }

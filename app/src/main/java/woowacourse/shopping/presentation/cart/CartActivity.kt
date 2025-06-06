@@ -46,10 +46,11 @@ class CartActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         val handler = CartEventHandlerImpl(viewModel)
-        cartAdapter = CartAdapter(
-            cartHandler = handler,
-            handler = handler,
-        )
+        cartAdapter =
+            CartAdapter(
+                cartHandler = handler,
+                handler = handler,
+            )
         binding.recyclerViewCart.adapter = cartAdapter
     }
 
@@ -76,10 +77,11 @@ class CartActivity : AppCompatActivity() {
         }
 
         viewModel.navigateToRecommendEvent.observe(this) { orderInfo ->
-            val intent = RecommendActivity.newIntent(
-                this@CartActivity,
-                ArrayList(orderInfo.checkedItems),
-            )
+            val intent =
+                RecommendActivity.newIntent(
+                    this@CartActivity,
+                    ArrayList(orderInfo.checkedItems),
+                )
             startActivity(intent)
         }
     }

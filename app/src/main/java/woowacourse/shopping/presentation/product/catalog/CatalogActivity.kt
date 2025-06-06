@@ -62,9 +62,10 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
-        productAdapter = ProductAdapter(handler, handler, onQuantityClick = { product ->
-            handler.toggleQuantity(product)
-        })
+        productAdapter =
+            ProductAdapter(handler, handler, onQuantityClick = { product ->
+                handler.toggleQuantity(product)
+            })
         binding.recyclerViewProducts.apply {
             this.adapter = productAdapter
             layoutManager =
@@ -76,8 +77,7 @@ class CatalogActivity : AppCompatActivity() {
         GridLayoutManager(this, 2).apply {
             spanSizeLookup =
                 object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int =
-                        if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
+                    override fun getSpanSize(position: Int): Int = if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
                 }
         }
 

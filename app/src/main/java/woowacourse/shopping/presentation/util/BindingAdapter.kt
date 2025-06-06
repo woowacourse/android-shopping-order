@@ -4,12 +4,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.recommend.RecommendAdapter
 
 @BindingAdapter("loadImage")
 fun loadImage(
@@ -48,4 +45,3 @@ fun setPrevButtonEnabled(
 ) {
     view.isEnabled = isEnabled
 }
-

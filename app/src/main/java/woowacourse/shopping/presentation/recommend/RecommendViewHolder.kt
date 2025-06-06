@@ -14,15 +14,16 @@ class RecommendViewHolder(
     private val onQuantityClick: (ProductUiModel) -> Unit,
     private val quantityHandler: ProductQuantityHandler,
 ) : RecyclerView.ViewHolder(
-    LayoutInflater.from(parent.context).inflate(R.layout.recommend_item, parent, false)
-) {
+        LayoutInflater.from(parent.context).inflate(R.layout.recommend_item, parent, false),
+    ) {
     private val binding = RecommendItemBinding.bind(itemView)
 
     fun bind(productUiModel: ProductUiModel) {
         binding.product = productUiModel
-        binding.onQuantityClick = View.OnClickListener {
-            onQuantityClick(productUiModel)
-        }
+        binding.onQuantityClick =
+            View.OnClickListener {
+                onQuantityClick(productUiModel)
+            }
         binding.handler = quantityHandler
     }
 }

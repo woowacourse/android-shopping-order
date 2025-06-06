@@ -13,7 +13,7 @@ class FakeViewedItemRepository(
                 name = "${index + 1} 아이스 카페 아메리카노",
                 imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
                 price = 1000 * (index + 1),
-                quantity = 0
+                quantity = 0,
             )
         }.toMutableList()
 

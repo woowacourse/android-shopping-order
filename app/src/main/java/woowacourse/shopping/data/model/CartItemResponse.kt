@@ -12,7 +12,7 @@ data class CartItemResponse(
     val sort: Sort,
     val totalElements: Long,
     val totalPages: Int,
-){
+) {
     data class Content(
         val id: Long,
         val product: ProductResponse,

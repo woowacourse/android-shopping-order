@@ -10,7 +10,6 @@ import woowacourse.shopping.presentation.util.ProductUiModelDiffCallback
 class ViewedItemAdapter(
     private val handler: CatalogEventHandlerImpl,
 ) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(ProductUiModelDiffCallback()) {
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

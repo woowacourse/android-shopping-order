@@ -1,8 +1,8 @@
 package woowacourse.shopping.presentation.util
 
 import android.content.Intent
-import android.os.Build.VERSION
 import android.os.Build
+import android.os.Build.VERSION
 import android.os.Parcelable
 
 object IntentCompat {

@@ -9,7 +9,6 @@ import woowacourse.shopping.fixture.FakeCartItemRepository
 import woowacourse.shopping.fixture.FakeCatalogItemRepository
 import woowacourse.shopping.fixture.FakeViewedItemRepository
 import woowacourse.shopping.util.InstantTaskExecutorExtension
-import woowacourse.shopping.util.getOrAwaitValue
 
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CatalogViewModelTest {

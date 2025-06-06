@@ -56,16 +56,17 @@ class DetailViewModelTest {
     fun `상품을 장바구니에 담을 수 있다`() {
         val cartRepository = FakeCartItemRepository(0)
 
-        viewModel = DetailViewModel(
-            FakeCatalogItemRepository(30),
-            cartRepository,
-            FakeViewedItemRepository(1),
-            productId = 10L
-        )
+        viewModel =
+            DetailViewModel(
+                FakeCatalogItemRepository(30),
+                cartRepository,
+                FakeViewedItemRepository(1),
+                productId = 10L,
+            )
 
         viewModel.setProduct()
 
-        cartRepository.addCartItem(id= 10L, quantity = 2) {  }
+        cartRepository.addCartItem(id = 10L, quantity = 2) { }
         val cartItems = mutableListOf<ProductUiModel>()
         cartRepository.getCartItems(page = 0, size = 5) { result ->
             result.onSuccess { pagingData ->
@@ -79,20 +80,20 @@ class DetailViewModelTest {
         assertThat(cartItems[0].id).isEqualTo(10L)
     }
 
-
     @Test
     fun `상품을 원하는 갯수만큼 장바구니에 담을 수 있다`() {
         val cartRepository = FakeCartItemRepository(0)
 
-        viewModel = DetailViewModel(
-            FakeCatalogItemRepository(30),
-            cartRepository,
-            FakeViewedItemRepository(1),
-            productId = 10L
-        )
+        viewModel =
+            DetailViewModel(
+                FakeCatalogItemRepository(30),
+                cartRepository,
+                FakeViewedItemRepository(1),
+                productId = 10L,
+            )
 
         viewModel.setProduct()
-        cartRepository.addCartItem(id= 10L, quantity = 3) {  }
+        cartRepository.addCartItem(id = 10L, quantity = 3) { }
 
         val cartItems = mutableListOf<ProductUiModel>()
         cartRepository.getCartItems(page = 0, size = 5) { result ->

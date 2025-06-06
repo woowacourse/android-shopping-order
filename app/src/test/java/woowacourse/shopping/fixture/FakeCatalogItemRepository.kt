@@ -25,18 +25,20 @@ class FakeCatalogItemRepository(
         val startIndex = page * size
         val endIndex = (startIndex + size).coerceAtMost(fakeProducts.size)
 
-        val pageItems = if (startIndex < fakeProducts.size) {
-            fakeProducts.subList(startIndex, endIndex)
-        } else {
-            emptyList()
-        }
+        val pageItems =
+            if (startIndex < fakeProducts.size) {
+                fakeProducts.subList(startIndex, endIndex)
+            } else {
+                emptyList()
+            }
 
-        val pagingData = PagingData(
-            products = pageItems,
-            page = page,
-            hasNext = endIndex < fakeProducts.size,
-            hasPrevious = page > 0
-        )
+        val pagingData =
+            PagingData(
+                products = pageItems,
+                page = page,
+                hasNext = endIndex < fakeProducts.size,
+                hasPrevious = page > 0,
+            )
 
         onResult(Result.success(pagingData))
     }

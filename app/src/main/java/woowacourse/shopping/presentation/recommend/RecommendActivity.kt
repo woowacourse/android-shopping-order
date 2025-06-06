@@ -63,11 +63,13 @@ class RecommendActivity : AppCompatActivity() {
     }
 
     private fun setAdapter() {
-        recommendAdapter = RecommendAdapter(
-            handler = RecommendEventHandlerImpl(recommendViewModel),
-            onQuantityClick = { product ->
-                recommendViewModel.toggleQuantity(product)
-            })
+        recommendAdapter =
+            RecommendAdapter(
+                handler = RecommendEventHandlerImpl(recommendViewModel),
+                onQuantityClick = { product ->
+                    recommendViewModel.toggleQuantity(product)
+                },
+            )
     }
 
     private fun requireCheckedItems(): List<ProductUiModel> {

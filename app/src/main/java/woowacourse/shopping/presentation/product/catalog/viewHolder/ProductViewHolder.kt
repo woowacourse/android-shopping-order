@@ -19,9 +19,10 @@ class ProductViewHolder(
         binding.product = product
         binding.catalogHandler = catalogHandler
         binding.handler = handler
-        binding.onQuantityClick = View.OnClickListener {
-            onQuantityClick(product)
-        }
+        binding.onQuantityClick =
+            View.OnClickListener {
+                onQuantityClick(product)
+            }
         binding.executePendingBindings()
     }
 

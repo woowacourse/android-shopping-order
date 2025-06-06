@@ -33,10 +33,9 @@ class OrderRemoteDataSource(
                 ) {
                     onResult(Result.failure(t))
                 }
-            }
+            },
         )
     }
-
 
     companion object {
         private const val POST_ERROR_MESSAGE = "[ERROR] 주문이 실패했습니다."

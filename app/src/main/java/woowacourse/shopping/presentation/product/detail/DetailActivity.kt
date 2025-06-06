@@ -14,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
 import woowacourse.shopping.presentation.product.detail.event.DetailEventHandlerImpl
