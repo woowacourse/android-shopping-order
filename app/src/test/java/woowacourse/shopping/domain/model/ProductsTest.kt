@@ -1,112 +1,187 @@
 package woowacourse.shopping.domain.model
 
-import com.google.common.truth.Truth.assertThat
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.model.DUMMY_CART_PRODUCTS_1
+import woowacourse.shopping.model.DUMMY_CART_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_CART_PRODUCT_2
+import woowacourse.shopping.model.DUMMY_CART_PRODUCT_3
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_1
+import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_2
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_2
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_3
 
 class ProductsTest {
     @Test
-    fun `두 상품 목록을 병합하면 기존 순서를 유지하며 결합되고 hasMore는 우측 값을 따른다`() {
+    fun `모든 상품이 선택되어 있으면 모든 상품이 선택되어 있음을 반환한다`() {
         // given
-        val left = Products(listOf(DUMMY_CATALOG_PRODUCT_1), hasMore = true)
-        val right = Products(listOf(DUMMY_CATALOG_PRODUCT_2), hasMore = false)
-
-        // when
-        val result = left + right
-
-        // then
-        assertThat(result.products)
-            .containsExactly(
-                DUMMY_CATALOG_PRODUCT_1,
-                DUMMY_CATALOG_PRODUCT_2,
-            ).inOrder()
-        assertThat(result.hasMore).isFalse()
-    }
-
-    @Test
-    fun `상품 수량을 변경하면 해당 상품만 반영되고 나머지는 유지된다`() {
-        // given
-        val original = DUMMY_CATALOG_PRODUCTS_1
-        val newQuantity = 100
-
-        // when
-        val updated =
-            original.updateProductQuantity(
-                DUMMY_CATALOG_PRODUCT_2.productDetail.id,
-                newQuantity,
-            )
-
-        // then
-        val modified =
-            updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }
-        assertThat(modified.quantity).isEqualTo(newQuantity)
-
-        val unmodified =
-            updated.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
-        assertThat(unmodified.quantity).isEqualTo(DUMMY_CATALOG_PRODUCT_1.quantity)
-    }
-
-    @Test
-    fun `단일 상품 정보를 갱신하면 해당 상품만 변경된다`() {
-        // given
-        val original = DUMMY_CATALOG_PRODUCTS_1
-        val updatedProduct = DUMMY_CATALOG_PRODUCT_2.copy(quantity = 100)
-
-        // when
-        val result = original.updateProduct(updatedProduct)
-
-        // then
-        val modified =
-            result.products.first { it.productDetail.id == updatedProduct.productDetail.id }
-        assertThat(modified.quantity).isEqualTo(100)
-
-        val unmodified =
-            result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }
-        assertThat(unmodified.quantity).isEqualTo(DUMMY_CATALOG_PRODUCT_1.quantity)
-    }
-
-    @Test
-    fun `복수 상품 정보를 갱신하면 매칭되는 항목만 반영된다`() {
-        // given
-        val original = DUMMY_CATALOG_PRODUCTS_1
-
-        val updatedList =
-            listOf(
-                DUMMY_CATALOG_PRODUCT_1.copy(quantity = 1),
-                DUMMY_CATALOG_PRODUCT_3.copy(quantity = 2),
+        val selectedProducts =
+            DUMMY_CART_PRODUCTS_1.copy(
+                products = DUMMY_CART_PRODUCTS_1.products.map { it.copy(isSelected = true) },
             )
 
         // when
-        val result = original.updateProducts(updatedList)
+        val result = selectedProducts.isAllSelected
 
         // then
-        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_1.productDetail.id }.quantity).isEqualTo(
-            1,
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `선택된 상품들의 총 수량을 반환한다`() {
+        // given
+        val selected =
+            DUMMY_CATALOG_PRODUCTS_1.copy(
+                products = DUMMY_CATALOG_PRODUCTS_1.products.map { it.copy(isSelected = true) },
+            )
+
+        // when
+        val quantity = selected.selectedProductsQuantity
+
+        // then
+        assertThat(quantity).isEqualTo(5 + 6 + 7)
+    }
+
+    @Test
+    fun `선택된 상품들의 총 가격을 반환한다`() {
+        // given
+        val selected =
+            DUMMY_CATALOG_PRODUCTS_1.copy(
+                products = DUMMY_CATALOG_PRODUCTS_1.products.map { it.copy(isSelected = true) },
+            )
+
+        // when
+        val price = selected.selectedProductsPrice
+
+        // then
+        val expected =
+            DUMMY_CATALOG_PRODUCT_1.totalPrice +
+                DUMMY_CATALOG_PRODUCT_2.totalPrice +
+                DUMMY_CATALOG_PRODUCT_3.totalPrice
+
+        assertThat(price).isEqualTo(expected)
+    }
+
+    @Test
+    fun `상품 선택 상태를 반전한다`() {
+        // given
+        val products = DUMMY_CART_PRODUCTS_1
+        val target = products.products.first()
+
+        // when
+        val updated = products.updateSelection(target)
+
+        // then
+        assertThat(updated.getProductByProductId(target.productDetail.id)?.isSelected).isEqualTo(!target.isSelected)
+    }
+
+    @Test
+    fun `특정 상품의 수량을 업데이트한다`() {
+        // given
+        val products = DUMMY_CART_PRODUCTS_1
+        val target = products.products.first()
+
+        // when
+        val updated = products.updateQuantity(target, 10)
+
+        // then
+        assertThat(updated.getProductByProductId(target.productDetail.id)?.quantity).isEqualTo(10)
+    }
+
+    @Test
+    fun `전체 선택 상태를 반전한다`() {
+        // given
+        val products = DUMMY_CART_PRODUCTS_1
+
+        // when
+        val toggled = products.toggleAllSelection()
+
+        // then
+        assertThat(toggled.isAllSelected).isTrue()
+    }
+
+    @Test
+    fun `상품의 ID로 상품을 조회할 수 있다`() {
+        // given
+        val products = DUMMY_CART_PRODUCTS_1
+        val id = DUMMY_CART_PRODUCT_3.productDetail.id
+
+        // when
+        val found = products.getProductByProductId(id)
+
+        // then
+        assertThat(found?.productDetail?.id).isEqualTo(id)
+    }
+
+    @Test
+    fun `장바구니 ID로 상품을 조회할 수 있다`() {
+        // given
+        val products = DUMMY_CART_PRODUCTS_1
+        val cartId = DUMMY_CART_PRODUCT_2.cartId
+
+        // when
+        val found = products.getProductByCartId(cartId!!)
+
+        // then
+        assertThat(found?.cartId).isEqualTo(cartId)
+    }
+
+    @Test
+    fun `선택된 상품들의 상품 ID 목록을 반환한다`() {
+        // given
+        val selected =
+            DUMMY_CART_PRODUCTS_1.copy(
+                products =
+                    DUMMY_CART_PRODUCTS_1.products.mapIndexed { index, product ->
+                        if (index < 3) product.copy(isSelected = true) else product
+                    },
+            )
+
+        // when
+        val ids = selected.getSelectedProductIds()
+
+        // then
+        assertThat(ids).containsExactly(
+            DUMMY_CART_PRODUCT_1.productDetail.id,
+            DUMMY_CART_PRODUCT_2.productDetail.id,
+            DUMMY_CART_PRODUCT_3.productDetail.id,
         )
-        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_2.productDetail.id }.quantity)
-            .isEqualTo(DUMMY_CATALOG_PRODUCT_2.quantity)
-        assertThat(result.products.first { it.productDetail.id == DUMMY_CATALOG_PRODUCT_3.productDetail.id }.quantity).isEqualTo(
-            2,
+    }
+
+    @Test
+    fun `선택된 상품들의 장바구니 ID 목록을 반환한다`() {
+        // given
+        val selected =
+            DUMMY_CART_PRODUCTS_1.copy(
+                products =
+                    DUMMY_CART_PRODUCTS_1.products.mapIndexed { index, product ->
+                        if (index < 3) product.copy(isSelected = true) else product
+                    },
+            )
+
+        // when
+        val cartIds = selected.getSelectedCartIds()
+
+        // then
+        assertThat(cartIds).containsExactly(
+            DUMMY_CART_PRODUCT_1.cartId,
+            DUMMY_CART_PRODUCT_2.cartId,
+            DUMMY_CART_PRODUCT_3.cartId,
         )
     }
 
     @Test
-    fun `총 수량은 모든 상품 수량의 합과 같다`() {
+    fun `두 Products를 병합하면 상품 목록이 추가된다`() {
         // given
-        val products =
-            Products(
-                listOf(
-                    DUMMY_CATALOG_PRODUCT_1.copy(quantity = 1),
-                    DUMMY_CATALOG_PRODUCT_2.copy(quantity = 2),
-                    DUMMY_CATALOG_PRODUCT_3.copy(quantity = 3),
-                ),
-                hasMore = false,
-            )
+        val left = DUMMY_CATALOG_PRODUCTS_1
+        val right = DUMMY_CATALOG_PRODUCTS_2.copy(page = Page(3, isFirst = false, isLast = true))
+
+        // when
+        val merged = left + right
 
         // then
-        assertThat(products.catalogProductsQuantity).isEqualTo(6)
+        assertThat(merged.products).hasSize(left.products.size + right.products.size)
+        assertThat(merged.page).isEqualTo(right.page)
     }
 }
