@@ -25,6 +25,7 @@
         android:onClick="@{() -> couponClickListener.onCouponClick(couponState)}">
 
         <CheckBox
+            android:clickable="false"
             android:checked="@{couponState.selected}"
             android:id="@+id/couponCheckbox"
             android:layout_width="wrap_content"
