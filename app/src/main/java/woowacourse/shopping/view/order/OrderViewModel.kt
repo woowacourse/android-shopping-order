@@ -10,11 +10,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.remote.repository.CouponRepository
 import woowacourse.shopping.data.coupon.remote.repository.DefaultCouponRepository
+import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
+import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 class OrderViewModel(
     private val couponRepository: CouponRepository = DefaultCouponRepository.get(),
+    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
     private val shoppingCartProductsToOrder: List<ShoppingCartProduct> = emptyList(),
 ) : ViewModel() {
     private val _orderState = MutableLiveData<OrderState>()
@@ -69,8 +72,12 @@ class OrderViewModel(
     }
 
     fun proceedOrder() {
-        // TODO 장바구니 데이터 삭제 후 발생
-        _event.value = OrderEvent.ORDER_SUCCESS
+        viewModelScope.launch {
+            shoppingCartProductsToOrder.forEach {
+                shoppingCartRepository.remove(it.id)
+            }
+            _event.value = OrderEvent.ORDER_SUCCESS
+        }
     }
 
     companion object {
