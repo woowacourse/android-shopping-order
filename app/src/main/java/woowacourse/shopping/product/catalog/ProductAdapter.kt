@@ -1,9 +1,7 @@
 package woowacourse.shopping.product.catalog
 
-import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.domain.LoadingState
 
 class ProductAdapter(
     products: List<CatalogItem>,
@@ -15,15 +13,15 @@ class ProductAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder = when (viewType) {
-        VIEW_TYPE_PRODUCT ->
-            ProductViewHolder.from(parent, productActionListener, quantityControlListener)
+    ): RecyclerView.ViewHolder =
+        when (viewType) {
+            VIEW_TYPE_PRODUCT ->
+                ProductViewHolder.from(parent, productActionListener, quantityControlListener)
 
-        VIEW_TYPE_LOAD_MORE -> LoadButtonViewHolder.from(parent, productActionListener)
+            VIEW_TYPE_LOAD_MORE -> LoadButtonViewHolder.from(parent, productActionListener)
 
-        else -> LoadingStateProductViewHolder.from(parent)
-
-    }
+            else -> LoadingStateProductViewHolder.from(parent)
+        }
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,

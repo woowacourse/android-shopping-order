@@ -13,9 +13,10 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 import kotlin.text.substringAfterLast
 
 class CartProductRemoteDataSource(
-    private val retrofitService: CartItemService = RetrofitProductService.INSTANCE.create(
-        CartItemService::class.java
-    ),
+    private val retrofitService: CartItemService =
+        RetrofitProductService.INSTANCE.create(
+            CartItemService::class.java,
+        ),
 ) : CartProductDataSource {
     override fun insertCartProduct(
         cartProduct: ProductUiModel,

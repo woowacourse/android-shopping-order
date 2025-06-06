@@ -45,9 +45,10 @@ class CartViewModel(
 
     fun onAllSelectedProducts() {
         val isChecked = _allChecked.value ?: true
-        _cartProducts.value = _cartProducts.value?.map {
-            it.copy(isChecked = !isChecked)
-        }
+        _cartProducts.value =
+            _cartProducts.value?.map {
+                it.copy(isChecked = !isChecked)
+            }
         _allChecked.value = !isChecked
         fetchTotalPurchaseAmount()
     }
@@ -116,7 +117,7 @@ class CartViewModel(
     fun increaseQuantity(product: ProductUiModel) {
         cartRepository.updateCartProduct(
             product,
-            product.quantity + A_COUNT
+            product.quantity + A_COUNT,
         ) { success ->
             if (success) {
                 val newProduct = product.copy(quantity = product.quantity + A_COUNT)
@@ -130,7 +131,7 @@ class CartViewModel(
             val newProduct = product.copy(quantity = product.quantity - A_COUNT)
             cartRepository.updateCartProduct(
                 product,
-                product.quantity - A_COUNT
+                product.quantity - A_COUNT,
             ) { success ->
                 if (success) {
                     updateItem(newProduct)
@@ -141,18 +142,20 @@ class CartViewModel(
 
     private fun updateItem(newProduct: ProductUiModel) {
         _updatedItem.postValue(newProduct)
-        _cartProducts.value = _cartProducts.value?.map {
-            if (it.id == newProduct.id) newProduct else it
-        }
+        _cartProducts.value =
+            _cartProducts.value?.map {
+                if (it.id == newProduct.id) newProduct else it
+            }
         fetchTotalPurchaseAmount()
         fetchTotalPurchaseCount()
     }
 
     fun changeProductSelection(product: ProductUiModel) {
         val newProduct = product.copy(isChecked = !product.isChecked ?: true)
-        _cartProducts.value = _cartProducts.value?.map {
-            if (it.id == newProduct.id) newProduct else it
-        }
+        _cartProducts.value =
+            _cartProducts.value?.map {
+                if (it.id == newProduct.id) newProduct else it
+            }
         _cartProducts.value?.let { list ->
             if (list.isEmpty()) return@let
             val firstChecked = list[0].isChecked ?: false

@@ -1,7 +1,6 @@
 package woowacourse.shopping.product.catalog
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -104,8 +103,7 @@ class CatalogActivity : AppCompatActivity() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup =
             object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int =
-                    spanSizeByPosition(position, adapter.itemCount)
+                override fun getSpanSize(position: Int): Int = spanSizeByPosition(position, adapter.itemCount)
             }
         binding.recyclerViewProducts.layoutManager = gridLayoutManager
     }

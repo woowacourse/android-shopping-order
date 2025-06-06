@@ -61,10 +61,11 @@ class CartActivity : AppCompatActivity() {
 
     private fun observeData() {
         viewModel.totalPurchaseCount.observe(this) { totalPurchaseCount ->
-            val fragment = when (totalPurchaseCount) {
-                0 -> RecommendationFragment()
-                else -> SelectionFragment()
-            }
+            val fragment =
+                when (totalPurchaseCount) {
+                    0 -> RecommendationFragment()
+                    else -> SelectionFragment()
+                }
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 replace(R.id.fragment_container_cart_selection, fragment)

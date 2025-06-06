@@ -10,6 +10,6 @@ sealed class CatalogItem {
     data object LoadMoreButtonItem : CatalogItem()
 
     data class LoadingStateProductItem(
-        val loadingState: LoadingState
+        val loadingState: LoadingState,
     ) : CatalogItem()
 }

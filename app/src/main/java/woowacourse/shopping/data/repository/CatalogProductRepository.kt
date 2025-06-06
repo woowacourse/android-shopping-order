@@ -7,7 +7,8 @@ interface CatalogProductRepository {
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit)
+        callback: (List<ProductUiModel>) -> Unit,
+    )
 
     fun getAllProductsSize(callback: (Int) -> Unit)
 
@@ -19,8 +20,11 @@ interface CatalogProductRepository {
     fun getProductsByPage(
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     )
 
-    fun getProduct(id: Int, callback: (ProductUiModel) -> Unit)
+    fun getProduct(
+        id: Int,
+        callback: (ProductUiModel) -> Unit,
+    )
 }

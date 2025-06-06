@@ -15,7 +15,7 @@ class CartRepositoryImpl(
     override fun updateCartProduct(
         cartProduct: ProductUiModel,
         newCount: Int,
-        callback: (Boolean) -> Unit
+        callback: (Boolean) -> Unit,
     ) {
         cartProductDataSource.updateProduct(cartProduct, newCount) { result ->
             callback(result)
@@ -34,7 +34,7 @@ class CartRepositoryImpl(
     override fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     ) {
         cartProductDataSource.getCartProductsInRange(currentPage, pageSize) { products ->
             callback(products)
@@ -45,10 +45,9 @@ class CartRepositoryImpl(
         private var instance: CartRepositoryImpl? = null
 
         @Synchronized
-        fun initialize(
-            cartProductDataSource: CartProductDataSource,
-        ): CartRepositoryImpl = instance ?: CartRepositoryImpl(
-            cartProductDataSource,
-        ).also { instance = it }
+        fun initialize(cartProductDataSource: CartProductDataSource): CartRepositoryImpl =
+            instance ?: CartRepositoryImpl(
+                cartProductDataSource,
+            ).also { instance = it }
     }
 }

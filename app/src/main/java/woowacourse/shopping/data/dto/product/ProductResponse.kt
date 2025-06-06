@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.dto.product
 
-
 import com.google.gson.annotations.SerializedName
 
 data class ProductResponse(
@@ -25,5 +24,5 @@ data class ProductResponse(
     @SerializedName("totalElements")
     val totalElements: Long,
     @SerializedName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 )

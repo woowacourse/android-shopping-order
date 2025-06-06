@@ -28,7 +28,7 @@ class RecommendationFragmentViewModel(
     fun loadRecentlyViewedProduct() {
         cartRecommendationRepository.getRecommendedProducts { products ->
             _recommendedProducts.postValue(
-                products
+                products,
             )
         }
     }
@@ -58,7 +58,7 @@ class RecommendationFragmentViewModel(
             else -> {
                 cartRecommendationRepository.updateCartProduct(
                     product,
-                    product.quantity + A_COUNT
+                    product.quantity + A_COUNT,
                 ) { success ->
                     if (success) {
                         val newProduct = product.copy(quantity = product.quantity + A_COUNT)
@@ -84,7 +84,7 @@ class RecommendationFragmentViewModel(
                 val newProduct = product.copy(quantity = product.quantity - A_COUNT)
                 cartRecommendationRepository.updateCartProduct(
                     product,
-                    product.quantity - A_COUNT
+                    product.quantity - A_COUNT,
                 ) { success ->
                     if (success) {
                         updateItem(newProduct)
@@ -96,9 +96,10 @@ class RecommendationFragmentViewModel(
 
     private fun updateItem(newProduct: ProductUiModel) {
         _updatedItem.postValue(newProduct)
-        _recommendedProducts.value = _recommendedProducts.value?.map {
-            if (it.id == newProduct.id) newProduct else it
-        }
+        _recommendedProducts.value =
+            _recommendedProducts.value?.map {
+                if (it.id == newProduct.id) newProduct else it
+            }
         fetchTotalCount()
         fetchPurchasePrice()
     }
@@ -108,6 +109,5 @@ class RecommendationFragmentViewModel(
         private const val INITIAL_SELECTED_PRODUCTS_COUNT: Int = 0
         private const val INITIAL_PRODUCT_COUNT: Int = 0
         private const val A_COUNT: Int = 1
-
     }
 }

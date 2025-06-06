@@ -58,11 +58,18 @@ class RecommendationFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         observeData()
     }
-    private fun initViewBinding(inflater: LayoutInflater, container: ViewGroup?) {
+
+    private fun initViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+    ) {
         binding =
             DataBindingUtil.inflate(
                 inflater,
@@ -79,16 +86,18 @@ class RecommendationFragment : Fragment() {
 
     private fun observeData() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map {
-                ProductItem(
-                    it
-                )
-            })
+            (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).setItems(
+                products.map {
+                    ProductItem(
+                        it,
+                    )
+                },
+            )
         }
         viewModel.updatedItem.observe(viewLifecycleOwner) { product ->
             if (product != null) {
                 (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).updateItem(
-                    product
+                    product,
                 )
             }
         }

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.dto.product
 
-
 import com.google.gson.annotations.SerializedName
 
 data class Content(
@@ -13,5 +12,5 @@ data class Content(
     @SerializedName("name")
     val name: String,
     @SerializedName("price")
-    val price: Int
+    val price: Int,
 )

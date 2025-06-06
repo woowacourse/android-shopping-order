@@ -11,11 +11,12 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 
 class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
+
     override fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     ) {
         retrofitService
             .requestProducts(

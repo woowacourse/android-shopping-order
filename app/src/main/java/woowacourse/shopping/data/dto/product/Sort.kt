@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.dto.product
 
-
 import com.google.gson.annotations.SerializedName
 
 data class Sort(
@@ -9,5 +8,5 @@ data class Sort(
     @SerializedName("sorted")
     val sorted: Boolean,
     @SerializedName("unsorted")
-    val unsorted: Boolean
+    val unsorted: Boolean,
 )

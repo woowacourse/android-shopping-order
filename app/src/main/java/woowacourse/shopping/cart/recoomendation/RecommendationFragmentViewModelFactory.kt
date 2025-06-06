@@ -20,9 +20,10 @@ class RecommendationFragmentViewModelFactory(
                 CartRecommendationRepositoryImpl.initialize(
                     cartProductDataSource = CartProductRemoteDataSource(),
                     catalogProductDataSource = CatalogProductDataSourceRemoteDataSource(),
-                    recentlyViewProductDataSource = RecentlyViewedProductDataSourceRemoteDataSource.initialize(
-                        application.database.recentlyViewedProductDao()
-                    ),
+                    recentlyViewProductDataSource =
+                        RecentlyViewedProductDataSourceRemoteDataSource.initialize(
+                            application.database.recentlyViewedProductDao(),
+                        ),
                 )
             return RecommendationFragmentViewModel(
                 cartRecommendationRepository = cartRecommendationRepository,

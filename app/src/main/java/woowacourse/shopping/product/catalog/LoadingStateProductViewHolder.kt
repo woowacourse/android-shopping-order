@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ShimmerProductItemBinding
 
 class LoadingStateProductViewHolder(
-    val binding: ShimmerProductItemBinding
+    val binding: ShimmerProductItemBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
     companion object {
         fun from(parent: ViewGroup): LoadingStateProductViewHolder {

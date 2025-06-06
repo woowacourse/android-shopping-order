@@ -10,15 +10,16 @@ import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CatalogProductDataSourceRemoteDataSource(
-    private val retrofitService: ProductService = RetrofitProductService.INSTANCE.create(
-        ProductService::class.java
-    ),
+    private val retrofitService: ProductService =
+        RetrofitProductService.INSTANCE.create(
+            ProductService::class.java,
+        ),
 ) : CatalogProductDataSource {
     override fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit
+        callback: (List<ProductUiModel>) -> Unit,
     ) {
         retrofitService
             .requestProducts(

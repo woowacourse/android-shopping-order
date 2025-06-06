@@ -8,18 +8,16 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class CartRecommendationRepositoryImpl(
     private val cartProductDataSource: CartProductDataSource,
     private val catalogProductDataSource: CatalogProductDataSource,
-    private val recentlyViewProductDataSource: RecentlyViewedProductDataSource
+    private val recentlyViewProductDataSource: RecentlyViewedProductDataSource,
 ) : CartRecommendationRepository {
-    override fun getRecommendedProducts(
-        callback: (List<ProductUiModel>) -> Unit
-    ) {
+    override fun getRecommendedProducts(callback: (List<ProductUiModel>) -> Unit) {
         recentlyViewProductDataSource.getLatestViewedProduct { id ->
             catalogProductDataSource.getProduct(id) { categoryProduct ->
                 val category = categoryProduct.category ?: ""
                 catalogProductDataSource.getRecommendedProducts(
                     category,
                     ZERO,
-                    TOTAL_RECOMMENDATION_PRODUCTS_COUNT
+                    TOTAL_RECOMMENDATION_PRODUCTS_COUNT,
                 ) { products ->
                     callback(products)
                 }
@@ -27,9 +25,7 @@ class CartRecommendationRepositoryImpl(
         }
     }
 
-    override fun getSelectedProductsCount(
-        callback: (Int) -> Unit
-    ) {
+    override fun getSelectedProductsCount(callback: (Int) -> Unit) {
         cartProductDataSource.getTotalElements { count ->
             callback(count)
         }
@@ -63,11 +59,9 @@ class CartRecommendationRepositoryImpl(
         }
     }
 
-
     companion object {
         private const val ZERO: Int = 0
         private const val TOTAL_RECOMMENDATION_PRODUCTS_COUNT: Int = 10
-
 
         private var instance: CartRecommendationRepository? = null
 
@@ -75,11 +69,12 @@ class CartRecommendationRepositoryImpl(
         fun initialize(
             cartProductDataSource: CartProductDataSource,
             catalogProductDataSource: CatalogProductDataSource,
-            recentlyViewProductDataSource: RecentlyViewedProductDataSource
-        ): CartRecommendationRepository = instance ?: CartRecommendationRepositoryImpl(
-            cartProductDataSource,
-            catalogProductDataSource,
-            recentlyViewProductDataSource
-        ).also { instance = it }
+            recentlyViewProductDataSource: RecentlyViewedProductDataSource,
+        ): CartRecommendationRepository =
+            instance ?: CartRecommendationRepositoryImpl(
+                cartProductDataSource,
+                catalogProductDataSource,
+                recentlyViewProductDataSource,
+            ).also { instance = it }
     }
 }
