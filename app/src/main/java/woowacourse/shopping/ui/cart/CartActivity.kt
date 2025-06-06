@@ -13,6 +13,7 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.CartActivity.OnClickHandler
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.model.CartProductUiState
 import woowacourse.shopping.ui.payment.PaymentActivity
 
 class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
@@ -71,22 +72,27 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
     }
 
     private fun initObservers() {
-        viewModel.editedProductIds.observe(this) { editedProductIds ->
-            setResult(
-                ActivityResult.CART_PRODUCT_EDITED.code,
-                Intent().apply {
-                    putExtra(
-                        ActivityResult.CART_PRODUCT_EDITED.key,
-                        editedProductIds.toLongArray(),
-                    )
-                },
-            )
+        viewModel.uiState.observe(this) { uiState ->
+            handleCartProducts(uiState)
+            handleErrorMessage(uiState)
         }
+    }
 
-        viewModel.isError.observe(this) { errorMessage ->
-            errorMessage?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
-            }
+    private fun handleCartProducts(uiState: CartProductUiState) {
+        setResult(
+            ActivityResult.CART_PRODUCT_EDITED.code,
+            Intent().apply {
+                putExtra(
+                    ActivityResult.CART_PRODUCT_EDITED.key,
+                    uiState.editedProductIds.toLongArray(),
+                )
+            },
+        )
+    }
+
+    private fun handleErrorMessage(uiState: CartProductUiState) {
+        uiState.connectionErrorMessage?.let {
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }
 
