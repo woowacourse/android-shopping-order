@@ -14,8 +14,8 @@ import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
 import woowacourse.shopping.model.DUMMY_HISTORY_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_PRODUCT_1
 import woowacourse.shopping.ui.model.ProductDetailUiState
 import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
@@ -53,7 +53,7 @@ class ProductDetailViewModelTest {
     fun `상품 상세 정보를 불러온다`() =
         runTest {
             // given
-            val expected = DUMMY_CATALOG_PRODUCT_1
+            val expected = DUMMY_PRODUCT_1
             coEvery { getCatalogProductUseCase(expected.productDetail.id) } returns Result.success(expected)
 
             // when
@@ -98,7 +98,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `장바구니 수량을 증가시키면 상품 수량이 1 증가한다`() {
         // given
-        val original = DUMMY_CATALOG_PRODUCT_1
+        val original = DUMMY_PRODUCT_1
         setUpTestLiveData(ProductDetailUiState(product = original), "_uiState", viewModel)
 
         // when
@@ -112,7 +112,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `장바구니 수량을 감소시키면 상품 수량이 1 감소한다`() {
         // given
-        val original = DUMMY_CATALOG_PRODUCT_1
+        val original = DUMMY_PRODUCT_1
         setUpTestLiveData(ProductDetailUiState(product = original), "_uiState", viewModel)
 
         // when
@@ -127,7 +127,7 @@ class ProductDetailViewModelTest {
     fun `장바구니 수량 업데이트 성공 여부를 State에 반영한다`() =
         runTest {
             // given
-            val product = DUMMY_CATALOG_PRODUCT_1
+            val product = DUMMY_PRODUCT_1
             setUpTestLiveData(ProductDetailUiState(product = product), "_uiState", viewModel)
 
             coEvery {

@@ -5,7 +5,7 @@ data class Page(
     val isFirst: Boolean,
     val isLast: Boolean,
 ) {
-    val isSingle: Boolean get() = isFirst == isLast
+    val isSingle: Boolean get() = isFirst && isLast
 
     operator fun plus(step: Int): Page = copy(current = current + step)
 

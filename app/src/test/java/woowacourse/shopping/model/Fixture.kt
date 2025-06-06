@@ -64,11 +64,11 @@ val DUMMY_PRODUCT_DETAIL_5 =
         category = "공백제이",
     )
 
-val DUMMY_CART_PRODUCT_1 = Product(DUMMY_PRODUCT_DETAIL_1, 1)
-val DUMMY_CART_PRODUCT_2 = Product(DUMMY_PRODUCT_DETAIL_2, 2)
-val DUMMY_CART_PRODUCT_3 = Product(DUMMY_PRODUCT_DETAIL_3, 3)
-val DUMMY_CART_PRODUCT_4 = Product(DUMMY_PRODUCT_DETAIL_4, 4)
-val DUMMY_CART_PRODUCT_5 = Product(DUMMY_PRODUCT_DETAIL_5, 5)
+val DUMMY_PRODUCT_1 = Product(DUMMY_PRODUCT_DETAIL_1, 1, 5)
+val DUMMY_PRODUCT_2 = Product(DUMMY_PRODUCT_DETAIL_2, 2, 6)
+val DUMMY_PRODUCT_3 = Product(DUMMY_PRODUCT_DETAIL_3, 3, 7)
+val DUMMY_PRODUCT_4 = Product(DUMMY_PRODUCT_DETAIL_4, 4)
+val DUMMY_PRODUCT_5 = Product(DUMMY_PRODUCT_DETAIL_5, 5)
 
 val DUMMY_HISTORY_PRODUCT_1 =
     HistoryProduct(
@@ -78,35 +78,25 @@ val DUMMY_HISTORY_PRODUCT_1 =
         category = "공백제이",
     )
 
-val DUMMY_CATALOG_PRODUCT_1 = Product(DUMMY_PRODUCT_DETAIL_1, quantity = 5)
-val DUMMY_CATALOG_PRODUCT_2 = Product(DUMMY_PRODUCT_DETAIL_2, quantity = 6)
-val DUMMY_CATALOG_PRODUCT_3 = Product(DUMMY_PRODUCT_DETAIL_3, quantity = 7)
-
-val DUMMY_CART_PRODUCTS_1 =
-    Products(
-        products =
-            listOf(
-                DUMMY_CART_PRODUCT_1,
-                DUMMY_CART_PRODUCT_2,
-                DUMMY_CART_PRODUCT_3,
-                DUMMY_CART_PRODUCT_4,
-                DUMMY_CART_PRODUCT_5,
-            ),
-        page = Page(2, isFirst = false, isLast = false),
-    )
-
 val DUMMY_CATALOG_PRODUCTS_1 =
     Products(
         products =
             listOf(
-                DUMMY_CATALOG_PRODUCT_1,
-                DUMMY_CATALOG_PRODUCT_2,
-                DUMMY_CATALOG_PRODUCT_3,
+                DUMMY_PRODUCT_1,
+                DUMMY_PRODUCT_2,
+                DUMMY_PRODUCT_3,
             ),
+        page = Page(2, isFirst = false, isLast = false),
     )
+
 val DUMMY_CATALOG_PRODUCTS_2 =
     Products(
-        products = listOf(DUMMY_CATALOG_PRODUCT_1),
+        products = listOf(DUMMY_PRODUCT_1),
+    )
+
+val DUMMY_CATALOG_PRODUCTS_3 =
+    Products(
+        products = listOf(DUMMY_PRODUCT_4),
     )
 
 val DUMMY_COUPON_1: Coupon =

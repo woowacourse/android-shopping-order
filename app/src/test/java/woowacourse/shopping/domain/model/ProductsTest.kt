@@ -2,23 +2,19 @@ package woowacourse.shopping.domain.model
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.DUMMY_CART_PRODUCTS_1
-import woowacourse.shopping.model.DUMMY_CART_PRODUCT_1
-import woowacourse.shopping.model.DUMMY_CART_PRODUCT_2
-import woowacourse.shopping.model.DUMMY_CART_PRODUCT_3
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_1
 import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_2
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_2
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_3
+import woowacourse.shopping.model.DUMMY_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_PRODUCT_2
+import woowacourse.shopping.model.DUMMY_PRODUCT_3
 
 class ProductsTest {
     @Test
     fun `모든 상품이 선택되어 있으면 모든 상품이 선택되어 있음을 반환한다`() {
         // given
         val selectedProducts =
-            DUMMY_CART_PRODUCTS_1.copy(
-                products = DUMMY_CART_PRODUCTS_1.products.map { it.copy(isSelected = true) },
+            DUMMY_CATALOG_PRODUCTS_1.copy(
+                products = DUMMY_CATALOG_PRODUCTS_1.products.map { it.copy(isSelected = true) },
             )
 
         // when
@@ -56,9 +52,9 @@ class ProductsTest {
 
         // then
         val expected =
-            DUMMY_CATALOG_PRODUCT_1.totalPrice +
-                DUMMY_CATALOG_PRODUCT_2.totalPrice +
-                DUMMY_CATALOG_PRODUCT_3.totalPrice
+            DUMMY_PRODUCT_1.totalPrice +
+                DUMMY_PRODUCT_2.totalPrice +
+                DUMMY_PRODUCT_3.totalPrice
 
         assertThat(price).isEqualTo(expected)
     }
@@ -66,7 +62,7 @@ class ProductsTest {
     @Test
     fun `상품 선택 상태를 반전한다`() {
         // given
-        val products = DUMMY_CART_PRODUCTS_1
+        val products = DUMMY_CATALOG_PRODUCTS_1
         val target = products.products.first()
 
         // when
@@ -79,7 +75,7 @@ class ProductsTest {
     @Test
     fun `특정 상품의 수량을 업데이트한다`() {
         // given
-        val products = DUMMY_CART_PRODUCTS_1
+        val products = DUMMY_CATALOG_PRODUCTS_1
         val target = products.products.first()
 
         // when
@@ -92,7 +88,7 @@ class ProductsTest {
     @Test
     fun `전체 선택 상태를 반전한다`() {
         // given
-        val products = DUMMY_CART_PRODUCTS_1
+        val products = DUMMY_CATALOG_PRODUCTS_1
 
         // when
         val toggled = products.toggleAllSelection()
@@ -104,8 +100,8 @@ class ProductsTest {
     @Test
     fun `상품의 ID로 상품을 조회할 수 있다`() {
         // given
-        val products = DUMMY_CART_PRODUCTS_1
-        val id = DUMMY_CART_PRODUCT_3.productDetail.id
+        val products = DUMMY_CATALOG_PRODUCTS_1
+        val id = DUMMY_PRODUCT_3.productDetail.id
 
         // when
         val found = products.getProductByProductId(id)
@@ -117,8 +113,8 @@ class ProductsTest {
     @Test
     fun `장바구니 ID로 상품을 조회할 수 있다`() {
         // given
-        val products = DUMMY_CART_PRODUCTS_1
-        val cartId = DUMMY_CART_PRODUCT_2.cartId
+        val products = DUMMY_CATALOG_PRODUCTS_1
+        val cartId = DUMMY_PRODUCT_2.cartId
 
         // when
         val found = products.getProductByCartId(cartId!!)
@@ -131,9 +127,9 @@ class ProductsTest {
     fun `선택된 상품들의 상품 ID 목록을 반환한다`() {
         // given
         val selected =
-            DUMMY_CART_PRODUCTS_1.copy(
+            DUMMY_CATALOG_PRODUCTS_1.copy(
                 products =
-                    DUMMY_CART_PRODUCTS_1.products.mapIndexed { index, product ->
+                    DUMMY_CATALOG_PRODUCTS_1.products.mapIndexed { index, product ->
                         if (index < 3) product.copy(isSelected = true) else product
                     },
             )
@@ -143,9 +139,9 @@ class ProductsTest {
 
         // then
         assertThat(ids).containsExactly(
-            DUMMY_CART_PRODUCT_1.productDetail.id,
-            DUMMY_CART_PRODUCT_2.productDetail.id,
-            DUMMY_CART_PRODUCT_3.productDetail.id,
+            DUMMY_PRODUCT_1.productDetail.id,
+            DUMMY_PRODUCT_2.productDetail.id,
+            DUMMY_PRODUCT_3.productDetail.id,
         )
     }
 
@@ -153,9 +149,9 @@ class ProductsTest {
     fun `선택된 상품들의 장바구니 ID 목록을 반환한다`() {
         // given
         val selected =
-            DUMMY_CART_PRODUCTS_1.copy(
+            DUMMY_CATALOG_PRODUCTS_1.copy(
                 products =
-                    DUMMY_CART_PRODUCTS_1.products.mapIndexed { index, product ->
+                    DUMMY_CATALOG_PRODUCTS_1.products.mapIndexed { index, product ->
                         if (index < 3) product.copy(isSelected = true) else product
                     },
             )
@@ -165,9 +161,9 @@ class ProductsTest {
 
         // then
         assertThat(cartIds).containsExactly(
-            DUMMY_CART_PRODUCT_1.cartId,
-            DUMMY_CART_PRODUCT_2.cartId,
-            DUMMY_CART_PRODUCT_3.cartId,
+            DUMMY_PRODUCT_1.cartId,
+            DUMMY_PRODUCT_2.cartId,
+            DUMMY_PRODUCT_3.cartId,
         )
     }
 
