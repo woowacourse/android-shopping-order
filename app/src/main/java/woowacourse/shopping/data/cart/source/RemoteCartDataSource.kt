@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.cart.source
 
 import woowacourse.shopping.data.API
-import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.cart.PageableCartItemData
 import woowacourse.shopping.data.cart.dto.CartItemRequest
 import woowacourse.shopping.data.cart.dto.CartResponse
@@ -10,7 +9,6 @@ import woowacourse.shopping.data.product.dto.CartRequest
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 class RemoteCartDataSource(
-    private val productsHttpClient: ProductsHttpClient = ProductsHttpClient(),
     private val cartService: CartService = API.cartService,
 ) : CartDataSource {
     override fun pageableCartItems(

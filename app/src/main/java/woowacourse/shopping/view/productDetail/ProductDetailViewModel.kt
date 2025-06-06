@@ -3,6 +3,8 @@ package woowacourse.shopping.view.productDetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -49,64 +51,69 @@ class ProductDetailViewModel(
     }
 
     private fun loadLatestViewedProduct() {
-        productsRepository.loadLatestViewedProduct { result ->
-            _latestViewedProduct.postValue(result.getOrNull())
+        viewModelScope.launch {
+            _latestViewedProduct.value = productsRepository.loadLatestViewedProduct().getOrNull()
         }
     }
 
     fun loadProduct(productId: Long) {
-        productsRepository.getProductById(productId) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getProductById(productId)
                 .onSuccess { product ->
-                    _product.postValue(product)
+                    _product.value = product
+
                     if (product != null) addViewedProduct(product)
                     Thread.sleep(1000)
-                    loading.postValue(false)
+
+                    loading.value = false
                 }.onFailure {
-                    _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
+                    _event.value = ProductDetailEvent.LOAD_PRODUCT_FAILURE
                 }
         }
     }
 
     private fun addViewedProduct(product: Product) {
-        productsRepository.addViewedProduct(product) { result ->
-            result.onFailure {
-                _event.postValue(ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE)
+        viewModelScope.launch {
+            productsRepository.addViewedProduct(product).onFailure {
+                _event.value = ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE
             }
         }
     }
 
     fun addToShoppingCart() {
-        val productId: Long = product.value?.id ?: error("")
-        val cartItem: CartItem? =
-            cartItems
-                .find { cartItem: CartItem ->
-                    cartItem.productId == productId
-                }
+        viewModelScope.launch {
+            val productId: Long = product.value?.id ?: error("")
+            val cartItem: CartItem? =
+                cartItems
+                    .find { cartItem: CartItem ->
+                        cartItem.productId == productId
+                    }
 
-        if (cartItem == null) {
-            cartRepository.addCartItem(
-                productId = productId,
-                quantity = quantity.value ?: 1,
-            ) { result ->
-                result
-                    .onSuccess {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
-                    }.onFailure {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
-                    }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                cartItemId = cartItem.id,
-                quantity = quantity.value ?: 1,
-            ) { result ->
-                result
-                    .onSuccess {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
-                    }.onFailure {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
-                    }
+            if (cartItem == null) {
+                cartRepository.addCartItem(
+                    productId = productId,
+                    quantity = quantity.value ?: 1,
+                ) { result ->
+                    result
+                        .onSuccess {
+                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS
+                        }.onFailure {
+                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_FAILURE
+                        }
+                }
+            } else {
+                cartRepository.updateCartItemQuantity(
+                    cartItemId = cartItem.id,
+                    quantity = quantity.value ?: 1,
+                ) { result ->
+                    result
+                        .onSuccess {
+                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS
+                        }.onFailure {
+                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_FAILURE
+                        }
+                }
             }
         }
     }

@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.product.source
 
 import woowacourse.shopping.data.API
-import woowacourse.shopping.data.ProductsHttpClient
 import woowacourse.shopping.data.product.PageableProductData
 import woowacourse.shopping.data.product.dto.ProductResponse
 import woowacourse.shopping.data.product.dto.ProductsResponse
@@ -10,21 +9,20 @@ import woowacourse.shopping.data.product.entity.ProductEntity
 import woowacourse.shopping.data.product.service.ProductService
 
 class RemoteProductsDataSource(
-    private val productsHttpClient: ProductsHttpClient = ProductsHttpClient(),
     private val productService: ProductService = API.productService,
 ) : ProductsDataSource {
-    override fun products(category: String): List<ProductEntity> {
+    override suspend fun products(category: String): List<ProductEntity> {
         val response: ProductsResponse? =
-            productService.getProducts(category = category).execute().body()
+            productService.getProducts(category = category)
 
         return response?.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList()
     }
 
-    override fun pageableProducts(
+    override suspend fun pageableProducts(
         page: Int,
         size: Int,
     ): PageableProductData {
-        val response: ProductsResponse? = productService.getProducts(page, size).execute().body()
+        val response: ProductsResponse? = productService.getProducts(page, size)
 
         return PageableProductData(
             products = response?.content?.mapNotNull { it.toEntityOrNull() } ?: emptyList(),
@@ -32,8 +30,8 @@ class RemoteProductsDataSource(
         )
     }
 
-    override fun getProductById(id: Long): ProductEntity? {
-        val response: ProductResponse? = productService.getProductById(id).execute().body()
+    override suspend fun getProductById(id: Long): ProductEntity? {
+        val response: ProductResponse? = productService.getProductById(id)
         return response.toEntityOrNull()
     }
 
