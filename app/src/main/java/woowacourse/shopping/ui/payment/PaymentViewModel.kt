@@ -65,6 +65,10 @@ class PaymentViewModel(
         updateUiState { current ->
             current.copy(
                 coupons = current.coupons.selectCoupon(couponId),
+            )
+        }
+        updateUiState { current ->
+            current.copy(
                 price = current.coupons.applyCoupon(current.products),
             )
         }
