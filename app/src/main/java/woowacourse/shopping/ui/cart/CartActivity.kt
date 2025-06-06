@@ -66,6 +66,7 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                     is CartRecommendFragment -> {
                         val intent = PaymentActivity.newIntent(this, viewModel.getSelectedProductIds().toLongArray())
                         startActivity(intent)
+                        finish()
                     }
                 }
             }
