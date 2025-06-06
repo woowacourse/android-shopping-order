@@ -85,7 +85,8 @@
                 android:text="@{@string/cart_order_button(viewModel.totalCheckedItemsCount)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:onClick="@{() -> viewModel.orderItems()}"/>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,11 +35,18 @@ class CartRecommendFragment : Fragment() {
                 LinearLayoutManager.HORIZONTAL,
                 false,
             )
-
-        binding.tvOrderButton.setOnClickListener {
-            navigate()
-        }
         return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.orderItems.observe(this) { orderIds ->
+            navigate(orderIds.toLongArray())
+        }
     }
 
     private fun setupAdapter() {
@@ -57,8 +64,8 @@ class CartRecommendFragment : Fragment() {
             )
     }
 
-    private fun navigate() {
-        val intent = PaymentActivity.newIntent(this.requireActivity())
+    private fun navigate(orderIds: LongArray) {
+        val intent = PaymentActivity.newIntent(this.requireActivity(), orderIds)
         startActivity(intent)
     }
 }

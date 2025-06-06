@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.payment
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,7 +23,6 @@ class PaymentViewModel(
         viewModelScope.launch {
             val coupons = couponRepository.fetchAllCoupons().map { it.toDomain() }
             _coupons.postValue(coupons)
-            Log.e("123451", "$coupons")
         }
     }
 }

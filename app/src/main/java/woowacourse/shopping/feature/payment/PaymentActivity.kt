@@ -25,12 +25,19 @@ class PaymentActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.rvCoupons.adapter = adapter
         binding.rvCoupons.isNestedScrollingEnabled = false
+
+        val orderIds = intent.getLongArrayExtra(ORDER_IDS)
     }
 
     companion object {
-        fun newIntent(context: Context): Intent =
+        private const val ORDER_IDS = "orderIds"
+
+        fun newIntent(
+            context: Context,
+            orderIds: LongArray,
+        ): Intent =
             Intent(context, PaymentActivity::class.java).apply {
-//                putExtra(GOODS_KEY, id)
+                putExtra(ORDER_IDS, orderIds)
             }
     }
 }

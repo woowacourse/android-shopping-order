@@ -12,6 +12,8 @@ import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
 
 class CartViewModel(
@@ -50,12 +52,13 @@ class CartViewModel(
 
     private val totalItemsCount = MutableLiveData(0)
 
+    private val _orderItems = MutableSingleLiveData<List<Long>>()
+    val orderItems: SingleLiveData<List<Long>> get() = _orderItems
+
     init {
         fetchTotalItemsCount()
         loadCarts()
         loadProductsByCategory()
-
-        val productIds = carts.value?.filter { it.isChecked }?.map { it.id }
     }
 
     fun plusPage() {
@@ -70,12 +73,16 @@ class CartViewModel(
         loadCarts()
     }
 
-    fun toggleCheck(cart: CartProduct) {
+    fun toggleCheck(
+        cart: CartProduct,
+        isRecommend: Boolean = false,
+    ) {
+        val targetList = if (isRecommend) _recommendItems else _carts
         val updatedList =
-            _carts.value?.map {
+            targetList.value?.map {
                 if (it.id == cart.id) it.copy(isChecked = !it.isChecked) else it
             } ?: return
-        _carts.value = updatedList
+        targetList.value = updatedList
         updateCheckedSummary(updatedList)
     }
 
@@ -118,12 +125,14 @@ class CartViewModel(
                     .onSuccess { newId ->
                         val updatedCart = cart.copy(id = newId, quantity = 1)
                         updateCartItemList(_recommendItems, updatedCart)
+                        toggleCheck(updatedCart, isRecommend = true)
                         fetchTotalItemsCount()
                     }.onFailure {
                         Log.e("addRecommend", "추천 상품 추가 실패", it)
                     }
             } else {
                 changeCartQuantity(cart, 1, isRecommend = true)
+                toggleCheck(cart)
             }
         }
     }
@@ -144,6 +153,12 @@ class CartViewModel(
             val recommendedList = productRepository.fetchRecommendProducts(latestHistory.id, cartProductIds)
             _recommendItems.value = recommendedList
         }
+    }
+
+    fun orderItems() {
+        val orderFromCarts = carts.value?.filter { it.isChecked }?.map { it.id } ?: emptyList()
+        val orderFromRecommend = recommendItems.value?.filter { it.isChecked }?.map { it.id } ?: emptyList()
+        _orderItems.postValue(orderFromCarts + orderFromRecommend)
     }
 
     private fun changeCartQuantity(
