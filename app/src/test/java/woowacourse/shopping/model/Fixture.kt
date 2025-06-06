@@ -1,10 +1,23 @@
 package woowacourse.shopping.model
 
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponDetail
+import woowacourse.shopping.domain.model.CouponDiscountType.BUY_X_GET_Y
+import woowacourse.shopping.domain.model.CouponDiscountType.FIXED
+import woowacourse.shopping.domain.model.CouponDiscountType.FREE_SHIPPING
+import woowacourse.shopping.domain.model.CouponDiscountType.PERCENTAGE
+import woowacourse.shopping.domain.model.Coupons
+import woowacourse.shopping.domain.model.FixedDiscountCoupon
+import woowacourse.shopping.domain.model.FreeShippingCoupon
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Page
+import woowacourse.shopping.domain.model.PercentageDiscountCoupon
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.QuantityBonusCoupon
+import java.time.LocalDate
+import java.time.LocalTime
 
 val DUMMY_PRODUCT_DETAIL_1 =
     ProductDetail(
@@ -95,3 +108,81 @@ val DUMMY_CATALOG_PRODUCTS_2 =
     Products(
         products = listOf(DUMMY_CATALOG_PRODUCT_1),
     )
+
+val DUMMY_COUPON_1: Coupon =
+    FixedDiscountCoupon(
+        detail =
+            CouponDetail(
+                id = 1,
+                code = "FIXED5000",
+                name = "5,000원 할인 쿠폰",
+                expirationDate = LocalDate.of(2025, 11, 30),
+                discount = 5000,
+                minimumPurchase = 100000,
+                discountType = FIXED,
+                buyQuantity = null,
+                getQuantity = null,
+                availableTime = null,
+            ),
+        isSelected = false,
+    )
+
+val DUMMY_COUPON_2: Coupon =
+    QuantityBonusCoupon(
+        detail =
+            CouponDetail(
+                id = 2,
+                code = "BOGO",
+                name = "2개 구매 시 1개 무료 쿠폰",
+                expirationDate = LocalDate.of(2025, 6, 30),
+                discount = null,
+                minimumPurchase = null,
+                discountType = BUY_X_GET_Y,
+                buyQuantity = 2,
+                getQuantity = 1,
+                availableTime = null,
+            ),
+        isSelected = false,
+    )
+
+val DUMMY_COUPON_3: Coupon =
+    FreeShippingCoupon(
+        detail =
+            CouponDetail(
+                id = 3,
+                code = "FREESHIPPING",
+                name = "5만원 이상 구매 시 무료 배송 쿠폰",
+                expirationDate = LocalDate.of(2025, 8, 31),
+                discount = null,
+                minimumPurchase = 50000,
+                discountType = FREE_SHIPPING,
+                buyQuantity = null,
+                getQuantity = null,
+                availableTime = null,
+            ),
+        isSelected = false,
+    )
+
+val DUMMY_COUPON_4: Coupon =
+    PercentageDiscountCoupon(
+        detail =
+            CouponDetail(
+                id = 4,
+                code = "MIRACLESALE",
+                name = "미라클모닝 30% 할인 쿠폰",
+                expirationDate = LocalDate.of(2025, 7, 31),
+                discount = 30,
+                minimumPurchase = null,
+                discountType = PERCENTAGE,
+                buyQuantity = null,
+                getQuantity = null,
+                availableTime =
+                    CouponDetail.AvailableTime(
+                        start = LocalTime.of(4, 0, 0),
+                        end = LocalTime.of(7, 0, 0),
+                    ),
+            ),
+        isSelected = false,
+    )
+
+val DUMMY_COUPONS_1: Coupons = Coupons(listOf(DUMMY_COUPON_1, DUMMY_COUPON_2, DUMMY_COUPON_3, DUMMY_COUPON_4))
