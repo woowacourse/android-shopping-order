@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.fragment.ktx)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    testImplementation("io.mockk:mockk:1.14.2")
 
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)
