@@ -57,12 +57,11 @@ class RecommendViewModel(
 
                         addedItems = addedItems.plus(recommend.productId to cartItemId)
                         recommend.update(1)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value?.plus(
                                 CartItem(cartItemId, recommend.product, 1),
-                            ),
-                        )
-                    }.onFailure { _event.postValue(RecommendEvent.MODIFY_CART_FAILURE) }
+                            )
+                    }.onFailure { _event.value = RecommendEvent.MODIFY_CART_FAILURE }
             } else {
                 cartRepository
                     .updateCartItemQuantity(
@@ -70,7 +69,7 @@ class RecommendViewModel(
                         recommend.quantity + 1,
                     ).onSuccess {
                         recommend.update(recommend.quantity + 1)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value
                                 ?.minus(
                                     CartItem(
@@ -84,10 +83,9 @@ class RecommendViewModel(
                                         recommend.product,
                                         recommend.quantity + 1,
                                     ),
-                                ),
-                        )
+                                )
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
+                        _event.value = RecommendEvent.MODIFY_CART_FAILURE
                     }
             }
         }
@@ -101,18 +99,17 @@ class RecommendViewModel(
                         addedItems[recommend.productId] ?: return@launch,
                     ).onSuccess {
                         recommend.update(0)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value?.minus(
                                 CartItem(
                                     addedItems[recommend.productId] ?: return@onSuccess,
                                     recommend.product,
                                     1,
                                 ),
-                            ),
-                        )
+                            )
                         addedItems = addedItems.minus(recommend.productId)
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
+                        _event.value = RecommendEvent.MODIFY_CART_FAILURE
                     }
             } else {
                 cartRepository
@@ -121,7 +118,7 @@ class RecommendViewModel(
                         recommend.quantity - 1,
                     ).onSuccess {
                         recommend.update(recommend.quantity - 1)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value
                                 ?.minus(
                                     CartItem(
@@ -135,10 +132,9 @@ class RecommendViewModel(
                                         recommend.product,
                                         recommend.quantity - 1,
                                     ),
-                                ),
-                        )
+                                )
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
+                        _event.value = RecommendEvent.MODIFY_CART_FAILURE
                     }
             }
         }
@@ -149,11 +145,10 @@ class RecommendViewModel(
             productsRepository
                 .loadRecommendedProducts(RECOMMEND_COUNT)
                 .onSuccess { recommendedProducts: List<Product> ->
-                    _recommendedProducts.postValue(
-                        recommendedProducts.map { product -> RecommendProduct(product) },
-                    )
+                    _recommendedProducts.value =
+                        recommendedProducts.map { product -> RecommendProduct(product) }
                 }.onFailure {
-                    _event.postValue(RecommendEvent.LOAD_RECOMMENDED_PRODUCTS_FAILURE)
+                    _event.value = RecommendEvent.LOAD_RECOMMENDED_PRODUCTS_FAILURE
                 }
         }
     }
@@ -164,9 +159,8 @@ class RecommendViewModel(
             recommendedProducts.value?.toMutableList()
 
         if (index != null && newProducts != null) {
-            newProducts[index] =
-                newProducts[index].copy(quantity = newQuantity)
-            _recommendedProducts.postValue(newProducts)
+            newProducts[index] = newProducts[index].copy(quantity = newQuantity)
+            _recommendedProducts.value = newProducts
         }
     }
 
