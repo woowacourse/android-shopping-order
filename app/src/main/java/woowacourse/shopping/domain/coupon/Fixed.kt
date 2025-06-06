@@ -12,7 +12,7 @@ data class Fixed(
     val discount: Int,
     override val minimumAmount: Int?,
 ) : Coupon() {
-    override fun disCountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
+    override fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
         return discount
     }
 }

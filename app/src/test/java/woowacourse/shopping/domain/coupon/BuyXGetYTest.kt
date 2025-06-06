@@ -29,7 +29,7 @@ class BuyXGetYTest {
 
         // when
         val actual =
-            BUY_X_GET_Y.disCountAmount(
+            BUY_X_GET_Y.discountAmount(
                 SHOPPING_CART_PRODUCTS_TO_ORDER2,
             )
         // then

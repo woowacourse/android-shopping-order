@@ -11,7 +11,7 @@ class FreeShipping(
     override val discountType: DiscountType = DiscountType.FREE_SHIPPING,
     override val minimumAmount: Int?,
 ) : Coupon() {
-    override fun disCountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
+    override fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
         return DEFAULT_SHIPPING_FEE
     }
 }

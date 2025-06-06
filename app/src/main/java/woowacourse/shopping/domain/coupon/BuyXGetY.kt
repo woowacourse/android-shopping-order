@@ -27,7 +27,7 @@ data class BuyXGetY(
         }
     }
 
-    override fun disCountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
+    override fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
         val target =
             shoppingCartProductToOrder.filter {
                 it.quantity >= buyQuantity + getQuantity

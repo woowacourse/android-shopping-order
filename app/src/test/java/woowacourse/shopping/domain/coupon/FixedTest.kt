@@ -13,7 +13,7 @@ class FixedTest {
 
         // when
         val actual =
-            FIXED.disCountAmount(
+            FIXED.discountAmount(
                 SHOPPING_CART_PRODUCTS_TO_ORDER,
             )
         // then

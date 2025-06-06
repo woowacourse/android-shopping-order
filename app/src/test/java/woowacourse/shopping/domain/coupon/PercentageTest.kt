@@ -15,7 +15,7 @@ class PercentageTest {
 
         // when
         val actual =
-            PERCENTAGE.disCountAmount(
+            PERCENTAGE.discountAmount(
                 SHOPPING_CART_PRODUCTS_TO_ORDER,
             )
         // then

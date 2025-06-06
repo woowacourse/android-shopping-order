@@ -39,7 +39,7 @@ sealed class Coupon {
         return true
     }
 
-    abstract fun disCountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int
+    abstract fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int
 
     companion object {
         const val DEFAULT_SHIPPING_FEE = 3000

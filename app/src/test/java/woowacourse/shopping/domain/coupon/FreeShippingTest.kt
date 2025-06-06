@@ -13,7 +13,7 @@ class FreeShippingTest {
 
         // when
         val actual =
-            FREE_SHIPPING.disCountAmount(
+            FREE_SHIPPING.discountAmount(
                 SHOPPING_CART_PRODUCTS_TO_ORDER,
             )
         // then
