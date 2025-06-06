@@ -39,6 +39,12 @@ class RecommendViewModel(
     private val _navigateTo = SingleLiveData<Long>()
     val navigateTo: LiveData<Long> = _navigateTo
 
+    private var initRecommendProducts: List<CartItemUiModel>? = null
+    val isUpdated: Boolean
+        get() =
+            recommendProducts.value?.containsAll(initRecommendProducts ?: emptyList())?.not()
+                ?: true
+
     init {
         fetchData()
     }
@@ -58,6 +64,10 @@ class RecommendViewModel(
                                 .map { product -> product.toPresentation() }
                                 .take(10)
                                 .toList()
+                        if (initRecommendProducts == null) {
+                            initRecommendProducts =
+                                recommendProductsUiModel
+                        }
                         _recommendProducts.value = recommendProductsUiModel
                         if (recommendProductsUiModel.isEmpty()) {
                             _toastMessage.value = R.string.recommend_toast_load_not_enough_products

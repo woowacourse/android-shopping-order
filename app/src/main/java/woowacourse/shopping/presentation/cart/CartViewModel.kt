@@ -56,6 +56,10 @@ class CartViewModel(
     val isUpdated: Boolean
         get() = cartItems.value?.containsAll(initCartItemStatus ?: emptyList())?.not() ?: true
 
+    init {
+        loadItems()
+    }
+
     fun loadItems(currentPage: Int = 0) {
         _uiState.value = ResultState.Loading
 

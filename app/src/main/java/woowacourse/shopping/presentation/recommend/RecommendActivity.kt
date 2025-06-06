@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -35,10 +36,27 @@ class RecommendActivity : AppCompatActivity() {
         val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
         viewModel.fetchSelectedInfo(price, count)
 
+        setOnBackPressedCallback()
         initInsets()
         setupToolbar()
         initAdapter()
         observeViewModel()
+    }
+
+    private fun setOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val intent =
+                        Intent().apply {
+                            putExtra(Extra.KEY_RECOMMEND_IS_UPDATE, viewModel.isUpdated)
+                        }
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+            },
+        )
     }
 
     private fun initInsets() {
@@ -54,7 +72,11 @@ class RecommendActivity : AppCompatActivity() {
         binding.tbRecommend.apply {
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
-                setResult(Activity.RESULT_OK)
+                val intent =
+                    Intent().apply {
+                        putExtra(Extra.KEY_RECOMMEND_IS_UPDATE, viewModel.isUpdated)
+                    }
+                setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }

@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -45,11 +46,6 @@ class CartActivity : AppCompatActivity() {
         initAdapter()
         setupToolbar()
         observeViewModel()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.loadItems()
     }
 
     private fun initInsets() {
@@ -129,9 +125,22 @@ class CartActivity : AppCompatActivity() {
         viewModel.navigateTo.observe(this) { (totalPrice, totalCount) ->
             val intent =
                 RecommendActivity.newIntent(this, totalPrice, totalCount)
-            startActivity(intent)
+            recommendLauncher.launch(intent)
         }
     }
+
+    private val recommendLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val isUpdated =
+                    result.data?.getBooleanExtra(Extra.KEY_RECOMMEND_IS_UPDATE, true) ?: true
+                if (isUpdated) {
+                    viewModel.loadItems()
+                }
+            }
+        }
 
     private fun showSkeleton(isLoading: Boolean) {
         if (isLoading) {
