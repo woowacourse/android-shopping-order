@@ -15,7 +15,10 @@ import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showToast
 import woowacourse.shopping.view.product.ProductsActivity
 
-class OrderActivity : AppCompatActivity(), CouponClickListener {
+class OrderActivity :
+    AppCompatActivity(),
+    CouponClickListener,
+    OrderClickListener {
     private val binding: ActivityOrderBinding by lazy {
         ActivityOrderBinding.inflate(layoutInflater)
     }
@@ -68,6 +71,7 @@ class OrderActivity : AppCompatActivity(), CouponClickListener {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.coupons.adapter = orderAdapter
+        binding.orderClickListener = this
     }
 
     private fun backToProducts() {
@@ -79,6 +83,10 @@ class OrderActivity : AppCompatActivity(), CouponClickListener {
 
     override fun onCouponClick(couponState: CouponState) {
         viewModel.toggleCoupon(couponState)
+    }
+
+    override fun onBackButtonClick() {
+        finish()
     }
 
     companion object {
