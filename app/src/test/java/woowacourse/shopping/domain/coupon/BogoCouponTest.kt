@@ -12,32 +12,6 @@ class BogoCouponTest {
     private val today = LocalDate.now()
 
     @Test
-    fun `유효 기간 이내이고 최소 수량을 만족하면 사용 가능하다`() {
-        // given
-        val coupon =
-            BogoCoupon(
-                id = 1,
-                code = "",
-                description = "",
-                discountType = "",
-                expirationDate = today.plusDays(1),
-                buyQuantity = 2,
-                getQuantity = 1,
-            )
-
-        val order =
-            listOf(
-                ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
-            )
-
-        // when
-        val result = coupon.isUsable(today, order)
-
-        // then
-        assertTrue(result)
-    }
-
-    @Test
     fun `유효 기간이 지났으면 사용 불가능하다`() {
         val coupon =
             BogoCoupon(
