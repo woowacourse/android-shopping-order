@@ -12,7 +12,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.getSerializableExtraData
-import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.common.showToast
 import woowacourse.shopping.view.product.ProductsActivity
 
 class OrderActivity : AppCompatActivity() {
@@ -49,7 +49,7 @@ class OrderActivity : AppCompatActivity() {
         viewModel.event.observe(this) { event ->
             when (event) {
                 OrderEvent.ORDER_SUCCESS -> {
-                    binding.root.showSnackBar(getString(R.string.order_complete))
+                    showToast(getString(R.string.order_complete))
                     backToProducts()
                 }
 
