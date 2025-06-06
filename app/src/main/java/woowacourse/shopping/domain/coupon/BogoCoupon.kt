@@ -12,6 +12,9 @@ data class BogoCoupon(
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : Coupon {
+    val standardQuantity
+        get() = buyQuantity + getQuantity
+
     fun isUsable(
         standardDate: LocalDate,
         order: List<ShoppingCart>,
@@ -23,6 +26,6 @@ data class BogoCoupon(
 
     private fun hasEnoughQuantity(order: List<ShoppingCart>): Boolean {
         val quantities = order.map { it.quantity }
-        return quantities.any { it.value >= buyQuantity + getQuantity }
+        return quantities.any { it.value >= standardQuantity }
     }
 }
