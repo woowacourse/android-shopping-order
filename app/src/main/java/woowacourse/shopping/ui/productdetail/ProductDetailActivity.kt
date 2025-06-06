@@ -74,9 +74,7 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
     }
 
     private fun handleHistoryProduct(uiState: ProductDetailUiState) {
-        uiState.product.let {
-            viewModel.addHistoryProduct(it.productDetail)
-        }
+        viewModel.addHistoryProduct(uiState.product.productDetail)
     }
 
     private fun handleCartProductAddResult(uiState: ProductDetailUiState) {
