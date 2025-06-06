@@ -116,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
-                    android:text="@string/payment_discount_price"
+                    android:text="@{@string/payment_discount_price(viewModel.price.discountPrice)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"

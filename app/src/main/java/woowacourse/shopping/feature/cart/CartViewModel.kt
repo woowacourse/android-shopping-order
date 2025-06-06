@@ -233,14 +233,7 @@ class CartViewModel(
         _isLoading.postValue(true)
         viewModelScope.launch {
             val response = cartRepository.fetchCart(page = currentPage)
-            val cartList =
-                response.content.map {
-                    CartProduct(
-                        id = it.id,
-                        product = it.product.toDomain(),
-                        quantity = it.quantity,
-                    )
-                }
+            val cartList = response.content.map { it.toDomain() }
             _carts.postValue(cartList)
             _page.postValue(response.number)
             updatePageButtonStates(response.first, response.last, response.totalElements.toInt())

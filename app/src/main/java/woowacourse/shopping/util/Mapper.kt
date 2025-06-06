@@ -1,8 +1,9 @@
 package woowacourse.shopping.util
 
+import woowacourse.shopping.data.remote.cart.CartResponse
 import woowacourse.shopping.data.remote.cart.CartResponse.Content.CartRemoteProduct
 import woowacourse.shopping.data.remote.coupon.CouponResponse
-import woowacourse.shopping.data.remote.product.ProductResponse.Content
+import woowacourse.shopping.data.remote.product.ProductResponse
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Product
@@ -21,13 +22,20 @@ fun CartRemoteProduct.toDomain(): Product =
         category = category,
     )
 
-fun Content.toDomain(): Product =
+fun ProductResponse.Content.toDomain(): Product =
     Product(
         id = id,
         name = name,
         price = price,
         imageUrl = imageUrl,
         category = category,
+    )
+
+fun CartResponse.Content.toDomain(): CartProduct =
+    CartProduct(
+        id = id,
+        product = product.toDomain(),
+        quantity = quantity,
     )
 
 fun CouponResponse.toDomain(): Coupon {
