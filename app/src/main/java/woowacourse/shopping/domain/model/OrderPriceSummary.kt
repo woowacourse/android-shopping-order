@@ -32,10 +32,15 @@ data class OrderPriceSummary(
             }
         }
 
-    fun canApplyCoupon(coupon: Coupon): Boolean = coupon.isValidForOrder(productTotalPrice)
-
     private fun calculateBogoDiscount(
         buyQuantity: Int,
         getQuantity: Int,
-    ): Int = 0
+    ): Int {
+        val eligibleItems = cartItems.filter { it.quantity >= buyQuantity + getQuantity }
+        if (eligibleItems.isEmpty()) return 0
+
+        val maxPricedItem = eligibleItems.maxByOrNull { it.product.price } ?: return 0
+
+        return maxPricedItem.product.price * getQuantity
+    }
 }

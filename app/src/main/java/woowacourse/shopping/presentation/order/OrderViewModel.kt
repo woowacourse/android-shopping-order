@@ -13,6 +13,7 @@ import woowacourse.shopping.presentation.Extra.KEY_SELECT_ITEMS
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.model.toPresentation
 
 class OrderViewModel(
@@ -39,9 +40,10 @@ class OrderViewModel(
     }
 
     private fun fetchData() {
-        val orderPrice = _orderSummary.value?.productTotalPrice ?: return
+        val orderPrice = orderSummary.value?.productTotalPrice ?: return
+        val selectedItems = orderSummary.value?.cartItems ?: return
         viewModelScope.launch {
-            getAvailableCouponUseCase(orderPrice)
+            getAvailableCouponUseCase(orderPrice, selectedItems.map { it.toDomain() })
                 .onSuccess { coupons ->
                     _coupons.value = coupons.map { it.toPresentation() }
                 }.onFailure {
