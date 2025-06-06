@@ -10,6 +10,7 @@ data class Coupon(
     val buyQuantity: Int?,
     val getQuantity: Int?,
     val discount: Int?,
+    val discountType: DiscountType,
     val minimumAmount: Int?,
     val availableTime: AvailableTime?,
 ) {
