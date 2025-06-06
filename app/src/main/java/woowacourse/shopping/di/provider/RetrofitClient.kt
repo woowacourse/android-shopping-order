@@ -7,6 +7,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.internal.platform.Platform
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Converter
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 
@@ -30,7 +31,14 @@ object RetrofitClient {
         return builder.build()
     }
 
-    private fun createJsonConverterFactory() = Json.asConverterFactory("application/json".toMediaType())
+    private fun createJsonConverterFactory(): Converter.Factory {
+        val json =
+            Json {
+                ignoreUnknownKeys = true
+                classDiscriminator = "discountType"
+            }
+        return json.asConverterFactory("application/json".toMediaType())
+    }
 
     private class PrettyJsonLogger : HttpLoggingInterceptor.Logger {
         private val json =
