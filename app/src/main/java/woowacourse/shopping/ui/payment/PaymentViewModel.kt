@@ -11,38 +11,17 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.di.UseCaseModule.getCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.di.UseCaseModule.getCouponsUseCase
 import woowacourse.shopping.di.UseCaseModule.orderProductsUseCase
-import woowacourse.shopping.domain.model.Coupons
-import woowacourse.shopping.domain.model.Coupons.Companion.EMPTY_COUPONS
-import woowacourse.shopping.domain.model.Price
-import woowacourse.shopping.domain.model.Price.Companion.EMPTY_PRICE
 import woowacourse.shopping.domain.model.Products
-import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
-import woowacourse.shopping.util.MutableSingleLiveData
-import woowacourse.shopping.util.SingleLiveData
+import woowacourse.shopping.ui.model.PaymentUiState
 
 class PaymentViewModel(
     private val getCatalogProductsByProductIdsUseCase: GetCatalogProductsByProductIdsUseCase,
     private val getCouponsUseCase: GetCouponsUseCase,
 ) : ViewModel() {
-    private val _products: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
-    val products: LiveData<Products> get() = _products
-
-    private val _coupons: MutableLiveData<Coupons> = MutableLiveData(EMPTY_COUPONS)
-    val coupons: LiveData<Coupons> get() = _coupons
-
-    private val _price: MutableLiveData<Price> = MutableLiveData(EMPTY_PRICE)
-    val price: LiveData<Price> get() = _price
-
-    private val _isCouponsLoading: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isCouponsLoading: LiveData<Boolean> get() = _isCouponsLoading
-
-    private val _isNetworkError: MutableLiveData<String> = MutableLiveData()
-    val isNetworkError: LiveData<String> get() = _isNetworkError
-
-    private val _isOrderSuccess: MutableSingleLiveData<Unit> = MutableSingleLiveData()
-    val isOrderSuccess: SingleLiveData<Unit> get() = _isOrderSuccess
+    private val _uiState: MutableLiveData<PaymentUiState> = MutableLiveData(PaymentUiState())
+    val uiState: LiveData<PaymentUiState> get() = _uiState
 
     init {
         loadCoupons()
@@ -50,16 +29,13 @@ class PaymentViewModel(
 
     private fun loadCoupons() {
         viewModelScope.launch {
-            if (isCouponsLoading.value == true) return@launch
+            val uiState = uiState.value ?: return@launch
 
-            _isCouponsLoading.value = true
             getCouponsUseCase()
                 .onSuccess {
-                    _isCouponsLoading.value = false
-                    _coupons.value = it
+                    _uiState.value = uiState.copy(coupons = it)
                 }.onFailure {
-                    _isCouponsLoading.value = false
-                    _isNetworkError.value = it.message.toString()
+                    _uiState.value = uiState.copy(connectionErrorMessage = it.message.toString())
                     Log.e("PaymentViewModel", it.toString())
                 }
         }
@@ -67,6 +43,8 @@ class PaymentViewModel(
 
     fun loadProducts(productIds: List<Long>) {
         viewModelScope.launch {
+            val uiState = uiState.value ?: return@launch
+
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { newProducts ->
                     val products =
@@ -75,35 +53,50 @@ class PaymentViewModel(
                                 .filterNot { it.cartId == null }
                                 .map { it.copy(isSelected = true) },
                         )
-                    _products.value = products
-                    _price.value = coupons.value?.applyCoupon(products)
+                    _uiState.value =
+                        uiState.copy(
+                            products = products,
+                            price = uiState.coupons.applyCoupon(products),
+                        )
                 }.onFailure {
-                    _isNetworkError.value = it.message.toString()
+                    _uiState.value = uiState.copy(connectionErrorMessage = it.message.toString())
                     Log.e("PaymentViewModel", it.toString())
                 }
         }
     }
 
     fun selectCoupon(couponId: Int) {
-        _coupons.value = coupons.value?.selectCoupon(couponId)
-        _price.value = coupons.value?.applyCoupon(products.value ?: return)
+        val uiState = uiState.value ?: return
+
+        _uiState.value =
+            uiState.copy(
+                coupons = uiState.coupons.selectCoupon(couponId),
+                price = uiState.coupons.applyCoupon(uiState.products),
+            )
     }
 
     fun orderProducts() {
         viewModelScope.launch {
-            val cartIds: Set<Long> = products.value?.getSelectedCartIds() ?: emptySet()
+            val uiState = uiState.value ?: return@launch
+            val cartIds: Set<Long> = uiState.products.getSelectedCartIds()
 
             orderProductsUseCase(cartIds)
                 .onSuccess {
-                    _isOrderSuccess.postValue(Unit)
+                    _uiState.value = uiState.copy(isOrderSuccess = true)
                 }.onFailure {
-                    _isNetworkError.value = it.message
+                    _uiState.value =
+                        uiState.copy(
+                            isOrderSuccess = false,
+                            connectionErrorMessage = it.message.toString(),
+                        )
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
 
     companion object {
+        const val MAX_USABLE_COUPON_COUNT = 1
+
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

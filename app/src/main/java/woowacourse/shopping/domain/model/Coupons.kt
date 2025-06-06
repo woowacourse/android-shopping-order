@@ -22,7 +22,6 @@ value class Coupons(
             ?: Price(products.selectedProductsPrice)
 
     companion object {
-        const val MAX_USABLE_COUNT = 1
         val EMPTY_COUPONS: Coupons = Coupons(emptyList())
     }
 }
