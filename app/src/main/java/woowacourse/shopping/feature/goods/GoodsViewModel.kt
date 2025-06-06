@@ -85,17 +85,15 @@ class GoodsViewModel(
                     }
             }
         } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(newQuantity),
-            ) { result ->
-                result
+            viewModelScope.launch {
+                cartRepository
+                    .updateCart(id = cart.id, cartQuantity = CartQuantity(newQuantity))
                     .onSuccess {
                         val updatedCart = cart.copy(quantity = newQuantity)
                         updateItems(updatedCart)
                         getCartCounts()
                         _insertState.value = Event(State.Success)
-                    }.onFailure { error ->
+                    }.onFailure {
                         _insertState.value = Event(State.Failure)
                     }
             }
@@ -116,16 +114,16 @@ class GoodsViewModel(
                     }
             }
         } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(cart.quantity - 1),
-            ) { result ->
-                result
-                    .onSuccess {
+            viewModelScope.launch {
+                cartRepository
+                    .updateCart(
+                        id = cart.id,
+                        cartQuantity = CartQuantity(cart.quantity - 1),
+                    ).onSuccess {
                         val updatedCart = cart.copy(quantity = cart.quantity - 1)
                         updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure { error ->
+                    }.onFailure {
                         _insertState.value = Event(State.Failure)
                     }
             }

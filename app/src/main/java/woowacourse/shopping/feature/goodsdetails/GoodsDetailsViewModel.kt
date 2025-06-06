@@ -108,18 +108,18 @@ class GoodsDetailsViewModel(
                         }
                 }
             } else {
-                cartRepository.updateCart(
-                    id = currentCart.id,
-                    cartQuantity = CartQuantity(newQuantity),
-                ) { result ->
-                    result
-                        .onSuccess {
+                viewModelScope.launch {
+                    cartRepository
+                        .updateCart(
+                            id = currentCart.id,
+                            cartQuantity = CartQuantity(newQuantity),
+                        ).onSuccess {
                             val updatedCart = cartProduct.value?.copy(quantity = newQuantity)
 
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
-                        }.onFailure { error ->
+                        }.onFailure {
                             _insertState.value = Event(State.Failure)
                         }
                 }

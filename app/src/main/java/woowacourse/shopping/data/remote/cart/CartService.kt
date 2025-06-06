@@ -32,11 +32,11 @@ interface CartService {
     ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun updateCart(
+    suspend fun updateCart(
         @Header("accept") accept: String = "*/*",
         @Path("id") id: Long,
         @Body cartQuantity: CartQuantity,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @GET("/cart-items/counts")
     fun getCartCounts(

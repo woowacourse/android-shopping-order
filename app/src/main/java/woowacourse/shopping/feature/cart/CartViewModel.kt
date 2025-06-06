@@ -130,8 +130,9 @@ class CartViewModel(
     }
 
     fun addToCart(cart: CartProduct) {
-        cartRepository.updateCart(cart.id, CartQuantity(cart.quantity + 1)) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .updateCart(id = cart.id, cartQuantity = CartQuantity(cart.quantity + 1))
                 .onSuccess {
                     val updatedList =
                         _carts.value?.map {
@@ -144,7 +145,7 @@ class CartViewModel(
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
                 }.onFailure { error ->
-                    Log.e("addCartTest", "장바구니 추가 실패", error)
+                    Log.e("addCart", "장바구니 추가 실패", error)
                 }
         }
     }
@@ -153,12 +154,12 @@ class CartViewModel(
         if (cart.quantity == 1) {
             delete(cart)
         } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(cart.quantity - 1),
-            ) { result ->
-                result
-                    .onSuccess {
+            viewModelScope.launch {
+                cartRepository
+                    .updateCart(
+                        id = cart.id,
+                        cartQuantity = CartQuantity(cart.quantity - 1),
+                    ).onSuccess {
                         val updatedList =
                             _carts.value?.map {
                                 if (it.product.id == cart.product.id) {
@@ -170,7 +171,7 @@ class CartViewModel(
                         _carts.postValue(updatedList)
                         fetchTotalItemsCount()
                     }.onFailure { error ->
-                        Log.e("123451", "$error")
+                        Log.e("removeCart", "장바구니 삭제 실패", error)
                     }
             }
         }

@@ -43,36 +43,18 @@ class CartRepository {
             Result.failure(e)
         }
 
-    fun updateCart(
+    suspend fun updateCart(
         id: Long,
         cartQuantity: CartQuantity,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        CartClient
-            .getRetrofitService()
-            .updateCart(id = id, cartQuantity = cartQuantity)
-            .enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit?>,
-                        response: Response<Unit?>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onResult(Result.success(Unit))
-                        } else {
-                            val error = response.errorBody()?.string()
-                            onResult(Result.failure(Throwable("수정 실패: ${response.code()} - $error")))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit?>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
+    ) = try {
+        val response = CartClient.getRetrofitService().updateCart(id = id, cartQuantity = cartQuantity)
+        if (response.isSuccessful) {
+            Result.success(Result.success(Unit))
+        } else {
+            Result.failure(Throwable("응답 실패: ${response.code()}"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
     fun getCartCounts(
