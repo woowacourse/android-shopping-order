@@ -11,6 +11,7 @@ import woowacourse.shopping.data.datasource.CouponDataSource
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeshippingCoupon
 import woowacourse.shopping.domain.exception.NetworkResult
+import java.time.LocalDate
 
 class DefaultCouponRepositoryTest {
     private val couponDataSource = mockk<CouponDataSource>()
@@ -27,8 +28,23 @@ class DefaultCouponRepositoryTest {
             // given
             val expectedCoupons =
                 listOf(
-                    FixedCoupon(id = 1, code = "FIXED5000", discount = 5000, description = "할인", discountType = "", minimumAmount = 0),
-                    FreeshippingCoupon(id = 2, code = "FREESHIPPING", minimumAmount = 50000, description = "무료배송", discountType = ""),
+                    FixedCoupon(
+                        id = 1,
+                        code = "FIXED5000",
+                        discount = 5000,
+                        description = "할인",
+                        discountType = "",
+                        minimumAmount = 0,
+                        expirationDate = LocalDate.now(),
+                    ),
+                    FreeshippingCoupon(
+                        id = 2,
+                        code = "FREESHIPPING",
+                        minimumAmount = 50000,
+                        description = "무료배송",
+                        discountType = "",
+                        expirationDate = LocalDate.now(),
+                    ),
                 )
             coEvery { couponDataSource.getCoupons() } returns NetworkResult.Success(expectedCoupons)
 
