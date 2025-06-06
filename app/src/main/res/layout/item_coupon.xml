@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="104dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/background_shopping_cart_product"
+    android:layout_marginHorizontal="18dp"
+    android:layout_marginVertical="2dp"
+
+    >
+
+    <CheckBox
+        android:id="@+id/couponCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/gray_5"
+        tools:text="5,000원 할인 쿠폰 "
+        app:layout_constraintBottom_toBottomOf="@id/couponCheckbox"
+        app:layout_constraintTop_toTopOf="@id/couponCheckbox"
+        app:layout_constraintStart_toEndOf="@id/couponCheckbox" />
+
+    <TextView
+        android:id="@+id/couponExpiration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        android:textColor="@color/gray_5"
+        tools:text="만료일: 2024년 11월 30일"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/couponCheckbox" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        android:textColor="@color/gray_5"
+        tools:text="최소 주문 금액: 100,000원"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/couponExpiration" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
