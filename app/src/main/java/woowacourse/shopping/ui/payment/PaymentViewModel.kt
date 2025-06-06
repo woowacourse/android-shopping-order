@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.ui.model.PaymentUiState
+import java.time.LocalDate
 
 class PaymentViewModel(
     private val getCatalogProductsByProductIdsUseCase: GetCatalogProductsByProductIdsUseCase,
@@ -49,11 +50,16 @@ class PaymentViewModel(
         }
     }
 
-    private fun loadCoupons(products: Products) {
+    private fun loadCoupons(
+        products: Products,
+        nowDate: LocalDate = LocalDate.now(),
+    ) {
         viewModelScope.launch {
-            getCouponsUseCase(products)
+            getCouponsUseCase()
                 .onSuccess {
-                    updateUiState { current -> current.copy(coupons = it) }
+                    updateUiState { current ->
+                        current.copy(coupons = it.filterAvailableCoupons(products, nowDate))
+                    }
                 }.onFailure {
                     updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("PaymentViewModel", it.toString())
