@@ -9,9 +9,9 @@ import woowacourse.shopping.data.api.CouponApi
 import woowacourse.shopping.data.api.OrderApi
 import woowacourse.shopping.data.api.ProductApi
 import woowacourse.shopping.data.interceptor.ShoppingAuthInterceptor
-import woowacourse.shopping.di.PreferenceModule.authSharedPreference
+import woowacourse.shopping.di.PreferenceInjection.authSharedPreference
 
-object NetworkModule {
+object NetworkInjection {
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()

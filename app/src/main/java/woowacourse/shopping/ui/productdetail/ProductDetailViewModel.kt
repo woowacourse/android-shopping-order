@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.UseCaseModule.addSearchHistoryUseCase
-import woowacourse.shopping.di.UseCaseModule.getCatalogProductUseCase
-import woowacourse.shopping.di.UseCaseModule.getRecentSearchHistoryUseCase
-import woowacourse.shopping.di.UseCaseModule.updateCartProductUseCase
+import woowacourse.shopping.di.UseCaseInjection.addSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseInjection.getCatalogProductUseCase
+import woowacourse.shopping.di.UseCaseInjection.getRecentSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseInjection.updateCartProductUseCase
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase

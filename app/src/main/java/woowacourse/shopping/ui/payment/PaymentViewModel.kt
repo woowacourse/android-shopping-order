@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.UseCaseModule.getCatalogProductsByProductIdsUseCase
-import woowacourse.shopping.di.UseCaseModule.getCouponsUseCase
-import woowacourse.shopping.di.UseCaseModule.orderProductsUseCase
+import woowacourse.shopping.di.UseCaseInjection.getCatalogProductsByProductIdsUseCase
+import woowacourse.shopping.di.UseCaseInjection.getCouponsUseCase
+import woowacourse.shopping.di.UseCaseInjection.orderProductsUseCase
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase

@@ -1,17 +1,17 @@
 package woowacourse.shopping.di
 
-import woowacourse.shopping.di.DatabaseModule.database
-import woowacourse.shopping.di.NetworkModule.cartApi
-import woowacourse.shopping.di.NetworkModule.couponApi
-import woowacourse.shopping.di.NetworkModule.orderApi
-import woowacourse.shopping.di.NetworkModule.productApi
+import woowacourse.shopping.di.DatabaseInjection.database
+import woowacourse.shopping.di.NetworkInjection.cartApi
+import woowacourse.shopping.di.NetworkInjection.couponApi
+import woowacourse.shopping.di.NetworkInjection.orderApi
+import woowacourse.shopping.di.NetworkInjection.productApi
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
-object RepositoryModule {
+object RepositoryInjection {
     val cartRepository: CartRepository by lazy {
         woowacourse.shopping.data.repository
             .CartRepository(cartApi)
