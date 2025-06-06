@@ -121,6 +121,36 @@ class OrderViewModelTest {
     }
 
     @Test
+    fun `사용 가능한 쿠폰만 표시된다`() {
+        // given
+        coEvery { couponRepository.getAllCoupons() } returns
+            Result.success(
+                COUPONS,
+            )
+
+        // when
+        viewModel =
+            OrderViewModel(
+                couponRepository,
+                shoppingCartRepository,
+                SHOPPING_CART_PRODUCTS_TO_ORDER,
+            )
+
+        // then
+        assertThat(viewModel.couponState.getOrAwaitValue()).isEqualTo(
+            listOf(
+                CouponState(
+                    id = COUPONS[0].id,
+                    isSelected = false,
+                    title = COUPONS[0].description,
+                    expirationDate = COUPONS[0].explanationDate,
+                    minimumOrderPrice = COUPONS[0].minimumAmount,
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun `상품을 결제하면 결제한 상품이 장바구니에서 삭제된다`() {
         // given
         coEvery { couponRepository.getAllCoupons() } returns

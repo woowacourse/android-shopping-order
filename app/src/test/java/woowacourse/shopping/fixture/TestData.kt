@@ -65,6 +65,12 @@ val SHOPPING_CART_PRODUCTS_TO_ORDER =
         SHOPPING_CART_PRODUCT2,
     )
 
+val SHOPPING_CART_PRODUCTS_TO_ORDER2 =
+    listOf(
+        SHOPPING_CART_PRODUCT3,
+        SHOPPING_CART_PRODUCT2,
+    )
+
 val COUPONS =
     listOf(
         FreeShipping(
@@ -77,7 +83,7 @@ val COUPONS =
         BuyXGetY(
             id = 1,
             description = "10000원 쿠폰",
-            explanationDate = LocalDate.of(2099, 1, 1),
+            explanationDate = LocalDate.of(2000, 1, 1),
             code = "adsf",
             buyQuantity = 2,
             getQuantity = 1,

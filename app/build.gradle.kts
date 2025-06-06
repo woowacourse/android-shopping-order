@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.shimmer)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
+    implementation(libs.places)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)

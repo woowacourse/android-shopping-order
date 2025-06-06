@@ -21,7 +21,7 @@ val SHOPPING_CART_PRODUCT3 =
     ShoppingCartProduct(
         id = 3,
         product = PRODUCT1,
-        quantity = 1,
+        quantity = 10,
     )
 
 val SHOPPING_CART_PRODUCT4 =
