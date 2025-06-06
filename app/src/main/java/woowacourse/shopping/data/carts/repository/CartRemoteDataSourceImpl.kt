@@ -54,35 +54,6 @@ class CartRemoteDataSourceImpl(
             CartFetchResult.Error(CartFetchError.Network)
         }
 
-    override fun fetchCartCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartCounts()
-            .enqueue(
-                object : Callback<CartQuantity> {
-                    override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!.quantity)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartQuantity>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
     override fun fetchAuthCode(
         validKey: String,
         onResponse: (Int) -> Unit,

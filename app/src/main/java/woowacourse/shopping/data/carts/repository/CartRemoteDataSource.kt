@@ -18,11 +18,6 @@ interface CartRemoteDataSource {
         offset: Int,
     ): CartFetchResult<CartResponse>
 
-    fun fetchCartCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
-
     fun fetchAuthCode(
         validKey: String,
         onResponse: (Int) -> Unit,
