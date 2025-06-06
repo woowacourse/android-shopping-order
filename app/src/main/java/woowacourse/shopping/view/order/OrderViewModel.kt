@@ -12,7 +12,7 @@ import woowacourse.shopping.data.coupon.remote.repository.CouponRepository
 import woowacourse.shopping.data.coupon.remote.repository.DefaultCouponRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 class OrderViewModel(
@@ -29,11 +29,11 @@ class OrderViewModel(
     private val _event: MutableLiveData<OrderEvent> = MutableLiveData(OrderEvent.ORDER_PROCEEDING)
     val event: LiveData<OrderEvent> get() = _event
 
-    private var allCoupons: List<Coupon> = emptyList()
+    private lateinit var coupons: Coupons
 
     init {
         viewModelScope.launch {
-            allCoupons = couponRepository.getAllCoupons()
+            coupons = Coupons(couponRepository.getAllCoupons())
             _orderState.value =
                 OrderState(
                     totalPrice = shoppingCartProductsToOrder.sumOf { it.price },
@@ -42,7 +42,7 @@ class OrderViewModel(
                     finalPrice = 202200,
                 )
             _couponState.value =
-                allCoupons.map {
+                coupons.available(shoppingCartProductsToOrder).map {
                     CouponState(
                         id = it.id,
                         isSelected = false,

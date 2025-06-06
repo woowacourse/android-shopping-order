@@ -6,6 +6,7 @@ import woowacourse.shopping.domain.coupon.Fixed
 import woowacourse.shopping.domain.coupon.FreeShipping
 import woowacourse.shopping.domain.coupon.Percentage
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 fun CouponResponse.toBuyXGetY(): BuyXGetY {
@@ -31,6 +32,21 @@ fun CouponResponse.toFixed(): Fixed {
 }
 
 fun CouponResponse.toPercentage(): Percentage {
+    if (availableTime != null) {
+        return Percentage(
+            id = id.toLong(),
+            description = description,
+            code = code,
+            explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+            discount = discount!!,
+            availableStartTime =
+                LocalTime.parse(
+                    availableTime.start,
+                    DateTimeFormatter.ISO_LOCAL_TIME,
+                ),
+            availableEndTime = LocalTime.parse(availableTime.end, DateTimeFormatter.ISO_LOCAL_TIME),
+        )
+    }
     return Percentage(
         id = id.toLong(),
         description = description,
