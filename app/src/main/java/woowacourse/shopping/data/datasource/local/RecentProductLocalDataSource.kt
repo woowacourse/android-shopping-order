@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.datasource.local
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.dao.RecentProductDao
 import woowacourse.shopping.data.entity.RecentProductEntity
 
@@ -7,20 +9,26 @@ class RecentProductLocalDataSource(
     private val dao: RecentProductDao,
 ) {
     suspend fun getLastViewedProduct(): Result<RecentProductEntity?> =
-        runCatching {
-            dao.getLastViewedProduct()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                dao.getLastViewedProduct()
+            }
         }
 
     suspend fun getPagedProducts(
         limit: Int,
         offset: Int,
     ): Result<List<RecentProductEntity>> =
-        runCatching {
-            dao.getPagedProducts(limit, offset)
+        withContext(Dispatchers.IO) {
+            runCatching {
+                dao.getPagedProducts(limit, offset)
+            }
         }
 
     suspend fun replaceRecentProduct(recentProductEntity: RecentProductEntity): Result<Unit> =
-        runCatching {
-            dao.replaceRecentProduct(recentProductEntity)
+        withContext(Dispatchers.IO) {
+            runCatching {
+                dao.replaceRecentProduct(recentProductEntity)
+            }
         }
 }

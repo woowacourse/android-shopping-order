@@ -1,10 +1,8 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.dto.response.toProduct
@@ -19,14 +17,12 @@ class RecentProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
 ) : RecentProductRepository {
     override suspend fun getLastViewedProduct(): Result<RecentProduct?> =
-        withContext(Dispatchers.IO) {
-            localDataSource.getLastViewedProduct().mapCatching { entity ->
-                if (entity != null) {
-                    val product = getProductById(entity.productId)
-                    RecentProduct(product, entity.viewedAt.toLocalDateTime())
-                } else {
-                    null
-                }
+        localDataSource.getLastViewedProduct().mapCatching { entity ->
+            if (entity != null) {
+                val product = getProductById(entity.productId)
+                RecentProduct(product, entity.viewedAt.toLocalDateTime())
+            } else {
+                null
             }
         }
 
@@ -34,26 +30,22 @@ class RecentProductRepositoryImpl(
         limit: Int,
         offset: Int,
     ): Result<List<RecentProduct>> =
-        withContext(Dispatchers.IO) {
-            localDataSource.getPagedProducts(limit, offset).mapCatching { entities ->
-                coroutineScope {
-                    val productResults =
-                        entities
-                            .map { entity ->
-                                async { entity to getProductById(entity.productId) }
-                            }.awaitAll()
+        localDataSource.getPagedProducts(limit, offset).mapCatching { entities ->
+            coroutineScope {
+                val productResults =
+                    entities
+                        .map { entity ->
+                            async { entity to getProductById(entity.productId) }
+                        }.awaitAll()
 
-                    productResults.map { (entity, product) ->
-                        RecentProduct(product, entity.viewedAt.toLocalDateTime())
-                    }
+                productResults.map { (entity, product) ->
+                    RecentProduct(product, entity.viewedAt.toLocalDateTime())
                 }
             }
         }
 
     override suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            localDataSource.replaceRecentProduct(recentProduct.toEntity())
-        }
+        localDataSource.replaceRecentProduct(recentProduct.toEntity())
 
     private suspend fun getProductById(id: Int): Product = productRemoteDataSource.getProductById(id).getOrThrow().toProduct()
 }

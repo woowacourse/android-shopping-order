@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.datasource.remote
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.dto.request.CartProductQuantityRequestDto
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
 import woowacourse.shopping.data.dto.response.CartProductQuantityResponseDto
@@ -15,42 +17,52 @@ class CartProductRemoteDataSource(
         page: Int?,
         size: Int?,
     ): Result<CartProductResponseDto> =
-        runCatching {
-            cartProductService.getPagedProducts(page = page, size = size).requireBody()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                cartProductService.getPagedProducts(page = page, size = size).requireBody()
+            }
         }
 
     suspend fun insert(
         id: Int,
         quantity: Int,
     ): Result<Int> =
-        runCatching {
-            val locationHeader =
-                cartProductService
-                    .insert(body = CartProductRequestDto(id, quantity))
-                    .requireHeader(HEADER_LOCATION)
-            locationHeader.removePrefix(LOCATION_PREFIX).toInt()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val locationHeader =
+                    cartProductService
+                        .insert(body = CartProductRequestDto(id, quantity))
+                        .requireHeader(HEADER_LOCATION)
+                locationHeader.removePrefix(LOCATION_PREFIX).toInt()
+            }
         }
 
     suspend fun delete(id: Int): Result<Unit> =
-        runCatching {
-            cartProductService.delete(id = id).requireBody()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                cartProductService.delete(id = id).requireBody()
+            }
         }
 
     suspend fun getTotalQuantity(): Result<CartProductQuantityResponseDto> =
-        runCatching {
-            cartProductService.getTotalQuantity().requireBody()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                cartProductService.getTotalQuantity().requireBody()
+            }
         }
 
     suspend fun updateQuantity(
         id: Int,
         quantity: Int,
     ): Result<Unit> =
-        runCatching {
-            cartProductService
-                .updateQuantity(
-                    id = id,
-                    body = CartProductQuantityRequestDto(quantity),
-                ).requireBody()
+        withContext(Dispatchers.IO) {
+            runCatching {
+                cartProductService
+                    .updateQuantity(
+                        id = id,
+                        body = CartProductQuantityRequestDto(quantity),
+                    ).requireBody()
+            }
         }
 
     companion object {
