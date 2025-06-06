@@ -31,14 +31,7 @@ object RetrofitClient {
         return builder.build()
     }
 
-    private fun createJsonConverterFactory(): Converter.Factory {
-        val json =
-            Json {
-                ignoreUnknownKeys = true
-                classDiscriminator = "discountType"
-            }
-        return json.asConverterFactory("application/json".toMediaType())
-    }
+    private fun createJsonConverterFactory(): Converter.Factory = Json.asConverterFactory("application/json".toMediaType())
 
     private class PrettyJsonLogger : HttpLoggingInterceptor.Logger {
         private val json =
