@@ -12,14 +12,13 @@ class CartItemsRepositoryImpl(
     private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
     private val cartItemsLocalDataSource: CartItemsLocalDataSource,
 ) : CartItemRepository {
-    init {
-        getInitialCartItems(null, null) { result ->
-            result
-                .onSuccess { cachedCartItems ->
-                    cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
-                }
-        }
-    }
+//    init {
+//        getInitialCartItems(null, null) {
+//                .onSuccess { cachedCartItems ->
+//                    cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
+//                }
+//        }
+//    }
 
     override fun getQuantity(pagingData: PagingData): PagingData {
         val updatedProducts =
@@ -38,118 +37,112 @@ class CartItemsRepositoryImpl(
         return cartItemsLocalDataSource.getCartItemCartIds()
     }
 
-    override fun getInitialCartItems(
+    override suspend fun getInitialCartItems(
         page: Int?,
         size: Int?,
-        onResult: (Result<List<CachedCartItem>>) -> Unit,
-    ) {
-        cartItemsRemoteDataSource.getCartItems(page, size) { result ->
-            result
-                .mapCatching { response ->
-                    response.content.map { content ->
-                        CachedCartItem(
-                            productId = content.product.id,
-                            cartId = content.id,
-                            quantity = content.quantity,
-                        )
-                    }
-                }
-                .let(onResult)
+    ): Result<List<CachedCartItem>> {
+        val result = cartItemsRemoteDataSource.getCartItems(page, size)
+
+        return result.mapCatching { response ->
+            response.content.map { content ->
+                CachedCartItem(
+                    productId = content.product.id,
+                    cartId = content.id,
+                    quantity = content.quantity,
+                )
+            }
         }
     }
 
-    override fun getCartItems(
+    override suspend fun getCartItems(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagingData>) -> Unit,
-    ) {
-        cartItemsRemoteDataSource.getCartItems(page, size) { result ->
-            result
-                .mapCatching { response ->
-                    PagingData(
-                        products = response.content.map { it.toUiModel() },
-                        page = response.pageable.pageNumber,
-                        hasNext = !response.last,
-                        hasPrevious = !response.first,
-                    )
-                }
-                .let(onResult)
+    ): Result<PagingData> {
+        val result = cartItemsRemoteDataSource.getCartItems(page, size)
+
+        return result.mapCatching { response ->
+            PagingData(
+                products = response.content.map { it.toUiModel() },
+                page = response.pageable.pageNumber,
+                hasNext = !response.last,
+                hasPrevious = !response.first,
+            )
         }
     }
 
-    override fun deleteCartItem(
-        id: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    override suspend fun deleteCartItem(id: Long): Result<Unit> {
         val cartId = cartItemsLocalDataSource.findCachedCartId(id)
 
-        if (cartId != null) {
-            cartItemsRemoteDataSource.deleteCartItem(cartId) { result ->
+        return if (cartId != null) {
+            val result = cartItemsRemoteDataSource.deleteCartItem(cartId)
+
+            result.onSuccess {
                 cartItemsLocalDataSource.remove(cartId)
-                result.let(onResult)
             }
-        }
-    }
 
-    override fun addCartItem(
-        id: Long,
-        quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
             result
-                .mapCatching { cartId ->
-                    cartItemsLocalDataSource.add(cartId, id, quantity)
-                }
-                .let(onResult)
+        } else {
+            Result.failure(Exception(CART_ID_ERROR_MESSAGE))
         }
     }
 
-    override fun updateCartItemQuantity(
+    override suspend fun addCartItem(
         id: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
-        if (cartId != null) {
-            cartItemsLocalDataSource.update(id, quantity)
-            cartItemsRemoteDataSource.updateCartItem(cartId, quantity) { result ->
-                result.let(onResult)
+    ): Result<Unit> {
+        return cartItemsRemoteDataSource.addCartItem(id, quantity)
+            .mapCatching { cartId ->
+                cartItemsLocalDataSource.add(cartId, id, quantity)
             }
+    }
+
+    override suspend fun updateCartItemQuantity(
+        id: Long,
+        quantity: Int,
+    ): Result<Unit> {
+        val cartId = cartItemsLocalDataSource.findCachedCartId(id)
+
+        return if (cartId != null) {
+            val result = cartItemsRemoteDataSource.updateCartItem(cartId, quantity)
+
+            result.onSuccess {
+                cartItemsLocalDataSource.update(id, quantity)
+            }
+
+            result
+        } else {
+            Result.failure(Exception(CART_ID_ERROR_MESSAGE))
         }
     }
 
-    override fun addCartItemQuantity(
+    override suspend fun addCartItemQuantity(
         id: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    ): Result<Unit> {
         val cartId = cartItemsLocalDataSource.findCachedCartId(id)
         val updatedQuantity = cartItemsLocalDataSource.getQuantity(id) + quantity
-        if (cartId != null) {
-            cartItemsLocalDataSource.update(id, updatedQuantity)
-            cartItemsRemoteDataSource.updateCartItem(cartId, updatedQuantity) { result ->
-                result.let(onResult)
+
+        return if (cartId != null) {
+            val result = cartItemsRemoteDataSource.updateCartItem(cartId, updatedQuantity)
+
+            result.onSuccess {
+                cartItemsLocalDataSource.update(id, updatedQuantity)
             }
+
+            result
         } else {
-            cartItemsRemoteDataSource.addCartItem(id, quantity) { result ->
-                result
-                    .mapCatching { cartId ->
-                        cartItemsLocalDataSource.add(cartId, id, quantity)
-                    }
-                    .let(onResult)
-            }
+            cartItemsRemoteDataSource.addCartItem(id, quantity)
+                .mapCatching { newCartId ->
+                    cartItemsLocalDataSource.add(newCartId, id, quantity)
+                }
         }
     }
 
-    override fun getCartItemsCount(onResult: (Result<Int>) -> Unit) {
-        cartItemsRemoteDataSource.getCarItemsCount { result ->
-            result
-                .mapCatching {
-                    it.quantity
-                }
-                .let(onResult)
-        }
+    override suspend fun getCartItemsCount(): Result<Int> {
+        return cartItemsRemoteDataSource.getCarItemsCount()
+            .mapCatching {
+                it.quantity
+            }
     }
 
     private fun Content.toUiModel() =
@@ -160,4 +153,8 @@ class CartItemsRepositoryImpl(
             quantity = this.quantity,
             price = this.product.price,
         )
+
+    companion object {
+        private const val CART_ID_ERROR_MESSAGE = "[ERROR] 해당 productId에 대한 cartId를 찾을 수 없습니다."
+    }
 }
