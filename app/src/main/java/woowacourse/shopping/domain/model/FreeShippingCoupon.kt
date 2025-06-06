@@ -15,7 +15,7 @@ class FreeShippingCoupon(
 
         val discount = if (isAvailable) DEFAULT_SHIPPING_PRICE else MINIMUM_PRICE
 
-        val shipping = if (isAvailable) MINIMUM_PRICE else DEFAULT_SHIPPING_PRICE
+        val shipping = DEFAULT_SHIPPING_PRICE
 
         return Price(
             original = original,
