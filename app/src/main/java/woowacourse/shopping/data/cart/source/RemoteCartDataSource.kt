@@ -31,7 +31,7 @@ class RemoteCartDataSource(
         return response?.content?.mapNotNull { it.toCartItemEntityOrNull() } ?: emptyList()
     }
 
-    private suspend fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
+    private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
         if (id == null ||
             product?.id == null ||
             product.name == null ||
