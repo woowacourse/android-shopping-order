@@ -17,6 +17,7 @@ class MiracleSaleCouponTest {
                 description = "",
                 discountType = "",
                 expirationDate = LocalDate.of(2024, 12, 31),
+                discount = 30,
                 availableTime =
                     MiracleSaleCoupon.AvailableTime(
                         start = LocalTime.of(9, 0),
@@ -41,6 +42,7 @@ class MiracleSaleCouponTest {
                 description = "",
                 discountType = "",
                 expirationDate = LocalDate.of(2025, 12, 31),
+                discount = 30,
                 availableTime =
                     MiracleSaleCoupon.AvailableTime(
                         start = LocalTime.of(10, 0),
@@ -65,6 +67,7 @@ class MiracleSaleCouponTest {
                 description = "",
                 discountType = "",
                 expirationDate = LocalDate.of(2025, 12, 31),
+                discount = 30,
                 availableTime =
                     MiracleSaleCoupon.AvailableTime(
                         start = LocalTime.of(10, 0),
@@ -89,6 +92,7 @@ class MiracleSaleCouponTest {
                 description = "",
                 discountType = "",
                 expirationDate = LocalDate.of(2025, 6, 6),
+                discount = 30,
                 availableTime =
                     MiracleSaleCoupon.AvailableTime(
                         start = LocalTime.of(10, 0),
@@ -113,6 +117,7 @@ class MiracleSaleCouponTest {
                 description = "",
                 discountType = "",
                 expirationDate = LocalDate.of(2025, 6, 7),
+                discount = 30,
                 availableTime =
                     MiracleSaleCoupon.AvailableTime(
                         start = LocalTime.of(10, 0),

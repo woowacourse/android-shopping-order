@@ -10,6 +10,7 @@ data class MiracleSaleCoupon(
     override val description: String,
     override val discountType: String,
     override val expirationDate: LocalDate,
+    val discount: Int,
     val availableTime: AvailableTime,
 ) : Coupon {
     fun isUsable(standardTime: LocalDateTime): Boolean {

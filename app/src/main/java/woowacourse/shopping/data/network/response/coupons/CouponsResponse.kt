@@ -67,6 +67,7 @@ data class CouponsResponse(
             }
 
             "MIRACLESALE" -> {
+                requireNotNull(discount) { ERROR_FIXED_DISCOUNT_NULL }
                 val time = requireNotNull(availableTime) { ERROR_MIRACLESALE_AVAILABLE_TIME_NULL }
 
                 MiracleSaleCoupon(
@@ -75,6 +76,7 @@ data class CouponsResponse(
                     description = description,
                     discountType = discountType,
                     expirationDate = LocalDate.parse(expirationDate),
+                    discount = discount,
                     availableTime = time.toDomain(),
                 )
             }
