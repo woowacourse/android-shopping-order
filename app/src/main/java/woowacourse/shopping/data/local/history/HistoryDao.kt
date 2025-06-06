@@ -8,17 +8,17 @@ import androidx.room.Query
 @Dao
 interface HistoryDao {
     @Query("SELECT * FROM history ORDER BY timestamp DESC")
-    fun getAll(): List<HistoryEntity>
+    suspend fun getAll(): List<HistoryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg historyEntity: HistoryEntity)
+    suspend fun insert(vararg historyEntity: HistoryEntity)
 
     @Query("SELECT * FROM history WHERE id = :id LIMIT 1")
-    fun findById(id: Long): HistoryEntity?
+    suspend fun findById(id: Long): HistoryEntity?
 
     @Query("DELETE FROM history WHERE id = (SELECT id FROM history ORDER BY timestamp ASC LIMIT 1)")
     fun deleteOldest()
 
     @Query("SELECT * FROM history ORDER BY timestamp DESC LIMIT 1")
-    fun findLatest(): HistoryEntity?
+    suspend fun findLatest(): HistoryEntity?
 }

@@ -101,20 +101,18 @@ class GoodsViewModel(
     }
 
     fun removeFromCart(cart: CartProduct) {
-        if (cart.quantity == 1) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (cart.quantity == 1) {
                 cartRepository
                     .deleteCart(cart.id)
                     .onSuccess {
-                        val updatedCart = cart.copy(id = 0, quantity = cart.quantity - 1)
+                        val updatedCart = cart.copy(id = 0, quantity = 0)
                         updateItems(updatedCart)
                         getCartCounts()
                     }.onFailure {
                         _insertState.value = Event(State.Failure)
                     }
-            }
-        } else {
-            viewModelScope.launch {
+            } else {
                 cartRepository
                     .updateCart(
                         id = cart.id,
@@ -132,12 +130,13 @@ class GoodsViewModel(
     }
 
     fun refreshHistoryOnly() {
-        historyRepository.getAll { historiesList ->
+        viewModelScope.launch {
+            val allHistories = historyRepository.getAll()
             val currentItems = _items.value.orEmpty().toMutableList()
             val cartsOnly = currentItems.filterIsInstance<GoodsItem.Product>()
             val updatedItems = mutableListOf<GoodsItem>()
-            if (historiesList.isNotEmpty()) {
-                updatedItems.add(GoodsItem.Recent(historiesList))
+            if (allHistories.isNotEmpty()) {
+                updatedItems.add(GoodsItem.Recent(allHistories))
             }
             updatedItems.addAll(cartsOnly)
             _items.postValue(updatedItems)
@@ -219,7 +218,8 @@ class GoodsViewModel(
     }
 
     private fun loadHistories() {
-        historyRepository.getAll { allHistories ->
+        viewModelScope.launch {
+            val allHistories = historyRepository.getAll()
             histories.clear()
             histories.addAll(allHistories)
             refreshItems()

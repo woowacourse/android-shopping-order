@@ -217,14 +217,13 @@ class CartViewModel(
     }
 
     fun loadProductsByCategory() {
-        historyRepository.findLatest { latestProduct ->
-            viewModelScope.launch {
-                val response = cartRepository.fetchAllCart()
-                val cartProductIds = response.content.map { it.product.id }
+        viewModelScope.launch {
+            val latestHistory = historyRepository.findLatest()
+            val response = cartRepository.fetchAllCart()
+            val cartProductIds = response.content.map { it.product.id }
 
-                val recommendedList = productRepository.fetchRecommendProducts(latestProduct.id, cartProductIds)
-                _recommendItems.value = recommendedList
-            }
+            val recommendedList = productRepository.fetchRecommendProducts(latestHistory.id, cartProductIds)
+            _recommendItems.value = recommendedList
         }
     }
 

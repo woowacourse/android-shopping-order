@@ -128,8 +128,9 @@ class GoodsDetailsViewModel(
     }
 
     fun loadLastViewed() {
-        historyRepository.findLatest { lastViewed ->
-            _lastViewed.postValue(lastViewed)
+        viewModelScope.launch {
+            val latestHistory = historyRepository.findLatest()
+            _lastViewed.postValue(latestHistory)
         }
     }
 
@@ -149,8 +150,10 @@ class GoodsDetailsViewModel(
     }
 
     private fun insertToHistory(cart: CartProduct) {
-        historyRepository.insert(
-            History(id = cart.product.id, name = cart.product.name, thumbnailUrl = cart.product.imageUrl),
-        )
+        viewModelScope.launch {
+            historyRepository.insert(
+                History(id = cart.product.id, name = cart.product.name, thumbnailUrl = cart.product.imageUrl),
+            )
+        }
     }
 }
