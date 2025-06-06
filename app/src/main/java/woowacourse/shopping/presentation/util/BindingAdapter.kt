@@ -45,3 +45,16 @@ fun setPrevButtonEnabled(
 ) {
     view.isEnabled = isEnabled
 }
+
+@BindingAdapter("expirationDateFormatted")
+fun TextView.setExpirationDateFormatted(expirationDate: String?) {
+    expirationDate?.let {
+        val parts = it.split("-")
+        if (parts.size == 3) {
+            val formatted = "만료일: ${parts[0]}년 ${parts[1]}월 ${parts[2]}일"
+            text = formatted
+        } else {
+            View.GONE
+        }
+    }
+}

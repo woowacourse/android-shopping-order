@@ -2,18 +2,20 @@ package woowacourse.shopping.presentation.payment
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.databinding.ActivityRecommendBinding
-import woowacourse.shopping.presentation.recommend.RecommendActivity
 
 class PaymentActivity : AppCompatActivity() {
     private lateinit var couponAdapter : CouponAdapter
 
+    private val viewModel: PaymentViewModel  by viewModels{
+        PaymentViewModel.FACTORY
+    }
     private val binding: ActivityPaymentBinding by lazy {
         DataBindingUtil.setContentView(this, R.layout.activity_payment)
     }
@@ -22,6 +24,10 @@ class PaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpScreen()
         setupToolbar()
+        setAdapter()
+        setUpBinding()
+        viewModel.getCoupons()
+        observeViewModel()
     }
 
     private fun setUpScreen() {
@@ -42,8 +48,20 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun setUpBinding() {
         binding.apply {
+            binding.viewModel = viewModel
             lifecycleOwner = this@PaymentActivity
             recyclerViewCoupon.adapter = couponAdapter
+        }
+    }
+
+    private fun setAdapter() {
+        couponAdapter =
+            CouponAdapter()
+    }
+
+    private fun observeViewModel() {
+        viewModel.coupons.observe(this) {  coupons->
+            couponAdapter.submitList(coupons)
         }
     }
 }
