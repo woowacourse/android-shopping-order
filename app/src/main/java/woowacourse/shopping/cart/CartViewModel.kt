@@ -49,7 +49,6 @@ class CartViewModel(
             it.copy(isChecked = !isChecked)
         }
         _allChecked.value = !isChecked
-//        _onAllSelectedProducts.value = Unit
         fetchTotalPurchaseAmount()
     }
 
