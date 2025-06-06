@@ -8,4 +8,6 @@ sealed interface Coupon {
     val description: String
     val expirationDate: LocalDate
     val discountType: String
+
+    fun isExpired(standardDate: LocalDate) = standardDate > expirationDate
 }
