@@ -3,5 +3,5 @@ package woowacourse.shopping.data.remote.coupon
 import woowacourse.shopping.data.remote.NetworkClient
 
 class CouponRepository {
-    suspend fun fetchAllCoupons(): CouponResponse = NetworkClient.getCouponService().requestCoupons()
+    suspend fun fetchAllCoupons(): List<CouponResponse> = NetworkClient.getCouponService().requestCoupons()
 }
