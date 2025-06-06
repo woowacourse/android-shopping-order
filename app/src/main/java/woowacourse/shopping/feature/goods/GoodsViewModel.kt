@@ -86,7 +86,6 @@ class GoodsViewModel(
 
     fun initialize() {
         appendCartItemsWithZeroQuantity()
-        updateRecentlyViewedGoods()
     }
 
     fun findCart(goods: Goods): Int = _cartCache.value?.get(goods.id)?.id ?: -1
