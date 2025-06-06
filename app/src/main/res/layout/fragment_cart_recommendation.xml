@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="vm"
+            type="woowacourse.shopping.cart.CartRecommendationFragmentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="이런 상품은 어떠세요?"
+            android:text="@string/recommendation_title"
             app:layout_constraintBottom_toTopOf="@id/textView_cart_recommendation_subtitle"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -28,22 +30,63 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요."
-            app:layout_constraintBottom_toTopOf="@id/RecyclerView_cart_recommendation"
+            android:text="@string/recommendation_subtitle"
+            app:layout_constraintBottom_toTopOf="@id/recyclerView_cart_recommendation"
             app:layout_constraintStart_toStartOf="@id/textView_cart_recommendation_title" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/RecyclerView_cart_recommendation"
+            android:id="@+id/recyclerView_cart_recommendation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             tools:itemCount="5"
             tools:listitem="@layout/product_item" />
 
+        <View
+            android:id="@+id/view_cart_bottom_bar"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/gray_5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/view_cart_order"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:id="@+id/view_cart_order"
+            android:layout_width="0dp"
+            android:layout_height="78dp"
+            android:background="@color/mint_blue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/view_cart_bottom_bar" />
+
+        <TextView
+            style="@style/CartPageOrderStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:text="@{@string/format_price(vm.totalPurchasePrice)}"
+            app:layout_constraintBottom_toBottomOf="@id/view_cart_bottom_bar"
+            app:layout_constraintEnd_toEndOf="@id/view_cart_bottom_bar"
+            app:layout_constraintTop_toTopOf="@id/view_cart_bottom_bar"
+            tools:text="184,000원" />
+
+        <TextView
+            style="@style/CartPageOrderStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/text_order(vm.selectedProductsCount)}"
+            app:layout_constraintBottom_toBottomOf="@id/view_cart_order"
+            app:layout_constraintEnd_toEndOf="@id/view_cart_order"
+            app:layout_constraintStart_toStartOf="@id/view_cart_order"
+            app:layout_constraintTop_toTopOf="@id/view_cart_order"
+            tools:text="주문하기(2)" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

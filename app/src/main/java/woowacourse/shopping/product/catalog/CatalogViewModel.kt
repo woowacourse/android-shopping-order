@@ -61,7 +61,6 @@ class CatalogViewModel(
                 }
             }
         }
-
         fetchTotalCount()
     }
 
@@ -76,7 +75,6 @@ class CatalogViewModel(
                 }
             }
         }
-
         fetchTotalCount()
     }
 

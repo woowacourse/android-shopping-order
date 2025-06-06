@@ -71,9 +71,10 @@ class CartViewModel(
         _totalAmount.postValue(amount)
     }
 
-    fun postTotalCount() {
-        val count = totalProducts.value?.size ?: 0
-        _cartItemCount.postValue(count)
+    fun fetchTotalCount() {
+        cartProductRepository.getTotalElements { count ->
+            _cartItemCount.postValue(count)
+        }
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
@@ -209,7 +210,7 @@ class CartViewModel(
                     _cartProducts.postValue(pagedProducts)
                     checkNextButtonEnabled(totalSize)
                     checkPrevButtonEnabled()
-                    postTotalCount()
+                    fetchTotalCount()
 
                     _loadingState.postValue(LoadingState.loaded())
                 }

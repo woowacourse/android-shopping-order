@@ -19,12 +19,13 @@ import woowacourse.shopping.product.detail.DetailActivity
 
 class CartRecommendationFragment : Fragment() {
     private lateinit var binding: FragmentCartRecommendationBinding
-    private val viewModel: CartViewModel by lazy {
+    private val viewModel: CartRecommendationFragmentViewModel by lazy {
         ViewModelProvider(
-            requireActivity(),
-            CartViewModelFactory(requireActivity().application as ShoppingApplication),
-        )[CartViewModel::class.java]
+            this,
+            CartRecommendationFragmentViewModelFactory(requireActivity().application as ShoppingApplication),
+        )[CartRecommendationFragmentViewModel::class.java]
     }
+
     private val adapter: ProductAdapter by lazy {
         ProductAdapter(
             products = emptyList(),
@@ -38,7 +39,13 @@ class CartRecommendationFragment : Fragment() {
                         viewModel.increaseQuantity(product)
                     }
                 },
-            quantityControlListener = { event, product -> },
+            quantityControlListener = { event, product ->
+                if (event == 1) {
+                    viewModel.increaseQuantity(product)
+                } else {
+                    viewModel.decreaseQuantity(product)
+                }
+            },
         )
     }
 
@@ -60,17 +67,25 @@ class CartRecommendationFragment : Fragment() {
                 container,
                 false,
             )
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.RecyclerViewCartRecommendation.adapter = adapter
+        binding.apply {
+            lifecycleOwner = viewLifecycleOwner
+            recyclerViewCartRecommendation.adapter = adapter
+            vm = viewModel
+        }
     }
 
     private fun observeData() {
         viewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            (binding.RecyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map {
+            (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).setItems(products.map {
                 ProductItem(
                     it
                 )
             })
+        }
+        viewModel.updatedItem.observe(viewLifecycleOwner) { product ->
+            if (product != null) {
+                (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).updateItem(product)
+            }
         }
     }
 }
