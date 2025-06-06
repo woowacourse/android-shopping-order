@@ -55,10 +55,13 @@ class RecommendationFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View? {
         initViewBinding(inflater, container)
-        observeData()
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeData()
+    }
     private fun initViewBinding(inflater: LayoutInflater, container: ViewGroup?) {
         binding =
             DataBindingUtil.inflate(
