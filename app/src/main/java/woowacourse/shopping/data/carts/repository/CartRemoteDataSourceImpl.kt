@@ -10,6 +10,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
@@ -35,45 +36,21 @@ class CartRemoteDataSourceImpl(
             .build()
             .create(RetrofitService::class.java)
 
-    override fun fetchCartItemByPage(
-        page: Int,
-        size: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartProduct(page = page, size = size)
-            .enqueue(
-                object : Callback<CartResponse> {
-                    override fun onResponse(
-                        call: Call<CartResponse>,
-                        response: Response<CartResponse>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartResponse>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
-    override fun fetchCartItemByOffset(
+    override suspend fun fetchCartItemByOffset(
         limit: Int,
         offset: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        fetchCartItemByPage(offset / limit, limit, onSuccess, onFailure)
-    }
+    ): CartFetchResult<CartResponse> = fetchCartItemByPage(offset / limit, limit)
+
+    override suspend fun fetchCartItemByPage(
+        page: Int,
+        size: Int,
+    ): CartFetchResult<CartResponse> =
+        try {
+            val response = retrofitService.requestCartProduct(page = page, size = size)
+            CartFetchResult.Success(response)
+        } catch (e: Exception) {
+            CartFetchResult.Error(CartFetchError.Network)
+        }
 
     override fun fetchCartCount(
         onSuccess: (Int) -> Unit,

@@ -6,9 +6,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
-import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
@@ -114,11 +116,17 @@ class CartViewModel(
         updateWholeCarts()
     }
 
-    fun updateWholeCarts() {
-        cartRepository.fetchAllCartItems({ cartResponse ->
-            val allItems: List<CartItem> = cartResponse.toCartItems()
-            _carts.value = allItems.associateBy { it.id }.toMutableMap()
-        }, { })
+    private fun updateWholeCarts() {
+        viewModelScope.launch {
+            when (val result = cartRepository.fetchAllCartItems()) {
+                is CartFetchResult.Success -> {
+                    val allItems = result.data.toCartItems()
+                    _carts.value = allItems.associateBy { it.goods.id }
+                }
+                is CartFetchResult.Error -> { // todo 에러 구현 필요
+                }
+            }
+        }
     }
 
     fun loadRecommendedGoods() {
@@ -146,26 +154,28 @@ class CartViewModel(
         recommendGoodsList: List<CartItem>,
         pageOffset: Int = 0,
     ) {
-        cartRepository.fetchAllCartItems(
-            { cartResponse: CartResponse ->
-                val cartItems = cartResponse.toCartItems()
-                val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
+        viewModelScope.launch {
+            when (val result = cartRepository.fetchAllCartItems()) {
+                is CartFetchResult.Success -> {
+                    val cartItems = result.data.toCartItems()
+                    val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
 
-                val cartFilteredGoodsList =
-                    recommendGoodsList.filter { recommendItem ->
-                        !cartGoodsIds.contains(recommendItem.goods.id)
+                    val cartFilteredGoodsList =
+                        recommendGoodsList.filter { recommendItem ->
+                            !cartGoodsIds.contains(recommendItem.goods.id)
+                        }
+
+                    if (cartFilteredGoodsList.isNotEmpty()) {
+                        _recommendedGoods.value = cartFilteredGoodsList
+                    } else {
+                        loadDefaultRecommendedGoods(pageOffset + 1)
                     }
-
-                if (cartFilteredGoodsList.isNotEmpty()) {
-                    _recommendedGoods.value = cartFilteredGoodsList
-                } else {
-                    loadDefaultRecommendedGoods(pageOffset + 1)
                 }
-            },
-            {
-                _recommendedGoods.value = recommendGoodsList
-            },
-        )
+                is CartFetchResult.Error -> {
+                    // todo 에러 처리 필요
+                }
+            }
+        }
     }
 
     private fun loadDefaultRecommendedGoods(pageOffset: Int = 0) {

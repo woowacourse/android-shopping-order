@@ -28,11 +28,11 @@ interface RetrofitService {
     ): Call<Content>
 
     @GET("/cart-items")
-    fun requestCartProduct(
+    suspend fun requestCartProduct(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
         @Query("sort") sort: String = "id,desc",
-    ): Call<CartResponse>
+    ): CartResponse
 
     @GET("/cart-items/counts")
     fun requestCartCounts(): Call<CartQuantity>

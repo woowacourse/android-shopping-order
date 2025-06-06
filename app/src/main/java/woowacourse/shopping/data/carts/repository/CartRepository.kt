@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
@@ -23,24 +24,12 @@ interface CartRepository {
         onFail: (CartFetchError) -> Unit,
     )
 
-    fun fetchAllCartItems(
-        onComplete: (CartResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    )
+    suspend fun fetchAllCartItems(): CartFetchResult<CartResponse>
 
-    fun fetchCartItemsByOffset(
+    suspend fun fetchCartItemsByOffset(
         limit: Int,
         offset: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
-
-    fun fetchCartItemsByPage(
-        page: Int,
-        size: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    ): CartFetchResult<CartResponse>
 
     fun updateQuantity(
         cartId: Int,

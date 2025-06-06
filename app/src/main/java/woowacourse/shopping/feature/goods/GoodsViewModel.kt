@@ -6,6 +6,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
@@ -128,10 +131,18 @@ class GoodsViewModel(
     }
 
     fun fetchAndSetCartCache() {
-        cartRepository.fetchAllCartItems({ cartResponse ->
-            val cartItems = cartResponse.toCartItems()
-            _cartCache.value = cartItems.associateBy { it.goods.id }
-        }, {})
+        viewModelScope.launch {
+            when (val result = cartRepository.fetchAllCartItems()) {
+                is CartFetchResult.Success -> {
+                    val cartItems = result.data.toCartItems()
+                    _cartCache.value = cartItems.associateBy { it.goods.id }
+                }
+
+                is CartFetchResult.Error -> {
+                    // todo 에러 처리 필요
+                }
+            }
+        }
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {

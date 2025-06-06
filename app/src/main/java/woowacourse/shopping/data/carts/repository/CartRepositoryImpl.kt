@@ -2,6 +2,7 @@ package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.account.AccountLocalDataSource
 import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
@@ -37,55 +38,20 @@ class CartRepositoryImpl(
         }, { })
     }
 
-    override fun fetchAllCartItems(
-        onComplete: (CartResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    ) {
+    override suspend fun fetchAllCartItems(): CartFetchResult<CartResponse> =
         remoteDataSource.fetchCartItemByOffset(
             Int.MAX_VALUE,
             0,
-            { response ->
-                onComplete(response)
-            },
-            { },
         )
-    }
 
-    override fun fetchCartItemsByOffset(
+    override suspend fun fetchCartItemsByOffset(
         limit: Int,
         offset: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
+    ): CartFetchResult<CartResponse> =
         remoteDataSource.fetchCartItemByOffset(
             limit,
             offset,
-            { response ->
-                onComplete(response)
-            },
-            { response ->
-                onFail(response)
-            },
         )
-    }
-
-    override fun fetchCartItemsByPage(
-        page: Int,
-        size: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.fetchCartItemByPage(
-            page,
-            size,
-            { response ->
-                onComplete(response)
-            },
-            { response ->
-                onFail(response)
-            },
-        )
-    }
 
     override fun updateQuantity(
         cartId: Int,
