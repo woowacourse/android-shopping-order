@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.model.Products
 
 interface ProductRepository {
@@ -11,4 +12,6 @@ interface ProductRepository {
     ): Result<Products>
 
     suspend fun fetchAllProducts(): Result<List<Product>>
+
+    suspend fun fetchProduct(productId: Long): Result<ProductDetail>
 }

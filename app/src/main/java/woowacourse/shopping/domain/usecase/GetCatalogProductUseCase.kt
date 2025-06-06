@@ -9,16 +9,14 @@ class GetCatalogProductUseCase(
     private val cartRepository: CartRepository,
 ) {
     suspend operator fun invoke(productId: Long): Result<Product> {
-        val catalogProducts =
-            productRepository.fetchAllProducts().getOrElse {
+        val productDetail =
+            productRepository.fetchProduct(productId).getOrElse {
                 return Result.failure(Throwable("[GetCatalogProductUseCase] 상품 목록 불러오기 오류", it))
             }
 
-        val catalogProduct =
-            catalogProducts.find { it.productDetail.id == productId }
-                ?: return Result.failure(Throwable("[GetCatalogProductUseCase] 찾을 수 없는 상품"))
+        val product = Product(productDetail)
 
-        return combineCartProduct(productId, catalogProduct)
+        return combineCartProduct(productId, product)
     }
 
     private suspend fun combineCartProduct(

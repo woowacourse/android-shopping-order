@@ -1,7 +1,9 @@
 package woowacourse.shopping.data.api
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.model.response.ProductDetailResponse
 import woowacourse.shopping.data.model.response.ProductsResponse
 
 interface ProductApi {
@@ -11,4 +13,9 @@ interface ProductApi {
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): ProductsResponse
+
+    @GET("/products/{id}")
+    suspend fun getProduct(
+        @Path("id") id: Long,
+    ): ProductDetailResponse
 }

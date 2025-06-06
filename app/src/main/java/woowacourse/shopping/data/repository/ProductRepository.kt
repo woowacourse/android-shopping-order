@@ -3,9 +3,11 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.api.ProductApi
+import woowacourse.shopping.data.model.response.ProductDetailResponse.Companion.toDomain
 import woowacourse.shopping.data.model.response.ProductsResponse.Content.Companion.toDomain
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -39,4 +41,6 @@ class ProductRepository(
             }
         }
     }
+
+    override suspend fun fetchProduct(productId: Long): Result<ProductDetail> = runCatching { api.getProduct(productId).toDomain() }
 }

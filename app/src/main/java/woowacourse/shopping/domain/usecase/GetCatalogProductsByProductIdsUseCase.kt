@@ -10,14 +10,17 @@ class GetCatalogProductsByProductIdsUseCase(
     private val cartRepository: CartRepository,
 ) {
     suspend operator fun invoke(productIds: List<Long>): Result<List<Product>> {
-        val products: List<Product> =
-            productRepository.fetchAllProducts().getOrElse {
-                return Result.failure(Throwable("[GetCatalogProductsByIdsUseCase] 상품 목록 불러오기 오류", it))
-            }
+        val products = mutableListOf<Product>()
 
-        val filteredCatalogProducts: List<Product> = products.filter { it.productDetail.id in productIds }
+        for (id in productIds) {
+            val productDetail =
+                productRepository.fetchProduct(id).getOrElse {
+                    return Result.failure(Throwable("[GetCatalogProductsByIdsUseCase] 상품 ID($id) 조회 실패", it))
+                }
+            products += Product(productDetail)
+        }
 
-        return combineCartProducts(filteredCatalogProducts)
+        return combineCartProducts(products)
     }
 
     private suspend fun combineCartProducts(catalogProducts: List<Product>): Result<List<Product>> {
