@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -15,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
@@ -37,6 +39,7 @@ class CartActivity : AppCompatActivity() {
         binding.clickListener = viewModel
         binding.lifecycleOwner = this
 
+        setOnBackPressedCallback()
         showSkeleton(true)
         initInsets()
         initAdapter()
@@ -69,10 +72,30 @@ class CartActivity : AppCompatActivity() {
         binding.tbCart.apply {
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
-                setResult(Activity.RESULT_OK)
+                val intent =
+                    Intent().apply {
+                        putExtra(Extra.KEY_CART_IS_UPDATE, viewModel.isUpdated)
+                    }
+                setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }
+    }
+
+    private fun setOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val intent =
+                        Intent().apply {
+                            putExtra(Extra.KEY_CART_IS_UPDATE, viewModel.isUpdated)
+                        }
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+            },
+        )
     }
 
     private fun observeViewModel() {

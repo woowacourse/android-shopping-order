@@ -52,6 +52,10 @@ class CartViewModel(
     private val _navigateTo = SingleLiveData<Pair<Int, Int>>()
     val navigateTo: LiveData<Pair<Int, Int>> = _navigateTo
 
+    private var initCartItemStatus: List<CartItemUiModel>? = null
+    val isUpdated: Boolean
+        get() = cartItems.value?.containsAll(initCartItemStatus ?: emptyList())?.not() ?: true
+
     fun loadItems(currentPage: Int = 0) {
         _uiState.value = ResultState.Loading
 
@@ -68,6 +72,7 @@ class CartViewModel(
                             oldItemsMapper[newItem.cartId] ?: newItem.toPresentation()
                         }
 
+                    if (initCartItemStatus == null) initCartItemStatus = newItems
                     _cartItems.value = newItems
                     _uiState.value = ResultState.Success(Unit)
                 }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
