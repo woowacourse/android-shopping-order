@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
 import woowacourse.shopping.R
@@ -23,7 +24,25 @@ import woowacourse.shopping.util.toUi
 
 class GoodsDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsDetailsBinding
-    private lateinit var viewModel: GoodsDetailsViewModel
+    private val goodsUiModel by lazy {
+        IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java)
+            ?: throw IllegalArgumentException("GoodsUiModel is required")
+    }
+
+    private val cartId by lazy { intent.getIntExtra(SELECTED_ITEM_CART_ID_KEY, -1) }
+
+    private val viewModel: GoodsDetailsViewModel by viewModels {
+        GoodsDetailsViewModelFactory(
+            goodsUiModel,
+            CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            GoodsRepositoryImpl(
+                GoodsRemoteDataSourceImpl(),
+                GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
+            ),
+            cartId,
+        )
+    }
+
     private val mostRecentItemCartId: Int by lazy {
         intent.getIntExtra(MOST_RECENT_ITEM_CART_ID_KEY, -1)
     }
@@ -33,22 +52,6 @@ class GoodsDetailsActivity : AppCompatActivity() {
         binding = ActivityGoodsDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.lifecycleOwner = this
-
-        val goodsUiModel =
-            IntentCompat.getParcelableExtra(intent, GOODS_KEY, GoodsUiModel::class.java) ?: return
-
-        val cartId: Int = intent.getIntExtra(SELECTED_ITEM_CART_ID_KEY, -1)
-
-        viewModel =
-            GoodsDetailsViewModel(
-                goodsUiModel,
-                CartRepositoryImpl(CartRemoteDataSourceImpl()),
-                GoodsRepositoryImpl(
-                    GoodsRemoteDataSourceImpl(),
-                    GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
-                ),
-                cartId,
-            )
 
         val source = intent.getStringExtra(EXTRA_SOURCE)
         if (source != SOURCE_RECENTLY_VIEWED) {

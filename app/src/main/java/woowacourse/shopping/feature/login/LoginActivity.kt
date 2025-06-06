@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.login
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.account.AccountLocalDataSource
@@ -13,14 +14,15 @@ import woowacourse.shopping.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var viewModel: LoginViewModel
+    private val viewModel: LoginViewModel by viewModels {
+        LoginViewModelFactory(CartRepositoryImpl(CartRemoteDataSourceImpl()))
+    }
     private lateinit var accountLocalDataSource: AccountLocalDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        viewModel = LoginViewModel(CartRepositoryImpl(CartRemoteDataSourceImpl()))
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.lifecycleOwner = this
