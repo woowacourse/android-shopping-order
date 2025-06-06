@@ -6,12 +6,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource,
 ) : OrderRepository {
-    override fun orderItems(
-        cartIds: List<Long>,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        orderDataSource.orderCheckedItems(cartIds) { result ->
-            onResult(result)
-        }
+    override suspend fun orderItems(cartIds: List<Long>): Result<Unit> {
+        return orderDataSource.orderCheckedItems(cartIds)
     }
 }
