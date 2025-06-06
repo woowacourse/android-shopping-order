@@ -35,11 +35,7 @@ interface CartRemoteDataSource {
         onFailure: (CartUpdateError) -> Unit,
     )
 
-    fun deleteItem(
-        cartId: Int,
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
+    suspend fun deleteItem(cartId: Int): CartFetchResult<Int>
 
     fun addItem(
         itemId: Int,

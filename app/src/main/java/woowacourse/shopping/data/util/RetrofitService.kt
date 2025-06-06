@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.util
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -44,9 +45,9 @@ interface RetrofitService {
     ): Call<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") cartId: Int,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @POST("/cart-items")
     fun addCartItem(

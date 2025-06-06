@@ -171,9 +171,14 @@ class GoodsViewModel(
             val existingItem = currentCache[cartItem.goods.id] ?: return
 
             if (existingItem.quantity - 1 <= 0) {
-                cartRepository.delete(existingItem.id, {
-                    removeFromCartCache(existingItem.goods.id)
-                }, {})
+                viewModelScope.launch {
+                    when (cartRepository.delete(existingItem.id)) {
+                        is CartFetchResult.Success -> {
+                            removeFromCartCache(existingItem.goods.id)
+                        }
+                        is CartFetchResult.Error -> TODO()
+                    }
+                }
             } else {
                 updateCartItemQuantity(
                     existingItem.id,

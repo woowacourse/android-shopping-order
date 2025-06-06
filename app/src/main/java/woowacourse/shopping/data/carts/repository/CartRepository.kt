@@ -38,11 +38,7 @@ interface CartRepository {
         onFail: (CartUpdateError) -> Unit,
     )
 
-    fun delete(
-        cartId: Int,
-        onComplete: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    suspend fun delete(cartId: Int): CartFetchResult<Int>
 
     fun addCartItem(
         goods: Goods,

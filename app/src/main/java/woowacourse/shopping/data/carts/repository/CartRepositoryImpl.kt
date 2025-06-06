@@ -71,17 +71,10 @@ class CartRepositoryImpl(
         )
     }
 
-    override fun delete(
-        cartId: Int,
-        onComplete: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
+    override suspend fun delete(cartId: Int): CartFetchResult<Int> =
         remoteDataSource.deleteItem(
             cartId = cartId,
-            onSuccess = onComplete,
-            onFailure = onFail,
         )
-    }
 
     override fun addCartItem(
         goods: Goods,

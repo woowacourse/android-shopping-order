@@ -287,22 +287,23 @@ class CartViewModel(
     }
 
     fun delete(cartItem: CartItem) {
-        cartRepository.delete(
-            cartItem.id,
-            {
-                val currentMap = _carts.value ?: return@delete
-                val newMap = currentMap.toMutableMap()
-                newMap.remove(cartItem.id)
-                _carts.value = newMap
+        viewModelScope.launch {
+            when (cartRepository.delete(cartItem.id)) {
+                is CartFetchResult.Success -> {
+                    val currentMap = _carts.value ?: return@launch
+                    val newMap = currentMap.toMutableMap()
+                    newMap.remove(cartItem.goods.id)
+                    _carts.value = newMap
 
-                val newEndPage = maxOf((newMap.size + PAGE_SIZE - 1) / PAGE_SIZE, 1)
-                val currentPage = _page.value ?: MINIMUM_PAGE
-                if (currentPage > newEndPage) {
-                    _page.value = newEndPage
+                    val newEndPage = maxOf((newMap.size + PAGE_SIZE - 1) / PAGE_SIZE, 1)
+                    val currentPage = _page.value ?: MINIMUM_PAGE
+                    if (currentPage > newEndPage) {
+                        _page.value = newEndPage
+                    }
                 }
-            },
-            {},
-        )
+                is CartFetchResult.Error -> TODO()
+            }
+        }
     }
 
     fun plusPage() {

@@ -144,36 +144,19 @@ class CartRemoteDataSourceImpl(
             )
     }
 
-    override fun deleteItem(
-        cartId: Int,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .deleteCartItem(
-                cartId = cartId,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
+    override suspend fun deleteItem(cartId: Int): CartFetchResult<Int> =
+        try {
+            val response = retrofitService.deleteCartItem(cartId = cartId)
+            if (response.isSuccessful) {
+                CartFetchResult.Success(response.code())
+            } else {
+                CartFetchResult.Error(
+                    CartFetchError.Server(response.code(), response.message()),
+                )
+            }
+        } catch (e: Exception) {
+            CartFetchResult.Error(CartFetchError.Network)
+        }
 
     override fun addItem(
         itemId: Int,
