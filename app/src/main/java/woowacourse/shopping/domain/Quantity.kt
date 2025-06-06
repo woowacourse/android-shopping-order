@@ -1,7 +1,9 @@
 package woowacourse.shopping.domain
 
+import java.io.Serializable
+
 @JvmInline
-value class Quantity(val value: Int) {
+value class Quantity(val value: Int) : Serializable {
     fun hasQuantity(minValue: Int = 1): Boolean = value >= minValue
 
     operator fun plus(other: Int): Quantity {

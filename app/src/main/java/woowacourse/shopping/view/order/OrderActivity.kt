@@ -1,8 +1,8 @@
 package woowacourse.shopping.view.order
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -13,6 +13,8 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.view.core.ext.getSerializableArrayList
 import woowacourse.shopping.view.order.adapter.OrderAdapter
 import woowacourse.shopping.view.order.vm.OrderViewModel
 import woowacourse.shopping.view.order.vm.OrderViewModelFactory
@@ -34,6 +36,9 @@ class OrderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
+        val order = intent.getSerializableArrayList<ShoppingCart>(KEY_ORDER)
+        viewModel.loadCoupons(order)
+
         setUpBinding(binding)
         setUpSystemBar()
 
@@ -69,5 +74,18 @@ class OrderActivity : AppCompatActivity() {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    companion object {
+        fun newIntent(
+            context: Context,
+            order: List<ShoppingCart>,
+        ): Intent {
+            return Intent(context, OrderActivity::class.java).apply {
+                putExtra(KEY_ORDER, ArrayList(order))
+            }
+        }
+
+        private const val KEY_ORDER = "order"
     }
 }

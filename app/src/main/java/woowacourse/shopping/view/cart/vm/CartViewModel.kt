@@ -235,8 +235,10 @@ class CartViewModel(
         }
     }
 
-    fun onChangeScreen() {
-        _uiEvent.setValue(CartUiEvent.ChangeScreen)
+    fun sendScreenChangeEvent() {
+        withState(_cartUiState.value) { state ->
+            _uiEvent.setValue(CartUiEvent.ChangeScreen(state.items.map { it.cart }))
+        }
     }
 
     private fun handleFailure(throwable: Throwable) {
