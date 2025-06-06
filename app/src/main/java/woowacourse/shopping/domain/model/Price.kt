@@ -8,8 +8,8 @@ data class Price(
     val result: Int get() = (original - discount + shipping).coerceAtLeast(MINIMUM_PRICE)
 
     companion object {
-        val EMPTY_PRICE: Price = Price(0)
         const val MINIMUM_PRICE: Int = 0
         const val DEFAULT_SHIPPING_PRICE: Int = 3_000
+        val EMPTY_PRICE: Price = Price(MINIMUM_PRICE)
     }
 }
