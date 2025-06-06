@@ -26,4 +26,14 @@ data class BuyXGetY(
             it.quantity >= buyQuantity + getQuantity
         }
     }
+
+    override fun disCountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
+        val target =
+            shoppingCartProductToOrder.filter {
+                it.quantity >= buyQuantity + getQuantity
+            }.minBy {
+                it.price
+            }
+        return target.price / target.quantity
+    }
 }

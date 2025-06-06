@@ -46,6 +46,8 @@
     <string name="finalPricetitle">총 결제 금액</string>
     <string name="orderProceedTitle">결제하기</string>
     <string name="couponExpirationDate">만료일 : %s년 %s월 %s일</string>
-    <string name="couponMinimumOrderPrice">최소 주문 금액: %,d원</string>"
+    <string name="couponMinimumOrderPrice">최소 주문 금액: %,d원</string>
+    <string name="product_discount_format">-%,d원</string>
+
 
 </resources>

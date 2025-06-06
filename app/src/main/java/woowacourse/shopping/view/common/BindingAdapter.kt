@@ -31,3 +31,15 @@ fun setExpirationDate(
             expirationDate.dayOfMonth,
         )
 }
+
+@BindingAdapter("discount")
+fun setDiscount(
+    view: TextView,
+    discount: Int,
+) {
+    if (discount > 0) {
+        view.text = view.context.getString(R.string.product_discount_format, discount)
+    } else {
+        view.text = view.context.getString(R.string.product_price_format, discount)
+    }
+}

@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.coupon
 
+import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import java.time.LocalDate
 
 data class Fixed(
@@ -10,4 +11,8 @@ data class Fixed(
     override val discountType: DiscountType = DiscountType.FIXED,
     val discount: Int,
     override val minimumAmount: Int?,
-) : Coupon()
+) : Coupon() {
+    override fun disCountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
+        return discount
+    }
+}

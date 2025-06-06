@@ -141,7 +141,7 @@
                     android:textColor="@color/gray_5"
                     android:textSize="18sp"
                     android:textStyle="normal"
-                    android:text="@{@string/product_price_format(viewModel.orderState.discountPrice)}"
+                    app:discount="@{viewModel.orderState.discountPrice}"
                     app:layout_constraintBottom_toTopOf="@id/shippingFee"
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:text="-5,000원" />
