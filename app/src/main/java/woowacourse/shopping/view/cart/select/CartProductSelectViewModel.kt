@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
@@ -50,9 +52,11 @@ class CartProductSelectViewModel(
         }
 
     fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
-        _isLoading.value = true
-        repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
-            result
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            repository
+                .getPagedProducts(page - 1, PAGE_SIZE)
                 .onSuccess { pagedResult ->
                     _isLoading.value = false
                     _cartProductItems.value =
@@ -60,7 +64,9 @@ class CartProductSelectViewModel(
                             CartProductItem(it, it in selectedCartProducts.value.orEmpty())
                         }
                     updatePageState(page, pagedResult.hasNext)
-                }.onFailure { Log.e("error", it.message.toString()) }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -75,18 +81,24 @@ class CartProductSelectViewModel(
     }
 
     override fun onProductRemoveClick(item: CartProduct) {
-        repository.delete(item.id) {
-            val currentPage = page.value ?: FIRST_PAGE_NUMBER
-            if (cartProductItems.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
-                loadPage(currentPage - 1)
-            } else {
-                loadPage(currentPage)
-            }
-        }
+        viewModelScope.launch {
+            repository
+                .delete(item.id)
+                .onSuccess {
+                    val currentPage = page.value ?: FIRST_PAGE_NUMBER
+                    if (cartProductItems.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
+                        loadPage(currentPage - 1)
+                    } else {
+                        loadPage(currentPage)
+                    }
 
-        val currentSelected = selectedCartProducts.value.orEmpty()
-        if (item in currentSelected) {
-            _selectedCartProducts.postValue(currentSelected - item)
+                    val currentSelected = selectedCartProducts.value.orEmpty()
+                    if (item in currentSelected) {
+                        _selectedCartProducts.postValue(currentSelected - item)
+                    }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -137,17 +149,25 @@ class CartProductSelectViewModel(
         item: CartProduct,
         quantityDelta: Int,
     ) {
-        val existing =
-            cartProductItems.value.orEmpty().firstOrNull { it.cartProduct.id == item.id } ?: return
-        val newQuantity = existing.cartProduct.quantity + quantityDelta
-        if (newQuantity < MINIMUM_QUANTITY) return
-        repository.updateQuantity(existing.cartProduct, quantityDelta) {
-            loadPage(page.value ?: FIRST_PAGE_NUMBER)
-        }
-        val currentSelected = selectedCartProducts.value.orEmpty()
-        if (item in currentSelected) {
-            val newItem = item.copy(quantity = newQuantity)
-            _selectedCartProducts.postValue(currentSelected - item + newItem)
+        viewModelScope.launch {
+            val existing =
+                cartProductItems.value.orEmpty().firstOrNull { it.cartProduct.id == item.id }
+                    ?: return@launch
+            val newQuantity = existing.cartProduct.quantity + quantityDelta
+            if (newQuantity < MINIMUM_QUANTITY) return@launch
+
+            repository
+                .updateQuantity(existing.cartProduct, quantityDelta)
+                .onSuccess {
+                    loadPage(page.value ?: FIRST_PAGE_NUMBER)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
+            val currentSelected = selectedCartProducts.value.orEmpty()
+            if (item in currentSelected) {
+                val newItem = item.copy(quantity = newQuantity)
+                _selectedCartProducts.postValue(currentSelected - item + newItem)
+            }
         }
     }
 

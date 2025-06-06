@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -50,22 +52,27 @@ class ProductDetailViewModel(
     }
 
     override fun onAddToCartClick() {
-        cartProductRepository.getCartProductByProductId(product.id) { result ->
-            result
+        viewModelScope.launch {
+            cartProductRepository
+                .getCartProductByProductId(product.id)
                 .onSuccess { cartProduct ->
                     val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
-                    if (cartProduct == null) {
-                        cartProductRepository.insert(product.id, quantityToAdd) {
-                            _quantity.postValue(MINIMUM_QUANTITY)
+                    val updateResult =
+                        if (cartProduct == null) {
+                            cartProductRepository.insert(product.id, quantityToAdd)
+                        } else {
+                            cartProductRepository.updateQuantity(cartProduct, quantityToAdd)
                         }
-                    } else {
-                        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
+
+                    updateResult
+                        .onSuccess {
                             _quantity.postValue(MINIMUM_QUANTITY)
+                            _addToCartEvent.postValue(Unit)
+                        }.onFailure {
+                            Log.e("error", it.message.toString())
                         }
-                    }
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
-        _addToCartEvent.setValue(Unit)
     }
 
     override fun onLastViewedProductClick() {

@@ -1,5 +1,7 @@
 package woowacourse.shopping.viewmodel.product
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -12,9 +14,12 @@ import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.catalog.ProductCatalogViewModel
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
+import woowacourse.shopping.viewmodel.CoroutinesTestExtension
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductCatalogViewModelTest {
     private lateinit var viewModel: ProductCatalogViewModel
@@ -23,19 +28,20 @@ class ProductCatalogViewModelTest {
     private lateinit var recentProductRepository: RecentProductRepository
 
     @BeforeEach
-    fun setup() {
-        productRepository = FakeProductRepository()
-        cartProductRepository = FakeCartProductRepository()
-        recentProductRepository = FakeRecentProductRepository()
-        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
-        viewModel =
-            ProductCatalogViewModel(
-                productRepository,
-                cartProductRepository,
-                recentProductRepository,
-            )
-        viewModel.loadCatalog()
-    }
+    fun setup() =
+        runTest {
+            productRepository = FakeProductRepository()
+            cartProductRepository = FakeCartProductRepository()
+            recentProductRepository = FakeRecentProductRepository()
+            repeat(12) { id -> cartProductRepository.insert(id, 1) }
+            viewModel =
+                ProductCatalogViewModel(
+                    productRepository,
+                    cartProductRepository,
+                    recentProductRepository,
+                )
+            viewModel.loadCatalog()
+        }
 
     @Test
     fun `초기 로드 시 첫 페이지의 상품과 더보기 버튼이 포함된다`() {

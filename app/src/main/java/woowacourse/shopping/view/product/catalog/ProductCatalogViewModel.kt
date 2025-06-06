@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -46,11 +48,13 @@ class ProductCatalogViewModel(
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
     fun loadCatalog() {
-        _isLoading.value = true
-        loadRecentProducts()
-        loadCartProducts()
-        cartProductRepository.getTotalQuantity { result ->
-            result
+        viewModelScope.launch {
+            _isLoading.value = true
+            loadRecentProducts()
+            loadCartProducts()
+
+            cartProductRepository
+                .getTotalQuantity()
                 .onSuccess {
                     _totalQuantity.postValue(it)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -58,8 +62,9 @@ class ProductCatalogViewModel(
     }
 
     override fun onPlusClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
-            result
+        viewModelScope.launch {
+            cartProductRepository
+                .insert(item.id, QUANTITY_TO_ADD)
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
                     updateProductQuantity(item, QUANTITY_TO_ADD)
@@ -98,8 +103,9 @@ class ProductCatalogViewModel(
     }
 
     private fun loadCartProducts() {
-        cartProductRepository.getPagedProducts { result ->
-            result
+        viewModelScope.launch {
+            cartProductRepository
+                .getPagedProducts()
                 .onSuccess {
                     cartProducts.clear()
                     cartProducts.addAll(it.items)
@@ -146,14 +152,21 @@ class ProductCatalogViewModel(
         item: Product,
         quantityDelta: Int,
     ) {
-        val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        val newQuantity = existing.quantity + quantityDelta
-        cartProductRepository.updateQuantity(existing, quantityDelta) {
-            cartProducts.removeIf { it.product.id == item.id }
-            if (newQuantity > MINIMUM_QUANTITY) {
-                cartProducts.add(existing.copy(quantity = newQuantity))
-            }
-            updateProductQuantity(item, quantityDelta)
+        viewModelScope.launch {
+            val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return@launch
+            val newQuantity = existing.quantity + quantityDelta
+
+            cartProductRepository
+                .updateQuantity(existing, quantityDelta)
+                .onSuccess {
+                    cartProducts.removeIf { it.product.id == item.id }
+                    if (newQuantity > MINIMUM_QUANTITY) {
+                        cartProducts.add(existing.copy(quantity = newQuantity))
+                    }
+                    updateProductQuantity(item, quantityDelta)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 

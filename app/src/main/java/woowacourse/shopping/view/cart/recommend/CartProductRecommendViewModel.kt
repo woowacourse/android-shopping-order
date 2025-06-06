@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -39,8 +41,9 @@ class CartProductRecommendViewModel(
     val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
 
     init {
-        cartProductRepository.getPagedProducts { result ->
-            result
+        viewModelScope.launch {
+            cartProductRepository
+                .getPagedProducts()
                 .onSuccess {
                     cartProducts.addAll(it.items)
                     loadRecommendedProducts()
@@ -96,8 +99,9 @@ class CartProductRecommendViewModel(
     }
 
     override fun onPlusClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
-            result
+        viewModelScope.launch {
+            cartProductRepository
+                .insert(item.id, QUANTITY_TO_ADD)
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
                     selectedCartIds.add(cartProductId)
@@ -109,25 +113,37 @@ class CartProductRecommendViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
-        val cartProduct = cartProducts.first { it.product.id == item.id }
-        cartProductRepository.updateQuantity(cartProduct, QUANTITY_TO_ADD) {
-            cartProducts.remove(cartProduct)
-            cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-            updateQuantity(item, QUANTITY_TO_ADD)
+        viewModelScope.launch {
+            val cartProduct = cartProducts.first { it.product.id == item.id }
+            cartProductRepository
+                .updateQuantity(cartProduct, QUANTITY_TO_ADD)
+                .onSuccess {
+                    cartProducts.remove(cartProduct)
+                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
+                    updateQuantity(item, QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
-        val cartProduct = cartProducts.first { it.product.id == item.id }
-        cartProductRepository.updateQuantity(cartProduct, -QUANTITY_TO_ADD) {
-            cartProducts.remove(cartProduct)
-            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
-            if (newQuantity > DEFAULT_COUNT) {
-                cartProducts.add(cartProduct.copy(quantity = newQuantity))
-            } else {
-                selectedCartIds.remove(cartProduct.id)
-            }
-            updateQuantity(item, -QUANTITY_TO_ADD)
+        viewModelScope.launch {
+            val cartProduct = cartProducts.first { it.product.id == item.id }
+            cartProductRepository
+                .updateQuantity(cartProduct, -QUANTITY_TO_ADD)
+                .onSuccess {
+                    cartProducts.remove(cartProduct)
+                    val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+                    if (newQuantity > DEFAULT_COUNT) {
+                        cartProducts.add(cartProduct.copy(quantity = newQuantity))
+                    } else {
+                        selectedCartIds.remove(cartProduct.id)
+                    }
+                    updateQuantity(item, -QUANTITY_TO_ADD)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -150,10 +166,12 @@ class CartProductRecommendViewModel(
     }
 
     override fun onOrderClick() {
-        selectedCartIds.forEach { id ->
-            cartProductRepository.delete(id) {}
+        viewModelScope.launch {
+            selectedCartIds.forEach { id ->
+                cartProductRepository.delete(id)
+            }
+            _finishOrderEvent.postValue(Unit)
         }
-        _finishOrderEvent.postValue(Unit)
     }
 
     companion object {

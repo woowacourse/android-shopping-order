@@ -8,62 +8,39 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 class CartProductRepositoryImpl(
     private val remoteDataSource: CartProductRemoteDataSource,
 ) : CartProductRepository {
-    override fun insert(
+    override suspend fun insert(
         productId: Int,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
-    ) {
-        remoteDataSource.insert(productId, quantity, onResult)
-    }
+    ): Result<Int> = remoteDataSource.insert(productId, quantity)
 
-    override fun getPagedProducts(
+    override suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
-    ) {
-        remoteDataSource.getPagedProducts(page = page, size = size, onResult)
+    ): Result<PagedResult<CartProduct>> = remoteDataSource.getPagedProducts(page = page, size = size)
+
+    override suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?> {
+        getPagedProducts()
+            .onSuccess { pagedResult ->
+                val cartProduct = pagedResult.items.firstOrNull { it.product.id == productId }
+                return Result.success(cartProduct)
+            }.onFailure {
+                return Result.failure(it)
+            }
+        return Result.failure(Exception("Unknown error"))
     }
 
-    override fun getCartProductByProductId(
-        productId: Int,
-        onResult: (Result<CartProduct?>) -> Unit,
-    ) {
-        getPagedProducts { result ->
-            result
-                .onSuccess { pagedResult ->
-                    val cartProduct = pagedResult.items.firstOrNull { it.product.id == productId }
-                    onResult(Result.success(cartProduct))
-                }.onFailure {
-                    onResult(Result.failure(it))
-                }
-        }
-    }
+    override suspend fun getTotalQuantity(): Result<Int> = remoteDataSource.getTotalQuantity()
 
-    override fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
-        remoteDataSource.getTotalQuantity(onResult)
-    }
-
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartProduct: CartProduct,
         quantityToAdd: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    ): Result<Unit> {
         val newQuantity = cartProduct.quantity + quantityToAdd
-        when {
-            newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
-            else ->
-                remoteDataSource.updateQuantity(
-                    cartProduct.id,
-                    newQuantity,
-                ) { onResult(Result.success(Unit)) }
+        return when {
+            newQuantity == 0 -> delete(cartProduct.id)
+            else -> remoteDataSource.updateQuantity(cartProduct.id, newQuantity)
         }
-        return
     }
 
-    override fun delete(
-        id: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        remoteDataSource.delete(id, onResult)
-    }
+    override suspend fun delete(id: Int): Result<Unit> = remoteDataSource.delete(id)
 }

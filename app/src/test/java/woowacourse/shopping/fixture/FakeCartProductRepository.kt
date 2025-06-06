@@ -7,70 +7,90 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 
 class FakeCartProductRepository : CartProductRepository {
     private val cartProducts = mutableListOf<CartProduct>()
+    private var nextCartId = 1
 
-    override fun insert(
+    override suspend fun insert(
         productId: Int,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
-    ) {
-        val product =
-            Product(
-                id = productId,
-                imageUrl = "",
-                name = "Product $productId",
-                price = 1000,
-            )
-        cartProducts.add(CartProduct(product = product, quantity = quantity))
-    }
+    ): Result<Int> =
+        try {
+            val product =
+                Product(
+                    id = productId,
+                    imageUrl = "",
+                    name = "Product $productId",
+                    price = 1000,
+                )
+            val cartProduct =
+                CartProduct(
+                    id = nextCartId++,
+                    product = product,
+                    quantity = quantity,
+                )
+            cartProducts.add(cartProduct)
+            Result.success(cartProduct.id) // cartId 반환
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-    override fun getPagedProducts(
+    override suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
-    ) {
-        if (page == null || size == null) {
-            onResult(Result.success(PagedResult(cartProducts, false)))
-            return
+    ): Result<PagedResult<CartProduct>> =
+        try {
+            if (page == null || size == null) {
+                Result.success(PagedResult(cartProducts, hasNext = false))
+            } else {
+                val pagedItems = cartProducts.drop(page * size).take(size)
+                val hasNext = (page + 1) * size < cartProducts.size
+                Result.success(PagedResult(pagedItems, hasNext))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        val pagedItems = cartProducts.drop(page * size).take(size)
-        val hasNext = page * size + pagedItems.size < cartProducts.size
-        onResult(Result.success(PagedResult(pagedItems, hasNext)))
-    }
 
-    override fun getCartProductByProductId(
-        productId: Int,
-        onResult: (Result<CartProduct?>) -> Unit,
-    ) {
-        onResult(Result.success(cartProducts.find { it.product.id == productId }))
-    }
+    override suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?> =
+        try {
+            val product = cartProducts.find { it.product.id == productId }
+            Result.success(product)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-    override fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
-        onResult(Result.success(cartProducts.sumOf { it.quantity }))
-    }
+    override suspend fun getTotalQuantity(): Result<Int> =
+        try {
+            Result.success(cartProducts.sumOf { it.quantity })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartProduct: CartProduct,
         quantityToAdd: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val newQuantity = cartProduct.quantity + quantityToAdd
-        when {
-            newQuantity == 0 -> delete(cartProduct.id) { onResult(Result.success(Unit)) }
-            else -> {
+    ): Result<Unit> =
+        try {
+            val newQuantity = cartProduct.quantity + quantityToAdd
+            if (newQuantity == 0) {
+                delete(cartProduct.id)
+            } else {
                 cartProducts.replaceAll {
-                    if (it.product.id == cartProduct.product.id) it.copy(quantity = newQuantity) else it
+                    if (it.product.id == cartProduct.product.id) {
+                        it.copy(quantity = newQuantity)
+                    } else {
+                        it
+                    }
                 }
-                onResult(Result.success(Unit))
+                Result.success(Unit)
             }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        return
-    }
 
-    override fun delete(
-        id: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        cartProducts.removeIf { it.product.id == id }
-        onResult(Result.success(Unit))
-    }
+    override suspend fun delete(id: Int): Result<Unit> =
+        try {
+            cartProducts.removeIf { it.product.id == id }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 }

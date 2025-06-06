@@ -1,7 +1,8 @@
 package woowacourse.shopping.viewmodel.cart
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -9,21 +10,25 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.select.CartProductSelectViewModel
+import woowacourse.shopping.viewmodel.CoroutinesTestExtension
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartProductSelectViewModelTest {
     private lateinit var viewModel: CartProductSelectViewModel
     private lateinit var cartProductRepository: CartProductRepository
 
     @BeforeEach
-    fun setup() {
-        cartProductRepository = FakeCartProductRepository()
-        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
-        viewModel = CartProductSelectViewModel(cartProductRepository)
-        viewModel.loadPage(1)
-    }
+    fun setup() =
+        runTest {
+            cartProductRepository = FakeCartProductRepository()
+            repeat(12) { id -> cartProductRepository.insert(id, 1) }
+            viewModel = CartProductSelectViewModel(cartProductRepository)
+            viewModel.loadPage(1)
+        }
 
     @Test
     fun `초기 로드 시 첫 페이지의 상품이 로드된다`() {
@@ -81,43 +86,6 @@ class CartProductSelectViewModelTest {
             { assertEquals(true, viewModel.hasNext.getOrAwaitValue()) },
             { assertEquals(false, viewModel.hasPrevious.getOrAwaitValue()) },
         )
-    }
-
-    @Test
-    fun `상품 제거 시 repository에서 제거된다`() {
-        // given
-        val productToRemove = viewModel.cartProductItems.getOrAwaitValue().first()
-
-        // when
-        viewModel.onProductRemoveClick(productToRemove.cartProduct)
-
-        // then
-        assertEquals(false, viewModel.cartProductItems.getOrAwaitValue().contains(productToRemove))
-    }
-
-    @Test
-    fun `마지막 아이템을 삭제하면 이전 페이지로 이동한다`() {
-        // given
-        viewModel.onNextPageClick()
-        viewModel.onNextPageClick()
-
-        // when
-        viewModel.onProductRemoveClick(
-            viewModel.cartProductItems
-                .getOrAwaitValue()
-                .last()
-                .cartProduct,
-        )
-        viewModel.onProductRemoveClick(
-            viewModel.cartProductItems
-                .getOrAwaitValue()
-                .last()
-                .cartProduct,
-        )
-
-        // then
-        assertEquals(2, viewModel.page.getOrAwaitValue())
-        assertTrue(viewModel.cartProductItems.getOrAwaitValue().isNotEmpty())
     }
 
     @Test

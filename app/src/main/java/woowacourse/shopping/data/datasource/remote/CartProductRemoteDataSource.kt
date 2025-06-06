@@ -1,12 +1,7 @@
 package woowacourse.shopping.data.datasource.remote
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import woowacourse.shopping.data.dto.request.CartProductQuantityRequestDto
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
-import woowacourse.shopping.data.dto.response.CartProductQuantityResponseDto
-import woowacourse.shopping.data.dto.response.CartProductResponseDto
 import woowacourse.shopping.data.dto.response.toCartProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.CartProductApiService
@@ -15,155 +10,85 @@ import woowacourse.shopping.domain.model.CartProduct
 class CartProductRemoteDataSource(
     private val cartProductService: CartProductApiService,
 ) {
-    fun getPagedProducts(
+    suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
-    ) {
-        cartProductService.getPagedProducts(page = page, size = size).enqueue(
-            object : Callback<CartProductResponseDto> {
-                override fun onResponse(
-                    call: Call<CartProductResponseDto>,
-                    response: Response<CartProductResponseDto>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { body ->
-                            val products = body.content.map { it.toCartProduct() }
-                            val hasNext = body.last.not()
-                            onResult(Result.success(PagedResult(products, hasNext)))
-                        } ?: onResult(Result.success(PagedResult(emptyList(), false)))
-                    } else {
-                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                    }
-                }
+    ): Result<PagedResult<CartProduct>> =
+        try {
+            val response = cartProductService.getPagedProducts(page = page, size = size)
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    val products = body.content.map { it.toCartProduct() }
+                    val hasNext = body.last.not()
+                    Result.success(PagedResult(products, hasNext))
+                } ?: Result.success(PagedResult(emptyList(), false))
+            } else {
+                Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-                override fun onFailure(
-                    call: Call<CartProductResponseDto>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    fun insert(
+    suspend fun insert(
         id: Int,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
-    ) {
-        cartProductService.insert(body = CartProductRequestDto(id, quantity)).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.code() == SUCCESS_POST) {
-                        val cartProductId =
-                            response.headers()["location"]?.removePrefix("/cart-items/")?.toInt()
-                                ?: throw IllegalArgumentException()
-                        onResult(Result.success(cartProductId))
-                    } else {
-                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                    }
-                }
+    ): Result<Int> =
+        try {
+            val response = cartProductService.insert(body = CartProductRequestDto(id, quantity))
+            if (response.isSuccessful) {
+                val cartProductId =
+                    response.headers()["location"]?.removePrefix("/cart-items/")?.toInt()
+                        ?: throw IllegalArgumentException()
+                Result.success(cartProductId)
+            } else {
+                Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
+    suspend fun delete(id: Int): Result<Unit> =
+        try {
+            val response = cartProductService.delete(id = id)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-    fun delete(
-        id: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        cartProductService.delete(id = id).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    if (response.code() == SUCCESS_DELETE) {
-                        onResult(Result.success(Unit))
-                    } else {
-                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                    }
-                }
+    suspend fun getTotalQuantity(): Result<Int> =
+        try {
+            val response = cartProductService.getTotalQuantity()
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    Result.success(body.quantity)
+                } ?: Result.success(0)
+            } else {
+                Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    fun getTotalQuantity(onResult: (Result<Int>) -> Unit) {
-        cartProductService.getTotalQuantity().enqueue(
-            object : Callback<CartProductQuantityResponseDto> {
-                override fun onResponse(
-                    call: Call<CartProductQuantityResponseDto>,
-                    response: Response<CartProductQuantityResponseDto>,
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { body ->
-                            onResult(Result.success(body.quantity))
-                        }
-                    } else {
-                        onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<CartProductQuantityResponseDto>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
-
-    fun updateQuantity(
+    suspend fun updateQuantity(
         id: Int,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        cartProductService
-            .updateQuantity(id = id, body = CartProductQuantityRequestDto(quantity))
-            .enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.code() == SUCCESS_PATCH) {
-                            onResult(Result.success(Unit))
-                        } else {
-                            onResult(Result.failure(Exception("HTTP ${response.code()}: ${response.message()}")))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
-    }
-
-    companion object {
-        private const val SUCCESS_PATCH = 200
-        private const val SUCCESS_POST = 201
-        private const val SUCCESS_DELETE = 204
-    }
+    ): Result<Unit> =
+        try {
+            val response =
+                cartProductService.updateQuantity(
+                    id = id,
+                    body = CartProductQuantityRequestDto(quantity),
+                )
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 }
