@@ -15,6 +15,8 @@ import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultCouponRepository
 import woowacourse.shopping.data.repository.DefaultHistoryRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
+import woowacourse.shopping.domain.coupon.CouponApplierFactory
+import woowacourse.shopping.domain.coupon.CouponValidator
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -49,4 +51,7 @@ class AppContainer(
     val historyRepository: HistoryRepository = DefaultHistoryRepository(defaultHistoryDataSource)
 
     val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
+
+    val couponValidator: CouponValidator = CouponValidator()
+    val couponApplierFactory: CouponApplierFactory = CouponApplierFactory()
 }

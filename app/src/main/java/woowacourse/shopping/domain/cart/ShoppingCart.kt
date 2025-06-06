@@ -18,6 +18,9 @@ data class ShoppingCart(
     val imgUrl: String
         get() = product.imgUrl
 
+    val quantityValue: Int
+        get() = quantity.value
+
     fun increasedQuantity(): ShoppingCart {
         return copy(quantity = quantity + 1)
     }

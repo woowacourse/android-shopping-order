@@ -25,7 +25,7 @@
             android:id="@+id/checkbox_apply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onCheckedChanged="@{(button, isChecked) -> eventHandler.onChangeCheckedState(model.item.id)}"
+            android:onClick="@{() -> eventHandler.onChangeCheckedState(model.item.id)}"
             android:checked="@{model.checked}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

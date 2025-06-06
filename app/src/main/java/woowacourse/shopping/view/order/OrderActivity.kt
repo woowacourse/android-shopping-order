@@ -25,6 +25,7 @@ class OrderActivity : AppCompatActivity() {
         OrderViewModelFactory(
             couponRepository = container.couponRepository,
             couponValidator = container.couponValidator,
+            couponApplierFactory = container.couponApplierFactory,
         )
     }
 
@@ -43,6 +44,7 @@ class OrderActivity : AppCompatActivity() {
         setUpBinding(binding)
         setUpSystemBar()
 
+        binding.recyclerViewOrder.itemAnimator = null
         viewModel.uiState.observe(this) { value ->
             orderAdapter.submitItems(value)
         }
