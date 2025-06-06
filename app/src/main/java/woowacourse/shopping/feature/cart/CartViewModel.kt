@@ -304,16 +304,10 @@ class CartViewModel(
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
-        viewModelScope.launch {
-            val result = cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1))
-            when (result) {
-                is CartUpdateResult.Success -> {
-                    updateCartItem(cartItem.id) { item ->
-                        item.copy(quantity = (item.quantity - 1))
-                    }
-                }
-                is CartUpdateResult.Error -> TODO()
-            }
+        if (cartItem.quantity == 1) {
+            delete(cartItem)
+        } else {
+            decreaseCartQuantity(cartItem)
         }
     }
 
@@ -333,6 +327,22 @@ class CartViewModel(
                     }
                 }
                 is CartFetchResult.Error -> TODO()
+            }
+        }
+    }
+
+    private fun decreaseCartQuantity(cartItem: CartItem) {
+        viewModelScope.launch {
+            val result =
+                cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1))
+            when (result) {
+                is CartUpdateResult.Success -> {
+                    updateCartItem(cartItem.id) { item ->
+                        item.copy(quantity = (item.quantity - 1))
+                    }
+                }
+
+                is CartUpdateResult.Error -> TODO()
             }
         }
     }
