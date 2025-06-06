@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.product.ProductsItem
 
 class ShoppingCartRecommendActivity :
@@ -80,8 +81,9 @@ class ShoppingCartRecommendActivity :
         finish()
     }
 
-    override fun onOrderButtonClick() {
-        // TOOD: 주문하기 api 연동
+    override fun onOrderButtonClick(shoppingCartProductsToOrder: List<ShoppingCartProduct>) {
+        val intent = OrderActivity.newIntent(this, shoppingCartProductsToOrder)
+        startActivity(intent)
     }
 
     companion object {
