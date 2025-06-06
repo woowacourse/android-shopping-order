@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.domain.model.Price.Companion.MINIMUM_PRICE
+import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_SHIPPING_PRICE
 import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class QuantityBonusCoupon(
     override val detail: CouponDetail,
@@ -10,37 +10,39 @@ class QuantityBonusCoupon(
 ) : Coupon {
     override fun apply(products: Products): Price {
         val original = products.selectedProductsPrice
-        val isAvailable = getIsAvailable(products)
+        if (!getIsAvailable(products)) return Price(original = original)
+
+        val targetProduct =
+            products.products
+                .filter { it.isSelected && it.quantity >= getRequiredTotalQuantity() }
+                .maxByOrNull { it.productDetail.price }
+                ?: return Price(original = original)
+
+        val productPrice = targetProduct.productDetail.price
 
         val discount =
-            if (isAvailable) {
-                products.products
-                    .filter { it.isSelected && it.quantity >= getRequiredTotalQuantity() }
-                    .maxByOrNull { it.productDetail.price }
-                    ?.productDetail
-                    ?.price ?: MINIMUM_PRICE
-            } else {
-                MINIMUM_PRICE
+            with(detail) {
+                if (buyQuantity == null || getQuantity == null) return Price(original = original)
+                val quantityForDiscount = targetProduct.quantity / (buyQuantity + getQuantity) * getQuantity
+                productPrice * quantityForDiscount
             }
-
-        val shipping = Price.EMPTY_PRICE.shipping
 
         return Price(
             original = original,
             discount = discount,
-            shipping = shipping,
+            shipping = DEFAULT_SHIPPING_PRICE,
         )
     }
 
     override fun getIsAvailable(
         products: Products,
-        nowDate: LocalDate,
+        nowDateTime: LocalDateTime,
     ): Boolean {
         val isValidQuantity =
             products.products.any {
                 it.isSelected && it.quantity >= getRequiredTotalQuantity()
             }
-        val isDateOkay = detail.expirationDate >= nowDate
+        val isDateOkay = detail.expirationDate >= nowDateTime.toLocalDate()
 
         return isValidQuantity && isDateOkay
     }

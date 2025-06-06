@@ -59,6 +59,9 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
     }
 
     private fun handleCoupons(uiState: PaymentUiState) {
+        if (uiState.coupons.value.isEmpty() && uiState.products.products.isNotEmpty()) {
+            viewModel.loadCoupons(uiState.products)
+        }
         paymentCouponAdapter.submitList(uiState.coupons.value)
     }
 

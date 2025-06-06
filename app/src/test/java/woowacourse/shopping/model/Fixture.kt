@@ -51,14 +51,14 @@ val DUMMY_PRODUCT_DETAIL_4 =
         id = 4,
         name = "치밥하기 좋은 순살 바베큐치킨",
         imageUrl = "https://product-image.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/product/image/f864b361-85da-4482-aec8-909397caac4e.jpg",
-        price = 13990,
+        price = 139900,
         category = "공백제이",
     )
 
 val DUMMY_PRODUCT_1 = Product(DUMMY_PRODUCT_DETAIL_1, 1, 5)
 val DUMMY_PRODUCT_2 = Product(DUMMY_PRODUCT_DETAIL_2, 2, 6)
 val DUMMY_PRODUCT_3 = Product(DUMMY_PRODUCT_DETAIL_3, 3, 7)
-val DUMMY_PRODUCT_4 = Product(DUMMY_PRODUCT_DETAIL_4, 4, 8)
+val DUMMY_PRODUCT_4 = Product(DUMMY_PRODUCT_DETAIL_4, 4, 8, true)
 
 val DUMMY_HISTORY_PRODUCT_1 =
     HistoryProduct(

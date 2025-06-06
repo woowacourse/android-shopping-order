@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_SHIPPING_PRICE
 import woowacourse.shopping.domain.model.Price.Companion.MINIMUM_PRICE
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class FreeShippingCoupon(
     override val detail: CouponDetail,
@@ -26,10 +26,10 @@ class FreeShippingCoupon(
 
     override fun getIsAvailable(
         products: Products,
-        nowDate: LocalDate,
+        nowDateTime: LocalDateTime,
     ): Boolean {
         val isExceedingMinimumPurchase = products.selectedProductsPrice >= (detail.minimumPurchase ?: MINIMUM_PRICE)
-        val isDateOkay = detail.expirationDate >= nowDate
+        val isDateOkay = detail.expirationDate >= nowDateTime.toLocalDate()
 
         return isExceedingMinimumPurchase && isDateOkay
     }

@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @JvmInline
 value class Coupons(
@@ -25,11 +25,11 @@ value class Coupons(
 
     fun filterAvailableCoupons(
         products: Products,
-        nowDate: LocalDate,
+        nowDateTime: LocalDateTime,
     ): Coupons =
         Coupons(
             value.filter { coupon ->
-                coupon.getIsAvailable(products, nowDate)
+                coupon.getIsAvailable(products, nowDateTime)
             },
         )
 

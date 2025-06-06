@@ -18,9 +18,11 @@ import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.model.DUMMY_COUPONS_1
 import woowacourse.shopping.model.DUMMY_PRODUCTS_1
+import woowacourse.shopping.model.DUMMY_PRODUCTS_3
 import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -52,14 +54,16 @@ class PaymentViewModelTest {
     @Test
     fun `상품 ID 목록을 전달하면 해당 상품들과 쿠폰을 불러온다`() =
         runTest {
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
-            coEvery { getCouponsUseCase(any()) } returns Result.success(DUMMY_COUPONS_1)
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns
+                Result.success(DUMMY_PRODUCTS_3.products)
+            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
 
-            viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
+            viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
+            viewModel.loadCoupons(DUMMY_PRODUCTS_3, LocalDateTime.of(2025, 6, 15, 6, 30))
 
             val state = viewModel.uiState.getOrAwaitValue()
 
-            val expectedProducts = DUMMY_PRODUCTS_1.products.map { it.copy(isSelected = true) }
+            val expectedProducts = DUMMY_PRODUCTS_3.products.map { it.copy(isSelected = true) }
 
             assertThat(state.products.products).containsExactlyElementsIn(expectedProducts)
             assertThat(state.coupons.value).containsExactlyElementsIn(DUMMY_COUPONS_1.value)
@@ -70,7 +74,7 @@ class PaymentViewModelTest {
     fun `쿠폰을 선택하면 선택된 쿠폰만 참이 된다`() =
         runTest {
             coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
-            coEvery { getCouponsUseCase(any()) } returns Result.success(DUMMY_COUPONS_1)
+            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
 
@@ -90,7 +94,7 @@ class PaymentViewModelTest {
     fun `주문 성공 시 isOrderSuccess가 참이다`() =
         runTest {
             coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
-            coEvery { getCouponsUseCase(any()) } returns Result.success(DUMMY_COUPONS_1)
+            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
             coEvery { orderProductsUseCase(any()) } returns Result.success(Unit)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
@@ -106,7 +110,7 @@ class PaymentViewModelTest {
         runTest {
             val exception = Throwable("ERROR")
             coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
-            coEvery { getCouponsUseCase(any()) } returns Result.success(DUMMY_COUPONS_1)
+            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
             coEvery { orderProductsUseCase(any()) } returns Result.failure(exception)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })

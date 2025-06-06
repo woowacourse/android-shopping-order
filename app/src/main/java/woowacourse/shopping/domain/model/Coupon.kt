@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 sealed interface Coupon {
     val detail: CouponDetail
@@ -11,7 +11,7 @@ sealed interface Coupon {
 
     fun getIsAvailable(
         products: Products,
-        nowDate: LocalDate = LocalDate.now(),
+        nowDateTime: LocalDateTime = LocalDateTime.now(),
     ): Boolean
 
     fun copy(

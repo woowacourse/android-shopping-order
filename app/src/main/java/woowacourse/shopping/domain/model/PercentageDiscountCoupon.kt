@@ -2,8 +2,7 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_SHIPPING_PRICE
 import woowacourse.shopping.domain.model.Price.Companion.MINIMUM_PRICE
-import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 class PercentageDiscountCoupon(
     override val detail: CouponDetail,
@@ -28,10 +27,10 @@ class PercentageDiscountCoupon(
 
     override fun getIsAvailable(
         products: Products,
-        nowDate: LocalDate,
+        nowDateTime: LocalDateTime,
     ): Boolean {
         val minimumPurchase = detail.minimumPurchase ?: MINIMUM_PRICE
-        val now = LocalTime.now()
+        val now = nowDateTime.toLocalTime()
 
         val isAmountOkay = products.selectedProductsPrice >= minimumPurchase
         val isTimeOkay =
@@ -39,7 +38,7 @@ class PercentageDiscountCoupon(
                 now.isAfter(it.start) && now.isBefore(it.end)
             } ?: true
 
-        val isDateOkay = detail.expirationDate >= nowDate
+        val isDateOkay = detail.expirationDate >= nowDateTime.toLocalDate()
 
         return isAmountOkay && isTimeOkay && isDateOkay
     }
