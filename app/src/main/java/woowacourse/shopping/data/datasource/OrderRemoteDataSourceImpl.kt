@@ -8,9 +8,9 @@ import woowacourse.shopping.data.util.safeApiCall
 class OrderRemoteDataSourceImpl(
     private val orderService: OrderService,
 ) : OrderRemoteDataSource {
-    override fun addOrder(cartItemIds: List<String>) =
+    override suspend fun addOrder(cartItemIds: List<String>) =
         safeApiCall {
-            orderService.addOrder(AUTHORIZATION_KEY, OrderRequest(cartItemIds)).execute()
+            orderService.addOrder(AUTHORIZATION_KEY, OrderRequest(cartItemIds))
         }
 
     companion object {

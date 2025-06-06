@@ -6,19 +6,19 @@ import woowacourse.shopping.data.model.cart.Quantity
 import woowacourse.shopping.data.model.common.PageableResponse
 
 interface CartRemoteDataSource {
-    fun fetchCartItems(
+    suspend fun fetchCartItems(
         page: Int,
         size: Int,
     ): Result<PageableResponse<CartItemResponse>>
 
-    fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long>
+    suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long>
 
-    fun deleteCartItem(cartId: Long): Result<Unit>
+    suspend fun deleteCartItem(cartId: Long): Result<Unit>
 
-    fun patchCartItemQuantity(
+    suspend fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
     ): Result<Unit>
 
-    fun fetchCartItemCount(): Result<Quantity>
+    suspend fun fetchCartItemCount(): Result<Quantity>
 }

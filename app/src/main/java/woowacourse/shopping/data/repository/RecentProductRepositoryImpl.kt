@@ -4,7 +4,6 @@ import woowacourse.shopping.data.datasource.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.model.product.toDomain
-import woowacourse.shopping.data.util.runCatchingInThread
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -22,12 +21,12 @@ class RecentProductRepositoryImpl(
                 }
         }
 
-    override fun insertAndTrimToLimit(
+    override suspend fun insertAndTrimToLimit(
         productId: Long,
         category: String,
-        onResult: (Result<Unit>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        recentProductLocalDataSource.insertRecentProduct(RecentProductEntity(productId, category))
-        recentProductLocalDataSource.trimToLimit(recentProductLimit)
-    }
+    ): Result<Unit> =
+        runCatching {
+            recentProductLocalDataSource.insertRecentProduct(RecentProductEntity(productId, category))
+            recentProductLocalDataSource.trimToLimit(recentProductLimit)
+        }
 }

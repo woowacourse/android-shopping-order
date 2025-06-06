@@ -5,9 +5,8 @@ import woowacourse.shopping.domain.model.Product
 interface RecentProductRepository {
     suspend fun getRecentProducts(limit: Int): Result<List<Product>>
 
-    fun insertAndTrimToLimit(
+    suspend fun insertAndTrimToLimit(
         productId: Long,
         category: String,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 }

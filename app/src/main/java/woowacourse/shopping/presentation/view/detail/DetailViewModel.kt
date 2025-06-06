@@ -92,13 +92,13 @@ class DetailViewModel(
         }
     }
 
-    private fun updateRecentProduct(
+    private suspend fun updateRecentProduct(
         productId: Long,
         category: String,
     ) {
-        recentProductRepository.insertAndTrimToLimit(productId, category) { result ->
-            result.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
-        }
+        recentProductRepository
+            .insertAndTrimToLimit(productId, category)
+            .onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
     }
 
     private fun MediatorLiveData<Boolean>.updateVisibility() {

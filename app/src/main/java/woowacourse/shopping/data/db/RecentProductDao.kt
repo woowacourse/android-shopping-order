@@ -8,16 +8,16 @@ import androidx.room.Query
 @Dao
 interface RecentProductDao {
     @Query("SELECT COUNT(*) FROM RecentViewedProducts")
-    fun getRecentProductCount(): Int
+    suspend fun getRecentProductCount(): Int
 
     @Query("SELECT * FROM RecentViewedProducts ORDER BY lastViewedAt DESC LIMIT :limit")
-    fun getRecentProducts(limit: Int): List<RecentProductEntity>
+    suspend fun getRecentProducts(limit: Int): List<RecentProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertRecentProduct(recentProduct: RecentProductEntity)
+    suspend fun insertRecentProduct(recentProduct: RecentProductEntity)
 
     @Query("SELECT category FROM RecentViewedProducts ORDER BY lastViewedAt DESC LIMIT 1")
-    fun getRecentViewedProductCategory(): String?
+    suspend fun getRecentViewedProductCategory(): String?
 
     @Query(
         """
@@ -29,5 +29,5 @@ interface RecentProductDao {
             )
         """,
     )
-    fun deleteOldestRecentProducts(overflowCount: Int)
+    suspend fun deleteOldestRecentProducts(overflowCount: Int)
 }

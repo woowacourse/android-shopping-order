@@ -12,30 +12,29 @@ import woowacourse.shopping.data.util.safeApiCall
 class CartRemoteDataSourceImpl(
     private val cartService: CartService,
 ) : CartRemoteDataSource {
-    override fun fetchCartItems(
+    override suspend fun fetchCartItems(
         page: Int,
         size: Int,
-    ): Result<PageableResponse<CartItemResponse>> = safeApiCall { cartService.fetchCartItems(AUTHORIZATION_KEY, page, size).execute() }
+    ): Result<PageableResponse<CartItemResponse>> = safeApiCall { cartService.fetchCartItems(AUTHORIZATION_KEY, page, size) }
 
-    override fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
+    override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
         runCatching {
-            val response = cartService.addCartItem(AUTHORIZATION_KEY, addCartItemCommand).execute()
+            val response = cartService.addCartItem(AUTHORIZATION_KEY, addCartItemCommand)
             val cartId = response.extractCartItemId()
             requireNotNull(cartId) { ADD_CART_PRODUCT_FAILURE_MESSAGE.format(addCartItemCommand.productId) }
         }
 
-    override fun deleteCartItem(cartId: Long): Result<Unit> =
-        safeApiCall { cartService.deleteCartItem(AUTHORIZATION_KEY, cartId).execute() }
+    override suspend fun deleteCartItem(cartId: Long): Result<Unit> = safeApiCall { cartService.deleteCartItem(AUTHORIZATION_KEY, cartId) }
 
-    override fun patchCartItemQuantity(
+    override suspend fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
     ): Result<Unit> =
         safeApiCall {
-            cartService.patchCartItemQuantity(AUTHORIZATION_KEY, cartId, quantity).execute()
+            cartService.patchCartItemQuantity(AUTHORIZATION_KEY, cartId, quantity)
         }
 
-    override fun fetchCartItemCount(): Result<Quantity> = safeApiCall { cartService.fetchCartItem(AUTHORIZATION_KEY).execute() }
+    override suspend fun fetchCartItemCount(): Result<Quantity> = safeApiCall { cartService.fetchCartItem(AUTHORIZATION_KEY) }
 
     private fun Response<*>.extractCartItemId(): Long? {
         val locationHeader = this.headers()[HEADER_LOCATION]

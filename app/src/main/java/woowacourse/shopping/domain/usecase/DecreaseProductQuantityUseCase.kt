@@ -5,11 +5,8 @@ import woowacourse.shopping.domain.repository.CartRepository
 class DecreaseProductQuantityUseCase(
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         productId: Long,
         decreaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        cartRepository.decreaseCartProductQuantityFromCart(productId, decreaseCount, onResult)
-    }
+    ): Result<Unit> = cartRepository.decreaseCartProductQuantityFromCart(productId, decreaseCount)
 }

@@ -94,7 +94,9 @@ class SuggestionViewModel(
     }
 
     override fun decreaseQuantity(productId: Long) {
-        decreaseProductQuantity(productId)
+        viewModelScope.launch {
+            decreaseProductQuantity(productId)
+        }
     }
 
     private fun increaseProductQuantity(productId: Long) {
@@ -106,12 +108,11 @@ class SuggestionViewModel(
         }
     }
 
-    private fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
-            result
-                .onSuccess { fetchSuggestionProducts() }
-                .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
-        }
+    private suspend fun decreaseProductQuantity(productId: Long) {
+        cartRepository
+            .decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP)
+            .onSuccess { fetchSuggestionProducts() }
+            .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
     }
 
     private fun postFailureCartEvent(event: SuggestionMessageEvent) {

@@ -68,8 +68,8 @@ class CatalogViewModel(
     }
 
     fun decreaseProductQuantity(productId: Long) {
-        decreaseProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            decreaseProductQuantityUseCase(productId, QUANTITY_STEP)
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
@@ -78,38 +78,35 @@ class CatalogViewModel(
     fun refreshCatalogItems() {
         if (_products.value.isNullOrEmpty()) return
 
-        loadRecentProducts { recentProducts ->
-            rebuildCatalogItems(recentProducts)
-        }
-    }
-
-    private fun handleProductPageLoad(pageable: PageableItem<Product>) {
-        page++
-
-        val currentItems = currentProductItems()
-        val newItems = pageable.items.map { it.toCatalogProductItem() }
-        val mergedItems = (currentItems + newItems).distinctBy { it.productId }
-        val catalogWithLoadMore = appendLoadMore(mergedItems, pageable.hasMore)
-
-        loadRecentProducts { recentProducts ->
-            rebuildCatalogItems(recentProducts, catalogWithLoadMore)
-        }
-    }
-
-    private fun loadRecentProducts(onSuccess: (CatalogItem.RecentProducts) -> Unit) {
         viewModelScope.launch {
             recentRepository
                 .getRecentProducts(RECENT_PRODUCT_LIMIT)
                 .onSuccess {
                     val uiModels = it.map { product -> product.toUiModel() }
-                    onSuccess(CatalogItem.RecentProducts(uiModels))
+                    rebuildCatalogItems(CatalogItem.RecentProducts(uiModels))
                 }.onFailure {
                     emitToastMessage(CatalogMessageEvent.FETCH_RECENT_PRODUCT_FAILURE)
                 }
         }
     }
 
-    private fun rebuildCatalogItems(
+    private suspend fun handleProductPageLoad(pageable: PageableItem<Product>) {
+        page++
+
+        val currentItems = currentProductItems()
+        val newItems = pageable.items.map { it.toCatalogProductItem() }
+        val mergedItems = (currentItems + newItems).distinctBy { it.productId }
+        val catalogWithLoadMore = appendLoadMore(mergedItems, pageable.hasMore)
+        recentRepository
+            .getRecentProducts(RECENT_PRODUCT_LIMIT)
+            .onSuccess {
+                val uiModels = it.map { product -> product.toUiModel() }
+                rebuildCatalogItems(CatalogItem.RecentProducts(uiModels), catalogWithLoadMore)
+            }.onFailure {
+            }
+    }
+
+    private suspend fun rebuildCatalogItems(
         recentProductsItem: CatalogItem.RecentProducts,
         currentItems: List<CatalogItem> = _products.value.orEmpty(),
     ) {
@@ -128,7 +125,7 @@ class CatalogViewModel(
         _isLoading.postValue(false)
     }
 
-    private fun updateProductQuantityInList(productId: Long) {
+    private suspend fun updateProductQuantityInList(productId: Long) {
         cartRepository
             .findQuantityByProductId(productId)
             .onSuccess { newQuantity ->
@@ -136,7 +133,7 @@ class CatalogViewModel(
             }.onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 
-    private fun applyProductQuantityUpdate(
+    private suspend fun applyProductQuantityUpdate(
         productId: Long,
         quantity: Int,
     ) {
@@ -149,16 +146,15 @@ class CatalogViewModel(
                     item
                 }
             }
-        _products.postValue(updatedProducts)
+        _products.value = updatedProducts
         updateCartItemCount()
     }
 
-    private fun updateCartItemCount() {
-        cartRepository.fetchCartItemCount { result ->
-            result
-                .onSuccess { _cartItemCount.postValue(it) }
-                .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
-        }
+    private suspend fun updateCartItemCount() {
+        cartRepository
+            .fetchCartItemCount()
+            .onSuccess { _cartItemCount.postValue(it) }
+            .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
     }
 
     private fun currentProductItems(): List<CatalogItem.ProductItem> = _products.value.orEmpty().filterIsInstance<CatalogItem.ProductItem>()
@@ -178,7 +174,11 @@ class CatalogViewModel(
     ): List<CatalogItem> {
         val cleanedItems = items.filterNot { it is CatalogItem.RecentProducts }
         return buildList {
-            if (recentProducts != null && recentProducts.products.isNotEmpty()) add(recentProducts)
+            if (recentProducts != null && recentProducts.products.isNotEmpty()) {
+                add(
+                    recentProducts,
+                )
+            }
             addAll(cleanedItems)
         }
     }
