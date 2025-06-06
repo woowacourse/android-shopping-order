@@ -8,7 +8,7 @@ import androidx.room.Transaction
 @Dao
 interface RecentSeenGoodsDao {
     @Query("SELECT goods_id FROM recent_seen_goods ORDER BY id DESC LIMIT :limit")
-    fun getRecentGoodsIds(limit: Int = 10): List<String>
+    suspend fun getRecentGoodsIds(limit: Int = 10): List<String>
 
     @Query("DELETE FROM recent_seen_goods WHERE goods_id = :goodsId")
     fun deleteByGoodsId(goodsId: String)

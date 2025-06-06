@@ -16,8 +16,5 @@ interface GoodsRemoteDataSource {
         category: String,
     ): GoodsResponse
 
-    fun fetchGoodsById(
-        id: Int,
-        onComplete: (Content) -> Unit,
-    )
+    suspend fun fetchGoodsDetailByGoodsId(goodsId: Int): Content
 }

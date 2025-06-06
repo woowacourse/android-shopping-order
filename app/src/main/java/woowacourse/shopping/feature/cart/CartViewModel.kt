@@ -132,7 +132,8 @@ class CartViewModel(
     }
 
     fun loadRecommendedGoods() {
-        goodsRepository.fetchMostRecentGoods { goods ->
+        viewModelScope.launch {
+            val goods = goodsRepository.fetchMostRecentGoods()
             if (goods != null) {
                 viewModelScope.launch {
                     try {

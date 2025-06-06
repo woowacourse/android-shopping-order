@@ -3,7 +3,7 @@ package woowacourse.shopping.data.goods.repository
 import woowacourse.shopping.domain.model.Goods
 
 interface GoodsLocalDataSource {
-    fun fetchRecentGoodsIds(onComplete: (List<String>) -> Unit)
+    suspend fun fetchRecentGoodsIds(): List<String>
 
     fun loggingRecentGoods(
         goods: Goods,

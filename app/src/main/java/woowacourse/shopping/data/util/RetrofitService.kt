@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.util
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -24,9 +23,9 @@ interface RetrofitService {
     ): GoodsResponse
 
     @GET("/products/{id}")
-    fun requestProductDetail(
+    suspend fun requestProductDetail(
         @Path("id") id: Long = 0,
-    ): Call<Content>
+    ): Content
 
     @GET("/cart-items")
     suspend fun requestCartProduct(

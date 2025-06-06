@@ -4,9 +4,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.goods.dto.Content
@@ -53,31 +50,9 @@ class GoodsRemoteDataSourceImpl(
     override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
     }
 
-    override fun fetchGoodsById(
-        id: Int,
-        onComplete: (Content) -> Unit,
-    ) {
+    override suspend fun fetchGoodsDetailByGoodsId(goodsId: Int): Content =
         retrofitService
             .requestProductDetail(
-                id = id.toLong(),
-            ).enqueue(
-                object : Callback<Content> {
-                    override fun onResponse(
-                        call: Call<Content>,
-                        response: Response<Content>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onComplete(response.body()!!)
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Content>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
+                id = goodsId.toLong(),
             )
-    }
 }

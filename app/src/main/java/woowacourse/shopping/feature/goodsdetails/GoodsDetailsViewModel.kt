@@ -36,7 +36,8 @@ class GoodsDetailsViewModel(
     val clickMostRecentlyGoodsEvent: SingleLiveData<Goods> get() = _clickMostRecentlyGoodsEvent
 
     fun initMostRecentlyViewedGoods() {
-        goodsRepository.fetchMostRecentGoods { goods ->
+        viewModelScope.launch {
+            val goods = goodsRepository.fetchMostRecentGoods()
             goods?.let {
                 if (goodsUiModel.id != goods.id) _mostRecentlyViewedGoods.postValue(it)
             }

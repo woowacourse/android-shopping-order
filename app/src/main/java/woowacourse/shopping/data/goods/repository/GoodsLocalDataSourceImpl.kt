@@ -9,14 +9,7 @@ import kotlin.concurrent.thread
 class GoodsLocalDataSourceImpl(
     private val shoppingDatabase: ShoppingDatabase,
 ) : GoodsLocalDataSource {
-    override fun fetchRecentGoodsIds(onComplete: (List<String>) -> Unit) {
-        thread {
-            val ids = shoppingDatabase.recentSeenGoodsDao().getRecentGoodsIds()
-            Handler(Looper.getMainLooper()).post {
-                onComplete(ids)
-            }
-        }
-    }
+    override suspend fun fetchRecentGoodsIds(): List<String> = shoppingDatabase.recentSeenGoodsDao().getRecentGoodsIds()
 
     override fun loggingRecentGoods(
         goods: Goods,

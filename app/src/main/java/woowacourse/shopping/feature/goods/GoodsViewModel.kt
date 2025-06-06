@@ -134,7 +134,8 @@ class GoodsViewModel(
     }
 
     fun updateRecentlyViewedGoods() {
-        goodsRepository.fetchRecentGoods { goods ->
+        viewModelScope.launch {
+            val goods = goodsRepository.fetchRecentGoods()
             _recentlyViewedGoods.value = goods
         }
     }
