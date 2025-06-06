@@ -5,12 +5,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.util.DiffCallback
+import woowacourse.shopping.presentation.util.ProductUiModelDiffCallback
 
 class RecommendAdapter(
     private val handler: ProductQuantityHandler,
     private val onQuantityClick: (ProductUiModel) -> Unit,
-) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(DiffCallback()) {
+) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(ProductUiModelDiffCallback()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

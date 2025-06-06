@@ -7,13 +7,13 @@ import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
 import woowacourse.shopping.presentation.product.catalog.viewHolder.LoadButtonViewHolder
 import woowacourse.shopping.presentation.product.catalog.viewHolder.ProductViewHolder
-import woowacourse.shopping.presentation.util.DiffCallback
+import woowacourse.shopping.presentation.util.ProductUiModelDiffCallback
 
 class ProductAdapter(
     private val catalogHandler: CatalogEventHandler,
     private val quantityHandler: ProductQuantityHandler,
     private val onQuantityClick: (ProductUiModel) -> Unit,
-) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(DiffCallback()) {
+) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(ProductUiModelDiffCallback()) {
     private var showLoadMoreButton = false
 
     override fun onCreateViewHolder(
