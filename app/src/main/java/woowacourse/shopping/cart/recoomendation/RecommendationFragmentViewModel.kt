@@ -58,7 +58,7 @@ class RecommendationFragmentViewModel(
             0 -> {
                 val newProduct = product.copy(quantity = 1)
                 cartProductRepository.insertCartProduct(newProduct) { product ->
-                    updateItem(newProduct)
+                    updateItem(product)
                 }
             }
 
