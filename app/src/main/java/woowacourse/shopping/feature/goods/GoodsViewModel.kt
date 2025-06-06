@@ -71,8 +71,9 @@ class GoodsViewModel(
                     quantity = newQuantity,
                 )
 
-            cartRepository.addToCart(cartRequest) { result ->
-                result
+            viewModelScope.launch {
+                cartRepository
+                    .addToCart(cartRequest)
                     .onSuccess { newCartId ->
                         val updatedCart = cart.copy(id = newCartId, quantity = newQuantity)
 

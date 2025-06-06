@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.remote.cart
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -19,10 +20,10 @@ interface CartService {
     ): CartResponse
 
     @POST("/cart-items")
-    fun addToCart(
+    suspend fun addToCart(
         @Header("accept") accept: String = "*/*",
         @Body cartRequest: CartRequest,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
     fun deleteFromCart(

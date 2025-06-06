@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import woowacourse.shopping.data.remote.cart.CartResponse.Content
+import kotlin.text.substringAfterLast
 
 class CartRepository {
     suspend fun fetchAllCart() = CartClient.getRetrofitService().requestCart(size = Int.MAX_VALUE)
@@ -17,37 +18,18 @@ class CartRepository {
 
     suspend fun fetchCart(page: Int) = CartClient.getRetrofitService().requestCart(page = page)
 
-    fun addToCart(
-        cartRequest: CartRequest,
-        onResult: (Result<Long>) -> Unit,
-    ) {
-        CartClient
-            .getRetrofitService()
-            .addToCart(cartRequest = cartRequest)
-            .enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val newCartId = response.headers()["Location"]?.substringAfterLast("/")?.toLongOrNull() ?: 0
-                            onResult(Result.success(newCartId))
-                        } else {
-                            val error = response.errorBody()?.string()
-                            onResult(Result.failure(Throwable("추가 실패: ${response.code()} - $error")))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onResult(Result.failure(t))
-                    }
-                },
-            )
-    }
+    suspend fun addToCart(cartRequest: CartRequest): Result<Long> =
+        try {
+            val response = CartClient.getRetrofitService().addToCart(cartRequest = cartRequest)
+            if (response.isSuccessful) {
+                val id = response.headers()["Location"]?.substringAfterLast("/")?.toLongOrNull() ?: 0
+                Result.success(id)
+            } else {
+                Result.failure(Throwable("응답 실패: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
     fun deleteCart(
         id: Long,
