@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.data.util.LocalDateSerializer
 import java.time.LocalDate
+import woowacourse.shopping.domain.model.coupon.BuyXGetYCoupon as DomainBuyXGetYCoupon
 
 @Serializable
 @SerialName("buyXgetY")
@@ -16,3 +17,13 @@ data class BuyXGetYCoupon(
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : CouponResponse
+
+fun BuyXGetYCoupon.toDomain(): DomainBuyXGetYCoupon =
+    DomainBuyXGetYCoupon(
+        id,
+        code,
+        description,
+        expirationDate,
+        buyQuantity,
+        getQuantity,
+    )
