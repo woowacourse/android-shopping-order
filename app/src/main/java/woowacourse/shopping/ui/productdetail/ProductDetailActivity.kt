@@ -13,6 +13,7 @@ import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.custom.CartCountView
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.model.ProductDetailUiState
 
 class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(R.layout.activity_product_detail) {
     private val viewModel: ProductDetailViewModel by viewModels { ProductDetailViewModel.Factory }
@@ -65,33 +66,37 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
     }
 
     private fun initObservers() {
-        viewModel.product.observe(this) { product ->
-            product?.let {
-                viewModel.addHistoryProduct(product.productDetail)
-            }
+        viewModel.uiState.observe(this) { uiState ->
+            handleHistoryProduct(uiState)
+            handleCartProductAddResult(uiState)
+            handleErrorMessage(uiState)
         }
+    }
 
-        viewModel.onCartProductAddSuccess.observe(this) { isSuccess ->
-            isSuccess?.let { handleCartProductAddResult(it) }
+    private fun handleHistoryProduct(uiState: ProductDetailUiState) {
+        uiState.product.let {
+            viewModel.addHistoryProduct(it.productDetail)
         }
+    }
 
-        viewModel.isError.observe(this) { errorMessage ->
-            errorMessage?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+    private fun handleCartProductAddResult(uiState: ProductDetailUiState) {
+        uiState.isCartProductUpdateSuccess?.let { isSuccess ->
+            if (isSuccess) {
+                setResult(
+                    ActivityResult.PRODUCT_DETAIL_CART_UPDATED.code,
+                    Intent().apply {
+                        putExtra(ActivityResult.PRODUCT_DETAIL_CART_UPDATED.key, productId)
+                    },
+                )
+                Toast.makeText(this, getString(R.string.product_detail_cart_add_success), Toast.LENGTH_SHORT).show()
+                finish()
             }
         }
     }
 
-    private fun handleCartProductAddResult(isSuccess: Boolean) {
-        if (isSuccess) {
-            setResult(
-                ActivityResult.PRODUCT_DETAIL_CART_UPDATED.code,
-                Intent().apply {
-                    putExtra(ActivityResult.PRODUCT_DETAIL_CART_UPDATED.key, productId)
-                },
-            )
-            Toast.makeText(this, getString(R.string.product_detail_cart_add_success), Toast.LENGTH_SHORT).show()
-            finish()
+    private fun handleErrorMessage(uiState: ProductDetailUiState) {
+        uiState.connectionErrorMessage?.let {
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }
 
