@@ -1,10 +1,13 @@
 package woowacourse.shopping.fixture
 
+import woowacourse.shopping.domain.coupon.BuyXGetY
+import woowacourse.shopping.domain.coupon.FreeShipping
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 import woowacourse.shopping.view.product.ProductsItem
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
+import java.time.LocalDate
 
 val PRODUCT1 =
     Product(
@@ -237,5 +240,30 @@ val RECOMMENDED_PRODUCTS =
         ProductsItem.ProductItem(
             null,
             PRODUCT2,
+        ),
+    )
+
+val SHOPPING_CART_PRODUCTS_TO_ORDER =
+    listOf(
+        SHOPPING_CART_PRODUCT1,
+        SHOPPING_CART_PRODUCT2,
+    )
+
+val COUPONS =
+    listOf(
+        FreeShipping(
+            id = 0,
+            description = "무료배송",
+            explanationDate = LocalDate.of(2099, 1, 1),
+            code = "adsf",
+            minimumAmount = 0,
+        ),
+        BuyXGetY(
+            id = 1,
+            description = "10000원 쿠폰",
+            explanationDate = LocalDate.of(2099, 1, 1),
+            code = "adsf",
+            buyQuantity = 2,
+            getQuantity = 1,
         ),
     )

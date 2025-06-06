@@ -8,6 +8,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.remote.repository.CouponRepository
 import woowacourse.shopping.data.coupon.remote.repository.DefaultCouponRepository
@@ -27,6 +28,11 @@ class OrderViewModel(
 
     private val _couponState = MutableLiveData<List<CouponState>>()
     val couponState: LiveData<List<CouponState>> get() = _couponState
+
+    private val handler =
+        CoroutineExceptionHandler { _, exception ->
+            _event.value = OrderEvent.FAIL_TO_LOAD_COUPONS
+        }
 
     val orderState: LiveData<OrderState>
         get() =
@@ -59,8 +65,8 @@ class OrderViewModel(
     val event: LiveData<OrderEvent> get() = _event
 
     init {
-        viewModelScope.launch {
-            coupons = Coupons(couponRepository.getAllCoupons())
+        viewModelScope.launch(handler) {
+            coupons = Coupons(couponRepository.getAllCoupons().getOrThrow())
             _couponState.value =
                 coupons.available(shoppingCartProductsToOrder).map {
                     CouponState(
@@ -92,7 +98,7 @@ class OrderViewModel(
     }
 
     fun proceedOrder() {
-        viewModelScope.launch {
+        viewModelScope.launch(handler) {
             shoppingCartProductsToOrder.forEach {
                 shoppingCartRepository.remove(it.id)
             }

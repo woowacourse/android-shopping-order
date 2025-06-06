@@ -6,9 +6,11 @@ import woowacourse.shopping.domain.coupon.Coupon
 class DefaultCouponRepository(
     private val couponService: CouponService,
 ) : CouponRepository {
-    override suspend fun getAllCoupons(): List<Coupon> {
-        return couponService.getAllCoupons().map {
-            it.toDomain()
+    override suspend fun getAllCoupons(): Result<List<Coupon>> {
+        return runCatching {
+            couponService.getAllCoupons().map {
+                it.toDomain()
+            }
         }
     }
 

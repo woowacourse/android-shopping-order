@@ -59,6 +59,7 @@ class OrderActivity :
                 }
 
                 OrderEvent.ORDER_PROCEEDING -> Unit
+                OrderEvent.FAIL_TO_LOAD_COUPONS -> showToast(getString(R.string.order_fail_to_load_coupons))
             }
         }
 
