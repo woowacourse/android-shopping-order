@@ -115,15 +115,16 @@ class CartViewModel(
             _page.value = currentPage
         }
 
-        cartRepository.deleteCart(cart.id) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .deleteCart(cart.id)
                 .onSuccess {
                     val updatedList =
                         _carts.value?.filter { it.id != cart.id } ?: emptyList()
                     _carts.postValue(updatedList)
                     fetchTotalItemsCount()
                 }.onFailure { error ->
-                    Log.e("123451", "$error")
+                    Log.e("deleteCart", "장바구니 삭제 실패", error)
                 }
         }
     }

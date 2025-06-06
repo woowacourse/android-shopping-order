@@ -104,13 +104,14 @@ class GoodsViewModel(
 
     fun removeFromCart(cart: CartProduct) {
         if (cart.quantity == 1) {
-            cartRepository.deleteCart(cart.id) { result ->
-                result
+            viewModelScope.launch {
+                cartRepository
+                    .deleteCart(cart.id)
                     .onSuccess {
                         val updatedCart = cart.copy(id = 0, quantity = cart.quantity - 1)
                         updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure { error ->
+                    }.onFailure {
                         _insertState.value = Event(State.Failure)
                     }
             }

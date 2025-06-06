@@ -31,33 +31,17 @@ class CartRepository {
             Result.failure(e)
         }
 
-    fun deleteCart(
-        id: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        CartClient.getRetrofitService().deleteFromCart(id = id).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit?>,
-                    response: Response<Unit?>,
-                ) {
-                    if (response.isSuccessful) {
-                        onResult(Result.success(Unit))
-                    } else {
-                        val error = response.errorBody()?.string()
-                        onResult(Result.failure(Throwable("수정 실패: ${response.code()} - $error")))
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<Unit?>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-    }
+    suspend fun deleteCart(id: Long): Result<Unit> =
+        try {
+            val response = CartClient.getRetrofitService().deleteFromCart(id = id)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Throwable("응답 실패: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
     fun updateCart(
         id: Long,
