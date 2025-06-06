@@ -12,31 +12,35 @@ class GetCartRecommendProductsUseCase(
     private val historyRepository: HistoryRepository,
 ) {
     suspend operator fun invoke(): Result<Products> {
-        val historyProduct =
-            historyRepository.fetchRecentHistory()
-                ?: return Result.success(EMPTY_PRODUCTS)
+        val historyProductResult = historyRepository.fetchRecentHistory()
+        return if (historyProductResult.isSuccess) {
+            val historyProduct =
+                historyProductResult.getOrThrow() ?: return Result.success(EMPTY_PRODUCTS)
+            val catalogResult =
+                productRepository.fetchProducts(FIRST_PAGE, MAXIMUM_SIZE, historyProduct.category)
+            if (catalogResult.isFailure) return Result.failure(catalogResult.exceptionOrNull()!!)
 
-        val catalogResult =
-            productRepository.fetchProducts(0, Int.MAX_VALUE, historyProduct.category)
-        if (catalogResult.isFailure) return Result.failure(catalogResult.exceptionOrNull()!!)
+            val catalogProducts = catalogResult.getOrThrow()
 
-        val catalogProducts = catalogResult.getOrThrow()
+            val cartResult = cartRepository.fetchAllCartProducts()
+            if (cartResult.isFailure) return Result.failure(cartResult.exceptionOrNull()!!)
 
-        val cartResult = cartRepository.fetchAllCartProducts()
-        if (cartResult.isFailure) return Result.failure(cartResult.exceptionOrNull()!!)
+            val cartProducts = cartResult.getOrThrow()
+            val cartProductIds = cartProducts.products.map { it.productDetail.id }
 
-        val cartProducts = cartResult.getOrThrow()
-        val cartProductIds = cartProducts.products.map { it.productDetail.id }
-
-        val filtered =
-            catalogProducts.products
-                .filterNot { it.productDetail.id in cartProductIds }
-                .take(MAXIMUM_HISTORY_PRODUCTS_COUNT)
-
-        return Result.success(Products(filtered))
+            val filtered =
+                catalogProducts.products
+                    .filterNot { it.productDetail.id in cartProductIds }
+                    .take(MAXIMUM_HISTORY_PRODUCTS_COUNT)
+            Result.success(Products(filtered))
+        } else {
+            Result.failure(historyProductResult.exceptionOrNull()!!)
+        }
     }
 
     companion object {
         private const val MAXIMUM_HISTORY_PRODUCTS_COUNT: Int = 10
+        private const val FIRST_PAGE: Int = 0
+        private const val MAXIMUM_SIZE = Int.MAX_VALUE
     }
 }
