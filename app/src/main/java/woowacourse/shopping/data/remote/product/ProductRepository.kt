@@ -1,12 +1,13 @@
 package woowacourse.shopping.data.remote.product
 
+import woowacourse.shopping.data.remote.NetworkClient
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.util.toDomain
 
 class ProductRepository {
-    suspend fun fetchAllProducts(): ProductResponse = ProductClient.getRetrofitService().requestGoods(size = Int.MAX_VALUE)
+    suspend fun fetchAllProducts(): ProductResponse = NetworkClient.getProductService().requestGoods(size = Int.MAX_VALUE)
 
-    suspend fun fetchProducts(page: Int): ProductResponse = ProductClient.getRetrofitService().requestGoods(page = page)
+    suspend fun fetchProducts(page: Int): ProductResponse = NetworkClient.getProductService().requestGoods(page = page)
 
     suspend fun fetchRecommendProducts(
         latestProductId: Long,
@@ -33,5 +34,5 @@ class ProductRepository {
         }
     }
 
-    suspend fun requestProductDetails(productId: Long) = ProductClient.getRetrofitService().requestProductDetails(productId = productId)
+    suspend fun requestProductDetails(productId: Long) = NetworkClient.getProductService().requestProductDetails(productId = productId)
 }
