@@ -3,7 +3,6 @@ package woowacourse.shopping.feature.cart
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
@@ -204,16 +203,14 @@ class CartViewModelTest {
 
     @Test
     fun `delete 호출 시 repository delete가 호출된다`() {
-        val mockCallback = mockk<() -> Unit>(relaxed = true)
         every { cartRepository.delete(any(), any(), any()) } answers {
             secondArg<(Int) -> Unit>()(200)
         }
         viewModel.setTestCarts(listOf(sampleCartItem1))
 
-        viewModel.delete(sampleCartItem1, mockCallback)
+        viewModel.delete(sampleCartItem1)
 
         verify { cartRepository.delete(eq(1), any(), any()) }
-        verify { mockCallback() }
     }
 
     @Test
