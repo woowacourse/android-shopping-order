@@ -15,7 +15,7 @@ import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showToast
 import woowacourse.shopping.view.product.ProductsActivity
 
-class OrderActivity : AppCompatActivity() {
+class OrderActivity : AppCompatActivity(), CouponClickListener {
     private val binding: ActivityOrderBinding by lazy {
         ActivityOrderBinding.inflate(layoutInflater)
     }
@@ -25,6 +25,8 @@ class OrderActivity : AppCompatActivity() {
             shoppingCartProductsToOrder,
         )
     }
+
+    private val orderAdapter = OrderAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +58,16 @@ class OrderActivity : AppCompatActivity() {
                 OrderEvent.ORDER_PROCEEDING -> Unit
             }
         }
+
+        viewModel.couponState.observe(this) {
+            orderAdapter.submitList(it)
+        }
     }
 
     private fun bindViewModel() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        binding.coupons.adapter = orderAdapter
     }
 
     private fun backToProducts() {
@@ -68,6 +75,10 @@ class OrderActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(this)
         }
+    }
+
+    override fun onCouponClick(couponState: CouponState) {
+        viewModel.toggleCoupon(couponState)
     }
 
     companion object {

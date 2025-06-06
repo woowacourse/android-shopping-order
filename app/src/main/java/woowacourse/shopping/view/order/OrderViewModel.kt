@@ -20,28 +20,52 @@ class OrderViewModel(
     private val _orderState = MutableLiveData<OrderState>()
     val orderState: LiveData<OrderState> get() = _orderState
 
-    private val _couponState = MutableLiveData<CouponState>()
-    val couponState: LiveData<CouponState> get() = _couponState
+    private val _couponState = MutableLiveData<List<CouponState>>()
+    val couponState: LiveData<List<CouponState>> get() = _couponState
 
     private val _event: MutableLiveData<OrderEvent> = MutableLiveData(OrderEvent.ORDER_PROCEEDING)
     val event: LiveData<OrderEvent> get() = _event
 
-    private lateinit var allCoupons: List<Coupon>
+    private var allCoupons: List<Coupon> = emptyList()
 
     init {
         viewModelScope.launch {
             allCoupons = couponRepository.getAllCoupons()
+            _orderState.value =
+                OrderState(
+                    totalPrice = shoppingCartProductsToOrder.sumOf { it.price },
+                    discountPrice = 5000,
+                    shippingFee = DEFAULT_SHIPPING_FEE,
+                    finalPrice = 202200,
+                )
+            _couponState.value =
+                allCoupons.map {
+                    CouponState(
+                        id = it.id,
+                        isSelected = false,
+                        title = it.description,
+                        expirationDate = it.explanationDate,
+                        minimumOrderPrice = it.minimumAmount,
+                    )
+                }
         }
-        _orderState.value =
-            OrderState(
-                totalPrice = shoppingCartProductsToOrder.sumOf { it.price },
-                discountPrice = 5000,
-                shippingFee = DEFAULT_SHIPPING_FEE,
-                finalPrice = 202200,
-            )
     }
 
-    fun toggleCoupon() {
+    fun toggleCoupon(couponState: CouponState) {
+        _couponState.value =
+            _couponState.value
+                ?.map {
+                    it.copy(isSelected = false)
+                }
+                ?.map {
+                    if (it.id == couponState.id) {
+                        it.copy(
+                            isSelected = true,
+                        )
+                    } else {
+                        it
+                    }
+                }
     }
 
     fun proceedOrder() {

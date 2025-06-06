@@ -1,9 +1,11 @@
 package woowacourse.shopping.view.order
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class CouponState(
+    val id: Long,
+    val isSelected: Boolean,
     val title: String,
-    val explanation: LocalDateTime,
+    val expirationDate: LocalDate,
     val minimumOrderPrice: Int?,
 )
