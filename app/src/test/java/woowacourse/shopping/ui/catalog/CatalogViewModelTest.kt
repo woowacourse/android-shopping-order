@@ -20,10 +20,10 @@ import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_1
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_2
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_3
 import woowacourse.shopping.model.DUMMY_HISTORY_PRODUCT_1
+import woowacourse.shopping.model.DUMMY_PRODUCTS_1
+import woowacourse.shopping.model.DUMMY_PRODUCTS_2
+import woowacourse.shopping.model.DUMMY_PRODUCTS_3
 import woowacourse.shopping.model.DUMMY_PRODUCT_1
 import woowacourse.shopping.ui.model.CatalogUiState
 import woowacourse.shopping.util.CoroutinesTestExtension
@@ -55,7 +55,7 @@ class CatalogViewModelTest {
         decreaseCartProductQuantityUseCase = mockk()
         getCartProductsQuantityUseCase = mockk()
 
-        coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_CATALOG_PRODUCTS_1)
+        coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_1)
 
         viewModel =
             CatalogViewModel(
@@ -75,17 +75,17 @@ class CatalogViewModelTest {
     @Test
     fun `ViewModel이 초기화되면 상품 목록을 불러온다`() {
         val state = viewModel.uiState.getOrAwaitValue()
-        assertThat(state.catalogProducts.products).containsExactlyElementsIn(DUMMY_CATALOG_PRODUCTS_1.products)
+        assertThat(state.catalogProducts.products).containsExactlyElementsIn(DUMMY_PRODUCTS_1.products)
         assertThat(state.isProductsLoading).isFalse()
     }
 
     @Test
     fun `상품을 더 불러오면 페이지가 증가하고 기존 목록에 추가된다`() =
         runTest {
-            coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_CATALOG_PRODUCTS_3)
+            coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_3)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_CATALOG_PRODUCTS_1),
+                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_1),
                 "_uiState",
                 viewModel,
             )
@@ -94,7 +94,7 @@ class CatalogViewModelTest {
 
             val state = viewModel.uiState.getOrAwaitValue()
             assertThat(state.catalogProducts.products).containsExactlyElementsIn(
-                DUMMY_CATALOG_PRODUCTS_1.products + DUMMY_CATALOG_PRODUCTS_3.products,
+                DUMMY_PRODUCTS_1.products + DUMMY_PRODUCTS_3.products,
             )
         }
 
@@ -107,7 +107,7 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_CATALOG_PRODUCTS_2),
+                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_2),
                 "_uiState",
                 viewModel,
             )
@@ -127,7 +127,7 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_CATALOG_PRODUCTS_2),
+                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_2),
                 "_uiState",
                 viewModel,
             )
@@ -141,12 +141,12 @@ class CatalogViewModelTest {
     @Test
     fun `특정 상품 정보를 불러오면 상품 목록에 반영된다`() =
         runTest {
-            val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 999)
+            val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 1234)
 
             coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_CATALOG_PRODUCTS_1),
+                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_1),
                 "_uiState",
                 viewModel,
             )
@@ -154,18 +154,18 @@ class CatalogViewModelTest {
             viewModel.loadCartProduct(DUMMY_PRODUCT_1.productDetail.id)
 
             val result = viewModel.uiState.getOrAwaitValue()
-            assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(999)
+            assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(1234)
         }
 
     @Test
     fun `여러 상품 정보를 불러오면 상품 목록에 반영된다`() =
         runTest {
-            val updated = listOf(DUMMY_PRODUCT_1.copy(quantity = 123))
+            val updated = listOf(DUMMY_PRODUCT_1.copy(quantity = 1234))
 
             coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(updated)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_CATALOG_PRODUCTS_2),
+                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_2),
                 "_uiState",
                 viewModel,
             )
@@ -190,12 +190,12 @@ class CatalogViewModelTest {
     @Test
     fun `장바구니 상품 수량을 불러와서 상품 목록에 반영한다`() =
         runTest {
-            coEvery { getCartProductsQuantityUseCase() } returns Result.success(13)
+            coEvery { getCartProductsQuantityUseCase() } returns Result.success(10)
 
             viewModel.loadCartProductsQuantity()
 
             val result = viewModel.uiState.getOrAwaitValue()
-            assertThat(result.cartProductsQuantity).isEqualTo(13)
+            assertThat(result.cartProductsQuantity).isEqualTo(10)
         }
 
     @Test

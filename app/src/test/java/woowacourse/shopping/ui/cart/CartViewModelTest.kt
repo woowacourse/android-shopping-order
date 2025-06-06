@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_1
+import woowacourse.shopping.model.DUMMY_PRODUCTS_1
 import woowacourse.shopping.model.DUMMY_PRODUCT_1
 import woowacourse.shopping.ui.model.CartProductUiState
 import woowacourse.shopping.util.CoroutinesTestExtension
@@ -46,7 +46,7 @@ class CartViewModelTest {
         getCartRecommendProductsUseCase = mockk()
         getCatalogProductUseCase = mockk()
 
-        coEvery { getCartProductsUseCase(any(), any()) } returns Result.success(DUMMY_CATALOG_PRODUCTS_1)
+        coEvery { getCartProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_1)
 
         viewModel =
             CartViewModel(
@@ -62,16 +62,16 @@ class CartViewModelTest {
     @Test
     fun `초기 로딩 시 장바구니 상품 목록을 불러온다`() {
         val state = viewModel.uiState.getOrAwaitValue()
-        assertThat(state.cartProducts.products).containsExactlyElementsIn(DUMMY_CATALOG_PRODUCTS_1.products)
+        assertThat(state.cartProducts.products).containsExactlyElementsIn(DUMMY_PRODUCTS_1.products)
     }
 
     @Test
     fun `장바구니 상품을 제거하면 UI 상태에서 제거되고 상품 목록을 다시 불러온다`() =
         runTest {
             coEvery { removeCartProductUseCase(DUMMY_PRODUCT_1.cartId!!) } returns Result.success(Unit)
-            coEvery { getCartProductsUseCase(any(), any()) } returns Result.success(DUMMY_CATALOG_PRODUCTS_1)
+            coEvery { getCartProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_1)
 
-            setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+            setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
             viewModel.removeCartProduct(DUMMY_PRODUCT_1.cartId!!, DUMMY_PRODUCT_1.productDetail.id)
 
@@ -84,7 +84,7 @@ class CartViewModelTest {
         runTest {
             coEvery { increaseCartProductQuantityUseCase(any()) } returns Result.success(10)
 
-            setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+            setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
             viewModel.increaseCartProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
 
@@ -97,7 +97,7 @@ class CartViewModelTest {
         runTest {
             coEvery { decreaseCartProductQuantityUseCase(any()) } returns Result.success(3)
 
-            setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+            setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
             viewModel.decreaseCartProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
 
@@ -107,7 +107,7 @@ class CartViewModelTest {
 
     @Test
     fun `장바구니 상품의 선택 상태를 토글하면 상태가 반전된다`() {
-        setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+        setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
         val before =
             viewModel.uiState
@@ -130,7 +130,7 @@ class CartViewModelTest {
 
     @Test
     fun `전체 장바구니 상품의 선택 상태를 토글하면 전체 상태가 반전된다`() {
-        setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+        setUpTestLiveData(CartProductUiState(cartProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
         viewModel.toggleAllCartProductsSelection()
 
@@ -146,7 +146,7 @@ class CartViewModelTest {
 
             coEvery { increaseCartProductQuantityUseCase(any()) } returns Result.success(updatedQuantity)
 
-            setUpTestLiveData(CartProductUiState(recommendedProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+            setUpTestLiveData(CartProductUiState(recommendedProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
             viewModel.increaseRecommendedProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
 
@@ -162,7 +162,7 @@ class CartViewModelTest {
 
             coEvery { decreaseCartProductQuantityUseCase(any()) } returns Result.success(updatedQuantity)
 
-            setUpTestLiveData(CartProductUiState(recommendedProducts = DUMMY_CATALOG_PRODUCTS_1), "_uiState", viewModel)
+            setUpTestLiveData(CartProductUiState(recommendedProducts = DUMMY_PRODUCTS_1), "_uiState", viewModel)
 
             viewModel.decreaseRecommendedProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
 
@@ -174,14 +174,14 @@ class CartViewModelTest {
     fun `선택된 장바구니 및 추천 상품 ID를 반환한다`() {
         val modifiedState =
             CartProductUiState(
-                cartProducts = DUMMY_CATALOG_PRODUCTS_1.toggleAllSelection(),
-                recommendedProducts = DUMMY_CATALOG_PRODUCTS_1.toggleAllSelection(),
+                cartProducts = DUMMY_PRODUCTS_1.toggleAllSelection(),
+                recommendedProducts = DUMMY_PRODUCTS_1.toggleAllSelection(),
             )
 
         setUpTestLiveData(modifiedState, "_uiState", viewModel)
 
         val selectedIds = viewModel.getSelectedProductIds()
-        val expectedIds = (DUMMY_CATALOG_PRODUCTS_1.products + DUMMY_CATALOG_PRODUCTS_1.products).map { it.productDetail.id }.toSet()
+        val expectedIds = (DUMMY_PRODUCTS_1.products + DUMMY_PRODUCTS_1.products).map { it.productDetail.id }.toSet()
 
         assertThat(selectedIds).isEqualTo(expectedIds)
     }
