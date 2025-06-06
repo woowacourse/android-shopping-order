@@ -47,8 +47,9 @@ class ProductViewModel(
     private var currentPage = FIRST_PAGE
 
     init {
-        cartRepository.fetchAllCartItems { result ->
-            result
+        viewModelScope.launch {
+            val cachedCartItemsInRepository = cartRepository.fetchAllCartItems()
+            cachedCartItemsInRepository
                 .onSuccess {
                     fetchData()
                     fetchCartItemCount()
@@ -88,13 +89,11 @@ class ProductViewModel(
     }
 
     fun fetchCartItemCount() {
-        cartRepository.fetchTotalCount { result ->
-            result
-                .onSuccess { count ->
-                    _cartItemCount.postValue(count)
-                }.onFailure {
-                    _toastMessage.postValue(R.string.product_toast_load_total_cart_quantity_fail)
-                }
+        viewModelScope.launch {
+            val totalCount = cartRepository.fetchTotalCount()
+            totalCount
+                .onSuccess { _cartItemCount.postValue(it) }
+                .onFailure { _toastMessage.postValue(R.string.product_toast_load_total_cart_quantity_fail) }
         }
     }
 
@@ -122,39 +121,38 @@ class ProductViewModel(
     }
 
     override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
-        addToCartUseCase(
-            product = cartItemUiModel.product.toDomain(),
-            quantity = 1,
-            onSuccess = {
+        viewModelScope.launch {
+            addToCartUseCase(
+                product = cartItemUiModel.product.toDomain(),
+                quantity = 1,
+            ).onSuccess {
                 updateQuantity(productId = cartItemUiModel.product.id, 1)
                 fetchCartItemCount()
-            },
-            onFailure = { _toastMessage.value = R.string.product_toast_add_cart_fail },
-        )
+            }.onFailure { _toastMessage.value = R.string.product_toast_add_cart_fail }
+        }
     }
 
     override fun onClickMinus(id: Long) {
-        decreaseProductQuantityUseCase(
-            id,
-            onSuccess = {
+        viewModelScope.launch {
+            decreaseProductQuantityUseCase(
+                id,
+            ).onSuccess {
                 updateQuantity(id, -1)
                 fetchCartItemCount()
-            },
-            onFailure = { _toastMessage.value = R.string.product_toast_increase_fail },
-        )
+            }.onFailure { _toastMessage.value = R.string.product_toast_increase_fail }
+        }
     }
 
     override fun onClickPlus(id: Long) {
-        increaseProductQuantityUseCase(
-            id,
-            onSuccess = {
-                updateQuantity(id, 1)
-                fetchCartItemCount()
-            },
-            onFailure = {
-                _toastMessage.value = R.string.product_toast_increase_fail
-            },
-        )
+        viewModelScope.launch {
+            increaseProductQuantityUseCase(id)
+                .onSuccess {
+                    updateQuantity(id, 1)
+                    fetchCartItemCount()
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_increase_fail
+                }
+        }
     }
 
     private fun updateQuantity(

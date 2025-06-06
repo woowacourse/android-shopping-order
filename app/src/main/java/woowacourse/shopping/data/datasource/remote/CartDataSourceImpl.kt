@@ -1,150 +1,65 @@
 package woowacourse.shopping.data.datasource.remote
 
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
+import woowacourse.shopping.data.dto.cart.CartContent
+import woowacourse.shopping.data.dto.cart.CartIdResponse
 import woowacourse.shopping.data.dto.cart.CartItemCountResponse
 import woowacourse.shopping.data.dto.cart.CartItemRequest
-import woowacourse.shopping.data.dto.cart.CartsResponse
 import woowacourse.shopping.data.dto.cart.UpdateCartRequest
-import woowacourse.shopping.data.dto.cart.toDomain
 import woowacourse.shopping.data.remote.CartItemService
-import woowacourse.shopping.domain.model.CartItem
 
 class CartDataSourceImpl(
     private val cartItemService: CartItemService,
 ) : CartDataSource {
-    override fun getTotalCount(onResult: (Result<Int>) -> Unit) =
-        cartItemService.requestCartItemCount().enqueue(
-            object : Callback<CartItemCountResponse> {
-                override fun onResponse(
-                    call: Call<CartItemCountResponse>,
-                    response: Response<CartItemCountResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        onResult(Result.success(response.body()?.quantity ?: 0))
-                    }
-                }
+    override suspend fun getTotalCount(): CartItemCountResponse {
+        val response = cartItemService.requestCartItemCount()
+        if (response.isSuccessful) {
+            return response.body() ?: CartItemCountResponse(0)
+        }
+        throw HttpException(response)
+    }
 
-                override fun onFailure(
-                    call: Call<CartItemCountResponse>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
-
-    override fun getPagedCartItems(
+    override suspend fun getPagedCartItems(
         page: Int,
         size: Int?,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    ) = cartItemService.requestCartItems(page = page, size = size).enqueue(
-        object : Callback<CartsResponse> {
-            override fun onResponse(
-                call: Call<CartsResponse>,
-                response: Response<CartsResponse>,
-            ) {
-                if (response.isSuccessful) {
-                    val body =
-                        response.body()?.cartContent?.map { it.toDomain() }
-                            ?: emptyList()
-                    onResult(Result.success(body))
-                }
-            }
+    ): List<CartContent> {
+        val response = cartItemService.requestCartItems(page, size)
+        if (response.isSuccessful) {
+            return response.body()?.cartContent ?: emptyList()
+        }
+        throw HttpException(response)
+    }
 
-            override fun onFailure(
-                call: Call<CartsResponse>,
-                t: Throwable,
-            ) {
-                onResult(Result.failure(t))
-            }
-        },
-    )
-
-    override fun insertCartItem(
+    override suspend fun insertCartItem(
         productId: Long,
         quantity: Int,
-        onResult: (Result<Long>) -> Unit,
-    ) {
-        val request = CartItemRequest(productId, quantity)
-        cartItemService.addCartItem(request).enqueue(
-            object : Callback<ResponseBody> {
-                override fun onResponse(
-                    call: Call<ResponseBody>,
-                    response: Response<ResponseBody>,
-                ) {
-                    if (response.isSuccessful) {
-                        val cartId =
-                            response.toIdOrNull() ?: return onResult(
-                                Result.failure(
-                                    IllegalStateException(ERROR_NOT_EXIST_ID),
-                                ),
-                            )
-                        onResult(Result.success(cartId))
-                    }
-                }
+    ): CartIdResponse {
+        val response = cartItemService.addCartItem(CartItemRequest(productId, quantity))
+        if (response.isSuccessful) {
+            val id = response.toIdOrNull() ?: throw IllegalStateException(ERROR_NOT_EXIST_ID)
+            return CartIdResponse(id)
+        }
 
-                override fun onFailure(
-                    call: Call<ResponseBody>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+        throw HttpException(response)
     }
 
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartId: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
     ) {
-        val request = UpdateCartRequest(quantity)
-        cartItemService.updateCartItem(cartId, request).enqueue(
-            object : Callback<ResponseBody> {
-                override fun onResponse(
-                    call: Call<ResponseBody>,
-                    response: Response<ResponseBody>,
-                ) {
-                    if (response.isSuccessful) {
-                        onResult(Result.success(Unit))
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ResponseBody>,
-                    t: Throwable,
-                ) {
-                    onResult(Result.failure(t))
-                }
-            },
-        )
+        val response = cartItemService.updateCartItem(cartId, UpdateCartRequest(quantity))
+        if (!response.isSuccessful) {
+            throw HttpException(response)
+        }
     }
 
-    override fun deleteCartItemById(
-        cartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) = cartItemService.deleteCartItem(cartId).enqueue(
-        object : Callback<ResponseBody> {
-            override fun onResponse(
-                call: Call<ResponseBody>,
-                response: Response<ResponseBody>,
-            ) {
-                if (response.isSuccessful) {
-                    onResult(Result.success(Unit))
-                }
-            }
-
-            override fun onFailure(
-                call: Call<ResponseBody>,
-                t: Throwable,
-            ) {
-                onResult(Result.failure(t))
-            }
-        },
-    )
+    override suspend fun deleteCartItemById(cartId: Long) {
+        val response = cartItemService.deleteCartItem(cartId)
+        if (!response.isSuccessful) {
+            throw HttpException(response)
+        }
+    }
 
     private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
 

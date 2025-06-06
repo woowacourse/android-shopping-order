@@ -85,28 +85,31 @@ class RecommendViewModel(
     }
 
     override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
-        addToCartUseCase(
-            product = cartItemUiModel.product.toDomain(),
-            quantity = 1,
-            onSuccess = { updateQuantity(productId = cartItemUiModel.product.id, 1) },
-            onFailure = { _toastMessage.value = R.string.product_toast_add_cart_fail },
-        )
+        viewModelScope.launch {
+            addToCartUseCase(
+                product = cartItemUiModel.product.toDomain(),
+                quantity = 1,
+            ).onSuccess { updateQuantity(productId = cartItemUiModel.product.id, 1) }
+                .onFailure { _toastMessage.value = R.string.product_toast_add_cart_fail }
+        }
     }
 
     override fun onClickMinus(id: Long) {
-        decreaseProductQuantityUseCase(
-            id,
-            onSuccess = { updateQuantity(id, -1) },
-            onFailure = { _toastMessage.value = R.string.product_toast_decrease_fail },
-        )
+        viewModelScope.launch {
+            decreaseProductQuantityUseCase(
+                id,
+            ).onSuccess { updateQuantity(id, -1) }
+                .onFailure { _toastMessage.value = R.string.product_toast_decrease_fail }
+        }
     }
 
     override fun onClickPlus(id: Long) {
-        increaseProductQuantityUseCase(
-            id,
-            onSuccess = { updateQuantity(id, 1) },
-            onFailure = { _toastMessage.value = R.string.product_toast_increase_fail },
-        )
+        viewModelScope.launch {
+            increaseProductQuantityUseCase(
+                id,
+            ).onSuccess { updateQuantity(id, 1) }
+                .onFailure { _toastMessage.value = R.string.product_toast_increase_fail }
+        }
     }
 
     private fun updateQuantity(

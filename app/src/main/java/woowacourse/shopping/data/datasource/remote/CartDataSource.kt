@@ -1,30 +1,26 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.data.dto.cart.CartContent
+import woowacourse.shopping.data.dto.cart.CartIdResponse
+import woowacourse.shopping.data.dto.cart.CartItemCountResponse
 
 interface CartDataSource {
-    fun getTotalCount(onResult: (Result<Int>) -> Unit)
+    suspend fun getTotalCount(): CartItemCountResponse
 
-    fun getPagedCartItems(
+    suspend fun getPagedCartItems(
         page: Int,
         size: Int?,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    )
+    ): List<CartContent>
 
-    fun insertCartItem(
+    suspend fun insertCartItem(
         productId: Long,
         quantity: Int,
-        onResult: (Result<Long>) -> Unit,
-    )
+    ): CartIdResponse
 
-    fun updateQuantity(
+    suspend fun updateQuantity(
         cartId: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
     )
 
-    fun deleteCartItemById(
-        cartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCartItemById(cartId: Long)
 }

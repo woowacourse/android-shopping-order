@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
@@ -53,36 +55,33 @@ class CartViewModel(
     fun loadItems(currentPage: Int = 0) {
         _uiState.value = ResultState.Loading
 
-        cartRepository.fetchPagedCartItems(currentPage) { result ->
-            result
-                .onSuccess { loadedItems ->
-                    val oldItemsMap =
+        viewModelScope.launch {
+            val fetchedCartItems = cartRepository.fetchPagedCartItems(currentPage)
+            fetchedCartItems
+                .onSuccess {
+                    val oldItemsMapper =
                         cartItems.value
                             .orEmpty()
                             .associateBy { cartItemUiModel -> cartItemUiModel.id }
-
                     val newItems =
-                        loadedItems.map { newItem ->
-                            oldItemsMap[newItem.cartId] ?: newItem.toPresentation()
+                        it.map { newItem ->
+                            oldItemsMapper[newItem.cartId] ?: newItem.toPresentation()
                         }
 
-                    _cartItems.postValue(newItems)
-                    _uiState.postValue(ResultState.Success(Unit))
-                }.onFailure {
-                    _toastMessage.postValue(R.string.cart_toast_load_fail)
-                }
+                    _cartItems.value = newItems
+                    _uiState.value = ResultState.Success(Unit)
+                }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
         }
     }
 
     override fun onClickDelete(cartItem: CartItemUiModel) {
-        cartRepository.deleteProduct(cartItem.product.id) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .deleteProduct(cartItem.product.id)
                 .onSuccess {
                     _toastMessage.value = R.string.cart_toast_delete_success
                     loadItems()
-                }.onFailure {
-                    _toastMessage.value = R.string.cart_toast_delete_fail
-                }
+                }.onFailure { _toastMessage.value = R.string.cart_toast_delete_fail }
         }
     }
 
@@ -90,7 +89,7 @@ class CartViewModel(
         val newCartItems =
             _cartItems.value?.map { if (it.id == cartId) it.copy(isSelected = !it.isSelected) else it }
                 ?: return
-        _cartItems.postValue(newCartItems)
+        _cartItems.value = newCartItems
     }
 
     override fun onClickCheckAll() {
@@ -112,19 +111,21 @@ class CartViewModel(
             return
         }
 
-        decreaseProductQuantityUseCase(
-            id,
-            onSuccess = { updateQuantity(id, -1) },
-            onFailure = { _toastMessage.value = R.string.cart_toast_decrease_fail },
-        )
+        viewModelScope.launch {
+            decreaseProductQuantityUseCase(
+                id,
+            ).onSuccess { updateQuantity(id, -1) }
+                .onFailure { _toastMessage.value = R.string.cart_toast_decrease_fail }
+        }
     }
 
     override fun onClickPlus(id: Long) {
-        increaseProductQuantityUseCase(
-            id,
-            onSuccess = { updateQuantity(id, 1) },
-            onFailure = { _toastMessage.value = R.string.cart_toast_increase_fail },
-        )
+        viewModelScope.launch {
+            increaseProductQuantityUseCase(
+                id,
+            ).onSuccess { updateQuantity(id, 1) }
+                .onFailure { _toastMessage.value = R.string.cart_toast_increase_fail }
+        }
     }
 
     private fun updateQuantity(
@@ -143,6 +144,6 @@ class CartViewModel(
                     cartItem
                 }
             }
-        _cartItems.postValue(updatedItem)
+        _cartItems.value = updatedItem
     }
 }

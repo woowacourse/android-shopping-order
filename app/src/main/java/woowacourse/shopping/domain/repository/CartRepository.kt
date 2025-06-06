@@ -4,49 +4,36 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 
 interface CartRepository {
-    fun fetchTotalCount(onResult: (Result<Int>) -> Unit)
+    suspend fun fetchTotalCount(): Result<Int>
 
-    fun fetchPagedCartItems(
+    suspend fun fetchPagedCartItems(
         page: Int,
         pageSize: Int? = null,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    )
+    ): Result<List<CartItem>>
 
-    fun fetchAllCartItems(onResult: (Result<Unit>) -> Unit)
+    suspend fun fetchAllCartItems(): Result<Unit>
 
     fun fetchCartItemById(productId: Long): CartItem?
 
-    fun insertOrUpdate(
+    suspend fun insertOrUpdate(
         product: Product,
         productQuantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun insertProduct(
+    suspend fun insertProduct(
         product: Product,
         productQuantity: Int,
-        onResult: (Result<Long>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun updateProduct(
+    suspend fun updateProduct(
         cartId: Long,
         product: Product,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun increaseQuantity(
-        productId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun increaseQuantity(productId: Long): Result<Unit>
 
-    fun decreaseQuantity(
-        productId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun decreaseQuantity(productId: Long): Result<Unit>
 
-    fun deleteProduct(
-        productId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteProduct(productId: Long): Result<Unit>
 }
