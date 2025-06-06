@@ -7,6 +7,9 @@
         <variable
             name="coupon"
             type="woowacourse.shopping.domain.model.Coupon" />
+        <variable
+            name="couponClickListener"
+            type="woowacourse.shopping.feature.payment.adapter.PaymentCouponViewHolder.CouponClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:checked="@{coupon.checked}"
+            android:onClick="@{() -> couponClickListener.onCouponCheck(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -33,7 +38,7 @@
             android:layout_marginEnd="60dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{String.valueOf(coupon.description)}"
+            android:text="@{String.valueOf(coupon.couponDetail.description)}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -47,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
-            android:text="@{@string/payment_expiration_date(coupon.expirationDate)}"
+            android:text="@{@string/payment_expiration_date(coupon.couponDetail.expirationDate)}"
             android:textSize="12sp"
             android:textColor="@color/gray_700"
             app:layout_constraintTop_toBottomOf="@id/tv_cart_item_name"
@@ -60,10 +65,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
-            android:text="@{@string/payment_minimum_order_price(coupon.minimumAmount)}"
+            android:text="@{@string/payment_minimum_order_price(coupon.couponDetail.minimumAmount)}"
             android:textSize="12sp"
             android:textColor="@color/gray_700"
-            app:visible="@{coupon.minimumAmount != 0}"
+            app:visible="@{coupon.couponDetail.minimumAmount != 0}"
             app:layout_constraintTop_toBottomOf="@id/tv_expiration_date"
             app:layout_constraintStart_toStartOf="parent"
             tools:text="최소 주문 금액: 100,000원"/>

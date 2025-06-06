@@ -5,7 +5,7 @@ import woowacourse.shopping.data.remote.cart.CartResponse.Content.CartRemoteProd
 import woowacourse.shopping.data.remote.coupon.CouponResponse
 import woowacourse.shopping.data.remote.product.ProductResponse
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponDetail
 import woowacourse.shopping.domain.model.Product
 import java.time.LocalDate
 import java.time.LocalTime
@@ -38,7 +38,7 @@ fun CartResponse.Content.toDomain(): CartProduct =
         quantity = quantity,
     )
 
-fun CouponResponse.toDomain(): Coupon {
+fun CouponResponse.toDomain(): CouponDetail {
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
 
@@ -47,7 +47,7 @@ fun CouponResponse.toDomain(): Coupon {
             LocalDate.parse(it).format(dateFormatter)
         } ?: ""
 
-    return Coupon(
+    return CouponDetail(
         id = this.id,
         code = this.code,
         description = this.description,
