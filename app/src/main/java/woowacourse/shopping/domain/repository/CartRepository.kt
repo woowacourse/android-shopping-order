@@ -19,11 +19,10 @@ interface CartRepository {
         onResult: (Result<Unit>) -> Unit,
     )
 
-    fun insertCartProductQuantityToCart(
+    suspend fun insertCartProductQuantityToCart(
         productId: Long,
         increaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
     fun decreaseCartProductQuantityFromCart(
         productId: Long,

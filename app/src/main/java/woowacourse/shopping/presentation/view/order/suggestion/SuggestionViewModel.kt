@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -50,10 +52,12 @@ class SuggestionViewModel(
                 .filter { cart ->
                     !suggestionProducts.value.orEmpty().any { it.productId == cart.product.id }
                 }.map { it.product.id }
-
-        productRepository.fetchSuggestionProducts(SUGGESTION_LIMIT, excludedProductIds) { result ->
-            result
-                .onSuccess { combine(it) }
+        viewModelScope.launch {
+            productRepository
+                .fetchSuggestionProducts(
+                    SUGGESTION_LIMIT,
+                    excludedProductIds,
+                ).onSuccess { combine(it) }
                 .onFailure { }
         }
     }
@@ -94,8 +98,9 @@ class SuggestionViewModel(
     }
 
     private fun increaseProductQuantity(productId: Long) {
-        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .insertCartProductQuantityToCart(productId, QUANTITY_STEP)
                 .onSuccess { fetchSuggestionProducts() }
                 .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }

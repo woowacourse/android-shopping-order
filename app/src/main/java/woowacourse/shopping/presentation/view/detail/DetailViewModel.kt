@@ -5,7 +5,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -49,11 +51,12 @@ class DetailViewModel(
     }
 
     fun loadProduct(productId: Long) {
-        productRepository.fetchProduct(productId) { result ->
-            result
-                .onSuccess {
-                    _product.postValue(it.toUiModel())
-                    updateRecentProduct(productId, it.category)
+        viewModelScope.launch {
+            val productResult = productRepository.fetchProduct(productId)
+            productResult
+                .onSuccess { product ->
+                    _product.value = product.toUiModel()
+                    updateRecentProduct(productId, product.toUiModel().category)
                 }.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
@@ -72,16 +75,18 @@ class DetailViewModel(
         val product = _product.value ?: return
         val quantity = _quantity.value ?: DEFAULT_QUANTITY
 
-        cartRepository.insertCartProductQuantityToCart(product.id, quantity) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .insertCartProductQuantityToCart(product.id, quantity)
                 .onSuccess { _addToCartSuccessEvent.postValue(Unit) }
                 .onFailure { _toastEvent.postValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }
         }
     }
 
     private fun loadRecentProduct() {
-        recentProductRepository.getRecentProducts(1) { result ->
-            result
+        viewModelScope.launch {
+            recentProductRepository
+                .getRecentProducts(1)
                 .onSuccess { _recentProduct.postValue(it.firstOrNull()?.toUiModel()) }
                 .onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }

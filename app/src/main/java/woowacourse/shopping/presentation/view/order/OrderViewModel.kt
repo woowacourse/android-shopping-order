@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.di.provider.UseCaseProvider
 import woowacourse.shopping.domain.model.CartProduct
@@ -124,9 +126,11 @@ class OrderViewModel(
     }
 
     private fun increaseProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
-            result
-                .onSuccess { refreshFetchItem() }
+        viewModelScope.launch {
+            increaseCartProductQuantityUseCase(
+                productId,
+                QUANTITY_STEP,
+            ).onSuccess { refreshFetchItem() }
                 .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }

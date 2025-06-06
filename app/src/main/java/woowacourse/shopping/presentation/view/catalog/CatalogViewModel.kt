@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.di.provider.UseCaseProvider
 import woowacourse.shopping.domain.model.CartProduct
@@ -49,17 +51,17 @@ class CatalogViewModel(
 
     fun loadProducts() {
         _isLoading.value = true
-
-        productRepository.fetchProducts(page, PRODUCT_LOAD_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchProducts(page, PRODUCT_LOAD_LIMIT)
                 .onSuccess { handleProductPageLoad(it) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_PRODUCTS_FAILURE) }
         }
     }
 
     fun increaseProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            increaseCartProductQuantityUseCase(productId, QUANTITY_STEP)
                 .onSuccess { updateProductQuantityInList(productId) }
                 .onFailure { emitToastMessage(CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
@@ -95,8 +97,9 @@ class CatalogViewModel(
     }
 
     private fun loadRecentProducts(onSuccess: (CatalogItem.RecentProducts) -> Unit) {
-        recentRepository.getRecentProducts(RECENT_PRODUCT_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            recentRepository
+                .getRecentProducts(RECENT_PRODUCT_LIMIT)
                 .onSuccess {
                     val uiModels = it.map { product -> product.toUiModel() }
                     onSuccess(CatalogItem.RecentProducts(uiModels))

@@ -8,17 +8,17 @@ import woowacourse.shopping.data.util.safeApiCall
 class ProductRemoteDataSourceImpl(
     private val productService: ProductService,
 ) : ProductRemoteDataSource {
-    override fun fetchProducts(
+    override suspend fun fetchProducts(
         category: String?,
         page: Int?,
         size: Int?,
     ): Result<PageableResponse<ProductResponse>> =
         safeApiCall {
-            productService.fetchProducts(category, page, size).execute()
+            productService.fetchProducts(category, page, size)
         }
 
-    override fun fetchProduct(productId: Long): Result<ProductResponse> =
+    override suspend fun fetchProduct(productId: Long): Result<ProductResponse> =
         safeApiCall {
-            productService.fetchProduct(productId).execute()
+            productService.fetchProduct(productId)
         }
 }

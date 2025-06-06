@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.service
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -9,14 +9,14 @@ import woowacourse.shopping.data.model.product.ProductResponse
 
 interface ProductService {
     @GET("/products")
-    fun fetchProducts(
+    suspend fun fetchProducts(
         @Query("category") category: String?,
         @Query("page") page: Int?,
         @Query("size") size: Int?,
-    ): Call<PageableResponse<ProductResponse>>
+    ): Response<PageableResponse<ProductResponse>>
 
     @GET("/products/{id}")
-    fun fetchProduct(
+    suspend fun fetchProduct(
         @Path("id") productId: Long,
-    ): Call<ProductResponse>
+    ): Response<ProductResponse>
 }

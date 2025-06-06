@@ -13,16 +13,14 @@ class RecentProductRepositoryImpl(
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
     private val recentProductLimit: Int = 10,
 ) : RecentProductRepository {
-    override fun getRecentProducts(
-        limit: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        recentProductLocalDataSource
-            .getRecentProducts(limit)
-            .mapNotNull {
-                productRemoteDataSource.fetchProduct(it.productId).getOrNull()?.toDomain()
-            }
-    }
+    override suspend fun getRecentProducts(limit: Int): Result<List<Product>> =
+        runCatching {
+            recentProductLocalDataSource
+                .getRecentProducts(limit)
+                .mapNotNull {
+                    productRemoteDataSource.fetchProduct(it.productId).getOrNull()?.toDomain()
+                }
+        }
 
     override fun insertAndTrimToLimit(
         productId: Long,

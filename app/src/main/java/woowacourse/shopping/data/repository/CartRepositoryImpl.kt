@@ -50,23 +50,22 @@ class CartRepositoryImpl(
         Result.success(Unit)
     }
 
-    override fun insertCartProductQuantityToCart(
+    override suspend fun insertCartProductQuantityToCart(
         productId: Long,
         increaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        val currentQuantity = cachedCart.findQuantityByProductId(productId)
-        if (currentQuantity == 0) {
-            val newCartId =
-                cartDataSource
-                    .addCartItem(AddCartItemCommand(productId, increaseCount))
-                    .getOrThrow()
-            addCartProductToCart(newCartId, productId, increaseCount)
-            return@runCatchingInThread
+    ): Result<Unit> =
+        runCatching {
+            val currentQuantity = cachedCart.findQuantityByProductId(productId)
+            if (currentQuantity == 0) {
+                val newCartId =
+                    cartDataSource
+                        .addCartItem(AddCartItemCommand(productId, increaseCount))
+                        .getOrThrow()
+                addCartProductToCart(newCartId, productId, increaseCount)
+                return@runCatching
+            }
+            patchCartItemQuantity(productId, currentQuantity + increaseCount)
         }
-
-        patchCartItemQuantity(productId, currentQuantity + increaseCount)
-    }
 
     override fun decreaseCartProductQuantityFromCart(
         productId: Long,
@@ -109,7 +108,7 @@ class CartRepositoryImpl(
 
     private fun CartItemResponse.toDomain() = CartProduct(cartId, product.toDomain(), quantity)
 
-    private fun addCartProductToCart(
+    private suspend fun addCartProductToCart(
         cartId: Long,
         productId: Long,
         quantity: Int,

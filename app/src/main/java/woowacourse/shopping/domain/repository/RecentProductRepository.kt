@@ -3,10 +3,7 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface RecentProductRepository {
-    fun getRecentProducts(
-        limit: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    )
+    suspend fun getRecentProducts(limit: Int): Result<List<Product>>
 
     fun insertAndTrimToLimit(
         productId: Long,
