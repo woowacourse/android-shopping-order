@@ -4,8 +4,6 @@ import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface GoodsRepository {
-    fun fetchGoodsSize(onComplete: (Int) -> Unit)
-
     suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,

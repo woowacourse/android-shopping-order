@@ -47,9 +47,6 @@ class GoodsRemoteDataSourceImpl(
                 category = category,
             )
 
-    override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
-    }
-
     override suspend fun fetchGoodsDetailByGoodsId(goodsId: Int): Content =
         retrofitService
             .requestProductDetail(

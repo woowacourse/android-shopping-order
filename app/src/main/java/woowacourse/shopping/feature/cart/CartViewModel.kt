@@ -111,9 +111,6 @@ class CartViewModel(
     private val _loginErrorEvent = MutableSingleLiveData<CartFetchError>()
     val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
 
-    private val _removeItemEvent = MutableSingleLiveData<CartItem>()
-    val removeItemEvent: SingleLiveData<CartItem> get() = _removeItemEvent
-
     init {
         updateWholeCarts()
     }

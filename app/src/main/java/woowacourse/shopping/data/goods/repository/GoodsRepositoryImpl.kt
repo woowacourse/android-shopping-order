@@ -11,10 +11,6 @@ class GoodsRepositoryImpl(
     private val remoteDataSource: GoodsRemoteDataSource,
     private val localDataSource: GoodsLocalDataSource,
 ) : GoodsRepository {
-    override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
-        remoteDataSource.fetchGoodsSize(onComplete)
-    }
-
     override suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
