@@ -44,4 +44,6 @@
     <string name="payment_order_button">결제하기</string>
     <string name="payment_minimum_order_price">최소 주문 금액: %,d원</string>
     <string name="payment_expiration_date">만료일: %s</string>
+    <string name="payment_price">%,d원</string>
+    <string name="payment_discount_price">-%,d원</string>
 </resources>

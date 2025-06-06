@@ -49,6 +49,7 @@ class ShoppingApplication : Application() {
         ViewModelFactory {
             PaymentViewModel(
                 CouponRepository(),
+                CartRepository(),
             )
         }
     }

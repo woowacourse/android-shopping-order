@@ -26,7 +26,8 @@ class PaymentActivity : AppCompatActivity() {
         binding.rvCoupons.adapter = adapter
         binding.rvCoupons.isNestedScrollingEnabled = false
 
-        val orderIds = intent.getLongArrayExtra(ORDER_IDS)
+        val orderIds = intent.getLongArrayExtra(ORDER_IDS) ?: longArrayOf()
+        viewModel.setOrderDetails(orderIds)
     }
 
     companion object {
