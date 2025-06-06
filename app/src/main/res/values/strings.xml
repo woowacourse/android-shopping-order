@@ -25,4 +25,7 @@
     <string name="text_recommend_main_info">이런 상품은 어떠세요?</string>
     <string name="message_order_success">주문을 성공했습니다.</string>
     <string name="message_order_fail">주문을 실패했습니다</string>
+    <string name="text_applicatble_coupon_info">적용 가능한 쿠폰</string>
+    <string name="text_applicable_coupon_sub_info">* 쿠폰은 1개만 적용 가능합니다</string>
+    <string name="text_payment_toolbar">결제하기</string>
 </resources>

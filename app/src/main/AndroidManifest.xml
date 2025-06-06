@@ -18,6 +18,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.payment.PaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.recommend.RecommendActivity"
             android:exported="false"
             android:parentActivityName=".presentation.cart.CartActivity" />
