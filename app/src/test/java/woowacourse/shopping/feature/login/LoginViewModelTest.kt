@@ -27,7 +27,7 @@ class LoginViewModelTest {
     }
 
     private fun setupRepositoryMocks() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
+        every { cartRepository.checkValidLocalSavedBasicKey(any(), any()) } answers {
             secondArg<(Int) -> Unit>()(200)
         }
     }
@@ -51,44 +51,35 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login 호출 시 repository checkValidBasicKey가 호출된다`() {
-        viewModel.id.set("testuser")
-        viewModel.pw.set("testpass")
-
-        viewModel.login()
-
-        verify { cartRepository.checkValidBasicKey(any(), any(), any()) }
-    }
-
-    @Test
-    fun `login 호출 시 올바른 BasicKey로 repository가 호출된다`() {
+    fun `login 호출 시 id와 pw 문자열로 생성한 BasicKey로 checkValidBasicKey가 호출된다`() {
         val testId = "testuser"
         val testPw = "testpass"
-        val expectedBasicKey = Authorization.getBasicKey(testId, testPw)
+        Authorization.setBasicKeyByIdPw(testId, testPw)
+        val expectedBasicKey = Authorization.basicKey
+
+        every { cartRepository.saveBasicKey(any(), any()) } answers {}
+
+        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {}
 
         viewModel.id.set(testId)
         viewModel.pw.set(testPw)
 
         viewModel.login()
 
-        verify { cartRepository.checkValidBasicKey(eq(expectedBasicKey), any(), any()) }
+        verify { cartRepository.checkValidBasicKey(expectedBasicKey, any(), any()) }
     }
 
     @Test
-    fun `정확한 게정으로 로그인 성공시(200) loginSuccessEvent가 발생한다`() {
-        val testId = "testuser"
-        val testPw = "testpass"
-        val expectedBasicKey = Authorization.getBasicKey(testId, testPw)
-
+    fun `정확한 게정으로 로그인 성공시(200) saveBasicKey가 발생한다`() {
         every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
             secondArg<(Int) -> Unit>()(200)
         }
-        viewModel.id.set(testId)
-        viewModel.pw.set(testPw)
+
+        every { cartRepository.saveBasicKey(any(), any()) } answers {}
 
         viewModel.login()
 
-        assertThat(viewModel.loginSuccessEvent.getValue()).isEqualTo(expectedBasicKey)
+        verify { cartRepository.saveBasicKey(any(), any()) }
     }
 
     @Test

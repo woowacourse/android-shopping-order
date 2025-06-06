@@ -159,23 +159,23 @@ class GoodsViewModelTest {
 
     @Test
     fun `로그인 성공 시 Authorization 상태가 true로 설정된다`() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(200)
+        every { cartRepository.checkValidLocalSavedBasicKey(any(), any()) } answers {
+            firstArg<(Int) -> Unit>()(200)
         }
 
-        viewModel.login("validKey")
+        viewModel.login()
 
         assertThat(Authorization.isLogin).isTrue()
-        verify { cartRepository.checkValidBasicKey("validKey", any(), any()) }
+        verify { cartRepository.checkValidLocalSavedBasicKey(any(), any()) }
     }
 
     @Test
     fun `로그인 실패 시 Authorization 상태가 false로 설정된다`() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(401)
+        every { cartRepository.checkValidLocalSavedBasicKey(any(), any()) } answers {
+            firstArg<(Int) -> Unit>()(401)
         }
 
-        viewModel.login("invalidKey")
+        viewModel.login()
 
         assertThat(Authorization.isLogin).isFalse()
     }
