@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
@@ -34,15 +36,16 @@ class DetailViewModel(
     val productInserted: LiveData<Boolean> = _productInserted
 
     fun setProduct() {
-        productsRepository.getProductById(productId) { result ->
+        viewModelScope.launch {
+            val result = productsRepository.getProductById(productId)
+
             result
                 .onSuccess { product ->
                     val loadedProduct = product.copy(quantity = 1)
                     _product.postValue(loadedProduct)
 
-                    viewedRepository.insertViewedItem(loadedProduct) {
-                        _productInserted.postValue(true)
-                    }
+                    viewedRepository.insertViewedItem(loadedProduct)
+                    _productInserted.postValue(true)
                 }
                 .onFailure {
                     _productInserted.postValue(false)
@@ -52,19 +55,22 @@ class DetailViewModel(
 
     fun addToCart() {
         val product = _product.value ?: return
-        cartItemRepository.addCartItemQuantity(product.id, product.quantity) { result ->
-            result
-                .onSuccess {
-                    _cartEvent.postValue(AddItemSuccess)
-                }
-                .onFailure {
-                    _cartEvent.postValue(AddItemFailure)
-                }
+
+        viewModelScope.launch {
+            val result = cartItemRepository.addCartItemQuantity(product.id, product.quantity)
+
+            result.onSuccess {
+                _cartEvent.postValue(AddItemSuccess)
+            }.onFailure {
+                _cartEvent.postValue(AddItemFailure)
+            }
         }
     }
 
     fun loadLastViewedItem() {
-        viewedRepository.getLastViewedItem { lastViewedItem ->
+        viewModelScope.launch {
+            val lastViewedItem = viewedRepository.getLastViewedItem()
+
             val filtered = if (lastViewedItem?.id == productId) null else lastViewedItem
             _lastViewed.postValue(filtered)
         }
@@ -81,20 +87,17 @@ class DetailViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            productId: Long,
-        ): ViewModelProvider.Factory {
+        fun provideFactory(productId: Long): ViewModelProvider.Factory {
             return viewModelFactory {
                 initializer {
                     DetailViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartItemRepository = RepositoryProvider.cartItemRepository,
                         viewedRepository = RepositoryProvider.viewedItemRepository,
-                        productId = productId
+                        productId = productId,
                     )
                 }
             }
         }
-
     }
 }

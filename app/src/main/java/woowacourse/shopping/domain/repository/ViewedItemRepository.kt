@@ -3,12 +3,9 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface ViewedItemRepository {
-    fun insertViewedItem(
-        product: ProductUiModel,
-        onComplete: () -> Unit,
-    )
+    suspend fun insertViewedItem(product: ProductUiModel)
 
-    fun getViewedItems(callback: (List<ProductUiModel>) -> Unit)
+    suspend fun getViewedItems(): List<ProductUiModel>
 
-    fun getLastViewedItem(callback: (ProductUiModel?) -> Unit)
+    suspend fun getLastViewedItem(): ProductUiModel?
 }
