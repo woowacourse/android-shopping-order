@@ -5,20 +5,14 @@ import woowacourse.shopping.domain.repository.CartRepository
 class UpdateCartProductUseCase(
     private val repository: CartRepository,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         productId: Long,
         cartId: Long?,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    ) {
+    ): Result<Unit> =
         if (cartId == null) {
-            repository.addCartProduct(productId, quantity) { result ->
-                callback(result)
-            }
+            repository.addCartProduct(productId, quantity)
         } else {
-            repository.updateCartProduct(cartId, quantity) { result ->
-                callback(result)
-            }
+            repository.updateCartProduct(cartId, quantity)
         }
-    }
 }

@@ -11,35 +11,32 @@ class GetCartRecommendProductsUseCase(
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
 ) {
-    operator fun invoke(callback: (products: Result<Products>) -> Unit) {
-        historyRepository.fetchRecentHistory { historyProduct ->
-            if (historyProduct == null) {
-                callback(Result.success(EMPTY_PRODUCTS))
-            } else {
-                productRepository.fetchProducts(0, Int.MAX_VALUE, historyProduct.category) { result ->
-                    result
-                        .onSuccess { catalogProducts ->
-                            cartRepository.fetchAllCartProducts { result ->
-                                result
-                                    .onSuccess { cartProducts ->
-                                        val cartProductIds = cartProducts.products.map { product -> product.productDetail.id }
-                                        val filteredProducts =
-                                            catalogProducts.products
-                                                .filterNot { product ->
-                                                    product.productDetail.id in cartProductIds
-                                                }.take(10)
+    suspend operator fun invoke(): Result<Products> {
+        val historyProduct =
+            historyRepository.fetchRecentHistory()
+                ?: return Result.success(EMPTY_PRODUCTS)
 
-                                        callback(Result.success(Products(filteredProducts)))
-                                    }.onFailure {
-                                        callback(Result.failure(it))
-                                        return@fetchAllCartProducts
-                                    }
-                            }
-                        }.onFailure {
-                            callback(Result.failure(it))
-                        }
-                }
-            }
-        }
+        val catalogResult =
+            productRepository.fetchProducts(0, Int.MAX_VALUE, historyProduct.category)
+        if (catalogResult.isFailure) return Result.failure(catalogResult.exceptionOrNull()!!)
+
+        val catalogProducts = catalogResult.getOrThrow()
+
+        val cartResult = cartRepository.fetchAllCartProducts()
+        if (cartResult.isFailure) return Result.failure(cartResult.exceptionOrNull()!!)
+
+        val cartProducts = cartResult.getOrThrow()
+        val cartProductIds = cartProducts.products.map { it.productDetail.id }
+
+        val filtered =
+            catalogProducts.products
+                .filterNot { it.productDetail.id in cartProductIds }
+                .take(MAXIMUM_HISTORY_PRODUCTS_COUNT)
+
+        return Result.success(Products(filtered))
+    }
+
+    companion object {
+        private const val MAXIMUM_HISTORY_PRODUCTS_COUNT: Int = 10
     }
 }

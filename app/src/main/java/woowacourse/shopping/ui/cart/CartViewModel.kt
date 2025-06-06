@@ -7,7 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
@@ -108,7 +110,8 @@ class CartViewModel(
     }
 
     fun loadRecommendedProducts() {
-        getCartRecommendProductsUseCase { result ->
+        viewModelScope.launch {
+            val result = getCartRecommendProductsUseCase()
             result
                 .onSuccess { products ->
                     _recommendedProducts.value = products
@@ -119,9 +122,13 @@ class CartViewModel(
     }
 
     fun increaseRecommendedProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(
-            product = recommendedProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                increaseCartProductQuantityUseCase(
+                    product =
+                        recommendedProducts.value?.getProductByProductId(productId)
+                            ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     _recommendedProducts.value =
@@ -138,9 +145,13 @@ class CartViewModel(
     }
 
     fun decreaseRecommendedProductQuantity(productId: Long) {
-        decreaseCartProductQuantityUseCase(
-            product = recommendedProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                decreaseCartProductQuantityUseCase(
+                    product =
+                        recommendedProducts.value?.getProductByProductId(productId)
+                            ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     if (newQuantity > MINIMUM_QUANTITY) {
@@ -169,7 +180,8 @@ class CartViewModel(
 
         if (selectedProductIds.isEmpty()) return
 
-        orderProductsUseCase.invoke(selectedProductIds) { result ->
+        viewModelScope.launch {
+            val result = orderProductsUseCase(selectedProductIds)
             result
                 .onSuccess {
                     _editedProductIds.value = selectedProductIds
@@ -182,10 +194,12 @@ class CartViewModel(
 
     private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
         _isLoading.value = true
-        getCartProductsUseCase(
-            page = page.current,
-            size = DEFAULT_PAGE_SIZE,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                getCartProductsUseCase(
+                    page = page.current,
+                    size = DEFAULT_PAGE_SIZE,
+                )
             result
                 .onSuccess { cartProducts ->
                     _cartProducts.value = cartProducts
@@ -200,7 +214,9 @@ class CartViewModel(
         cartId: Long,
         productId: Long,
     ) {
-        removeCartProductUseCase(cartId) { result ->
+        viewModelScope.launch {
+            val result = removeCartProductUseCase(cartId)
+
             result
                 .onSuccess {
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
@@ -212,9 +228,11 @@ class CartViewModel(
     }
 
     private fun increaseCartProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(
-            product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                increaseCartProductQuantityUseCase(
+                    product = cartProducts.value?.getProductByProductId(productId) ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     _cartProducts.value =
@@ -231,9 +249,11 @@ class CartViewModel(
     }
 
     private fun decreaseCartProductQuantity(productId: Long) {
-        decreaseCartProductQuantityUseCase(
-            product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                decreaseCartProductQuantityUseCase(
+                    product = cartProducts.value?.getProductByProductId(productId) ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     if (newQuantity > MINIMUM_QUANTITY) {
