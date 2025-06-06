@@ -1,7 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -16,7 +21,24 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
+    }
+
+    defaultConfig {
+        val localProperties = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localProperties.load(FileInputStream(localFile))
+        }
+
+        val id = localProperties["id"] as String
+        val pw = localProperties["password"] as String
+        val baseUrl = localProperties["baseUrl"] as String
+
+        buildConfigField("String", "AUTH_ID", "\"$id\"")
+        buildConfigField("String", "AUTH_PW", "\"$pw\"")
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
     buildTypes {
@@ -41,17 +63,35 @@ android {
             excludes += "win32-x86*/**"
         }
     }
+    buildFeatures {
+        dataBinding = true
+        buildConfig = true
+    }
 }
 
 dependencies {
+    implementation(libs.androidx.activity)
+    kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.google.material)
+    implementation(libs.google.glide)
+    implementation(libs.room.runtime)
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.logging.interceptor)
+    implementation(libs.shimmer)
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockwebserver)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)

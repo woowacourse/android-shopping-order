@@ -1,0 +1,10 @@
+package woowacourse.shopping.view.recommend
+
+enum class RecommendEvent {
+    LOAD_RECENT_PRODUCTS_FAILURE,
+    LOAD_SHOPPING_CART_FAILURE,
+    LOAD_PRODUCT_FAILURE,
+    PLUS_CART_ITEM_FAILURE,
+    REMOVE_CART_ITEM_FAILURE,
+    MINUS_CART_ITEM_FAILURE,
+}
