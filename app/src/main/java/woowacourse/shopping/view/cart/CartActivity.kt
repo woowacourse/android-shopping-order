@@ -75,6 +75,10 @@ class CartActivity : AppCompatActivity() {
                     val messageResId = getErrorMessage(event.throwable)
                     showToast(getString(messageResId))
                 }
+
+                CartUiEvent.ShowNotHasPurchaseCart -> {
+                    showToast(getString(R.string.text_not_has_purchase_cart))
+                }
             }
         }
     }

@@ -8,14 +8,20 @@ data class CartUiState(
     val pageState: PageState = PageState(),
     val isFetching: Boolean = true,
 ) {
+    val checkedCart: List<CartState>
+        get() = items.filter { it.checked }
+
+    val hasPurchaseCart: Boolean
+        get() = checkedCart.isNotEmpty()
+
     val purchaseCart
-        get() = items.filter { it.checked }.map { it.cart }
+        get() = checkedCart.map { it.cart }
 
     val totalPrice: Int
-        get() = items.filter { it.checked }.sumOf { it.totalPrice }
+        get() = checkedCart.sumOf { it.totalPrice }
 
     val checkedProductCount: Int
-        get() = items.filter { it.checked }.sumOf { it.quantity }
+        get() = checkedCart.sumOf { it.quantity }
 
     val cartIds: List<Long>
         get() = items.map { it.cart.productId }

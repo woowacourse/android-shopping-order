@@ -237,7 +237,11 @@ class CartViewModel(
 
     fun sendScreenChangeEvent() {
         withState(_cartUiState.value) { state ->
-            _uiEvent.setValue(CartUiEvent.ChangeScreen(state.purchaseCart))
+            if (!state.hasPurchaseCart) {
+                _uiEvent.setValue(CartUiEvent.ShowNotHasPurchaseCart)
+            } else {
+                _uiEvent.setValue(CartUiEvent.ChangeScreen(state.purchaseCart))
+            }
         }
     }
 
