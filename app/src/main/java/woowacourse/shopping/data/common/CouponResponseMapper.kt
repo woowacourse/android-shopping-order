@@ -32,27 +32,26 @@ fun CouponResponse.toFixed(): Fixed {
 }
 
 fun CouponResponse.toPercentage(): Percentage {
-    if (availableTime != null) {
-        return Percentage(
-            id = id.toLong(),
-            description = description,
-            code = code,
-            explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
-            discount = discount!!,
-            availableStartTime =
-                LocalTime.parse(
-                    availableTime.start,
-                    DateTimeFormatter.ISO_LOCAL_TIME,
-                ),
-            availableEndTime = LocalTime.parse(availableTime.end, DateTimeFormatter.ISO_LOCAL_TIME),
-        )
-    }
     return Percentage(
         id = id.toLong(),
         description = description,
         code = code,
         explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
         discount = discount!!,
+        availableStartTime =
+            availableTime?.let {
+                LocalTime.parse(
+                    availableTime.start,
+                    DateTimeFormatter.ISO_LOCAL_TIME,
+                )
+            },
+        availableEndTime =
+            availableTime?.let {
+                LocalTime.parse(
+                    availableTime.end,
+                    DateTimeFormatter.ISO_LOCAL_TIME,
+                )
+            },
     )
 }
 
