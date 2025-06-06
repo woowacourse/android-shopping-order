@@ -19,6 +19,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
+import woowacourse.shopping.presentation.getParcelableArrayListExtraCompat
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.order.OrderActivity
 
@@ -50,13 +51,9 @@ class RecommendActivity :
     }
 
     private fun setupViewModel() {
-        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
-        val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
-        val defaultArgs =
-            bundleOf(
-                Extra.KEY_SELECT_PRICE to price,
-                Extra.KEY_SELECT_COUNT to count,
-            )
+        val selectedCartItems =
+            intent.getParcelableArrayListExtraCompat<CartItemUiModel>(Extra.KEY_SELECT_ITEMS)
+        val defaultArgs = bundleOf(Extra.KEY_SELECT_ITEMS to selectedCartItems)
         val creationExtras =
             MutableCreationExtras(defaultViewModelCreationExtras).apply {
                 this[VIEW_MODEL_DEFAULT_ARGS_KEY] = defaultArgs
@@ -119,11 +116,9 @@ class RecommendActivity :
     }
 
     override fun onClickOrder() {
+        val selectedItems = viewModel.selectedItems.value ?: return
         val intent =
-            OrderActivity.newIntent(
-                this,
-                viewModel.selectedTotalPrice.value ?: 0,
-            )
+            OrderActivity.newIntent(this, selectedItems)
         startActivity(intent)
     }
 
@@ -138,12 +133,10 @@ class RecommendActivity :
     companion object {
         fun newIntent(
             context: Context,
-            selectedPrice: Int,
-            selectedCount: Int,
+            selectedItems: List<CartItemUiModel>,
         ): Intent =
             Intent(context, RecommendActivity::class.java).apply {
-                putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
-                putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
+                putParcelableArrayListExtra(Extra.KEY_SELECT_ITEMS, ArrayList(selectedItems))
             }
 
         private val VIEW_MODEL_DEFAULT_ARGS_KEY = object : CreationExtras.Key<Bundle> {}

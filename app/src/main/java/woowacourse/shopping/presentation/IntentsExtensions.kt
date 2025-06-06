@@ -2,15 +2,15 @@ package woowacourse.shopping.presentation
 
 import android.content.Intent
 import android.os.Build
-import java.io.Serializable
+import android.os.Parcelable
 
-inline fun <reified T : Serializable> Intent.getSerializableExtraCompat(key: String): T =
+inline fun <reified T : Parcelable> Intent.getParcelableArrayListExtraCompat(key: String): ArrayList<T> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getSerializableExtra(key, T::class.java)
+        getParcelableArrayListExtra(key, T::class.java)
             ?: error(ERROR_NO_DATA.format(key))
     } else {
         @Suppress("DEPRECATION")
-        getSerializableExtra(key) as? T
+        getParcelableArrayListExtra<T>(key)
             ?: error(ERROR_NO_DATA.format(key))
     }
 

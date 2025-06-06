@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.MutableCreationExtras
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.Extra
+import woowacourse.shopping.presentation.getParcelableArrayListExtraCompat
+import woowacourse.shopping.presentation.model.CartItemUiModel
 
 class OrderActivity :
     AppCompatActivity(),
@@ -44,11 +46,9 @@ class OrderActivity :
     }
 
     private fun setupViewModel() {
-        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
-        val defaultArgs =
-            bundleOf(
-                Extra.KEY_SELECT_PRICE to price,
-            )
+        val selectedItems =
+            intent.getParcelableArrayListExtraCompat<CartItemUiModel>(Extra.KEY_SELECT_ITEMS)
+        val defaultArgs = bundleOf(Extra.KEY_SELECT_ITEMS to selectedItems)
         val creationExtras =
             MutableCreationExtras(defaultViewModelCreationExtras).apply {
                 this[VIEW_MODEL_DEFAULT_ARGS_KEY] = defaultArgs
@@ -111,10 +111,10 @@ class OrderActivity :
     companion object {
         fun newIntent(
             context: Context,
-            totalPrice: Int,
+            selectedCartItem: List<CartItemUiModel>,
         ): Intent =
             Intent(context, OrderActivity::class.java).apply {
-                putExtra(Extra.KEY_SELECT_PRICE, totalPrice)
+                putParcelableArrayListExtra(Extra.KEY_SELECT_ITEMS, ArrayList(selectedCartItem))
             }
 
         private val VIEW_MODEL_DEFAULT_ARGS_KEY = object : CreationExtras.Key<Bundle> {}
