@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
+import woowacourse.shopping.domain.model.OrderPriceSummary
 import woowacourse.shopping.domain.usecase.GetAvailableCouponUseCase
-import woowacourse.shopping.presentation.Extra.KEY_SELECT_PRICE
+import woowacourse.shopping.presentation.Extra.KEY_SELECT_ITEMS
 import woowacourse.shopping.presentation.SingleLiveData
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.model.toPresentation
 
@@ -19,20 +21,27 @@ class OrderViewModel(
 ) : ViewModel() {
     private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
     val coupons: LiveData<List<CouponUiModel>> = _coupons
+    private val _orderSummary: MutableLiveData<OrderPriceSummary> = MutableLiveData()
+    val orderSummary: LiveData<OrderPriceSummary> = _orderSummary
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
-    val orderPrice: LiveData<Int> = savedStateHandle.getLiveData(KEY_SELECT_PRICE, 0)
+    private val initialItems =
+        savedStateHandle.get<ArrayList<CartItemUiModel>>(KEY_SELECT_ITEMS) ?: emptyList()
 
     init {
+        _orderSummary.value =
+            OrderPriceSummary(
+                productTotalPrice = initialItems.sumOf { it.totalPrice },
+                cartItems = initialItems,
+            )
         fetchData()
     }
 
     private fun fetchData() {
-        val orderPrice = orderPrice.value ?: return
+        val orderPrice = _orderSummary.value?.productTotalPrice ?: return
         viewModelScope.launch {
-            getAvailableCouponUseCase
-                .invoke(orderPrice)
+            getAvailableCouponUseCase(orderPrice)
                 .onSuccess { coupons ->
                     _coupons.value = coupons.map { it.toPresentation() }
                 }.onFailure {

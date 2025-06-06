@@ -10,30 +10,36 @@ import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
-import woowacourse.shopping.presentation.Extra.KEY_SELECT_COUNT
-import woowacourse.shopping.presentation.Extra.KEY_SELECT_PRICE
+import woowacourse.shopping.presentation.Extra.KEY_SELECT_ITEMS
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.model.toPresentation
 
 class RecommendViewModel(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
     private val recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel() {
     private lateinit var recentCategory: String
+
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val recommendProducts: LiveData<List<CartItemUiModel>> = _recommendProducts
-
-    val selectedTotalPrice: LiveData<Int> = savedStateHandle.getLiveData(KEY_SELECT_PRICE, 0)
-    val selectedTotalCount: LiveData<Int> = savedStateHandle.getLiveData(KEY_SELECT_COUNT, 0)
-
+    private val _selectedItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
+    val selectedItems: LiveData<List<CartItemUiModel>> = _selectedItems
+    private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData()
+    val selectedTotalPrice: LiveData<Int> = _selectedTotalPrice
+    private val _selectedTotalCount: MutableLiveData<Int> = MutableLiveData()
+    val selectedTotalCount: LiveData<Int> = _selectedTotalCount
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
     init {
+        val initialItems =
+            savedStateHandle.get<ArrayList<CartItemUiModel>>(KEY_SELECT_ITEMS) ?: emptyList()
+        _selectedItems.value = initialItems
+        setupPriceCount(initialItems)
         fetchData()
     }
 
@@ -110,13 +116,18 @@ class RecommendViewModel(
         _recommendProducts.value = updatedItem
     }
 
+    private fun setupPriceCount(items: List<CartItemUiModel>) {
+        _selectedTotalPrice.value = items.sumOf { it.totalPrice }
+        _selectedTotalCount.value = items.sumOf { it.quantity }
+    }
+
     private fun updateSelectedInfo(
         priceDelta: Int,
         countDelta: Int,
     ) {
-        val newPrice = (savedStateHandle.get<Int>(KEY_SELECT_PRICE) ?: 0) + priceDelta
-        val newCount = (savedStateHandle.get<Int>(KEY_SELECT_COUNT) ?: 0) + countDelta
-        savedStateHandle[KEY_SELECT_PRICE] = newPrice
-        savedStateHandle[KEY_SELECT_COUNT] = newCount
+        val oldPrice = _selectedTotalPrice.value ?: return
+        val oldCount = _selectedTotalCount.value ?: return
+        _selectedTotalPrice.value = oldPrice + priceDelta
+        _selectedTotalCount.value = oldCount + countDelta
     }
 }

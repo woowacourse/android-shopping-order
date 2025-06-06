@@ -1,0 +1,41 @@
+package woowacourse.shopping.domain.model
+
+import woowacourse.shopping.presentation.model.CartItemUiModel
+
+data class OrderPriceSummary(
+    val productTotalPrice: Int,
+    val discountAmount: Int = 0,
+    val deliveryFee: Int = 3_000,
+    val cartItems: List<CartItemUiModel>,
+) {
+    val finalPrice: Int
+        get() = productTotalPrice - discountAmount + deliveryFee
+
+    fun applyCoupon(coupon: Coupon): OrderPriceSummary =
+        when (val type = coupon.discountType) {
+            is DiscountType.FixedAmount -> {
+                this.copy(discountAmount = type.amount)
+            }
+
+            is DiscountType.Percentage -> {
+                val discount = (productTotalPrice * type.rate * 0.01).toInt()
+                this.copy(discountAmount = discount)
+            }
+
+            is DiscountType.FreeShipping -> {
+                this.copy(deliveryFee = 0)
+            }
+
+            is DiscountType.BuyXGetY -> {
+                val bogoDiscount = calculateBogoDiscount(type.buyQuantity, type.getQuantity)
+                this.copy(discountAmount = bogoDiscount)
+            }
+        }
+
+    fun canApplyCoupon(coupon: Coupon): Boolean = coupon.isValidForOrder(productTotalPrice)
+
+    private fun calculateBogoDiscount(
+        buyQuantity: Int,
+        getQuantity: Int,
+    ): Int = 0
+}
