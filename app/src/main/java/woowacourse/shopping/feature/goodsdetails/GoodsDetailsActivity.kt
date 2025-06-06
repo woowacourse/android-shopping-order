@@ -21,6 +21,7 @@ import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.GoodsUiModel
 import woowacourse.shopping.feature.QuantityChangeListener
+import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel.Companion.NULL_CART_ID
 import woowacourse.shopping.util.toUi
 
 class GoodsDetailsActivity : AppCompatActivity() {
@@ -30,7 +31,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
             ?: throw IllegalArgumentException("GoodsUiModel is required")
     }
 
-    private val cartId by lazy { intent.getIntExtra(SELECTED_ITEM_CART_ID_KEY, -1) }
+    private val cartId by lazy { intent.getIntExtra(SELECTED_ITEM_CART_ID_KEY, NULL_CART_ID) }
 
     private val viewModel: GoodsDetailsViewModel by viewModels {
         GoodsDetailsViewModelFactory(

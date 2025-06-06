@@ -4,8 +4,10 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.data.carts.CartUpdateError
+import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
@@ -57,18 +59,29 @@ class GoodsDetailsViewModel(
 
     fun addOrUpdateQuantityToCart() {
         cartItem.value?.let { item ->
-            cartRepository.updateQuantity(
-                cartId,
-                CartQuantity(item.quantity),
-                {
-                    alertMessageEvent(R.string.goods_detail_cart_update_complete_toast_message, item.quantity)
-                },
-                { cartUpdateError ->
-                    if (cartUpdateError is CartUpdateError.NotFound) {
-                        addCartItem(item)
-                    }
-                },
-            )
+            viewModelScope.launch {
+                if (cartId == NULL_CART_ID) {
+                    addCartItem(item)
+                } else {
+                    updateCartItem(item)
+                }
+            }
+        }
+    }
+
+    private suspend fun updateCartItem(item: CartItem) {
+        val result = cartRepository.updateQuantity(cartId, CartQuantity(item.quantity))
+        when (result) {
+            is CartUpdateResult.Success -> {
+                alertMessageEvent(
+                    R.string.goods_detail_cart_update_complete_toast_message,
+                    item.quantity,
+                )
+            }
+
+            is CartUpdateResult.Error -> {
+                // todo
+            }
         }
     }
 
@@ -100,5 +113,9 @@ class GoodsDetailsViewModel(
 
     fun loggingRecentViewedGoods(goods: Goods) {
         goodsRepository.loggingRecentGoods(goods) {}
+    }
+
+    companion object {
+        const val NULL_CART_ID = -1
     }
 }

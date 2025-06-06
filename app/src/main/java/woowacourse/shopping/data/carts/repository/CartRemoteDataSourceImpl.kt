@@ -12,6 +12,7 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateError
+import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
@@ -107,41 +108,26 @@ class CartRemoteDataSourceImpl(
             )
     }
 
-    override fun updateCartItemCount(
+    override suspend fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartUpdateError) -> Unit,
-    ) {
-        retrofitService
-            .updateCartCounts(
+    ): CartUpdateResult<Int> {
+        val response =
+            retrofitService.updateCartCounts(
                 cartId = cartId,
                 requestBody = cartQuantity,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                            val errorBody = response.errorBody()?.string() ?: ""
-                            when {
-                                errorBody.contains("cartItem not found") -> onFailure(CartUpdateError.NotFound)
-                                else -> onFailure(CartUpdateError.Server(response.code(), errorBody))
-                            }
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartUpdateError.Network)
-                    }
-                },
             )
+        return if (response.isSuccessful) {
+            CartUpdateResult.Success(response.code())
+        } else {
+            if (response.code() == 400) {
+                CartUpdateResult.Error(CartUpdateError.NotFound)
+            } else {
+                CartUpdateResult.Error(
+                    CartUpdateError.Server(response.code(), response.message()),
+                )
+            }
+        }
     }
 
     override suspend fun deleteItem(cartId: Int): CartFetchResult<Int> =

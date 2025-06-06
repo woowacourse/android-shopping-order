@@ -3,7 +3,7 @@ package woowacourse.shopping.data.carts.repository
 import woowacourse.shopping.data.account.AccountLocalDataSource
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateError
+import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.domain.model.Authorization
@@ -53,23 +53,14 @@ class CartRepositoryImpl(
             offset,
         )
 
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartId: Int,
         cartQuantity: CartQuantity,
-        onComplete: () -> Unit,
-        onFail: (CartUpdateError) -> Unit,
-    ) {
+    ): CartUpdateResult<Int> =
         remoteDataSource.updateCartItemCount(
             cartId = cartId,
             cartQuantity = cartQuantity,
-            onSuccess = { resultCode ->
-                onComplete()
-            },
-            onFailure = { error ->
-                onFail(error)
-            },
         )
-    }
 
     override suspend fun delete(cartId: Int): CartFetchResult<Int> =
         remoteDataSource.deleteItem(

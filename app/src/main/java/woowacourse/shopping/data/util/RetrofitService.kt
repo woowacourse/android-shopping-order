@@ -39,10 +39,10 @@ interface RetrofitService {
     fun requestCartCounts(): Call<CartQuantity>
 
     @PATCH("/cart-items/{id}")
-    fun updateCartCounts(
+    suspend fun updateCartCounts(
         @Path("id") cartId: Int,
         @Body requestBody: CartQuantity,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
     suspend fun deleteCartItem(

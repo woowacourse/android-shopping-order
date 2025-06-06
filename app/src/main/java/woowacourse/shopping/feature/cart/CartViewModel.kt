@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
@@ -121,7 +122,7 @@ class CartViewModel(
             when (val result = cartRepository.fetchAllCartItems()) {
                 is CartFetchResult.Success -> {
                     val allItems = result.data.toCartItems()
-                    _carts.value = allItems.associateBy { it.goods.id }
+                    _carts.value = allItems.associateBy { it.id }
                 }
                 is CartFetchResult.Error -> { // todo 에러 구현 필요
                 }
@@ -256,11 +257,17 @@ class CartViewModel(
     fun getPosition(cartItem: CartItem): Int? = currentPageCarts.value?.indexOf(cartItem)?.takeIf { it >= 0 }
 
     fun increaseQuantity(cartItem: CartItem) {
-        cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
-            updateCartItem(cartItem.id) { item ->
-                item.copy(quantity = item.quantity + 1)
+        viewModelScope.launch {
+            val result = cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
+            when (result) {
+                is CartUpdateResult.Success -> {
+                    updateCartItem(cartItem.id) { item ->
+                        item.copy(quantity = item.quantity + 1)
+                    }
+                }
+                is CartUpdateResult.Error -> TODO()
             }
-        }, {})
+        }
     }
 
     fun removeCartItemOrDecreaseQuantityFromRecommend(cartItem: CartItem) {
@@ -278,12 +285,17 @@ class CartViewModel(
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
-        if (cartItem.quantity - 1 == 0) return
-        cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
-            updateCartItem(cartItem.id) { item ->
-                item.copy(quantity = (item.quantity - 1))
+        viewModelScope.launch {
+            val result = cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1))
+            when (result) {
+                is CartUpdateResult.Success -> {
+                    updateCartItem(cartItem.id) { item ->
+                        item.copy(quantity = (item.quantity - 1))
+                    }
+                }
+                is CartUpdateResult.Error -> TODO()
             }
-        }, {})
+        }
     }
 
     fun delete(cartItem: CartItem) {
@@ -292,7 +304,7 @@ class CartViewModel(
                 is CartFetchResult.Success -> {
                     val currentMap = _carts.value ?: return@launch
                     val newMap = currentMap.toMutableMap()
-                    newMap.remove(cartItem.goods.id)
+                    newMap.remove(cartItem.id)
                     _carts.value = newMap
 
                     val newEndPage = maxOf((newMap.size + PAGE_SIZE - 1) / PAGE_SIZE, 1)

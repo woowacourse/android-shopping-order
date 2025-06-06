@@ -9,6 +9,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
@@ -224,9 +225,13 @@ class GoodsViewModel(
         cartId: Int,
         cartItem: CartItem,
     ) {
-        cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity), {
-            updateCartCacheItem(cartItem)
-        }, {})
+        viewModelScope.launch {
+            val result = cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity))
+            when (result) {
+                is CartUpdateResult.Error -> TODO()
+                is CartUpdateResult.Success -> updateCartCacheItem(cartItem)
+            }
+        }
     }
 
     private fun updateCartCacheItem(cartItem: CartItem) {
