@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -146,8 +148,9 @@ class RecommendViewModel(
     }
 
     private fun loadRecommendedProducts() {
-        productsRepository.loadRecommendedProducts(RECOMMEND_COUNT) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .loadRecommendedProducts(RECOMMEND_COUNT)
                 .onSuccess { recommendedProducts: List<Product> ->
                     _recommendedProducts.postValue(
                         recommendedProducts.map { product -> RecommendProduct(product) },

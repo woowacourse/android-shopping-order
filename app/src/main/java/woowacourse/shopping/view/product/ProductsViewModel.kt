@@ -3,6 +3,8 @@ package woowacourse.shopping.view.product
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -37,38 +39,41 @@ class ProductsViewModel(
     }
 
     fun loadCart() {
-        cartRepository.loadCart { result ->
-            result
-                .onSuccess { cartItems: List<CartItem> ->
-                    this.cartItems = cartItems
-                    _cartItemsSize.postValue(cartItems.sumOf { it.quantity })
-                    loadRecentViewedProducts()
-                }.onFailure {
-                    _event.postValue(ProductsEvent.LOAD_SHOPPING_CART_FAILURE)
-                }
+        viewModelScope.launch {
+            cartRepository.loadCart { result ->
+                result
+                    .onSuccess { cartItems: List<CartItem> ->
+                        this@ProductsViewModel.cartItems = cartItems
+                        _cartItemsSize.postValue(cartItems.sumOf { it.quantity })
+                        loadRecentViewedProducts()
+                    }.onFailure {
+                        _event.value = ProductsEvent.LOAD_SHOPPING_CART_FAILURE
+                    }
+            }
         }
     }
 
     private fun loadRecentViewedProducts() {
-        productsRepository.loadRecentViewedProducts { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .loadRecentViewedProducts()
                 .onSuccess { products: List<Product> ->
                     val recentViewedProductsItem = ProductsItem.RecentViewedProductsItem(products)
                     loadProducts(recentViewedProductsItem)
                 }.onFailure {
-                    _event.postValue(ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE)
+                    _event.value = ProductsEvent.LOAD_RECENT_PRODUCTS_FAILURE
                     loadProducts(ProductsItem.RecentViewedProductsItem(emptyList()))
                 }
         }
     }
 
     private fun loadProducts(recentViewedProductsItem: ProductsItem.RecentViewedProductsItem) {
-        productsRepository.loadPageableProducts(
-            page = page,
-            size = LOAD_PRODUCTS_SIZE,
-        ) { result ->
-            result
-                .onSuccess { pageableProducts: Pageable<Product> ->
+        viewModelScope.launch {
+            productsRepository
+                .loadPageableProducts(
+                    page = page,
+                    size = LOAD_PRODUCTS_SIZE,
+                ).onSuccess { pageableProducts: Pageable<Product> ->
                     val productItems =
                         pageableProducts.items.map { product: Product ->
                             ProductsItem.ProductItem(
@@ -81,22 +86,23 @@ class ProductsViewModel(
                             )
                         }
                     val loadItem = ProductsItem.LoadItem(pageableProducts.hasNext)
-                    _productsItems.postValue(listOf(recentViewedProductsItem) + productItems + loadItem)
+                    _productsItems.value =
+                        listOf(recentViewedProductsItem) + productItems + loadItem
                     Thread.sleep(1000)
-                    loading.postValue(false)
+                    loading.value = false
                 }.onFailure {
-                    _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
+                    _event.value = ProductsEvent.LOAD_MORE_PRODUCT_FAILURE
                 }
         }
     }
 
     fun loadMoreProducts() {
-        productsRepository.loadPageableProducts(
-            ++page,
-            LOAD_PRODUCTS_SIZE,
-        ) { result: Result<Pageable<Product>> ->
-            result
-                .onSuccess { pageableProducts: Pageable<Product> ->
+        viewModelScope.launch {
+            productsRepository
+                .loadPageableProducts(
+                    ++page,
+                    LOAD_PRODUCTS_SIZE,
+                ).onSuccess { pageableProducts: Pageable<Product> ->
                     val recentViewedProductsItem =
                         productsItems.value?.first() ?: ProductsItem.RecentViewedProductsItem(
                             emptyList(),
@@ -117,9 +123,10 @@ class ProductsViewModel(
                         }
                     val loadItem = ProductsItem.LoadItem(pageableProducts.hasNext)
 
-                    _productsItems.postValue(listOf(recentViewedProductsItem) + oldProductItems + productItems + loadItem)
+                    _productsItems.value =
+                        listOf(recentViewedProductsItem) + oldProductItems + productItems + loadItem
                 }.onFailure {
-                    _event.postValue(ProductsEvent.LOAD_MORE_PRODUCT_FAILURE)
+                    _event.value = ProductsEvent.LOAD_MORE_PRODUCT_FAILURE
                 }
         }
     }
@@ -128,24 +135,26 @@ class ProductsViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val cartItemId = cartItems.find { it.productId == productId }?.id
-        if (cartItemId == null) {
-            cartRepository.addCartItem(productId, quantity) { result ->
-                result
-                    .onSuccess {
-                        loadCart()
-                    }.onFailure {
-                        _event.postValue(ProductsEvent.ADD_CART_ITEM_FAILURE)
-                    }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
-                result
-                    .onSuccess {
-                        loadCart()
-                    }.onFailure {
-                        _event.postValue(ProductsEvent.PLUS_CART_ITEM_FAILURE)
-                    }
+        viewModelScope.launch {
+            val cartItemId = cartItems.find { it.productId == productId }?.id
+            if (cartItemId == null) {
+                cartRepository.addCartItem(productId, quantity) { result ->
+                    result
+                        .onSuccess {
+                            loadCart()
+                        }.onFailure {
+                            _event.value = ProductsEvent.ADD_CART_ITEM_FAILURE
+                        }
+                }
+            } else {
+                cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
+                    result
+                        .onSuccess {
+                            loadCart()
+                        }.onFailure {
+                            _event.value = ProductsEvent.PLUS_CART_ITEM_FAILURE
+                        }
+                }
             }
         }
     }
@@ -154,26 +163,28 @@ class ProductsViewModel(
         productId: Long,
         quantity: Int,
     ) {
-        val cartItemId = cartItems.find { it.productId == productId }?.id ?: error("")
-        if (quantity == 0) {
-            cartRepository.remove(
-                cartItemId = cartItemId,
-            ) { result ->
-                result
-                    .onSuccess {
-                        loadCart()
-                    }.onFailure {
-                        _event.postValue(ProductsEvent.REMOVE_CART_ITEM_FAILURE)
-                    }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
-                result
-                    .onSuccess {
-                        loadCart()
-                    }.onFailure {
-                        _event.postValue(ProductsEvent.MINUS_CART_ITEM_FAILURE)
-                    }
+        viewModelScope.launch {
+            val cartItemId = cartItems.find { it.productId == productId }?.id ?: error("")
+            if (quantity == 0) {
+                cartRepository.remove(
+                    cartItemId = cartItemId,
+                ) { result ->
+                    result
+                        .onSuccess {
+                            loadCart()
+                        }.onFailure {
+                            _event.value = ProductsEvent.REMOVE_CART_ITEM_FAILURE
+                        }
+                }
+            } else {
+                cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
+                    result
+                        .onSuccess {
+                            loadCart()
+                        }.onFailure {
+                            _event.value = ProductsEvent.MINUS_CART_ITEM_FAILURE
+                        }
+                }
             }
         }
     }

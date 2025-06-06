@@ -13,44 +13,36 @@ import woowacourse.shopping.data.product.source.RemoteProductsDataSource
 import woowacourse.shopping.domain.Pageable
 import woowacourse.shopping.domain.product.Product
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
 class DefaultProductsRepository(
     private val productsDataSource: ProductsDataSource = RemoteProductsDataSource(),
     private val recentViewedProductsDataSource: RecentViewedProductsDataSource = LocalRecentViewedProductsDataSource,
     private val cartDataSource: CartDataSource = RemoteCartDataSource(),
 ) : ProductsRepository {
-    override fun loadPageableProducts(
+    override suspend fun loadPageableProducts(
         page: Int,
         size: Int,
-        onLoad: (Result<Pageable<Product>>) -> Unit,
-    ) {
-        {
-            val pageableProductData: PageableProductData =
-                productsDataSource.pageableProducts(
-                    page = page,
-                    size = size,
-                )
+    ): Result<Pageable<Product>> {
+        val pageableProductData: PageableProductData =
+            productsDataSource.pageableProducts(page = page, size = size)
+
+        return runCatching {
             Pageable<Product>(
                 items = pageableProductData.products.map { it.toDomain() },
                 hasPrevious = false,
                 hasNext = pageableProductData.loadable,
             )
-        }.runAsync(onLoad)
+        }
     }
 
-    override fun getProductById(
-        id: Long,
-        onLoad: (Result<Product?>) -> Unit,
-    ) {
-        {
+    override suspend fun getProductById(id: Long): Result<Product?> =
+        runCatching {
             val productEntity: ProductEntity? = productsDataSource.getProductById(id)
             productEntity?.toDomain()
-        }.runAsync(onLoad)
-    }
+        }
 
-    override fun loadLatestViewedProduct(onLoad: (productId: Result<Product?>) -> Unit) {
-        {
+    override suspend fun loadLatestViewedProduct(): Result<Product?> =
+        runCatching {
             val productId: Long? =
                 recentViewedProductsDataSource.load().maxByOrNull { it.viewedAt }?.productId
             if (productId == null) {
@@ -58,11 +50,10 @@ class DefaultProductsRepository(
             } else {
                 productsDataSource.getProductById(productId)?.toDomain()
             }
-        }.runAsync(onLoad)
-    }
+        }
 
-    override fun loadRecentViewedProducts(onLoad: (Result<List<Product>>) -> Unit) {
-        {
+    override suspend fun loadRecentViewedProducts(): Result<List<Product>> =
+        runCatching {
             recentViewedProductsDataSource
                 .load()
                 .sortedByDescending { it.viewedAt }
@@ -71,28 +62,20 @@ class DefaultProductsRepository(
                         .getProductById(recentViewedProductEntity.productId)
                         ?.toDomain()
                 }
-        }.runAsync(onLoad)
-    }
+        }
 
-    override fun addViewedProduct(
-        product: Product,
-        onLoad: (Result<Unit>) -> Unit,
-    ) {
-        {
+    override suspend fun addViewedProduct(product: Product): Result<Unit> =
+        runCatching {
             recentViewedProductsDataSource.upsert(
                 RecentViewedProductEntity(
                     productId = product.id,
                     viewedAt = LocalDateTime.now(),
                 ),
             )
-        }.runAsync(onLoad)
-    }
+        }
 
-    override fun loadRecommendedProducts(
-        size: Int,
-        onLoad: (Result<List<Product>>) -> Unit,
-    ) {
-        {
+    override suspend fun loadRecommendedProducts(size: Int): Result<List<Product>> =
+        runCatching {
             val latestViewedProductId: Long =
                 recentViewedProductsDataSource.load().maxByOrNull { it.viewedAt }?.productId
                     ?: error(NO_RECENT_VIEWED_PRODUCT_ERROR_MESSAGE)
@@ -110,15 +93,7 @@ class DefaultProductsRepository(
                     product.id in cart.map { cartItem: CartItemEntity -> cartItem.productId }
                 }.map { it.toDomain() }
                 .take(size)
-        }.runAsync(onLoad)
-    }
-
-    private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {
-        thread {
-            val result = runCatching(this)
-            onResult(result)
         }
-    }
 
     companion object {
         private const val NO_RECENT_VIEWED_PRODUCT_ERROR_MESSAGE = "가장 최근 본 상품을 조회할 수 없습니다."
