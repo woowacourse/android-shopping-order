@@ -3,6 +3,7 @@ package woowacourse.shopping.data.carts.repository
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,16 +14,23 @@ import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.HeaderInterceptor
 import woowacourse.shopping.data.util.RetrofitService
-import woowacourse.shopping.domain.model.Authorization
 
 class CartRemoteDataSourceImpl(
     baseUrl: String = BuildConfig.BASE_URL,
 ) : CartRemoteDataSource {
+    private val client =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(HeaderInterceptor())
+            .build()
+
     private val retrofitService: RetrofitService =
         Retrofit
             .Builder()
             .baseUrl(baseUrl)
+            .client(client)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(RetrofitService::class.java)
@@ -34,7 +42,7 @@ class CartRemoteDataSourceImpl(
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
-            .requestCartProduct(page = page, size = size, authorization = "Basic " + Authorization.basicKey)
+            .requestCartProduct(page = page, size = size)
             .enqueue(
                 object : Callback<CartResponse> {
                     override fun onResponse(
@@ -72,7 +80,7 @@ class CartRemoteDataSourceImpl(
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
-            .requestCartCounts(authorization = "Basic " + Authorization.basicKey)
+            .requestCartCounts()
             .enqueue(
                 object : Callback<CartQuantity> {
                     override fun onResponse(
@@ -102,7 +110,7 @@ class CartRemoteDataSourceImpl(
         onFailure: (CartFetchError) -> Unit,
     ) {
         retrofitService
-            .requestCartCounts(authorization = "Basic $validKey")
+            .requestCartCounts()
             .enqueue(
                 object : Callback<CartQuantity> {
                     override fun onResponse(
@@ -132,7 +140,6 @@ class CartRemoteDataSourceImpl(
             .updateCartCounts(
                 cartId = cartId,
                 requestBody = cartQuantity,
-                authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
                 object : Callback<Unit> {
                     override fun onResponse(
@@ -168,7 +175,6 @@ class CartRemoteDataSourceImpl(
         retrofitService
             .deleteCartItem(
                 cartId = cartId,
-                authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
                 object : Callback<Unit> {
                     override fun onResponse(
@@ -201,7 +207,6 @@ class CartRemoteDataSourceImpl(
         retrofitService
             .addCartItem(
                 cartItem = CartItemRequest(itemId, itemCount),
-                authorization = "Basic " + Authorization.basicKey,
             ).enqueue(
                 object : Callback<Unit> {
                     override fun onResponse(

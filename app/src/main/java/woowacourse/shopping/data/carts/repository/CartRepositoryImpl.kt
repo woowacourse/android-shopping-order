@@ -1,20 +1,40 @@
 package woowacourse.shopping.data.carts.repository
 
+import woowacourse.shopping.data.account.AccountLocalDataSource
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.Goods
 
 class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource,
+    private val accountLocalDataSource: AccountLocalDataSource,
 ) : CartRepository {
+    override fun saveBasicKey(
+        onResponse: () -> Unit,
+        onFail: () -> Unit,
+    ) {
+        accountLocalDataSource.saveBasicKey(Authorization.basicKey, onResponse, onFail)
+    }
+
     override fun checkValidBasicKey(
-        validKey: String,
+        basicKey: String,
         onResponse: (Int) -> Unit,
         onFail: (CartFetchError) -> Unit,
     ) {
-        remoteDataSource.fetchAuthCode(validKey, onResponse, onFail)
+        remoteDataSource.fetchAuthCode(basicKey, onResponse, onFail)
+    }
+
+    override fun checkValidLocalSavedBasicKey(
+        onResponse: (Int) -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    ) {
+        accountLocalDataSource.loadBasicKey({ basicKey ->
+            Authorization.setBasicKey(basicKey)
+            remoteDataSource.fetchAuthCode(basicKey, onResponse, onFail)
+        }, { })
     }
 
     override fun fetchAllCartItems(
@@ -104,9 +124,5 @@ class CartRepositoryImpl(
         onFail: (CartFetchError) -> Unit,
     ) {
         remoteDataSource.addItem(goods.id, quantity, onComplete, onFail)
-    }
-
-    override fun getAllItemsSize(onComplete: (Int) -> Unit) {
-        // Todo
     }
 }

@@ -6,4 +6,9 @@ interface AccountLocalDataSource {
         onComplete: () -> Unit,
         onFail: () -> Unit,
     )
+
+    fun loadBasicKey(
+        onComplete: (basicKey: String) -> Unit,
+        onFail: () -> Unit,
+    )
 }

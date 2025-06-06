@@ -12,15 +12,15 @@ object Authorization {
         _isLogin = status
     }
 
-    fun setBasicKey(basicKey: String) {
-        _basicKey = basicKey
-    }
-
-    fun getBasicKey(
+    fun setBasicKeyByIdPw(
         id: String,
         pw: String,
-    ): String {
+    ) {
         val bytes = ("$id:$pw").toByteArray(Charsets.UTF_8)
-        return Base64.getEncoder().encodeToString(bytes)
+        setBasicKey(Base64.getEncoder().encodeToString(bytes))
+    }
+
+    fun setBasicKey(basicKey: String) {
+        _basicKey = basicKey
     }
 }

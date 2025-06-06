@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
+import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
@@ -20,7 +21,7 @@ class CartActivity : AppCompatActivity() {
 
     val sharedViewModelFactory by lazy {
         CartViewModelFactory(
-            CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            CartRepositoryImpl(CartRemoteDataSourceImpl(), AccountLocalDataSourceImpl(this)),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
                 GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),

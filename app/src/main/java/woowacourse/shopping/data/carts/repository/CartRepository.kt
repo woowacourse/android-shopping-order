@@ -7,8 +7,18 @@ import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface CartRepository {
+    fun saveBasicKey(
+        onResponse: () -> Unit,
+        onFail: () -> Unit,
+    )
+
     fun checkValidBasicKey(
-        validKey: String,
+        basicKey: String,
+        onResponse: (Int) -> Unit,
+        onFail: (CartFetchError) -> Unit,
+    )
+
+    fun checkValidLocalSavedBasicKey(
         onResponse: (Int) -> Unit,
         onFail: (CartFetchError) -> Unit,
     )
@@ -44,8 +54,6 @@ interface CartRepository {
         onComplete: (Int) -> Unit,
         onFail: (CartFetchError) -> Unit,
     )
-
-    fun getAllItemsSize(onComplete: (Int) -> Unit)
 
     fun addCartItem(
         goods: Goods,

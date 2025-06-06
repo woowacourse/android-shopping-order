@@ -85,6 +85,7 @@ class GoodsViewModel(
     }
 
     fun initialize() {
+        login()
         appendCartItemsWithZeroQuantity()
     }
 
@@ -98,9 +99,8 @@ class GoodsViewModel(
             ?.id ?: -1
     }
 
-    fun login(basicKey: String) {
-        Authorization.setBasicKey(basicKey)
-        cartRepository.checkValidBasicKey(basicKey, { response ->
+    fun login() {
+        cartRepository.checkValidLocalSavedBasicKey({ response ->
             when {
                 response == 200 -> Authorization.setLoginStatus(true)
                 else -> Authorization.setLoginStatus(false)

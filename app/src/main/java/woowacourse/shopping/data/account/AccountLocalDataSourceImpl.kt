@@ -22,4 +22,15 @@ class AccountLocalDataSourceImpl(
             onFail()
         }
     }
+
+    override fun loadBasicKey(
+        onComplete: (basicKey: String) -> Unit,
+        onFail: () -> Unit,
+    ) {
+        try {
+            sharedPreferences.getString("basicKey", "")?.let { onComplete(it) }
+        } catch (e: Exception) {
+            onFail()
+        }
+    }
 }

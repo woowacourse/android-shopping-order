@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.goods
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
+import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
@@ -39,9 +39,10 @@ import woowacourse.shopping.util.toUi
 class GoodsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsBinding
     private lateinit var navbarBinding: MenuCartNavbarBinding
+
     private val viewModel: GoodsViewModel by viewModels {
         GoodsViewModelFactory(
-            CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            CartRepositoryImpl(CartRemoteDataSourceImpl(), AccountLocalDataSourceImpl(this)),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
                 GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
@@ -135,8 +136,6 @@ class GoodsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val sharedPreferences = getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
-        sharedPreferences.getString("basicKey", "")?.let { viewModel.login(it) }
         viewModel.fetchAndSetCartCache()
         viewModel.updateRecentlyViewedGoods()
     }

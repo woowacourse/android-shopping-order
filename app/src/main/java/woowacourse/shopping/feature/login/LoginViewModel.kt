@@ -10,8 +10,8 @@ import woowacourse.shopping.util.SingleLiveData
 class LoginViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _loginSuccessEvent = MutableSingleLiveData<String>()
-    val loginSuccessEvent: SingleLiveData<String> get() = _loginSuccessEvent
+    private val _loginSuccessEvent = MutableSingleLiveData<Unit>()
+    val loginSuccessEvent: SingleLiveData<Unit> get() = _loginSuccessEvent
     private val _loginErrorEvent = MutableSingleLiveData<LoginError>()
     val loginErrorEvent: SingleLiveData<LoginError> get() = _loginErrorEvent
     val id = ObservableField<String>("")
@@ -20,11 +20,15 @@ class LoginViewModel(
     fun login() {
         val idValue = id.get() ?: ""
         val pwValue = pw.get() ?: ""
+        Authorization.setBasicKeyByIdPw(idValue, pwValue)
         cartRepository.checkValidBasicKey(
-            Authorization.getBasicKey(idValue, pwValue),
+            Authorization.basicKey,
             { response ->
                 when (response) {
-                    200 -> _loginSuccessEvent.postValue(Authorization.getBasicKey(idValue, pwValue))
+                    200 -> {
+                        Authorization.setLoginStatus(true)
+                        saveBasicKey()
+                    }
                     else -> _loginErrorEvent.postValue(LoginError.NotFound)
                 }
             },
@@ -32,5 +36,13 @@ class LoginViewModel(
                 _loginErrorEvent.postValue(LoginError.Network)
             },
         )
+    }
+
+    private fun saveBasicKey() {
+        cartRepository.saveBasicKey({
+            _loginSuccessEvent.postValue(Unit)
+        }, {
+            _loginErrorEvent.postValue(LoginError.NotFound)
+        })
     }
 }
