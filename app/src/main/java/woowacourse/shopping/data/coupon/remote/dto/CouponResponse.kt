@@ -9,16 +9,16 @@ import woowacourse.shopping.domain.coupon.Coupon
 
 @Serializable
 data class CouponResponse(
-    val availableTime: AvailableTime?,
-    val buyQuantity: Int?,
+    val availableTime: AvailableTime? = null,
+    val buyQuantity: Int? = null,
     val code: String,
     val description: String,
-    val discount: Int?,
+    val discount: Int? = null,
     val discountType: String,
     val expirationDate: String,
-    val getQuantity: Int?,
+    val getQuantity: Int? = null,
     val id: Int,
-    val minimumAmount: Int?,
+    val minimumAmount: Int? = null,
 ) {
     fun toDomain(): Coupon {
         return when (discountType) {

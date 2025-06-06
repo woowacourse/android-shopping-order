@@ -35,6 +35,9 @@
     <!-- 장바구니 추천 페이지 -->
     <string name="shopping_cart_recommend_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="shopping_cart_recommend_title">이런 상품은 어떠세요?</string>
+
+    <!-- 주문 페이지 -->
+    <string name="order_complete">주문이 완료되었습니다</string>
     <string name="available_coupon">적용 가능한 쿠폰</string>
     <string name="available_coupon_description">* 쿠폰은 1개만 적용 가능합니다.</string>
     <string name="totalPriceTitle">주문 금액</string>

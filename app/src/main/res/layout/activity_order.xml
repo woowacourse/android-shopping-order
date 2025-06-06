@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <data>
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.order.OrderViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -40,6 +47,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/shoppingCartBackButton"
                 app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.core.widget.NestedScrollView
@@ -82,20 +90,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/couponTitle" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/coupons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="26dp"
-                    android:layout_marginBottom="21dp"
-                    app:layout_constraintBottom_toTopOf="@id/divider1"
-                    app:layout_constraintTop_toBottomOf="@id/couponDescription"
-                    app:layout_constraintVertical_bias="0.0"
-                    tools:itemCount="10"
-
-                    tools:layout_editor_absoluteX="-16dp"
-                    tools:listitem="@layout/item_coupon" />
-
                 <View
                     android:id="@+id/divider1"
                     android:layout_width="0dp"
@@ -117,6 +111,7 @@
                     android:textStyle="normal"
                     app:layout_constraintBottom_toTopOf="@id/couponDiscount"
                     app:layout_constraintEnd_toEndOf="parent"
+                    android:text="@{@string/product_price_format(viewModel.orderState.totalPrice)}"
                     tools:text="204,200원" />
 
                 <TextView
@@ -141,6 +136,7 @@
                     android:textColor="@color/gray_5"
                     android:textSize="18sp"
                     android:textStyle="normal"
+                    android:text="@{@string/product_price_format(viewModel.orderState.discountPrice)}"
                     app:layout_constraintBottom_toTopOf="@id/shippingFee"
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:text="-5,000원" />
@@ -167,6 +163,7 @@
                     android:textColor="@color/gray_5"
                     android:textSize="18sp"
                     android:textStyle="normal"
+                    android:text="@{@string/product_price_format(viewModel.orderState.shippingFee)}"
                     app:layout_constraintBottom_toTopOf="@id/divider2"
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:text="3,000원" />
@@ -203,6 +200,7 @@
                     android:textColor="@color/gray_5"
                     android:textSize="18sp"
                     android:textStyle="normal"
+                    android:text="@{@string/product_price_format(viewModel.orderState.finalPrice)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/finalPriceTitle"
                     tools:text="202,200원" />
@@ -221,6 +219,7 @@
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
+                    android:onClick="@{()->viewModel.proceedOrder()}"
                     android:id="@+id/orderButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -232,6 +231,14 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/coupons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:itemCount="10"
+
+                    tools:listitem="@layout/item_coupon" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
 

@@ -8,16 +8,23 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.getSerializableExtraData
+import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.product.ProductsActivity
 
 class OrderActivity : AppCompatActivity() {
     private val binding: ActivityOrderBinding by lazy {
         ActivityOrderBinding.inflate(layoutInflater)
     }
     private lateinit var shoppingCartProductsToOrder: List<ShoppingCartProduct>
-    private val viewModel: OrderViewModel by viewModels()
+    private val viewModel: OrderViewModel by viewModels {
+        OrderViewModel.factory(
+            shoppingCartProductsToOrder,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +42,32 @@ class OrderActivity : AppCompatActivity() {
             )?.toList() ?: emptyList()
 
         bindViewModel()
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        viewModel.event.observe(this) { event ->
+            when (event) {
+                OrderEvent.ORDER_SUCCESS -> {
+                    binding.root.showSnackBar(getString(R.string.order_complete))
+                    backToProducts()
+                }
+
+                OrderEvent.ORDER_PROCEEDING -> Unit
+            }
+        }
     }
 
     private fun bindViewModel() {
         binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+    }
+
+    private fun backToProducts() {
+        Intent(this, ProductsActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(this)
+        }
     }
 
     companion object {

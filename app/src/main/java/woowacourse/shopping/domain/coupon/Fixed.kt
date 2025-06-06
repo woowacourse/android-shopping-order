@@ -1,11 +1,11 @@
 package woowacourse.shopping.domain.coupon
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class Fixed(
     override val description: String,
     override val code: String,
-    override val explanationDate: LocalDateTime,
+    override val explanationDate: LocalDate,
     override val id: Long,
     override val discountType: DiscountType = DiscountType.FIXED,
     val discount: Int,
