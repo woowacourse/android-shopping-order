@@ -33,7 +33,7 @@ class RecommendationFragmentViewModel(
         recentlyViewedProductRepository.getLatestViewedProduct { product ->
             catalogProductRepository.getProduct(product.id) { categoryProduct ->
                 val category = categoryProduct.category ?: ""
-                catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
+                catalogProductRepository.getRecommendedProducts(category, ZERO, TOTAL_RECOMMENDATION_PRODUCTS_COUNT) { products ->
                     _recommendedProducts.postValue(products)
                 }
             }
@@ -49,23 +49,23 @@ class RecommendationFragmentViewModel(
     fun fetchPurchasePrice() {
         val amount =
             _recommendedProducts.value?.sumOf { it.price * it.quantity }
-                ?: 0
+                ?: INITIAL_TOTAL_PURCHASE_PRICE
         _totalPurchasePrice.postValue(amount)
     }
 
     fun increaseQuantity(product: ProductUiModel) {
         when (product.quantity) {
             0 -> {
-                val newProduct = product.copy(quantity = 1)
+                val newProduct = product.copy(quantity = A_COUNT)
                 cartProductRepository.insertCartProduct(newProduct) { product ->
                     updateItem(product)
                 }
             }
 
             else -> {
-                cartProductRepository.updateProduct(product, product.quantity + 1) { success ->
+                cartProductRepository.updateProduct(product, product.quantity + A_COUNT) { success ->
                     if (success) {
-                        val newProduct = product.copy(quantity = product.quantity + 1)
+                        val newProduct = product.copy(quantity = product.quantity + A_COUNT)
                         updateItem(newProduct)
                     }
                 }
@@ -76,7 +76,7 @@ class RecommendationFragmentViewModel(
     fun decreaseQuantity(product: ProductUiModel) {
         when (product.quantity) {
             1 -> {
-                val newProduct = product.copy(quantity = 0)
+                val newProduct = product.copy(quantity = INITIAL_PRODUCT_COUNT)
                 cartProductRepository.deleteCartProduct(product) { success ->
                     if (success) {
                         updateItem(newProduct)
@@ -85,8 +85,8 @@ class RecommendationFragmentViewModel(
             }
 
             else -> {
-                val newProduct = product.copy(quantity = product.quantity - 1)
-                cartProductRepository.updateProduct(product, product.quantity - 1) { success ->
+                val newProduct = product.copy(quantity = product.quantity - A_COUNT)
+                cartProductRepository.updateProduct(product, product.quantity - A_COUNT) { success ->
                     if (success) {
                         updateItem(newProduct)
                     }
@@ -107,5 +107,9 @@ class RecommendationFragmentViewModel(
     companion object {
         private const val INITIAL_TOTAL_PURCHASE_PRICE: Int = 0
         private const val INITIAL_SELECTED_PRODUCTS_COUNT: Int = 0
+        private const val INITIAL_PRODUCT_COUNT: Int = 0
+        private const val A_COUNT: Int = 1
+        private const val ZERO: Int = 0
+        private const val TOTAL_RECOMMENDATION_PRODUCTS_COUNT: Int = 10
     }
 }
