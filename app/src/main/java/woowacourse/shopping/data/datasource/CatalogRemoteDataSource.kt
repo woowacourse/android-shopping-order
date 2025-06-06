@@ -4,22 +4,13 @@ import woowacourse.shopping.data.dto.product.ProductContent
 import woowacourse.shopping.data.dto.product.ProductResponse
 
 interface CatalogRemoteDataSource {
-    fun fetchProducts(
+    suspend fun fetchProducts(
         category: String?,
         page: Int,
         size: Int,
-        onSuccess: (ProductResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): ProductResponse
 
-    fun fetchAllProducts(
-        onSuccess: (ProductResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun fetchAllProducts(): ProductResponse
 
-    fun fetchProductDetail(
-        id: Long,
-        onSuccess: (ProductContent) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun fetchProductDetail(id: Long): ProductContent
 }

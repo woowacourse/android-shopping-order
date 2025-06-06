@@ -1,5 +1,9 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.CatalogRemoteDataSource
 import woowacourse.shopping.data.dto.product.toUiModel
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -7,91 +11,68 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class RemoteCatalogProductRepositoryImpl(
     private val remoteDataSource: CatalogRemoteDataSource,
 ) : CatalogProductRepository {
-    override fun getRecommendedProducts(
+    override suspend fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        remoteDataSource.fetchProducts(
-            category = category,
-            page = page,
-            size = size,
-            onSuccess = { response ->
-                val products = response.productContent.map { it.toUiModel() }
-                callback(products)
-            },
-            onFailure = {
-                callback(emptyList())
-            },
-        )
-    }
-
-    override fun getAllProductsSize(callback: (Long) -> Unit) {
-        remoteDataSource.fetchAllProducts(
-            onSuccess = { response -> callback(response.totalElements) },
-            onFailure = { callback(0) },
-        )
-    }
-
-    override fun getCartProductsByIds(
-        productIds: List<Long>,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        val resultsMap = mutableMapOf<Long, ProductUiModel>()
-        var completedCount = 0
-
-        if (productIds.isEmpty()) {
-            callback(emptyList())
-            return
+    ): List<ProductUiModel> =
+        try {
+            remoteDataSource
+                .fetchProducts(
+                    category = category,
+                    page = page,
+                    size = size,
+                ).productContent
+                .map { it.toUiModel() }
+        } catch (e: Exception) {
+            emptyList()
         }
 
-        productIds.forEach { uid ->
-            getProduct(
-                productId = uid,
-                onSuccess = { product ->
-                    resultsMap[uid] = product
-                    completedCount++
-                    if (completedCount == productIds.size) {
-                        callback(productIds.mapNotNull { resultsMap[it] })
+    override suspend fun getAllProductsSize(): Long =
+        try {
+            remoteDataSource.fetchAllProducts().totalElements
+        } catch (e: Exception) {
+            0
+        }
+
+    override suspend fun getCartProductsByIds(productIds: List<Long>): List<ProductUiModel> {
+        if (productIds.isEmpty()) return emptyList()
+
+        return coroutineScope {
+            val deferredProducts: List<Deferred<ProductUiModel?>> =
+                productIds.map {
+                    async {
+                        getProduct(it)
                     }
-                },
-                onFailure = {
-                    completedCount++
-                    if (completedCount == productIds.size) {
-                        callback(productIds.mapNotNull { resultsMap[it] })
-                    }
-                },
-            )
+                }
+
+            deferredProducts
+                .awaitAll()
+                .filterNotNull()
+                .sortedBy { (id, _) -> productIds.indexOf(id) }
         }
     }
 
-    override fun getProductsByPage(
+    override suspend fun getProductsByPage(
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        remoteDataSource.fetchProducts(
-            category = null,
-            page = page,
-            size = size,
-            onSuccess = { response ->
-                val products = response.productContent.map { it.toUiModel() }
-                callback(products)
-            },
-            onFailure = { callback(emptyList()) },
-        )
-    }
+    ): List<ProductUiModel> =
+        try {
+            remoteDataSource
+                .fetchProducts(
+                    category = null,
+                    page = page,
+                    size = size,
+                ).productContent
+                .map { it.toUiModel() }
+        } catch (e: Exception) {
+            emptyList()
+        }
 
-    override fun getProduct(
-        productId: Long,
-        onSuccess: (ProductUiModel) -> Unit,
-        onFailure: () -> Unit,
-    ) {
-        remoteDataSource.fetchProductDetail(
-            id = productId,
-            onSuccess = { content -> onSuccess(content.toUiModel()) },
-            onFailure = { onFailure() },
-        )
-    }
+    override suspend fun getProduct(productId: Long): ProductUiModel? =
+        try {
+            remoteDataSource.fetchProductDetail(productId).toUiModel()
+        } catch (e: Exception) {
+            null
+        }
 }
