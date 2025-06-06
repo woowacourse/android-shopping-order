@@ -4,17 +4,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.api.CouponApi
 import woowacourse.shopping.data.model.response.CouponResponse.Companion.toDomain
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponDetail.Companion.toCoupon
-import woowacourse.shopping.domain.model.Coupons
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepository(
     private val api: CouponApi,
 ) : CouponRepository {
-    override suspend fun fetchAllCoupons(): Result<Coupons> =
+    override suspend fun fetchAllCoupons(): Result<List<Coupon>> =
         withContext(Dispatchers.IO) {
             runCatching {
-                Coupons(api.getCoupons().mapNotNull { it.toDomain()?.toCoupon() })
+                api.getCoupons().mapNotNull { it.toDomain()?.toCoupon() }
             }
         }
 }
