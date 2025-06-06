@@ -4,9 +4,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.carts.AddItemResult
@@ -54,30 +51,16 @@ class CartRemoteDataSourceImpl(
             CartFetchResult.Error(CartFetchError.Network)
         }
 
-    override fun fetchAuthCode(
-        validKey: String,
-        onResponse: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartCounts()
-            .enqueue(
-                object : Callback<CartQuantity> {
-                    override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
-                    ) {
-                        onResponse(response.code())
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartQuantity>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
+    override suspend fun fetchAuthCode(validKey: String): CartFetchResult<Int> {
+        try {
+            val response = retrofitService.requestCartCounts()
+            return when {
+                response.isSuccessful -> CartFetchResult.Success(response.code())
+                else -> CartFetchResult.Error(CartFetchError.Server(response.code(), response.message()))
+            }
+        } catch (e: Exception) {
+            return CartFetchResult.Error(CartFetchError.Network)
+        }
     }
 
     override suspend fun updateCartItemCount(

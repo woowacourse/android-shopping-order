@@ -104,12 +104,20 @@ class GoodsViewModel(
     }
 
     fun login() {
-        cartRepository.checkValidLocalSavedBasicKey({ response ->
-            when {
-                response == 200 -> Authorization.setLoginStatus(true)
-                else -> Authorization.setLoginStatus(false)
+        viewModelScope.launch {
+            val result = cartRepository.checkValidLocalSavedBasicKey()
+            when (result) {
+                is CartFetchResult.Error -> {
+                    // todo
+                }
+                is CartFetchResult.Success -> {
+                    when {
+                        result.data == 200 -> Authorization.setLoginStatus(true)
+                        else -> Authorization.setLoginStatus(false)
+                    }
+                }
             }
-        }, {})
+        }
     }
 
     fun onCartClicked() {

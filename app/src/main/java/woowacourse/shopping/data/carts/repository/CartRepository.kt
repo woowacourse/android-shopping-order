@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
@@ -9,21 +8,11 @@ import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface CartRepository {
-    fun saveBasicKey(
-        onResponse: () -> Unit,
-        onFail: () -> Unit,
-    )
+    suspend fun saveBasicKey(): Result<Unit>
 
-    fun checkValidBasicKey(
-        basicKey: String,
-        onResponse: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    suspend fun checkValidBasicKey(basicKey: String): CartFetchResult<Int>
 
-    fun checkValidLocalSavedBasicKey(
-        onResponse: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    suspend fun checkValidLocalSavedBasicKey(): CartFetchResult<Int>
 
     suspend fun fetchAllCartItems(): CartFetchResult<CartResponse>
 

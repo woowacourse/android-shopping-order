@@ -36,7 +36,7 @@ interface RetrofitService {
     ): CartResponse
 
     @GET("/cart-items/counts")
-    fun requestCartCounts(): Call<CartQuantity>
+    suspend fun requestCartCounts(): Response<CartQuantity>
 
     @PATCH("/cart-items/{id}")
     suspend fun updateCartCounts(

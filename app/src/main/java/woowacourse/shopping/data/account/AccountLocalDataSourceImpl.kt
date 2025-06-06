@@ -8,29 +8,23 @@ class AccountLocalDataSourceImpl(
 ) : AccountLocalDataSource {
     private val sharedPreferences = context.getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
 
-    override fun saveBasicKey(
-        basicKey: String,
-        onComplete: () -> Unit,
-        onFail: () -> Unit,
-    ) {
+    override fun saveBasicKey(basicKey: String): Result<Unit> {
         try {
             sharedPreferences.edit {
                 putString("basicKey", basicKey)
             }
-            onComplete()
+            return Result.success(Unit)
         } catch (e: Exception) {
-            onFail()
+            return Result.failure(e)
         }
     }
 
-    override fun loadBasicKey(
-        onComplete: (basicKey: String) -> Unit,
-        onFail: () -> Unit,
-    ) {
-        try {
-            sharedPreferences.getString("basicKey", "")?.let { onComplete(it) }
-        } catch (e: Exception) {
-            onFail()
+    override fun loadBasicKey(): Result<String> {
+        val basicKey = sharedPreferences.getString("basicKey", "") ?: ""
+        return if (basicKey.isNotEmpty()) {
+            Result.success(basicKey)
+        } else {
+            Result.failure(IllegalStateException())
         }
     }
 }

@@ -72,21 +72,9 @@ class CartFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.loginErrorEvent.observe(viewLifecycleOwner) { result ->
             when (result) {
-                CartFetchError.Network ->
-                    Toast
-                        .makeText(
-                            requireContext(),
-                            "네트워크 에러 발생",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-
-                is CartFetchError.Server ->
-                    Toast
-                        .makeText(
-                            requireContext(),
-                            "로그인 실패",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                is CartFetchError.Network -> extracted("네트워크 에러 발생")
+                is CartFetchError.Server -> extracted("로그인 실패")
+                is CartFetchError.Local -> extracted("로컬 저장소 에러 발생")
             }
             requireActivity().finish()
         }
@@ -94,6 +82,15 @@ class CartFragment : Fragment() {
         binding.bottomBar.orderButton.setOnClickListener {
             (requireActivity() as CartActivity).navigateToRecommend()
         }
+    }
+
+    private fun extracted(message: String) {
+        Toast
+            .makeText(
+                requireContext(),
+                message,
+                Toast.LENGTH_SHORT,
+            ).show()
     }
 
     override fun onResume() {

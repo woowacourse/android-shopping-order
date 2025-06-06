@@ -14,29 +14,22 @@ class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource,
     private val accountLocalDataSource: AccountLocalDataSource,
 ) : CartRepository {
-    override fun saveBasicKey(
-        onResponse: () -> Unit,
-        onFail: () -> Unit,
-    ) {
-        accountLocalDataSource.saveBasicKey(Authorization.basicKey, onResponse, onFail)
-    }
+    override suspend fun saveBasicKey(): Result<Unit> = accountLocalDataSource.saveBasicKey(Authorization.basicKey)
 
-    override fun checkValidBasicKey(
-        basicKey: String,
-        onResponse: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.fetchAuthCode(basicKey, onResponse, onFail)
-    }
+    override suspend fun checkValidBasicKey(basicKey: String): CartFetchResult<Int> = remoteDataSource.fetchAuthCode(basicKey)
 
-    override fun checkValidLocalSavedBasicKey(
-        onResponse: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        accountLocalDataSource.loadBasicKey({ basicKey ->
-            Authorization.setBasicKey(basicKey)
-            remoteDataSource.fetchAuthCode(basicKey, onResponse, onFail)
-        }, { })
+    override suspend fun checkValidLocalSavedBasicKey(): CartFetchResult<Int> {
+        val result = accountLocalDataSource.loadBasicKey()
+        when {
+            result.isSuccess -> {
+                val basicKey = result.getOrNull() ?: ""
+                if (basicKey.isNotEmpty()) {
+                    Authorization.setBasicKey(basicKey)
+                    return remoteDataSource.fetchAuthCode(basicKey)
+                }
+            }
+        }
+        return CartFetchResult.Error(CartFetchError.Local)
     }
 
     override suspend fun fetchAllCartItems(): CartFetchResult<CartResponse> =
