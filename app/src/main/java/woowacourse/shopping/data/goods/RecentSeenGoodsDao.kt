@@ -11,16 +11,16 @@ interface RecentSeenGoodsDao {
     suspend fun getRecentGoodsIds(limit: Int = 10): List<String>
 
     @Query("DELETE FROM recent_seen_goods WHERE goods_id = :goodsId")
-    fun deleteByGoodsId(goodsId: String)
+    suspend fun deleteByGoodsId(goodsId: String)
 
     @Insert
-    fun insert(recentGoods: RecentSeenGoodsEntity)
+    suspend fun insert(recentGoods: RecentSeenGoodsEntity)
 
     @Query("DELETE FROM recent_seen_goods WHERE id NOT IN (SELECT id FROM recent_seen_goods ORDER BY id DESC LIMIT :maxCount)")
-    fun deleteOldestItems(maxCount: Int)
+    suspend fun deleteOldestItems(maxCount: Int)
 
     @Transaction
-    fun addRecentGoodsWithLimit(
+    suspend fun addRecentGoodsWithLimit(
         goodsId: String,
         maxCount: Int = 10,
     ) {

@@ -120,7 +120,13 @@ class GoodsDetailsViewModel(
     }
 
     fun loggingRecentViewedGoods(goods: Goods) {
-        goodsRepository.loggingRecentGoods(goods) {}
+        viewModelScope.launch {
+            try {
+                goodsRepository.loggingRecentGoods(goods)
+            } catch (e: Exception) {
+                // todo(최근 본 항목 로깅 실패 처리)
+            }
+        }
     }
 
     companion object {

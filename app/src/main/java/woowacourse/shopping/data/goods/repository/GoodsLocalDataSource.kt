@@ -5,8 +5,5 @@ import woowacourse.shopping.domain.model.Goods
 interface GoodsLocalDataSource {
     suspend fun fetchRecentGoodsIds(): List<String>
 
-    fun loggingRecentGoods(
-        goods: Goods,
-        onComplete: () -> Unit,
-    )
+    suspend fun loggingRecentGoods(goods: Goods)
 }

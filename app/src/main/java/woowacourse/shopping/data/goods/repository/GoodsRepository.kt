@@ -24,8 +24,5 @@ interface GoodsRepository {
 
     suspend fun fetchMostRecentGoods(): Goods?
 
-    fun loggingRecentGoods(
-        goods: Goods,
-        onComplete: () -> Unit,
-    )
+    suspend fun loggingRecentGoods(goods: Goods)
 }

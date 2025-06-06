@@ -67,10 +67,7 @@ class GoodsRepositoryImpl(
         return fetchGoodsByGoodsId(id)
     }
 
-    override fun loggingRecentGoods(
-        goods: Goods,
-        onComplete: () -> Unit,
-    ) {
-        localDataSource.loggingRecentGoods(goods, onComplete)
+    override suspend fun loggingRecentGoods(goods: Goods) {
+        localDataSource.loggingRecentGoods(goods)
     }
 }
