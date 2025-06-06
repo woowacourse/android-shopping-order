@@ -52,8 +52,13 @@ class ProductDetailViewModel(
 
     fun loadLastHistoryProduct() {
         viewModelScope.launch {
-            val historyProduct = getRecentSearchHistoryUseCase()
-            _lastHistoryProduct.value = historyProduct
+            val result = getRecentSearchHistoryUseCase()
+            result
+                .onSuccess { historyProduct ->
+                    _lastHistoryProduct.value = historyProduct
+                }.onFailure {
+                    Log.e("ProductDetailViewModel", it.message.toString())
+                }
         }
     }
 

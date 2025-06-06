@@ -10,23 +10,30 @@ import woowacourse.shopping.domain.repository.HistoryRepository
 class HistoryRepository(
     private val dao: HistoryDao,
 ) : HistoryRepository {
-    override suspend fun fetchAllHistory(): List<HistoryProduct> = dao.getHistoryProducts().map { it.toDomain() }
+    override suspend fun fetchAllHistory(): Result<List<HistoryProduct>> =
+        runCatching {
+            dao.getHistoryProducts().map { it.toDomain() }
+        }
 
     override suspend fun addHistoryWithLimit(
         productDetail: ProductDetail,
         limit: Int,
-    ) {
-        dao.insertHistoryWithLimit(
-            history =
-                HistoryProductEntity(
-                    productId = productDetail.id,
-                    name = productDetail.name,
-                    imageUrl = productDetail.imageUrl,
-                    category = productDetail.category,
-                ),
-            limit = limit,
-        )
-    }
+    ): Result<Unit> =
+        runCatching {
+            dao.insertHistoryWithLimit(
+                history =
+                    HistoryProductEntity(
+                        productId = productDetail.id,
+                        name = productDetail.name,
+                        imageUrl = productDetail.imageUrl,
+                        category = productDetail.category,
+                    ),
+                limit = limit,
+            )
+        }
 
-    override suspend fun fetchRecentHistory(): HistoryProduct? = dao.getRecentHistoryProduct()?.toDomain()
+    override suspend fun fetchRecentHistory(): Result<HistoryProduct?> =
+        runCatching {
+            dao.getRecentHistoryProduct()?.toDomain()
+        }
 }

@@ -82,11 +82,16 @@ class CatalogViewModel(
 
     fun loadHistoryProducts() {
         viewModelScope.launch {
-            val newHistory = getSearchHistoryUseCase()
-            val isChanged = newHistory != _historyProducts.value
-            if (isChanged) {
-                _historyProducts.value = newHistory
-            }
+            val result = getSearchHistoryUseCase()
+            result
+                .onSuccess { newHistory ->
+                    val isChanged = newHistory != _historyProducts.value
+                    if (isChanged) {
+                        _historyProducts.value = newHistory
+                    }
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 
