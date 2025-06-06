@@ -19,6 +19,7 @@ import woowacourse.shopping.ui.catalog.adapter.product.CatalogAdapter.OnClickHan
 import woowacourse.shopping.ui.catalog.adapter.product.CatalogLayoutManager
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.model.CatalogUiState
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 
 class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.activity_catalog) {
@@ -76,7 +77,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
             }
 
             override fun onLoadMoreClick() {
-                viewModel.loadMoreCartProducts()
+                viewModel.loadMoreCatalogProducts()
             }
         }
 
@@ -112,19 +113,25 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     }
 
     private fun initObservers() {
-        viewModel.catalogProducts.observe(this) { products ->
-            catalogAdapter.submitItems(products.products, !products.page.isLast)
-            viewModel.loadCartProductsQuantity()
+        viewModel.uiState.observe(this) { uiState ->
+            handleCatalogProducts(uiState)
+            handleHistoryProducts(uiState)
+            handlerErrorMessage(uiState)
         }
+    }
 
-        viewModel.historyProducts.observe(this) { products ->
-            historyProductAdapter.submitItems(products)
-        }
+    private fun handleCatalogProducts(uiState: CatalogUiState) {
+        catalogAdapter.submitItems(uiState.catalogProducts.products, !uiState.catalogProducts.page.isLast)
+        viewModel.loadCartProductsQuantity()
+    }
 
-        viewModel.isError.observe(this) { errorMessage ->
-            errorMessage?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
-            }
+    private fun handleHistoryProducts(uiState: CatalogUiState) {
+        historyProductAdapter.submitItems(uiState.historyProducts)
+    }
+
+    private fun handlerErrorMessage(uiState: CatalogUiState) {
+        uiState.connectionErrorMessage?.let {
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }
 

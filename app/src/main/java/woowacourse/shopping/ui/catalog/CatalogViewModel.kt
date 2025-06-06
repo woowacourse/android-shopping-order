@@ -15,10 +15,7 @@ import woowacourse.shopping.di.UseCaseModule.getCatalogProductsByProductIdsUseCa
 import woowacourse.shopping.di.UseCaseModule.getCatalogProductsUseCase
 import woowacourse.shopping.di.UseCaseModule.getSearchHistoryUseCase
 import woowacourse.shopping.di.UseCaseModule.increaseCartProductQuantityUseCase
-import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Page.Companion.UNINITIALIZED_PAGE
-import woowacourse.shopping.domain.model.Products
-import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
@@ -26,6 +23,7 @@ import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
+import woowacourse.shopping.ui.model.CatalogUiState
 
 class CatalogViewModel(
     private val getCatalogProductsUseCase: GetCatalogProductsUseCase,
@@ -36,62 +34,67 @@ class CatalogViewModel(
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase,
 ) : ViewModel() {
-    private val _catalogProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
-    val catalogProducts: LiveData<Products> get() = _catalogProducts
-
-    private val _historyProducts: MutableLiveData<List<HistoryProduct>> = MutableLiveData(emptyList())
-    val historyProducts: LiveData<List<HistoryProduct>> get() = _historyProducts
-
-    private val _cartProductsQuantity: MutableLiveData<Int> = MutableLiveData(INITIAL_PRODUCT_QUANTITY)
-    val cartProductsQuantity: LiveData<Int> get() = _cartProductsQuantity
-
-    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
-    private val _isError: MutableLiveData<String> = MutableLiveData()
-    val isError: LiveData<String> get() = _isError
+    private val _uiState: MutableLiveData<CatalogUiState> = MutableLiveData(CatalogUiState())
+    val uiState: LiveData<CatalogUiState> get() = _uiState
 
     init {
-        loadCartProducts()
+        loadCatalogProducts()
     }
 
-    private fun loadCartProducts(
-        page: Int = catalogProducts.value?.page?.current ?: UNINITIALIZED_PAGE,
+    private fun loadCatalogProducts(
+        page: Int =
+            uiState.value
+                ?.catalogProducts
+                ?.page
+                ?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
         viewModelScope.launch {
-            _isLoading.value = true
+            _uiState.value = uiState.value?.copy(isProductsLoading = true)
+
             getCatalogProductsUseCase(page, count)
                 .onSuccess { newProducts ->
-                    _catalogProducts.value = catalogProducts.value?.plus(newProducts)
-                    _isLoading.value = false
+                    val uiState = uiState.value ?: return@launch
+
+                    _uiState.value =
+                        uiState.copy(
+                            catalogProducts = uiState.catalogProducts.plus(newProducts),
+                            isProductsLoading = false,
+                        )
                 }.onFailure {
-                    _isError.value = it.message
+                    _uiState.value = uiState.value?.copy(connectionErrorMessage = it.message.toString())
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
     }
 
-    fun loadMoreCartProducts() {
+    fun loadMoreCatalogProducts() {
         val currentPage =
-            catalogProducts.value
+            uiState.value
+                ?.catalogProducts
                 ?.page
                 ?.current
                 ?.plus(DEFAULT_PAGE_STEP) ?: UNINITIALIZED_PAGE
-        loadCartProducts(page = currentPage)
+        loadCatalogProducts(page = currentPage)
     }
 
     fun loadHistoryProducts() {
         viewModelScope.launch {
             getSearchHistoryUseCase().onSuccess { historyProducts ->
-                _historyProducts.value = historyProducts
+                val uiState = uiState.value ?: return@launch
+
+                _uiState.value =
+                    uiState.copy(
+                        historyProducts = historyProducts,
+                    )
             }
         }
     }
 
     fun increaseCartProduct(productId: Long) {
         viewModelScope.launch {
-            val product = catalogProducts.value?.getProductByProductId(productId) ?: return@launch
+            val product = uiState.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
+
             increaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -100,7 +103,8 @@ class CatalogViewModel(
 
     fun decreaseCartProduct(productId: Long) {
         viewModelScope.launch {
-            val product = catalogProducts.value?.getProductByProductId(productId) ?: return@launch
+            val product = uiState.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
+
             decreaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -111,9 +115,14 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
-                    _catalogProducts.value = catalogProducts.value?.updateProduct(cartProduct)
+                    val uiState = uiState.value ?: return@launch
+
+                    _uiState.value =
+                        uiState.copy(
+                            catalogProducts = uiState.catalogProducts.updateProduct(cartProduct),
+                        )
                 }.onFailure {
-                    _isError.value = it.message
+                    _uiState.value = uiState.value?.copy(connectionErrorMessage = it.message.toString())
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -123,9 +132,14 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { cartProducts ->
-                    _catalogProducts.value = catalogProducts.value?.updateProducts(cartProducts)
+                    val uiState = uiState.value ?: return@launch
+
+                    _uiState.value =
+                        uiState.copy(
+                            catalogProducts = uiState.catalogProducts.updateProducts(cartProducts),
+                        )
                 }.onFailure {
-                    _isError.value = it.message
+                    _uiState.value = uiState.value?.copy(connectionErrorMessage = it.message.toString())
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -135,7 +149,7 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCartProductsQuantityUseCase()
                 .onSuccess { quantity ->
-                    _cartProductsQuantity.value = quantity
+                    _uiState.value = uiState.value?.copy(cartProductsQuantity = quantity)
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
                 }
@@ -145,7 +159,6 @@ class CatalogViewModel(
     companion object {
         private const val DEFAULT_PAGE_STEP: Int = 1
         private const val SHOWN_PRODUCTS_COUNT: Int = 20
-        private const val INITIAL_PRODUCT_QUANTITY: Int = 0
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
