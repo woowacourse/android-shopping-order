@@ -25,18 +25,6 @@ class PaymentViewModel(
     private val _uiState: MutableLiveData<PaymentUiState> = MutableLiveData(PaymentUiState())
     val uiState: LiveData<PaymentUiState> get() = _uiState
 
-    fun loadCoupons() {
-        viewModelScope.launch {
-            getCouponsUseCase()
-                .onSuccess {
-                    updateUiState { current -> current.copy(coupons = it) }
-                }.onFailure {
-                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                    Log.e("PaymentViewModel", it.toString())
-                }
-        }
-    }
-
     fun loadProducts(productIds: List<Long>) {
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
@@ -53,6 +41,19 @@ class PaymentViewModel(
                             price = current.coupons.applyCoupon(products),
                         )
                     }
+                    loadCoupons(products)
+                }.onFailure {
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+                    Log.e("PaymentViewModel", it.toString())
+                }
+        }
+    }
+
+    private fun loadCoupons(products: Products) {
+        viewModelScope.launch {
+            getCouponsUseCase(products)
+                .onSuccess {
+                    updateUiState { current -> current.copy(coupons = it) }
                 }.onFailure {
                     updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("PaymentViewModel", it.toString())

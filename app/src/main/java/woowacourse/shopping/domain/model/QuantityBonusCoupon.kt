@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Price.Companion.MINIMUM_PRICE
 import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
+import java.time.LocalDate
 
 class QuantityBonusCoupon(
     override val detail: CouponDetail,
@@ -31,10 +32,18 @@ class QuantityBonusCoupon(
         )
     }
 
-    override fun getIsAvailable(products: Products): Boolean =
-        products.products.any {
-            it.isSelected && it.quantity >= getRequiredTotalQuantity()
-        }
+    override fun getIsAvailable(
+        products: Products,
+        nowDate: LocalDate,
+    ): Boolean {
+        val isValidQuantity =
+            products.products.any {
+                it.isSelected && it.quantity >= getRequiredTotalQuantity()
+            }
+        val isDateOkay = detail.expirationDate >= nowDate
+
+        return isValidQuantity && isDateOkay
+    }
 
     private fun getRequiredTotalQuantity(): Int {
         val buy = detail.buyQuantity ?: MINIMUM_QUANTITY

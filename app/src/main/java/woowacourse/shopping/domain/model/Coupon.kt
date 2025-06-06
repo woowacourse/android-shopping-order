@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.model
 
+import java.time.LocalDate
+
 sealed interface Coupon {
     val detail: CouponDetail
 
@@ -7,7 +9,10 @@ sealed interface Coupon {
 
     fun apply(products: Products): Price
 
-    fun getIsAvailable(products: Products): Boolean
+    fun getIsAvailable(
+        products: Products,
+        nowDate: LocalDate = LocalDate.now(),
+    ): Boolean
 
     fun copy(
         detail: CouponDetail = this.detail,
