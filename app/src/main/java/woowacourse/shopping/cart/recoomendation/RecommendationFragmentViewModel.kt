@@ -48,7 +48,7 @@ class RecommendationFragmentViewModel(
 
     fun increaseQuantity(product: ProductUiModel) {
         when (product.quantity) {
-            0 -> {
+            INITIAL_PRODUCT_COUNT -> {
                 val newProduct = product.copy(quantity = A_COUNT)
                 cartRecommendationRepository.insertCartProduct(newProduct) { product ->
                     updateItem(product)
@@ -71,7 +71,7 @@ class RecommendationFragmentViewModel(
 
     fun decreaseQuantity(product: ProductUiModel) {
         when (product.quantity) {
-            1 -> {
+            A_COUNT -> {
                 val newProduct = product.copy(quantity = INITIAL_PRODUCT_COUNT)
                 cartRecommendationRepository.deleteCartProduct(product) { success ->
                     if (success) {
