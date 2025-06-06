@@ -48,26 +48,23 @@ class RecommendViewModel(
             val recentProduct = recentProductRepository.getMostRecentProduct()
             recentProduct.onSuccess {
                 recentCategory = it?.category ?: ""
-                productRepository.fetchPagingProducts(category = recentCategory) { result ->
-                    result
-                        .onSuccess { products ->
-                            val recommendProductsUiModel =
-                                products
-                                    .asSequence()
-                                    .filter { it.quantity == 0 }
-                                    .map { it.toPresentation() }
-                                    .take(10)
-                                    .toList()
-                            _recommendProducts.postValue(recommendProductsUiModel)
-                            if (recommendProductsUiModel.isEmpty()) {
-                                _toastMessage.postValue(
-                                    R.string.recommend_toast_load_not_enough_products,
-                                )
-                            }
-                        }.onFailure {
-                            _toastMessage.postValue(R.string.recommend_toast_load_fail)
+                productRepository
+                    .fetchPagingProducts(category = recentCategory)
+                    .onSuccess { products ->
+                        val recommendProductsUiModel =
+                            products
+                                .asSequence()
+                                .filter { product -> product.quantity == 0 }
+                                .map { product -> product.toPresentation() }
+                                .take(10)
+                                .toList()
+                        _recommendProducts.value = recommendProductsUiModel
+                        if (recommendProductsUiModel.isEmpty()) {
+                            _toastMessage.value = R.string.recommend_toast_load_not_enough_products
                         }
-                }
+                    }.onFailure {
+                        _toastMessage.value = R.string.recommend_toast_load_fail
+                    }
             }
         }
     }
@@ -128,6 +125,6 @@ class RecommendViewModel(
                     it
                 }
             }
-        _recommendProducts.postValue(updatedItem)
+        _recommendProducts.value = updatedItem
     }
 }

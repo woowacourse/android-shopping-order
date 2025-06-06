@@ -34,14 +34,15 @@ class ProductDetailViewModel(
     val toastMessage: LiveData<Int> = _toastMessage
 
     fun fetchData(productId: Long) {
-        productRepository.fetchProductById(productId) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchProductById(productId)
                 .onSuccess { product ->
-                    _product.postValue(product)
+                    _product.value = product
                     handleRecentProduct(productId)
                     insertCurrentProductToRecent(product)
                 }.onFailure {
-                    _toastMessage.postValue(R.string.product_detail_toast_load_fail)
+                    _toastMessage.value = R.string.product_detail_toast_load_fail
                 }
         }
     }
@@ -77,7 +78,9 @@ class ProductDetailViewModel(
     private fun insertCurrentProductToRecent(product: Product) {
         viewModelScope.launch {
             val result = recentProductRepository.insertRecentProduct(product)
-            result.onFailure { _toastMessage.postValue(R.string.product_detail_toast_most_recent_insert_fail) }
+            result.onFailure {
+                _toastMessage.value = R.string.product_detail_toast_most_recent_insert_fail
+            }
         }
     }
 
@@ -86,12 +89,12 @@ class ProductDetailViewModel(
             val recentProduct = recentProductRepository.getMostRecentProduct()
             recentProduct
                 .onSuccess {
-                    _recentProduct.postValue(it)
+                    _recentProduct.value = it
 
                     val isSame = (it == null || it.productId == currentProductId)
-                    _isRecentProduct.postValue(isSame)
+                    _isRecentProduct.value = isSame
                 }.onFailure {
-                    _toastMessage.postValue(R.string.product_detail_toast_most_recent_load_fail)
+                    _toastMessage.value = R.string.product_detail_toast_most_recent_load_fail
                 }
         }
     }

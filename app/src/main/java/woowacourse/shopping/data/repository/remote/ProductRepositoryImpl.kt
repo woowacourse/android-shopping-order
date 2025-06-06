@@ -1,6 +1,10 @@
 package woowacourse.shopping.data.repository.remote
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.remote.ProductDataSource
+import woowacourse.shopping.data.dto.product.toDomain
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -9,42 +13,34 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
     private val cartRepository: CartRepository,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ProductRepository {
-    override fun fetchPagingProducts(
+    override suspend fun fetchPagingProducts(
         page: Int?,
         pageSize: Int?,
         category: String?,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    ) {
-        productDataSource.fetchPagingProducts(page, pageSize, category) { result ->
-            result
-                .onSuccess { products ->
-                    val cartItems =
-                        products.map { product ->
-                            cartRepository
-                                .fetchCartItemById(product.productId) ?: CartItem(
-                                product = product,
-                                quantity = 0,
-                            )
-                        }
-                    onResult(Result.success(cartItems))
-                }.onFailure {
-                    onResult(Result.failure(it))
-                }
+    ): Result<List<CartItem>> =
+        withContext(defaultDispatcher) {
+            runCatching {
+                val products =
+                    productDataSource
+                        .fetchPagingProducts(page, pageSize, category)
+                        .map { it.toDomain() }
+                val cartItems =
+                    products.map {
+                        cartRepository.fetchCartItemById(it.productId) ?: CartItem(
+                            product = it,
+                            quantity = 0,
+                        )
+                    }
+                cartItems
+            }
         }
-    }
 
-    override fun fetchProductById(
-        productId: Long,
-        onResult: (Result<Product>) -> Unit,
-    ) {
-        productDataSource.fetchProductById(productId) { result ->
-            result
-                .onSuccess { product ->
-                    onResult(Result.success(product))
-                }.onFailure {
-                    onResult(Result.failure(it))
-                }
+    override suspend fun fetchProductById(productId: Long): Result<Product> =
+        withContext(defaultDispatcher) {
+            runCatching {
+                productDataSource.fetchProductById(productId).toDomain()
+            }
         }
-    }
 }
