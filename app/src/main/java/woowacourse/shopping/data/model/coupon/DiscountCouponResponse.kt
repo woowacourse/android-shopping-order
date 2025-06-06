@@ -1,10 +1,15 @@
 package woowacourse.shopping.data.model.coupon
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+import woowacourse.shopping.domain.model.coupon.DiscountCoupon
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
-data class DiscountCoupon(
+@JsonClassDiscriminator("discountType")
+data class DiscountCouponResponse(
     @SerialName("code")
     override val code: String,
     @SerialName("description")
@@ -20,3 +25,5 @@ data class DiscountCoupon(
     @SerialName("minimumAmount")
     val minimumAmount: Int,
 ) : CouponResponse()
+
+fun DiscountCouponResponse.toDomain() = DiscountCoupon(code, description, discount, discountType, expirationDate, id, minimumAmount)

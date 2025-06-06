@@ -3,6 +3,7 @@ package woowacourse.shopping
 import android.app.Application
 import woowacourse.shopping.data.db.ShoppingDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
@@ -26,6 +27,7 @@ class ShoppingApplication : Application() {
         initRecentProductRepository()
         initOrderRepository()
         initCartUseCases()
+        initCouponRepository()
     }
 
     private fun initProductRepository() {
@@ -62,6 +64,12 @@ class ShoppingApplication : Application() {
         val orderRemoteDataSource = DataSourceProvider.orderRemoteDataSource
         val repository = OrderRepositoryImpl(orderRemoteDataSource)
         RepositoryProvider.initOrderRepository(repository)
+    }
+
+    private fun initCouponRepository() {
+        val couponRemoteDataSource = DataSourceProvider.couponRemoteDataSource
+        val repository = CouponRepositoryImpl(couponRemoteDataSource)
+        RepositoryProvider.initCouponRepository(repository)
     }
 
     companion object {
