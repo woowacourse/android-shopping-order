@@ -54,7 +54,7 @@ class CartViewModel(
                 }.onFailure {
                     _event.value = CartEvent.LOAD_SHOPPING_CART_FAILURE
                 }
-            delay(1000)
+            delay(LOADING_TIME)
             _loading.value = false
         }
     }
@@ -196,5 +196,6 @@ class CartViewModel(
     private companion object {
         private const val MIN_PAGE = 1
         private const val PAGE_SIZE = 5
+        private const val LOADING_TIME = 500L
     }
 }

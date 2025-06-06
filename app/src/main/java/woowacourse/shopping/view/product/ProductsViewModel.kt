@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
@@ -87,7 +88,7 @@ class ProductsViewModel(
                     val loadItem = ProductsItem.LoadItem(pageableProducts.hasNext)
                     _productsItems.value =
                         listOf(recentViewedProductsItem) + productItems + loadItem
-                    Thread.sleep(1000)
+                    delay(LOADING_TIME)
                     loading.value = false
                 }.onFailure {
                     _event.value = ProductsEvent.LOAD_MORE_PRODUCT_FAILURE
@@ -185,5 +186,6 @@ class ProductsViewModel(
     companion object {
         private const val LOAD_PRODUCTS_SIZE = 20
         private const val MIN_PAGE = 0
+        private const val LOADING_TIME = 500L
     }
 }
