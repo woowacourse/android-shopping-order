@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Page.Companion.UNINITIALIZED_PAGE
@@ -52,10 +54,12 @@ class CatalogViewModel(
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
         _isLoading.value = true
-        getCatalogProductsUseCase(
-            page = page,
-            size = count,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                getCatalogProductsUseCase(
+                    page = page,
+                    size = count,
+                )
             result
                 .onSuccess { newProducts ->
 
@@ -77,41 +81,53 @@ class CatalogViewModel(
     }
 
     fun loadHistoryProducts() {
-        getSearchHistoryUseCase { newHistory ->
+        viewModelScope.launch {
+            val newHistory = getSearchHistoryUseCase()
             val isChanged = newHistory != _historyProducts.value
             if (isChanged) {
-                _historyProducts.postValue(newHistory)
+                _historyProducts.value = newHistory
             }
         }
     }
 
     fun increaseCartProduct(productId: Long) {
-        runCatching {
-            increaseCartProductQuantityUseCase(
-                product = products.value?.getProductByProductId(productId) ?: return,
-            )
-        }.onSuccess {
-            loadCartProduct(productId)
+        viewModelScope.launch {
+            val result =
+                increaseCartProductQuantityUseCase(
+                    product = products.value?.getProductByProductId(productId) ?: return@launch,
+                )
+            result
+                .onSuccess {
+                    loadCartProduct(productId)
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 
     fun decreaseCartProduct(productId: Long) {
-        runCatching {
-            decreaseCartProductQuantityUseCase(
-                product = products.value?.getProductByProductId(productId) ?: return,
-            )
-        }.onSuccess {
-            loadCartProduct(productId)
+        viewModelScope.launch {
+            val result =
+                decreaseCartProductQuantityUseCase(
+                    product = products.value?.getProductByProductId(productId) ?: return@launch,
+                )
+            result
+                .onSuccess {
+                    loadCartProduct(productId)
+                }.onFailure {
+                    Log.e("CatalogViewModel", it.message.toString())
+                }
         }
     }
 
     fun loadCartProduct(productId: Long) {
-        getCatalogProductUseCase(productId) { result ->
+        viewModelScope.launch {
+            val result = getCatalogProductUseCase(productId)
             result
                 .onSuccess { cartProduct ->
                     _products.value =
                         products.value?.updateProduct(
-                            cartProduct ?: return@getCatalogProductUseCase,
+                            cartProduct ?: return@launch,
                         )
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
@@ -120,7 +136,8 @@ class CatalogViewModel(
     }
 
     fun loadCartProductsByIds(ids: List<Long>) {
-        getCatalogProductsByIdsUseCase(ids) { result ->
+        viewModelScope.launch {
+            val result = getCatalogProductsByIdsUseCase(ids)
             result
                 .onSuccess { cartProducts ->
                     _products.value = products.value?.updateProducts(cartProducts)
@@ -131,7 +148,8 @@ class CatalogViewModel(
     }
 
     fun loadCartProductsQuantity() {
-        getCartProductsQuantityUseCase { result ->
+        viewModelScope.launch {
+            val result = getCartProductsQuantityUseCase()
             result
                 .onSuccess { quantity ->
                     _cartProductsQuantity.value = quantity

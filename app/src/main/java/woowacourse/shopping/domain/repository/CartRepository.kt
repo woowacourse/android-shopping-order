@@ -3,30 +3,24 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Products
 
 interface CartRepository {
-    fun fetchCartProducts(
+    suspend fun fetchCartProducts(
         page: Int,
         size: Int,
-        callback: (Result<Products>) -> Unit,
-    )
+    ): Result<Products>
 
-    fun fetchAllCartProducts(callback: (Result<Products>) -> Unit)
+    suspend fun fetchAllCartProducts(): Result<Products>
 
-    fun fetchCartItemCount(callback: (Result<Int>) -> Unit)
+    suspend fun fetchCartItemCount(): Result<Int>
 
-    fun addCartProduct(
+    suspend fun addCartProduct(
         productId: Long,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun deleteCartProduct(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCartProduct(cartId: Long): Result<Unit>
 
-    fun updateCartProduct(
+    suspend fun updateCartProduct(
         cartId: Long,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 }

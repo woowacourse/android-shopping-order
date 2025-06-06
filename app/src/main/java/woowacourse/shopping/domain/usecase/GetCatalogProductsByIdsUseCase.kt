@@ -8,39 +8,33 @@ class GetCatalogProductsByIdsUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
-        productIds: List<Long>,
-        callback: (products: Result<List<Product>>) -> Unit,
-    ) {
-        productRepository.fetchAllProducts { result ->
-            result
-                .onSuccess { catalogProducts ->
-                    val filteredCatalogProducts: List<Product> = catalogProducts.filter { it.productDetail.id in productIds }
-                    combineCartProducts(filteredCatalogProducts, callback)
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
+    suspend operator fun invoke(productIds: List<Long>): Result<List<Product>> {
+        val result = productRepository.fetchAllProducts()
+
+        return if (result.isSuccess) {
+            val catalogProducts = result.getOrThrow()
+            val filteredCatalogProducts: List<Product> =
+                catalogProducts.filter { it.productDetail.id in productIds }
+            combineCartProducts(filteredCatalogProducts)
+        } else {
+            Result.failure(result.exceptionOrNull()!!)
         }
     }
 
-    private fun combineCartProducts(
-        filteredCatalogProducts: List<Product>,
-        callback: (products: Result<List<Product>>) -> Unit,
-    ) {
-        cartRepository.fetchAllCartProducts { result ->
-            result
-                .onSuccess { cartProducts ->
-                    val cartProductsByProductId =
-                        cartProducts.products.associateBy { product ->
-                            product.productDetail.id
-                        }
-                    val updatedCartProducts = getUpdatedCartProducts(filteredCatalogProducts, cartProductsByProductId)
+    private suspend fun combineCartProducts(filteredCatalogProducts: List<Product>): Result<List<Product>> {
+        val result = cartRepository.fetchAllCartProducts()
 
-                    callback(Result.success(updatedCartProducts))
-                }.onFailure {
-                    callback(Result.failure(it))
-                    return@fetchAllCartProducts
+        return if (result.isSuccess) {
+            val cartProducts = result.getOrThrow()
+            val cartProductsByProductId =
+                cartProducts.products.associateBy { product ->
+                    product.productDetail.id
                 }
+            val updatedCartProducts =
+                getUpdatedCartProducts(filteredCatalogProducts, cartProductsByProductId)
+            Result.success(updatedCartProducts)
+        } else {
+            Result.failure(result.exceptionOrNull()!!)
         }
     }
 

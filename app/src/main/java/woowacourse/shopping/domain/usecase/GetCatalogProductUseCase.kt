@@ -8,40 +8,38 @@ class GetCatalogProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
-        productId: Long,
-        callback: (product: Result<Product?>) -> Unit,
-    ) {
-        productRepository.fetchAllProducts { result ->
-            result
-                .onSuccess { catalogProducts ->
-                    catalogProducts.find { product -> product.productDetail.id == productId }?.let { catalogProduct ->
-                        combineCartProduct(productId, catalogProduct, callback)
-                    } ?: return@fetchAllProducts callback(Result.success(null))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
+    suspend operator fun invoke(productId: Long): Result<Product?> {
+        val result = productRepository.fetchAllProducts()
+
+        return if (result.isSuccess) {
+            val catalogProducts = result.getOrThrow()
+            catalogProducts
+                .find { product -> product.productDetail.id == productId }
+                ?.let { catalogProduct ->
+                    combineCartProduct(productId, catalogProduct)
+                } ?: return Result.success(null)
+        } else {
+            Result.failure(result.exceptionOrNull()!!)
         }
     }
 
-    private fun combineCartProduct(
+    private suspend fun combineCartProduct(
         productId: Long,
         catalogProduct: Product,
-        callback: (product: Result<Product?>) -> Unit,
-    ) {
-        cartRepository.fetchAllCartProducts { result ->
-            result
-                .onSuccess { cartProducts ->
-                    val cartProductsByProductId: Map<Long, Product> =
-                        cartProducts.products.associateBy { product ->
-                            product.productDetail.id
-                        }
-                    val updatedProduct = getUpdatedProduct(cartProductsByProductId, productId, catalogProduct)
+    ): Result<Product> {
+        val result = cartRepository.fetchAllCartProducts()
 
-                    callback(Result.success(updatedProduct))
-                }.onFailure {
-                    callback(Result.failure(it))
+        return if (result.isSuccess) {
+            val cartProducts = result.getOrThrow()
+            val cartProductsByProductId: Map<Long, Product> =
+                cartProducts.products.associateBy { product ->
+                    product.productDetail.id
                 }
+            val updatedProduct =
+                getUpdatedProduct(cartProductsByProductId, productId, catalogProduct)
+            Result.success(updatedProduct)
+        } else {
+            Result.failure(result.exceptionOrNull()!!)
         }
     }
 

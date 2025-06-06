@@ -4,11 +4,11 @@ import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.ProductDetail
 
 interface HistoryRepository {
-    fun fetchAllHistory(callback: (List<HistoryProduct>) -> Unit)
+    suspend fun fetchAllHistory(): List<HistoryProduct>
 
-    fun fetchRecentHistory(callback: (HistoryProduct?) -> Unit)
+    suspend fun fetchRecentHistory(): HistoryProduct?
 
-    fun addHistoryWithLimit(
+    suspend fun addHistoryWithLimit(
         productDetail: ProductDetail,
         limit: Int,
     )

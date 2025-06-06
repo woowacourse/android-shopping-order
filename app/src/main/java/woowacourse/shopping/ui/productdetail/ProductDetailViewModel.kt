@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Product
@@ -37,7 +39,8 @@ class ProductDetailViewModel(
     val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
 
     fun loadProductDetail(id: Long) {
-        getCatalogProductUseCase(id) { result ->
+        viewModelScope.launch {
+            val result = getCatalogProductUseCase(id)
             result
                 .onSuccess { catalogProduct ->
                     _product.value = catalogProduct ?: EMPTY_PRODUCT
@@ -48,13 +51,16 @@ class ProductDetailViewModel(
     }
 
     fun loadLastHistoryProduct() {
-        getRecentSearchHistoryUseCase { historyProduct ->
-            _lastHistoryProduct.postValue(historyProduct)
+        viewModelScope.launch {
+            val historyProduct = getRecentSearchHistoryUseCase()
+            _lastHistoryProduct.value = historyProduct
         }
     }
 
     fun addHistoryProduct(productDetail: ProductDetail) {
-        addSearchHistoryUseCase(productDetail)
+        viewModelScope.launch {
+            addSearchHistoryUseCase(productDetail)
+        }
     }
 
     fun decreaseCartProductQuantity() {
@@ -67,11 +73,13 @@ class ProductDetailViewModel(
 
     fun updateCartProduct() {
         val product: Product = product.value ?: return
-        updateCartProductUseCase(
-            productId = product.productDetail.id,
-            cartId = product.cartId,
-            quantity = product.quantity,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                updateCartProductUseCase(
+                    productId = product.productDetail.id,
+                    cartId = product.cartId,
+                    quantity = product.quantity,
+                )
             result
                 .onSuccess {
                     _onCartProductAddSuccess.setValue(true)

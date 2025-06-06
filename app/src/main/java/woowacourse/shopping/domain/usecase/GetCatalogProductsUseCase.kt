@@ -9,38 +9,33 @@ class GetCatalogProductsUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         page: Int,
         size: Int,
-        callback: (products: Result<Products>) -> Unit,
-    ) {
-        productRepository.fetchProducts(page, size) { result ->
-            result
-                .onSuccess { catalogProducts ->
-                    combineCartProducts(catalogProducts, callback)
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
+    ): Result<Products> {
+        val result = productRepository.fetchProducts(page, size)
+
+        return if (result.isSuccess) {
+            val catalogProducts = result.getOrThrow()
+            combineCartProducts(catalogProducts)
+        } else {
+            Result.failure(result.exceptionOrNull()!!)
         }
     }
 
-    private fun combineCartProducts(
-        catalogProducts: Products,
-        callback: (products: Result<Products>) -> Unit,
-    ) {
-        cartRepository.fetchAllCartProducts { result ->
-            result
-                .onSuccess { cartProducts ->
-                    val cartProductsByProductId =
-                        cartProducts.products.associateBy { product ->
-                            product.productDetail.id
-                        }
-                    val updatedProducts = getUpdatedProducts(catalogProducts, cartProductsByProductId)
+    private suspend fun combineCartProducts(catalogProducts: Products): Result<Products> {
+        val result = cartRepository.fetchAllCartProducts()
 
-                    callback(Result.success(catalogProducts.copy(products = updatedProducts)))
-                }.onFailure {
-                    callback(Result.failure(it))
+        return if (result.isSuccess) {
+            val cartProducts = result.getOrThrow()
+            val cartProductsByProductId =
+                cartProducts.products.associateBy { product ->
+                    product.productDetail.id
                 }
+            val updatedProducts = getUpdatedProducts(catalogProducts, cartProductsByProductId)
+            Result.success(catalogProducts.copy(products = updatedProducts))
+        } else {
+            Result.failure(result.exceptionOrNull()!!)
         }
     }
 
