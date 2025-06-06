@@ -2,25 +2,21 @@ package woowacourse.shopping.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.database.ShoppingDatabase
-import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
-import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
-import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.source.CartProductRemoteDataSource
 
-class CartViewModelFactory(
-    private val application: ShoppingApplication,
-) : ViewModelProvider.Factory {
+@Suppress("UNCHECKED_CAST")
+class CartViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
+            val cartRepository: CartRepository =
+                CartRepositoryImpl.Companion.initialize(
+                    cartProductDataSource = CartProductRemoteDataSource(),
+                )
             return CartViewModel(
-                cartProductRepository = RemoteCartProductRepositoryImpl(),
-                catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
-                RecentlyViewedProductRepositoryImpl(
-                    ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
-                    RemoteCatalogProductRepositoryImpl(),
-                ),
+                cartRepository = cartRepository,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

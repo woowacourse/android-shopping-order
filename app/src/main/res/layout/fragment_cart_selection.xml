@@ -5,6 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <import type="android.view.View" />
+
         <variable
             name="vm"
             type="woowacourse.shopping.cart.CartViewModel" />
@@ -49,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:text="@{@string/format_price(10000)}"
+            android:text="@{@string/format_price(vm.totalPurchaseAmount)}"
             app:layout_constraintBottom_toBottomOf="@id/view_cart_bottom_bar"
             app:layout_constraintEnd_toEndOf="@id/view_cart_bottom_bar"
             app:layout_constraintTop_toTopOf="@id/view_cart_bottom_bar"
@@ -59,7 +62,7 @@
             style="@style/CartPageOrderStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/text_order(vm.cartItemCount)}"
+            android:text="@{@string/text_order(vm.totalPurchaseCount)}"
             app:layout_constraintBottom_toBottomOf="@id/view_cart_order"
             app:layout_constraintEnd_toEndOf="@id/view_cart_order"
             app:layout_constraintStart_toStartOf="@id/view_cart_order"
@@ -72,10 +75,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_12dp"
             android:buttonTint="@color/mint_blue"
-            android:checked="true"
+            android:checked="@{vm.allChecked}"
             android:foregroundTint="@color/white"
             android:minWidth="0dp"
             android:minHeight="0dp"
+            android:onClick="@{() -> vm.onAllSelectedProducts()}"
             app:layout_constraintBottom_toBottomOf="@id/textView_all_selection"
             app:layout_constraintStart_toStartOf="@id/view_cart_bottom_bar"
             app:layout_constraintTop_toTopOf="@id/view_cart_bottom_bar" />
@@ -86,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:text="전체"
+            android:text="@string/total_cart_items"
             app:layout_constraintBottom_toBottomOf="@id/view_cart_bottom_bar"
             app:layout_constraintEnd_toEndOf="@id/checkbox_all_selection"
             app:layout_constraintStart_toStartOf="@id/checkbox_all_selection"
@@ -95,7 +99,8 @@
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmerFrameLayout_cart_products"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="@{vm.loadingState ? View.VISIBLE : View.GONE}">
 
             <LinearLayout
                 android:layout_width="match_parent"
