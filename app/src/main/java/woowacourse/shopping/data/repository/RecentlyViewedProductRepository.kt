@@ -4,9 +4,9 @@ import woowacourse.shopping.data.entity.CartProductEntity
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface RecentlyViewedProductRepository {
-    fun insertRecentlyViewedProductId(productId: Long)
+    suspend fun insertRecentlyViewedProductId(productId: Long)
 
-    fun getRecentlyViewedProducts(callback: (List<CartProductEntity>) -> Unit)
+    suspend fun getRecentlyViewedProducts(): List<CartProductEntity>
 
-    fun getLatestViewedProduct(callback: (ProductUiModel) -> Unit)
+    suspend fun getLatestViewedProduct(): ProductUiModel?
 }

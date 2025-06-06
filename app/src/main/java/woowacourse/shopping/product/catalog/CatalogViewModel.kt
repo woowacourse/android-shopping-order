@@ -141,7 +141,8 @@ class CatalogViewModel(
     }
 
     fun loadRecentlyViewedProducts() {
-        recentlyViewedProductRepository.getRecentlyViewedProducts { products ->
+        viewModelScope.launch {
+            val products = recentlyViewedProductRepository.getRecentlyViewedProducts()
             _recentlyViewedProducts.postValue(products.map { it.toUiModel() })
         }
     }

@@ -3,6 +3,8 @@ package woowacourse.shopping.product.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.cart.ButtonEvent
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
@@ -26,7 +28,9 @@ class DetailViewModel(
     val latestViewedProduct: LiveData<ProductUiModel> = _latestViewedProduct
 
     init {
-        recentlyViewedProductRepository.insertRecentlyViewedProductId(product.id)
+        viewModelScope.launch {
+            recentlyViewedProductRepository.insertRecentlyViewedProductId(product.id)
+        }
     }
 
     fun updateQuantity(buttonEvent: ButtonEvent) {
@@ -37,17 +41,19 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0) ?: return
-
-        if (addedProduct.cartItemId != null) {
-            cartProductRepository.updateProduct(addedProduct.id, addedProduct.quantity) {}
-        } else {
-            cartProductRepository.insertCartProduct(addedProduct.id, addedProduct.quantity) {}
+        viewModelScope.launch {
+            val addedProduct = product.value?.copy(quantity = quantity.value ?: 0) ?: return@launch
+            if (addedProduct.cartItemId != null) {
+                cartProductRepository.updateProduct(addedProduct.id, addedProduct.quantity)
+            } else {
+                cartProductRepository.insertCartProduct(addedProduct.id, addedProduct.quantity)
+            }
         }
     }
 
     fun setLatestViewedProduct() {
-        recentlyViewedProductRepository.getLatestViewedProduct { product ->
+        viewModelScope.launch {
+            val product = recentlyViewedProductRepository.getLatestViewedProduct() ?: return@launch
             _latestViewedProduct.postValue(product)
         }
     }
