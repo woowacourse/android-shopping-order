@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.cart.source
 
+import retrofit2.Response
 import woowacourse.shopping.data.API
 import woowacourse.shopping.data.cart.PageableCartItemData
 import woowacourse.shopping.data.cart.dto.CartItemRequest
@@ -11,11 +12,11 @@ import woowacourse.shopping.data.product.entity.CartItemEntity
 class RemoteCartDataSource(
     private val cartService: CartService = API.cartService,
 ) : CartDataSource {
-    override fun pageableCartItems(
+    override suspend fun pageableCartItems(
         page: Int,
         size: Int,
     ): PageableCartItemData {
-        val response: CartResponse? = cartService.getCart(page = page, size = size).execute().body()
+        val response: CartResponse? = cartService.getCart(page = page, size = size)
         return PageableCartItemData(
             cartItems =
                 response?.content?.mapNotNull { it.toCartItemEntityOrNull() }
@@ -25,12 +26,12 @@ class RemoteCartDataSource(
         )
     }
 
-    override fun cart(): List<CartItemEntity> {
-        val response: CartResponse? = cartService.getAllCart().execute().body()
+    override suspend fun cart(): List<CartItemEntity> {
+        val response: CartResponse? = cartService.getAllCart()
         return response?.content?.mapNotNull { it.toCartItemEntityOrNull() } ?: emptyList()
     }
 
-    private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
+    private suspend fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
         if (id == null ||
             product?.id == null ||
             product.name == null ||
@@ -51,21 +52,21 @@ class RemoteCartDataSource(
             )
         }
 
-    override fun addCartItem(
+    override suspend fun addCartItem(
         productId: Long,
         quantity: Int,
     ): Long? {
-        val response = cartService.postCartItem(CartRequest(productId, quantity)).execute()
+        val response: Response<Unit> = cartService.postCartItem(CartRequest(productId, quantity))
         val cartItemId: Long? =
             response.headers()["Location"]?.substringAfter("/cart-items/", "")?.toLongOrNull()
         return cartItemId
     }
 
-    override fun remove(cartItemId: Long) {
-        cartService.deleteShoppingCartItem(cartItemId).execute()
+    override suspend fun remove(cartItemId: Long) {
+        cartService.deleteShoppingCartItem(cartItemId)
     }
 
-    override fun updateCartItemQuantity(
+    override suspend fun updateCartItemQuantity(
         cartItemId: Long,
         newQuantity: Int,
     ) {
@@ -73,11 +74,11 @@ class RemoteCartDataSource(
             .patchCartItemQuantity(
                 cartItemId,
                 CartItemRequest(newQuantity),
-            ).execute()
+            )
     }
 
-    override fun cartItemsSize(): Int {
-        val response = cartService.getCartItemQuantity().execute().body()
-        return response?.quantity ?: 0
+    override suspend fun cartItemsSize(): Int {
+        val response = cartService.getCartItemQuantity()
+        return response.quantity ?: 0
     }
 }

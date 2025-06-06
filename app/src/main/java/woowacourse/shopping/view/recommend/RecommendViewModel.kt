@@ -48,9 +48,10 @@ class RecommendViewModel(
     }
 
     fun plusCartItemQuantity(recommend: RecommendProduct) {
-        if (recommend.quantity == 0) {
-            cartRepository.addCartItem(recommend.productId, 1) { result ->
-                result
+        viewModelScope.launch {
+            if (recommend.quantity == 0) {
+                cartRepository
+                    .addCartItem(recommend.productId, 1)
                     .onSuccess { cartItemId: Long? ->
                         cartItemId ?: return@onSuccess
 
@@ -62,14 +63,12 @@ class RecommendViewModel(
                             ),
                         )
                     }.onFailure { _event.postValue(RecommendEvent.MODIFY_CART_FAILURE) }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                addedItems[recommend.productId] ?: return,
-                recommend.quantity + 1,
-            ) { result ->
-                result
-                    .onSuccess {
+            } else {
+                cartRepository
+                    .updateCartItemQuantity(
+                        addedItems[recommend.productId] ?: return@launch,
+                        recommend.quantity + 1,
+                    ).onSuccess {
                         recommend.update(recommend.quantity + 1)
                         selectedCartItems.postValue(
                             selectedCartItems.value
@@ -95,12 +94,12 @@ class RecommendViewModel(
     }
 
     fun minusCartItemQuantity(recommend: RecommendProduct) {
-        if (recommend.quantity == 1) {
-            cartRepository.remove(
-                addedItems[recommend.productId] ?: return,
-            ) { result ->
-                result
-                    .onSuccess {
+        viewModelScope.launch {
+            if (recommend.quantity == 1) {
+                cartRepository
+                    .remove(
+                        addedItems[recommend.productId] ?: return@launch,
+                    ).onSuccess {
                         recommend.update(0)
                         selectedCartItems.postValue(
                             selectedCartItems.value?.minus(
@@ -115,14 +114,12 @@ class RecommendViewModel(
                     }.onFailure {
                         _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
                     }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                addedItems[recommend.productId] ?: return,
-                recommend.quantity - 1,
-            ) { result ->
-                result
-                    .onSuccess {
+            } else {
+                cartRepository
+                    .updateCartItemQuantity(
+                        addedItems[recommend.productId] ?: return@launch,
+                        recommend.quantity - 1,
+                    ).onSuccess {
                         recommend.update(recommend.quantity - 1)
                         selectedCartItems.postValue(
                             selectedCartItems.value
