@@ -27,10 +27,6 @@ class CartRemoteDataSourceImpl(
             .build()
             .create(RetrofitService::class.java)
 
-    override fun fetchCartItemSize(onComplete: (Int) -> Unit) {
-        // Todo
-    }
-
     override fun fetchCartItemByPage(
         page: Int,
         size: Int,

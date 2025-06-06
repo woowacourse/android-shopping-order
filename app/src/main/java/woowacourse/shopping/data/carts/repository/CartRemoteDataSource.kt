@@ -6,8 +6,6 @@ import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 
 interface CartRemoteDataSource {
-    fun fetchCartItemSize(onComplete: (Int) -> Unit)
-
     fun fetchCartItemByPage(
         page: Int,
         size: Int,
