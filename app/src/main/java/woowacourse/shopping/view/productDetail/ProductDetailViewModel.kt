@@ -46,7 +46,7 @@ class ProductDetailViewModel(
                 .onSuccess { cartItems: List<CartItem> ->
                     this@ProductDetailViewModel.cartItems = cartItems
                 }.onFailure {
-                    _event.postValue(ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE)
+                    _event.value = ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE
                 }
         }
     }
