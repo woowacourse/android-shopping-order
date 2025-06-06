@@ -14,27 +14,24 @@ import woowacourse.shopping.di.UseCaseModule.orderProductsUseCase
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
+import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.ui.model.PaymentUiState
 
 class PaymentViewModel(
     private val getCatalogProductsByProductIdsUseCase: GetCatalogProductsByProductIdsUseCase,
     private val getCouponsUseCase: GetCouponsUseCase,
+    private val orderProductsUseCase: OrderProductsUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<PaymentUiState> = MutableLiveData(PaymentUiState())
     val uiState: LiveData<PaymentUiState> get() = _uiState
 
-    init {
-        loadCoupons()
-    }
-
-    private fun loadCoupons() {
+    fun loadCoupons() {
         viewModelScope.launch {
-            val uiState = uiState.value ?: return@launch
             getCouponsUseCase()
                 .onSuccess {
-                    _uiState.value = uiState.copy(coupons = it)
+                    updateUiState { current -> current.copy(coupons = it) }
                 }.onFailure {
-                    _uiState.value = uiState.copy(connectionErrorMessage = it.message.toString())
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("PaymentViewModel", it.toString())
                 }
         }
@@ -42,7 +39,6 @@ class PaymentViewModel(
 
     fun loadProducts(productIds: List<Long>) {
         viewModelScope.launch {
-            val uiState = uiState.value ?: return@launch
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { newProducts ->
                     val products =
@@ -51,44 +47,52 @@ class PaymentViewModel(
                                 .filterNot { it.cartId == null }
                                 .map { it.copy(isSelected = true) },
                         )
-                    _uiState.value =
-                        uiState.copy(
+                    updateUiState { current ->
+                        current.copy(
                             products = products,
-                            price = uiState.coupons.applyCoupon(products),
+                            price = current.coupons.applyCoupon(products),
                         )
+                    }
                 }.onFailure {
-                    _uiState.value = uiState.copy(connectionErrorMessage = it.message.toString())
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("PaymentViewModel", it.toString())
                 }
         }
     }
 
     fun selectCoupon(couponId: Int) {
-        val uiState = uiState.value ?: return
-        _uiState.value =
-            uiState.copy(
-                coupons = uiState.coupons.selectCoupon(couponId),
-                price = uiState.coupons.applyCoupon(uiState.products),
+        updateUiState { current ->
+            current.copy(
+                coupons = current.coupons.selectCoupon(couponId),
+                price = current.coupons.applyCoupon(current.products),
             )
+        }
     }
 
     fun orderProducts() {
         viewModelScope.launch {
-            val uiState = uiState.value ?: return@launch
-            val cartIds: Set<Long> = uiState.products.getSelectedCartIds()
+            val cartIds: Set<Long> = uiState.value?.products?.getSelectedCartIds() ?: return@launch
 
             orderProductsUseCase(cartIds)
                 .onSuccess {
-                    _uiState.value = uiState.copy(isOrderSuccess = true)
+                    updateUiState { current ->
+                        current.copy(isOrderSuccess = true)
+                    }
                 }.onFailure {
-                    _uiState.value =
-                        uiState.copy(
+                    updateUiState { current ->
+                        current.copy(
                             isOrderSuccess = false,
                             connectionErrorMessage = it.message.toString(),
                         )
+                    }
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
+    }
+
+    private fun updateUiState(update: (PaymentUiState) -> PaymentUiState) {
+        val current = _uiState.value ?: return
+        _uiState.value = update(current)
     }
 
     companion object {
@@ -104,6 +108,7 @@ class PaymentViewModel(
                     PaymentViewModel(
                         getCatalogProductsByProductIdsUseCase = getCatalogProductsByProductIdsUseCase,
                         getCouponsUseCase = getCouponsUseCase,
+                        orderProductsUseCase = orderProductsUseCase,
                     ) as T
             }
     }

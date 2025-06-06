@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.api.CouponApi
 import woowacourse.shopping.data.model.response.CouponResponse.Companion.toDomain
 import woowacourse.shopping.domain.model.CouponDetail.Companion.toCoupon
@@ -10,7 +12,9 @@ class CouponRepository(
     private val api: CouponApi,
 ) : CouponRepository {
     override suspend fun fetchAllCoupons(): Result<Coupons> =
-        runCatching {
-            Coupons(api.getCoupons().mapNotNull { it.toDomain()?.toCoupon() })
+        withContext(Dispatchers.IO) {
+            runCatching {
+                Coupons(api.getCoupons().mapNotNull { it.toDomain()?.toCoupon() })
+            }
         }
 }

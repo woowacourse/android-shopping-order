@@ -50,18 +50,18 @@ class CatalogViewModel(
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
         viewModelScope.launch {
-            _uiState.value = uiState.value?.copy(isProductsLoading = true)
+            updateUiState { current -> current.copy(isProductsLoading = true) }
 
             getCatalogProductsUseCase(page, count)
                 .onSuccess { newProducts ->
-                    val uiState = uiState.value ?: return@launch
-                    _uiState.value =
-                        uiState.copy(
-                            catalogProducts = uiState.catalogProducts.plus(newProducts),
+                    updateUiState { current ->
+                        current.copy(
+                            catalogProducts = current.catalogProducts.plus(newProducts),
                             isProductsLoading = false,
                         )
+                    }
                 }.onFailure {
-                    _uiState.value = uiState.value?.copy(connectionErrorMessage = it.message.toString())
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -80,11 +80,11 @@ class CatalogViewModel(
     fun loadHistoryProducts() {
         viewModelScope.launch {
             getSearchHistoryUseCase().onSuccess { historyProducts ->
-                val uiState = uiState.value ?: return@launch
-                _uiState.value =
-                    uiState.copy(
+                updateUiState { current ->
+                    current.copy(
                         historyProducts = historyProducts,
                     )
+                }
             }
         }
     }
@@ -111,13 +111,13 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
-                    val uiState = uiState.value ?: return@launch
-                    _uiState.value =
-                        uiState.copy(
-                            catalogProducts = uiState.catalogProducts.updateProduct(cartProduct),
+                    updateUiState { current ->
+                        current.copy(
+                            catalogProducts = current.catalogProducts.updateProduct(cartProduct),
                         )
+                    }
                 }.onFailure {
-                    _uiState.value = uiState.value?.copy(connectionErrorMessage = it.message.toString())
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -127,13 +127,13 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { cartProducts ->
-                    val uiState = uiState.value ?: return@launch
-                    _uiState.value =
-                        uiState.copy(
-                            catalogProducts = uiState.catalogProducts.updateProducts(cartProducts),
+                    updateUiState { current ->
+                        current.copy(
+                            catalogProducts = current.catalogProducts.updateProducts(cartProducts),
                         )
+                    }
                 }.onFailure {
-                    _uiState.value = uiState.value?.copy(connectionErrorMessage = it.message.toString())
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -143,11 +143,16 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCartProductsQuantityUseCase()
                 .onSuccess { quantity ->
-                    _uiState.value = uiState.value?.copy(cartProductsQuantity = quantity)
+                    updateUiState { current -> current.copy(cartProductsQuantity = quantity) }
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
+    }
+
+    private fun updateUiState(update: (CatalogUiState) -> CatalogUiState) {
+        val current = _uiState.value ?: return
+        _uiState.value = update(current)
     }
 
     companion object {

@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.api.CartApi
 import woowacourse.shopping.data.model.request.CartItemQuantityRequest
 import woowacourse.shopping.data.model.request.CartItemRequest
@@ -15,12 +17,14 @@ class CartRepository(
         page: Int,
         size: Int,
     ): Result<Products> =
-        runCatching {
-            api.getCartItems(page, size)
-        }.mapCatching { response ->
-            val items = response.content.map { it.toDomain() }
-            val pageInfo = Page(page, response.first, response.last)
-            Products(items, pageInfo)
+        withContext(Dispatchers.IO) {
+            runCatching {
+                api.getCartItems(page, size)
+            }.mapCatching { response ->
+                val items = response.content.map { it.toDomain() }
+                val pageInfo = Page(page, response.first, response.last)
+                Products(items, pageInfo)
+            }
         }
 
     override suspend fun fetchAllCartProducts(): Result<Products> {
@@ -31,30 +35,38 @@ class CartRepository(
     }
 
     override suspend fun fetchCartItemCount(): Result<Int> =
-        runCatching {
-            api.getCartItemsCount()
-        }.mapCatching { response ->
-            response.quantity
+        withContext(Dispatchers.IO) {
+            runCatching {
+                api.getCartItemsCount()
+            }.mapCatching { response ->
+                response.quantity
+            }
         }
 
     override suspend fun addCartProduct(
         productId: Long,
         quantity: Int,
     ): Result<Unit> =
-        runCatching {
-            api.postCartItem(CartItemRequest(productId = productId, quantity = quantity))
+        withContext(Dispatchers.IO) {
+            runCatching {
+                api.postCartItem(CartItemRequest(productId = productId, quantity = quantity))
+            }
         }
 
     override suspend fun updateCartProduct(
         cartId: Long,
         quantity: Int,
     ): Result<Unit> =
-        runCatching {
-            api.patchCartItem(cartId, CartItemQuantityRequest(quantity))
+        withContext(Dispatchers.IO) {
+            runCatching {
+                api.patchCartItem(cartId, CartItemQuantityRequest(quantity))
+            }
         }
 
     override suspend fun deleteCartProduct(cartId: Long): Result<Unit> =
-        runCatching {
-            api.deleteCartItem(cartId)
+        withContext(Dispatchers.IO) {
+            runCatching {
+                api.deleteCartItem(cartId)
+            }
         }
 }

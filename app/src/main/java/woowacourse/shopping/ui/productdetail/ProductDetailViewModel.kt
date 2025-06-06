@@ -29,12 +29,11 @@ class ProductDetailViewModel(
 
     fun loadProductDetail(productId: Long) {
         viewModelScope.launch {
-            val uiState = uiState.value ?: return@launch
             getCatalogProductUseCase(productId)
                 .onSuccess { catalogProduct ->
-                    _uiState.value = uiState.copy(product = catalogProduct)
+                    updateUiState { current -> current.copy(product = catalogProduct) }
                 }.onFailure {
-                    _uiState.value = uiState.copy(connectionErrorMessage = it.message.toString())
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                 }
         }
     }
@@ -42,7 +41,7 @@ class ProductDetailViewModel(
     fun loadLastHistoryProduct() {
         viewModelScope.launch {
             getRecentSearchHistoryUseCase().onSuccess {
-                _uiState.value = uiState.value?.copy(lastHistoryProduct = it)
+                updateUiState { current -> current.copy(lastHistoryProduct = it) }
             }
         }
     }
@@ -55,12 +54,12 @@ class ProductDetailViewModel(
 
     fun decreaseCartProductQuantity() {
         val uiState = uiState.value ?: return
-        _uiState.value = uiState.copy(product = uiState.product.decreaseQuantity())
+        updateUiState { current -> current.copy(product = uiState.product.decreaseQuantity()) }
     }
 
     fun increaseCartProductQuantity() {
         val uiState = uiState.value ?: return
-        _uiState.value = uiState.copy(product = uiState.product.increaseQuantity())
+        updateUiState { current -> current.copy(product = uiState.product.increaseQuantity()) }
     }
 
     fun updateCartProduct() {
@@ -71,11 +70,16 @@ class ProductDetailViewModel(
                 cartId = uiState.product.cartId,
                 quantity = uiState.product.quantity,
             ).onSuccess {
-                _uiState.value = uiState.copy(isCartProductUpdateSuccess = true)
+                updateUiState { current -> current.copy(isCartProductUpdateSuccess = true) }
             }.onFailure {
-                _uiState.value = uiState.copy(connectionErrorMessage = it.message.toString())
+                updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
             }
         }
+    }
+
+    private fun updateUiState(update: (ProductDetailUiState) -> ProductDetailUiState) {
+        val current = _uiState.value ?: return
+        _uiState.value = update(current)
     }
 
     companion object {
