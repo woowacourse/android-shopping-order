@@ -2,12 +2,11 @@ package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.dto.request.CartProductQuantityRequestDto
 import woowacourse.shopping.data.dto.request.CartProductRequestDto
-import woowacourse.shopping.data.dto.response.toCartProduct
-import woowacourse.shopping.data.model.PagedResult
+import woowacourse.shopping.data.dto.response.CartProductQuantityResponseDto
+import woowacourse.shopping.data.dto.response.CartProductResponseDto
 import woowacourse.shopping.data.service.CartProductApiService
 import woowacourse.shopping.data.util.requireBody
 import woowacourse.shopping.data.util.requireHeader
-import woowacourse.shopping.domain.model.CartProduct
 
 class CartProductRemoteDataSource(
     private val cartProductService: CartProductApiService,
@@ -15,13 +14,9 @@ class CartProductRemoteDataSource(
     suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-    ): Result<PagedResult<CartProduct>> =
+    ): Result<CartProductResponseDto> =
         runCatching {
-            val responseBody =
-                cartProductService.getPagedProducts(page = page, size = size).requireBody()
-            val products = responseBody.content.map { it.toCartProduct() }
-            val hasNext = responseBody.last.not()
-            PagedResult(products, hasNext)
+            cartProductService.getPagedProducts(page = page, size = size).requireBody()
         }
 
     suspend fun insert(
@@ -41,9 +36,9 @@ class CartProductRemoteDataSource(
             cartProductService.delete(id = id).requireBody()
         }
 
-    suspend fun getTotalQuantity(): Result<Int> =
+    suspend fun getTotalQuantity(): Result<CartProductQuantityResponseDto> =
         runCatching {
-            cartProductService.getTotalQuantity().requireBody().quantity
+            cartProductService.getTotalQuantity().requireBody()
         }
 
     suspend fun updateQuantity(
