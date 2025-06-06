@@ -8,6 +8,9 @@ data class CartUiState(
     val pageState: PageState = PageState(),
     val isFetching: Boolean = true,
 ) {
+    val purchaseCart
+        get() = items.filter { it.checked }.map { it.cart }
+
     val totalPrice: Int
         get() = items.filter { it.checked }.sumOf { it.totalPrice }
 

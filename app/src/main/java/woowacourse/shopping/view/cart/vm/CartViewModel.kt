@@ -237,7 +237,7 @@ class CartViewModel(
 
     fun sendScreenChangeEvent() {
         withState(_cartUiState.value) { state ->
-            _uiEvent.setValue(CartUiEvent.ChangeScreen(state.items.map { it.cart }))
+            _uiEvent.setValue(CartUiEvent.ChangeScreen(state.purchaseCart))
         }
     }
 
