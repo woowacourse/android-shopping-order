@@ -21,9 +21,9 @@ object LocalRecentViewedProductsDataSource : RecentViewedProductsDataSource {
         dao = db.dao()
     }
 
-    override fun load(): List<RecentViewedProductEntity> = dao.loadProducts()
+    override suspend fun load(): List<RecentViewedProductEntity> = dao.loadProducts()
 
-    override fun upsert(product: RecentViewedProductEntity) {
+    override suspend fun upsert(product: RecentViewedProductEntity) {
         val count = dao.productsSize()
         if (count < MAX_ENTITY_COUNT) {
             dao.upsertProduct(product)

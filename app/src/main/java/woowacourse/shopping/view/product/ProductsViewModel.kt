@@ -40,16 +40,15 @@ class ProductsViewModel(
 
     fun loadCart() {
         viewModelScope.launch {
-            cartRepository.loadCart { result ->
-                result
-                    .onSuccess { cartItems: List<CartItem> ->
-                        this@ProductsViewModel.cartItems = cartItems
-                        _cartItemsSize.postValue(cartItems.sumOf { it.quantity })
-                        loadRecentViewedProducts()
-                    }.onFailure {
-                        _event.value = ProductsEvent.LOAD_SHOPPING_CART_FAILURE
-                    }
-            }
+            cartRepository
+                .loadCart()
+                .onSuccess { cartItems: List<CartItem> ->
+                    this@ProductsViewModel.cartItems = cartItems
+                    _cartItemsSize.value = cartItems.sumOf { it.quantity }
+                    loadRecentViewedProducts()
+                }.onFailure {
+                    _event.value = ProductsEvent.LOAD_SHOPPING_CART_FAILURE
+                }
         }
     }
 
@@ -138,23 +137,21 @@ class ProductsViewModel(
         viewModelScope.launch {
             val cartItemId = cartItems.find { it.productId == productId }?.id
             if (cartItemId == null) {
-                cartRepository.addCartItem(productId, quantity) { result ->
-                    result
-                        .onSuccess {
-                            loadCart()
-                        }.onFailure {
-                            _event.value = ProductsEvent.ADD_CART_ITEM_FAILURE
-                        }
-                }
+                cartRepository
+                    .addCartItem(productId, quantity)
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.value = ProductsEvent.ADD_CART_ITEM_FAILURE
+                    }
             } else {
-                cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
-                    result
-                        .onSuccess {
-                            loadCart()
-                        }.onFailure {
-                            _event.value = ProductsEvent.PLUS_CART_ITEM_FAILURE
-                        }
-                }
+                cartRepository
+                    .updateCartItemQuantity(cartItemId, quantity)
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.value = ProductsEvent.PLUS_CART_ITEM_FAILURE
+                    }
             }
         }
     }
@@ -166,25 +163,21 @@ class ProductsViewModel(
         viewModelScope.launch {
             val cartItemId = cartItems.find { it.productId == productId }?.id ?: error("")
             if (quantity == 0) {
-                cartRepository.remove(
-                    cartItemId = cartItemId,
-                ) { result ->
-                    result
-                        .onSuccess {
-                            loadCart()
-                        }.onFailure {
-                            _event.value = ProductsEvent.REMOVE_CART_ITEM_FAILURE
-                        }
-                }
+                cartRepository
+                    .remove(cartItemId)
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.value = ProductsEvent.REMOVE_CART_ITEM_FAILURE
+                    }
             } else {
-                cartRepository.updateCartItemQuantity(cartItemId, quantity) { result ->
-                    result
-                        .onSuccess {
-                            loadCart()
-                        }.onFailure {
-                            _event.value = ProductsEvent.MINUS_CART_ITEM_FAILURE
-                        }
-                }
+                cartRepository
+                    .updateCartItemQuantity(cartItemId, quantity)
+                    .onSuccess {
+                        loadCart()
+                    }.onFailure {
+                        _event.value = ProductsEvent.MINUS_CART_ITEM_FAILURE
+                    }
             }
         }
     }

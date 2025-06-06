@@ -9,16 +9,16 @@ import woowacourse.shopping.data.product.entity.RecentViewedProductEntity
 @Dao
 interface RecentViewedProductDao {
     @Query("SELECT * FROM recentViewedProducts")
-    fun loadProducts(): List<RecentViewedProductEntity>
+    suspend fun loadProducts(): List<RecentViewedProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun upsertProduct(item: RecentViewedProductEntity)
+    suspend fun upsertProduct(item: RecentViewedProductEntity)
 
     @Query("SELECT COUNT(*) FROM recentViewedProducts")
-    fun productsSize(): Int
+    suspend fun productsSize(): Int
 
     @Query(
         "DELETE FROM recentViewedProducts WHERE productId IN (SELECT productId FROM recentViewedProducts ORDER BY viewedAt ASC LIMIT :count)",
     )
-    fun deleteProduct(count: Int)
+    suspend fun deleteProduct(count: Int)
 }

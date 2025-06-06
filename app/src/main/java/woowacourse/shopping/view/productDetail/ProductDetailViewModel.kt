@@ -40,10 +40,11 @@ class ProductDetailViewModel(
     }
 
     private fun loadCartItems() {
-        cartRepository.loadCart { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .loadCart()
                 .onSuccess { cartItems: List<CartItem> ->
-                    this.cartItems = cartItems
+                    this@ProductDetailViewModel.cartItems = cartItems
                 }.onFailure {
                     _event.postValue(ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE)
                 }
@@ -91,29 +92,21 @@ class ProductDetailViewModel(
                     }
 
             if (cartItem == null) {
-                cartRepository.addCartItem(
-                    productId = productId,
-                    quantity = quantity.value ?: 1,
-                ) { result ->
-                    result
-                        .onSuccess {
-                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS
-                        }.onFailure {
-                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_FAILURE
-                        }
-                }
+                cartRepository
+                    .addCartItem(productId, quantity.value ?: 1)
+                    .onSuccess {
+                        _event.value = ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS
+                    }.onFailure {
+                        _event.value = ProductDetailEvent.ADD_SHOPPING_CART_FAILURE
+                    }
             } else {
-                cartRepository.updateCartItemQuantity(
-                    cartItemId = cartItem.id,
-                    quantity = quantity.value ?: 1,
-                ) { result ->
-                    result
-                        .onSuccess {
-                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS
-                        }.onFailure {
-                            _event.value = ProductDetailEvent.ADD_SHOPPING_CART_FAILURE
-                        }
-                }
+                cartRepository
+                    .updateCartItemQuantity(cartItem.id, quantity.value ?: 1)
+                    .onSuccess {
+                        _event.value = ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS
+                    }.onFailure {
+                        _event.value = ProductDetailEvent.ADD_SHOPPING_CART_FAILURE
+                    }
             }
         }
     }
