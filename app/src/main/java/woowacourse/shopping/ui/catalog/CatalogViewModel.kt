@@ -55,7 +55,6 @@ class CatalogViewModel(
             getCatalogProductsUseCase(page, count)
                 .onSuccess { newProducts ->
                     val uiState = uiState.value ?: return@launch
-
                     _uiState.value =
                         uiState.copy(
                             catalogProducts = uiState.catalogProducts.plus(newProducts),
@@ -82,7 +81,6 @@ class CatalogViewModel(
         viewModelScope.launch {
             getSearchHistoryUseCase().onSuccess { historyProducts ->
                 val uiState = uiState.value ?: return@launch
-
                 _uiState.value =
                     uiState.copy(
                         historyProducts = historyProducts,
@@ -94,7 +92,6 @@ class CatalogViewModel(
     fun increaseCartProduct(productId: Long) {
         viewModelScope.launch {
             val product = uiState.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
-
             increaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -104,7 +101,6 @@ class CatalogViewModel(
     fun decreaseCartProduct(productId: Long) {
         viewModelScope.launch {
             val product = uiState.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
-
             decreaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -116,7 +112,6 @@ class CatalogViewModel(
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
                     val uiState = uiState.value ?: return@launch
-
                     _uiState.value =
                         uiState.copy(
                             catalogProducts = uiState.catalogProducts.updateProduct(cartProduct),
@@ -133,7 +128,6 @@ class CatalogViewModel(
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { cartProducts ->
                     val uiState = uiState.value ?: return@launch
-
                     _uiState.value =
                         uiState.copy(
                             catalogProducts = uiState.catalogProducts.updateProducts(cartProducts),

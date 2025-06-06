@@ -49,7 +49,6 @@ class CartViewModel(
                 size = DEFAULT_PAGE_SIZE,
             ).onSuccess { cartProducts ->
                 val uiState = uiState.value ?: return@launch
-
                 _uiState.value =
                     uiState.copy(
                         cartProducts = cartProducts,
@@ -70,7 +69,6 @@ class CartViewModel(
             removeCartProductUseCase(cartId)
                 .onSuccess {
                     val uiState = uiState.value ?: return@launch
-
                     _uiState.value =
                         uiState.copy(
                             editedProductIds = uiState.editedProductIds.plus(productId),
@@ -101,7 +99,6 @@ class CartViewModel(
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     val uiState = uiState.value ?: return@launch
-
                     _uiState.value =
                         uiState.copy(
                             cartProducts = uiState.cartProducts.updateQuantity(product, newQuantity),
@@ -120,7 +117,6 @@ class CartViewModel(
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     val uiState = uiState.value ?: return@launch
-
                     when (newQuantity > MINIMUM_QUANTITY) {
                         true ->
                             _uiState.value =
@@ -149,7 +145,6 @@ class CartViewModel(
 
     fun toggleAllCartProductsSelection() {
         val uiState = uiState.value ?: return
-
         _uiState.value =
             uiState.copy(
                 cartProducts = uiState.cartProducts.toggleAllSelection(),
@@ -178,7 +173,6 @@ class CartViewModel(
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     val uiState = uiState.value ?: return@launch
-
                     when (product.quantity <= MINIMUM_QUANTITY) {
                         true -> updateRecommendedProduct(productId)
                         false ->
@@ -199,7 +193,6 @@ class CartViewModel(
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
                     val uiState = uiState.value ?: return@launch
-
                     _uiState.value =
                         uiState.copy(
                             recommendedProducts = uiState.recommendedProducts.updateProduct(cartProduct.copy(isSelected = true)),
@@ -217,7 +210,6 @@ class CartViewModel(
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     val uiState = uiState.value ?: return@launch
-
                     when (product.quantity <= MINIMUM_QUANTITY) {
                         true -> updateRecommendedProduct(productId)
                         false ->

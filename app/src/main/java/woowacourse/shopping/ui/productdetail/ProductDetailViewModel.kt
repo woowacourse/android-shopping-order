@@ -30,7 +30,6 @@ class ProductDetailViewModel(
     fun loadProductDetail(productId: Long) {
         viewModelScope.launch {
             val uiState = uiState.value ?: return@launch
-
             getCatalogProductUseCase(productId)
                 .onSuccess { catalogProduct ->
                     _uiState.value = uiState.copy(product = catalogProduct)
@@ -66,7 +65,6 @@ class ProductDetailViewModel(
 
     fun updateCartProduct() {
         val uiState = uiState.value ?: return
-
         viewModelScope.launch {
             updateCartProductUseCase(
                 productId = uiState.product.productDetail.id,

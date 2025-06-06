@@ -30,7 +30,6 @@ class PaymentViewModel(
     private fun loadCoupons() {
         viewModelScope.launch {
             val uiState = uiState.value ?: return@launch
-
             getCouponsUseCase()
                 .onSuccess {
                     _uiState.value = uiState.copy(coupons = it)
@@ -44,7 +43,6 @@ class PaymentViewModel(
     fun loadProducts(productIds: List<Long>) {
         viewModelScope.launch {
             val uiState = uiState.value ?: return@launch
-
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { newProducts ->
                     val products =
@@ -67,7 +65,6 @@ class PaymentViewModel(
 
     fun selectCoupon(couponId: Int) {
         val uiState = uiState.value ?: return
-
         _uiState.value =
             uiState.copy(
                 coupons = uiState.coupons.selectCoupon(couponId),
