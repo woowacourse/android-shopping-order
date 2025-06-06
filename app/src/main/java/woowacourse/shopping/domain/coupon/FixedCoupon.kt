@@ -10,4 +10,15 @@ data class FixedCoupon(
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
     val discount: Int,
-) : Coupon
+) : Coupon {
+    fun isUsable(
+        standardDate: LocalDate,
+        standardAmount: Int,
+    ): Boolean {
+        if (isExpired(standardDate)) return false
+        if (!isMinimumAmountSatisfied(standardAmount)) return false
+        return true
+    }
+
+    private fun isMinimumAmountSatisfied(standardAmount: Int) = standardAmount >= minimumAmount
+}
