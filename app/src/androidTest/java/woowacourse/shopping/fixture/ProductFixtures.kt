@@ -3,6 +3,7 @@
 package woowacourse.shopping.fixture
 
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 val RECENT_PRODUCTS: List<Product> = listOf(
     Product(
@@ -130,6 +131,21 @@ val RECENT_PRODUCTS: List<Product> = listOf(
         price = 100000,
         imageUrl = "https://kream-phinf.pstatic.net/MjAyNTA1MTNfMjI5/MDAxNzQ3MTA4MjUzOTg4.106G0-WfVU8g8ziNKgKJjc1_UXvF-2IatsA-Cz5mG1og.etXRFVPYqcs5J9HAfXpaHFPFHorGnZU4Nl7k4368rfog.PNG/a_090d2310040b4f9ca922f2498ae8ae3a.png?type=l",
         category = "패션잡화"
+    ),
+)
+
+
+val PRODUCT_TO_ORDER = listOf(
+    ShoppingCartProduct(
+        id = 1,
+        product = Product(
+            id = 361,
+            name = "에어포스311",
+            price = 100000,
+            imageUrl = "https://kream-phinf.pstatic.net/MjAyNTA1MTNfMjI5/MDAxNzQ3MTA4MjUzOTg4.106G0-WfVU8g8ziNKgKJjc1_UXvF-2IatsA-Cz5mG1og.etXRFVPYqcs5J9HAfXpaHFPFHorGnZU4Nl7k4368rfog.PNG/a_090d2310040b4f9ca922f2498ae8ae3a.png?type=l",
+            category = "패션잡화"
+        ),
+        quantity = 2,
     ),
 )
 
