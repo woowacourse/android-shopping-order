@@ -3,6 +3,8 @@ package woowacourse.shopping.product.catalog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.mapper.toUiModel
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
@@ -36,57 +38,53 @@ class CatalogViewModel(
     val loadingState: LiveData<LoadingState> get() = _loadingState
 
     fun increaseQuantity(product: ProductUiModel) {
-        if (product.quantity == 0) {
-            cartProductRepository.insertCartProduct(product.id, quantity = 1) { cartItemId ->
-                val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId?.toLong())
+        viewModelScope.launch {
+            if (product.quantity == 0) {
+                val cartItemId = cartProductRepository.insertCartProduct(product.id, quantity = 1)
+                val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId)
                 _updatedItem.postValue(addedProduct)
-            }
-        } else if (product.cartItemId != null) {
-            cartProductRepository.updateProduct(
-                product.cartItemId,
-                product.quantity + 1,
-            ) { result ->
-                if (result == true) {
+            } else if (product.cartItemId != null) {
+                val result: Boolean =
+                    cartProductRepository.updateProduct(product.cartItemId, product.quantity + 1)
+                if (result) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                 }
             }
+            loadCartItemSize()
         }
-
-        loadCartItemSize()
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        if (product.quantity == 1 && product.cartItemId != null) {
-            cartProductRepository.deleteCartProduct(product.cartItemId) { result ->
-                if (result == true) {
+        viewModelScope.launch {
+            if (product.quantity == 1 && product.cartItemId != null) {
+                val result: Boolean = cartProductRepository.deleteCartProduct(product.cartItemId)
+                if (result) {
                     _updatedItem.postValue(product.copy(quantity = 0))
                 }
-            }
-        } else if (product.cartItemId != null) {
-            cartProductRepository.updateProduct(
-                product.cartItemId,
-                product.quantity - 1,
-            ) { result ->
+            } else if (product.cartItemId != null) {
+                val result: Boolean =
+                    cartProductRepository.updateProduct(product.cartItemId, product.quantity - 1)
                 if (result == true) {
                     _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                 }
             }
+            loadCartItemSize()
         }
-
-        loadCartItemSize()
     }
 
     fun loadNextCatalogProducts() {
         page++
-        catalogProductRepository.getAllProductsSize { allProductSize ->
-            val endIndex = (page + 1) * PAGE_SIZE
+        val endIndex = (page + 1) * PAGE_SIZE
+        viewModelScope.launch {
+            val allProductSize = catalogProductRepository.getAllProductsSize()
             loadCatalog(page, endIndex, 20, allProductSize)
         }
     }
 
     fun loadCatalogUntilCurrentPage() {
-        catalogProductRepository.getAllProductsSize { allProductSize ->
-            val endIndex = (page + 1) * PAGE_SIZE
+        val endIndex = (page + 1) * PAGE_SIZE
+        viewModelScope.launch {
+            val allProductSize = catalogProductRepository.getAllProductsSize()
             loadCatalog(0, endIndex, endIndex, allProductSize)
         }
     }
@@ -97,46 +95,48 @@ class CatalogViewModel(
         size: Int = 20,
         allProductsSize: Long,
     ) {
-        _loadingState.postValue(LoadingState.loading())
+        viewModelScope.launch {
+            _loadingState.postValue(LoadingState.loading())
+            val pagedProducts: List<ProductUiModel> =
+                catalogProductRepository.getProductsByPage(page, size)
+            val totalElements: Long = cartProductRepository.getTotalElements()
+            val cartProducts: List<ProductUiModel> =
+                cartProductRepository.getCartProducts(totalElements)
 
-        catalogProductRepository.getProductsByPage(page, size) { pagedProducts ->
-            cartProductRepository.getTotalElements { totalElements ->
-                cartProductRepository.getCartProducts(totalElements) { cartProducts ->
-                    val cartProductMap: Map<Long, ProductUiModel> =
-                        cartProducts.associateBy { it.id }
+            val cartProductMap: Map<Long, ProductUiModel> =
+                cartProducts.associateBy { it.id }
 
-                    val mergedProducts =
-                        pagedProducts.map { product ->
-                            val cartProduct = cartProductMap[product.id]
-                            if (cartProduct != null) {
-                                product.copy(
-                                    quantity = cartProduct.quantity,
-                                    cartItemId = cartProduct.cartItemId,
-                                )
-                            } else {
-                                product
-                            }
-                        }
-
-                    val items = mergedProducts.map { ProductItem(it) }
-                    val hasNextPage = endIndex < allProductsSize
-                    val updatedItems =
-                        if (hasNextPage) {
-                            items + CatalogItem.LoadMoreButtonItem
-                        } else {
-                            items
-                        }
-
-                    _loadedCatalogItems.postValue(updatedItems)
-                    _loadingState.postValue(LoadingState.loaded())
+            val mergedProducts =
+                pagedProducts.map { product ->
+                    val cartProduct = cartProductMap[product.id]
+                    if (cartProduct != null) {
+                        product.copy(
+                            quantity = cartProduct.quantity,
+                            cartItemId = cartProduct.cartItemId,
+                        )
+                    } else {
+                        product
+                    }
                 }
-            }
+
+            val items = mergedProducts.map { ProductItem(it) }
+            val hasNextPage = endIndex < allProductsSize
+            val updatedItems =
+                if (hasNextPage) {
+                    items + CatalogItem.LoadMoreButtonItem
+                } else {
+                    items
+                }
+
+            _loadedCatalogItems.postValue(updatedItems)
+            _loadingState.postValue(LoadingState.loaded())
         }
     }
 
     fun loadCartItemSize() {
-        cartProductRepository.getCartItemSize { size ->
-            _cartItemSize.postValue(size)
+        viewModelScope.launch {
+            val cartItemSize = cartProductRepository.getCartItemSize()
+            _cartItemSize.postValue(cartItemSize)
         }
     }
 

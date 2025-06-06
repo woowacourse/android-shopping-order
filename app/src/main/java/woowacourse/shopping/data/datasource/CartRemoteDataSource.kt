@@ -3,40 +3,24 @@ package woowacourse.shopping.data.datasource
 import woowacourse.shopping.data.dto.cartitem.ProductResponse
 
 interface CartRemoteDataSource {
-    fun insertProduct(
+    suspend fun insertProduct(
         productId: Long,
         quantity: Int,
-        onSuccess: (Int) -> Unit, // cartItemId를 반환
-        onFailure: (Throwable) -> Unit,
-    )
+    ): Long
 
-    fun deleteProduct(
-        cartItemId: Long,
-        onSuccess: (Unit) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun deleteProduct(cartItemId: Long)
 
-    fun fetchProducts(
+    suspend fun fetchProducts(
         page: Int,
         size: Int,
-        onSuccess: (ProductResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): ProductResponse
 
-    fun updateProduct(
+    suspend fun updateProduct(
         cartItemId: Long,
         quantity: Int,
-        onSuccess: (Unit) -> Unit,
-        onFailure: (Throwable) -> Unit,
     )
 
-    fun fetchCartTotalElements(
-        onSuccess: (Long) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun fetchCartTotalElements(): Long
 
-    fun fetchCartItemsCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    suspend fun fetchCartItemsCount(): Int
 }
