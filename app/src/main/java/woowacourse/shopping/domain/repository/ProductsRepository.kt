@@ -1,23 +1,15 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.PagingData
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface ProductsRepository {
-    fun getProducts(
+    suspend fun getProducts(
         page: Int,
         size: Int = 20,
-        onResult: (Result<PagingData>) -> Unit,
-    )
+    ): Result<PagingData>
 
-    fun getProductById(
-        id: Long,
-        onResult: (Result<ProductUiModel>) -> Unit,
-    )
+    suspend fun getProductById(id: Long): Result<ProductUiModel>
 
-    fun getRecommendedProductsFromLastViewed(
-        cartProductIds: List<Long>,
-        onResult: (Result<List<ProductUiModel>>) -> Unit
-    )
+    suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<ProductUiModel>>
 }

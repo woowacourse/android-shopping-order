@@ -13,71 +13,53 @@ class ProductsRepositoryImpl(
     private val productsRemoteDataSource: ProductsRemoteDataSource,
     private val viewedItemRepository: ViewedItemRepository,
 ) : ProductsRepository {
-    override fun getProducts(
+    override suspend fun getProducts(
         page: Int,
         size: Int,
-        onResult: (Result<PagingData>) -> Unit,
-    ) {
-        productsRemoteDataSource.getProducts(page, size) { result ->
-            result
-                .mapCatching { response ->
-                    PagingData(
-                        products = response.content.map { it.toDomain().toUiModel() },
-                        page = response.pageable.pageNumber,
-                        hasNext = !response.last,
-                        hasPrevious = !response.first,
-                    )
-                }
-                .let(onResult)
-        }
-    }
-
-    override fun getProductById(
-        id: Long,
-        onResult: (Result<ProductUiModel>) -> Unit,
-    ) {
-        productsRemoteDataSource.getProductById(id) { result ->
-            result
-                .mapCatching { response ->
-                    response.toDomain().toUiModel()
-                }
-                .let(onResult)
-        }
-    }
-
-    override fun getRecommendedProductsFromLastViewed(
-        cartProductIds: List<Long>,
-        onResult: (Result<List<ProductUiModel>>) -> Unit,
-    ) {
-        viewedItemRepository.getLastViewedItem { item ->
-            if (item != null) {
-                getRecommendedProducts(
-                    category = item.category,
-                    cartProductIds = cartProductIds,
-                    onResult = onResult
+    ): Result<PagingData> {
+        return productsRemoteDataSource.getProducts(page, size)
+            .mapCatching { response ->
+                PagingData(
+                    products = response.content.map { it.toDomain().toUiModel() },
+                    page = response.pageable.pageNumber,
+                    hasNext = !response.last,
+                    hasPrevious = !response.first,
                 )
-            } else {
-                onResult(Result.success(emptyList()))
             }
+    }
+
+    override suspend fun getProductById(id: Long): Result<ProductUiModel> {
+        return productsRemoteDataSource.getProductById(id)
+            .mapCatching { response ->
+                response.toDomain().toUiModel()
+            }
+    }
+
+    override suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<ProductUiModel>> {
+        val lastViewedItem = viewedItemRepository.getLastViewedItem()
+
+        return if (lastViewedItem != null) {
+            getRecommendedProducts(
+                category = lastViewedItem.category,
+                cartProductIds = cartProductIds,
+            )
+        } else {
+            Result.success(emptyList())
         }
     }
 
-    private fun getRecommendedProducts(
+    private suspend fun getRecommendedProducts(
         category: String,
         cartProductIds: List<Long>,
-        onResult: (Result<List<ProductUiModel>>) -> Unit,
-    ) {
-        productsRemoteDataSource.getProductsByCategory(category) { result ->
-            result
-                .mapCatching { response ->
-                    response.content
-                        .map { it.toDomain() }
-                        .filter { it.id !in cartProductIds }
-                        .take(10)
-                        .map { it.toUiModel() }
-                }
-                .let(onResult)
-        }
+    ): Result<List<ProductUiModel>> {
+        return productsRemoteDataSource.getProductsByCategory(category)
+            .mapCatching { response ->
+                response.content
+                    .map { it.toDomain() }
+                    .filter { it.id !in cartProductIds }
+                    .take(10)
+                    .map { it.toUiModel() }
+            }
     }
 
     private fun ProductResponse.toDomain(): Product {
