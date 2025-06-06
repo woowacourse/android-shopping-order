@@ -1,6 +1,5 @@
 package woowacourse.shopping.viewModel.shoppingCart
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -12,7 +11,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,9 +35,6 @@ import woowacourse.shopping.viewModel.common.getOrAwaitValue
 @ExtendWith(CoroutinesTestExtension::class)
 @Suppress("FunctionName")
 class ShoppingCartViewModelTest {
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
-
     private lateinit var viewModel: ShoppingCartViewModel
     private lateinit var shoppingCartRepository: ShoppingCartRepository
 
