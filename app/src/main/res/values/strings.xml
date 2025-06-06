@@ -42,4 +42,6 @@
     <string name="payment_shipping_title">배송비</string>
     <string name="payment_total_payment_title">총 결제 금액</string>
     <string name="payment_order_button">결제하기</string>
+    <string name="payment_minimum_order_price">최소 주문 금액: %,d원</string>
+    <string name="payment_expiration_date">만료일: %s</string>
 </resources>

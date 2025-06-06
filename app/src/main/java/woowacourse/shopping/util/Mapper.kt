@@ -1,18 +1,14 @@
 package woowacourse.shopping.util
 
 import woowacourse.shopping.data.remote.cart.CartResponse.Content.CartRemoteProduct
+import woowacourse.shopping.data.remote.coupon.CouponResponse
 import woowacourse.shopping.data.remote.product.ProductResponse.Content
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Product
-
-fun List<Any>.replaceCartByProductId(newCart: CartProduct): List<Any> =
-    map {
-        if (it is CartProduct && it.product.id == newCart.product.id) {
-            newCart
-        } else {
-            it
-        }
-    }
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 fun CartProduct.updateQuantity(newQuantity: Int): CartProduct = this.copy(quantity = newQuantity)
 
@@ -33,3 +29,29 @@ fun Content.toDomain(): Product =
         imageUrl = imageUrl,
         category = category,
     )
+
+fun CouponResponse.toDomain(): Coupon {
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
+
+    val formattedDate =
+        this.expirationDate?.let {
+            LocalDate.parse(it).format(dateFormatter)
+        } ?: ""
+
+    return Coupon(
+        id = this.id,
+        code = this.code,
+        description = this.description,
+        expirationDate = formattedDate,
+        discountType = this.discountType,
+        discount = this.discount ?: 0,
+        minimumAmount = this.minimumAmount ?: 0,
+        buyQuantity = this.buyQuantity ?: 0,
+        getQuantity = this.getQuantity ?: 0,
+        availableTime =
+            this.availableTime?.start?.let {
+                LocalTime.parse(it, timeFormatter)
+            } ?: LocalTime.MIN,
+    )
+}

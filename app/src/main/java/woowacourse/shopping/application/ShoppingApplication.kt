@@ -4,10 +4,12 @@ import android.app.Application
 import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
 import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.coupon.CouponRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.goods.GoodsViewModel
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel
+import woowacourse.shopping.feature.payment.PaymentViewModel
 import woowacourse.shopping.util.ViewModelFactory
 
 class ShoppingApplication : Application() {
@@ -39,6 +41,14 @@ class ShoppingApplication : Application() {
                 CartRepository(),
                 ProductRepository(),
                 HistoryRepositoryImpl(database.historyDao()),
+            )
+        }
+    }
+
+    val paymentFactory by lazy {
+        ViewModelFactory {
+            PaymentViewModel(
+                CouponRepository(),
             )
         }
     }

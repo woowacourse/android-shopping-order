@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-import java.time.LocalDateTime
+import java.time.LocalTime
 
 data class Coupon(
     val id: Long,
@@ -12,5 +12,5 @@ data class Coupon(
     val minimumAmount: Int,
     val buyQuantity: Int,
     val getQuantity: Int,
-    val availableTime: LocalDateTime,
+    val availableTime: LocalTime,
 )
