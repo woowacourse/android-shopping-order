@@ -1,4 +1,4 @@
-package woowacourse.shopping.cart
+package woowacourse.shopping.cart.recoomendation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,13 +8,13 @@ import woowacourse.shopping.data.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCartProductRepositoryImpl
 import woowacourse.shopping.data.repository.RemoteCatalogProductRepositoryImpl
 
-class CartRecommendationFragmentViewModelFactory(
+class RecommendationFragmentViewModelFactory(
     private val application: ShoppingApplication,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CartRecommendationFragmentViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(RecommendationFragmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CartRecommendationFragmentViewModel(
+            return RecommendationFragmentViewModel(
                 cartProductRepository = RemoteCartProductRepositoryImpl(),
                 catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
                 recentlyViewedProductRepository = RecentlyViewedProductRepositoryImpl(

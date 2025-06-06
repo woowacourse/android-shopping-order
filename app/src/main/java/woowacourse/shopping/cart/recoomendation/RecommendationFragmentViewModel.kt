@@ -1,6 +1,5 @@
-package woowacourse.shopping.cart
+package woowacourse.shopping.cart.recoomendation
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,7 @@ import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
-class CartRecommendationFragmentViewModel(
+class RecommendationFragmentViewModel(
     private val cartProductRepository: CartProductRepository,
     private val catalogProductRepository: CatalogProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
@@ -17,10 +16,10 @@ class CartRecommendationFragmentViewModel(
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>(emptyList())
     val recommendedProducts: LiveData<List<ProductUiModel>> get() = _recommendedProducts
 
-    private val _totalPurchasePrice = MutableLiveData<Int>(0)
+    private val _totalPurchasePrice = MutableLiveData<Int>(INITIAL_TOTAL_PURCHASE_PRICE)
     val totalPurchasePrice: LiveData<Int> get() = _totalPurchasePrice
 
-    private val _selectedProductsCount = MutableLiveData<Int>(0)
+    private val _selectedProductsCount = MutableLiveData<Int>(INITIAL_SELECTED_PRODUCTS_COUNT)
     val selectedProductsCount: LiveData<Int> get() = _selectedProductsCount
 
     private val _updatedItem = MutableLiveData<ProductUiModel>()
@@ -55,56 +54,58 @@ class CartRecommendationFragmentViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        if (product.quantity == 0) {
-            val newProduct = product.copy(quantity = 1)
-            cartProductRepository.insertCartProduct(newProduct) { product ->
-                _updatedItem.postValue(product)
-                _recommendedProducts.value = _recommendedProducts.value?.map {
-                    if (it.id == product.id) product else it
+        when (product.quantity) {
+            0 -> {
+                val newProduct = product.copy(quantity = 1)
+                cartProductRepository.insertCartProduct(newProduct) { product ->
+                    updateItem(newProduct)
                 }
-                fetchTotalCount()
-                fetchPurchasePrice()
             }
-        } else {
-            cartProductRepository.updateProduct(product, product.quantity + 1) { result ->
-                if (result == true) {
-                    val newProduct = product.copy(quantity = product.quantity + 1)
-                    _updatedItem.postValue(newProduct)
-                    _recommendedProducts.value = _recommendedProducts.value?.map {
-                        if (it.id == newProduct.id) newProduct else it
+
+            else -> {
+                cartProductRepository.updateProduct(product, product.quantity + 1) { success ->
+                    if (success) {
+                        val newProduct = product.copy(quantity = product.quantity + 1)
+                        updateItem(newProduct)
                     }
-                    fetchTotalCount()
-                    fetchPurchasePrice()
                 }
             }
         }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        if (product.quantity == 1) {
-            val newProduct = product.copy(quantity = 0)
-            cartProductRepository.deleteCartProduct(product) {result ->
-                if (result == true) {
-                    _updatedItem.postValue(newProduct)
-                    _recommendedProducts.value = _recommendedProducts.value?.map {
-                        if (it.id == newProduct.id) newProduct else it
+        when (product.quantity) {
+            1 -> {
+                val newProduct = product.copy(quantity = 0)
+                cartProductRepository.deleteCartProduct(product) { success ->
+                    if (success) {
+                        updateItem(newProduct)
                     }
-                    fetchTotalCount()
-                    fetchPurchasePrice()
                 }
             }
-        } else {
-            cartProductRepository.updateProduct(product, product.quantity - 1) { result ->
-                if (result == true) {
-                    val newProduct = product.copy(quantity = product.quantity - 1)
-                    _updatedItem.postValue(newProduct)
-                    _recommendedProducts.value = _recommendedProducts.value?.map {
-                        if (it.id == newProduct.id) newProduct else it
+
+            else -> {
+                val newProduct = product.copy(quantity = product.quantity - 1)
+                cartProductRepository.updateProduct(product, product.quantity - 1) { success ->
+                    if (success) {
+                        updateItem(newProduct)
                     }
-                    fetchTotalCount()
-                    fetchPurchasePrice()
                 }
             }
         }
+    }
+
+    private fun updateItem(newProduct: ProductUiModel) {
+        _updatedItem.postValue(newProduct)
+        _recommendedProducts.value = _recommendedProducts.value?.map {
+            if (it.id == newProduct.id) newProduct else it
+        }
+        fetchTotalCount()
+        fetchPurchasePrice()
+    }
+
+    companion object {
+        private const val INITIAL_TOTAL_PURCHASE_PRICE: Int = 0
+        private const val INITIAL_SELECTED_PRODUCTS_COUNT: Int = 0
     }
 }

@@ -1,7 +1,6 @@
-package woowacourse.shopping.cart
+package woowacourse.shopping.cart.recoomendation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +16,13 @@ import woowacourse.shopping.product.catalog.ProductAdapter
 import woowacourse.shopping.product.catalog.ProductUiModel
 import woowacourse.shopping.product.detail.DetailActivity
 
-class CartRecommendationFragment : Fragment() {
+class RecommendationFragment : Fragment() {
     private lateinit var binding: FragmentCartRecommendationBinding
-    private val viewModel: CartRecommendationFragmentViewModel by lazy {
+    private val viewModel: RecommendationFragmentViewModel by lazy {
         ViewModelProvider(
             this,
-            CartRecommendationFragmentViewModelFactory(requireActivity().application as ShoppingApplication),
-        )[CartRecommendationFragmentViewModel::class.java]
+            RecommendationFragmentViewModelFactory(requireActivity().application as ShoppingApplication),
+        )[RecommendationFragmentViewModel::class.java]
     }
 
     private val adapter: ProductAdapter by lazy {
@@ -35,6 +34,7 @@ class CartRecommendationFragment : Fragment() {
                         val intent = DetailActivity.newIntent(requireContext(), product)
                         startActivity(intent)
                     }
+
                     override fun onQuantityAddClick(product: ProductUiModel) {
                         viewModel.increaseQuantity(product)
                     }
@@ -84,7 +84,9 @@ class CartRecommendationFragment : Fragment() {
         }
         viewModel.updatedItem.observe(viewLifecycleOwner) { product ->
             if (product != null) {
-                (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).updateItem(product)
+                (binding.recyclerViewCartRecommendation.adapter as ProductAdapter).updateItem(
+                    product
+                )
             }
         }
     }
