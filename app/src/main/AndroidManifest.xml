@@ -17,7 +17,7 @@
         android:theme="@style/Theme.Shopping"
         tools:targetApi="31">
         <activity
-            android:name=".feature.PaymentActivity"
+            android:name=".feature.payment.PaymentActivity"
             android:exported="false" />
         <activity
             android:name=".feature.cart.CartActivity"

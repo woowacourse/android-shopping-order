@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.cart
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.databinding.FragmentCartRecommendBinding
 import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
+import woowacourse.shopping.feature.payment.PaymentActivity
 import kotlin.getValue
 
 class CartRecommendFragment : Fragment() {
@@ -31,6 +33,16 @@ class CartRecommendFragment : Fragment() {
                 LinearLayoutManager.HORIZONTAL,
                 false,
             )
+
+        binding.tvOrderButton.setOnClickListener {
+            Log.d("CartRecommendFragment", "order button clicked")
+            navigate()
+        }
         return binding.root
+    }
+
+    private fun navigate() {
+        val intent = PaymentActivity.newIntent(this.requireActivity())
+        startActivity(intent)
     }
 }
