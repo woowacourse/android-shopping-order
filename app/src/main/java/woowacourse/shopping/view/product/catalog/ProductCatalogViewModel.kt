@@ -94,11 +94,14 @@ class ProductCatalogViewModel(
     }
 
     private fun loadRecentProducts() {
-        recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            recentProductRepository
+                .getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT)
                 .onSuccess {
                     recentProducts.postValue(it)
-                }.onFailure { Log.e("error", it.message.toString()) }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
@@ -115,8 +118,9 @@ class ProductCatalogViewModel(
     }
 
     private fun loadProducts() {
-        productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1)) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult, true)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -124,8 +128,9 @@ class ProductCatalogViewModel(
     }
 
     private fun loadMoreProducts() {
-        productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .getPagedProducts(page, PRODUCT_SIZE_LIMIT)
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult, false)
                 }.onFailure { Log.e("error", it.message.toString()) }

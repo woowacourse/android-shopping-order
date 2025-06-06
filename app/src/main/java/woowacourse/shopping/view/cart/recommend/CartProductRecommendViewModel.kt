@@ -64,30 +64,29 @@ class CartProductRecommendViewModel(
     }
 
     private fun loadRecommendedProducts() {
-        recentProductRepository.getLastViewedProduct { result ->
-            result
+        viewModelScope.launch {
+            recentProductRepository
+                .getLastViewedProduct()
                 .onSuccess { recentProduct ->
-                    recentProduct ?: return@getLastViewedProduct
-                    productRepository.getPagedProducts { result ->
-                        result
-                            .onSuccess { products ->
-                                val cartProductIds =
-                                    cartProducts.map { it.product.id }.toSet()
-                                val recommended =
-                                    products.items
-                                        .asSequence()
-                                        .filter { it.category == recentProduct.product.category }
-                                        .filter { it.id !in cartProductIds }
-                                        .shuffled()
-                                        .take(RECOMMEND_SIZE)
-                                        .map { RecommendedProductItem(it) }
-                                        .toList()
+                    if (recentProduct == null) return@launch
+                    productRepository
+                        .getPagedProducts()
+                        .onSuccess { products ->
+                            val cartProductIds = cartProducts.map { it.product.id }.toSet()
+                            val recommended =
+                                products.items
+                                    .asSequence()
+                                    .filter { it.category == recentProduct.product.category }
+                                    .filter { it.id !in cartProductIds }
+                                    .shuffled()
+                                    .take(RECOMMEND_SIZE)
+                                    .map { RecommendedProductItem(it) }
+                                    .toList()
 
-                                _recommendedProducts.postValue(recommended)
-                            }.onFailure {
-                                Log.e("error", it.message.toString())
-                            }
-                    }
+                            _recommendedProducts.postValue(recommended)
+                        }.onFailure {
+                            Log.e("error", it.message.toString())
+                        }
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }

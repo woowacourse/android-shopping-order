@@ -80,18 +80,25 @@ class ProductDetailViewModel(
     }
 
     private fun loadLastViewedProduct() {
-        recentProductRepository.getLastViewedProduct { result ->
-            result
+        viewModelScope.launch {
+            recentProductRepository
+                .getLastViewedProduct()
                 .onSuccess {
                     _lastViewedProduct.postValue(it)
-                }.onFailure { Log.e("error", it.message.toString()) }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 
     private fun updateRecentProduct() {
-        val recentProduct = RecentProduct(product = product)
-        recentProductRepository.replaceRecentProduct(recentProduct) {
-            it.onFailure { Log.e("error", it.message.toString()) }
+        viewModelScope.launch {
+            val recentProduct = RecentProduct(product = product)
+            recentProductRepository
+                .replaceRecentProduct(recentProduct)
+                .onFailure {
+                    Log.e("error", it.message.toString())
+                }
         }
     }
 

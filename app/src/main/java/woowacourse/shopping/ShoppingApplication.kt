@@ -27,7 +27,7 @@ class ShoppingApplication : Application() {
         by lazy {
             RecentProductRepositoryImpl(
                 RecentProductLocalDataSource(database.recentProductDao),
-                productRepository,
+                ProductRemoteDataSource(retrofitInstance.productService),
             )
         }
 }
