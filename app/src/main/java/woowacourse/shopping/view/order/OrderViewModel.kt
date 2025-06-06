@@ -44,14 +44,8 @@ class OrderViewModel(
 
                 val totalPrice = shoppingCartProductsToOrder.sumOf { it.price }
                 val totalShippingDiscount =
-                    Coupon.DEFAULT_SHIPPING_FEE -
-                        coupon
-                            .filterIsInstance<FreeShipping>()
-                            .sumOf { it.disCountAmount(shoppingCartProductsToOrder) }
-
-                val totalDiscount =
-                    coupon
-                        .sumOf { it?.disCountAmount(shoppingCartProductsToOrder) ?: 0 }
+                    coupon.totalShippingDiscount(shoppingCartProductsToOrder)
+                val totalDiscount = coupon.totalDiscount(shoppingCartProductsToOrder)
 
                 OrderState(
                     totalPrice = totalPrice,
@@ -69,13 +63,7 @@ class OrderViewModel(
             coupons = Coupons(couponRepository.getAllCoupons().getOrThrow())
             _couponState.value =
                 coupons.available(shoppingCartProductsToOrder).map {
-                    CouponState(
-                        id = it.id,
-                        isSelected = false,
-                        title = it.description,
-                        expirationDate = it.explanationDate,
-                        minimumOrderPrice = it.minimumAmount,
-                    )
+                    CouponState.fromDomain(it)
                 }
         }
     }
@@ -88,9 +76,7 @@ class OrderViewModel(
                 }
                 ?.map {
                     if (it.id == couponState.id) {
-                        it.copy(
-                            isSelected = true,
-                        )
+                        it.copy(isSelected = true)
                     } else {
                         it
                     }
@@ -104,6 +90,17 @@ class OrderViewModel(
             }
             _event.value = OrderEvent.ORDER_SUCCESS
         }
+    }
+
+    private fun List<Coupon?>.totalDiscount(shoppingCartProductsToOrder: List<ShoppingCartProduct>): Int {
+        return sumOf { it?.discountAmount(shoppingCartProductsToOrder) ?: 0 }
+    }
+
+    private fun List<Coupon?>.totalShippingDiscount(shoppingCartProductsToOrder: List<ShoppingCartProduct>): Int {
+        return Coupon.DEFAULT_SHIPPING_FEE -
+            this
+                .filterIsInstance<FreeShipping>()
+                .sumOf { it.discountAmount(shoppingCartProductsToOrder) }
     }
 
     companion object {
