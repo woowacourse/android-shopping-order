@@ -26,10 +26,10 @@ class DefaultProductsRepository(
         }
     }
 
-    override suspend fun getLatestRecentWatchingProduct(): Result<Product> {
+    override suspend fun getLatestRecentWatchingProduct(): Result<Product?> {
         val result = recentWatchingDao.getRecentWatchingProducts(1)
         return runCatching {
-            result.map { it.product }.first()
+            result.map { it.product }.firstOrNull()
         }
     }
 

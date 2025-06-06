@@ -75,8 +75,10 @@ class ProductDetailViewModel(
                 _recentProductBoxVisible.postValue(false)
                 return@launch
             }
-            _recentWatchingProduct.postValue(recentProducts)
-            _recentProductBoxVisible.postValue(true)
+            recentProducts?.let {
+                _recentWatchingProduct.postValue(it)
+                _recentProductBoxVisible.postValue(true)
+            }
             updateRecentWatching()
         }
     }

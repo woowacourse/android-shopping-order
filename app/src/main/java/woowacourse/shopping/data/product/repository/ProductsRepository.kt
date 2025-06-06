@@ -10,7 +10,7 @@ interface ProductsRepository {
 
     suspend fun getRecentWatchingProducts(size: Int): Result<List<Product>>
 
-    suspend fun getLatestRecentWatchingProduct(): Result<Product>
+    suspend fun getLatestRecentWatchingProduct(): Result<Product?>
 
     suspend fun getRecentRecommendWatchingProducts(size: Int): Result<List<Product>>
 
