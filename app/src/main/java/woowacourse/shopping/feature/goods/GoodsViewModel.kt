@@ -64,28 +64,25 @@ class GoodsViewModel(
     fun addToCart(cart: CartProduct) {
         val newQuantity = cart.quantity + 1
 
-        if (cart.quantity == 0) {
-            val cartRequest =
-                CartRequest(
-                    productId = cart.product.id,
-                    quantity = newQuantity,
-                )
+        viewModelScope.launch {
+            if (cart.quantity == 0) {
+                val cartRequest =
+                    CartRequest(
+                        productId = cart.product.id,
+                        quantity = newQuantity,
+                    )
 
-            viewModelScope.launch {
                 cartRepository
                     .addToCart(cartRequest)
                     .onSuccess { newCartId ->
                         val updatedCart = cart.copy(id = newCartId, quantity = newQuantity)
-
                         updateItems(updatedCart)
                         getCartCounts()
                         _insertState.value = Event(State.Success)
                     }.onFailure {
                         _insertState.value = Event(State.Failure)
                     }
-            }
-        } else {
-            viewModelScope.launch {
+            } else {
                 cartRepository
                     .updateCart(id = cart.id, cartQuantity = CartQuantity(newQuantity))
                     .onSuccess {

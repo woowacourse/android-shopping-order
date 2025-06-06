@@ -60,7 +60,6 @@ class GoodsDetailsViewModel(
                     product = productContent.toDomain(),
                     quantity = matchedCart?.quantity ?: 1,
                 )
-
             _cartProduct.value = cartProduct
             insertToHistory(cartProduct)
         }
@@ -87,35 +86,31 @@ class GoodsDetailsViewModel(
             val currentCart = cartProduct.value ?: EMPTY_CART_PRODUCT
             val newQuantity = currentCart.quantity
 
-            if (currentCart.quantity == 1) {
-                val cartRequest =
-                    CartRequest(
-                        productId = currentCart.product.id,
-                        quantity = newQuantity,
-                    )
+            viewModelScope.launch {
+                if (currentCart.quantity == 1) {
+                    val cartRequest =
+                        CartRequest(
+                            productId = currentCart.product.id,
+                            quantity = newQuantity,
+                        )
 
-                viewModelScope.launch {
                     cartRepository
                         .addToCart(cartRequest)
                         .onSuccess { newCartId ->
                             val updatedCart = cartProduct.value?.copy(id = newCartId, quantity = newQuantity)
-
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
                         }.onFailure {
                             _insertState.value = Event(State.Failure)
                         }
-                }
-            } else {
-                viewModelScope.launch {
+                } else {
                     cartRepository
                         .updateCart(
                             id = currentCart.id,
                             cartQuantity = CartQuantity(newQuantity),
                         ).onSuccess {
                             val updatedCart = cartProduct.value?.copy(quantity = newQuantity)
-
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)

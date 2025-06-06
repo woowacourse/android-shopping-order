@@ -53,26 +53,20 @@ class CartViewModel(
 
     init {
         fetchTotalItemsCount()
-        viewModelScope.launch {
-            loadCarts()
-        }
+        loadCarts()
         loadProductsByCategory()
     }
 
     fun plusPage() {
         currentPage++
         _page.value = currentPage
-        viewModelScope.launch {
-            loadCarts()
-        }
+        loadCarts()
     }
 
     fun minusPage() {
         currentPage--
         _page.value = currentPage
-        viewModelScope.launch {
-            loadCarts()
-        }
+        loadCarts()
     }
 
     fun toggleCheck(cart: CartProduct) {
@@ -195,25 +189,28 @@ class CartViewModel(
         }
     }
 
-    private suspend fun loadCarts() {
+    private fun loadCarts() {
         _isLoading.postValue(true)
-        val response = cartRepository.fetchCart(page = currentPage)
-        val cartList =
-            response.content.map {
-                CartProduct(
-                    id = it.id,
-                    product = it.product.toDomain(),
-                    quantity = it.quantity,
-                )
-            }
-        _carts.postValue(cartList)
-        _page.postValue(response.number)
-        updatePageButtonStates(
-            response.first,
-            response.last,
-            response.totalElements.toInt(),
-        )
-        _isLoading.postValue(false)
+
+        viewModelScope.launch {
+            val response = cartRepository.fetchCart(page = currentPage)
+            val cartList =
+                response.content.map {
+                    CartProduct(
+                        id = it.id,
+                        product = it.product.toDomain(),
+                        quantity = it.quantity,
+                    )
+                }
+            _carts.postValue(cartList)
+            _page.postValue(response.number)
+            updatePageButtonStates(
+                response.first,
+                response.last,
+                response.totalElements.toInt(),
+            )
+            _isLoading.postValue(false)
+        }
     }
 
     fun loadProductsByCategory() {
