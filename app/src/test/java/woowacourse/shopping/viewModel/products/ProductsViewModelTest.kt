@@ -1,9 +1,8 @@
 package woowacourse.shopping.viewModel.products
 
-import io.mockk.Runs
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -13,13 +12,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.fixture.PRODUCT1
-import woowacourse.shopping.fixture.SHOPPING_CARTS
+import woowacourse.shopping.fixture.SHOPPING_CARTS1
 import woowacourse.shopping.fixture.SHOPPING_CART_PRODUCT1
 import woowacourse.shopping.view.product.ProductsEvent
 import woowacourse.shopping.view.product.ProductsItem
@@ -40,22 +40,30 @@ class ProductsViewModelTest {
     @OptIn(DelicateCoroutinesApi::class)
     @BeforeEach
     fun setUp() {
-        coEvery { productsRepository.getProduct(any()) } returns PRODUCT1
-        coEvery { productsRepository.load(any(), any()) } returns listOf(PRODUCT1)
-        coEvery { productsRepository.updateRecentWatchingProduct(any()) } just Runs
-        coEvery { shoppingCartRepository.fetchAllQuantity() } returns 1
+        coEvery { productsRepository.getProduct(any()) } returns Result.success(PRODUCT1)
+        coEvery { productsRepository.load(any(), any()) } returns Result.success(listOf(PRODUCT1))
+        coEvery { productsRepository.updateRecentWatchingProduct(any()) } returns
+            Result.success(
+                Unit,
+            )
+        coEvery { shoppingCartRepository.fetchAllQuantity() } returns Result.success(1)
         coEvery {
             shoppingCartRepository.updateQuantity(
                 any(), any(),
             )
-        } returns SHOPPING_CART_PRODUCT1
-        coEvery { shoppingCartRepository.load() } returns SHOPPING_CARTS
+        } returns Result.success(SHOPPING_CART_PRODUCT1)
+        coEvery { shoppingCartRepository.load() } returns Result.success(SHOPPING_CARTS1)
 
         viewModel =
             ProductsViewModel(
                 productsRepository,
                 shoppingCartRepository,
             )
+    }
+
+    @AfterEach
+    fun tearDown() {
+        clearAllMocks()
     }
 
     @Test
@@ -155,8 +163,9 @@ class ProductsViewModelTest {
                 ProductsItem.ProductItem(
                     shoppingCartId = 1,
                     product = PRODUCT1,
-                    selectedQuantity = 1,
+                    selectedQuantity = 2,
                 ),
+                ProductsItem.LoadItem,
             ),
         )
     }

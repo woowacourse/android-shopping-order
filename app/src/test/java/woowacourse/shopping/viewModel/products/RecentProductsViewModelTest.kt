@@ -1,9 +1,7 @@
 package woowacourse.shopping.viewModel.products
 
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,10 +29,16 @@ class RecentProductsViewModelTest {
     @OptIn(DelicateCoroutinesApi::class)
     @BeforeEach
     fun setUp() {
-        coEvery { productsRepository.getProduct(any()) } returns PRODUCT1
-        coEvery { productsRepository.load(any(), any()) } returns listOf(PRODUCT1)
-        coEvery { productsRepository.updateRecentWatchingProduct(any()) } just Runs
-        coEvery { productsRepository.getRecentWatchingProducts(any()) } returns RECENT_PRODUCTS
+        coEvery { productsRepository.getProduct(any()) } returns Result.success(PRODUCT1)
+        coEvery { productsRepository.load(any(), any()) } returns Result.success(listOf(PRODUCT1))
+        coEvery { productsRepository.updateRecentWatchingProduct(any()) } returns
+            Result.success(
+                Unit,
+            )
+        coEvery { productsRepository.getRecentWatchingProducts(any()) } returns
+            Result.success(
+                RECENT_PRODUCTS,
+            )
 
         viewModel =
             RecentProductsViewModel(
