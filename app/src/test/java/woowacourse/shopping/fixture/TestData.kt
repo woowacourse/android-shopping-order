@@ -3,6 +3,7 @@ package woowacourse.shopping.fixture
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
+import woowacourse.shopping.view.product.ProductsItem
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
 
 val PRODUCT1 =
@@ -20,10 +21,89 @@ val PRODUCT2 =
         name = "에어포스2",
         price = 100_000,
         imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
-        category = "패션일까",
+        category = "패션잡화",
     )
 
-val SHOPPING_CART_QUANTITY = 1
+val PRODUCT3 =
+    Product(
+        id = 3,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT4 =
+    Product(
+        id = 4,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT5 =
+    Product(
+        id = 5,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT6 =
+    Product(
+        id = 6,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT7 =
+    Product(
+        id = 7,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT8 =
+    Product(
+        id = 8,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT9 =
+    Product(
+        id = 9,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT10 =
+    Product(
+        id = 10,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
+
+val PRODUCT11 =
+    Product(
+        id = 11,
+        name = "에어포스2",
+        price = 100_000,
+        imageUrl = "https://i.namu.wiki/i/ExNTyOB5363wFnhGLSfRPOSj9G5VwSQiISkjICuIVI-8S8djFN8cJLB44Mb7jzqQMu-8OJxtuPTmE3FLkq4ebg.webp",
+        category = "패션잡화",
+    )
 
 val SHOPPING_CART_PRODUCT1 =
     ShoppingCartProduct(
@@ -135,4 +215,27 @@ val RECENT_PRODUCTS =
     listOf(
         PRODUCT1,
         PRODUCT2,
+    )
+
+val RECENT_PRODUCTS_FULL =
+    listOf(
+        PRODUCT1,
+        PRODUCT2,
+        PRODUCT3,
+        PRODUCT4,
+        PRODUCT5,
+        PRODUCT6,
+        PRODUCT7,
+        PRODUCT8,
+        PRODUCT9,
+        PRODUCT10,
+        PRODUCT11,
+    )
+
+val RECOMMENDED_PRODUCTS =
+    listOf(
+        ProductsItem.ProductItem(
+            null,
+            PRODUCT2,
+        ),
     )

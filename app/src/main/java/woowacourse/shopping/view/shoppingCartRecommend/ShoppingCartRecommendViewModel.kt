@@ -59,11 +59,14 @@ class ShoppingCartRecommendViewModel(
             val shoppingCarts =
                 shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE).getOrThrow()
 
+            val category = products.firstOrNull()?.category ?: return@launch
+
             val cartProductIds: Set<Long> =
                 shoppingCarts.shoppingCartItems.map { it.product.id }.toSet()
             val recommended =
                 products
                     .filter { !cartProductIds.contains(it.id) }
+                    .filter { it.category == category }
                     .map { ProductsItem.ProductItem(product = it) }
                     .take(10)
             _recommendProducts.value = recommended
