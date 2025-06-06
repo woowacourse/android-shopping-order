@@ -28,7 +28,7 @@ class CartFragment : Fragment() {
             quantityChangeListener =
                 object : QuantityChangeListener {
                     override fun onIncrease(cartItem: CartItem) {
-                        viewModel.increaseQuantity(cartItem)
+                        viewModel.increaseCartItemQuantity(cartItem)
                     }
 
                     override fun onDecrease(cartItem: CartItem) {

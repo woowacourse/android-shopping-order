@@ -9,6 +9,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateError
@@ -144,39 +145,29 @@ class CartRemoteDataSourceImpl(
             CartFetchResult.Error(CartFetchError.Network)
         }
 
-    override fun addItem(
+    override suspend fun addItem(
         itemId: Int,
         itemCount: Int,
-        onSuccess: (resultCode: Int, cartId: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .addCartItem(
-                cartItem = CartItemRequest(itemId, itemCount),
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val location = response.headers()["Location"]
-                            val cartItemId = extractCartItemId(location)
+    ): CartFetchResult<AddItemResult> {
+        try {
+            val response =
+                retrofitService
+                    .addCartItem(
+                        cartItem = CartItemRequest(itemId, itemCount),
+                    )
+            if (response.isSuccessful) {
+                val location = response.headers()["Location"]
+                val cartItemId = extractCartItemId(location)
 
-                            onSuccess(response.code(), cartItemId)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
+                return CartFetchResult.Success(AddItemResult(response.code(), cartItemId))
+            } else {
+                return CartFetchResult.Error(
+                    CartFetchError.Server(response.code(), response.message()),
+                )
+            }
+        } catch (e: Exception) {
+            return CartFetchResult.Error(CartFetchError.Network)
+        }
     }
 
     private fun extractCartItemId(location: String?): Int =

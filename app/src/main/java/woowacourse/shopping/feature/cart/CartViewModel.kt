@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
@@ -197,35 +198,53 @@ class CartViewModel(
     fun addCartItemOrIncreaseQuantityFromRecommend(cartItem: CartItem) {
         when {
             _carts.value?.contains(cartItem.id) == true -> {
-                val currentList = _recommendedGoods.value ?: return
-                val updatedList =
-                    currentList.map { item ->
-                        if (item.goods.id == cartItem.goods.id) {
-                            item.copy(quantity = item.quantity + 1)
-                        } else {
-                            item
-                        }
-                    }
-                _recommendedGoods.value = updatedList
-                increaseQuantity(cartItem)
+                updateRecommendItem(cartItem.copy(quantity = cartItem.quantity + 1))
+                increaseCartItemQuantity(cartItem)
             }
             else -> {
-                cartRepository.addCartItem(cartItem.goods, 1, { resultCode: Int, cartId: Int ->
-                    val currentList = _recommendedGoods.value ?: return@addCartItem
-                    val newItem = cartItem.copy(quantity = cartItem.quantity + 1, id = cartId, isSelected = true)
-                    val updatedList =
-                        currentList.map { item ->
-                            if (item.goods.id == cartItem.goods.id) {
-                                newItem
-                            } else {
-                                item
-                            }
-                        }
-                    _recommendedGoods.value = updatedList
-                    addLocalCartItem(newItem)
-                }, { })
+                addCartItemFromRecommend(cartItem)
             }
         }
+    }
+
+    private fun addCartItemFromRecommend(cartItem: CartItem) {
+        viewModelScope.launch {
+            val result = cartRepository.addCartItem(cartItem.goods, quantity = 1)
+            when (result) {
+                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Success -> {
+                    addRecommendItemToLocalVariables(cartItem, result)
+                }
+            }
+        }
+    }
+
+    private fun addRecommendItemToLocalVariables(
+        cartItem: CartItem,
+        result: CartFetchResult.Success<AddItemResult>,
+    ) {
+        val newItem =
+            cartItem.copy(
+                quantity = cartItem.quantity + 1,
+                id = result.data.cartId,
+                isSelected = true,
+            )
+
+        updateRecommendItem(newItem)
+        addLocalCartItem(newItem)
+    }
+
+    private fun updateRecommendItem(newRecommendItem: CartItem) {
+        val currentList = _recommendedGoods.value ?: return
+        val updatedList =
+            currentList.map { item ->
+                if (item.goods.id == newRecommendItem.goods.id) {
+                    newRecommendItem
+                } else {
+                    item
+                }
+            }
+        _recommendedGoods.value = updatedList
     }
 
     private fun addLocalCartItem(cartItem: CartItem) {
@@ -256,7 +275,7 @@ class CartViewModel(
 
     fun getPosition(cartItem: CartItem): Int? = currentPageCarts.value?.indexOf(cartItem)?.takeIf { it >= 0 }
 
-    fun increaseQuantity(cartItem: CartItem) {
+    fun increaseCartItemQuantity(cartItem: CartItem) {
         viewModelScope.launch {
             val result = cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
             when (result) {

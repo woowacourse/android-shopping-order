@@ -196,7 +196,7 @@ class CartViewModelTest {
         }
         viewModel.setTestCarts(listOf(sampleCartItem1))
 
-        viewModel.increaseQuantity(sampleCartItem1)
+        viewModel.increaseCartItemQuantity(sampleCartItem1)
 
         verify { cartRepository.updateQuantity(eq(1), any(), any(), any()) }
     }

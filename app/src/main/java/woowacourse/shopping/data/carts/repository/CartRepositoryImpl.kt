@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.account.AccountLocalDataSource
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
@@ -67,12 +68,8 @@ class CartRepositoryImpl(
             cartId = cartId,
         )
 
-    override fun addCartItem(
+    override suspend fun addCartItem(
         goods: Goods,
         quantity: Int,
-        onComplete: (resultCode: Int, cartId: Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.addItem(goods.id, quantity, onComplete, onFail)
-    }
+    ): CartFetchResult<AddItemResult> = remoteDataSource.addItem(goods.id, quantity)
 }

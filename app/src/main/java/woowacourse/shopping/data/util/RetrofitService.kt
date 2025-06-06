@@ -50,7 +50,7 @@ interface RetrofitService {
     ): Response<Unit>
 
     @POST("/cart-items")
-    fun addCartItem(
+    suspend fun addCartItem(
         @Body cartItem: CartItemRequest,
-    ): Call<Unit>
+    ): Response<Unit>
 }

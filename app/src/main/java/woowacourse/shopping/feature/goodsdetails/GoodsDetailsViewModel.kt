@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
@@ -86,10 +87,16 @@ class GoodsDetailsViewModel(
     }
 
     private fun addCartItem(item: CartItem) {
-        cartRepository.addCartItem(item.goods, item.quantity, { resultCode: Int, cartId: Int ->
-            alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
-            this.cartId = cartId
-        }, {})
+        viewModelScope.launch {
+            val result = cartRepository.addCartItem(item.goods, item.quantity)
+            when (result) {
+                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Success -> {
+                    alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
+                    cartId = result.data.cartId
+                }
+            }
+        }
     }
 
     private fun alertMessageEvent(

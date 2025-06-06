@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
@@ -38,10 +39,8 @@ interface CartRepository {
 
     suspend fun delete(cartId: Int): CartFetchResult<Int>
 
-    fun addCartItem(
+    suspend fun addCartItem(
         goods: Goods,
         quantity: Int,
-        onComplete: (resultCode: Int, cartId: Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    ): CartFetchResult<AddItemResult>
 }

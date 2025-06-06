@@ -215,10 +215,13 @@ class GoodsViewModel(
     private fun getGoodsByGoodsResponse(goodsResponse: GoodsResponse): List<Goods> = goodsResponse.content.map { it.toDomain() }
 
     private fun addCartItem(cartItem: CartItem) {
-        cartRepository.addCartItem(cartItem.goods, 1, { resultCode: Int, cartId: Int ->
-            val newCartItem = cartItem.copy(quantity = 1, id = cartId)
-            updateCartCacheItem(newCartItem)
-        }, {})
+        viewModelScope.launch {
+            val result = cartRepository.addCartItem(cartItem.goods, 1)
+            when (result) {
+                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Success -> updateCartCacheItem(cartItem.copy(quantity = 1, id = result.data.cartId))
+            }
+        }
     }
 
     private fun updateCartItemQuantity(
