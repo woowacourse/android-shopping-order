@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.cart
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -39,7 +38,7 @@ interface CartService {
     ): Response<Unit>
 
     @GET("/cart-items/counts")
-    fun getCartCounts(
+    suspend fun getCartCounts(
         @Header("accept") accept: String = "*/*",
-    ): Call<CartQuantity>
+    ): Response<CartQuantity>
 }

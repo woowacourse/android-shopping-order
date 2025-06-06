@@ -240,12 +240,15 @@ class GoodsViewModel(
     }
 
     private fun getCartCounts() {
-        cartRepository.getCartCounts(
-            onSuccess = { totalCount ->
-                _totalQuantity.value = totalCount.toInt()
-            },
-            onError = { Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it) },
-        )
+        viewModelScope.launch {
+            cartRepository
+                .getCartCounts()
+                .onSuccess { totalCount ->
+                    _totalQuantity.value = totalCount.toInt()
+                }.onFailure {
+                    Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it)
+                }
+        }
     }
 
     companion object {

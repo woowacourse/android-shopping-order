@@ -184,12 +184,15 @@ class CartViewModel(
     }
 
     private fun fetchTotalItemsCount() {
-        cartRepository.getCartCounts(
-            onSuccess = { count ->
-                totalItemsCount.postValue(count.toInt())
-            },
-            onError = { Log.e("loadProductsInRange", "API 요청 실패", it) },
-        )
+        viewModelScope.launch {
+            cartRepository
+                .getCartCounts()
+                .onSuccess { totalCount ->
+                    totalItemsCount.postValue(totalCount.toInt())
+                }.onFailure {
+                    Log.e("TotalItemsCount", "API 요청 실패", it)
+                }
+        }
     }
 
     private suspend fun loadCarts() {
