@@ -21,6 +21,7 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         viewModel.loadCoupons()
         initViewBinding()
         initPaymentProductsInfo()
