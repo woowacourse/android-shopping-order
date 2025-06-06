@@ -3,6 +3,7 @@ package woowacourse.shopping.view.productDetail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -43,7 +44,6 @@ class ProductDetailActivity :
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         productId =
             intent.getSerializableExtraData(EXTRA_PRODUCT_ID) ?: run {
                 binding.root.showSnackBar(getString(R.string.product_not_provided_error_message))
@@ -52,8 +52,19 @@ class ProductDetailActivity :
         shoppingCartId = intent.getSerializableExtraData(EXTRA_SHOPPING_CART_ID)
         shoppingCartQuantity =
             intent.getSerializableExtraData(EXTRA_SHOPPING_CART_QUANTITY) ?: 0
+        setOnBackPressed()
         bindViewModel()
         setupObservers()
+    }
+
+    private fun setOnBackPressed() {
+        onBackPressedDispatcher.addCallback(
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    onCloseButton()
+                }
+            },
+        )
     }
 
     private fun bindViewModel() {

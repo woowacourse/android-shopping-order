@@ -18,8 +18,8 @@ import woowacourse.shopping.view.product.ProductsEvent
 import woowacourse.shopping.view.product.ProductsItem
 
 class ProductsViewModel(
-    private val productsRepository: ProductsRepository = DefaultProductsRepository.Companion.get(),
-    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.Companion.get(),
+    private val productsRepository: ProductsRepository = DefaultProductsRepository.get(),
+    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
 ) : ViewModel() {
     private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductsEvent> get() = _event
@@ -30,9 +30,9 @@ class ProductsViewModel(
     private var loadable: Boolean = false
     private var page: Int = MINIMUM_PAGE
 
-    private val _productsUi: MutableLiveData<List<ProductsItem.ProductItem>> =
+    private val _products: MutableLiveData<List<ProductsItem>> =
         MutableLiveData(emptyList())
-    val productsUi: LiveData<List<ProductsItem.ProductItem>> get() = _productsUi
+    val products: LiveData<List<ProductsItem>> get() = _products
 
     private var shoppingCartDomain = emptyList<ShoppingCartProduct>()
     private var productsDomain = emptyList<Product>()
@@ -40,12 +40,14 @@ class ProductsViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private var isApiLoading: Boolean = false
+    private val _isSingleProductLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSingleProductLoading: LiveData<Boolean> get() = _isSingleProductLoading
 
-    val handler =
+    private val handler =
         CoroutineExceptionHandler { _, exception ->
             _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
             _isLoading.value = false
+            _isSingleProductLoading.value = false
         }
 
     init {
@@ -55,7 +57,7 @@ class ProductsViewModel(
 
     fun reload() {
         _isLoading.value = true
-        _productsUi.value = emptyList()
+        _products.value = emptyList()
         shoppingCartDomain = emptyList()
 
         updateProducts(0, LOAD_PRODUCTS_SIZE * page)
@@ -67,7 +69,7 @@ class ProductsViewModel(
         size: Int = LOAD_PRODUCTS_SIZE,
     ) {
         viewModelScope.launch(handler) {
-            productsDomain = productsRepository.load(offset, size)
+            productsDomain = productsRepository.load(offset, size).getOrThrow()
             loadable = productsDomain.size == LOAD_PRODUCTS_SIZE
             updateProductsShoppingCartQuantity()
             _isLoading.value = false
@@ -75,8 +77,8 @@ class ProductsViewModel(
     }
 
     private fun updateShoppingCartQuantity() {
-        viewModelScope.launch {
-            _shoppingCartQuantity.value = shoppingCartRepository.fetchAllQuantity()
+        viewModelScope.launch(handler) {
+            _shoppingCartQuantity.value = shoppingCartRepository.fetchAllQuantity().getOrThrow()
         }
     }
 
@@ -84,20 +86,26 @@ class ProductsViewModel(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
-        if (isApiLoading) return
-        isApiLoading = true
-        updateProductQuantity(productItem, quantity + 1)
-        _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
+        if (_isSingleProductLoading.value ?: false) return
+        _isSingleProductLoading.value = true
+        viewModelScope.launch(handler) {
+            updateProductQuantity(productItem, quantity + 1)
+            _shoppingCartQuantity.value = _shoppingCartQuantity.value?.plus(1)
+            _isSingleProductLoading.value = false
+        }
     }
 
     fun minusProductToShoppingCart(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
-        if (isApiLoading) return
-        isApiLoading = true
-        updateProductQuantity(productItem, quantity - 1)
-        _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
+        if (_isSingleProductLoading.value ?: false) return
+        _isSingleProductLoading.value = true
+        viewModelScope.launch(handler) {
+            updateProductQuantity(productItem, quantity - 1)
+            _shoppingCartQuantity.value = _shoppingCartQuantity.value?.minus(1)
+            _isSingleProductLoading.value = false
+        }
     }
 
     fun updateMoreProducts() {
@@ -105,23 +113,24 @@ class ProductsViewModel(
         updateProducts()
     }
 
-    private fun updateProductQuantity(
+    private suspend fun updateProductQuantity(
         productItem: ProductsItem.ProductItem,
         quantity: Int,
     ) {
-        viewModelScope.launch(handler) {
-            val uploaded =
-                if (productItem.shoppingCartId == null) {
-                    shoppingCartRepository.add(productItem.product, quantity)
-                } else {
-                    shoppingCartRepository.updateQuantity(
-                        productItem.shoppingCartId,
-                        quantity,
-                    )
-                }
+        val uploaded =
+            if (productItem.shoppingCartId == null) {
+                shoppingCartRepository.add(productItem.product, quantity).getOrThrow()
+            } else {
+                shoppingCartRepository.updateQuantity(
+                    productItem.shoppingCartId,
+                    quantity,
+                ).getOrThrow()
+            }
 
-            _productsUi.value =
-                productsUi.value?.map { item ->
+        _products.value =
+            products.value
+                ?.filterIsInstance<ProductsItem.ProductItem>()
+                ?.map { item ->
                     if (item.product.id == productItem.product.id) {
                         item.copy(
                             selectedQuantity = uploaded?.quantity ?: 0,
@@ -131,12 +140,10 @@ class ProductsViewModel(
                         item
                     }
                 }
-            isApiLoading = false
-        }
     }
 
     private suspend fun updateProductsShoppingCartQuantity() {
-        shoppingCartDomain = shoppingCartRepository.load().shoppingCartItems
+        shoppingCartDomain = shoppingCartRepository.load().getOrThrow().shoppingCartItems
         val productUi =
             productsDomain.map { product ->
                 val target = shoppingCartDomain.find { it.product.id == product.id }
@@ -148,7 +155,11 @@ class ProductsViewModel(
                 )
             }
 
-        _productsUi.value = _productsUi.value?.plus(productUi)
+        _products.value =
+            _products.value
+                ?.filterIsInstance<ProductsItem.ProductItem>()
+                ?.plus(productUi)
+                ?.plus(ProductsItem.LoadItem)
     }
 
     companion object {

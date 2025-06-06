@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.shimmer)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
+    implementation(libs.places)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
@@ -81,4 +82,5 @@ dependencies {
     androidTestImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.mannodermaus.junit5.core)
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
+    testImplementation(kotlin("test"))
 }

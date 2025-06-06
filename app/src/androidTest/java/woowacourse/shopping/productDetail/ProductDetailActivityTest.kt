@@ -16,6 +16,7 @@ import org.junit.Test
 import woowacourse.shopping.R
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.fixture.allRequests
 import woowacourse.shopping.fixture.fakeContext
 import woowacourse.shopping.matcher.isDisplayed
 import woowacourse.shopping.matcher.matchText
@@ -37,6 +38,7 @@ class ProductDetailActivityTest {
             it.viewModelStore.clear()
         }
         scenario.recreate()
+        Thread.sleep(100)
     }
 
     @Test
@@ -56,18 +58,13 @@ class ProductDetailActivityTest {
         onView(withId(R.id.productDetailShoppingCartButton)).performClick()
 
         // then
-        val recorded =
-            buildList {
-                repeat(mockServerRule.mockShoppingCartServer.requestCount) {
-                    add(mockServerRule.mockShoppingCartServer.takeRequest())
-                }
-            }
+        val recorded = mockServerRule.mockShoppingCartServer.allRequests()
 
         val result =
             recorded.any {
                 it.method == "PATCH" && it.path == "/cart-items/0" &&
                         it.body.readUtf8()
-                            .contains("{\"quantity\" : 3}")
+                            .contains("{\"quantity\":3}")
             }
         assertThat(result).isTrue()
     }
@@ -89,7 +86,7 @@ class ProductDetailActivityTest {
             }
         }
         scenario.close()
-        scenario = ActivityScenario.launch<ProductDetailActivity>(intent)
+        scenario = ActivityScenario.launch(intent)
 
         // when - then
         onView(withId(R.id.productDetailRecentWatchingName))

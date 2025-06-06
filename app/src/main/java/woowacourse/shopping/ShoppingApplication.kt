@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.room.Room
 import woowacourse.shopping.data.authentication.repository.DefaultAuthenticationRepository
+import woowacourse.shopping.data.coupon.remote.repository.DefaultCouponRepository
+import woowacourse.shopping.data.coupon.remote.service.CouponService
 import woowacourse.shopping.data.network.ApiClient
 import woowacourse.shopping.data.product.local.database.ProductDatabase
 import woowacourse.shopping.data.product.remote.service.ProductService
@@ -34,6 +36,12 @@ class ShoppingApplication : Application() {
             .create(ShoppingCartService::class.java)
     }
 
+    private val couponService: CouponService by lazy {
+        ApiClient
+            .getApiClient(DefaultAuthenticationRepository.get())
+            .create(CouponService::class.java)
+    }
+
     override fun onCreate() {
         super.onCreate()
         productDatabase =
@@ -51,6 +59,8 @@ class ShoppingApplication : Application() {
             productDatabase.recentWatchingDao(),
             productService,
         )
+
+        DefaultCouponRepository.initialize(couponService)
 
         thread {
             DefaultAuthenticationRepository.get().updateUserAuthentication(

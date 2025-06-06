@@ -8,12 +8,16 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.view.common.MutableSingleLiveData
+import woowacourse.shopping.view.common.SingleLiveData
+import woowacourse.shopping.view.product.ProductsEvent
 import woowacourse.shopping.view.product.ProductsItem
 
 class ShoppingCartRecommendViewModel(
@@ -34,22 +38,35 @@ class ShoppingCartRecommendViewModel(
 
     private var isApiLoading: Boolean = false
 
+    private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ProductsEvent> get() = _event
+
+    private val handler =
+        CoroutineExceptionHandler { _, exception ->
+            _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
+        }
+
     init {
         _shoppingCartProductsToOrder.value = shoppingCartProductsToOrderList
         initRecentWatchingProducts()
     }
 
     private fun initRecentWatchingProducts() {
-        viewModelScope.launch {
+        viewModelScope.launch(handler) {
             val products =
                 productsRepository.getRecentRecommendWatchingProducts(MAX_RECENT_PRODUCT_LOAD_SIZE)
-            val shoppingCarts = shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
+                    .getOrThrow()
+            val shoppingCarts =
+                shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE).getOrThrow()
+
+            val category = products.firstOrNull()?.category ?: return@launch
 
             val cartProductIds: Set<Long> =
                 shoppingCarts.shoppingCartItems.map { it.product.id }.toSet()
             val recommended =
                 products
                     .filter { !cartProductIds.contains(it.id) }
+                    .filter { it.category == category }
                     .map { ProductsItem.ProductItem(product = it) }
                     .take(10)
             _recommendProducts.value = recommended
@@ -104,12 +121,13 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(handler) {
             val uploaded =
                 if (item.shoppingCartId == null) {
-                    shoppingCartRepository.add(item.product, selectedQuantity)
+                    shoppingCartRepository.add(item.product, selectedQuantity).getOrThrow()
                 } else {
                     shoppingCartRepository.updateQuantity(item.shoppingCartId, selectedQuantity)
+                        .getOrThrow()
                 }
 
             uploaded?.let {

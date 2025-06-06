@@ -30,9 +30,11 @@ class ProductAdapter(
         },
     ) {
     private var items: MutableMap<ProductsItem.ItemType, List<ProductsItem>> =
-        ProductsItem.ItemType.entries
-            .associateWith { emptyList<ProductsItem>() }
-            .toMutableMap()
+        mutableMapOf(
+            ProductsItem.ItemType.RECENT_WATCHING to emptyList(),
+            ProductsItem.ItemType.PRODUCT to emptyList(),
+        )
+
     private val existsAllViewType: Boolean
         get() =
             items.values.all { it.isNotEmpty() }
@@ -64,14 +66,12 @@ class ProductAdapter(
     }
 
     override fun submitList(item: List<ProductsItem>?) {
-        item?.let {
-            if (it.isEmpty()) return
-            val viewType = it.first().viewType
-            items[viewType] = it
+        if (item.isNullOrEmpty()) return
+        val viewType = item.first().viewType
+        items[viewType] = item
 
-            if (existsAllViewType) {
-                super.submitList(items.flatMap { entry -> entry.value })
-            }
+        if (existsAllViewType) {
+            super.submitList(items.flatMap { entry -> entry.value })
         }
     }
 

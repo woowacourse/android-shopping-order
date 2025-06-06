@@ -7,22 +7,16 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ShoppingCartProductAdapter(
     private val shoppingCartListener: ShoppingCartListener,
-) : ListAdapter<ShoppingCartItem, RecyclerView.ViewHolder>(
-        object : DiffUtil.ItemCallback<ShoppingCartItem>() {
+) : ListAdapter<ShoppingCartItem.ShoppingCartProductItem, RecyclerView.ViewHolder>(
+        object : DiffUtil.ItemCallback<ShoppingCartItem.ShoppingCartProductItem>() {
             override fun areItemsTheSame(
-                oldItem: ShoppingCartItem,
-                newItem: ShoppingCartItem,
-            ): Boolean =
-                when {
-                    oldItem is ShoppingCartItem.ShoppingCartProductItem && newItem is ShoppingCartItem.ShoppingCartProductItem ->
-                        oldItem.shoppingCartProduct.id == newItem.shoppingCartProduct.id
-
-                    else -> false
-                }
+                oldItem: ShoppingCartItem.ShoppingCartProductItem,
+                newItem: ShoppingCartItem.ShoppingCartProductItem,
+            ): Boolean = oldItem.shoppingCartProduct.id == newItem.shoppingCartProduct.id
 
             override fun areContentsTheSame(
-                oldItem: ShoppingCartItem,
-                newItem: ShoppingCartItem,
+                oldItem: ShoppingCartItem.ShoppingCartProductItem,
+                newItem: ShoppingCartItem.ShoppingCartProductItem,
             ): Boolean = oldItem == newItem
         },
     ) {
@@ -32,14 +26,10 @@ class ShoppingCartProductAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder {
-        val viewType: ShoppingCartItem.ItemType = ShoppingCartItem.ItemType.from(viewType)
-        return when (viewType) {
-            ShoppingCartItem.ItemType.PRODUCT ->
-                ShoppingCartProductViewHolder.of(
-                    parent,
-                    shoppingCartListener,
-                )
-        }
+        return ShoppingCartProductViewHolder.of(
+            parent,
+            shoppingCartListener,
+        )
     }
 
     override fun onBindViewHolder(

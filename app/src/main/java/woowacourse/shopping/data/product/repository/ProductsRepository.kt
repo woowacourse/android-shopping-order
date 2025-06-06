@@ -6,13 +6,15 @@ interface ProductsRepository {
     suspend fun load(
         page: Int,
         size: Int,
-    ): List<Product>
+    ): Result<List<Product>>
 
-    suspend fun getRecentWatchingProducts(size: Int): List<Product>
+    suspend fun getRecentWatchingProducts(size: Int): Result<List<Product>>
 
-    suspend fun getRecentRecommendWatchingProducts(size: Int): List<Product>
+    suspend fun getLatestRecentWatchingProduct(): Result<Product?>
 
-    suspend fun updateRecentWatchingProduct(product: Product)
+    suspend fun getRecentRecommendWatchingProducts(size: Int): Result<List<Product>>
 
-    suspend fun getProduct(productId: Long): Product?
+    suspend fun updateRecentWatchingProduct(product: Product): Result<Unit>
+
+    suspend fun getProduct(productId: Long): Result<Product?>
 }

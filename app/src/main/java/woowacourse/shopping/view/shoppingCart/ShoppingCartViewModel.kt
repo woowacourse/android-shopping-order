@@ -1,14 +1,18 @@
-package woowacourse.shopping.view.shoppingCart.viewModel
+package woowacourse.shopping.view.shoppingCart
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
+import woowacourse.shopping.view.common.MutableSingleLiveData
+import woowacourse.shopping.view.common.SingleLiveData
+import woowacourse.shopping.view.product.ProductsEvent
 
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.Companion.get(),
@@ -24,11 +28,47 @@ class ShoppingCartViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    val orderBarState: LiveData<ShoppingCartItem.OrderBarItem> =
+        shoppingCart.map {
+            ShoppingCartItem.OrderBarItem(
+                totalPrice =
+                    it
+                        .filter { item -> item.isChecked }
+                        .sumOf { item -> item.shoppingCartProduct.price },
+                totalQuantity =
+                    it
+                        .filter { item -> item.isChecked }
+                        .sumOf { item -> item.shoppingCartProduct.quantity },
+                isAllSelected = it.all { item -> item.isChecked },
+                isOrderEnabled = it.any { item -> item.isChecked },
+            )
+        }
+
+    val shoppingCartProductsToOrder: List<ShoppingCartProduct>
+        get() =
+            shoppingCart.value
+                ?.filter { item -> item.isChecked }
+                ?.map { item -> item.shoppingCartProduct }
+                ?: emptyList()
+
     private var page: Int = MINIMUM_PAGE
 
     private var loadable: Boolean = false
 
-    private var isApiLoading: Boolean = false
+    private val _isSingleShoppingCartLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSingleShoppingCartLoading: LiveData<Boolean> get() = _isSingleShoppingCartLoading
+
+    private val _event: MutableSingleLiveData<ProductsEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<ProductsEvent> get() = _event
+
+    private val _orderEvent: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
+    val orderEvent: SingleLiveData<OrderEvent> get() = _orderEvent
+
+    private val handler =
+        CoroutineExceptionHandler { _, exception ->
+            _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
+            _isLoading.value = false
+        }
 
     init {
         loadShoppingCart()
@@ -43,8 +83,8 @@ class ShoppingCartViewModel(
         val page = this.page - 1
         val size = COUNT_PER_PAGE
 
-        viewModelScope.launch {
-            val shoppingCarts = shoppingCartRepository.load(page, size)
+        viewModelScope.launch(handler) {
+            val shoppingCarts = shoppingCartRepository.load(page, size).getOrThrow()
             loadable = !shoppingCarts.last
 
             loadShoppingCartItems(
@@ -65,7 +105,7 @@ class ShoppingCartViewModel(
 
     private suspend fun updateShoppingCartItems() {
         val shoppingCarts =
-            shoppingCartRepository.load(0, COUNT_PER_PAGE * page).shoppingCartItems
+            shoppingCartRepository.load(0, COUNT_PER_PAGE * page).getOrThrow().shoppingCartItems
         _shoppingCart.value =
             _shoppingCart.value?.mapNotNull { item ->
                 shoppingCarts.find { it.id == item.shoppingCartProduct.id }
@@ -79,41 +119,42 @@ class ShoppingCartViewModel(
     }
 
     fun removeShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
-        if (isApiLoading) return
-        isApiLoading = true
-        viewModelScope.launch {
+        if (_isSingleShoppingCartLoading.value ?: false) return
+        _isSingleShoppingCartLoading.value = true
+        viewModelScope.launch(handler) {
             shoppingCartRepository.remove(shoppingCartProductItem.shoppingCartProduct.id)
+                .getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.postValue(true)
-            isApiLoading = false
+            _isSingleShoppingCartLoading.value = false
         }
     }
 
     fun decreaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleShoppingCartLoading.value ?: false) return
+        _isSingleShoppingCartLoading.value = true
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
                 shoppingCartProductItem.shoppingCartProduct.quantity - 1,
-            )
+            ).getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
-            isApiLoading = false
+            _isSingleShoppingCartLoading.value = false
         }
     }
 
     fun increaseQuantity(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
-        if (isApiLoading) return
-        isApiLoading = true
+        if (_isSingleShoppingCartLoading.value ?: false) return
+        _isSingleShoppingCartLoading.value = true
         viewModelScope.launch {
             shoppingCartRepository.updateQuantity(
                 shoppingCartProductItem.shoppingCartProduct.id,
                 shoppingCartProductItem.shoppingCartProduct.quantity + 1,
-            )
+            ).getOrThrow()
             updateShoppingCartItems()
             _hasUpdatedProducts.value = true
-            isApiLoading = false
+            _isSingleShoppingCartLoading.value = false
         }
     }
 
@@ -123,28 +164,33 @@ class ShoppingCartViewModel(
         loadShoppingCart()
     }
 
-    fun selectShoppingCartProduct(
-        shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
-        selected: Boolean,
-    ) {
+    fun toggleShoppingCartProduct(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
         _shoppingCart.value =
             _shoppingCart.value?.map { item ->
                 if (item.shoppingCartProduct.id == shoppingCartProductItem.shoppingCartProduct.id) {
                     return@map shoppingCartProductItem.copy(
-                        isChecked = selected,
+                        isChecked = item.isChecked.not(),
                     )
                 }
                 return@map item
             }
     }
 
-    fun selectAllShoppingCartProducts(isChecked: Boolean) {
+    fun selectAllShoppingCartProducts() {
         _shoppingCart.value =
             _shoppingCart.value?.map { item ->
                 item.copy(
-                    isChecked = isChecked,
+                    isChecked = true,
                 )
             }
+    }
+
+    fun checkoutIfPossible() {
+        if (orderBarState.value?.isOrderEnabled ?: false) {
+            _orderEvent.setValue(OrderEvent.PROCEED)
+        } else {
+            _orderEvent.setValue(OrderEvent.ABORT)
+        }
     }
 
     companion object {

@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.network
 
 import android.util.Base64
-import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.Response
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
@@ -24,7 +23,6 @@ class AppInterceptor(
             val newRequest =
                 request()
                     .newBuilder()
-                    .cacheControl(CacheControl.Builder().noCache().build())
                     .addHeader("Authorization", basicAuth)
                     .build()
             proceed(newRequest)
