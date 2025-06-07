@@ -24,3 +24,17 @@ data class Coupon(
     @SerializedName("minimumAmount")
     val minimumAmount: Int,
 )
+
+fun Coupon.toDomain(): woowacourse.shopping.order.Coupon =
+    woowacourse.shopping.order.Coupon(
+        availableTime = availableTime.toDomain(),
+        buyQuantity = buyQuantity,
+        code = code,
+        description = description,
+        discount = discount,
+        discountType = discountType,
+        expirationDate = expirationDate,
+        getQuantity = getQuantity,
+        id = id,
+        minimumAmount = minimumAmount,
+    )
