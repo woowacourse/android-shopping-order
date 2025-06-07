@@ -26,12 +26,16 @@ class RecommendViewModel(
 
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val recommendProducts: LiveData<List<CartItemUiModel>> = _recommendProducts
+
     private val _selectedItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val selectedItems: LiveData<List<CartItemUiModel>> = _selectedItems
+
     private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData()
     val selectedTotalPrice: LiveData<Int> = _selectedTotalPrice
+
     private val _selectedTotalCount: MutableLiveData<Int> = MutableLiveData()
     val selectedTotalCount: LiveData<Int> = _selectedTotalCount
+
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
@@ -39,7 +43,7 @@ class RecommendViewModel(
         val initialItems =
             savedStateHandle.get<ArrayList<CartItemUiModel>>(KEY_SELECT_ITEMS) ?: emptyList()
         _selectedItems.value = initialItems
-        setupPriceCount(initialItems)
+        setupPriceCount()
         fetchData()
     }
 
@@ -68,7 +72,7 @@ class RecommendViewModel(
             cartRepository
                 .insertProduct(cartItem.product.toDomain(), 1)
                 .onSuccess {
-                    updateQuantity(productId = cartItem.product.id, 1)
+                    updateQuantity(cartItem.product.id, 1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_add_cart_fail
                 }
@@ -103,31 +107,44 @@ class RecommendViewModel(
         productId: Long,
         delta: Int,
     ) {
-        val currentItems = _recommendProducts.value ?: return
-        val updatedItem =
-            currentItems.map {
-                if (it.product.id == productId) {
-                    updateSelectedInfo(it.product.price * delta, delta)
-                    it.copy(isSelected = true, quantity = it.quantity + delta)
+        val updatedItems =
+            _recommendProducts.value.orEmpty().map { item ->
+                if (item.product.id == productId) {
+                    val newQuantity = item.quantity + delta
+                    item.copy(
+                        isSelected = true,
+                        quantity = newQuantity,
+                        totalPrice = item.product.price * newQuantity,
+                    )
                 } else {
-                    it
+                    item
                 }
             }
-        _recommendProducts.value = updatedItem
+        _recommendProducts.value = updatedItems
+
+        val changedItem = updatedItems.first { it.product.id == productId }
+        updateSelectedItem(changedItem)
+        setupPriceCount()
     }
 
-    private fun setupPriceCount(items: List<CartItemUiModel>) {
-        _selectedTotalPrice.value = items.sumOf { it.totalPrice }
-        _selectedTotalCount.value = items.sumOf { it.quantity }
+    private fun updateSelectedItem(item: CartItemUiModel) {
+        if (!item.isSelected) return
+
+        val currentSelected = _selectedItems.value.orEmpty().toMutableList()
+        val index = currentSelected.indexOfFirst { it.product.id == item.product.id }
+
+        when {
+            item.quantity == 0 && index != -1 -> currentSelected.removeAt(index)
+            item.quantity > 0 && index != -1 -> currentSelected[index] = item
+            item.quantity > 0 -> currentSelected.add(item)
+        }
+
+        _selectedItems.value = currentSelected
     }
 
-    private fun updateSelectedInfo(
-        priceDelta: Int,
-        countDelta: Int,
-    ) {
-        val oldPrice = _selectedTotalPrice.value ?: return
-        val oldCount = _selectedTotalCount.value ?: return
-        _selectedTotalPrice.value = oldPrice + priceDelta
-        _selectedTotalCount.value = oldCount + countDelta
+    private fun setupPriceCount() {
+        val selectedItems = this.selectedItems.value ?: return
+        _selectedTotalPrice.value = selectedItems.sumOf { it.totalPrice }
+        _selectedTotalCount.value = selectedItems.sumOf { it.quantity }
     }
 }
