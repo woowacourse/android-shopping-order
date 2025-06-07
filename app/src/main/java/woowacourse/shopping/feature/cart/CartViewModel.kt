@@ -130,7 +130,7 @@ class CartViewModel(
                         val updatedCart = cart.copy(id = newId, quantity = 1)
                         updateCartItemList(_recommendItems, updatedCart)
                         toggleCheck(updatedCart, isRecommend = true)
-                        fetchTotalItemsCount()
+                        changeCartQuantity(cart, 1, isRecommend = true)
                     }.onFailure {
                         Log.e("addRecommend", "추천 상품 추가 실패", it)
                     }
@@ -143,7 +143,7 @@ class CartViewModel(
 
     fun removeFromRecommendCart(cart: CartProduct) {
         if (cart.quantity == 1) {
-            delete(cart)
+            delete(cart, isRecommend = true)
         } else {
             changeCartQuantity(cart, -1, isRecommend = true)
         }
@@ -190,12 +190,19 @@ class CartViewModel(
         }
     }
 
-    private fun delete(cart: CartProduct) {
+    private fun delete(
+        cart: CartProduct,
+        isRecommend: Boolean = false,
+    ) {
         viewModelScope.launch {
             cartRepository
                 .deleteCart(cart.id)
                 .onSuccess {
-                    _carts.value = _carts.value?.filter { it.id != cart.id }
+                    if (isRecommend) {
+                        _recommendItems.value = _recommendItems.value?.filter { it.id != cart.id }
+                    } else {
+                        _carts.value = _carts.value?.filter { it.id != cart.id }
+                    }
                     fetchTotalItemsCount()
                 }.onFailure {
                     Log.e("deleteCart", "장바구니 삭제 실패", it)

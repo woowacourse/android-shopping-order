@@ -35,6 +35,7 @@ class CartRecommendFragment : Fragment() {
                 LinearLayoutManager.HORIZONTAL,
                 false,
             )
+        binding.rvRecommend.itemAnimator = null
         return binding.root
     }
 
