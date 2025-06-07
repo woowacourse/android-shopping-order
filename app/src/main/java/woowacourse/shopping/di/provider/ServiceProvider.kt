@@ -1,5 +1,6 @@
 package woowacourse.shopping.di.provider
 
+import woowacourse.shopping.data.network.RetrofitClient
 import woowacourse.shopping.data.service.CartService
 import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OrderService

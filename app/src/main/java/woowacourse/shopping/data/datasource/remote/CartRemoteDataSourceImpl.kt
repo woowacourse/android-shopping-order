@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.datasource.remote
 
 import retrofit2.Response
-import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.model.cart.AddCartItemCommand
 import woowacourse.shopping.data.model.cart.CartItemResponse
 import woowacourse.shopping.data.model.cart.Quantity
@@ -18,7 +17,6 @@ class CartRemoteDataSourceImpl(
     ): Result<PageableResponse<CartItemResponse>> =
         safeApiCall {
             cartService.fetchCartItems(
-                AUTHORIZATION_KEY,
                 page,
                 size,
             )
@@ -26,7 +24,7 @@ class CartRemoteDataSourceImpl(
 
     override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
         runCatching {
-            val response = cartService.addCartItem(AUTHORIZATION_KEY, addCartItemCommand)
+            val response = cartService.addCartItem(addCartItemCommand)
             val cartId = response.extractCartItemId()
             requireNotNull(cartId) { ADD_CART_PRODUCT_FAILURE_MESSAGE.format(addCartItemCommand.productId) }
         }
@@ -34,7 +32,6 @@ class CartRemoteDataSourceImpl(
     override suspend fun deleteCartItem(cartId: Long): Result<Unit> =
         safeApiCall {
             cartService.deleteCartItem(
-                AUTHORIZATION_KEY,
                 cartId,
             )
         }
@@ -44,14 +41,12 @@ class CartRemoteDataSourceImpl(
         quantity: Quantity,
     ): Result<Unit> =
         safeApiCall {
-            cartService.patchCartItemQuantity(AUTHORIZATION_KEY, cartId, quantity)
+            cartService.patchCartItemQuantity(cartId, quantity)
         }
 
     override suspend fun fetchCartItemCount(): Result<Quantity> =
         safeApiCall {
-            cartService.fetchCartItem(
-                AUTHORIZATION_KEY,
-            )
+            cartService.fetchCartItem()
         }
 
     private fun Response<*>.extractCartItemId(): Long? {
@@ -64,7 +59,6 @@ class CartRemoteDataSourceImpl(
 
     companion object {
         private const val ADD_CART_PRODUCT_FAILURE_MESSAGE = "%s 상품을 장바구니에 상품을 추가하지 못했습니다."
-        private const val AUTHORIZATION_KEY = "Basic ${BuildConfig.AUTHORIZATION_KEY}"
         private const val HEADER_LOCATION = "Location"
         private const val HEADER_CART_ID_PREFIX = "/cart-items/"
     }
