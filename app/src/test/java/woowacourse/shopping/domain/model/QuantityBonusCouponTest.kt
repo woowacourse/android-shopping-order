@@ -77,7 +77,7 @@ class QuantityBonusCouponTest {
     }
 
     @Test
-    fun `모든 조건을 만족하면 쿠폰을 사용할 수 있다`() {
+    fun `수량 조건과 유효기간을 만족하면 쿠폰을 사용할 수 있다`() {
         // given
         val coupon = DUMMY_COUPON_2
         val product = Product(DUMMY_PRODUCT_DETAIL_2, cartId = 1, quantity = 3, isSelected = true)
