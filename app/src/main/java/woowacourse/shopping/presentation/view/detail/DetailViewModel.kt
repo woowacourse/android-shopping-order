@@ -5,7 +5,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
@@ -71,29 +73,36 @@ class DetailViewModel(
         val amountToAdd = _amount.value ?: 1
         val updatedAmount = product.amount + amountToAdd
 
-        cartRepository.upsertCartItemQuantity(
-            productId = product.id,
-            cartId = if (product.cartId != 0L) product.cartId else null,
-            quantity = updatedAmount,
-        ) {
-            _product.postValue(product.copy(amount = updatedAmount))
-            _saveState.postValue(Unit)
+        viewModelScope.launch {
+            cartRepository
+                .upsertCartItemQuantity(
+                    productId = product.id,
+                    cartId = if (product.cartId != 0L) product.cartId else null,
+                    quantity = updatedAmount,
+                ).onSuccess {
+                    _product.postValue(product.copy(amount = updatedAmount))
+                    _saveState.postValue(Unit)
+                }
         }
     }
 
     fun loadProductById(productId: Long) {
-        productRepository.getProductById(productId) { product ->
-            product?.let {
-                fetchProduct(it.toUiModel())
-            }
+        viewModelScope.launch {
+            productRepository
+                .getProductById(productId)
+                .onSuccess { product ->
+                    _product.postValue(product.toUiModel())
+                }
         }
     }
 
     fun fetchLastViewedProduct(currentProductId: Long) {
-        productRepository.loadLastViewedProduct(currentProductId) { product ->
-            if (product != null) {
-                _lastViewedProduct.postValue(product.toUiModel())
-            }
+        viewModelScope.launch {
+            productRepository
+                .loadLastViewedProduct(currentProductId)
+                .onSuccess { product ->
+                    _lastViewedProduct.postValue(product.toUiModel())
+                }
         }
     }
 

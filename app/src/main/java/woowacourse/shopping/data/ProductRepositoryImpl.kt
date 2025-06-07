@@ -1,107 +1,73 @@
 package woowacourse.shopping.data
 
-import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.db.RecentProductDao
-import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import kotlin.concurrent.thread
 
 class ProductRepositoryImpl(
     private val recentProductDao: RecentProductDao,
     private val productDataSource: ProductDataSource,
-    private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
-    override fun loadProducts(
+    override suspend fun loadProducts(
         page: Int,
         loadSize: Int,
-        callback: (List<Product>, Boolean) -> Unit,
-    ) {
-        productDataSource.fetchProducts(
-            page = page,
-            size = loadSize,
-        ) {
-            val products: List<Product> = it.productContent.map { it.toProduct() }
+    ): Result<Pair<List<Product>, Boolean>> =
+        runCatching {
+            val result =
+                productDataSource
+                    .fetchProducts(
+                        page = page,
+                        size = loadSize,
+                    ).getOrThrow()
+
+            val products = result.productContent.map { it.toProduct() }
             val hasMore = products.size >= loadSize
 
-            callback(products, hasMore)
+            products to hasMore
         }
-    }
 
-    override fun getProductById(
-        id: Long,
-        callback: (Product?) -> Unit,
-    ) {
-        productDataSource.fetchProduct(id) {
-            val product = it.toProduct()
-            callback(product)
+    override suspend fun getProductById(id: Long): Result<Product> =
+        runCatching {
+            productDataSource.fetchProduct(id).getOrThrow().toProduct()
         }
-    }
 
-    override fun loadCartItems(callback: (List<CartItem>?) -> Unit) {
-        cartItemDataSource.fetchCartItems(
-            page = 0,
-            size = Int.MAX_VALUE,
-        ) { it ->
-            callback(it?.content?.map { it.toCartItem() }.orEmpty())
+    override suspend fun loadProductsByCategory(category: String): Result<List<Product>> =
+        runCatching {
+            val response =
+                productDataSource
+                    .fetchProducts(
+                        page = 0,
+                        size = Int.MAX_VALUE,
+                    ).getOrThrow()
+
+            response.productContent
+                .map { it.toProduct() }
+                .filter { it.category == category }
         }
-    }
 
-    override fun addRecentProduct(
-        product: Product,
-        callback: (Product?) -> Unit,
-    ) {
-        thread {
+    override suspend fun addRecentProduct(product: Product): Result<Product> =
+        runCatching {
             recentProductDao.insert(product.toRecentEntity())
-            callback(product)
+            product
         }
-    }
 
-    override fun loadRecentProducts(
-        limit: Int,
-        callback: (List<Product>) -> Unit,
-    ) {
-        thread {
-            val recentEntities = recentProductDao.getRecentProducts(limit)
-            val recentProducts = recentEntities.map { it.toProduct() }
-            callback(recentProducts)
+    override suspend fun loadRecentProducts(limit: Int): Result<List<Product>> =
+        runCatching {
+            recentProductDao.getRecentProducts(limit).map { it.toProduct() }
         }
-    }
 
-    override fun loadLastViewedProduct(
-        currentProductId: Long,
-        callback: (Product?) -> Unit,
-    ) {
-        thread {
-            val entity = recentProductDao.getLastViewedProduct(currentProductId)
-            val product = entity?.toProduct()
-            callback(product)
+    override suspend fun loadLastViewedProduct(currentProductId: Long): Result<Product> =
+        runCatching {
+            recentProductDao.getLastViewedProduct(currentProductId)?.toProduct()
+                ?: throw NoSuchElementException("최근 본 상품이 없습니다.")
         }
-    }
 
-    override fun getMostRecentProduct(callback: (Product?) -> Unit) {
-        thread {
-            val entity = recentProductDao.getMostRecentProduct()
-            val product = entity?.toProduct()
-            callback(product)
+    override suspend fun getMostRecentProduct(): Result<Product> =
+        runCatching {
+            recentProductDao.getMostRecentProduct()?.toProduct()
+                ?: throw NoSuchElementException("가장 최근 본 상품이 없습니다.")
         }
-    }
-
-    override fun loadProductsByCategory(
-        category: String,
-        callback: (List<Product>) -> Unit,
-    ) {
-        productDataSource.fetchProducts(
-            page = 0,
-            size = Int.MAX_VALUE,
-        ) {
-            val products: List<Product> = it.productContent.map { it.toProduct() }
-            val filteredProducts = products.filter { it.category == category }
-            callback(filteredProducts)
-        }
-    }
 }
