@@ -8,10 +8,13 @@ class PercentageDiscountCoupon(
     override val detail: CouponDetail,
     override val isSelected: Boolean = false,
 ) : Coupon {
-    override fun apply(products: Products): Price {
+    override fun apply(
+        products: Products,
+        nowDateTime: LocalDateTime,
+    ): Price {
         val original = products.selectedProductsPrice
 
-        val isAvailable = getIsAvailable(products)
+        val isAvailable = getIsAvailable(products, nowDateTime)
 
         val discountRate = (detail.discount ?: MINIMUM_PRICE).coerceIn(0, 100)
         val discount = if (isAvailable) (original * discountRate / 100.0).toInt() else MINIMUM_PRICE

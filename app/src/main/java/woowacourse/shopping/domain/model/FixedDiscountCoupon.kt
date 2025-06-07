@@ -8,11 +8,14 @@ class FixedDiscountCoupon(
     override val detail: CouponDetail,
     override val isSelected: Boolean = false,
 ) : Coupon {
-    override fun apply(products: Products): Price {
+    override fun apply(
+        products: Products,
+        nowDateTime: LocalDateTime,
+    ): Price {
         val original = products.selectedProductsPrice
 
         val discount =
-            if (getIsAvailable(products)) {
+            if (getIsAvailable(products, nowDateTime)) {
                 detail.discount ?: MINIMUM_PRICE
             } else {
                 MINIMUM_PRICE

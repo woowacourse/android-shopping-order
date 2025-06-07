@@ -8,9 +8,12 @@ class QuantityBonusCoupon(
     override val detail: CouponDetail,
     override val isSelected: Boolean = false,
 ) : Coupon {
-    override fun apply(products: Products): Price {
+    override fun apply(
+        products: Products,
+        nowDateTime: LocalDateTime,
+    ): Price {
         val original = products.selectedProductsPrice
-        if (!getIsAvailable(products)) return Price(original = original)
+        if (!getIsAvailable(products, nowDateTime)) return Price(original = original)
 
         val targetProduct =
             products.products

@@ -39,7 +39,6 @@ class PaymentViewModel(
                     updateUiState { current ->
                         current.copy(
                             products = products,
-                            price = current.coupons.applyCoupon(products),
                         )
                     }
                 }.onFailure {
@@ -57,7 +56,10 @@ class PaymentViewModel(
             getCouponsUseCase()
                 .onSuccess {
                     updateUiState { current ->
-                        current.copy(coupons = it.filterAvailableCoupons(products, nowDateTime))
+                        current.copy(
+                            coupons = it.filterAvailableCoupons(products, nowDateTime),
+                            price = current.coupons.applyCoupon(products, nowDateTime),
+                        )
                     }
                 }.onFailure {
                     updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
@@ -66,7 +68,10 @@ class PaymentViewModel(
         }
     }
 
-    fun selectCoupon(couponId: Int) {
+    fun selectCoupon(
+        couponId: Int,
+        nowDateTime: LocalDateTime = LocalDateTime.now(),
+    ) {
         updateUiState { current ->
             current.copy(
                 coupons = current.coupons.selectCoupon(couponId),
@@ -74,7 +79,7 @@ class PaymentViewModel(
         }
         updateUiState { current ->
             current.copy(
-                price = current.coupons.applyCoupon(current.products),
+                price = current.coupons.applyCoupon(current.products, nowDateTime),
             )
         }
     }

@@ -17,12 +17,12 @@ import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.model.DUMMY_COUPONS_1
+import woowacourse.shopping.model.DUMMY_LOCAL_DATE_TIME_1
 import woowacourse.shopping.model.DUMMY_PRODUCTS_1
 import woowacourse.shopping.model.DUMMY_PRODUCTS_3
 import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
-import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -59,7 +59,7 @@ class PaymentViewModelTest {
             coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
-            viewModel.loadCoupons(DUMMY_PRODUCTS_3, LocalDateTime.of(2025, 6, 15, 6, 30))
+            viewModel.loadCoupons(DUMMY_PRODUCTS_3, DUMMY_LOCAL_DATE_TIME_1)
 
             val state = viewModel.uiState.getOrAwaitValue()
 
@@ -73,21 +73,23 @@ class PaymentViewModelTest {
     @Test
     fun `쿠폰을 선택하면 선택된 쿠폰만 참이 된다`() =
         runTest {
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_3.products)
             coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
 
-            viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
+            viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
+            viewModel.loadCoupons(DUMMY_PRODUCTS_3, DUMMY_LOCAL_DATE_TIME_1)
 
             viewModel.selectCoupon(
                 DUMMY_COUPONS_1.value
                     .first()
                     .detail.id,
+                DUMMY_LOCAL_DATE_TIME_1,
             )
 
             val state = viewModel.uiState.getOrAwaitValue()
             val selected = state.coupons.value.filter { it.isSelected }
             assertThat(selected).hasSize(1)
-            assertThat(state.price.result).isGreaterThan(0) // 할인 적용 여부
+            assertThat(state.price.result).isGreaterThan(0)
         }
 
     @Test

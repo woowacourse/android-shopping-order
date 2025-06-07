@@ -19,8 +19,11 @@ value class Coupons(
         )
     }
 
-    fun applyCoupon(products: Products): Price =
-        value.find { it.isSelected }?.apply(products)
+    fun applyCoupon(
+        products: Products,
+        nowDateTime: LocalDateTime,
+    ): Price =
+        value.find { it.isSelected }?.apply(products, nowDateTime)
             ?: Price(products.selectedProductsPrice)
 
     fun filterAvailableCoupons(

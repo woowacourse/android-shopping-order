@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.QuantityBonusCoupon
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 val DUMMY_PRODUCT_DETAIL_1 =
@@ -166,3 +167,5 @@ val DUMMY_COUPON_4: Coupon =
     )
 
 val DUMMY_COUPONS_1: Coupons = Coupons(listOf(DUMMY_COUPON_1, DUMMY_COUPON_2, DUMMY_COUPON_3, DUMMY_COUPON_4))
+
+val DUMMY_LOCAL_DATE_TIME_1: LocalDateTime = LocalDateTime.of(2025, 6, 15, 6, 30)
